@@ -1,9 +1,10 @@
-.PHONY: b bundle s server
-b bundle:
-	bundle install
+.PHONY: b bundle s server t test
+
+t test:
+	bundle exec rspec
 
 s server:
 	bundle exec ./bin/rails server
 
-t test:
-	bundle exec rake test
+b bundle:
+	bundle install --no-deployment --path vendor/bundle

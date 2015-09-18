@@ -12,12 +12,22 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'coveralls', require: false
 
-group :development, :test do
+group :development do
+  gem 'guard'
+  gem 'bullet'
   gem 'byebug'
+  gem 'pry-rails'
+  gem 'pry-doc'
+  gem 'hirb'
+  gem 'hirb-unicode'
+  gem 'awesome_print'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'spring'
+  gem 'guard-rspec'
 end
 
-group :development do
-  gem 'web-console', '~> 2.0'
-  gem 'spring'
+group :development, :test do
+  gem 'rspec-rails'
 end
 
