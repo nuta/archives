@@ -8,7 +8,7 @@ module ICS
   def parse(text)
     name, block = parse_block(concat_lines(text))
     if name != 'VCALENDAR'
-      raise 'iCalendar data does not start with BEGIN:VCALENDAR'
+      raise 'text does not start with BEGIN:VCALENDAR'
     end
 
     block
