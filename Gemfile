@@ -8,8 +8,6 @@ group :development do
   gem 'spring'
   gem 'byebug'
   gem 'awesome_print'
-  gem 'pry-rails'
-  gem 'pry-doc'
   gem 'hirb'
   gem 'hirb-unicode'
   gem 'guard'
@@ -21,3 +19,7 @@ group :test do
   gem 'coveralls', require: false
 end
 
+group :development, :test do
+  gem 'pry-rails'
+  gem 'pry-doc'
+end
