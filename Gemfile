@@ -12,6 +12,7 @@ group :development do
   gem 'hirb-unicode'
   gem 'guard'
   gem 'guard-rspec'
+  gem 'erd'
 end
 
 group :test do
