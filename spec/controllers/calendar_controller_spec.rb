@@ -1,7 +1,12 @@
 require 'rails_helper'
 
+RSpec.describe CalendarController, type: :controller do
+  it 'responds OPTIONS requests' do
+    process :options, 'OPTIONS', :user => 'foo', :uri => 'bar'
+    expect(response).to have_http_status(200)
+    expect(response.header).to include('DAV')
+  end
 
-describe 'PROPFIND' do
   it 'responds a request' do
     headers = {
       'Content-Type' => 'text/xml',
@@ -31,7 +36,6 @@ describe 'PROPFIND' do
   </A:prop>
 </A:propfind>
 EOS
-
-#    request_via_redirect 'PROPFIND', '/calendar/', nil, headers
+    # TODO: send a request
   end
 end
