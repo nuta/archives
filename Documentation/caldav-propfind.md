@@ -1,6 +1,6 @@
 PROPFIND examples
 =================
-Collection of PROPFIND requests. Server is [radicale]().
+Collection of PROPFIND requests. Server is [Radicale](http://radicale.org/).
 
 First request of OS X Calendar
 ------------------------------
