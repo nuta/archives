@@ -1,8 +1,11 @@
 PROPFIND examples
 =================
+Collection of PROPFIND requests. Server is [radicale]().
 
-Get a list of calendars
------------------------
+First request of OS X Calendar
+------------------------------
+It checks functionalities of the CalDAV server.
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <A:propfind xmlns:A="DAV:">
@@ -77,7 +80,8 @@ Get a list of calendars
 </multistatus>
 ```
 
---------------
+Get a list of calendars
+-----------------------
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <A:propfind xmlns:A="DAV:">
