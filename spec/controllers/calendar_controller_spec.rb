@@ -7,7 +7,7 @@ RSpec.describe CalendarController, type: :controller do
     expect(response.header).to include('DAV')
   end
 
-  it 'responds a request' do
+  it 'responds a PROPFIND request (get a list of calendars)' do
     headers = {
       'Content-Type' => 'text/xml',
       'Depth'        => '0',
@@ -36,6 +36,8 @@ RSpec.describe CalendarController, type: :controller do
   </A:prop>
 </A:propfind>
 EOS
-    # TODO: send a request
+
+    process :propfind, 'PROPFIND', :user => 'john', :uri => '/'
+    expect(response).to have_http_status(207)
   end
 end
