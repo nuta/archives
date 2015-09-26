@@ -1,11 +1,32 @@
-PROPFIND examples
+Request examples
 =================
-Collection of PROPFIND requests. Server is [Radicale](http://radicale.org/).
+Collection of CalDAV requests. Server is [Radicale](http://radicale.org/).
+
+For OS X Calendar users
+-----------------------
+OS X Calendar.app has debugging mode and a feature to log communication with servers
+(excluding iCloud). To enable it, use `defaults(1)`:
+
+```
+$ defaults write com.apple.iCal IncludeDebugMenu 1  # enable debug menu
+$ defaults write com.apple.iCal LogHTTPActivity -boolean TRUE  # logging HTTP activities
+```
+*Tested in Yosemite*
+
+You can investigate its log in Console.app.
+
+
 
 First request of OS X Calendar
 ------------------------------
 It checks functionalities of the CalDAV server.
 
+*HTTP request header:*
+```
+PROPFIND / HTTP/1.1
+```
+
+*HTTP request body*
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <A:propfind xmlns:A="DAV:">
@@ -25,8 +46,68 @@ It checks functionalities of the CalDAV server.
     <A:supported-report-set/>
   </A:prop>
 </A:propfind>
+
+Response content:
+<?xml version="1.0"?>
+<multistatus xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:CS="http://calendarserver.org/ns/">
+  <response>
+    <href>/</href>
+    <propstat>
+      <prop>
+        <C:calendar-home-set>
+          <href>/</href>
+        </C:calendar-home-set>
+        <C:calendar-user-address-set>
+          <href>/</href>
+        </C:calendar-user-address-set>
+        <displayname />
+        <principal-collection-set>
+          <href>/</href>
+        </principal-collection-set>
+        <principal-URL>
+          <href>/</href>
+        </principal-URL>
+        <supported-report-set>
+          <supported-report>
+            <report>principal-property-search</report>
+          </supported-report>
+          <supported-report>
+            <report>sync-collection</report>
+          </supported-report>
+          <supported-report>
+            <report>expand-property</report>
+          </supported-report>
+          <supported-report>
+            <report>principal-search-property-set</report>
+          </supported-report>
+        </supported-report-set>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <current-user-principal />
+        <CS:dropbox-home-URL />
+        <CS:email-address-set />
+        <CS:notification-URL />
+        <resource-id />
+        <C:schedule-inbox-URL />
+        <C:schedule-outbox-URL />
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+</multistatus>
 ```
 
+----
+
+*HTTP response header:*
+```
+HTTP/1.1 207 Multi-Status
+```
+
+*HTTP response body*
 ```xml
 <?xml version="1.0"?>
 <multistatus xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:CS="http://calendarserver.org/ns/">
@@ -80,8 +161,16 @@ It checks functionalities of the CalDAV server.
 </multistatus>
 ```
 
-Get a list of calendars
------------------------
+
+Get a list of calendar
+----------------------
+
+*HTTP request header:*
+```
+PROPFIND / HTTP/1.1
+```
+
+*HTTP request body*
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <A:propfind xmlns:A="DAV:">
@@ -127,6 +216,15 @@ Get a list of calendars
 </A:propfind>
 ```
 
+
+----
+
+*HTTP response header:*
+```
+HTTP/1.1 207 Multi-Status
+```
+
+*HTTP response body*
 ```xml
 <?xml version="1.0"?>
 <multistatus xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:CS="http://calendarserver.org/ns/" xmlns:ICAL="http://apple.com/ns/ical/" xmlns:ME="http://me.com/_namespace/">
@@ -342,7 +440,7 @@ END:VALARM
     <href>/73177CD3-7C11-4324-9A4D-89041BC18691/</href>
     <propstat>
       <prop>
-        <ICAL:calendar-color>#F64F00FF</ICAL:calendar-color>
+        <ICAL:calendar-color>#44A703FF</ICAL:calendar-color>
         <C:calendar-free-busy-set>
         </C:calendar-free-busy-set>
         <ICAL:calendar-order>7</ICAL:calendar-order>
@@ -379,7 +477,7 @@ END:VCALENDAR
             <write-content />
           </privilege>
         </current-user-privilege-set>
-        <displayname>Untitled</displayname>
+        <displayname>Hello</displayname>
         <CS:getctag>"62f8a81855896e2f251dd39d06fabe43"</CS:getctag>
         <resourcetype>
           <C:calendar />
@@ -434,6 +532,192 @@ END:VCALENDAR
         <CS:subscribed-strip-todos />
         <C:supported-calendar-component-sets />
         <sync-token />
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+</multistatus>
+```
+
+Get a ctag
+----------
+It requests Calendar Collection Entity Tag (ctag in short), a non-standard extension
+of CalDAV introduced by Apple. [Specification](http://svn.calendarserver.org/repository/calendarserver/CalendarServer/trunk/doc/Extensions/caldav-ctag.txt)
+
+*HTTP request header:*
+```
+PROPFIND /73177CD3-7C11-4324-9A4D-89041BC18691/ HTTP/1.1
+```
+
+*HTTP request body*
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<A:propfind xmlns:A="DAV:">
+  <A:prop>
+    <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+    <A:sync-token/>
+  </A:prop>
+</A:propfind>
+```
+
+----
+
+*HTTP response header:*
+```
+HTTP/1.1 207 Multi-Status
+```
+
+*HTTP response body*
+```xml
+<?xml version="1.0"?>
+<multistatus xmlns="DAV:" xmlns:CS="http://calendarserver.org/ns/">
+  <response>
+    <href>/73177CD3-7C11-4324-9A4D-89041BC18691/</href>
+    <propstat>
+      <prop>
+        <CS:getctag>"62f8a81855896e2f251dd39d06fabe43"</CS:getctag>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <sync-token />
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+</multistatus>
+```
+
+
+Get a list of calendar objects
+------------------------------
+
+*HTTP request header:*
+```
+PROPFIND /73177CD3-7C11-4324-9A4D-89041BC18691/ HTTP/1.1
+```
+
+*HTTP request body*
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<A:propfind xmlns:A="DAV:">
+  <A:prop>
+    <A:getcontenttype/>
+    <A:getetag/>
+  </A:prop>
+</A:propfind>
+```
+
+----
+
+*HTTP response header:*
+```
+HTTP/1.1 207 Multi-Status
+```
+
+*HTTP response body*
+```xml
+<?xml version="1.0"?>
+<multistatus xmlns="DAV:">
+  <response>
+    <href>/73177CD3-7C11-4324-9A4D-89041BC18691/80206729-DA20-4185-9497-F2521433F3E2.ics</href>
+    <propstat>
+      <prop>
+        <getcontenttype>text/calendar; component=vevent</getcontenttype>
+        <getetag>"54d119af7a4d399276ecc5ba88904a30"</getetag>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/73177CD3-7C11-4324-9A4D-89041BC18691/</href>
+    <propstat>
+      <prop>
+        <getcontenttype>text/calendar</getcontenttype>
+        <getetag>"62f8a81855896e2f251dd39d06fabe43"</getetag>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/73177CD3-7C11-4324-9A4D-89041BC18691/7AB4DF85-0828-455D-8938-ED35B06F5E1D.ics</href>
+    <propstat>
+      <prop>
+        <getcontenttype>text/calendar; component=vevent</getcontenttype>
+        <getetag>"5e341bfbf438ce34b3afefd6bc68cc69"</getetag>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+  </response>
+</multistatus>
+```
+
+
+Get contents of calendar objects
+--------------------------------
+
+*HTTP request header:*
+```
+REPORT /73177CD3-7C11-4324-9A4D-89041BC18691 HTTP/1.1
+```
+
+*HTTP request body*
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<B:calendar-multiget xmlns:B="urn:ietf:params:xml:ns:caldav">
+  <A:prop xmlns:A="DAV:">
+    <A:getetag/>
+    <B:calendar-data/>
+    <C:updated-by xmlns:C="http://calendarserver.org/ns/"/>
+    <C:created-by xmlns:C="http://calendarserver.org/ns/"/>
+  </A:prop>
+  <A:href xmlns:A="DAV:">/73177CD3-7C11-4324-9A4D-89041BC18691/80206729-DA20-4185-9497-F2521433F3E2.ics</A:href>
+  <A:href xmlns:A="DAV:">/73177CD3-7C11-4324-9A4D-89041BC18691/7AB4DF85-0828-455D-8938-ED35B06F5E1D.ics</A:href>
+</B:calendar-multiget>
+```
+
+----
+
+*HTTP response header:*
+```
+HTTP/1.1 207 Multi-Status
+```
+
+*HTTP response body*
+```xml
+<?xml version="1.0"?>
+<multistatus xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:CS="http://calendarserver.org/ns/">
+  <response>
+    <href>/73177CD3-7C11-4324-9A4D-89041BC18691/7AB4DF85-0828-455D-8938-ED35B06F5E1D.ics</href>
+    <propstat>
+      <prop>
+        <getetag>"5e341bfbf438ce34b3afefd6bc68cc69"</getetag>
+        <C:calendar-data>BEGIN:VCALENDAR ...</C:calendar-data>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <CS:updated-by />
+        <CS:created-by />
+      </prop>
+      <status>HTTP/1.1 404 Not Found</status>
+    </propstat>
+  </response>
+  <response>
+    <href>/73177CD3-7C11-4324-9A4D-89041BC18691/80206729-DA20-4185-9497-F2521433F3E2.ics</href>
+    <propstat>
+      <prop>
+        <getetag>"54d119af7a4d399276ecc5ba88904a30"</getetag>
+        <C:calendar-data>BEGIN:VCALENDAR ...</C:calendar-data>
+      </prop>
+      <status>HTTP/1.1 200 OK</status>
+    </propstat>
+    <propstat>
+      <prop>
+        <CS:updated-by />
+        <CS:created-by />
       </prop>
       <status>HTTP/1.1 404 Not Found</status>
     </propstat>
