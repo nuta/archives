@@ -1,6 +1,6 @@
 class CalendarController < ApplicationController
   def options
-    headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, PROPFIND'
+    headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, PROPFIND, PROPPATCH, REPORT'
     headers['DAV']   = ' 1, 2, calendar-access'
     head :ok
   end
@@ -18,6 +18,14 @@ class CalendarController < ApplicationController
   end
 
   def mkcalendar
+    render :text => 'not implemented', :status => :not_implemented
+  end
+
+  def report
+    render :text => 'not implemented', :status => :not_implemented
+  end
+
+  def proppatch
     render :text => 'not implemented', :status => :not_implemented
   end
 
