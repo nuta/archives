@@ -46,58 +46,6 @@ PROPFIND / HTTP/1.1
     <A:supported-report-set/>
   </A:prop>
 </A:propfind>
-
-Response content:
-<?xml version="1.0"?>
-<multistatus xmlns="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav" xmlns:CS="http://calendarserver.org/ns/">
-  <response>
-    <href>/</href>
-    <propstat>
-      <prop>
-        <C:calendar-home-set>
-          <href>/</href>
-        </C:calendar-home-set>
-        <C:calendar-user-address-set>
-          <href>/</href>
-        </C:calendar-user-address-set>
-        <displayname />
-        <principal-collection-set>
-          <href>/</href>
-        </principal-collection-set>
-        <principal-URL>
-          <href>/</href>
-        </principal-URL>
-        <supported-report-set>
-          <supported-report>
-            <report>principal-property-search</report>
-          </supported-report>
-          <supported-report>
-            <report>sync-collection</report>
-          </supported-report>
-          <supported-report>
-            <report>expand-property</report>
-          </supported-report>
-          <supported-report>
-            <report>principal-search-property-set</report>
-          </supported-report>
-        </supported-report-set>
-      </prop>
-      <status>HTTP/1.1 200 OK</status>
-    </propstat>
-    <propstat>
-      <prop>
-        <current-user-principal />
-        <CS:dropbox-home-URL />
-        <CS:email-address-set />
-        <CS:notification-URL />
-        <resource-id />
-        <C:schedule-inbox-URL />
-        <C:schedule-outbox-URL />
-      </prop>
-      <status>HTTP/1.1 404 Not Found</status>
-    </propstat>
-  </response>
-</multistatus>
 ```
 
 ----
