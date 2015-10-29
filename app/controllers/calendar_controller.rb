@@ -22,7 +22,24 @@ class CalendarController < ApplicationController
   end
 
   def put
-    render :text => 'not implemented', :status => :not_implemented
+    user = User.find_by_name(params[:user])
+    unless user
+      head :status => :not_found
+      return
+    end
+
+    entry = Schedule.new
+    entry.uri = params[:uri]
+    entry.ics = request.body.read
+    # TODO
+    # entry.type =
+    # entry.summary =
+    # entry.date_start =
+    # entry.date_end =
+    # entry.uid =
+    entry.save
+
+    render :status => :ok
   end
 
   def delete
