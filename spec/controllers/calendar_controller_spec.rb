@@ -37,7 +37,9 @@ RSpec.describe CalendarController, type: :controller do
 </A:propfind>
 EOS
 
+    request.env['RAW_POST_DATA'] = body
     process :propfind, 'PROPFIND', :user => 'john', :uri => '/'
     expect(response).to have_http_status(207)
+    expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
   end
 end

@@ -30,8 +30,68 @@ class CalendarController < ApplicationController
   end
 
   def propfind
-    res = ""
-    render :text => res,
+    if params['uri'] == '/'
+      # PROPFIND to / (root)
+      xml = Nokogiri::XML(request.body.read)
+      props = xml.xpath('/A:propfind/A:prop/*')
+
+      props_ok = []         # properties we know what it is
+      props_not_found = []  # properties we don't know
+      namespaces = {}       # namespaces used in a response XML
+
+      # process each properties in the request
+      for prop in props
+        namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
+
+        # FIXME: ugly
+        case prop.namespace.href
+        when 'urn:ietf:params:xml:ns:caldav'
+           case prop.name
+           when 'calendar-home-set'
+             props_ok << [prop, '/']
+             next
+           end
+        when 'DAV:'
+           case prop.name
+           when 'displayname'
+             props_ok << [prop, '']
+             next
+           end
+        end
+
+          props_not_found << [prop, '']
+      end
+
+      # create a response XML
+      res = Nokogiri::XML::Builder.new do |xml|
+        xml.multistatus(**namespaces) {
+          xml.response {
+            xml.propstat {
+              xml.prop {
+                props_ok.each do |prop, v|
+                  xml[prop.namespace.prefix].send(prop.name, v)
+                end
+              }
+              xml.status 'HTTP/1.1 200 OK'
+            }
+
+            xml.propstat {
+              xml.prop {
+                props_not_found.each do |prop, v|
+                  xml[prop.namespace.prefix].send(prop.name, v)
+                end
+              }
+              xml.status 'HTTP/1.1 404 Not Found'
+            }
+          }
+        }
+
+      end
+    else
+      raise 'not supported yet'
+    end
+
+    render :text => res.to_xml,
            :content_type => 'application/xml',
            :status => :multi_status
   end
