@@ -43,7 +43,20 @@ class CalendarController < ApplicationController
   end
 
   def delete
-    render :text => 'not implemented', :status => :not_implemented
+    user = User.find_by_name(params[:user])
+    unless user
+      head :status => :not_found
+      return
+    end
+
+    entry = Schedule.find_by_uri(params[:uri])
+    unless user
+      head :status => :not_found
+      return
+    end
+
+    entry.delete
+    head :status => :ok
   end
 
   def mkcalendar
