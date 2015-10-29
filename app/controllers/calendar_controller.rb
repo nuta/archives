@@ -28,6 +28,9 @@ class CalendarController < ApplicationController
       return
     end
 
+    # TODO: Support overriding. Note that HTTP status code should be
+    #       204 on success.
+
     entry = Schedule.new
     entry.uri = params[:uri]
     entry.ics = request.body.read
@@ -56,7 +59,7 @@ class CalendarController < ApplicationController
     end
 
     entry.delete
-    head :status => :ok
+    head :status => :no_content
   end
 
   def mkcalendar
