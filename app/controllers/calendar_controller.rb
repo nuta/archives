@@ -18,7 +18,24 @@ class CalendarController < ApplicationController
   end
 
   def mkcalendar
-    render :text => 'not implemented', :status => :not_implemented
+    body = request.body.read
+    xml  = Nokogiri::XML(body)
+    name = xml.xpath('/B:mkcalendar/A:set/A:prop/A:displayname',
+                     A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav').children.to_s
+
+    user = User.find_by_name(params[:user])
+    unless user
+      head :status => :not_found
+      return
+    end
+
+    calendar = Calendar.new
+    calendar.name    = name
+    calendar.propxml = body
+    calendar.user    = user
+    calendar.save
+
+    head :status => :created
   end
 
   def report
@@ -91,8 +108,6 @@ class CalendarController < ApplicationController
       raise 'not supported yet'
     end
 
-    render :text => res.to_xml,
-           :content_type => 'application/xml',
-           :status => :multi_status
+    render :xml => res.to_xml, :status => :multi_status
   end
 end
