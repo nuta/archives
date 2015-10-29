@@ -33,7 +33,7 @@ class CalendarController < ApplicationController
     if params['uri'] == '/'
       # PROPFIND to / (root)
       xml = Nokogiri::XML(request.body.read)
-      props = xml.xpath('/A:propfind/A:prop/*')
+      props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
 
       props_ok = []         # properties we know what it is
       props_not_found = []  # properties we don't know
