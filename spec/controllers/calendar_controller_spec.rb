@@ -1,11 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe CalendarController, type: :controller do
+  let!(:user) { create(:user) }
+
   it 'responds OPTIONS requests' do
-    process :options, 'OPTIONS', :user => 'foo', :uri => 'bar'
+    process :options, 'OPTIONS', :user => user.name, :uri => '/'
     expect(response).to have_http_status(200)
     expect(response.header).to include('DAV')
   end
+
 
   it 'responds a PROPFIND request (get a list of calendars)' do
     headers = {
@@ -38,7 +41,7 @@ RSpec.describe CalendarController, type: :controller do
 EOS
 
     request.env['RAW_POST_DATA'] = body
-    process :propfind, 'PROPFIND', :user => 'john', :uri => '/'
+    process :propfind, 'PROPFIND', :user => user.name, :uri => '/'
     expect(response).to have_http_status(207)
     expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
   end

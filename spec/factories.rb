@@ -1,9 +1,10 @@
+
 FactoryGirl.define do
   sequence :name do
-    FFaker::Name.name
+    Faker::Name.name
   end
 
   factory :user do
-    user { generate :name }
+    name { generate :name }
   end
 end
