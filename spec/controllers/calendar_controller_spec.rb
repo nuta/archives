@@ -1,31 +1,27 @@
 # coding: utf-8
 require 'rails_helper'
 
+
+def send_request(method, body, **params)
+
+  request.env['RAW_POST_DATA'] = body
+  process method.downcase.to_sym, method, **params
+end
+
+
 RSpec.describe CalendarController, type: :controller do
   let(:user) { create(:user) }
 
   describe 'OPTIONS' do
     it "responds successfully" do
-  
-      process :options, 'OPTIONS', :user => user.name, :uri => '/'
+      send_request('OPTIONS', '', {:user => '', :uri => '/'})
       expect(response).to have_http_status(200)
       expect(response.header).to include('DAV')
    end
   end
 
   describe 'PROPFIND /' do
-
-    it "responds successfully" do
-  
-      headers = {
-        'Content-Type' => 'text/xml',
-        'Depth'        => '0',
-        'Brief'        => 't',
-        'Accept'       => '*/*',
-        'Prefer'       => 'return=minimal'
-      }
-  
-      body = <<EOS
+    let(:body) { <<EOS
   <?xml version="1.0" encoding="UTF-8"?>
   <A:propfind xmlns:A="DAV:">
     <A:prop>
@@ -45,26 +41,18 @@ RSpec.describe CalendarController, type: :controller do
     </A:prop>
   </A:propfind>
 EOS
+    }
 
-      request.env['RAW_POST_DATA'] = body
-      process :propfind, 'PROPFIND', :user => user.name, :uri => '/'
+
+    it "responds successfully" do
+      send_request('PROPFIND', body, {:user => user.name, :uri => '/'})
       expect(response).to have_http_status(207)
       expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
     end
   end
 
   describe 'MKCALENDAR' do
-
-    it "creates a calendar" do
-      headers = {
-        'Content-Type' => 'text/xml',
-        'Depth'        => '0',
-        'Brief'        => 't',
-        'Accept'       => '*/*',
-        'Prefer'       => 'return=minimal'
-      }
-  
-      body = <<EOS
+    let(:body) { <<EOS
   <?xml version="1.0" encoding="UTF-8"?>
   <B:mkcalendar xmlns:B="urn:ietf:params:xml:ns:caldav">
     <A:set xmlns:A="DAV:">
@@ -77,39 +65,30 @@ EOS
     </A:set>
   </B:mkcalendar>
 EOS
-  
-      request.env['RAW_POST_DATA'] = body
-      process :mkcalendar, 'MKCALENDAR', :user => user.name,
-              :uri => '/calendar/7287558F-5F1C-4AEC-9F3C-E9C1068D4E4E/'
+    }
+
+    it "creates a calendar" do
+      send_request('MKCALENDAR', body, {:user => user.name, :uri => 'blah'})
       expect(response).to have_http_status(:created)
   
-      expect(Calendar.where(name: 'My Work', user: User.find_by_name(user.name))).to exist
+      calendar = Calendar.where(name: 'My Work', user: User.find_by_name(user.name))
+      expect(calendar).to exist
     end
   end
 
 
   describe 'PUT /:user/calendars/:uri' do
-
-    it "creates a object" do
-      headers = {
-        'Content-Type' => 'text/calendar',
-        'Depth'        => '0',
-        'Brief'        => 't',
-        'Accept'       => '*/*',
-        'Prefer'       => 'return=minimal'
-      }
-  
-      body = <<EOS
+    let(:body) { <<EOS
   BEGIN:VCALENDAR
   END:VCALENDAR
 EOS
-  
-      uri = '/calendar/6016BB06-B428-47A6-80A5-A6F846D80AF1.ics'
-      request.env['RAW_POST_DATA'] = body
-      process :put, 'PUT', :user => user.name, :uri => uri
+    }
+
+    it "creates a object" do
+      send_request('PUT', body, {:user => user.name, :uri => 'foo.ics'})
       expect(response).to have_http_status(:created)
-  
-      schedule = Schedule.where(uri: uri).first
+
+      schedule = Schedule.where(uri: 'foo.ics').first
       expect(schedule.ics).to eq(body)
     end
   end
@@ -119,15 +98,6 @@ EOS
     before { @object = create(:schedule) }
 
     it "deletes a object" do
-  
-      headers = {
-        'Content-Type' => 'text/calendar',
-        'Depth'        => '0',
-        'Brief'        => 't',
-        'Accept'       => '*/*',
-        'Prefer'       => 'return=minimal'
-      }
-
       process :delete, 'DELETE', :user => user.name, :uri => @object.uri
       expect(response).to have_http_status(:no_content)
     end
