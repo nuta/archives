@@ -42,7 +42,7 @@ class CalendarController < ApplicationController
     # entry.uid =
     entry.save
 
-    render :status => :ok
+    head :status => :created
   end
 
   def delete
@@ -53,7 +53,7 @@ class CalendarController < ApplicationController
     end
 
     entry = Schedule.find_by_uri(params[:uri])
-    unless user
+    unless entry
       head :status => :not_found
       return
     end
