@@ -1,7 +1,8 @@
 class CalendarController < ApplicationController
   def options
-    headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, PROPFIND, PROPPATCH, REPORT'
-    headers['DAV']   = ' 1, 2, calendar-access'
+    headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, '
+                       'PROPFIND, PROPPATCH, REPORT'
+    headers['DAV']   = '1, 2, calendar-access'
     head :ok
   end
 
