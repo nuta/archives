@@ -14,7 +14,7 @@ class CalendarController < ApplicationController
     end
 
     entry = Schedule.find_by_uri(params[:uri])
-    unless user
+    unless entry
       head :status => :not_found
       return
     end
