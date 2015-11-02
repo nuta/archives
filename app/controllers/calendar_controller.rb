@@ -129,7 +129,7 @@ class CalendarController < ApplicationController
 
       end
     else
-      raise 'not supported yet'
+      render :text => 'not implemented', :status => :not_implemented
     end
 
     render :xml => res.to_xml, :status => :multi_status
