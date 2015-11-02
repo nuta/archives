@@ -1,4 +1,6 @@
 class CalendarController < ApplicationController
+  before_action :authenticate, except: [:options]
+
   def options
     headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, '
                        'PROPFIND, PROPPATCH, REPORT'
@@ -7,12 +9,6 @@ class CalendarController < ApplicationController
   end
 
   def get
-    user = User.find_by_name(params[:user])
-    unless user
-      head :status => :not_found
-      return
-    end
-
     entry = Schedule.find_by_uri(params[:uri])
     unless entry
       head :status => :not_found
@@ -23,13 +19,7 @@ class CalendarController < ApplicationController
   end
 
   def put
-    user = User.find_by_name(params[:user])
-    unless user
-      head :status => :not_found
-      return
-    end
-
-    # TODO: Support overriding. Note that HTTP status code should be
+    # TODO: Support overwriting. Note that HTTP status code should be
     #       204 on success.
 
     entry = Schedule.new
@@ -47,12 +37,6 @@ class CalendarController < ApplicationController
   end
 
   def delete
-    user = User.find_by_name(params[:user])
-    unless user
-      head :status => :not_found
-      return
-    end
-
     entry = Schedule.find_by_uri(params[:uri])
     unless entry
       head :status => :not_found
@@ -69,16 +53,10 @@ class CalendarController < ApplicationController
     name = xml.xpath('/B:mkcalendar/A:set/A:prop/A:displayname',
                      A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav').children.to_s
 
-    user = User.find_by_name(params[:user])
-    unless user
-      head :status => :not_found
-      return
-    end
-
     calendar = Calendar.new
     calendar.name    = name
     calendar.propxml = body
-    calendar.user    = user
+    calendar.user    = @user
     calendar.save
 
     head :status => :created
@@ -155,5 +133,15 @@ class CalendarController < ApplicationController
     end
 
     render :xml => res.to_xml, :status => :multi_status
+  end
+
+  private
+
+  def authenticate
+    @user = User.find_by_name(params[:user])
+    unless @user
+      head :status => :not_found
+      return
+    end
   end
 end
