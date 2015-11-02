@@ -94,6 +94,17 @@ EOS
   end
 
 
+  describe 'GET /:user/calendars/:uri' do
+    before { @object = create(:schedule) }
+
+    it "gets a object" do
+      process :get, 'GET', :user => user.name, :uri => @object.uri
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to eq(@object.ics)
+    end
+  end
+
+
   describe 'DELETE /:user/calendars/:uri' do
     before { @object = create(:schedule) }
 

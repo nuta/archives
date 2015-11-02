@@ -13,6 +13,13 @@ FactoryGirl.define do
       SecureRandom.uuid
   end
 
+  sequence :ics do
+      <<-EOS
+BEGIN:VCALENDAR
+END:VCALENDAR
+      EOS
+  end
+
   factory :user do
     name { generate :name }
   end
@@ -21,5 +28,6 @@ FactoryGirl.define do
     type = ""
     summary { generate :todo }
     uri { generate :uuid }
+    ics { generate :ics }
   end
 end
