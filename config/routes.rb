@@ -3,6 +3,6 @@ Rails.application.routes.draw do
 
   ['options', 'get', 'put', 'delete', 'mkcalendar',
    'propfind', 'proppatch', 'report'].each do |method|
-    match '/:user/calendar/:uri', uri: /.*/, :to => 'calendar#' + method, :via => method.to_s
+    match '/:user/calendar:uri', uri: /.*/, :to => 'calendar#' + method, :via => method.to_s
   end
 end
