@@ -2,19 +2,24 @@
 require 'rails_helper'
 
 
-def send_request(method, body, **params)
+def send_request(method, body, uri, **params)
 
   request.env['RAW_POST_DATA'] = body
-  process method.downcase.to_sym, method, **params
+  process method.downcase.to_sym, method, :uri => uri, **params
 end
 
 
 RSpec.describe CalendarController, type: :controller do
-  let(:user) { create(:user) }
+  include LoginHelper
+
+  before(:each) do
+    User.create(name: get_login_name)
+    login
+  end
 
   describe 'OPTIONS' do
     it "responds successfully" do
-      send_request('OPTIONS', '', {:user => '', :uri => '/'})
+      send_request('OPTIONS', '', '/')
       expect(response).to have_http_status(200)
       expect(response.header).to include('DAV')
    end
@@ -45,7 +50,7 @@ EOS
 
 
     it "responds successfully" do
-      send_request('PROPFIND', body, {:user => user.name, :uri => '/'})
+      send_request('PROPFIND', body, '/')
       expect(response).to have_http_status(207)
       expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
     end
@@ -68,16 +73,16 @@ EOS
     }
 
     it "creates a calendar" do
-      send_request('MKCALENDAR', body, {:user => user.name, :uri => 'blah'})
+      send_request('MKCALENDAR', body, '/blah')
       expect(response).to have_http_status(:created)
   
-      calendar = Calendar.where(name: 'My Work', user: User.find_by_name(user.name))
+      calendar = Calendar.where(name: 'My Work', user: User.find_by_name(get_login_name))
       expect(calendar).to exist
     end
   end
 
 
-  describe 'PUT /:user/calendars/:uri' do
+  describe 'PUT /calendar/:uri' do
     let(:body) { <<EOS
   BEGIN:VCALENDAR
   END:VCALENDAR
@@ -85,31 +90,33 @@ EOS
     }
 
     it "creates a object" do
-      send_request('PUT', body, {:user => user.name, :uri => 'foo.ics'})
+      uri = '/blah/foo.ics'
+      send_request('PUT', body, uri)
       expect(response).to have_http_status(:created)
 
-      schedule = Schedule.where(uri: 'foo.ics').first
+      schedule = Schedule.where(uri: uri).first
+      expect(schedule).not_to eq(nil)
       expect(schedule.ics).to eq(body)
     end
   end
 
 
-  describe 'GET /:user/calendars/:uri' do
+  describe 'GET /calendars/:uri' do
     before { @object = create(:schedule) }
 
     it "gets a object" do
-      process :get, 'GET', :user => user.name, :uri => @object.uri
+      process :get, 'GET', :uri => @object.uri
       expect(response).to have_http_status(:ok)
       expect(response.body).to eq(@object.ics)
     end
   end
 
 
-  describe 'DELETE /:user/calendars/:uri' do
+  describe 'DELETE /calendars/:uri' do
     before { @object = create(:schedule) }
 
     it "deletes a object" do
-      process :delete, 'DELETE', :user => user.name, :uri => @object.uri
+      process :delete, 'DELETE', :uri => @object.uri
       expect(response).to have_http_status(:no_content)
     end
   end
