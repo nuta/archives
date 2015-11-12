@@ -126,23 +126,27 @@ class CalendarController < ApplicationController
             }
           }
         }
-
       end
+
+      render :xml => res.to_xml, :status => :multi_status
     else
       render :text => 'not implemented', :status => :not_implemented
     end
-
-    render :xml => res.to_xml, :status => :multi_status
   end
 
   private
 
   def authenticate
-    @user = User.find_by_name(params[:user])
-    unless @user
-      logger.warn "user '#{params[:user]}' not found"
-      head :status => :not_found
-      return
+    # TODO: check password
+    authenticate_or_request_with_http_basic('realm') do |name, passwd|
+      @user = User.find_by_name(name)
+      unless @user
+        logger.warn "user '#{name}' not found"
+        head :status => :not_found
+        return
+      end
+
+      true
     end
   end
 end
