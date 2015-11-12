@@ -140,6 +140,7 @@ class CalendarController < ApplicationController
   def authenticate
     @user = User.find_by_name(params[:user])
     unless @user
+      logger.warn "user '#{params[:user]}' not found"
       head :status => :not_found
       return
     end
