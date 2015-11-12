@@ -71,7 +71,7 @@ class CalendarController < ApplicationController
   end
 
   def propfind
-    if params['uri'] == '' or params['uri'] == ''
+    if params['uri'] == '/' or params['uri'] == ''
       # PROPFIND to / (root)
       xml = Nokogiri::XML(request.body.read)
       props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
