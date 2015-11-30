@@ -71,7 +71,14 @@ class CalendarController < ApplicationController
   end
 
   def propfind
-    if params['uri'] == '/' or params['uri'] == ''
+    uri = params['uri']
+
+    # XXX
+    if uri == ''
+      uri = '/'
+    end
+
+    if uri == '/'
       # PROPFIND to / (root)
       xml = Nokogiri::XML(request.body.read)
       props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
@@ -82,36 +89,38 @@ class CalendarController < ApplicationController
 
       # process each properties in the request
       for prop in props
-        ns = prop.namespace
-
-        # FIXME: ugly
-        case ns.href
-        when 'urn:ietf:params:xml:ns:caldav'
-           case prop.name
-           when 'calendar-home-set'
-             props_ok << [ns.prefix, prop.name, '/']
-             next
-           end
-        when 'DAV:'
-           case prop.name
-           when 'displayname'
-             props_ok << [ns.prefix, prop.name, '']
-             next
-           end
+        v = nil
+        case prop.name
+        when 'displayname';                v = ''
+        when 'calendar-home-set';          v = '/calendar'
+        when 'principal-URL';              v = '/'
+        when 'principal-collection-set';   v = '/'
         end
 
-        namespaces["xmlns:#{ns.prefix}".to_sym] = ns.href
-        props_not_found << [ns.prefix, prop.name, '']
+        namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
+        if v
+          props_ok << [prop.namespace.prefix, prop.name, v]
+        else
+          props_not_found << [prop.namespace.prefix, prop.name, '']
+        end
       end
 
       # create a response XML
       res = Nokogiri::XML::Builder.new do |xml|
         xml.multistatus("xmlns" => "DAV:", **namespaces) {
           xml.response {
+            xml.href uri
             xml.propstat {
               xml.prop {
                 props_ok.each do |prefix, name, v|
-                  xml[prefix].send(name, v)
+                  case name
+                  when 'calendar-home-set'
+                    xml[prefix].send(name) {
+                      xml.href v
+                    }
+                  else
+                    xml[prefix].send(name, v)
+                  end
                 end
               }
               xml.status 'HTTP/1.1 200 OK'
