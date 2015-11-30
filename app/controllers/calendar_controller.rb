@@ -82,35 +82,36 @@ class CalendarController < ApplicationController
 
       # process each properties in the request
       for prop in props
-        namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
+        ns = prop.namespace
 
         # FIXME: ugly
-        case prop.namespace.href
+        case ns.href
         when 'urn:ietf:params:xml:ns:caldav'
            case prop.name
            when 'calendar-home-set'
-             props_ok << [prop, '/']
+             props_ok << [ns.prefix, prop.name, '/']
              next
            end
         when 'DAV:'
            case prop.name
            when 'displayname'
-             props_ok << [prop, '']
+             props_ok << [ns.prefix, prop.name, '']
              next
            end
         end
 
-          props_not_found << [prop, '']
+        namespaces["xmlns:#{ns.prefix}".to_sym] = ns.href
+        props_not_found << [ns.prefix, prop.name, '']
       end
 
       # create a response XML
       res = Nokogiri::XML::Builder.new do |xml|
-        xml.multistatus(**namespaces) {
+        xml.multistatus("xmlns" => "DAV:", **namespaces) {
           xml.response {
             xml.propstat {
               xml.prop {
-                props_ok.each do |prop, v|
-                  xml[prop.namespace.prefix].send(prop.name, v)
+                props_ok.each do |prefix, name, v|
+                  xml[prefix].send(name, v)
                 end
               }
               xml.status 'HTTP/1.1 200 OK'
@@ -118,8 +119,8 @@ class CalendarController < ApplicationController
 
             xml.propstat {
               xml.prop {
-                props_not_found.each do |prop, v|
-                  xml[prop.namespace.prefix].send(prop.name, v)
+                props_not_found.each do |prefix, name, v|
+                  xml[prefix].send(name, v)
                 end
               }
               xml.status 'HTTP/1.1 404 Not Found'
