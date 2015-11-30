@@ -2,7 +2,7 @@ class CalendarController < ApplicationController
   before_action :authenticate, except: [:options]
 
   def options
-    headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, '
+    headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, ' +
                        'PROPFIND, PROPPATCH, REPORT'
     headers['DAV']   = '1, 2, calendar-access'
     head :ok
