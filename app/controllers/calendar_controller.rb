@@ -19,18 +19,25 @@ class CalendarController < ApplicationController
   end
 
   def put
-    # TODO: Support overwriting. Note that HTTP status code should be
-    #       204 on success.
+    uri  = params[:uri]
+    body = request.body.read.force_encoding("UTF-8")
+    ics  = ICS::parse(body)
 
-    entry = Schedule.new
-    entry.uri = params[:uri]
-    entry.ics = request.body.read.force_encoding("UTF-8")
     # TODO
-    # entry.type =
-    # entry.summary =
-    # entry.date_start =
-    # entry.date_end =
-    # entry.uid =
+    comp = "VEVENT"
+    date_start = "20150919T190000"
+    date_end   = "20150920T053000"
+    summary    = "Hello World"
+    uid        = "1234567890"
+
+    entry = Schedule.where(uri: uri).first_or_create
+    entry.uri  = uri
+    entry.ics  = body
+    entry.component = comp
+    entry.summary    = summary
+    entry.date_start = date_start
+    entry.date_end   = date_end
+    entry.uid        = uid
     entry.save
 
     head :status => :created
