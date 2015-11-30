@@ -84,8 +84,9 @@ EOS
 
   describe 'PUT /calendar/:uri' do
     let(:body) { <<EOS
-  BEGIN:VCALENDAR
-  END:VCALENDAR
+BEGIN:VCALENDAR
+SUMMARY:あいうえお
+END:VCALENDAR
 EOS
     }
 
@@ -96,7 +97,7 @@ EOS
 
       schedule = Schedule.where(uri: uri).first
       expect(schedule).not_to eq(nil)
-      expect(schedule.ics).to eq(body)
+      expect(schedule.ics).to eq(body.force_encoding("UTF-8"))
     end
   end
 
