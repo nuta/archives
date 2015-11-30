@@ -6,6 +6,8 @@ t test:
 at autotest:
 	bundle exec guard
 
+c console:
+	bundle exec ./bin/rails console
 
 s server:
 	bundle exec ./bin/rails server
