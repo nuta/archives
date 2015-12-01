@@ -20,10 +20,6 @@ END:VCALENDAR
       EOS
   end
 
-  factory :user do
-    name { generate :name }
-  end
-
   factory :calendar do
     name { generate :name }
   end

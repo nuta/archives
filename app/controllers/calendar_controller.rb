@@ -220,12 +220,12 @@ class CalendarController < ApplicationController
   end
 
   def authenticate
-    # TODO: check password
-    authenticate_or_request_with_http_basic('realm') do |name, passwd|
+    authenticate_or_request_with_http_basic('realm') do |name, password|
       @user = User.find_by_name(name)
-      unless @user
+
+      if not @user or @user.password != password
         logger.warn "user '#{name}' not found"
-        head :status => :not_found
+        head :status => :forbidden
         return
       end
       true

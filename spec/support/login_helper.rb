@@ -1,13 +1,19 @@
 module LoginHelper
-  LOGIN_NAME = 'guest'
+  NAME = 'guest'
+  PASSWORD = 'password'
 
   def login
-    name   = LOGIN_NAME
-    passwd = ''
-    request.env['HTTP_AUTHORIZATION'] = ActionController::HttpAuthentication::Basic.encode_credentials(name, passwd)
+    basic = ActionController::HttpAuthentication::Basic
+    name   = NAME
+    passwd = PASSWORD
+    request.env['HTTP_AUTHORIZATION'] = basic.encode_credentials(name, passwd)
   end
 
-  def get_login_name
-    LOGIN_NAME
+  def password
+    PASSWORD
+  end
+
+  def login_name
+    NAME
   end
 end

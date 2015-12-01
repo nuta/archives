@@ -13,7 +13,7 @@ RSpec.describe CalendarController, type: :controller do
   include LoginHelper
 
   before(:each) do
-    User.create(name: get_login_name)
+    User.create(name: login_name, password: password)
     login
   end
 
@@ -76,7 +76,7 @@ EOS
       expect(response).to have_http_status(:created)
   
       calendar = Calendar.where(name: 'My Work',
-                                user: User.find_by_name(get_login_name))
+                                user: User.find_by_name(login_name))
       expect(calendar).to exist
     end
   end
