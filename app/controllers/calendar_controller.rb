@@ -77,326 +77,134 @@ class CalendarController < ApplicationController
 
   def report
     xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
-    case xml.children[0].name
-    when 'calendar-multiget'
-      props = xml.xpath('/B:calendar-multiget/A:prop/*',
-                        A: 'DAV:', B:'urn:ietf:params:xml:ns:caldav')
-      uris  = xml.xpath('/B:calendar-multiget/A:href',
-                        A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav')
-
-      rs = []
-      namespaces ={}
-      for uri in uris
-        sched = Schedule.find_by_uri(uri.text)
-        props_ok = []
-        props_not_found = []
-        for prop in props
-          v = nil
-          case prop.name
-          when 'getetag';       v = Digest::MD5.hexdigest(sched.ics)
-          when 'calendar-data'; v = sched.ics
-          end
-
-          namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
-
-          if v
-            props_ok << [prop.namespace.prefix, prop.name, v]
+    res = case xml.children[0].name
+          when 'calendar-multiget'
+            respond_xml_request('/C:calendar-multiget/A:prop/*') do |props|
+              uris  = xml.xpath('/C:calendar-multiget/A:href',
+                                A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
+              responses = []      
+              for uri in uris
+                results = handle_props(props) do |prop|
+                  sched = Schedule.find_by_uri(uri.text)
+                  case prop
+                  when 'getetag'
+                    Digest::MD5.hexdigest(sched.ics)
+                  when 'calendar-data'
+                    sched.ics
+                  end
+                end
+                responses << [uri.text, results]
+              end
+              responses
+            end
           else
-            props_not_found << [prop.namespace.prefix, prop.name, '']
+            head :status => :not_implemented
+            return
           end
-        end
-        rs << [uri.text, props_ok, props_not_found]
-      end
 
-      # create a response XML
-      res = Nokogiri::XML::Builder.new do |xml|
-        xml.multistatus("xmlns" => "DAV:", **namespaces) {
-          for uri, props_ok, props_not_found in rs
-            xml.response {
-              xml.href uri
-              xml.propstat {
-                xml.prop {
-                  props_ok.each do |prefix, name, v|
-                    xml[prefix].send(name, v)
-                  end
-                }
-                xml.status 'HTTP/1.1 200 OK'
-              }
-  
-              xml.propstat {
-                xml.prop {
-                  props_not_found.each do |prefix, name, v|
-                    xml[prefix].send(name, v)
-                  end
-                }
-                xml.status 'HTTP/1.1 404 Not Found'
-              }
-            }
-          end
-        }
-      end
-      render :xml => res.to_xml, :status => :multi_status
-    else
-      head :status => :not_implemented
-      return
-    end
+    render :xml => res, :status => :multi_status
   end
 
   def proppatch
-      uri = params['uri']
-      patch = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
-      props = patch.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
-
-      props_ok = []
-      namespaces = {}
-      for prop in props
-        props_ok << [prop.namespace.prefix, prop.name]
-        namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
-      end
-
-      # create a response XML
-      res = Nokogiri::XML::Builder.new do |xml|
-        xml.multistatus("xmlns" => "DAV:", **namespaces) {
-          xml.response {
-            xml.href uri
-            xml.propstat {
-              xml.prop {
-                props_ok.each do |prefix, name, v|
-                  xml[prefix].send(name, v)
-                end
-              }
-              xml.status 'HTTP/1.1 200 OK'
-            }
-          }
-        }
-      end
-      render :xml => res.to_xml, :status => :multi_status
-  end
-
-  def propfind
-    uri = params['uri']
-
-    case uri
-    when '', '/'
-      # PROPFIND to / (root)
-      xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
-      props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
-
-      props_ok = []         # properties we know what it is
-      props_not_found = []  # properties we don't know
-      namespaces = {}       # namespaces used in a response XML
-
-      # process each properties in the request
-      for prop in props
-        v = nil
-        case prop.name
-        when 'displayname';                v = ''
-        when 'calendar-home-set';          v = '/calendar/calendars'
-#        when 'principal-URL';              v = '/calendar/principal-url'
-#        when 'principal-collection-set';   v = '/calendar/principal-collection-set'
-        end
-
-        namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
-
-        if v
-          props_ok << [prop.namespace.prefix, prop.name, v]
-        else
-          props_not_found << [prop.namespace.prefix, prop.name, '']
-        end
-      end
-
-      # create a response XML
-      res = Nokogiri::XML::Builder.new do |xml|
-        xml.multistatus("xmlns" => "DAV:", **namespaces) {
-          xml.response {
-            xml.href "/calendar/"
-            xml.propstat {
-              xml.prop {
-                props_ok.each do |prefix, name, v|
-                  case name
-                  when 'calendar-home-set', 'principal-URL', 'principal-collection-set'
-                    xml[prefix].send(name) {
-                      xml.href v
-                    }
-                  else
-                    xml[prefix].send(name, v)
-                  end
-                end
-              }
-              xml.status 'HTTP/1.1 200 OK'
-            }
-
-            xml.propstat {
-              xml.prop {
-                props_not_found.each do |prefix, name, v|
-                  xml[prefix].send(name, v)
-                end
-              }
-              xml.status 'HTTP/1.1 404 Not Found'
-            }
-          }
-        }
-      end
-      render :xml => res.to_xml, :status => :multi_status
-    when '/calendars'
-      # get a list of calendars
-      uri = params['uri']
-
-      xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
-      props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
-
-      cs = []               # calendars
-      namespaces = {}       # namespaces used in a response XML
-      caldav_ns = ''
-
-      # process each properties in the request
-      for cal in Calendar.all
-        props_ok = []         # properties we know what it is
-        props_not_found = []  # properties we don't know
-
-        for prop in props
-          v = nil
-          # TODO
-          case prop.name
-          when 'calendar-color';                   v = '#00ff00'
-          when 'calendar-order';                   v = '10'
-          when 'displayname';                      v = 'No Name'
-          when 'supported-calendar-component-set'; v = ['VEVENT']
-          when 'resourcetype';                     v = ''
-          end
-
-          if prop.namespace.href == 'urn:ietf:params:xml:ns:caldav'
-            caldav_ns = prop.namespace.prefix
-          end
-  
-          namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
-
-          if v
-            props_ok << [prop.namespace.prefix, prop.name, v]
-          else
-            props_not_found << [prop.namespace.prefix, prop.name, '']
-          end
-        end
-
-        cs << ["/calendar/#{cal.id}", props_ok, props_not_found]
-      end
-
-      # create a response XML
-      res = Nokogiri::XML::Builder.new do |xml|
-        xml.multistatus("xmlns" => "DAV:", **namespaces) {
-          for href, props_ok, props_not_found in cs
-            xml.response {
-              xml.href href
-              xml.propstat {
-                xml.prop {
-                  props_ok.each do |prefix, name, v|
-                    case name
-                    when 'supported-calendar-component-set'
-                      xml[prefix].send(name) {
-                        for comp in v
-                            xml[prefix].comp(:name => comp)
-                        end
-                      }
-                    when 'resourcetype'
-                      xml[prefix].send(name) {
-                        xml[caldav_ns].calendar
-                        xml.collection
-                      }
-                    else
-                      xml[prefix].send(name, v)
-                    end
-                  end
-                }
-                xml.status 'HTTP/1.1 200 OK'
-              }
-  
-              xml.propstat {
-                xml.prop {
-                  props_not_found.each do |prefix, name, v|
-                    xml[prefix].send(name, v)
-                  end
-                }
-                xml.status 'HTTP/1.1 404 Not Found'
-              }
-            }
-          end
-        }
-      end
-      render :xml => res.to_xml, :status => :multi_status
-    else
-      # get a list of calendar objects
-      uri = params['uri']
-      /^\/([a-zA-Z0-9\-_]+)/.match(uri)
-      cal_id = $1
-
-      xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
-      props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
-
-      cs = []               # calendars
-      namespaces = {}       # namespaces used in a response XML
-      caldav_ns = ''
-
-      # process each properties in the request
-      for sched in Schedule.where(calendar_id: Calendar.find(cal_id))
-        props_ok = []         # properties we know what it is
-        props_not_found = []  # properties we don't know
-
-        for prop in props
-          v = nil
-          # TODO
-          case prop.name
-          when 'getcontenttype';  v = 'text/calendar; component=vevent; charset=utf-8'
-          when 'getetag';         v = Digest::MD5.hexdigest(sched.ics)
-          end
-
-          if prop.namespace.href == 'urn:ietf:params:xml:ns:caldav'
-            caldav_ns = prop.namespace.prefix
-          end
-  
-          namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
-
-          if v
-            props_ok << [prop.namespace.prefix, prop.name, v]
-          else
-            props_not_found << [prop.namespace.prefix, prop.name, '']
-          end
-        end
-
-        cs << [sched.uri, props_ok, props_not_found]
-      end
-
-      # create a response XML
-      res = Nokogiri::XML::Builder.new do |xml|
-        xml.multistatus("xmlns" => "DAV:", **namespaces) {
-          for href, props_ok, props_not_found in cs
-            xml.response {
-              xml.href href
-              xml.propstat {
-                xml.prop {
-                  props_ok.each do |prefix, name, v|
-                    xml[prefix].send(name, v)
-                  end
-                }
-                xml.status 'HTTP/1.1 200 OK'
-              }
-  
-              xml.propstat {
-                xml.prop {
-                  props_not_found.each do |prefix, name, v|
-                    xml[prefix].send(name, v)
-                  end
-                }
-                xml.status 'HTTP/1.1 404 Not Found'
-              }
-            }
-          end
-        }
-      end
-      render :xml => res.to_xml, :status => :multi_status
+    # TODO
+    respond_xml_request('/A:propertyupdate/A:set/A:prop/*') do |props|
+      results = handle_props(props) {|prop| ''}
+      return [uri, results]
     end
   end
 
+  def propfind
+    xml = case params[:uri]
+          when '', '/'
+            # PROPFIND to / (root)
+            respond_xml_request('/A:propfind/A:prop/*') do |props|
+              results = handle_props(props) do |prop|
+                case prop
+                when 'displayname'
+                  ''
+                when 'calendar-home-set'
+                  {prefix: 'A', name: 'href', value: '/calendar/calendars'}
+                end
+              end
+
+              [[params[:uri], results]]
+            end
+          when '/calendars'
+            # get a list of calendars
+            # PROPFIND to / (root)
+            respond_xml_request('/A:propfind/A:prop/*') do |props|
+              responses = []
+              for cal in Calendar.all
+                results = handle_props(props) do |prop|
+                  case prop
+                  when 'calendar-color'                   
+                      '#00ff00'
+                  when 'calendar-order'                   
+                      '10'
+                  when 'displayname'                      
+                      'No Name'
+                  when 'supported-calendar-component-set' 
+                      {prefix: 'C', name: 'comp', attrs: {:name => 'VEVENT'}}
+                  when 'resourcetype'                     
+                      ''
+                  end
+                end
+                responses << ["/calendar/#{cal.id}", results]
+              end  
+
+              responses
+            end
+          else
+          # get a list of calendar objects
+          uri = params['uri']
+          /^\/([a-zA-Z0-9\-_]+)/.match(uri)
+          cal_id = $1
+    
+          respond_xml_request('/A:propfind/A:prop/*') do |props|
+            responses = []
+            for sched in Schedule.where(calendar_id: Calendar.find(cal_id))
+              results = handle_props(props) do |prop|
+                case prop
+                when 'getcontenttype'  
+                  'text/calendar; component=vevent; charset=utf-8'
+                when 'getetag'        
+                  Digest::MD5.hexdigest(sched.ics)
+                end
+              end
+              responses << [sched.uri, results]
+            end
+
+            responses
+          end
+        end
+
+    render :xml => xml, :status => :multi_status
+  end
+
   private
+
+  def handle_props(props)
+    ps = {}
+   for prop in props
+     r = yield(prop.name)
+     status = (r)? :ok : :not_found
+
+     unless ps.has_key?(status)
+       ps[status] = []
+     end
+
+     ps[status] << [prop.namespace.prefix, prop.name, r]
+    end
+
+    return ps
+  end
+
+  def stringify_http_status_code(status)
+    code = Rack::Utils::SYMBOL_TO_STATUS_CODE[status]
+    desc = Rack::Utils::HTTP_STATUS_CODES[code]
+
+    "HTTP/1.1 #{code} #{desc}"
+  end
 
   def authenticate
     # TODO: check password
@@ -407,8 +215,51 @@ class CalendarController < ApplicationController
         head :status => :not_found
         return
       end
-
       true
     end
+  end
+
+  def respond_xml_request(xpath)
+    xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
+    props = xml.xpath(xpath, A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
+    responses = yield props
+
+    namespaces = {}
+    for prop in props
+      prefix = "xmlns:#{prop.namespace.prefix}".to_sym
+      unless namespaces.has_key?(prefix)
+        namespaces[prefix] = prop.namespace.href
+      end
+    end
+
+    # create a response XML
+    r = Nokogiri::XML::Builder.new do |xml|
+      xml.multistatus("xmlns" => "DAV:", **namespaces) {
+        for href, results in responses
+          xml.response {
+            xml.href href
+            for status, props in results
+              xml.propstat {
+                xml.status stringify_http_status_code(status)
+                xml.prop {  
+                  for prefix, name, child in props
+                    if child.class == Hash
+                      xml[prefix].send(name) {
+                        attrs = (child[:attrs])? child[:attrs] : {}
+                        xml[child[:prefix]].send(child[:name], child[:value],
+                                                 attrs)
+                      }
+                    else
+                      xml[prefix].send(name, child)
+                    end
+                  end # for in props
+                } # xml.prop
+            } # xml.propstat
+            end # for in results
+          } # xml.response
+        end # for in responses
+      } # xml.multistatus
+    end
+    r.to_xml
   end
 end
