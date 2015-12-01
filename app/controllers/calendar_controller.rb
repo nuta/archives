@@ -79,24 +79,7 @@ class CalendarController < ApplicationController
     xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
     res = case xml.children[0].name
           when 'calendar-multiget'
-            respond_xml_request('/C:calendar-multiget/A:prop/*') do |props|
-              uris  = xml.xpath('/C:calendar-multiget/A:href',
-                                A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
-              responses = []      
-              for uri in uris
-                results = handle_props(props) do |prop|
-                  sched = Schedule.find_by_uri(uri.text)
-                  case prop
-                  when 'getetag'
-                    Digest::MD5.hexdigest(sched.ics)
-                  when 'calendar-data'
-                    sched.ics
-                  end
-                end
-                responses << [uri.text, results]
-              end
-              responses
-            end
+            report_multiget(xml)
           else
             head :status => :not_implemented
             return
@@ -116,72 +99,99 @@ class CalendarController < ApplicationController
   def propfind
     xml = case params[:uri]
           when '', '/'
-            # PROPFIND to / (root)
-            respond_xml_request('/A:propfind/A:prop/*') do |props|
-              results = handle_props(props) do |prop|
-                case prop
-                when 'displayname'
-                  ''
-                when 'calendar-home-set'
-                  {prefix: 'A', name: 'href', value: '/calendar/calendars'}
-                end
-              end
-
-              [[params[:uri], results]]
-            end
+            propfind_root
           when '/calendars'
-            # get a list of calendars
-            # PROPFIND to / (root)
-            respond_xml_request('/A:propfind/A:prop/*') do |props|
-              responses = []
-              for cal in Calendar.all
-                results = handle_props(props) do |prop|
-                  case prop
-                  when 'calendar-color'                   
-                      '#00ff00'
-                  when 'calendar-order'                   
-                      '10'
-                  when 'displayname'                      
-                      'No Name'
-                  when 'supported-calendar-component-set' 
-                      {prefix: 'C', name: 'comp', attrs: {:name => 'VEVENT'}}
-                  when 'resourcetype'                     
-                      ''
-                  end
-                end
-                responses << ["/calendar/#{cal.id}", results]
-              end  
-
-              responses
-            end
+            propfind_list_calendars
           else
-          # get a list of calendar objects
-          uri = params['uri']
-          /^\/([a-zA-Z0-9\-_]+)/.match(uri)
-          cal_id = $1
-    
-          respond_xml_request('/A:propfind/A:prop/*') do |props|
-            responses = []
-            for sched in Schedule.where(calendar_id: Calendar.find(cal_id))
-              results = handle_props(props) do |prop|
-                case prop
-                when 'getcontenttype'  
-                  'text/calendar; component=vevent; charset=utf-8'
-                when 'getetag'        
-                  Digest::MD5.hexdigest(sched.ics)
-                end
-              end
-              responses << [sched.uri, results]
-            end
-
-            responses
+            propfind_list_objects
           end
-        end
-
     render :xml => xml, :status => :multi_status
   end
 
   private
+
+  def report_multiget(xml)
+    respond_xml_request('/C:calendar-multiget/A:prop/*') do |props|
+      uris  = xml.xpath('/C:calendar-multiget/A:href',
+                        A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
+      responses = []      
+      for uri in uris
+        results = handle_props(props) do |prop|
+          sched = Schedule.find_by_uri(uri.text)
+          case prop
+          when 'getetag'
+            Digest::MD5.hexdigest(sched.ics)
+          when 'calendar-data'
+            sched.ics
+          end
+        end
+        responses << [uri.text, results]
+      end
+      responses
+    end
+  end
+
+  def propfind_root
+    # PROPFIND to / (root)
+    respond_xml_request('/A:propfind/A:prop/*') do |props|
+      results = handle_props(props) do |prop|
+        case prop
+        when 'displayname'
+          ''
+        when 'calendar-home-set'
+          {prefix: 'A', name: 'href', value: '/calendar/calendars'}
+        end
+      end
+      [[params[:uri], results]]
+    end
+  end
+
+  def propfind_list_calendars
+    # get a list of calendars
+    respond_xml_request('/A:propfind/A:prop/*') do |props|
+      responses = []
+      for cal in Calendar.all
+        results = handle_props(props) do |prop|
+          case prop
+          when 'calendar-color'                   
+              '#00ff00'
+          when 'calendar-order'                   
+              '10'
+          when 'displayname'                      
+              'No Name'
+          when 'supported-calendar-component-set' 
+              {prefix: 'C', name: 'comp', attrs: {:name => 'VEVENT'}}
+          when 'resourcetype'                     
+              ''
+          end
+        end
+        responses << ["/calendar/#{cal.id}", results]
+      end  
+      responses
+    end
+  end
+
+  def propfind_list_objects
+    # get a list of calendar objects
+    uri = params['uri']
+    /^\/([a-zA-Z0-9\-_]+)/.match(uri)
+    cal_id = $1
+    respond_xml_request('/A:propfind/A:prop/*') do |props|
+      responses = []
+      for sched in Schedule.where(calendar_id: Calendar.find(cal_id))
+        results = handle_props(props) do |prop|
+          case prop
+          when 'getcontenttype'  
+            'text/calendar; component=vevent; charset=utf-8'
+          when 'getetag'        
+            Digest::MD5.hexdigest(sched.ics)
+          end
+        end
+        responses << [sched.uri, results]
+      end
+      responses
+    end
+  end
 
   def handle_props(props)
     ps = {}
@@ -232,7 +242,10 @@ class CalendarController < ApplicationController
       end
     end
 
-    # create a response XML
+    create_multistatus_xml(responses, namespaces)
+  end
+
+  def create_multistatus_xml(responses, namespaces)
     r = Nokogiri::XML::Builder.new do |xml|
       xml.multistatus("xmlns" => "DAV:", **namespaces) {
         for href, results in responses
