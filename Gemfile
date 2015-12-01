@@ -20,6 +20,7 @@ group :test do
   gem 'factory_girl_rails'
   gem 'rspec-rails'
   gem 'coveralls', require: false
+  gem 'shoulda-matchers'
 end
 
 group :development, :test do

@@ -24,11 +24,15 @@ end
 
 require 'pry'
 require 'factory_girl'
+require 'shoulda-matchers'
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 
   Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f }
+
+  config.include(Shoulda::Matchers::ActiveModel, type: :model)
+  config.include(Shoulda::Matchers::ActiveRecord, type: :model)
 
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
