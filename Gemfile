@@ -21,6 +21,7 @@ group :test do
   gem 'rspec-rails'
   gem 'coveralls', require: false
   gem 'shoulda-matchers'
+  gem 'fuubar'
 end
 
 group :development, :test do
