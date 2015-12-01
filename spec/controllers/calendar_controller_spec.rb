@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 
-def send_request(method, body, uri, **params)
+def send_request(method, uri, body='', **params)
 
   request.env['RAW_POST_DATA'] = body
   process method.downcase.to_sym, method, :uri => uri, **params
@@ -19,7 +19,7 @@ RSpec.describe CalendarController, type: :controller do
 
   describe 'OPTIONS' do
     it "responds successfully" do
-      send_request('OPTIONS', '', '/')
+      send_request('OPTIONS', '/')
       expect(response).to have_http_status(200)
       expect(response.header).to include('DAV')
    end
@@ -48,9 +48,8 @@ RSpec.describe CalendarController, type: :controller do
 EOS
     }
 
-
     it "responds successfully" do
-      send_request('PROPFIND', body, '/')
+      send_request('PROPFIND', '/', body)
       expect(response).to have_http_status(207)
       expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
     end
@@ -73,14 +72,14 @@ EOS
     }
 
     it "creates a calendar" do
-      send_request('MKCALENDAR', body, '/blah')
+      send_request('MKCALENDAR', '/blah', body)
       expect(response).to have_http_status(:created)
   
-      calendar = Calendar.where(name: 'My Work', user: User.find_by_name(get_login_name))
+      calendar = Calendar.where(name: 'My Work',
+                                user: User.find_by_name(get_login_name))
       expect(calendar).to exist
     end
   end
-
 
   describe 'PUT /calendar/:uri' do
     before { @cal = create(:calendar) }
@@ -98,7 +97,7 @@ EOS
 
     it "creates a object" do
       uri = "/#{@cal.id}/foo.ics"
-      send_request('PUT', body, uri)
+      send_request('PUT', uri, body)
       expect(response).to have_http_status(:created)
 
       schedule = Schedule.where(uri: uri).first
@@ -107,31 +106,46 @@ EOS
     end
   end
 
-
   describe 'GET /calendars/:uri' do
-    before { @object = create(:schedule) }
+    let(:object) { create(:schedule) }
 
-    it "gets a object" do
-      process :get, 'GET', :uri => @object.uri
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to eq(@object.ics)
+    context "the object exists" do
+      it "returns object" do
+        send_request('GET', object.uri)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq(object.ics)
+      end
+    end
+
+    context "the object does not exists" do
+      it "returns 404" do
+        get :get, uri: "/not_found_object_url!"
+        expect(response).to have_http_status(:not_found)
+      end
     end
   end
-
 
   describe 'DELETE /calendars/:uri' do
-    before { @object = create(:schedule) }
+    let(:object) { create(:schedule) }
 
-    it "deletes a object" do
-      process :delete, 'DELETE', :uri => @object.uri
-      expect(response).to have_http_status(:no_content)
+    context "the object exists" do
+      it "returns object" do
+        send_request('DELETE', object.uri)
+        expect(response).to have_http_status(:no_content)
+      end
+    end
+
+    context "the object does not exists" do
+      it "returns 404" do
+        send_request('DELETE', "/not_found_object_url!")
+        expect(response).to have_http_status(:not_found)
+      end
     end
   end
-
 
   describe 'REPORT /calendars/:uri' do
     before { @sched = create(:schedule) }
-    let(:body) { <<EOS
+    let(:multiget) { <<EOS
 <?xml version="1.0" encoding="UTF-8"?>
 <B:calendar-multiget xmlns:B="urn:ietf:params:xml:ns:caldav">
   <A:prop xmlns:A="DAV:">
@@ -145,12 +159,27 @@ EOS
 EOS
     }
 
+    let(:invalid) { <<EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<B:invalidinvalidinvalid xmlns:B="urn:ietf:params:xml:ns:caldav">
+</B:invalidinvalidinvalid>
+EOS
+    }
 
-    it "responds successfully" do
-      calendar = File.basename(@sched.uri, File.extname(@sched.uri))
-      send_request('REPORT', body, "/#{calendar}")
-      expect(response).to have_http_status(207)
-      expect(response.body).to include("calendar-data>BEGIN:VCALENDAR")
+    context "calendar-multiget" do
+      it "returns calendar objects" do
+        calendar = File.basename(@sched.uri, File.extname(@sched.uri))
+        send_request('REPORT', "/#{calendar}", multiget)
+        expect(response).to have_http_status(:multi_status)
+        expect(response.body).to include("calendar-data>BEGIN:VCALENDAR")
+      end
+    end
+
+    context "invalid" do
+      it "returns 501 Not Implemented" do
+        send_request('REPORT', '/', invalid)
+        expect(response).to have_http_status(:not_implemented)
+      end
     end
   end
 end
