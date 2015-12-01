@@ -5,6 +5,32 @@
 module ICS
   extend self
 
+  def parse_date(ics, prop)
+    k = nil
+    for key in ics.keys
+      if key.start_with?(prop)
+        k = key
+      end
+    end
+
+    unless k
+      return nil # property not found
+    end
+
+    if k.include?(';TZID=')
+      timezone = k.split(';TZID=')[1]
+    else
+      timezone = 'UTC' # TZID is not speicifed
+    end
+
+    parser = ActiveSupport::TimeZone[timezone]
+    if parser
+      parser.parse(ics[k]).utc
+    else
+      return nil # invalid TZID
+    end
+  end
+
   def parse(text)
     name, block = parse_block(concat_lines(text))
     if name != 'VCALENDAR'

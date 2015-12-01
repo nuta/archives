@@ -24,25 +24,28 @@ class CalendarController < ApplicationController
     /^\/([a-zA-Z0-9\-_]+)/.match(params[:uri])
     cal_id = $1
 
-    uri  = params[:uri]
     body = request.body.read.force_encoding("UTF-8")
     ics  = ICS::parse(body)
 
-    # TODO
-    comp = "VEVENT"
-    date_start = "20150919T190000"
-    date_end   = "20150920T053000"
-    summary    = "Hello World"
-    uid        = "1234567890"
+    if ics.has_key?("VEVENT")
+      comp_name = "VEVENT"
+      comp = ics[comp_name][0]
+    else
+      # unknown calendar object
+      head :status => :not_implemented
+      return
+    end
 
-    entry = Schedule.where(uri: uri).first_or_create
-    entry.uri  = uri
+    date_start = ICS::parse_date(comp, 'DTSTART')
+    date_end   = ICS::parse_date(comp, 'DTEND')
+
+    entry = Schedule.where(uri: params[:uri]).first_or_create
     entry.ics  = body
-    entry.component = comp
-    entry.summary    = summary
+    entry.component = comp_name
     entry.date_start = date_start
     entry.date_end   = date_end
-    entry.uid        = uid
+    entry.uid        = comp['uid']
+    entry.summary    = comp['summary']
     entry.calendar   = Calendar.find(cal_id)
     entry.save
 
