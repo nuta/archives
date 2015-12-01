@@ -83,6 +83,7 @@ EOS
 
 
   describe 'PUT /calendar/:uri' do
+    before { @cal = create(:calendar) }
     let(:body) { <<EOS
 BEGIN:VCALENDAR
 BEGIN:VEVENT
@@ -96,7 +97,7 @@ EOS
     }
 
     it "creates a object" do
-      uri = '/blah/foo.ics'
+      uri = "/#{@cal.id}/foo.ics"
       send_request('PUT', body, uri)
       expect(response).to have_http_status(:created)
 
@@ -124,6 +125,32 @@ EOS
     it "deletes a object" do
       process :delete, 'DELETE', :uri => @object.uri
       expect(response).to have_http_status(:no_content)
+    end
+  end
+
+
+  describe 'REPORT /calendars/:uri' do
+    before { @sched = create(:schedule) }
+    let(:body) { <<EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<B:calendar-multiget xmlns:B="urn:ietf:params:xml:ns:caldav">
+  <A:prop xmlns:A="DAV:">
+    <A:getetag/>
+    <B:calendar-data/>
+    <C:updated-by xmlns:C="http://calendarserver.org/ns/"/>
+    <C:created-by xmlns:C="http://calendarserver.org/ns/"/>
+  </A:prop>
+  <A:href xmlns:A="DAV:">#{@sched.uri}</A:href>
+</B:calendar-multiget>
+EOS
+    }
+
+
+    it "responds successfully" do
+      calendar = File.basename(@sched.uri, File.extname(@sched.uri))
+      send_request('REPORT', body, "/#{calendar}")
+      expect(response).to have_http_status(207)
+      expect(response.body).to include("calendar-data>BEGIN:VCALENDAR")
     end
   end
 end

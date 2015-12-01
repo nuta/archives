@@ -24,10 +24,14 @@ END:VCALENDAR
     name { generate :name }
   end
 
+  factory :calendar do
+    name { generate :name }
+  end
+
   factory :schedule do
     type = ""
     summary { generate :todo }
-    uri { generate :uuid }
+    uri { "/calendar/1/#{generate :uuid}.ics" }
     ics { generate :ics }
   end
 end

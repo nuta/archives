@@ -76,7 +76,70 @@ class CalendarController < ApplicationController
   end
 
   def report
-    render :text => 'not implemented', :status => :not_implemented
+    xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
+    case xml.children[0].name
+    when 'calendar-multiget'
+      props = xml.xpath('/B:calendar-multiget/A:prop/*',
+                        A: 'DAV:', B:'urn:ietf:params:xml:ns:caldav')
+      uris  = xml.xpath('/B:calendar-multiget/A:href',
+                        A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav')
+
+      rs = []
+      namespaces ={}
+      for uri in uris
+        sched = Schedule.find_by_uri(uri.text)
+        props_ok = []
+        props_not_found = []
+        for prop in props
+          v = nil
+          case prop.name
+          when 'getetag';       v = Digest::MD5.hexdigest(sched.ics)
+          when 'calendar-data'; v = sched.ics
+          end
+
+          namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
+
+          if v
+            props_ok << [prop.namespace.prefix, prop.name, v]
+          else
+            props_not_found << [prop.namespace.prefix, prop.name, '']
+          end
+        end
+        rs << [uri.text, props_ok, props_not_found]
+      end
+
+      # create a response XML
+      res = Nokogiri::XML::Builder.new do |xml|
+        xml.multistatus("xmlns" => "DAV:", **namespaces) {
+          for uri, props_ok, props_not_found in rs
+            xml.response {
+              xml.href uri
+              xml.propstat {
+                xml.prop {
+                  props_ok.each do |prefix, name, v|
+                    xml[prefix].send(name, v)
+                  end
+                }
+                xml.status 'HTTP/1.1 200 OK'
+              }
+  
+              xml.propstat {
+                xml.prop {
+                  props_not_found.each do |prefix, name, v|
+                    xml[prefix].send(name, v)
+                  end
+                }
+                xml.status 'HTTP/1.1 404 Not Found'
+              }
+            }
+          end
+        }
+      end
+      render :xml => res.to_xml, :status => :multi_status
+    else
+      head :status => :not_implemented
+      return
+    end
   end
 
   def proppatch
@@ -299,7 +362,7 @@ class CalendarController < ApplicationController
           end
         end
 
-        cs << ["/calendar/#{cal_id}/#{sched.uri}", props_ok, props_not_found]
+        cs << [sched.uri, props_ok, props_not_found]
       end
 
       # create a response XML
