@@ -1,3 +1,5 @@
+require 'digest/md5'
+
 class CalendarController < ApplicationController
   before_action :authenticate, except: [:options]
 
@@ -19,6 +21,9 @@ class CalendarController < ApplicationController
   end
 
   def put
+    /^\/([a-zA-Z0-9\-_]+)/.match(params[:uri])
+    cal_id = $1
+
     uri  = params[:uri]
     body = request.body.read.force_encoding("UTF-8")
     ics  = ICS::parse(body)
@@ -38,6 +43,7 @@ class CalendarController < ApplicationController
     entry.date_start = date_start
     entry.date_end   = date_end
     entry.uid        = uid
+    entry.calendar   = Calendar.find(cal_id)
     entry.save
 
     head :status => :created
@@ -107,13 +113,8 @@ class CalendarController < ApplicationController
   def propfind
     uri = params['uri']
 
-    # XXX
-    if uri == ''
-      uri = '/'
-    end
-
     case uri
-    when '/'
+    when '', '/'
       # PROPFIND to / (root)
       xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
       props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
@@ -127,9 +128,9 @@ class CalendarController < ApplicationController
         v = nil
         case prop.name
         when 'displayname';                v = ''
-        when 'calendar-home-set';          v = '/calendar/hello-world' # XXX
-        when 'principal-URL';              v = '/'
-        when 'principal-collection-set';   v = '/'
+        when 'calendar-home-set';          v = '/calendar/calendars'
+#        when 'principal-URL';              v = '/calendar/principal-url'
+#        when 'principal-collection-set';   v = '/calendar/principal-collection-set'
         end
 
         namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
@@ -145,12 +146,12 @@ class CalendarController < ApplicationController
       res = Nokogiri::XML::Builder.new do |xml|
         xml.multistatus("xmlns" => "DAV:", **namespaces) {
           xml.response {
-            xml.href uri
+            xml.href "/calendar/"
             xml.propstat {
               xml.prop {
                 props_ok.each do |prefix, name, v|
                   case name
-                  when 'calendar-home-set'
+                  when 'calendar-home-set', 'principal-URL', 'principal-collection-set'
                     xml[prefix].send(name) {
                       xml.href v
                     }
@@ -174,9 +175,9 @@ class CalendarController < ApplicationController
         }
       end
       render :xml => res.to_xml, :status => :multi_status
-    else
+    when '/calendars'
       # get a list of calendars
-      cal_name = params['uri']
+      uri = params['uri']
 
       xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
       props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
@@ -214,7 +215,7 @@ class CalendarController < ApplicationController
           end
         end
 
-        cs << ["/calendar/#{cal_name}/", props_ok, props_not_found]
+        cs << ["/calendar/#{cal.id}", props_ok, props_not_found]
       end
 
       # create a response XML
@@ -241,6 +242,76 @@ class CalendarController < ApplicationController
                     else
                       xml[prefix].send(name, v)
                     end
+                  end
+                }
+                xml.status 'HTTP/1.1 200 OK'
+              }
+  
+              xml.propstat {
+                xml.prop {
+                  props_not_found.each do |prefix, name, v|
+                    xml[prefix].send(name, v)
+                  end
+                }
+                xml.status 'HTTP/1.1 404 Not Found'
+              }
+            }
+          end
+        }
+      end
+      render :xml => res.to_xml, :status => :multi_status
+    else
+      # get a list of calendar objects
+      uri = params['uri']
+      /^\/([a-zA-Z0-9\-_]+)/.match(uri)
+      cal_id = $1
+
+      xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
+      props = xml.xpath('/A:propfind/A:prop/*', A: 'DAV:')
+
+      cs = []               # calendars
+      namespaces = {}       # namespaces used in a response XML
+      caldav_ns = ''
+
+      # process each properties in the request
+      for sched in Schedule.where(calendar_id: Calendar.find(cal_id))
+        props_ok = []         # properties we know what it is
+        props_not_found = []  # properties we don't know
+
+        for prop in props
+          v = nil
+          # TODO
+          case prop.name
+          when 'getcontenttype';  v = 'text/calendar; component=vevent; charset=utf-8'
+          when 'getetag';         v = Digest::MD5.hexdigest(sched.ics)
+          end
+
+          if prop.namespace.href == 'urn:ietf:params:xml:ns:caldav'
+            caldav_ns = prop.namespace.prefix
+          end
+  
+          namespaces["xmlns:#{prop.namespace.prefix}".to_sym] = prop.namespace.href
+
+          if v
+            props_ok << [prop.namespace.prefix, prop.name, v]
+          else
+            props_not_found << [prop.namespace.prefix, prop.name, '']
+          end
+        end
+
+        cs << ["/calendar/#{cal_id}/#{sched.uri}", props_ok, props_not_found]
+      end
+
+      # create a response XML
+      res = Nokogiri::XML::Builder.new do |xml|
+        xml.multistatus("xmlns" => "DAV:", **namespaces) {
+          for href, props_ok, props_not_found in cs
+            xml.response {
+              xml.href href
+              xml.propstat {
+                xml.prop {
+                  props_ok.each do |prefix, name, v|
+                    xml[prefix].send(name, v)
                   end
                 }
                 xml.status 'HTTP/1.1 200 OK'
