@@ -4,8 +4,8 @@ class CalendarController < ApplicationController
   before_action :authenticate, except: [:options]
 
   def options
-    headers['Allow'] = 'OPTIONS, GET, PUT, DELETE, MKCALENDAR, ' +
-                       'PROPFIND, PROPPATCH, REPORT'
+    methods = %w(OPTIONS GET PUT DELETE MKCALENDAR PROPFIND PROPPATCH REPORT)
+    headers['Allow'] = methods.join(', ')
     headers['DAV']   = '1, 2, calendar-access'
     head :ok
   end
@@ -24,26 +24,26 @@ class CalendarController < ApplicationController
     body = request.body.read.force_encoding("UTF-8")
     ics  = ICS::parse(body)
 
-    if ics.has_key?("VEVENT")
-      comp_name = "VEVENT"
-      comp = ics[comp_name][0]
-    else
+    unless ics.has_key?("VEVENT")
       # unknown calendar object
       head :status => :not_implemented
       return
     end
 
+    comp_name = "VEVENT"
+    comp = ics[comp_name][0]
     date_start = ICS::parse_date(comp, 'DTSTART')
     date_end   = ICS::parse_date(comp, 'DTEND')
+    calendar   = Calendar.find(params[:calendar])
 
     entry = Schedule.where(uri: params[:calendar_object]).first_or_create
-    entry.ics  = body
-    entry.component = comp_name
+    entry.ics        = body
+    entry.component  = comp_name
     entry.date_start = date_start
     entry.date_end   = date_end
+    entry.calendar   = calendar
     entry.uid        = comp['uid']
     entry.summary    = comp['summary']
-    entry.calendar   = Calendar.find(params[:calendar])
     entry.save
 
     head :status => :created

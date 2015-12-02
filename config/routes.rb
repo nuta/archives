@@ -4,9 +4,12 @@ Rails.application.routes.draw do
   methods = %w(options get put delete mkcalendar propfind proppatch report)
 
   methods.each do |method|
-    match '/calendar', calendar: '', calendar_object: '', to: 'calendar#' + method, via: method.to_s
-    match '/calendar/:calendar', calendar_object: '', to: 'calendar#' + method, via: method.to_s
-    match '/calendar/:calendar/*calendar_object', to: 'calendar#' + method, via: method.to_s
+    match '/calendar', calendar: '', calendar_object: '',
+          to: 'calendar#' + method, via: method.to_s
+    match '/calendar/:calendar', calendar_object: '',
+          to: 'calendar#' + method, via: method.to_s
+    match '/calendar/:calendar/*calendar_object',
+          to: 'calendar#' + method, via: method.to_s
   end
 
   # other requests: return 404 Bad Request
