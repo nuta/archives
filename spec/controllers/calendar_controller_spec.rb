@@ -66,6 +66,34 @@ EOS
     end
   end
 
+  describe 'PROPPATCH' do
+    before { @cal = create(:calendar) }
+    let(:body) { <<EOS
+<?xml version="1.0" encoding="utf-8" ?>
+<D:propertyupdate xmlns:D="DAV:">
+  <D:set>
+    <D:prop>
+      <D:displayname>Hellooo</D:displayname>
+    </D:prop>
+  </D:set>
+  <D:remove>
+    <D:prop>
+      <C:calendar-color xmlns:C="http://apple.com/ns/ical/" /> 
+    </D:prop>
+  </D:remove>
+</D:propertyupdate>
+EOS
+    }
+
+    it "updates calendar properties" do
+      send_request('PROPPATCH', "#{@cal.id}", body)
+      expect(response).to have_http_status(207)
+      expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
+#      expect(@cal.propxml).to include("Helooo")
+#      expect(@cal.propxml).not_to include("calendar-color")
+    end
+  end
+
   describe 'MKCALENDAR' do
     let(:body) { <<EOS
   <?xml version="1.0" encoding="UTF-8"?>

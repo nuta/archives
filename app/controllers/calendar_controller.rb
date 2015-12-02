@@ -11,12 +11,7 @@ class CalendarController < ApplicationController
   end
 
   def get
-    entry = Schedule.find_by_uri(params[:calendar_object])
-    unless entry
-      head :status => :not_found
-      return
-    end
-
+    entry = Schedule.find_by_uri!(params[:calendar_object])
     render :text => entry.ics, :status => :ok
   end
 
@@ -58,13 +53,7 @@ class CalendarController < ApplicationController
   end
 
   def delete
-    entry = Schedule.find_by_uri(params[:calendar_object])
-
-    unless entry
-      head :status => :not_found
-      return
-    end
-
+    entry = Schedule.find_by_uri!(params[:calendar_object])
     entry.delete
     head :status => :no_content
   end
@@ -99,10 +88,12 @@ class CalendarController < ApplicationController
 
   def proppatch
     # TODO
-    respond_xml_request('/A:propertyupdate/A:set/A:prop/*') do |props|
-      results = handle_props(props) {|prop| ''}
-      return [uri, results]
+    xml = respond_xml_request('/A:propertyupdate/A:set/A:prop/*') do |props|
+      results = handle_props(props) {|prop| '' }
+      [[params[:calendar], results]]
     end
+
+    render :xml => xml, :status => :multi_status
   end
 
   def propfind
@@ -126,7 +117,7 @@ class CalendarController < ApplicationController
       responses = []      
       for uri in uris
         results = handle_props(props) do |prop|
-          sched = Schedule.find_by_uri(uri.text)
+          sched = Schedule.find_by_uri!(uri.text)
           case prop
           when 'getetag'
             Digest::MD5.hexdigest(sched.ics)
@@ -184,8 +175,9 @@ class CalendarController < ApplicationController
   def propfind_list_objects
     # get a list of calendar objects
     respond_xml_request('/A:propfind/A:prop/*') do |props|
+      calendar = Calendar.find(params[:calendar_object])
       responses = []
-      for sched in Schedule.where(calendar_id: Calendar.find(params[:calendar_object]))
+      Schedule.where(calendar_id: calendar).find_each do |sched|
         results = handle_props(props) do |prop|
           case prop
           when 'getcontenttype'  
@@ -216,26 +208,6 @@ class CalendarController < ApplicationController
     return ps
   end
 
-  def stringify_http_status_code(status)
-    code = Rack::Utils::SYMBOL_TO_STATUS_CODE[status]
-    desc = Rack::Utils::HTTP_STATUS_CODES[code]
-
-    "HTTP/1.1 #{code} #{desc}"
-  end
-
-  def authenticate
-    authenticate_or_request_with_http_basic('realm') do |name, password|
-      @user = User.find_by_name(name)
-
-      if not @user or @user.password != password
-        logger.warn "user '#{name}' not found"
-        head :status => :forbidden
-        return
-      end
-      true
-    end
-  end
-
   def respond_xml_request(xpath)
     xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
     props = xml.xpath(xpath, A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
@@ -254,32 +226,52 @@ class CalendarController < ApplicationController
 
   def create_multistatus_xml(responses, namespaces)
     r = Nokogiri::XML::Builder.new do |xml|
-      xml.multistatus("xmlns" => "DAV:", **namespaces) {
+      xml.multistatus("xmlns" => "DAV:", **namespaces) do
         for href, results in responses
-          xml.response {
+          xml.response do
             xml.href href
             for status, props in results
-              xml.propstat {
+              xml.propstat do
                 xml.status stringify_http_status_code(status)
-                xml.prop {  
+                xml.prop do  
                   for prefix, name, child in props
                     if child.class == Hash
-                      xml[prefix].send(name) {
+                      xml[prefix].send(name) do
                         attrs = (child[:attrs])? child[:attrs] : {}
                         xml[child[:prefix]].send(child[:name], child[:value],
                                                  attrs)
-                      }
+                      end
                     else
                       xml[prefix].send(name, child)
                     end
-                  end # for in props
-                } # xml.prop
-            } # xml.propstat
-            end # for in results
-          } # xml.response
-        end # for in responses
-      } # xml.multistatus
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end.to_xml
+  end
+
+  def stringify_http_status_code(status)
+    code = Rack::Utils::SYMBOL_TO_STATUS_CODE[status]
+    desc = Rack::Utils::HTTP_STATUS_CODES[code]
+
+    "HTTP/1.1 #{code} #{desc}"
+  end
+
+  def authenticate
+    authenticate_or_request_with_http_basic('realm') do |name, password|
+      @user = User.find_by_name(name)
+
+      if not @user or @user.password != password
+        logger.warn "user '#{name}' not found"
+        head :status => :forbidden
+        return
+      end
+
+      true
     end
-    r.to_xml
   end
 end
