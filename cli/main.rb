@@ -9,6 +9,7 @@ case ARGV[0]
 when "create-guest"
   guest = User.new
   guest.name = "guest"
+  guest.password = "password"
   guest.save
 else
   puts HELP
