@@ -11,7 +11,7 @@ class CalendarController < ApplicationController
   end
 
   def get
-    entry = Schedule.find_by_uri(params[:uri])
+    entry = Schedule.find_by_uri(params[:calendar_object])
     unless entry
       head :status => :not_found
       return
@@ -21,9 +21,6 @@ class CalendarController < ApplicationController
   end
 
   def put
-    /^\/([a-zA-Z0-9\-_]+)/.match(params[:uri])
-    cal_id = $1
-
     body = request.body.read.force_encoding("UTF-8")
     ics  = ICS::parse(body)
 
@@ -39,21 +36,22 @@ class CalendarController < ApplicationController
     date_start = ICS::parse_date(comp, 'DTSTART')
     date_end   = ICS::parse_date(comp, 'DTEND')
 
-    entry = Schedule.where(uri: params[:uri]).first_or_create
+    entry = Schedule.where(uri: params[:calendar_object]).first_or_create
     entry.ics  = body
     entry.component = comp_name
     entry.date_start = date_start
     entry.date_end   = date_end
     entry.uid        = comp['uid']
     entry.summary    = comp['summary']
-    entry.calendar   = Calendar.find(cal_id)
+    entry.calendar   = Calendar.find(params[:calendar])
     entry.save
 
     head :status => :created
   end
 
   def delete
-    entry = Schedule.find_by_uri(params[:uri])
+    entry = Schedule.find_by_uri(params[:calendar_object])
+
     unless entry
       head :status => :not_found
       return
@@ -100,14 +98,14 @@ class CalendarController < ApplicationController
   end
 
   def propfind
-    xml = case params[:uri]
-          when '', '/'
-            propfind_root
-          when '/calendars'
-            propfind_list_calendars
-          else
-            propfind_list_objects
-          end
+    if params[:calendar] == 'calendars'
+      xml = propfind_list_calendars
+    elsif params[:calendar_object] != ''
+      xml = propfind_list_objects
+    else
+      xml = propfind_root
+    end
+
     render :xml => xml, :status => :multi_status
   end
 
@@ -145,7 +143,8 @@ class CalendarController < ApplicationController
           {prefix: 'A', name: 'href', value: '/calendar/calendars'}
         end
       end
-      [[params[:uri], results]]
+
+      [["#{params[:calendar]}/#{params[:calendar_object]}", results]]
     end
   end
 
@@ -176,12 +175,9 @@ class CalendarController < ApplicationController
 
   def propfind_list_objects
     # get a list of calendar objects
-    uri = params['uri']
-    /^\/([a-zA-Z0-9\-_]+)/.match(uri)
-    cal_id = $1
     respond_xml_request('/A:propfind/A:prop/*') do |props|
       responses = []
-      for sched in Schedule.where(calendar_id: Calendar.find(cal_id))
+      for sched in Schedule.where(calendar_id: Calendar.find(params[:calendar_object]))
         results = handle_props(props) do |prop|
           case prop
           when 'getcontenttype'  

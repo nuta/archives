@@ -27,7 +27,7 @@ END:VCALENDAR
   factory :schedule do
     type = ""
     summary { generate :todo }
-    uri { "/calendar/1/#{generate :uuid}.ics" }
+    uri { "#{generate :uuid}.ics" }
     ics { generate :ics }
   end
 end
