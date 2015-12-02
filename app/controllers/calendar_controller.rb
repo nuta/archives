@@ -24,13 +24,21 @@ class CalendarController < ApplicationController
     body = request.body.read.force_encoding("UTF-8")
     ics  = ICS::parse(body)
 
-    unless ics.has_key?("VEVENT")
+    # determine component type
+    comp_name = ''
+    for comp_type in %w(VEVENT VTODO)
+      if ics.has_key?(comp_type)
+        comp_name = comp_type
+        break
+      end
+    end
+    
+    unless comp_name
       # unknown calendar object
       head :status => :not_implemented
       return
     end
 
-    comp_name = "VEVENT"
     comp = ics[comp_name][0]
     date_start = ICS::parse_date(comp, 'DTSTART')
     date_end   = ICS::parse_date(comp, 'DTEND')
