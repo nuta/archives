@@ -27,7 +27,7 @@ class CalendarController < ApplicationController
         break
       end
     end
-    
+
     unless comp_name
       # unknown calendar object
       head :status => :not_implemented
@@ -114,7 +114,7 @@ class CalendarController < ApplicationController
     respond_xml_request('/C:calendar-multiget/A:prop/*') do |props|
       uris  = xml.xpath('/C:calendar-multiget/A:href',
                         A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
-      responses = []      
+      responses = []
       for uri in uris
         results = handle_props(props) do |prop|
           sched = Schedule.find_by_uri!(uri.text)
@@ -152,22 +152,22 @@ class CalendarController < ApplicationController
     respond_xml_request('/A:propfind/A:prop/*') do |props|
       responses = []
       for cal in Calendar.all
-        results = handle_props(props) do |prop|
+          results = handle_props(props) do |prop|
           case prop
-          when 'calendar-color'                   
+          when 'calendar-color'
               '#00ff00'
-          when 'calendar-order'                   
+          when 'calendar-order'
               '10'
-          when 'displayname'                      
+          when 'displayname'
               'No Name'
-          when 'supported-calendar-component-set' 
+          when 'supported-calendar-component-set'
               {prefix: 'C', name: 'comp', attrs: {:name => 'VEVENT'}}
-          when 'resourcetype'                     
+          when 'resourcetype'
               ''
           end
         end
         responses << ["/calendar/#{cal.uri}", results]
-      end  
+      end
       responses
     end
   end
@@ -180,9 +180,9 @@ class CalendarController < ApplicationController
       Schedule.where(calendar_id: calendar).find_each do |sched|
         results = handle_props(props) do |prop|
           case prop
-          when 'getcontenttype'  
+          when 'getcontenttype'
             'text/calendar; component=vevent; charset=utf-8'
-          when 'getetag'        
+          when 'getetag'
             Digest::MD5.hexdigest(sched.ics)
           end
         end
@@ -233,7 +233,7 @@ class CalendarController < ApplicationController
             for status, props in results
               xml.propstat do
                 xml.status stringify_http_status_code(status)
-                xml.prop do  
+                xml.prop do
                   for prefix, name, child in props
                     if child.class == Hash
                       xml[prefix].send(name) do
