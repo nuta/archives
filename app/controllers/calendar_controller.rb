@@ -166,7 +166,7 @@ class CalendarController < ApplicationController
               ''
           end
         end
-        responses << ["/calendar/#{cal.id}", results]
+        responses << ["/calendar/#{cal.uri}", results]
       end  
       responses
     end
