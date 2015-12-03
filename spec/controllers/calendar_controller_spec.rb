@@ -86,7 +86,7 @@ EOS
     }
 
     it "updates calendar properties" do
-      send_request('PROPPATCH', "#{@cal.id}", body)
+      send_request('PROPPATCH', "#{@cal.uri}", body)
       expect(response).to have_http_status(207)
       expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
 #      expect(@cal.propxml).to include("Helooo")
@@ -135,7 +135,7 @@ EOS
     }
 
     it "creates a object" do
-      send_request('PUT', "#{@cal.id}/foo.ics", body)
+      send_request('PUT', "#{@cal.uri}/foo.ics", body)
       expect(response).to have_http_status(:created)
 
       schedule = Schedule.where(uri: 'foo.ics').first

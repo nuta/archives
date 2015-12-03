@@ -22,6 +22,7 @@ END:VCALENDAR
 
   factory :calendar do
     name { generate :name }
+    uri { generate :uuid }
     propxml { <<EOS
   <?xml version="1.0" encoding="UTF-8"?>
   <A:prop xmlns:A="DAV:">

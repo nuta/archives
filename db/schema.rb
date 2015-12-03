@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151201081548) do
+ActiveRecord::Schema.define(version: 20151203014745) do
 
   create_table "calendars", force: :cascade do |t|
     t.string   "name"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20151201081548) do
     t.integer  "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string   "uri"
   end
 
   add_index "calendars", ["user_id"], name: "index_calendars_on_user_id"

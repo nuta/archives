@@ -37,7 +37,7 @@ class CalendarController < ApplicationController
     comp = ics[comp_name][0]
     date_start = ICS::parse_date(comp, 'DTSTART')
     date_end   = ICS::parse_date(comp, 'DTEND')
-    calendar   = Calendar.find(params[:calendar])
+    calendar   = Calendar.find_by_uri!(params[:calendar])
 
     entry = Schedule.where(uri: params[:calendar_object]).first_or_create
     entry.ics        = body
@@ -63,8 +63,8 @@ class CalendarController < ApplicationController
     xml  = Nokogiri::XML(body)
     name = xml.xpath('/B:mkcalendar/A:set/A:prop/A:displayname',
                      A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav').children.to_s
-
     calendar = Calendar.new
+    calendar.uri     = params[:calendar]
     calendar.name    = name
     calendar.propxml = body
     calendar.user    = @user
@@ -175,7 +175,7 @@ class CalendarController < ApplicationController
   def propfind_list_objects
     # get a list of calendar objects
     respond_xml_request('/A:propfind/A:prop/*') do |props|
-      calendar = Calendar.find(params[:calendar_object])
+      calendar = Calendar.find_by_uri!(params[:calendar])
       responses = []
       Schedule.where(calendar_id: calendar).find_each do |sched|
         results = handle_props(props) do |prop|
