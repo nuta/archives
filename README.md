@@ -7,23 +7,24 @@ Busybook
 
 Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 
-## Features (ToDo)
+## Features and ToDo
 - [ ] CalDAV
+  - [x] HTTP Basic auth
   - [x] fundamental functions
   - [ ] etag support (including `If-Match`)
   - [ ] ctag support
   - [ ] principals
   - [ ] test by [CalDAVTester](http://calendarserver.org/wiki/CalDAVTester)
-- [ ] CardDAV
-- [ ] command-line utility (add user, backup)
+- [ ] rake commands: adding user and backup
 - [ ] write documentation
+- [ ] CardDAV *(I'll work on this when Apple fixes a bug in Contacts.app)*
 
 ## License
 Public domain
 
 ## compliance
 - [RFC4918: HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)](http://tools.ietf.org/html/rfc4918)
-  - supports `GET`, `PUT`, `DELETE`, `OPTIONS`, `PROPFIND`, and `PROPPATCH` HTTP methods
+  - supports `GET`, `PUT`, `DELETE`, `OPTIONS`, `MKCALENDAR`, `PROPFIND`, and `PROPPATCH` HTTP methods
   - does not support `HEAD`, `POST`, `LOCK`, `UNLOCK`, `COPY`, `MOVE`, and `MKCOL` HTTP methods
 - [RFC3744: WebDAV Access Control Protocol](https://tools.ietf.org/html/rfc3744)
   - not supported
