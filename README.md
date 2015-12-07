@@ -19,7 +19,7 @@ Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 - [ ] write documentation
 
 ## License
-[MIT License](http://opensource.org/licenses/mit-license.php)
+Public domain
 
 ## compliance
 - [RFC4918: HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)](http://tools.ietf.org/html/rfc4918)
