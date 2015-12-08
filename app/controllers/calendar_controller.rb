@@ -173,6 +173,16 @@ class CalendarController < ApplicationController
     respond_xml_request('/A:propfind/A:prop/*') do |props|
       results = handle_props(props) do |prop|
         case prop
+        when 'current-user-privilege-set'
+          <<-EOS
+            <A:privilege>
+              <A:all />
+              <A:read />
+              <A:write />
+              <A:write-properties />
+              <A:write-content />
+            </A:privilege>
+EOS
           when 'supported-calendar-component-set'
             <<-EOS
               <CALDAV:comp name="VTODO" />
