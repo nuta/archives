@@ -16,7 +16,7 @@ class CalendarController < ApplicationController
   end
 
   def put
-    body = request.body.read.force_encoding("UTF-8")
+    body = request_body
     ics  = ICS::parse(body)
 
     # determine component type
@@ -59,7 +59,7 @@ class CalendarController < ApplicationController
   end
 
   def mkcalendar
-    body = request.body.read.force_encoding("UTF-8")
+    body = request_body
     xml  = Nokogiri::XML(body)
     name = xml.xpath('/B:mkcalendar/A:set/A:prop/A:displayname',
                      A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav').children.to_s
@@ -74,7 +74,7 @@ class CalendarController < ApplicationController
   end
 
   def report
-    xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
+    xml = Nokogiri::XML(request_body)
     res = case xml.children[0].name
           when 'calendar-multiget'
             report_multiget(xml)
@@ -90,7 +90,7 @@ class CalendarController < ApplicationController
     # TODO
     xml = respond_xml_request('/A:propertyupdate/A:set/A:prop/*') do |props|
       results = handle_props(props) {|prop| '' }
-      [[params[:calendar], results]]
+      [["/calendar/#{params[:calendar]}/", results]]
     end
 
     render :xml => xml, :status => :multi_status
@@ -99,7 +99,7 @@ class CalendarController < ApplicationController
   def propfind
     if params[:calendar] == 'calendars'
       xml = propfind_list_calendars
-    elsif params[:calendar_object] != ''
+    elsif params[:calendar] != ''
       xml = propfind_list_objects
     else
       xml = propfind_root
@@ -114,10 +114,14 @@ class CalendarController < ApplicationController
     respond_xml_request('/C:calendar-multiget/A:prop/*') do |props|
       uris  = xml.xpath('/C:calendar-multiget/A:href',
                         A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
+
       responses = []
       for uri in uris
+        # TODO: return 404 reponse if it does not exists
+        sched_uri = File.basename(uri)
+        sched = Schedule.find_by_uri!(sched_uri)
+
         results = handle_props(props) do |prop|
-          sched = Schedule.find_by_uri!(uri.text)
           case prop
           when 'getetag'
             Digest::MD5.hexdigest(sched.ics)
@@ -139,34 +143,50 @@ class CalendarController < ApplicationController
         when 'displayname'
           ''
         when 'calendar-home-set'
-          {prefix: 'A', name: 'href', value: '/calendar/calendars'}
+          '<A:href>/calendar/calendars</A:href>'
         end
       end
 
-      [["#{params[:calendar]}/#{params[:calendar_object]}", results]]
+      [["/", results]]
     end
   end
 
   def propfind_list_calendars
     # get a list of calendars
     respond_xml_request('/A:propfind/A:prop/*') do |props|
-      responses = []
+      results = handle_props(props) do |prop|
+        case prop
+          when 'supported-calendar-component-set'
+            <<-EOS
+              <CALDAV:comp name="VTODO" />
+              <CALDAV:comp name="VEVENT" />
+EOS
+          when 'resourcetype'
+            "<A:collection />"
+        end
+      end
+      responses = [["/calendar/calendars/", results]]
+
       for cal in Calendar.all
-          results = handle_props(props) do |prop|
+        propxml = Nokogiri::XML(cal.propxml)
+        results = handle_props(props) do |prop|
           case prop
           when 'calendar-color'
-              '#00ff00'
+            '#ff00ff'
           when 'calendar-order'
-              '10'
+            '10'
           when 'displayname'
-              'No Name'
+            cal.name
           when 'supported-calendar-component-set'
-              {prefix: 'C', name: 'comp', attrs: {:name => 'VEVENT'}}
+              '<CALDAV:comp name="VEVENT" />'
           when 'resourcetype'
-              ''
+            <<-EOS
+              <CALDAV:calendar />
+              <A:collection />
+EOS
           end
         end
-        responses << ["/calendar/#{cal.uri}", results]
+        responses << ["/calendar/#{cal.uri}/", results]
       end
       responses
     end
@@ -208,12 +228,20 @@ class CalendarController < ApplicationController
     return ps
   end
 
+  def request_body
+    request.body.seek(0)
+    request.body.read.force_encoding("UTF-8")
+  end                                              
+
   def respond_xml_request(xpath)
-    xml = Nokogiri::XML(request.body.read.force_encoding("UTF-8"))
+    xml = Nokogiri::XML(request_body)
     props = xml.xpath(xpath, A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
     responses = yield props
 
-    namespaces = {}
+    namespaces = {
+      'xmlns:CALDAV' => 'urn:ietf:params:xml:ns:caldav'
+    }
+
     for prop in props
       prefix = "xmlns:#{prop.namespace.prefix}".to_sym
       unless namespaces.has_key?(prefix)
@@ -225,33 +253,39 @@ class CalendarController < ApplicationController
   end
 
   def create_multistatus_xml(responses, namespaces)
-    r = Nokogiri::XML::Builder.new do |xml|
-      xml.multistatus("xmlns" => "DAV:", **namespaces) do
-        for href, results in responses
-          xml.response do
-            xml.href href
-            for status, props in results
-              xml.propstat do
-                xml.status stringify_http_status_code(status)
-                xml.prop do
-                  for prefix, name, child in props
-                    if child.class == Hash
-                      xml[prefix].send(name) do
-                        attrs = (child[:attrs])? child[:attrs] : {}
-                        xml[child[:prefix]].send(child[:name], child[:value],
-                                                 attrs)
-                      end
-                    else
-                      xml[prefix].send(name, child)
-                    end
-                  end
-                end
-              end
-            end
+    ns = ""
+    namespaces.each do |prefix, uri|
+      ns += " #{prefix}=\"#{uri}\""
+    end
+
+    xml = <<EOS
+<?xml version="1.0" encoding="UTF-8"?>
+<multistatus xmlns="DAV:" #{ns}>
+EOS
+    for href, results in responses
+      xml += "<response>"
+      xml += "  <href>#{href}</href>"
+      for status, props in results
+        xml += "<propstat>"
+        xml += "  <status>#{stringify_http_status_code(status)}</status>"
+        xml += "  <prop>"
+        for ns, name, child in props
+          if child
+            xml += "<#{ns}:#{name}>"
+            xml += child
+            xml += "</#{ns}:#{name}>"
+          else
+            xml += "<#{ns}:#{name} />"
           end
         end
+        xml += "  </prop>"
+        xml += "</propstat>"
       end
-    end.to_xml
+      xml += "</response>"
+    end
+    xml += "</multistatus>"
+
+    xml
   end
 
   def stringify_http_status_code(status)
