@@ -39,6 +39,19 @@ class CalendarController < ApplicationController
     date_end   = ICS::parse_date(comp, 'DTEND')
     calendar   = Calendar.find_by_uri!(params[:calendar])
 
+    sched = Schedule.where(uri: params[:calendar_object]).first
+
+    if request.headers.key?("If-None-Match") and sched
+      head :status => :precondition_failed
+      return
+    end
+
+    if request.headers.key?("If-Match") and
+      getetag(sched) != request.headers["If-Match"]
+      head :status => :precondition_failed
+      return
+    end
+
     entry = Schedule.where(uri: params[:calendar_object]).first_or_create
     entry.ics        = body
     entry.component  = comp_name
@@ -110,6 +123,10 @@ class CalendarController < ApplicationController
 
   private
 
+  def getetag(sched)
+    Digest::MD5.hexdigest(sched.ics)
+  end
+
   def report_multiget(xml)
     respond_xml_request('/C:calendar-multiget/A:prop/*') do |props|
       uris  = xml.xpath('/C:calendar-multiget/A:href',
@@ -124,7 +141,7 @@ class CalendarController < ApplicationController
         results = handle_props(props) do |prop|
           case prop
           when 'getetag'
-            Digest::MD5.hexdigest(sched.ics)
+            getetag(sched)
           when 'calendar-data'
             sched.ics
           end
@@ -203,7 +220,7 @@ EOS
           when 'getcontenttype'
             'text/calendar; component=vevent; charset=utf-8'
           when 'getetag'
-            Digest::MD5.hexdigest(sched.ics)
+            getetag(sched)
           end
         end
         responses << [sched.uri, results]
