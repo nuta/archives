@@ -86,11 +86,12 @@ EOS
     }
 
     it "updates calendar properties" do
-      send_request('PROPPATCH', "#{@cal.uri}", body)
+      send_request('PROPPATCH', @cal.uri, body)
       expect(response).to have_http_status(207)
       expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
-#      expect(@cal.propxml).to include("Helooo")
-#      expect(@cal.propxml).not_to include("calendar-color")
+      cal = Calendar.find_by_uri!(@cal.uri)
+      expect(cal.propxml).to include("Hellooo")
+      expect(cal.propxml).not_to include("calendar-color")
     end
   end
 

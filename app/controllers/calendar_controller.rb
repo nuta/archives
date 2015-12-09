@@ -114,13 +114,32 @@ class CalendarController < ApplicationController
   end
 
   def proppatch
-    # TODO
-    xml = respond_xml_request('/A:propertyupdate/A:set/A:prop/*') do |props|
+    if params[:calendar_object] != ""
+      # PROPPATCH to a calendar object is not supported yet
+      head :status => :not_implemented
+      return
+    end
+
+    xml = Nokogiri::XML(request_body)
+    cal = Calendar.find_by_uri!(params[:calendar])
+    calprops = cal.props
+
+    for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
+      calprops[prop.name] = replace_propxml_nsprefix(xml, prop.children.to_s)
+    end
+
+    for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
+      calprops.delete(prop.name)
+    end
+
+    res = respond_xml_request('/A:propertyupdate/*/A:prop/*') do |props|
       results = handle_props(props) {|prop| '' }
       [["/calendar/#{params[:calendar]}/", results]]
     end
 
-    render :xml => xml, :status => :multi_status
+    cal.props = calprops
+    cal.save
+    render :xml => res, :status => :multi_status
   end
 
   def propfind
