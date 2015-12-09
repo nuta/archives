@@ -15,17 +15,10 @@ when "create-guest"
   cal.uri = "123-456-789"
   cal.name = "Aiueo"
   cal.propxml = <<EOS
-<?xml version="1.0" encoding="UTF-8"?>
-<B:mkcalendar xmlns:B="urn:ietf:params:xml:ns:caldav">
-  <A:set xmlns:A="DAV:">
-    <A:prop>
-      <D:calendar-color xmlns:D="http://apple.com/ns/ical/" symbolic-color="purple">
-      #7176FF
-      </D:calendar-color>
-      <A:displayname>Aiueo</A:displayname>
-    </A:prop>
-  </A:set>
-</B:mkcalendar>
+    {
+        "calendar-color": "#7176FF",
+        "displayname": "Aiueo"
+    }
 EOS
   cal.user = guest
   cal.save

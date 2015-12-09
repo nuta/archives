@@ -76,14 +76,24 @@ class CalendarController < ApplicationController
   end
 
   def mkcalendar
-    body = request_body
-    xml  = Nokogiri::XML(body)
-    name = xml.xpath('/B:mkcalendar/A:set/A:prop/A:displayname',
-                     A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav').children.to_s
+    xml = Nokogiri::XML(request_body)
+
     calendar = Calendar.new
+    props = {}
+
+    for prop in xml.xpath('/B:mkcalendar/A:set/A:prop/*',
+                          A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav')
+
+      props[prop.name] = replace_propxml_nsprefix(xml, prop.to_s)
+
+      if prop.name == 'displayname'
+        name = prop.children.to_s
+      end
+    end
+
+    calendar.props   = props
     calendar.uri     = params[:calendar]
     calendar.name    = name
-    calendar.propxml = body
     calendar.user    = @user
     calendar.save
 
@@ -114,12 +124,10 @@ class CalendarController < ApplicationController
   end
 
   def propfind
-    if params[:calendar] == 'calendars'
-      xml = propfind_list_calendars
-    elsif params[:calendar] != ''
-      xml = propfind_list_objects
+    if params[:calendar] != ''
+      xml = propfind_objects
     else
-      xml = propfind_root
+      xml = propfind_collections
     end
 
     render :xml => xml, :status => :multi_status
@@ -156,27 +164,14 @@ class CalendarController < ApplicationController
     end
   end
 
-  def propfind_root
-    # PROPFIND to / (root)
+  def propfind_collections
     respond_xml_request('/A:propfind/A:prop/*') do |props|
       results = handle_props(props) do |prop|
         case prop
         when 'displayname'
           ''
         when 'calendar-home-set'
-          '<A:href>/calendar/calendars</A:href>'
-        end
-      end
-
-      [["/", results]]
-    end
-  end
-
-  def propfind_list_calendars
-    # get a list of calendars
-    respond_xml_request('/A:propfind/A:prop/*') do |props|
-      results = handle_props(props) do |prop|
-        case prop
+          '<A:href>/calendar/</A:href>'
         when 'current-user-privilege-set'
           <<-EOS
             <A:privilege>
@@ -187,43 +182,44 @@ class CalendarController < ApplicationController
               <A:write-content />
             </A:privilege>
 EOS
-          when 'supported-calendar-component-set'
-            <<-EOS
-              <CALDAV:comp name="VTODO" />
-              <CALDAV:comp name="VEVENT" />
+        when 'supported-calendar-component-set'
+          <<-EOS
+            <CALDAV:comp name="VTODO" />
+            <CALDAV:comp name="VEVENT" />
 EOS
-          when 'resourcetype'
-            "<A:collection />"
+        when 'resourcetype'
+          "<A:collection />"
         end
       end
-      responses = [["/calendar/calendars/", results]]
 
-      for cal in Calendar.all
-        propxml = Nokogiri::XML(cal.propxml)
-        results = handle_props(props) do |prop|
-          case prop
-          when 'calendar-color'
-            '#ff00ff'
-          when 'calendar-order'
-            '10'
-          when 'displayname'
-            cal.name
-          when 'supported-calendar-component-set'
-              '<CALDAV:comp name="VEVENT" />'
-          when 'resourcetype'
-            <<-EOS
-              <CALDAV:calendar />
-              <A:collection />
+      responses = [["/calendar/", results]]
+
+      if request.headers["Depth"] != "0" # Depth > 0
+        for cal in Calendar.all
+          calprops = cal.props
+          results = handle_props(props) do |prop|
+            if calprops.key?(prop)
+              calprops[prop]
+            else
+              case prop
+              when 'supported-calendar-component-set'
+                  '<CALDAV:comp name="VEVENT" />'
+              when 'resourcetype'
+                <<-EOS
+                  <CALDAV:calendar />
+                  <A:collection />
 EOS
+              end
+            end
           end
+          responses << ["/calendar/#{cal.uri}/", results]
         end
-        responses << ["/calendar/#{cal.uri}/", results]
       end
       responses
     end
   end
 
-  def propfind_list_objects
+  def propfind_objects
     # get a list of calendar objects
     respond_xml_request('/A:propfind/A:prop/*') do |props|
       calendar = Calendar.find_by_uri!(params[:calendar])
@@ -239,6 +235,12 @@ EOS
         end
         responses << [sched.uri, results]
       end
+
+      if responses == []
+        results = handle_props(props) {|prop| }
+        responses << ["/calendar/#{calendar.uri}/", results]
+      end
+
       responses
     end
   end
@@ -264,17 +266,37 @@ EOS
     request.body.read.force_encoding("UTF-8")
   end                                              
 
+  DEFAULT_NAMESPACES = {
+    "DAV"    => "DAV:",
+    "CALDAV" => "urn:ietf:params:xml:ns:caldav",
+    "CS"     => "http://calendarserver.org/ns/",
+    "ICAL"   => "http://apple.com/ns/ical/",
+    "ME"     => "http://me.com/_namespace/"
+  }
+
+  def replace_propxml_nsprefix(xml, s)
+    xml.collect_namespaces.each do |k, v|
+      replace_to = DEFAULT_NAMESPACES.select {|_, w| v == w }.keys
+
+      if replace_to != []
+        from = k.sub('xmlns:', '')
+        to = replace_to[0]
+        s.gsub!("<#{from}:", "<#{to}:")
+        s.gsub!("</#{from}:", "</#{to}:")
+      end
+    end
+
+    s
+  end
+
   def respond_xml_request(xpath)
     xml = Nokogiri::XML(request_body)
     props = xml.xpath(xpath, A: 'DAV:', C: 'urn:ietf:params:xml:ns:caldav')
     responses = yield props
 
-    namespaces = {
-      'xmlns:CALDAV' => 'urn:ietf:params:xml:ns:caldav'
-    }
-
+    namespaces = DEFAULT_NAMESPACES
     for prop in props
-      prefix = "xmlns:#{prop.namespace.prefix}".to_sym
+      prefix = prop.namespace.prefix
       unless namespaces.has_key?(prefix)
         namespaces[prefix] = prop.namespace.href
       end
@@ -286,7 +308,7 @@ EOS
   def create_multistatus_xml(responses, namespaces)
     ns = ""
     namespaces.each do |prefix, uri|
-      ns += " #{prefix}=\"#{uri}\""
+      ns += " xmlns:#{prefix}=\"#{uri}\""
     end
 
     xml = <<EOS
