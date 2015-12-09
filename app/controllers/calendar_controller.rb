@@ -66,8 +66,12 @@ class CalendarController < ApplicationController
   end
 
   def delete
-    entry = Schedule.find_by_uri!(params[:calendar_object])
-    entry.delete
+    if params[:calendar_object] == ""
+      Calendar.find_by_uri!(params[:calendar]).delete
+    else
+      Schedule.find_by_uri!(params[:calendar_object]).delete
+    end
+
     head :status => :no_content
   end
 
