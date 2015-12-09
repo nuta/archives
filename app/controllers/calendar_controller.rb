@@ -84,10 +84,10 @@ class CalendarController < ApplicationController
     for prop in xml.xpath('/B:mkcalendar/A:set/A:prop/*',
                           A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav')
 
-      props[prop.name] = replace_propxml_nsprefix(xml, prop.to_s)
+      props[prop.name] = replace_propxml_nsprefix(xml, prop.children.to_s)
 
       if prop.name == 'displayname'
-        name = prop.children.to_s
+        name = props[prop.name]
       end
     end
 
