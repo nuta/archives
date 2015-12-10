@@ -8,11 +8,11 @@ Busybook
 Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 
 ## Features (and ToDo)
-- [ ] CalDAV
+- [x] CalDAV
   - [x] HTTP Basic auth
   - [x] fundamental functions
   - [x] etag support (including `If-Match`)
-  - [ ] ctag support
+  - [x] ctag support
 - [ ] CardDAV *(I'll work on this when Apple fixes a bug in Contacts.app)*
 - [ ] rake commands: adding user, expoting as .ics/.vcard file, and backup
 - [ ] write documentation
@@ -28,15 +28,15 @@ Public domain
 ## compliance
 - [RFC4918: HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)](http://tools.ietf.org/html/rfc4918)
   - supports `GET`, `PUT`, `DELETE`, `OPTIONS`, `MKCALENDAR`, `PROPFIND`, and `PROPPATCH` HTTP methods
-  - does not support `HEAD`, `POST`, `LOCK`, `UNLOCK`, `COPY`, `MOVE`, and `MKCOL` HTTP methods
-- [RFC3744: WebDAV Access Control Protocol](https://tools.ietf.org/html/rfc3744)
-  - not supported
+  - does *not* support `HEAD`, `POST`, `LOCK`, `UNLOCK`, `COPY`, `MOVE`, and `MKCOL` HTTP methods
 - [RFC4791: Calendaring Extensions to WebDAV (CalDAV)](http://tools.ietf.org/html/rfc4791)
   - supports `REPORT` and `MKCALENDAR` HTTP method
 - [RFC5545: iCalendar](http://tools.ietf.org/html/rfc5545)
   - supports `VEVENT` and `VTODO`
-  - does not support `VJOURNAL`
-- [RFC6638: Scheduling Extensions to CalDAV](http://tools.ietf.org/html/rfc6638)
-  - not supported
+  - does *not* support `VJOURNAL`
 - [caldav-ctag-03: Calendar Collection Entity Tag (CTag) in CalDAV](https://trac.calendarserver.org/browser/CalendarServer/trunk/doc/Extensions/caldav-ctag.txt)
-  - not supported
+  - supported
+- [RFC6638: Scheduling Extensions to CalDAV](http://tools.ietf.org/html/rfc6638)
+  - *not* supported
+- [RFC3744: WebDAV Access Control Protocol](https://tools.ietf.org/html/rfc3744)
+  - *not* supported
