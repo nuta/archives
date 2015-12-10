@@ -18,6 +18,7 @@ class CalendarController < ApplicationController
   def put
     body = request_body
     ics  = ICS::parse(body)
+    uri  = params[:calendar_object]
 
     # determine component type
     comp_name = ''
@@ -39,7 +40,7 @@ class CalendarController < ApplicationController
     date_end   = ICS::parse_date(comp, 'DTEND')
     calendar   = Calendar.find_by_uri!(params[:calendar])
 
-    sched = Schedule.where(uri: params[:calendar_object]).first
+    sched = Schedule.where(uri: uri).first
 
     if request.headers.key?("If-None-Match") and sched
       head :status => :precondition_failed
@@ -52,7 +53,7 @@ class CalendarController < ApplicationController
       return
     end
 
-    entry = Schedule.where(uri: params[:calendar_object]).first_or_create
+    entry = Schedule.where(uri: uri).first_or_create
     entry.ics        = body
     entry.component  = comp_name
     entry.date_start = date_start
@@ -60,16 +61,25 @@ class CalendarController < ApplicationController
     entry.calendar   = calendar
     entry.uid        = comp['uid']
     entry.summary    = comp['summary']
-    entry.save
+
+      ActiveRecord::Base.transaction do
+        entry.save
+        Change.create(calendar: calendar, uri: uri, is_delete: false)
+      end
 
     head :status => :created
   end
 
   def delete
+    cal = Calendar.find_by_uri!(params[:calendar])
     if params[:calendar_object] == ""
-      Calendar.find_by_uri!(params[:calendar]).delete
+      cal.delete
     else
-      Schedule.find_by_uri!(params[:calendar_object]).delete
+      ActiveRecord::Base.transaction do
+        sched = Schedule.find_by_uri!(params[:calendar_object])
+        sched.delete
+        Change.create(calendar: cal, uri: sched.uri, is_delete: true)
+      end
     end
 
     head :status => :no_content

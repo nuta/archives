@@ -37,5 +37,6 @@ EOS
     summary { generate :todo }
     uri { "#{generate :uuid}.ics" }
     ics { generate :ics }
+    association :calendar, factory: :calendar
   end
 end

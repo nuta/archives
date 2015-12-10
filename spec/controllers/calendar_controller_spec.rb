@@ -169,7 +169,7 @@ EOS
 
     context "the object exists" do
       it "returns object" do
-        send_request('DELETE', "1/#{object.uri}")
+        send_request('DELETE', "#{object.calendar.uri}/#{object.uri}")
         expect(response).to have_http_status(:no_content)
       end
     end
