@@ -232,7 +232,8 @@ EOS
             else
               case prop
               when 'supported-calendar-component-set'
-                  '<CALDAV:comp name="VEVENT" />'
+                '<CALDAV:comp name="VEVENT" />'
+                '<CALDAV:comp name="VTODO" />'
               when 'getctag'
                 c = Change.where(calendar: cal).order('updated_at DESC').first
                 (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
