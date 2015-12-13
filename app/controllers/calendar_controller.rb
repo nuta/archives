@@ -385,13 +385,7 @@ EOS
     authenticate_or_request_with_http_basic('realm') do |name, password|
       @user = User.find_by_name(name)
 
-      if not @user or @user.password != password
-        logger.warn "user '#{name}' not found"
-        head :status => :forbidden
-        return
-      end
-
-      true
+      @user and @user.password == password
     end
   end
 end
