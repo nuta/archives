@@ -48,24 +48,28 @@ class CalendarController < ApplicationController
     end
 
     if request.headers.key?("If-Match") and
-      getetag(sched) != request.headers["If-Match"]
+       sched and getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
       head :status => :precondition_failed
       return
     end
 
-    entry = Schedule.where(uri: uri).first_or_create
-    entry.ics        = body
-    entry.component  = comp_name
-    entry.date_start = date_start
-    entry.date_end   = date_end
-    entry.calendar   = calendar
-    entry.uid        = comp['uid']
-    entry.summary    = comp['summary']
+    unless sched
+      sched = Schedule.new
+      sched.uri = uri
+    end
 
-      ActiveRecord::Base.transaction do
-        entry.save
-        Change.create(calendar: calendar, uri: uri, is_delete: false)
-      end
+    sched.ics        = body
+    sched.component  = comp_name
+    sched.date_start = date_start
+    sched.date_end   = date_end
+    sched.calendar   = calendar
+    sched.uid        = comp['uid']
+    sched.summary    = comp['summary']
+
+    ActiveRecord::Base.transaction do
+      sched.save
+      Change.create(calendar: calendar, uri: uri, is_delete: false)
+    end
 
     head :status => :created
   end
@@ -105,7 +109,11 @@ class CalendarController < ApplicationController
     calendar.uri     = params[:calendar]
     calendar.name    = name
     calendar.user    = @user
-    calendar.save
+
+    ActiveRecord::Base.transaction do
+      calendar.save
+      Change.create(calendar: calendar, uri: '', is_delete: false)
+    end
 
     head :status => :created
   end
@@ -130,16 +138,25 @@ class CalendarController < ApplicationController
       return
     end
 
-    xml = Nokogiri::XML(request_body)
-    cal = Calendar.find_by_uri!(params[:calendar])
-    calprops = cal.props
+    if params[:calendar] != ""
+      xml = Nokogiri::XML(request_body)
+      cal = Calendar.find_by_uri!(params[:calendar])
+      calprops = cal.props
+  
+      for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
+        calprops[prop.name] = replace_propxml_nsprefix(xml, prop.children.to_s)
+      end
+  
+      for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
+        calprops.delete(prop.name)
+      end
 
-    for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
-      calprops[prop.name] = replace_propxml_nsprefix(xml, prop.children.to_s)
-    end
-
-    for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
-      calprops.delete(prop.name)
+      cal.props = calprops
+    
+      ActiveRecord::Base.transaction do
+        cal.save
+        Change.create(calendar: cal, uri: '', is_delete: false)
+      end
     end
 
     res = respond_xml_request('/A:propertyupdate/*/A:prop/*') do |props|
@@ -147,13 +164,11 @@ class CalendarController < ApplicationController
       [["/calendar/#{params[:calendar]}/", results]]
     end
 
-    cal.props = calprops
-    cal.save
     render :xml => res, :status => :multi_status
   end
 
   def propfind
-    if params[:calendar] != ''
+    if params[:calendar] != '' and request.headers["Depth"] == "1"
       xml = propfind_objects
     else
       xml = propfind_collections
@@ -165,7 +180,15 @@ class CalendarController < ApplicationController
   private
 
   def getetag(sched)
-    Digest::MD5.hexdigest(sched.ics)
+    '"' + Digest::MD5.hexdigest(sched.ics) + '"'
+  end
+
+  def remove_etag_prefix(etag)
+    if etag.start_with?("W/")
+      etag[2..-1]
+    else
+      etag
+    end
   end
 
   def report_multiget(xml)
@@ -223,31 +246,42 @@ EOS
 
       responses = [["/calendar/", results]]
 
-      if request.headers["Depth"] != "0" # Depth > 0
-        for cal in Calendar.all
-          calprops = cal.props
-          results = handle_props(props) do |prop|
-            if calprops.key?(prop)
-              calprops[prop]
-            else
-              case prop
-              when 'supported-calendar-component-set'
-                '<CALDAV:comp name="VEVENT" />'
-                '<CALDAV:comp name="VTODO" />'
-              when 'getctag'
-                c = Change.where(calendar: cal).order('updated_at DESC').first
-                (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
-              when 'resourcetype'
-                <<-EOS
-                  <CALDAV:calendar />
-                  <A:collection />
+      if params[:calendar] == ""
+        if request.headers["Depth"] == "1"
+          cals = Calendar.all
+        else
+          cals = []
+        end
+      else
+        cals = [Calendar.find_by_uri(params[:calendar])]
+      end
+     
+      for cal in cals
+        calprops = cal.props
+        results = handle_props(props) do |prop|
+          if calprops.key?(prop)
+            calprops[prop]
+          else
+            case prop
+            when 'supported-calendar-component-set'
+          <<-EOS
+            <CALDAV:comp name="VTODO" />
+            <CALDAV:comp name="VEVENT" />
 EOS
-              end
+            when 'getctag'
+              c = Change.where(calendar: cal).order('updated_at DESC').first
+              (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
+            when 'resourcetype'
+              <<-EOS
+                <CALDAV:calendar />
+                <A:collection />
+EOS
             end
           end
-          responses << ["/calendar/#{cal.uri}/", results]
         end
+        responses << ["/calendar/#{cal.uri}/", results]
       end
+
       responses
     end
   end
