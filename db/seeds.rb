@@ -5,3 +5,12 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
+
+guest = User.create(name: 'guest', pass: 'password')
+
+Calendar.create(
+  uri: '123-456-789',
+  name: 'Aiueo',
+  propxml: '{ "calendar-color": "#7176FF", "displayname": "Aiueo" }',
+  user: guest
+)
