@@ -57,6 +57,7 @@ GEM
     docile (1.1.5)
     domain_name (0.5.25)
       unf (>= 0.0.5, < 1.0.0)
+    dotenv (2.0.2)
     erd (0.3.2)
       nokogiri
       rails-erd (>= 0.4.5)
@@ -231,6 +232,7 @@ DEPENDENCIES
   bullet
   byebug
   coveralls
+  dotenv
   erd
   factory_girl_rails
   faker
