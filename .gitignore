@@ -8,7 +8,7 @@
 /.bundle
 /bin
 
-/.dotenv
+/.env
 /config/database.yml
 
 # Ignore the default SQLite database.
