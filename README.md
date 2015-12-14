@@ -14,7 +14,7 @@ Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
   - [x] etag support (including `If-Match`)
   - [x] ctag support
 - [x] rake command: add/delete/list users
-- [ ] rake command: export as a .ics/.vcard file
+- [x] rake command: export as a .ics/.vcard file
 - [ ] write documentation
 - [ ] test by [CalDAVTester](http://calendarserver.org/wiki/CalDAVTester)
 - [ ] CardDAV *(I'll work on this when Apple fixes a bug in Contacts.app)*

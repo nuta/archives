@@ -14,4 +14,14 @@ class Calendar < ActiveRecord::Base
   def props=(v)
     self.props_json = ActiveSupport::JSON.encode(v)
   end
+
+  def Calendar.find_by_name(name)
+    Calendar.all.find_each do |cal|
+      if name == cal.props['displayname']
+        return cal
+      end
+    end
+
+    nil
+  end
 end
