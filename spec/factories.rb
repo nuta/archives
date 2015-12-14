@@ -21,7 +21,6 @@ END:VCALENDAR
   end
 
   factory :calendar do
-    name { generate :name }
     uri { generate :uuid }
     propxml { <<EOS
       {

@@ -112,11 +112,10 @@ EOS
     }
 
     it "creates a calendar" do
-      send_request('MKCALENDAR', '/blah', body)
+      send_request('MKCALENDAR', 'blah', body)
       expect(response).to have_http_status(:created)
-  
-      calendar = Calendar.where(name: 'My Work',
-                                user: User.find_by_name(login_name))
+
+      calendar = Calendar.where(uri: 'blah')
       expect(calendar).to exist
     end
   end
