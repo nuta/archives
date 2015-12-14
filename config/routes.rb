@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root 'welcome#index'
+  root to: proc { [200, {}, ['']] }
 
   methods = %w(options get put delete mkcalendar propfind proppatch report)
 
