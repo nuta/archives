@@ -2,6 +2,9 @@
 
 t test:
 	bundle exec rspec
+	for workflow in osx-tests/*; do \
+		reattach-to-user-namespace automator $$workflow; \
+	done
 
 at autotest:
 	bundle exec guard
@@ -25,3 +28,4 @@ production:
 	RAILS_ENV=production bundle exec rake db:migrate
 	echo -n "SECRET_KEY_BASE=" > .env
 	RAILS_ENV=production bundle exec rake secret >> .env
+
