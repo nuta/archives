@@ -15,3 +15,7 @@ s server:
 b bundle:
 	bundle install
 	bundle --binstubs
+
+dev: bundle
+	cp config/database.yml.example config/database.yml
+	
