@@ -6,7 +6,6 @@
 
 # Ignore bundler config.
 /.bundle
-/bin
 
 /.env
 /config/database.yml
