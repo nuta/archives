@@ -3,7 +3,12 @@ class Calendar < ActiveRecord::Base
   validates :uri, uniqueness: true
 
   def props
-    ActiveSupport::JSON.decode(self.propxml)
+    propxml = self.propxml
+    if propxml.length >= 2 
+      ActiveSupport::JSON.decode(propxml)
+    else
+      {}
+    end
   end
 
   def props=(v)
