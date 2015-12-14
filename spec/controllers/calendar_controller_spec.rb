@@ -90,8 +90,8 @@ EOS
       expect(response).to have_http_status(207)
       expect(response.body).to include("<status>HTTP/1.1 200 OK</status>")
       cal = Calendar.find_by_uri!(@cal.uri)
-      expect(cal.propxml).to include("Hellooo")
-      expect(cal.propxml).not_to include("calendar-color")
+      expect(cal.props_json).to include("Hellooo")
+      expect(cal.props_json).not_to include("calendar-color")
     end
   end
 

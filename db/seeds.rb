@@ -11,6 +11,6 @@ guest = User.create(name: 'guest', pass: 'password')
 Calendar.create(
   uri: '123-456-789',
   name: 'Aiueo',
-  propxml: '{ "calendar-color": "#7176FF", "displayname": "Aiueo" }',
+  props_json: '{ "calendar-color": "#7176FF", "displayname": "Aiueo" }',
   user: guest
 )

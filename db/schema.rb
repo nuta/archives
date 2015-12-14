@@ -11,10 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151214063708) do
+ActiveRecord::Schema.define(version: 20151214064446) do
 
   create_table "calendars", force: :cascade do |t|
-    t.text     "propxml"
+    t.text     "props_json"
     t.integer  "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

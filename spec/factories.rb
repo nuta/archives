@@ -22,7 +22,7 @@ END:VCALENDAR
 
   factory :calendar do
     uri { generate :uuid }
-    propxml { <<EOS
+    props_json { <<EOS
       {
         "displayname": "My Work",
         "calendar-color": "#123456"

@@ -97,7 +97,7 @@ class CalendarController < ApplicationController
 
     for prop in xml.xpath('/B:mkcalendar/A:set/A:prop/*',
                           A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav')
-      props[prop.name] = replace_propxml_nsprefix(xml, prop.children.to_s)
+      props[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
     end
 
     calendar.props   = props
@@ -140,7 +140,7 @@ class CalendarController < ApplicationController
       calprops = cal.props
   
       for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
-        calprops[prop.name] = replace_propxml_nsprefix(xml, prop.children.to_s)
+        calprops[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
       end
   
       for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
@@ -375,7 +375,7 @@ EOS
     "ME"     => "http://me.com/_namespace/"
   }
 
-  def replace_propxml_nsprefix(xml, s)
+  def replace_xml_nsprefix(xml, s)
     xml.collect_namespaces.each do |k, v|
       replace_to = DEFAULT_NAMESPACES.select {|_, w| v == w }.keys
 
