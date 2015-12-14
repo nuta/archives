@@ -5,7 +5,7 @@ namespace :user do
     name = ENV['name']     || cli.ask('username: ')
     pass = ENV['password'] || cli.ask('password: ') {|q| q.echo = false }
     User.create(name: name, password: pass)
-    Calendar.create(name: 'Private', propxml: '', uri: 'private')
+    Calendar.create(props_json: '', uri: 'Private')
   end
 
   desc 'delete an user'
