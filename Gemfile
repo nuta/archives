@@ -1,7 +1,10 @@
 source 'https://rubygems.org'
 
 gem 'rails', '4.2.5'
-gem 'sqlite3'
+
+gem 'mysql2', group: :mysql
+gem 'pg', group: :postgres
+
 gem 'highline'
 
 group :development do
@@ -26,6 +29,7 @@ group :test do
 end
 
 group :development, :test do
+  gem 'sqlite3'
   gem 'pry-rails'
   gem 'pry-doc'
 end

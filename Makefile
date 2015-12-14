@@ -13,4 +13,5 @@ s server:
 	bundle exec ./bin/rails server
 
 b bundle:
-	bundle install --no-deployment --path vendor/bundle
+	bundle install
+	bundle --binstubs
