@@ -5,7 +5,20 @@ namespace :user do
     name = ENV['name']     || cli.ask('username: ')
     pass = ENV['password'] || cli.ask('password: ') {|q| q.echo = false }
     User.create(name: name, password: pass)
-    Calendar.create(props_json: '', uri: 'Private')
+
+    props_json = <<EOS
+      {
+        "supported-calendar-component-set": "<CALDAV:comp name=\\"VEVENT\\" />"
+      }
+EOS
+    Calendar.create(props_json: props_json, uri: 'Private')
+
+    props_json = <<EOS
+      {
+        "supported-calendar-component-set": "<CALDAV:comp name=\\"VTODO\\" />"
+      }
+EOS
+    Calendar.create(props_json: props_json, uri: 'ToDo')
   end
 
   desc 'delete an user'

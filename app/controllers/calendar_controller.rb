@@ -297,11 +297,6 @@ EOS
             calprops[prop]
           else
             case prop
-            when 'supported-calendar-component-set'
-          <<-EOS
-            <CALDAV:comp name="VTODO" />
-            <CALDAV:comp name="VEVENT" />
-EOS
             when 'getctag'
               c = Change.where(calendar: cal).order('updated_at DESC').first
               (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
