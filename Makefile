@@ -19,3 +19,10 @@ b bundle:
 dev: bundle
 	cp config/database.yml.example config/database.yml
 	
+
+production:
+	test -f config/database.yml
+	bundle install --without development test
+	RAILS_ENV=production bundle exec rake db:migrate
+	echo -n "SECRET_KEY_BASE=" > .env
+	RAILS_ENV=production bundle exec rake secret >> .env
