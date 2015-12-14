@@ -22,7 +22,7 @@ dev: bundle
 
 production:
 	test -f config/database.yml
-	bundle install --without development test
+	bundle install --without development test mysql
 	RAILS_ENV=production bundle exec rake db:migrate
 	echo -n "SECRET_KEY_BASE=" > .env
 	RAILS_ENV=production bundle exec rake secret >> .env

@@ -195,22 +195,21 @@ class CalendarController < ApplicationController
 
   def report_query(xml)
     respond_xml_request('/C:calendar-query/A:prop/*') do |props|
-      uris  = xml.xpath('/C:calendar-query/C:filter/C:comp-filter/*',
+      filters = xml.xpath('/C:calendar-query/C:filter/C:comp-filter/C:comp-filter/*',
                         C: 'urn:ietf:params:xml:ns:caldav')
-
       scheds = []
       filters.each do |filter|
         if filter.name == 'time-range'
           # TODO: support other comp-filters
-          range_start = Time.zone.parse(filter.attr('start'))
-          range_end   = Time.zone.parse(filter.attr('end'))
+          range_start = Time.zone.parse(filter.attr('start') || '')
+          range_end   = Time.zone.parse(filter.attr('end')   || '')
           scheds = Schedule.time_range(range_start, range_end)
           break
         end
       end
 
       responses = []
-      for sched in schds
+      for sched in scheds
         results = handle_props(props) do |prop|
           case prop
           when 'getetag'
@@ -219,7 +218,7 @@ class CalendarController < ApplicationController
             sched.ics
           end
         end
-        responses << ["/calendar/#{sched.calendar.uri}/#{sched}", results]
+        responses << ["/calendar/#{sched.calendar.uri}/#{sched.uri}", results]
       end
       responses
     end
@@ -262,6 +261,9 @@ class CalendarController < ApplicationController
           '<A:href>/calendar/</A:href>'
         when 'principal-URL'
           '<A:href>/calendar/</A:href>'
+        when 'getctag'
+          c = Change.order('updated_at DESC').first
+         (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
         when 'current-user-privilege-set'
           <<-EOS
             <A:privilege>
