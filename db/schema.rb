@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151209235553) do
+ActiveRecord::Schema.define(version: 20151213235353) do
 
   create_table "calendars", force: :cascade do |t|
     t.string   "name"
@@ -51,9 +51,10 @@ ActiveRecord::Schema.define(version: 20151209235553) do
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string   "password"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.string   "password_hash"
+    t.string   "password_salt"
   end
 
 end
