@@ -224,6 +224,10 @@ class CalendarController < ApplicationController
           ''
         when 'calendar-home-set'
           '<A:href>/calendar/</A:href>'
+        when 'principal-collection-set'
+          '<A:href>/calendar/</A:href>'
+        when 'principal-URL'
+          '<A:href>/calendar/</A:href>'
         when 'current-user-privilege-set'
           <<-EOS
             <A:privilege>
