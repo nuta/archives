@@ -257,7 +257,7 @@ EOS
           cals = []
         end
       else
-        cals = [Calendar.find_by_uri(params[:calendar])]
+        cals = [Calendar.find_by_uri!(params[:calendar])]
       end
      
       for cal in cals
