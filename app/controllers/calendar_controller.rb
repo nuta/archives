@@ -123,6 +123,8 @@ class CalendarController < ApplicationController
     res = case xml.children[0].name
           when 'calendar-multiget'
             report_multiget(xml)
+          when 'calendar-query'
+            report_query(xml)
           else
             head :status => :not_implemented
             return
@@ -188,6 +190,38 @@ class CalendarController < ApplicationController
       etag[2..-1]
     else
       etag
+    end
+  end
+
+  def report_query(xml)
+    respond_xml_request('/C:calendar-query/A:prop/*') do |props|
+      uris  = xml.xpath('/C:calendar-query/C:filter/C:comp-filter/*',
+                        C: 'urn:ietf:params:xml:ns:caldav')
+
+      scheds = []
+      filters.each do |filter|
+        if filter.name == 'time-range'
+          # TODO: support other comp-filters
+          range_start = Time.zone.parse(filter.attr('start'))
+          range_end   = Time.zone.parse(filter.attr('end'))
+          scheds = Schedule.time_range(range_start, range_end)
+          break
+        end
+      end
+
+      responses = []
+      for sched in schds
+        results = handle_props(props) do |prop|
+          case prop
+          when 'getetag'
+            getetag(sched)
+          when 'calendar-data'
+            sched.ics
+          end
+        end
+        responses << ["/calendar/#{sched.calendar.uri}/#{sched}", results]
+      end
+      responses
     end
   end
 
