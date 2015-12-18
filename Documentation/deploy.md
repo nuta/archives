@@ -7,7 +7,6 @@
 ### Nginx config
 ```
 upstream app {
-    # Path to Unicorn SOCK file, as defined previously
     server unix:/home/user/busybook/unicorn/unicorn.sock fail_timeout=0;
 }
 
