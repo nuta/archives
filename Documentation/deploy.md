@@ -2,12 +2,14 @@
 
 1. [Follow insturctions described here](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-rails-app-with-unicorn-and-nginx-on-ubuntu-14-04)
 2. write nginx config
-3. add account in your calendar app
+3. mkdir /var/run/busybook and chown it
+4. rake user:add
+5. add server in your calendar app
 
 ### Nginx config
 ```
 upstream app {
-    server unix:/var/run/busybook.sock fail_timeout=0;
+    server unix:/var/run/busybook/busybook.sock fail_timeout=0;
 }
 
 server {
