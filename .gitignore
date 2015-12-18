@@ -16,6 +16,7 @@
 /db/backup
 /backup/log
 /backup/.tmp
+/backup/data
 
 # Ignore all logfiles and tempfiles.
 /log/*

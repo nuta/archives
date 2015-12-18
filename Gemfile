@@ -9,6 +9,10 @@ gem 'backup'
 gem 'dotenv'
 gem 'highline'
 
+group :production do
+  gem 'unicorn'
+end
+
 group :development do
   gem 'bullet'
   gem 'spring'
