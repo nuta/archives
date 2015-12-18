@@ -5,6 +5,7 @@ gem 'rails', '4.2.5'
 gem 'mysql2', group: :mysql
 gem 'pg', group: :postgres
 
+gem 'backup'
 gem 'dotenv'
 gem 'highline'
 

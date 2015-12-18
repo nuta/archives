@@ -1,4 +1,4 @@
-.PHONY: b bundle s server t test at autotest
+.PHONY: b bundle s server t test at autotest backup
 
 t test:
 	bundle exec rspec
@@ -29,3 +29,5 @@ production:
 	echo -n "SECRET_KEY_BASE=" > .env
 	RAILS_ENV=production bundle exec rake secret >> .env
 
+backup:
+	bundle exec backup perform -t db_backup --root-path $$PWD/backup
