@@ -7,7 +7,7 @@
 ### Nginx config
 ```
 upstream app {
-    server unix:/home/user/busybook/unicorn/unicorn.sock fail_timeout=0;
+    server unix:/var/run/busybook.sock fail_timeout=0;
 }
 
 server {
