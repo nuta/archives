@@ -358,7 +358,7 @@ EOS
   end
 
   def request_body
-    request.body.seek(0)
+    request.body.rewind
     request.body.read.force_encoding("UTF-8")
   end                                              
 
