@@ -1,8 +1,8 @@
 class Calendar < ActiveRecord::Base
   belongs_to :user
   has_many :schedules, dependent: :destroy
-  has_many :cal_changes, foreign_key: 'calendar_id',
-           class_name: "Changes", dependent: :destroy
+  has_many :cal_changes,
+           class_name: 'Change', dependent: :destroy
   validates :uri, uniqueness: true
 
   def props
