@@ -1,6 +1,7 @@
 class Calendar < ActiveRecord::Base
   belongs_to :user
   has_many :schedules, dependent: :destroy
+  has_many :changes, dependent: :destroy
   validates :uri, uniqueness: true
 
   def props
