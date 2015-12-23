@@ -77,11 +77,11 @@ class CalendarController < ApplicationController
   def delete
     cal = Calendar.find_by_uri!(params[:calendar])
     if params[:calendar_object] == ""
-      cal.delete
+      cal.destroy
     else
       ActiveRecord::Base.transaction do
         sched = Schedule.find_by_uri!(params[:calendar_object])
-        sched.delete
+        sched.destroy
         Change.create(calendar: cal, uri: sched.uri, is_delete: true)
       end
     end
