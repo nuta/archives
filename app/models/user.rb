@@ -2,6 +2,7 @@ require 'digest/sha2'
 
 class User < ActiveRecord::Base
   validates :name, uniqueness: true
+  has_many :calendars, dependent: :destroy
 
   def validate_password(password)
     self.password_hash == hash(password + self.password_salt)
