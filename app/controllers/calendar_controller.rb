@@ -315,6 +315,16 @@ EOS
             when 'getctag'
               c = Change.where(calendar: cal).order('updated_at DESC').first
               (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
+        when 'current-user-privilege-set'
+          <<-EOS
+            <A:privilege>
+              <A:all />
+              <A:read />
+              <A:write />
+              <A:write-properties />
+              <A:write-content />
+            </A:privilege>
+EOS
         when 'supported-report-set'
 	  <<-EOS
           <supported-report>
