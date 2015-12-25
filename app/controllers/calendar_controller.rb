@@ -268,6 +268,21 @@ class CalendarController < ApplicationController
               <A:write-content />
             </A:privilege>
 EOS
+        when 'supported-report-set'
+	  <<-EOS
+          <supported-report>
+              <report>principal-property-search</report>
+          </supported-report>
+          <supported-report>
+              <report>sync-collection</report>
+          </supported-report>
+          <supported-report>
+              <report>expand-property</report>
+          </supported-report>
+          <supported-report>
+              <report>principal-search-property-set</report>
+          </supported-report>
+EOS
         when 'supported-calendar-component-set'
           <<-EOS
             <CALDAV:comp name="VTODO" />
@@ -300,6 +315,21 @@ EOS
             when 'getctag'
               c = Change.where(calendar: cal).order('updated_at DESC').first
               (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
+        when 'supported-report-set'
+	  <<-EOS
+          <supported-report>
+              <report>principal-property-search</report>
+          </supported-report>
+          <supported-report>
+              <report>sync-collection</report>
+          </supported-report>
+          <supported-report>
+              <report>expand-property</report>
+          </supported-report>
+          <supported-report>
+              <report>principal-search-property-set</report>
+          </supported-report>
+EOS
             when 'resourcetype'
               <<-EOS
                 <CALDAV:calendar />
