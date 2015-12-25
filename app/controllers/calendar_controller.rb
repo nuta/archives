@@ -289,7 +289,10 @@ EOS
             <CALDAV:comp name="VEVENT" />
 EOS
         when 'resourcetype'
-          "<A:collection />"
+          <<-EOS
+            <A:collection />
+	    <A:principal />
+EOS
         end
       end
 
