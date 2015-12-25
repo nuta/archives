@@ -209,7 +209,7 @@ class CalendarController < ApplicationController
           when 'getetag'
             getetag(sched)
           when 'calendar-data'
-            sched.ics
+	    sched.ics.encode(xml: :text)
           end
         end
         responses << ["/calendar/#{sched.calendar.uri}/#{sched.uri}", results]
@@ -234,7 +234,7 @@ class CalendarController < ApplicationController
           when 'getetag'
             getetag(sched)
           when 'calendar-data'
-            sched.ics
+	    sched.ics.encode(xml: :text)
           end
         end
         responses << [uri.text, results]
