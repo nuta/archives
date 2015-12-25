@@ -197,7 +197,7 @@ class CalendarController < ApplicationController
           # TODO: support other comp-filters
           range_start = Time.zone.parse(filter.attr('start') || '')
           range_end   = Time.zone.parse(filter.attr('end')   || '')
-          scheds = Schedule.time_range(range_start, range_end)
+          scheds = Schedule.in_time_range(range_start, range_end)
           break
         end
       end

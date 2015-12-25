@@ -1,10 +1,23 @@
 class Schedule < ActiveRecord::Base
   belongs_to :calendar
 
-  def Schedule.time_range(range_start, range_end)
-    range_start ||= Time.now - 100000.years
-    range_end   ||= Time.now + 100000.years
+  def Schedule.in_time_range(range_start, range_end)
+    sql = ''
+    args = []
 
-    self.where('? <= date_start AND date_end <= ?', range_start, range_end)
+    if range_start
+       sql += '? <= date_start '
+       args << range_start
+    end
+
+    if range_end
+	if sql != ""
+	    sql += 'AND '
+	end
+	sql += 'date_end <= ? '
+	args << range_end
+    end
+
+    self.where(sql, *args)
   end
 end
