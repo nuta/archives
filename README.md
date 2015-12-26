@@ -41,3 +41,11 @@ Public domain
   - *not* supported
 - [RFC3744: WebDAV Access Control Protocol](https://tools.ietf.org/html/rfc3744)
   - *not* supported
+
+## Changelog
+- **v0.1.0**
+  - support iOS
+  - support calendar-query REPORT request
+  - export a calendar as a .ics file
+  - introduce [backup](https://github.com/backup/backup) gem
+  - add unicorn config
