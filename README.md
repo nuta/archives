@@ -43,6 +43,8 @@ Public domain
   - *not* supported
 
 ## Changelog
+- **v0.1.1**
+  - fix implementation of calendar-query
 - **v0.1.0**
   - support iOS
   - support calendar-query REPORT request
