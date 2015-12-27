@@ -18,6 +18,6 @@ class Schedule < ActiveRecord::Base
 	args << range_end
     end
 
-    self.where(calendar: Calendar.find_by(calendar)).where(sql, *args)
+    self.where(calendar: Calendar.find_by_uri!(calendar)).where(sql, *args)
   end
 end
