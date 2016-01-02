@@ -42,11 +42,6 @@ class CalendarController < ApplicationController
 
     sched = Schedule.where(uri: uri).first
 
-    if request.headers.key?("If-None-Match") and sched
-      head :status => :precondition_failed
-      return
-    end
-
     if request.headers.key?("If-Match") and
        sched and getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
       head :status => :precondition_failed
