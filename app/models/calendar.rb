@@ -27,4 +27,11 @@ class Calendar < ActiveRecord::Base
 
     nil
   end
+
+  def save
+    ActiveRecord::Base.transaction do
+      super
+      Change.create(calendar: self, uri: '', is_delete: false)
+    end
+  end
 end

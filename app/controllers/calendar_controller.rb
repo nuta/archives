@@ -73,11 +73,7 @@ class CalendarController < ApplicationController
     calendar.props   = props
     calendar.uri     = params[:calendar]
     calendar.user    = @user
-
-    ActiveRecord::Base.transaction do
-      calendar.save
-      Change.create(calendar: calendar, uri: '', is_delete: false)
-    end
+    calendar.save
 
     head :status => :created
   end
