@@ -16,55 +16,33 @@ class CalendarController < ApplicationController
   end
 
   def put
-    body = request_body
-    ics  = ICS::parse(body)
-    uri  = params[:calendar_object]
+    ics   = ICS::ICalendar.new(request_body)
+    uri   = params[:calendar_object]
+    sched = Schedule.find_by_uri(uri)
 
-    # determine component type
-    comp_name = ''
-    for comp_type in %w(VEVENT VTODO)
-      if ics.has_key?(comp_type)
-        comp_name = comp_type
-        break
-      end
-    end
-
-    unless comp_name
-      # unknown calendar object
-      head :status => :not_implemented
-      return
-    end
-
-    comp = ics[comp_name][0]
-    date_start = ICS::parse_date(comp, 'DTSTART')
-    date_end   = ICS::parse_date(comp, 'DTEND')
-    calendar   = Calendar.find_by_uri!(params[:calendar])
-
-    sched = Schedule.where(uri: uri).first
-
+    # handle If-Match
     if request.headers.key?("If-Match") and
        sched and getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
       head :status => :precondition_failed
       return
     end
 
-    unless sched
-      sched = Schedule.new
-      sched.uri = uri
+    # accept a calendar event or a ToDo item
+    unless %w(VEVENT VTODO).include?(ics.comp_type)
+      # unknown calendar object
+      return head :status => :not_implemented
     end
 
-    sched.ics        = body
-    sched.component  = comp_name
-    sched.date_start = date_start
-    sched.date_end   = date_end
-    sched.calendar   = calendar
-    sched.uid        = comp['uid']
-    sched.summary    = comp['summary']
-
-    ActiveRecord::Base.transaction do
-      sched.save
-      Change.create(calendar: calendar, uri: uri, is_delete: false)
-    end
+    # update columns
+    sched = Schedule.new(uri: uri) unless sched
+    sched.ics        = request_body
+    sched.calendar   = Calendar.find_by_uri!(params[:calendar])
+    sched.component  = ics.comp_type
+    sched.date_start = ics.comp('DTSTART', date=true)
+    sched.date_end   = ics.comp('DTEND', date=true)
+    sched.uid        = ics.comp('UID')
+    sched.summary    = ics.comp('SUMMARY')
+    sched.save
 
     head :status => :created
   end

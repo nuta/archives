@@ -5,6 +5,35 @@
 module ICS
   extend self
 
+  class ICalendar
+    def initialize(ics)
+      @ics = ICS::parse(ics)
+      @default_comp_type = self.comp_type
+    end
+
+    # Returns the content of property `k`
+    def comp(k, date=false)
+      if date
+        ICS::parse_date(@ics[@default_comp_type][0], k)
+      else
+        @ics[@default_comp_type][0][k]
+      end
+    end
+
+    # Returns the first component type
+    def comp_type
+      # XXX
+      for comp_type in %w(VEVENT VTODO)
+        if @ics.has_key?(comp_type)
+          return comp_type
+        end
+      end
+
+      logger.warn 'unknown iCalendar component, handling as a VEVENT'
+      return 'VEVENT'
+    end
+  end
+
   def parse_date(ics, prop)
     k = nil
     for key in ics.keys

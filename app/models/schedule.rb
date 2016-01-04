@@ -20,4 +20,11 @@ class Schedule < ActiveRecord::Base
 
     self.where(calendar: Calendar.find_by_uri!(calendar)).where(sql, *args)
   end
+
+  def save
+    ActiveRecord::Base.transaction do
+      super
+      Change.create(calendar: self.calendar, uri: self.uri, is_delete: false)
+    end
+  end
 end
