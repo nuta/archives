@@ -27,4 +27,11 @@ class Schedule < ActiveRecord::Base
       Change.create(calendar: self.calendar, uri: self.uri, is_delete: false)
     end
   end
+
+  def destroy
+    ActiveRecord::Base.transaction do
+      Change.create(calendar: self.calendar, uri: self.uri, is_delete: true)
+      super
+    end
+  end
 end

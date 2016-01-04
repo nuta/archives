@@ -52,11 +52,8 @@ class CalendarController < ApplicationController
     if params[:calendar_object] == ""
       cal.destroy
     else
-      ActiveRecord::Base.transaction do
-        sched = Schedule.find_by_uri!(params[:calendar_object])
-        sched.destroy
-        Change.create(calendar: cal, uri: sched.uri, is_delete: true)
-      end
+      sched = Schedule.find_by_uri!(params[:calendar_object])
+      sched.destroy
     end
 
     head :status => :no_content
