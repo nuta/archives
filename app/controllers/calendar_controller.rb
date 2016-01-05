@@ -80,40 +80,34 @@ class CalendarController < ApplicationController
           when 'calendar-query'
             report_query(xml)
           else
-            head :status => :not_implemented
-            return
+            return head :status => :not_implemented
           end
 
     render :xml => res, :status => :multi_status
   end
 
   def proppatch
-    if params[:calendar_object] != ""
-      # PROPPATCH to a calendar object is not supported yet
-      head :status => :not_implemented
-      return
+    if params[:calendar_object] != "" || params[:calendar] == ""
+      # PROPPATCH to a calendar object or / is not supported
+      return head :status => :not_implemented
     end
 
-    if params[:calendar] != ""
-      xml = Nokogiri::XML(request_body)
-      cal = Calendar.find_by_uri!(params[:calendar])
-      calprops = cal.props
-  
-      for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
-        calprops[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
-      end
-  
-      for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
-        calprops.delete(prop.name)
-      end
+    xml = Nokogiri::XML(request_body)
+    cal = Calendar.find_by_uri!(params[:calendar])
+    props = cal.props
 
-      cal.props = calprops
-    
-      ActiveRecord::Base.transaction do
-        cal.save
-        Change.create(calendar: cal, uri: '', is_delete: false)
-      end
+    # set properties
+    for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
+      props[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
     end
+  
+    # remove properties
+    for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
+      props.delete(prop.name)
+    end
+
+    cal.props = props
+    cal.save
 
     res = respond_xml_request('/A:propertyupdate/*/A:prop/*') do |props|
       results = handle_props(props) {|prop| '' }
