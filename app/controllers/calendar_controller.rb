@@ -62,19 +62,13 @@ class CalendarController < ApplicationController
   def mkcalendar
     xml = Nokogiri::XML(request_body)
 
-    calendar = Calendar.new
     props = {}
-
     for prop in xml.xpath('/B:mkcalendar/A:set/A:prop/*',
                           A: 'DAV:', B: 'urn:ietf:params:xml:ns:caldav')
       props[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
     end
 
-    calendar.props   = props
-    calendar.uri     = params[:calendar]
-    calendar.user    = @user
-    calendar.save
-
+    Calendar.create(props: props, uri: params[:calendar], user: @user)
     head :status => :created
   end
 
