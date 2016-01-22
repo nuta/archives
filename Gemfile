@@ -8,10 +8,7 @@ gem 'pg', group: :postgres
 gem 'backup'
 gem 'dotenv'
 gem 'highline'
-
-group :production do
-  gem 'unicorn'
-end
+gem 'puma'
 
 group :development do
   gem 'bullet'

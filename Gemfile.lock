@@ -102,7 +102,6 @@ GEM
       domain_name (~> 0.5)
     i18n (0.7.0)
     json (1.8.3)
-    kgio (2.10.0)
     listen (3.0.5)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -134,6 +133,7 @@ GEM
       yard (~> 0.8)
     pry-rails (0.3.4)
       pry (>= 0.9.10)
+    puma (2.15.3)
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -166,7 +166,6 @@ GEM
       activesupport (= 4.2.5)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    raindrops (0.15.0)
     rake (10.4.2)
     rb-fsevent (0.9.7)
     rb-inotify (0.9.5)
@@ -227,10 +226,6 @@ GEM
       unf_ext
     unf_ext (0.0.7.1)
     unicode-display_width (0.1.1)
-    unicorn (5.0.1)
-      kgio (~> 2.6)
-      rack
-      raindrops (~> 0.7)
     uniform_notifier (1.9.0)
     yard (0.8.7.6)
 
@@ -257,12 +252,12 @@ DEPENDENCIES
   pg
   pry-doc
   pry-rails
+  puma
   rails (= 4.2.5)
   rspec-rails
   shoulda-matchers
   spring
   sqlite3
-  unicorn
 
 BUNDLED WITH
    1.11.2
