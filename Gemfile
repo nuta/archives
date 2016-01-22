@@ -9,6 +9,7 @@ gem 'backup'
 gem 'dotenv'
 gem 'highline'
 gem 'puma'
+gem 'capistrano'
 
 group :development do
   gem 'bullet'
