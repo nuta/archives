@@ -148,6 +148,8 @@ GEM
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
+    rack-vcr (0.1.4)
+      vcr (~> 2.9)
     rails (4.2.5.1)
       actionmailer (= 4.2.5.1)
       actionpack (= 4.2.5.1)
@@ -240,6 +242,7 @@ GEM
     unf_ext (0.0.7.1)
     unicode-display_width (0.1.1)
     uniform_notifier (1.9.0)
+    vcr (2.9.3)
     yard (0.8.7.6)
 
 PLATFORMS
@@ -268,6 +271,7 @@ DEPENDENCIES
   pry-doc
   pry-rails
   puma
+  rack-vcr
   rails (= 4.2.5.1)
   rspec-rails
   shoulda-matchers
