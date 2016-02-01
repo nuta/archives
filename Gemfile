@@ -40,5 +40,4 @@ group :development, :test do
   gem 'sqlite3'
   gem 'pry-rails'
   gem 'pry-doc'
-  gem 'rack-vcr'
 end
