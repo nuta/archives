@@ -2,9 +2,6 @@
 
 t test:
 	bundle exec rspec
-	for workflow in osx-tests/*; do \
-		reattach-to-user-namespace automator $$workflow; \
-	done
 
 at autotest:
 	bundle exec guard
