@@ -6,6 +6,8 @@ gem 'puma'
 gem 'mysql2', group: :mysql
 gem 'pg', group: :postgres
 
+gem 'highline', require: false
+
 group :capistrano do
   gem 'capistrano'
   gem 'capistrano-rails'

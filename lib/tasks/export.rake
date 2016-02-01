@@ -1,3 +1,5 @@
+require 'highline'
+
 namespace :export do
   desc 'export as a .ics file'
   task :ics => :environment do

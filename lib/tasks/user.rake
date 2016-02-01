@@ -1,3 +1,5 @@
+require 'highline'
+
 namespace :user do
   desc 'add an user'
   task :add => :environment do
