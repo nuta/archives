@@ -2,13 +2,9 @@ source 'https://rubygems.org'
 
 gem 'rails', '4.2.5.1'
 
+gem 'puma'
 gem 'mysql2', group: :mysql
 gem 'pg', group: :postgres
-
-gem 'backup'
-gem 'dotenv'
-gem 'highline'
-gem 'puma'
 
 group :capistrano do
   gem 'capistrano'
@@ -36,7 +32,6 @@ group :test do
   gem 'rspec-rails'
   gem 'coveralls', require: false
   gem 'shoulda-matchers'
-  gem 'fuubar'
 end
 
 group :development, :test do
