@@ -1,0 +1,328 @@
+---
+- method: DELETE
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 401
+- method: DELETE
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 404
+- method: PROPFIND
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    depth: '0'
+    brief: t
+    accept: "*/*"
+    connection: keep-alive
+    prefer: return=minimal
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 401
+- method: PROPFIND
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    prefer: return=minimal
+  body: ''
+  status: 207
+- method: OPTIONS
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    prefer: return=minimal
+  body: ''
+  status: 207
+- method: PROPPATCH
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propertyupdate xmlns:A="DAV:"><A:set><A:prop><B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav">BEGIN:VALARM&#13;
+    X-WR-ALARMUID:5B6EB431-1F91-424E-A6FD-E50423C15A53&#13;
+    UID:5B6EB431-1F91-424E-A6FD-E50423C15A53&#13;
+    TRIGGER:-PT15H&#13;
+    ATTACH;VALUE=URI:Basso&#13;
+    ACTION:AUDIO&#13;
+    END:VALARM&#13;
+    </B:default-alarm-vevent-date></A:prop></A:set></A:propertyupdate>
+  status: 501
+- method: PROPPATCH
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propertyupdate xmlns:A="DAV:"><A:set><A:prop><B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav">BEGIN:VALARM&#13;
+    X-WR-ALARMUID:1A95A3C7-F74E-426A-877E-AFED1D4CF112&#13;
+    UID:1A95A3C7-F74E-426A-877E-AFED1D4CF112&#13;
+    TRIGGER;VALUE=DATE-TIME:19760401T005545Z&#13;
+    ACTION:NONE&#13;
+    END:VALARM&#13;
+    </B:default-alarm-vevent-datetime></A:prop></A:set></A:propertyupdate>
+  status: 501
+- method: PROPFIND
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    depth: '0'
+    brief: t
+    accept: "*/*"
+    connection: keep-alive
+    prefer: return=minimal
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+      </A:prop>
+    </A:propfind>
+  status: 200
+- method: PROPFIND
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    depth: '0'
+    brief: t
+    accept: "*/*"
+    connection: keep-alive
+    prefer: return=minimal
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+      </A:prop>
+    </A:propfind>
+  status: 200
+- method: PROPFIND
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    prefer: return=minimal
+  body: ''
+  status: 207
+- method: PROPFIND
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    prefer: return=minimal
+  body: ''
+  status: 207
+- method: PUT
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    if_none_match: "*"
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 201
+- method: GET
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PUT
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    accept_encoding: gzip, deflate
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    if_match: W/"70de794b56521944e1468c0dd64d4597"
+    accept_language: en-us
+  body: ''
+  status: 201
+- method: GET
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    if_none_match: W/"70de794b56521944e1468c0dd64d4597"
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PUT
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    if_none_match: "*"
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 201
+- method: GET
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PUT
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    accept_encoding: gzip, deflate
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    if_match: W/"1191f425995d6b915d1c4fb1e22cb66b"
+    accept_language: en-us
+  body: ''
+  status: 201
+- method: GET
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    if_none_match: W/"1191f425995d6b915d1c4fb1e22cb66b"
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: DELETE
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    accept_encoding: gzip, deflate
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    if_match: W/"37f1832a201239f08f80243c06d6cdba"
+    accept_language: en-us
+  body: ''
+  status: 204
