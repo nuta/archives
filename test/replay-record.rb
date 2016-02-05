@@ -6,7 +6,7 @@ require 'colorize'
 HOST = 'localhost'
 PORT = 3000
 
-def request(method, path, headers, body)
+def request(method, path, headers, body, expected_status)
   print "#{method} #{path}   "
   STDOUT.flush
 
@@ -21,11 +21,11 @@ def request(method, path, headers, body)
     s.puts body
   end
  
-  status = s.gets.split(' ')[1]
-  if status.start_with?('2')
+  status = s.gets.split(' ')[1].to_i
+  if status == expected_status
     puts "OK".colorize(:green)
   else
-    puts "FAIL (#{status})".colorize(:red)
+    puts "FAIL (expected #{expected_status}, but #{status})".colorize(:red)
     $error = true
   end
 
@@ -35,7 +35,7 @@ end
 
 $error = false
 YAML.load(File.open(ARGV[0])).each do |r|
-  request(r['method'], r['path'], r['headers'], r['body'])
+  request(r['method'], r['path'], r['headers'], r['body'], r['status'])
 end
 
 exit ($error)? 1 : 0
