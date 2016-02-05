@@ -16,7 +16,12 @@ class CalendarController < ApplicationController
   end
 
   def put
-    ics   = ICS::ICalendar.new(request_body)
+    begin
+      ics   = ICS::ICalendar.new(request_body)
+    rescue
+      return head :status => :bad_request
+    end
+
     uri   = params[:calendar_object]
     sched = Schedule.find_by_uri(uri)
 
