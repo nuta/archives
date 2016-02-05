@@ -13,4 +13,4 @@ install:
   - bundle install --jobs 4
 
 script:
-  - bundle exec ./test/replay-record.rb test/records/osx-calendar.yml
+  - ./.travis.sh
