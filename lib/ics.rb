@@ -1,7 +1,6 @@
 #
 #  iCalendar (RFC5545) Parser
 #
-
 module ICS
   extend self
 
@@ -73,6 +72,10 @@ module ICS
 
   # parse between BEGIN:FOO and END:FOO
   def parse_block(lines)
+    if lines.size == 0
+      return '', {}, 0
+    end
+
     comp_name = get_comp_name(lines[0])
     block = {}
     i = 1

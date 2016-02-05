@@ -61,6 +61,7 @@ GEM
       puma (>= 2.6)
     choice (0.2.0)
     coderay (1.1.0)
+    colorize (0.7.7)
     concurrent-ruby (1.0.0)
     coveralls (0.8.10)
       json (~> 1.8)
@@ -254,6 +255,7 @@ DEPENDENCIES
   capistrano-rails
   capistrano-rbenv
   capistrano3-puma
+  colorize
   coveralls
   erd
   factory_girl_rails

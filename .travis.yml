@@ -1,5 +1,7 @@
 language: ruby
 rvm:
+  - 2.2.0
+  - 2.1.0
   - 2.0.0
 
 cache:
@@ -7,7 +9,8 @@ cache:
     - vendor/bundle
 
 install:
-  - make dev
+  - cp config/database.yml.example config/database.yml
+  - bundle install --jobs 4
 
 script:
-  - bundle exec rspec
+  - bundle exec ./test/replay-record.rb test/records/osx-calendar.yml

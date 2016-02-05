@@ -20,12 +20,13 @@ class Recorder
 
     @requests << {
       'method'  => method,
+      'path'    => path,
       'headers' => headers,
       'body'    => body,
       'status'  => status
     }
 
-    f = File.open("spec/records/#{ENV['RECORD_NAME']}.yml", 'w')
+    f = File.open("test/records/#{ENV['RECORD_NAME']}.yml", 'w')
     f.write(@requests.to_yaml)
     f.close
 
@@ -34,5 +35,7 @@ class Recorder
 end
 
 if Rails.env.development?
-  Rails.configuration.middleware.insert(0, Recorder)
+  if String(ENV['RECORD_NAME']) != ''
+    Rails.configuration.middleware.insert(0, Recorder)
+  end
 end
