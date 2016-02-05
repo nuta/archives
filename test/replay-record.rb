@@ -13,6 +13,7 @@ def request(method, path, headers, body, expected_status)
   s = TCPSocket.open HOST, PORT
   s.puts "#{method} #{path} HTTP/1.1\r\n"
   s.puts "Connection: close\r\n"
+  s.puts "Content-Length: #{body.size}"
   headers.each do |k,v|
     s.puts "#{k}: #{v}\r\n"
   end
@@ -20,7 +21,7 @@ def request(method, path, headers, body, expected_status)
   if body != ""
     s.puts body
   end
- 
+
   status = s.gets.split(' ')[1].to_i
   if status == expected_status
     puts "OK".colorize(:green)
