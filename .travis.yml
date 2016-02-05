@@ -10,7 +10,7 @@ cache:
 
 install:
   - cp config/database.yml.example config/database.yml
-  - bundle install --jobs 4
+  - bundle install --jobs 4 --path vendor/bundle
 
 script:
   - ./.travis.sh
