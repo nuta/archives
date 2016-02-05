@@ -11,7 +11,9 @@ class Recorder
     status, res_headers, res = @app.call(env)
     path = env['PATH_INFO']
     method = env['REQUEST_METHOD']
-    body = env['rack.input'].read
+
+    env['rack.input'].rewind
+    body = env['rack.input'].read.force_encoding('UTF-8')
 
     headers = {}
     env.select{|x| x.start_with? 'HTTP_' }.each do |k, v|
