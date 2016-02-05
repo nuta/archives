@@ -2,6 +2,7 @@
 exitcode=0
 
 cd test
+bundle exec rake db:migrate
 bundle exec rails server 2>&1 > log &
 sleep 5
 PID=$$
