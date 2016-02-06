@@ -6,7 +6,7 @@ require 'colorize'
 HOST = 'localhost'
 PORT = 3000
 
-def request(method, path, headers, body, expected_status)
+def request(method, path, headers, body, expected_status, expected_response)
   print "#{method} #{path}   "
   STDOUT.flush
 
@@ -23,10 +23,26 @@ def request(method, path, headers, body, expected_status)
   end
 
   status = s.gets.split(' ')[1].to_i
-  if status == expected_status
+  if status != expected_status
+    puts "FAIL (expected #{expected_status}, but #{status})".colorize(:red)
+    $error = true
+    return
+  end
+
+  response = ''
+  if %w(GET).include?(method)
+    length_line = false
+    while line = s.gets
+      # supports 'Transfer-Encoding: chunked' only
+      break if line == "0\r\n"
+      response += line
+    end
+  end
+
+  if not expected_response or response.force_encoding("UTF-8").include?(expected_response)
     puts "OK".colorize(:green)
   else
-    puts "FAIL (expected #{expected_status}, but #{status})".colorize(:red)
+    puts "FAIL (expected '#{expected_response}' in the response)".colorize(:red)
     $error = true
   end
 
@@ -36,7 +52,7 @@ end
 
 $error = false
 YAML.load(File.open(ARGV[0])).each do |r|
-  request(r['method'], r['path'], r['headers'], r['body'], r['status'])
+  request(r['method'], r['path'], r['headers'], r['body'], r['status'], r['includes'])
 end
 
 exit ($error)? 1 : 0

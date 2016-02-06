@@ -486,6 +486,7 @@
     accept_encoding: gzip, deflate
   body: ''
   status: 200
+  includes: 'SUMMARY:Hello'
 - method: PUT
   path: "/calendar/Private/5279B362-22BB-4974-8454-E0DEECBC08D7.ics"
   headers:
@@ -513,6 +514,7 @@
     accept_encoding: gzip, deflate
   body: ''
   status: 200
+  includes: "SUMMARY:\U0001F493"
 - method: PUT
   path: "/calendar/Private/5C1A6AB9-4149-429C-A1FB-0F5BE459E863.ics"
   headers:
@@ -568,6 +570,7 @@
     accept_encoding: gzip, deflate
   body: ''
   status: 200
+  includes: "DTEND;TZID=Asia/Tokyo:20160224T100000"
 - method: PUT
   path: "/calendar/Private/5C1A6AB9-4149-429C-A1FB-0F5BE459E863.ics"
   headers:
@@ -596,6 +599,7 @@
     accept_encoding: gzip, deflate
   body: ''
   status: 200
+  include: 'DTEND;TZID=Asia/Tokyo:20160225T100000'
 - method: PUT
   path: "/calendar/Private/5C1A6AB9-4149-429C-A1FB-0F5BE459E863.ics"
   headers:
