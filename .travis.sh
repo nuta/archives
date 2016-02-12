@@ -15,7 +15,7 @@ for record in records/*; do
     fi
 done
 
-kill -s SIGINT $PID
+kill -s INT $PID
 
 echo "---------------------------------------"
 cat log
