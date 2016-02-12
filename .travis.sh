@@ -1,10 +1,13 @@
 #!/bin/sh
+set -v
 exitcode=0
 
 cd test
+
 COVERALLS=true bundle exec rails server 3>&1 > log &
+PID=$!
+
 sleep 5
-PID=$$
 
 for record in records/*; do
     bundle exec ./replay-record.rb $record
@@ -13,6 +16,8 @@ for record in records/*; do
     fi
 done
 
+echo $PID
+ps ax| grep $PID
 kill -2 $PID
 wait $PID
 
