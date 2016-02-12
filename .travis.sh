@@ -4,7 +4,7 @@ exitcode=0
 cd test
 bundle exec rake db:migrate
 bundle exec rake user:add name=guest password=123
-bundle exec rails server 3>&1 > log &
+COVERALLS=true bundle exec rails server 3>&1 > log &
 sleep 5
 PID=$$
 
