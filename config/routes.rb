@@ -9,6 +9,10 @@ Rails.application.routes.draw do
       match '/calendar/:calendar', calendar_object: ''
       match '/calendar/:calendar/*calendar_object'
     end
+
+    with_options to: 'well_known#redirect', via: method.to_s do
+      match '/.well-known/:type'
+    end
   end
 
   # other requests: return 404 Bad Request
