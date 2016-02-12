@@ -1,5 +1,4 @@
 #!/bin/sh
-set -v
 exitcode=0
 
 cd test
