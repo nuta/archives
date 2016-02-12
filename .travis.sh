@@ -2,8 +2,6 @@
 exitcode=0
 
 cd test
-bundle exec rake db:migrate
-bundle exec rake user:add name=guest password=123
 COVERALLS=true bundle exec rails server 3>&1 > log &
 sleep 5
 PID=$$
@@ -15,7 +13,8 @@ for record in records/*; do
     fi
 done
 
-kill -s INT $PID
+kill -2 $PID
+wait $PID
 
 echo "---------------------------------------"
 cat log
