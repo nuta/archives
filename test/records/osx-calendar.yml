@@ -474,6 +474,19 @@
     World\r\nDTSTART;VALUE=DATE:20160210\r\nDTSTAMP:20160205T125207Z\r\nSEQUENCE:0\r\nBEGIN:VALARM\r\nX-WR-ALARMUID:4A9B15F0-1255-4CD2-A792-1AB5E11FD64A\r\nUID:4A9B15F0-1255-4CD2-A792-1AB5E11FD64A\r\nTRIGGER:-PT15H\r\nX-APPLE-DEFAULT-ALARM:TRUE\r\nATTACH;VALUE=URI:Basso\r\nACTION:AUDIO\r\nEND:VALARM\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
   status: 201
 - method: GET
+  path: "/calendar/Private/NOT-FOUND.ics"
+  headers:
+    version: HTTP/1.1
+    host: localhost:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: Mac+OS+X/10.11.3 (15D21) CalendarAgent/361.1
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 404
+- method: GET
   path: "/calendar/Private/B040443B-DF4A-433B-BEF8-892D9159D0AC.ics"
   headers:
     version: HTTP/1.1
