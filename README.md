@@ -58,6 +58,9 @@ Busybook stores all data in the database so simply you can backup and restore by
 Public domain
 
 ## Changelog
+- **v0.2.0**
+  - add busybook CLI
+  - support Well-Known URI
 - **v0.1.1**
   - fix implementation of calendar-query
 - **v0.1.0**
