@@ -25,6 +25,19 @@ def chdir_to_git_repo
   Dir.chdir('busybook')
 end
 
+def bundle_install
+    system 'bundle install --jobs 4'
+end
+
+def bundle_exec(cmd, by_exec)
+  cmd = "RAILS_ENV=production bundle exec #{cmd}"
+  if by_exec
+    exec cmd
+  else
+    system cmd
+  end
+end
+
 def download
   chdir_to_busybook_dir
 
@@ -32,13 +45,13 @@ def download
     Dir.chdir('busybook')
     Git.open('.').pull
     info 'updating Busybook...'
-    system 'bundle install --jobs 4'
+    bundle_install
   else
     info 'downloading Busybook from GitHub...'
     Git.clone('https://github.com/nuta/busybook', 'busybook')
     Dir.chdir('busybook')
     info 'installing dependencies'
-    system 'bundle install --jobs 4'
+    bundle_install
 
     FileUtils.cp('config/database.yml.example', 'config/database.yml')
     
@@ -57,24 +70,24 @@ end
 def config
   chdir_to_git_repo
   info 'setting up the database...'
-  system 'bundle exec rake db:migrate'
+  bundle_exec 'rake db:migrate'
 end
 
 def serve
   chdir_to_git_repo
-  exec 'bundle exec rails server'
+  bundle_exec 'rails server', true
 end
 
 
 def adduser
   chdir_to_git_repo
-  exec 'bundle exec rake user:add'
+  bundle_exec 'rake user:add', true
 end
 
 
 def deluser
   chdir_to_git_repo
-  exec 'bundle exec rake user:delete'
+  bundle_exec 'rake user:delete', true
 end
 
 
