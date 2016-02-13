@@ -5,34 +5,26 @@ Busybook
 [![Code Climate](https://codeclimate.com/github/nuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/nuta/busybook)
 [![Dependency Status](https://gemnasium.com/nuta/busybook.svg)](https://gemnasium.com/nuta/busybook)
 
-
 Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 
-## Features (and ToDo)
-- [x] CalDAV
-  - [x] HTTP Basic auth
-  - [x] fundamental functions
-  - [x] etag support (including `If-Match`)
-  - [x] ctag support
-- [x] rake command: add/delete/list users
-- [x] rake command: export as a .ics/.vcard file
-- [x] CalDAV/CardDAV tester
-- [x] `.well-known` ([RFC5785](https://tools.ietf.org/html/rfc5785))
-- [ ] Collection synchronization ([RFC6578](https://tools.ietf.org/html/rfc6578))
-- [ ] principals
-- [ ] CardDAV *WIP*
-- [ ] easy deployment
-  - [ ] `busybook(1)`
-  - [ ] config files for `upstart`
-  - [ ] config files for `systemd`
-  - [ ] distribute as a gem
-- [ ] documentation
-- [ ] Web UI
+## Getting started
+```
+$ gem install busybook    # install a CLI frontend
+$ busybook install        # install the server
+$ busybook config         # apply config
+$ busybook adduser        # add a user
+$ busybook serve -p 8080  # start server at localhost:8080
+```
 
-## License
-Public domain
+## Configuration
+Don't forget running `busybook config` to apply new configuration!
 
-## compliance
+- `~/.busybook/database.yml`: Database connection configuration. By default it is a sqlite3 database. Refer [Ruby on Rails Guides](http://guides.rubyonrails.org/configuring.html#configuring-a-database).
+
+## Backup
+Busybook stores all data in the database so simply you can backup and restore by RDBMS's command like [pg_dump](http://www.postgresql.org/docs/9.5/static/app-pgdump.html).
+
+## Compliance
 - [RFC4918: HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)](http://tools.ietf.org/html/rfc4918)
   - supports `GET`, `PUT`, `DELETE`, `OPTIONS`, `MKCALENDAR`, `PROPFIND`, and `PROPPATCH` HTTP methods
   - does *not* support `HEAD`, `POST`, `LOCK`, `UNLOCK`, `COPY`, `MOVE`, and `MKCOL` HTTP methods
@@ -50,6 +42,21 @@ Public domain
 - [RFC3744: WebDAV Access Control Protocol](https://tools.ietf.org/html/rfc3744)
   - *not* supported
 
+## ToDo
+- [ ] easy deployment
+  - [x] `busybook(1)`
+  - [x] easy installer
+  - [x] adduser/deluser command
+  - [ ] config files for `upstart`
+  - [ ] config files for `systemd`
+- [ ] principals
+- [ ] CardDAV
+- [ ] documentation
+- [ ] Web UI
+
+## License
+Public domain
+
 ## Changelog
 - **v0.1.1**
   - fix implementation of calendar-query
@@ -57,5 +64,3 @@ Public domain
   - support iOS
   - support calendar-query REPORT request
   - export a calendar as a .ics file
-  - introduce [backup](https://github.com/backup/backup) gem
-  - add unicorn config

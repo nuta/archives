@@ -1,0 +1,115 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'git'
+require 'colorize'
+
+
+def info(m)
+  puts "==> #{m}".colorize(:blue)
+end
+
+def error(m)
+  STDERR.puts "Error: #{m}".colorize(:red)
+  exit 1
+end
+
+def chdir_to_busybook_dir
+  Dir.chdir(Dir.home)
+  FileUtils.mkdir_p('.busybook')
+  Dir.chdir('.busybook')
+end
+
+def chdir_to_git_repo
+  chdir_to_busybook_dir
+  error 'do `busybook install` first' unless Dir.exist?('busybook')
+  Dir.chdir('busybook')
+end
+
+def download
+  chdir_to_busybook_dir
+
+  if Dir.exist?('busybook')
+    Dir.chdir('busybook')
+    Git.open('.').pull
+    info 'updating Busybook...'
+    system 'bundle install --jobs 4'
+  else
+    info 'downloading Busybook from GitHub...'
+    Git.clone('https://github.com/nuta/busybook', 'busybook')
+    Dir.chdir('busybook')
+    info 'installing dependencies'
+    system 'bundle install --jobs 4'
+
+    FileUtils.cp('config/database.yml.example', 'config/database.yml')
+    
+    Dir.chdir('..')
+    %w(busybook/config/database.yml).each do |src|
+      dst = File.basename(src)
+      info "creating symlink: #{src} -> #{dst}"
+      FileUtils.symlink(src, dst)
+    end
+
+    info "edit config files in #{Dir.pwd} and do `busybook serve` to start"
+  end
+end
+
+
+def config
+  chdir_to_git_repo
+  info 'setting up the database...'
+  system `bundle exec db:migrate`
+end
+
+def serve
+  chdir_to_git_repo
+  exec 'bundle exec rails server'
+end
+
+
+def adduser
+  chdir_to_git_repo
+  exec 'bundle exec rake user:add'
+end
+
+
+def deluser
+  chdir_to_git_repo
+  exec 'bundle exec rake user:delete'
+end
+
+
+def help
+  puts <<EOS
+busybook - A CalDAV server out of the box
+
+Usage: busybook command
+
+Commands:
+
+  install   download & install the busybook server
+  update    update Busybook
+  config    apply config
+  serve     start a server
+  adduser   add an user
+  deluser   delete an user
+  help      show this message
+
+EOS
+end
+
+
+command = ARGV.shift
+case command
+when 'serve'
+  serve
+when 'config'
+  config
+when 'install', 'update'
+  download
+when 'adduser'
+  adduser
+when 'deluser'
+  deluser
+else
+  help
+end
