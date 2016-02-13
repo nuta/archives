@@ -57,7 +57,7 @@ end
 def config
   chdir_to_git_repo
   info 'setting up the database...'
-  system `bundle exec db:migrate`
+  system 'bundle exec rake db:migrate'
 end
 
 def serve
