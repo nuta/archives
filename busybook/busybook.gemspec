@@ -1,17 +1,18 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'busybook/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "busybook"
-  spec.version       = Busybook::VERSION
+  spec.version       = File.read(File.expand_path('../../VERSION', __FILE__)).strip
   spec.authors       = ["Seiya Nuta"]
   spec.email         = ["nuta@seiya.me"]
-
   spec.summary       = %q{A CalDAV server out of the box}
   spec.description   = %q{}
   spec.homepage      = "https://github.com/nuta/busybook"
+  spec.license       = "Public Domain"
+
+  spec.required_ruby_version = '>= 2.0.0'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
