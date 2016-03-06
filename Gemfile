@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.5.1'
+gem 'rails', '4.2.5.2'
 
 gem 'puma'
 gem 'sqlite3', group: :sqlite3
