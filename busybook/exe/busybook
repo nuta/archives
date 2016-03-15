@@ -48,7 +48,7 @@ def download
     bundle_install
   else
     info 'downloading Busybook from GitHub...'
-    Git.clone('https://github.com/nuta/busybook', 'busybook')
+    Git.clone('https://github.com/seiyanuta/busybook', 'busybook')
     Dir.chdir('busybook')
     info 'installing dependencies'
     bundle_install

@@ -1,7 +1,7 @@
 Busybook
 ========
 [![Gem Version](http://img.shields.io/gem/v/busybook.svg)](https://rubygems.org/gems/busybook)
-[![Build Status](https://travis-ci.org/nuta/busybook.svg?branch=master)](https://travis-ci.org/nuta/busybook)
+[![Build Status](https://travis-ci.org/seiyanuta/busybook.svg?branch=master)](https://travis-ci.org/seiyanuta/busybook)
 [![Coverage Status](https://coveralls.io/repos/github/nuta/busybook/badge.svg?branch=master)](https://coveralls.io/github/nuta/busybook?branch=master)
 [![Code Climate](https://codeclimate.com/github/nuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/nuta/busybook)
 [![Dependency Status](https://gemnasium.com/nuta/busybook.svg)](https://gemnasium.com/nuta/busybook)

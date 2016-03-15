@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["nuta@seiya.me"]
   spec.summary       = %q{A CalDAV server out of the box}
   spec.description   = %q{}
-  spec.homepage      = "https://github.com/nuta/busybook"
+  spec.homepage      = "https://github.com/seiyanuta/busybook"
   spec.license       = "Public Domain"
 
   spec.required_ruby_version = '>= 2.0.0'

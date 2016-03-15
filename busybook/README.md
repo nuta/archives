@@ -1,5 +1,5 @@
 # Busybook CLI
-A CLI frontend for [Busybook](https://github.com/nuta/busybook).
+A CLI frontend for [Busybook](https://github.com/seiyanuta/busybook).
 
 # Install
 ```
