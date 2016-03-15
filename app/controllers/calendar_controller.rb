@@ -2,6 +2,7 @@ require 'digest/md5'
 
 class CalendarController < ApplicationController
   before_action :authenticate, except: [:options]
+  before_action :set_src_and_dst, only: [:move, :copy]
 
   def options
     methods = %w(OPTIONS GET PUT DELETE MKCALENDAR PROPFIND PROPPATCH REPORT)
@@ -62,6 +63,16 @@ class CalendarController < ApplicationController
     end
 
     head :status => :no_content
+  end
+
+  def copy
+    Schedule.copy(@src, @dst[:calendar], @dst[:calendar_object])
+    head :status => :no_content
+  end
+
+  def move
+    Schedule.move(@src, @dst[:calendar], @dst[:calendar_object])
+    head :status => :created
   end
 
   def mkcalendar
@@ -437,6 +448,17 @@ EOS
     xml += "</multistatus>"
 
     xml
+  end
+
+  def set_src_and_dst
+    @src = params[:calendar_object]
+
+    begin
+      @dst = Rails.application.routes.recognize_path(request.headers[:destination])
+    rescue
+      logger.warn "unknown destination url: '#{dst}'"
+      return head :status => :bad_request
+    end
   end
 
   def stringify_http_status_code(status)

@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   root to: proc { [200, {}, ['']] }
 
-  methods = %w(options get put delete mkcalendar propfind proppatch report)
+  methods = %w(options get put delete mkcalendar propfind proppatch report move copy)
 
   methods.each do |method|
     with_options to: 'calendar#' + method, via: method.to_s do
