@@ -8,7 +8,7 @@ class CalendarController < ApplicationController
   include DavXml
   include HttpStatus
 
-  before_action :authenticate, except: [:options]
+  skip_before_action :authenticate, only: [:options]
   before_action :set_src_and_dst, only: [:move, :copy]
 
   def options
@@ -26,16 +26,19 @@ class CalendarController < ApplicationController
   def put
     uri      = params[:calendar_object]
     calendar = params[:calendar]
-    sched = Schedule.find_by_uri(uri)
 
     # handle If-Match
-    if request.headers.key?("If-Match") and sched and
-       getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
-      head :status => :precondition_failed
-      return
+    sched = Schedule.find_by_uri(uri)
+    if request.headers.key?("If-Match")
+       unless sched
+          return head :status => :precondition_failed
+       end
+
+       if getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
+          return head :status => :precondition_failed
+       end
     end
 
-    # update columns
     sched = Schedule.new(uri: uri) unless sched
     sched.calendar = Calendar.find_by_uri!(calendar)
     sched.set_ics(rawrequest)
@@ -144,13 +147,6 @@ class CalendarController < ApplicationController
     rescue
       logger.warn "unknown destination url: '#{dst}'"
       return head :status => :bad_request
-    end
-  end
-
-  def authenticate
-    authenticate_or_request_with_http_basic('realm') do |name, password|
-      @user = User.find_by_name(name)
-      @user and @user.validate_password(password)
     end
   end
 end
