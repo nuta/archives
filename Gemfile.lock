@@ -168,6 +168,7 @@ DEPENDENCIES
   pry-rails
   puma
   rails (= 4.2.6)
+  rake
   spring
   sqlite3
 
