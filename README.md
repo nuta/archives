@@ -44,12 +44,6 @@ Busybook stores all data in the database so simply you can backup and restore by
   - *not* supported
 
 ## ToDo
-- [ ] easy deployment
-  - [x] `busybook(1)`
-  - [x] easy installer
-  - [x] adduser/deluser command
-  - [ ] config files for `upstart`
-  - [ ] config files for `systemd`
 - [ ] principals
 - [ ] CardDAV
 - [ ] documentation

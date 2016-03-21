@@ -1,3 +1,0 @@
-module Busybook
-  # Your code goes here...
-end
