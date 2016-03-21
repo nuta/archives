@@ -4,7 +4,7 @@ namespace :user do
   desc 'add an user'
   task :add => :environment do
     cli = HighLine.new
-    name = ENV['name']     || cli.ask('username: ')
+    name = ENV['username'] || cli.ask('username: ')
     pass = ENV['password'] || cli.ask('password: ') {|q| q.echo = false }
     User.create(name: name, password: pass)
 
