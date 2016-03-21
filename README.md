@@ -2,9 +2,9 @@ Busybook
 ========
 [![Gem Version](http://img.shields.io/gem/v/busybook.svg)](https://rubygems.org/gems/busybook)
 [![Build Status](https://travis-ci.org/seiyanuta/busybook.svg?branch=master)](https://travis-ci.org/seiyanuta/busybook)
-[![Coverage Status](https://coveralls.io/repos/github/nuta/busybook/badge.svg?branch=master)](https://coveralls.io/github/nuta/busybook?branch=master)
-[![Code Climate](https://codeclimate.com/github/nuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/nuta/busybook)
-[![Dependency Status](https://gemnasium.com/nuta/busybook.svg)](https://gemnasium.com/nuta/busybook)
+[![Coverage Status](https://coveralls.io/repos/github/seiyanuta/busybook/badge.svg?branch=master)](https://coveralls.io/github/seiyanuta/busybook?branch=master)
+[![Code Climate](https://codeclimate.com/github/seiyanuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/seiyanuta/busybook)
+[![Dependency Status](https://gemnasium.com/seiyanuta/busybook.svg)](https://gemnasium.com/seiyanuta/busybook)
 
 Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 
