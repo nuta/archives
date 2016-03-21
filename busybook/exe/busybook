@@ -30,7 +30,7 @@ def bundle_install
     without.delete(x) if ARGV.include?("--with-#{x}")
   end
 
-  system "bundle install --jobs 4 --without #{without.join(' ')}"
+  system "bundle install --jobs 4 --without #{without.join(' ')} --path vendor/bundle"
 end
 
 def bundle_exec(cmd, by_exec)
