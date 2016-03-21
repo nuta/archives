@@ -17,41 +17,21 @@ class CalendarController < ApplicationController
   end
 
   def put
-    begin
-      ics   = ICS::ICalendar.new(request_body)
-    rescue
-      logger.error "failed to parse iCalendar data:"
-      logger.error "----------------------------------------------"
-      logger.error request_body
-      logger.error "----------------------------------------------"
-      return head :status => :bad_request
-    end
-
-    uri   = params[:calendar_object]
+    uri      = params[:calendar_object]
+    calendar = params[:calendar]
     sched = Schedule.find_by_uri(uri)
 
     # handle If-Match
-    if request.headers.key?("If-Match") and
-       sched and getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
+    if request.headers.key?("If-Match") and sched and
+       getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
       head :status => :precondition_failed
       return
     end
 
-    # accept a calendar event or a ToDo item
-    unless %w(VEVENT VTODO).include?(ics.comp_type)
-      # unknown calendar object
-      return head :status => :not_implemented
-    end
-
     # update columns
     sched = Schedule.new(uri: uri) unless sched
-    sched.ics        = request_body
-    sched.calendar   = Calendar.find_by_uri!(params[:calendar])
-    sched.component  = ics.comp_type
-    sched.date_start = ics.comp('DTSTART', date=true)
-    sched.date_end   = ics.comp('DTEND', date=true)
-    sched.uid        = ics.comp('UID')
-    sched.summary    = ics.comp('SUMMARY')
+    sched.calendar = Calendar.find_by_uri!(calendar)
+    sched.set_ics(request_body)
     sched.save
 
     head :status => :created
@@ -114,23 +94,23 @@ class CalendarController < ApplicationController
 
     xml = Nokogiri::XML(request_body)
     cal = Calendar.find_by_uri!(params[:calendar])
-    props = cal.props
+    cal_props = cal.props
 
     # set properties
     for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
-      props[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
+      cal_props[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
     end
   
     # remove properties
     for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
-      props.delete(prop.name)
+      cal_props.delete(prop.name)
     end
 
-    cal.props = props
+    cal.props = cal_props
     cal.save
 
     res = respond_xml_request('/A:propertyupdate/*/A:prop/*') do |props|
-      results = handle_props(props) {|prop| '' }
+      results = handle_props(props) { '' }
       [["/calendar/#{params[:calendar]}/", results]]
     end
 

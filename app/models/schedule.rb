@@ -1,7 +1,12 @@
 class Schedule < ActiveRecord::Base
   belongs_to :calendar
 
-  validates :uri, uniqueness: true
+  validates :component,  presence: true
+  validates :date_start, presence: true
+  validates :date_end,   presence: true
+  validates :uid,        presence: true
+  validates :uri,        presence: true, uniqueness: true
+  validates :ics,        presence: true
 
   def Schedule.in_time_range(calendar, range_start, range_end)
     sql = ''
@@ -47,6 +52,23 @@ class Schedule < ActiveRecord::Base
       Change.create(calendar: src.calendar, uri: src.uri, is_delete: true)
       Change.create(calendar: dst.calendar, uri: dst.uri, is_delete: false)
     end
+  end
+
+  def set_ics(body)
+    ics = ICS::ICalendar.new(body)
+
+    # accept a calendar event or a ToDo item
+    unless %w(VEVENT VTODO).include?(ics.comp_type)
+      # unknown calendar object
+      raise "unsupported calendar object: '#{ics.comp_type}'"
+    end
+
+    self.ics        = body
+    self.component  = ics.comp_type
+    self.date_start = ics.comp('DTSTART', date: true)
+    self.date_end   = ics.comp('DTEND',   date: true)
+    self.uid        = ics.comp('UID')
+    self.summary    = ics.comp('SUMMARY')
   end
 
   def save
