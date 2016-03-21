@@ -37,7 +37,7 @@ case $1 in
     sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; gem2.0 install bundler --no-ri --no-rdoc"
     sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle install --path vendor/bundle --without postgres mysql development"
     sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; cp config/database.yml.example config/database.yml"
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; rake db:migrate"
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle exec rake db:migrate"
     ;;
   start)
     echo 'Starting Busybook...'
