@@ -20,7 +20,7 @@ BUSYBOOK_HOME=/var/lib/busybook
 case $1 in
   setup)
 
-    if ! id $USER 2>&1 >/dev/null; then
+    if ! getent passwd $USER 2>&1 >/dev/null; then
         mkdir $BUSYBOOK_HOME
         useradd -s /bin/false -d $BUSYBOOK_HOME $USER
         chown $USER $BUSYBOOK_HOME
@@ -30,17 +30,21 @@ case $1 in
         sudo -u $USER sh -c "cd $BUSYBOOK_HOME; git clone https://github.com/seiyanuta/busybook"
     fi
 
-    sudo -u $USER sh -c "cd $BUSYBOOK_HOME/busybook; GEM_HOME=$BUSYBOOK_HOME/.gem gem2.0 install bundler --no-ri --no-rdoc"
-    sudo -u $USER sh -c "cd $BUSYBOOK_HOME/busybook; bundle install --path vendor/bundle --without postgres mysql development"
-    sudo -u $USER sh -c "cd $BUSYBOOK_HOME/busybook; cp config/database.yml.example config/database.yml"
-    sudo -u $USER sh -c "cd $BUSYBOOK_HOME/busybook; RAILS_ENV=production rake db:migrate"
+    sudo -u $USER bash -c "echo 'export PATH=\$PATH:$BUSYBOOK_HOME/.gem/bin' >  $BUSYBOOK_HOME/env"
+    sudo -u $USER bash -c "echo 'export GEM_HOME=$BUSYBOOK_HOME/.gem'        >> $BUSYBOOK_HOME/env"
+    sudo -u $USER bash -c "echo 'export RAILS_ENV=production'                >> $BUSYBOOK_HOME/env"
+    sudo -u $USER bash -c "echo 'cd $BUSYBOOK_HOME/busybook'                 >> $BUSYBOOK_HOME/env"
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; gem2.0 install bundler --no-ri --no-rdoc"
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle install --path vendor/bundle --without postgres mysql development"
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; cp config/database.yml.example config/database.yml"
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; rake db:migrate"
     ;;
   start)
     echo 'Starting Busybook...'
     start-stop-daemon --start \
-        --exec '/bin/sh' --make-pidfile --pidfile $PIDFILE -c $USER \
+        --exec '/bin/bash' --make-pidfile --pidfile $PIDFILE -c $USER \
 	--background --chdir $BUSYBOOK_HOME/busybook \
-	-- -c 'RAILS_ENV=production exec bundle exec rails server'
+	-- -c "source $BUSYBOOK_HOME/env; RAILS_ENV=production exec bundle exec rails server"
     ;;
   stop)
     echo 'Stopping Busybook'
