@@ -8,15 +8,9 @@ PID=$!
 
 sleep 5
 
-for record in records/*; do
-    bundle exec ./replay-record.rb $record
-    if [ $? != 0 ]; then
-      exitcode=1
-    fi
-done
+bundle exec rake test:run
+exitcode=$?
 
-echo $PID
-ps ax| grep $PID
 kill -2 $PID
 wait $PID
 
