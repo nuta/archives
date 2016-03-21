@@ -10,7 +10,7 @@ Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 ## Installation
 ```
 $ apt-get > /dev/null || echo 'Use Ubuntu or Debian!'
-$ sudo apt install wget git ruby2.0 ruby2.0-dev libsqlite3-dev zlib1g-dev
+$ sudo apt-get install wget git ruby2.0 ruby2.0-dev libsqlite3-dev zlib1g-dev
 
 $ wget https://raw.githubusercontent.com/seiyanuta/busybook/master/init/busybook.init
 $ sudo cp busybook.init /etc/init.d/busybook
