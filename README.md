@@ -53,6 +53,8 @@ Busybook stores all data in the database so simply you can backup and restore by
 Public domain
 
 ## Changelog
+- **v0.4.0**
+  - refactor
 - **v0.3.0**
   - remove cli tool
   - add a init script for Debian and Ubuntu
