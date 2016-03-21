@@ -20,6 +20,10 @@ class CalendarController < ApplicationController
     begin
       ics   = ICS::ICalendar.new(request_body)
     rescue
+      logger.error "failed to parse iCalendar data:"
+      logger.error "----------------------------------------------"
+      logger.error request_body
+      logger.error "----------------------------------------------"
       return head :status => :bad_request
     end
 
