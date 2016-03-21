@@ -20,8 +20,6 @@ $ sudo service busybook start
 ```
 
 ## Configuration
-Don't forget running `busybook config` to apply new configuration!
-
 - `/var/lib/busybook/database.yml`: Database connection configuration. By default it is a sqlite3 database. Refer [Ruby on Rails Guides](http://guides.rubyonrails.org/configuring.html#configuring-a-database).
 
 ## Backup
