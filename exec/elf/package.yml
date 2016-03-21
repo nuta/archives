@@ -1,0 +1,46 @@
+name: elf
+id: 1001
+category: application
+license: Public Domain
+summary: The ELF loader
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: [thread, memory, cpp]
+lang: c
+
+# Interfaces which this package uses
+uses: [fs, pager]
+
+# Interfaces which this package implements
+implements: [exec]
+
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+config:
+  SOURCES:
+    set:
+      - src/startup.c
+      - src/elf.c
+      - src/handler.c
+      - src/exec.create.c

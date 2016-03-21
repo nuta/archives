@@ -1,0 +1,240 @@
+#!/usr/bin/env python3
+import argparse
+import re
+import sys
+import traceback
+import yaml
+import jinja2
+from reseasdk.defines import PAYLOAD_NUM
+from reseasdk.helpers import load_yaml
+from reseasdk.support import is_ool_type
+from reseasdk.validators import validate_package_yml
+from helpers import ctype
+
+class GeneratingError(Exception):
+    pass
+
+
+def load_payload_defs(interface_name, service_name, service, name_prefix=None):
+
+    if name_prefix is None:
+        name_prefix = ''
+
+    defs = [{
+        'type': '',
+        'name': 'SERVICE({}, {})'.format(interface_name, service_name)
+    }]
+
+    for p in service['payloads']:
+        defs.append(p)
+
+        if is_ool_type(p['type']):
+            # size of an OoL payload
+            defs.append({
+                'type': 'Size',
+                'name': p['name'] + '_size'
+            })
+
+    payloads = []
+    for i, p in enumerate(defs):
+        if i % 8 == 0:
+            # inject a payload header
+            header = 0
+            size_payload = False
+            for i, q in enumerate(defs[i:i+8]):
+                if size_payload:
+                    header |= 0x0f << (i * 4)
+                    size_payload = False
+                    continue
+
+                if isinstance(q, dict):
+                    if q['type'] == 'Channel':
+                        header |= 0x03 << (i * 4)
+                    elif is_ool_type(q['type']):
+                        header |= 0x02 << (i * 4)
+                        size_payload = True
+                    else:
+                        header |= 0x01 << (i * 4)
+
+            payloads.append(('', hex(header)))
+        payloads.append((ctype(p['type']), name_prefix + p['name'])) # payload
+
+    return payloads
+
+
+def call_decl(interface_name, service_name, service):
+    send_tmpl = """
+{{ func }} {
+    payload_t __payloads[{{ size }}];
+
+{% for type, name in payloads %}
+    __payloads[{{ loop.index0 }}] = (payload_t) {{ name }};
+{%- endfor %}
+
+    sys_send(__ch, (payload_t *) &__payloads);
+}
+
+"""
+    call_tmpl = """
+{{ func }} {
+    payload_t __arg[{{ arg_size }}];
+    payload_t __ret[{{ ret_size }}];
+
+{% for type, name in arg_payloads %}
+    __arg[{{ loop.index0 }}] = (payload_t) {{ name }};
+{%- endfor %}
+
+    sys_call(__ch, (payload_t *) &__arg, (payload_t *) &__ret, sizeof(__ret));
+
+{% for n, type, name in unmarshall %}
+    *{{ name }} = ({{ type }}) __ret[{{ n }}];
+{%- endfor %}
+}
+
+"""
+    code = ''
+    decls = ''
+
+    if service_name + '_reply' in services:
+        reply_service = services[service_name + '_reply']
+        arg_payloads = load_payload_defs(interface_name, service_name, service)
+        ret_payloads = load_payload_defs(interface_name, service_name, reply_service, '__r_')
+        arg_size = len(arg_payloads)
+        ret_size = len(ret_payloads)
+
+        unmarshall = []
+        n = 2 # skip the first payload header and service
+        for i, p in enumerate(reply_service['payloads']):
+            if n % 9 == 0:
+                n += 1 # skip payload headers
+
+            unmarshall.append((n, ctype(p['type']), '__r_' + p['name']))
+            n += 1
+
+            if is_ool_type(p['type']):
+                unmarshall.append((n, ctype('Size'), '__r_' + p['name'] + '_size'))
+                n += 1
+
+        args = ['channel_t __ch']
+        args += [ '{} {}'.format(*arg)  for arg in arg_payloads[1:] if arg[0] != '']
+        args += [ '{}* {}'.format(*ret) for ret in ret_payloads[1:] if ret[0] != '']
+
+        func = "static inline void call_{}_{}({})".format(
+            interface_name, service_name, ", ".join(args))
+
+        decls += func + ";\n"
+        code += jinja2.Template(call_tmpl).render(**locals())
+
+    payloads = load_payload_defs(interface_name, service_name, service)
+    size = len(payloads)
+    args = ['channel_t __ch'] + [ '{} {}'.format(*p) for p in payloads[1:] if p[0] != '']
+    func = "static inline void send_{}_{}({})".format(
+        interface_name, service_name, ", ".join(args))
+    decls += func + ";\n"
+    code += jinja2.Template(send_tmpl).render(**locals())
+    
+    return decls, code
+
+
+def type_decl(interface_name, type_name, type_):
+    """Returns the declaration of a type."""
+    s = ""
+    if type_["type"] == "struct":
+        s += "typedef struct{\n"
+        for member in type_["members"]:
+            s += "{type} {name};\n".format(**member)
+        s += "}} {}_{};\n".format(interface_name, type_name)
+
+    elif type_["type"] == "const":
+        size = type_["size"]
+        s += "typedef {} {}_{};\n".format(ctype(size), interface_name, type_name)
+        for name,val in type_["consts"].items():
+            interface_name_ = interface_name.upper()
+            s += "#define {interface_name_}_{name} ({val})\n".format(**locals())
+
+    elif type_["type"] == "alias":
+        s += "typedef {} {}_{};\n".format(ctype(type_["alias_of"]),
+                                          interface_name, type_name)
+
+    else:
+        raise GeneratingError("unknown type: '{}' in the type definition " +
+                              "of '{}'".format(type_["type"], type_name))
+
+    return s
+
+
+def id_decl(interface_name, interface_id, name, service):
+    """Returns a declaration of `__service_`"""
+    tmpl = """
+#define __service_{{ interface_name }}_{{ name }} \
+            (({{ interface_id }} << 16) | {{ service['id'] }})
+
+"""
+
+    return  jinja2.Template(tmpl).render(**locals())
+
+def main(args):
+    """Generates stubs of arg.package_yml into args.output"""
+    global services
+
+    package_yml = load_yaml(args.package_yml, validator=validate_package_yml)
+
+    #
+    #  Header
+    #
+    s = ""
+    s += "#ifndef __RESEA_{}__H__\n".format(package_yml["name"])
+    s += "#define __RESEA_{}__H__\n".format(package_yml["name"])
+    s += "#include <resea.h>\n"
+
+    #
+    #  Types (typedef and struct)
+    #
+    if isinstance(package_yml["type"], dict):
+        for name,type_ in package_yml["type"].items():
+            s += type_decl(package_yml["name"], name, type_)
+        s += "\n"
+
+    #
+    #  Inteface IDs
+    #
+    if "id" in package_yml:
+        s += "#define __interface_{} ({} << 24)\n".format(
+            package_yml["name"], package_yml["id"])
+
+    #
+    #  send and recv
+    #
+    if "interface" in package_yml and package_yml["interface"] is not None:
+        services = package_yml["interface"]
+        _s = ""
+        for name,service in services.items():
+            if service["payloads"] is None:
+                service["payloads"] = []
+
+            s += id_decl(package_yml["name"], package_yml["id"], name, service)
+            d, __s = call_decl(package_yml["name"], name, service)
+            s += d
+            _s += __s
+        s += _s
+
+    #
+    #  Footer
+    #
+    s += "#endif\n"
+    with open(args.output, "w") as f:
+        f.write(s)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate stubs for C")
+    parser.add_argument("output")
+    parser.add_argument("package_yml")
+    args = parser.parse_args()
+
+    try:
+        main(args)
+    except Exception as e:
+        sys.stderr.write("genstub ({}): {}\n".format(args.package_yml, str(e)))
+        traceback.print_exc()
+        sys.exit(1)

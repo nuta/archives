@@ -1,0 +1,50 @@
+name: lib
+category: library
+license: Public Domain
+summary: The HAL library for libraries including Resea packages
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: [cpp]
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: [hal]
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  HAL_LINK:
+    set:  $(LD) -r -o
+  HAL_RUN:
+      set: packages/lib/run
+  CFLAGS:
+    append_words: -Ipackages/lib/src
+
+#
+#  Config
+#
+config:
+  SOURCES:
+    set:
+      - src/stubs.c

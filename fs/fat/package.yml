@@ -1,0 +1,53 @@
+name: fat
+category: application
+license: Public Domain
+summary:     # brief explanation
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: [cpp]
+lang: c
+
+# Interfaces which this package uses
+uses:
+  - storage_device
+
+# Interfaces which this package implements
+implements:
+  - fs
+
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+config:
+  SOURCES:
+    set:
+      - src/startup.c
+      - src/handler.c
+      - src/fat.c
+      - src/file.c
+      - src/fs.open.c
+      - src/fs.close.c
+      - src/fs.read.c
+      - src/fs.write.c
+      - src/pager.fill.c
+      - tests/test.c

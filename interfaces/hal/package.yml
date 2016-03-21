@@ -1,0 +1,30 @@
+name: hal
+category: interface
+license: Public Domain
+summary: The interface of Hardware Abstaction Layer (HAL) libraries
+description:
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+warning:
+info:
+
+# Required packages
+requires: []
+lib_requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:

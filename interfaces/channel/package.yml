@@ -1,0 +1,45 @@
+name: channel
+category: interface
+id: 1
+license: Public Domain
+summary:     # brief explanation
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: []
+lib_requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+  connect:
+    id: 1
+    payloads:
+      - name: interface
+        type: Interface
+  connect_reply:
+    id: 2
+    payloads:
+      - name: result
+        type: Result
+      - name: ch
+        type: Channel

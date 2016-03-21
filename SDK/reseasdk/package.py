@@ -1,0 +1,150 @@
+from copy import copy
+import os
+from reseasdk.helpers import load_yaml, error
+from reseasdk.validators import validate_package_yml, ValidationError
+
+paths = None # cache
+def load_reseapath():
+    """Looks up for .reseapath in parent directories."""
+    global paths
+
+    if paths:
+        return paths
+
+    paths = []
+    wd = os.getcwd()
+    while True:
+        cwd = os.getcwd()
+
+        try:
+            with open('.reseapath') as f:
+                for path in f.readlines():
+                    paths.append(os.path.abspath(path.strip()))
+        except FileNotFoundError:
+            pass
+
+        os.chdir('..')
+        if os.getcwd() == cwd:
+            # root directory
+            break
+
+    os.chdir(wd)
+    return paths
+
+
+def get_package_dir(package):
+    """Returns a path to the package."""
+
+    for path in [os.path.abspath('..')] + load_reseapath():
+        d = os.path.join(path, package)
+        if os.path.exists(os.path.join(d, 'package.yml')):
+            return d
+
+    error("package not found: '{}'".format(package))
+
+
+def get_package(package):
+    """Add a package into packages directory."""
+
+    if not os.path.exists('packages/' + package):
+        os.makedirs('packages', exist_ok=True)
+        path = get_package_dir(package)
+        os.chdir('packages')
+        os.symlink(path, package)
+        os.chdir('..')
+
+
+package_ymls = {}  # cache
+def load_package_yml(package):
+    """Loads a package.yml."""
+    if package in package_ymls:
+        return package_ymls[package]
+
+    get_package(package)
+    yml = load_yaml('packages/{}/package.yml'.format(package),
+                    validator=validate_package_yml)
+    package_ymls[package] = yml
+    return yml
+
+
+def load_packages(builtin_packages, config=None):
+    """Returns packages config"""
+
+    if config is None:
+        config = {
+            'BUILD_DIR': '',
+        }
+
+    packages = copy(builtin_packages)
+    all_packages = []
+    local_config = {}
+    config['OBJS'] = []
+    config['STUBS'] = []
+    config['LANG'] = {}
+    while len(packages) > 0:
+        package = packages.pop()
+        all_packages.append(package)
+        yml = load_package_yml(package)
+
+        if yml['category'] == 'application':
+            config['CATEGORY'] = 'application'
+        if config.get('CATEGORY') != 'application' and yml['category'] == 'library':
+            config['CATEGORY'] = 'library'
+
+        # add dependent packages
+        for depend in yml['requires']:
+            if depend not in all_packages:
+                get_package(depend)
+                packages.append(depend)
+                builtin_packages.append(depend)
+
+        for depend in yml['uses'] + yml['implements']:
+            if depend not in all_packages:
+                get_package(depend)
+                packages.append(depend)
+                config['STUBS'].append(depend)
+
+        if package in builtin_packages:
+            # load global config
+            for k,v in yml.get('global_config', {}).items():
+                if v.get('default'):
+                    config[k] = v['default']
+        else:
+            if package in builtin_packages:
+                builtin_packages.append(package)
+
+    for package in builtin_packages:
+        yml = load_package_yml(package)
+        config['STUBS'].append(package)
+
+        # load global config
+        for k,v in yml.get('global_config', {}).items():
+            if v.get('append'):
+                val = v['append']
+                if isinstance(val, dict):
+                    config[k].update(val)
+                else:
+                    error("unexpected global_config type: '{}'".format(type(val)))
+            elif v.get('append_words'):
+                config[k] = config[k].strip() + ' ' + v['append_words'].strip()
+            elif v.get('default'):
+                pass
+            else:
+                error("unsupported global_config: '{}'".format(repr(v)))
+
+        if yml['category'] in ['application', 'library']:
+            # load config
+            local_config[package] = {}
+            for k,v in yml.get('config', {}).items():
+                if v.get('append'):
+                    local_config[package][k] = config[k] + v['append']
+                elif v.get('set'):
+                    if k == 'SOURCES':
+                        for src in v['set']:
+                            obj = os.path.splitext(src)[0] + '.o'
+                            config['OBJS'].append(os.path.join(config['BUILD_DIR'], package, obj))
+                    else:
+                        local_config[package][k] = v['set']
+                else:
+                    error("invalid local config: '{}' (expected set or append)".format(k))
+    return config, local_config

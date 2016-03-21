@@ -1,0 +1,87 @@
+name: datetime
+category: interface
+id: 11
+license: Public Domain
+summary: The interface of date/time management
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+  get_date:
+    id: 1
+    payloads:
+  get_date_reply:
+    id: 2
+    payloads:
+      - name: result
+        type: Result
+      - name: year
+        type: UInt32
+      - name: date
+        type: UInt32
+        description: unused:month:day:hour:min:sec (6, 4, 5, 5, 6, 6 bits respectively)
+      - name: nsec
+        type: UInt32
+
+  set_oneshot_timer:
+    id: 3
+    payloads:
+      - name: ch
+        type: Channel
+      - name: msec
+        type: UIntMax
+  set_oneshot_timer_reply:
+    id: 4
+    payloads:
+      - name: result
+        type: Result
+
+  set_interval_timer:
+    id: 5
+    payloads:
+      - name: ch
+        type: Channel
+      - name: msec
+        type: UIntMax
+  set_interval_timer_reply:
+    id: 6
+    payloads:
+      - name: result
+        type: Result
+
+  delay:
+    id: 7
+    description: Delays returning
+    payloads:
+      - name: msec
+        type: UIntMax
+  delay_reply:
+    id: 8
+    payloads:
+      - name: result
+        type: Result

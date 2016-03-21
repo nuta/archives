@@ -1,0 +1,84 @@
+name: kernel
+category: application
+license: Public Domain
+summary: The kernel.
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: [cpp]
+lang: c
+
+# Interfaces which this package uses
+uses:
+  - datetime_device
+
+# Interfaces which this package implements
+implements:
+  - channel
+  - memory
+  - thread
+  - io
+  - datetime
+  - pager
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  CFLAGS:
+    append_words: -DKERNEL
+
+config:
+  SOURCES:
+    set:
+    - src/channel.c
+    - src/channel.connect.c
+    - src/datetime.c
+    - src/datetime.delay.c
+    - src/datetime.get_date.c
+    - src/datetime.set_interval_timer.c
+    - src/datetime.set_oneshot_timer.c
+    - src/handler.c
+    - src/io.c
+    - src/io.read16.c
+    - src/io.read32.c
+    - src/io.read64.c
+    - src/io.read8.c
+    - src/io.write16.c
+    - src/io.write32.c
+    - src/io.write64.c
+    - src/io.write8.c
+    - src/memory.c
+    - src/memory.get_page_size.c
+    - src/memory.map.c
+    - src/memory.unmap.c
+    - src/pager.fill.c
+    - src/startup.c
+    - src/syscall.c
+    - src/thread.block.c
+    - src/thread.c
+    - src/thread.create.c
+    - src/thread.delete.c
+    - src/thread.get_current_thread.c
+    - src/thread.set.c
+    - src/thread.start.c
+    - src/thread.unblock.c
+    - tests/test.c

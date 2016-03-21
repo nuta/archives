@@ -1,0 +1,80 @@
+name: memory
+category: interface
+id: 3
+license: Public Domain
+summary:     # brief explanation
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: []
+lib_requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+
+#
+#  Interface definitions
+#
+type:
+  MapFlags:
+    type: const
+    size: UInt16
+    consts:
+      MAP_READ:  0x0001
+      MAP_WRITE: 0x0002
+      MAP_EXEC:  0x0004
+
+interface:
+  map:
+    id: 1
+    payloads:
+      - name: group
+        type: Id
+      - name: addr
+        type: Addr
+      - name: size
+        type: Size
+      - name: pager
+        type: Channel
+      - name: pager_arg
+        type: Id
+      - name: offset
+        type: Offset
+  map_reply:
+    id: 2
+    payloads:
+      - name: result
+        type: Result
+
+  unmap:
+    id: 3
+    payloads:
+      - name: addr
+        type: Addr
+  unmap_reply:
+    id: 4
+    payloads:
+      - name: result
+        type: Result
+
+  get_page_size:
+    id: 5
+    payloads:
+  get_page_size_reply:
+    id: 6
+    payloads:
+      - name: size
+        type: Size
+
+# TODO: get_mappable_range, markas_clean_pages, get_dirty_pages, alloc_memory (for DMA)

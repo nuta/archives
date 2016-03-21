@@ -1,0 +1,79 @@
+name: x86
+category: library
+license: Public Domain
+summary: The HAL library for x86
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: [cpp]
+lang: c
+
+# Interfaces which this package uses
+uses: [posix_host] # we use genstart in posix_host
+
+# Interfaces which this package implements
+implements: [hal]
+
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  HAL_LINK:
+    default: $(LD) -Map $(BUILD_DIR)/executable.map -nostdlib -nodefaultlibs -Tpackages/x86/src/executable.ld -o
+  HAL_RUN:
+    default: packages/x86/run
+  HAL_GENSTART:
+    default: ./packages/posix_host/genstart
+  CFLAGS:
+    append_words: >
+      -m64 -ffreestanding -mno-sse -mno-mmx
+      -fno-stack-protector -mno-red-zone
+      -mcmodel=large 
+      -Ipackages/x86/src
+
+config:
+  SOURCES:
+    set:
+      - src/startup.c
+      - src/asm.c
+      - src/exception.c
+      - src/gdt.c
+      - src/global.c
+      - src/handler.c
+      - src/idt.c
+      - src/init.c
+      - src/interrupt.c
+      - src/interrupt_handler.c
+      - src/io.c
+      - src/ioapic.c
+      - src/localapic.c
+      - src/pic.c
+      - src/print.c
+      - src/smp.c
+      - src/start.c
+      - src/_start.c
+      - src/thread.c
+      - src/tss.c
+      - src/vm.c
+      - src/cpu.c
+      - src/handler.c
+      - src/callback.c
+

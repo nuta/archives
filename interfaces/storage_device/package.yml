@@ -1,0 +1,62 @@
+name: storage_device
+id: 14
+category: interface
+license: Public Domain
+summary: The interface of storage devices
+description:
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: []
+lib_requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+  read:
+    id: 1
+    payloads:
+      - name: offset
+        type: Offset
+      - name: size
+        type: Size
+  read_reply:
+    id: 2
+    payloads:
+      - name: result
+        type: Result
+      - name: data
+        type: Data
+
+  write:
+    id: 3
+    payloads:
+      - name: offset
+        type: Offset
+      - name: data
+        type: Data
+        attrs: [readonly]
+  write_reply:
+    id: 4
+    payloads:
+      - name: result
+        type: Result

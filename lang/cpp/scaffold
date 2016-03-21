@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+import argparse
+from collections import OrderedDict
+import os
+import re
+import sys
+import traceback
+import yaml
+from reseasdk.defines import PAYLOAD_NUM
+from reseasdk.package import load_package_yml
+from reseasdk.helpers import render, error, generating
+from helpers import ctype
+
+
+STARTUP_C_TEMPLATE = """\
+#include <resea.h>
+{% for implement in all_implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+
+result_t {{ name }}_startup(void) {
+
+    return OK;
+}
+
+"""
+
+HANDLER_C_TEMPLATE = """\
+#include <resea.h>
+{% for implement in all_implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+#include "handler.h"
+
+
+void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
+    if ((payloads[0] & 1) != 1) {
+        WARN("the first payload is not inline one (service)");
+        return;
+    }
+
+    switch (payloads[1]) {
+{% for interface, service, args, _, unmarshall in services %}
+    case SERVICE({{ interface }}, {{ service }}):
+    {
+        DEBUG("received {{ interface }}.{{ service }}");
+        {% for i, arg in unmarshall %}
+            payload_t {{ arg }} = payloads[{{ i }}];
+        {% endfor %}
+            {{ name }}_{{ interface }}_{{ service }}({{ args | join(", ") }});
+            return;
+    }
+{% endfor %}
+    }
+
+    WARN("unsupported service: interface=%d, serivce=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+}
+
+"""
+
+HANDLER_H_TEMPLATE = """\
+#include <resea.h>
+{% for interface, service, _, args, _ in services %}
+void {{ name }}_{{ interface }}_{{ service }}({{ args | join(", ") }});
+{% endfor %}
+
+"""
+
+SERVICE_C_TEMPLATE = """\
+#include <resea.h>
+{% for implement in all_implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+
+/** handles {{ interface_name }}.{{ service_name }} */
+{{name}}_{{interface_name}}_{{service_name}}({{ service_args | join(", ") }}) {
+
+}
+
+"""
+
+
+def create_file(path, data, overwrite=False):
+    if overwrite or not os.path.exists(path):
+        generating("GEN", path)
+        open(path, "w").write(data)
+    else:
+        generating("GEN",
+                   "{} (file already exists, skipping)".format(path))
+
+
+def main(args):
+    package_yml = yaml.safe_load(open(args.package_yml))
+    name = package_yml["name"]
+    implements = [name]
+    all_implements = [name]
+    services = []
+
+    while len(implements) > 0:
+        implement = implements.pop()
+        yml = load_package_yml(implement)
+        for x in yml["implements"]:
+            if x not in all_implements:
+                all_implements.append(x)
+                implements.append(x)
+
+        if "interface" in yml and yml["interface"] is not None:
+            interface_name = yml["name"]
+            services_ = OrderedDict(sorted(yml["interface"].items(),
+                                          key=lambda e: e[1]["id"]))
+            for service_name, service in services_.items():
+                if service_name.endswith("_reply"):
+                    continue
+                service_args = [name, interface_name, service_name]
+                handler_args = ["__ch"]
+                _handler_args = ["channel_t __ch"]
+                unmarshall = []
+
+                payloads = service.get("payloads")
+                if payloads is None:
+                    payloads = []
+
+                n = 2 # skip the first payload header and service
+                for i, p in enumerate(payloads):
+                    if n % 9 == 0:
+                        n += 1 # skip payload headers
+                    unmarshall.append((n, 'a' + str(i)))
+                    n += 1
+
+                for i, p in enumerate(payloads):
+                    service_args.append("{} {}".format(ctype(p["type"]), p["name"]))
+                    handler_args.append("({}) a{}".format(ctype(p["type"]), i))
+                    _handler_args.append("{} a{}".format(ctype(p["type"]), i))
+
+                create_file("{}/src/{}.{}.c".format(args.output_dir,
+interface_name, service_name),
+                            render(SERVICE_C_TEMPLATE, locals()))
+                services.append((interface_name, service_name, handler_args, _handler_args,
+                    unmarshall))
+
+    create_file("{}/src/handler.c".format(args.output_dir),
+                render(HANDLER_C_TEMPLATE, locals()),
+                overwrite=True)
+    create_file("{}/src/handler.h".format(args.output_dir),
+                render(HANDLER_H_TEMPLATE, locals()),
+                overwrite=True)
+    create_file("{}/src/startup.c".format(args.output_dir),
+                render(STARTUP_C_TEMPLATE, locals()))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate boilerplates for C")
+    parser.add_argument("output_dir")
+    parser.add_argument("package_yml")
+    args = parser.parse_args()
+
+    try:
+        main(args)
+    except Exception as e:
+        sys.stderr.write("scaffold ({}): {}\n".format(args.package_yml, str(e)))
+        traceback.print_exc()
+        sys.exit(1)

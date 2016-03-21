@@ -1,0 +1,122 @@
+name: thread
+category: interface
+id: 6
+license: Public Domain
+summary: The threading server
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+requires: []
+lib_requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+  create:
+    id: 1
+    payloads:
+      - name: group
+        type: Id
+      - name: name
+        type: Array<UChar>
+        attrs: [readonly]
+  create_reply:
+    id: 2
+    payloads:
+      - name: result
+        type: Result
+      - name: thread
+        type: Id
+      - name: group
+        type: Id
+
+  delete:
+    id: 3
+    payloads:
+      - name: thread
+        type: Id
+  delete_reply:
+    id: 4
+    payloads:
+      - name: result
+        type: Result
+
+  start:
+    id: 5
+    payloads:
+      - name: thread
+        type: Id
+  start_reply:
+    id: 6
+    payloads:
+      - name: result
+        type: Result
+
+  block:
+    id: 7
+    payloads:
+      - name: thread
+        type: Id
+
+  unblock:
+    id: 8
+    payloads:
+      - name: thread
+        type: Id
+
+  set:
+    id: 9
+    payloads:
+      - name: thread
+        type: Id
+      - name: entry
+        type: Addr
+      - name: arg
+        type: Addr
+      - name: stack
+        type: Addr
+      - name: stack_size
+        type: Size
+  set_reply:
+    id: 10
+    payloads:
+      - name: result
+        type: Result
+
+  get_current_thread:
+    id: 11
+    payloads:
+
+  get_current_thread_reply:
+    id: 12
+    payloads:
+      - name: thread
+        type: Id
+      - name: group
+        type: Id
+
+# TODO:
+#
+#  .wait(addr, val)
+#  .wake(addr, wake_num_max)
+#

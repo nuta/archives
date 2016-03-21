@@ -1,0 +1,38 @@
+#!/bin/sh
+ISO=$BUILD_DIR/resea-x86-test.iso
+[ -z $QEMU ] && QEMU=qemu-system-x86_64
+
+cp -r packages/x86/isofiles $BUILD_DIR
+cp $1 $BUILD_DIR/isofiles/boot/executable
+
+# generate a disc image file
+# Many grep(1) are for suppressing messages we do not care
+grub-mkrescue -o $ISO $BUILD_DIR/isofiles 2>&1 | \
+    grep -v 'RockRidge filesystem manipulator' | \
+    grep -v '^Drive current' | \
+    grep -v '^Media current' | \
+    grep -v '^Media status' | \
+    grep -v '^Media summary' | \
+    grep -v '^Added to ISO image' | \
+    grep -v '^ISO image produced' | \
+    grep -v '^Written to medium' | \
+    grep -v "^Writing to '.*' completed successfully" | \
+    grep -v '^xorriso.*UPDATE.*files added' | \
+    grep -v '^xorriso.*UPDATE.*Thank you for being patient' | \
+    grep -v '^xorriso.*NOTE.*Copying to System Area' | \
+    grep -v "share/locale': No such file or directory" | \
+    grep -v '^$'
+
+[ ! -f hdd.img ] && dd if=/dev/zero of=hdd.img bs=1048576 count=8
+
+exec $QEMU \
+    -m 256 -localtime -nographic \
+    -no-reboot -boot d \
+    -cpu SandyBridge \
+    -net user -net nic,model=virtio \
+    -net dump,file=qemu.pcap \
+    -redir tcp:50080::80 \
+    -redir tcp:50022::22 \
+    -drive id=drive0,file=hdd.img,if=none,format=raw \
+    -device virtio-blk-pci,drive=drive0 \
+    -cdrom $ISO

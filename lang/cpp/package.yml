@@ -1,0 +1,74 @@
+name: cpp
+category: library
+license: Public Domain
+summary: The language library for C++
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net   # e.g. http://example.com/foo/bar
+
+# Required packages
+requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: [lang]
+
+global_config:
+  LANG:
+    append:
+      c:
+        ext:  c
+        abbrev: CC
+        stub:
+          prefix: resea/
+          suffix: .h
+        compile: '$(CC) $(CFLAGS) -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
+        scaffold: ./packages/cpp/scaffold
+        genstub: ./packages/cpp/genstub
+      asm:
+        ext:  S
+        abbrev: AS
+        compile: "$(CC) $(CFLAGS) -c -o"
+      cpp:
+        ext:  cpp
+        abbrev: CXX
+        stub:
+          prefix: resea/
+          suffix: .hpp
+        compile: echo
+        scaffold: ./packages/cpp/scaffold
+        genstub: ./packages/cpp/genstub
+  CFLAGS:
+    default: >
+      -Wall -g3 -std=c99 -Wno-incompatible-library-redeclaration
+      -fdiagnostics-color     
+      -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/c
+
+
+config:
+  SOURCES:
+    set:
+      - src/channel.c
+      - src/ctype.c
+      - src/string.c
+      - src/syscall.c
+      - src/memory.c
+      - src/mutex.c
+      - src/printfmt.c
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:

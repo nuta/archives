@@ -1,0 +1,29 @@
+name: lang
+category: interface
+license: Public Domain
+summary: The interface of language libraries
+description:
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+warning:
+info: 
+
+# Required packages
+requires: []
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
