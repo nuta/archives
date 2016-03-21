@@ -3,7 +3,6 @@ require 'optparse'
 require 'git'
 require 'colorize'
 
-
 def info(m)
   puts "==> #{m}".colorize(:blue)
 end
@@ -26,7 +25,12 @@ def chdir_to_git_repo
 end
 
 def bundle_install
-    system 'bundle install --jobs 4'
+  without = %w(mysql postgres sqlite development)
+  without.each do |x|
+    without.delete(x) if ARGV.include?("--with-#{x}")
+  end
+
+  system "bundle install --jobs 4 --without #{without.join(' ')}"
 end
 
 def bundle_exec(cmd, by_exec)
