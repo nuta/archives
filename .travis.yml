@@ -12,7 +12,7 @@ install:
   - cp config/database.yml.example config/database.yml
   - bundle install --jobs 4 --path vendor/bundle
   - bundle exec rake db:migrate
-  - bundle exec rake user:add name=guest password=123
+  - bundle exec rake user:add username=guest password=123
 
 script:
   - ./.travis.sh
