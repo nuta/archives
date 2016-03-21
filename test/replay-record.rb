@@ -13,10 +13,12 @@ def request(method, path, headers, body, expected_status, expected_response)
   s = TCPSocket.open HOST, PORT
   s.puts "#{method} #{path} HTTP/1.1\r\n"
   s.puts "Connection: close\r\n"
-  s.puts "Content-Length: #{body.size}"
+  s.puts "Content-Length: #{body.bytesize}\r\n"
+
   headers.each do |k,v|
     s.puts "#{k}: #{v}\r\n"
   end
+
   s.puts "\r\n"
   if body != ""
     s.puts body
