@@ -12,7 +12,7 @@ class CalendarController < ApplicationController
   before_action :set_src_and_dst, only: [:move, :copy]
 
   def options
-    methods = %w(OPTIONS GET PUT DELETE MKCALENDAR PROPFIND PROPPATCH REPORT)
+    methods = %w(OPTIONS GET PUT DELETE MKCALENDAR PROPFIND PROPPATCH REPORT COPY MOVE)
     headers['Allow'] = methods.join(', ')
     headers['DAV']   = '1, 2, calendar-access'
     head :ok
