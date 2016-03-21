@@ -11,8 +11,11 @@ Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 Run the following commands On Debian or Ubuntu server. Edit the init script to
 change the TCP port number or something.
 ```
+$ sudo apt install wget git ruby2.0 ruby2.0-dev libsqlite3-dev zlib1g-dev
+
 $ wget https://raw.githubusercontent.com/seiyanuta/busybook/master/init/busybook.init
 $ sudo cp busybook.init /etc/init.d/busybook
+$ sudo chmod 777 /etc/init.d/busybook
 $ sudo service busybook setup
 $ sudo service busybook start
 ```
