@@ -1,6 +1,5 @@
 Busybook
 ========
-[![Gem Version](http://img.shields.io/gem/v/busybook.svg)](https://rubygems.org/gems/busybook)
 [![Build Status](https://travis-ci.org/seiyanuta/busybook.svg?branch=master)](https://travis-ci.org/seiyanuta/busybook)
 [![Coverage Status](https://coveralls.io/repos/github/seiyanuta/busybook/badge.svg?branch=master)](https://coveralls.io/github/seiyanuta/busybook?branch=master)
 [![Code Climate](https://codeclimate.com/github/seiyanuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/seiyanuta/busybook)
@@ -8,19 +7,20 @@ Busybook
 
 Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 
-## Getting started
+## Installation
+Run the following commands On Debian or Ubuntu server. Edit the init script to
+change the TCP port number or something.
 ```
-$ gem install busybook    # install a CLI frontend
-$ busybook install        # install the server
-$ busybook config         # apply config
-$ busybook adduser        # add a user
-$ busybook serve -p 8080  # start server at localhost:8080
+$ wget https://raw.githubusercontent.com/seiyanuta/busybook/master/init/busybook.init
+$ sudo cp busybook.init /etc/init.d/busybook
+$ sudo service busybook setup
+$ sudo service busybook start
 ```
 
 ## Configuration
 Don't forget running `busybook config` to apply new configuration!
 
-- `~/.busybook/database.yml`: Database connection configuration. By default it is a sqlite3 database. Refer [Ruby on Rails Guides](http://guides.rubyonrails.org/configuring.html#configuring-a-database).
+- `/var/lib/busybook/database.yml`: Database connection configuration. By default it is a sqlite3 database. Refer [Ruby on Rails Guides](http://guides.rubyonrails.org/configuring.html#configuring-a-database).
 
 ## Backup
 Busybook stores all data in the database so simply you can backup and restore by RDBMS's command like [pg_dump](http://www.postgresql.org/docs/9.5/static/app-pgdump.html).
@@ -53,6 +53,9 @@ Busybook stores all data in the database so simply you can backup and restore by
 Public domain
 
 ## Changelog
+- **v0.3.0**
+  - remove cli tool
+  - add a init script for Debian and Ubuntu
 - **v0.2.1**
   - bug fixes
 - **v0.2.0**
