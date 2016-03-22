@@ -25,6 +25,13 @@ $ sudo service busybook start
 ## Backup
 Busybook stores all data in the database so simply you can backup and restore by RDBMS's command like [pg_dump](http://www.postgresql.org/docs/9.5/static/app-pgdump.html).
 
+## Supported clients
+- OS X (El Capitan) Calendar
+- OS X (El Capitan) Reminder
+- iOS 9 Calendar
+- iOS 9 Reminder
+
+
 ## Compliance
 - [RFC4918: HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)](http://tools.ietf.org/html/rfc4918)
   - supports `GET`, `PUT`, `DELETE`, `OPTIONS`, `MKCALENDAR`, `PROPFIND`, and `PROPPATCH` HTTP methods
