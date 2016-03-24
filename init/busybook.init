@@ -23,6 +23,9 @@ PIDFILE="/run/busybook.pid"
 
 cmd=$1; shift
 case $cmd in
+  update)
+    sudo -u $USER bash -c "source $HOME/env; git pull"
+    ;;
   rake)
     sudo -u $USER bash -c "source $HOME/env; bundle exec rake $*"
     ;;
