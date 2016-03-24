@@ -23,6 +23,9 @@ PIDFILE="/run/busybook.pid"
 
 cmd=$1; shift
 case $cmd in
+  rake)
+    sudo -u $USER bash -c "source $HOME/env; bundle exec rake $*"
+    ;;
   setup)
 
     if ! getent passwd $USER 2>&1 >/dev/null; then
