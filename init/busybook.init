@@ -12,39 +12,45 @@
 
 set -e
 
+HOST=localhost
+PORT=8443
+USER=busybook
+HOME=/var/lib/busybook
+BUNDLE_EXCLUDED="postgres mysql development"
+
 USAGE="Usage: $0 <start|stop|setup>"
 PIDFILE="/run/busybook.pid"
-USER=busybook
-BUSYBOOK_HOME=/var/lib/busybook
 
-case $1 in
+cmd=$1; shift
+case $cmd in
   setup)
 
     if ! getent passwd $USER 2>&1 >/dev/null; then
-        mkdir $BUSYBOOK_HOME
-        useradd -s /bin/false -d $BUSYBOOK_HOME $USER
-        chown $USER $BUSYBOOK_HOME
+        mkdir $HOME
+        useradd -s /bin/false -d $HOME $USER
+        chown $USER $HOME
     fi
 
-    if [ ! -d $BUSYBOOK_HOME/busybook ]; then
-        sudo -u $USER sh -c "cd $BUSYBOOK_HOME; git clone https://github.com/seiyanuta/busybook"
+    if [ ! -d $HOME/busybook ]; then
+        sudo -u $USER sh -c "cd $HOME; git clone https://github.com/seiyanuta/busybook"
     fi
 
-    sudo -u $USER bash -c "echo 'export PATH=\$PATH:$BUSYBOOK_HOME/.gem/bin' >  $BUSYBOOK_HOME/env"
-    sudo -u $USER bash -c "echo 'export GEM_HOME=$BUSYBOOK_HOME/.gem'        >> $BUSYBOOK_HOME/env"
-    sudo -u $USER bash -c "echo 'export RAILS_ENV=production'                >> $BUSYBOOK_HOME/env"
-    sudo -u $USER bash -c "echo 'cd $BUSYBOOK_HOME/busybook'                 >> $BUSYBOOK_HOME/env"
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; gem2.0 install bundler --no-ri --no-rdoc"
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle install --path vendor/bundle --without postgres mysql development"
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; cp config/database.yml.example config/database.yml"
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle exec rake db:migrate"
+    sudo -u $USER bash -c "echo 'export PATH=\$PATH:$HOME/.gem/bin' >  $HOME/env"
+    sudo -u $USER bash -c "echo 'export GEM_HOME=$HOME/.gem'        >> $HOME/env"
+    sudo -u $USER bash -c "echo 'export RAILS_ENV=production'       >> $HOME/env"
+    sudo -u $USER bash -c "echo 'cd $HOME/busybook'                 >> $HOME/env"
+    sudo -u $USER bash -c "source $HOME/env; gem2.0 install bundler --no-ri --no-rdoc"
+    sudo -u $USER bash -c "source $HOME/env; bundle install --path vendor/bundle --without $BUNDLE_EXCLUDED"
+    sudo -u $USER bash -c "source $HOME/env; cp -n config/database.yml.example $HOME/database.yml"
+    sudo -u $USER bash -c "source $HOME/env; ln -sf $HOME/database.yml config/database.yml"
+    sudo -u $USER bash -c "source $HOME/env; bundle exec rake db:migrate"
     ;;
   start)
     echo 'Starting Busybook...'
     start-stop-daemon --start \
         --exec '/bin/bash' --make-pidfile --pidfile $PIDFILE -c $USER \
-	--background --chdir $BUSYBOOK_HOME/busybook \
-	-- -c "source $BUSYBOOK_HOME/env; RAILS_ENV=production exec bundle exec rails server"
+	--background --chdir $HOME/busybook \
+	-- -c "source $HOME/env; RAILS_ENV=production exec bundle exec rails server -b $HOST -p $PORT"
     ;;
   stop)
     echo 'Stopping Busybook'
