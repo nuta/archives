@@ -43,7 +43,7 @@ case $cmd in
     sudo -u $USER bash -c "echo 'export RAILS_ENV=production'       >> $HOME/env"
     sudo -u $USER bash -c "echo 'cd $HOME/busybook'                 >> $HOME/env"
     sudo -u $USER bash -c "source $HOME/env; gem2.0 install bundler --no-ri --no-rdoc"
-    sudo -u $USER bash -c "source $HOME/env; bundle install --path vendor/bundle --without $BUNDLE_EXCLUDED"
+    sudo -u $USER bash -c "source $HOME/env; bundle install --deployment --without $BUNDLE_EXCLUDED"
     sudo -u $USER bash -c "source $HOME/env; cp -n config/database.yml.example $HOME/database.yml"
     sudo -u $USER bash -c "source $HOME/env; ln -sf $HOME/database.yml config/database.yml"
     sudo -u $USER bash -c "source $HOME/env; bundle exec rake db:migrate"
@@ -52,14 +52,16 @@ case $cmd in
   update)
     $0 stop && stopped=yes
     sudo -u $USER bash -c "source $HOME/env; git pull"
-    sudo -u $USER bash -c "source $HOME/env; bundle install --path vendor/bundle --without postgres mysql development"
+    sudo -u $USER bash -c "source $HOME/env; bundle install --deployment --without postgres mysql development"
     sudo -u $USER bash -c "source $HOME/env; bundle exec rake db:migrate"
-    [ "$stopped" = "yes" ] && $1 start
+    if [ "$stopped" = "yes" ]; then
+       	$0 start
+    fi
     ;;
 
   restart)
     $0 stop || :
-    $1 start
+    $0 start
     ;;
 
   start)
@@ -71,7 +73,7 @@ case $cmd in
     ;;
 
   stop)
-    echo 'Stopping Busybook'
+    echo 'Stopping Busybook...'
     sudo -u $USER  start-stop-daemon --stop --pidfile $PIDFILE
     ;;
 
