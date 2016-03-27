@@ -8,17 +8,24 @@ Busybook
 Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
 
 ## Installation
+First, install dependencies.
 ```
-$ apt-get > /dev/null || echo 'Use Ubuntu or Debian!'
 $ sudo apt-get install wget git ruby2.0 ruby2.0-dev libsqlite3-dev zlib1g-dev
+```
 
+Next, download Busybook init script.
+```
 $ wget https://raw.githubusercontent.com/seiyanuta/busybook/master/init/busybook.init
 $ vim busybook.init
 $ sudo cp busybook.init /etc/init.d/busybook
 $ sudo chmod 777 /etc/init.d/busybook
-$ sudo service busybook setup
-$ sudo service busybook rake user:add
-$ sudo service busybook start
+```
+
+Now you are ready for launching Busybook.
+```
+$ sudo service busybook setup          # install
+$ sudo service busybook rake user:add  # add an user
+$ sudo service busybook start          # launch!
 ```
 
 ## Configuration
@@ -26,14 +33,22 @@ $ sudo service busybook start
 Edit `/var/lib/busybook/database.yml`. By default it is a sqlite3 database. Refer [Ruby on Rails Guides](http://guides.rubyonrails.org/configuring.html#configuring-a-database).
 
 ### Adding users
-Do `service busybook rake user:add`.
+```
+service busybook rake user:add
+```
+
+or
+
+```
+service busybook rake user:add username=joey password=howyoudoing
+```
 
 ## Backup
 Busybook stores all data in the database so simply you can backup and restore by RDBMS's command like [pg_dump](http://www.postgresql.org/docs/9.5/static/app-pgdump.html).
 
 ## Supported clients
-- OS X (El Capitan): Calendar and Reminder
-- iOS 9 Calendar: and Reminder
+- OS X 10.11 (El Capitan): Calendar and Reminder
+- iOS 9: Calendar and Reminder
 
 ## Compliance
 - [RFC4918: HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)](http://tools.ietf.org/html/rfc4918)
