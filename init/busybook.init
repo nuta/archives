@@ -51,9 +51,9 @@ case $cmd in
 
   update)
     $0 stop && stopped=yes
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; git pull"
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle install --path vendor/bundle --without postgres mysql development"
-    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle exec rake db:migrate"
+    sudo -u $USER bash -c "source $HOME/env; git pull"
+    sudo -u $USER bash -c "source $HOME/env; bundle install --path vendor/bundle --without postgres mysql development"
+    sudo -u $USER bash -c "source $HOME/env; bundle exec rake db:migrate"
     [ "$stopped" = "yes" ] && $1 start
     ;;
 
