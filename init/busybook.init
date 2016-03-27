@@ -23,12 +23,10 @@ PIDFILE="/run/busybook.pid"
 
 cmd=$1; shift
 case $cmd in
-  update)
-    sudo -u $USER bash -c "source $HOME/env; git pull"
-    ;;
   rake)
     sudo -u $USER bash -c "source $HOME/env; bundle exec rake $*"
     ;;
+
   setup)
     if ! getent passwd $USER 2>&1 >/dev/null; then
         mkdir $HOME
@@ -49,6 +47,14 @@ case $cmd in
     sudo -u $USER bash -c "source $HOME/env; cp -n config/database.yml.example $HOME/database.yml"
     sudo -u $USER bash -c "source $HOME/env; ln -sf $HOME/database.yml config/database.yml"
     sudo -u $USER bash -c "source $HOME/env; bundle exec rake db:migrate"
+    ;;
+
+  update)
+    $0 stop && stopped=yes
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; git pull"
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle install --path vendor/bundle --without postgres mysql development"
+    sudo -u $USER bash -c "source $BUSYBOOK_HOME/env; bundle exec rake db:migrate"
+    [ "$stopped" = "yes" ] && $1 start
     ;;
 
   restart)
