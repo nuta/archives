@@ -30,7 +30,6 @@ case $cmd in
     sudo -u $USER bash -c "source $HOME/env; bundle exec rake $*"
     ;;
   setup)
-
     if ! getent passwd $USER 2>&1 >/dev/null; then
         mkdir $HOME
         useradd -s /bin/false -d $HOME $USER
@@ -51,6 +50,12 @@ case $cmd in
     sudo -u $USER bash -c "source $HOME/env; ln -sf $HOME/database.yml config/database.yml"
     sudo -u $USER bash -c "source $HOME/env; bundle exec rake db:migrate"
     ;;
+
+  restart)
+    $0 stop || :
+    $1 start
+    ;;
+
   start)
     echo 'Starting Busybook...'
     start-stop-daemon --start \
@@ -58,10 +63,12 @@ case $cmd in
 	--background --chdir $HOME/busybook \
 	-- -c "source $HOME/env; RAILS_ENV=production exec bundle exec rails server -b $HOST -p $PORT"
     ;;
+
   stop)
     echo 'Stopping Busybook'
     sudo -u $USER  start-stop-daemon --stop --pidfile $PIDFILE
     ;;
+
   *)
     echo >&2 $USAGE
     exit 1
