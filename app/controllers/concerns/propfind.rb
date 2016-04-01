@@ -20,26 +20,7 @@ module Propfind
           <<-EOS
             <A:privilege>
               <A:all />
-              <A:read />
-              <A:write />
-              <A:write-properties />
-              <A:write-content />
             </A:privilege>
-EOS
-        when 'supported-report-set'
-	  <<-EOS
-          <supported-report>
-              <report>principal-property-search</report>
-          </supported-report>
-          <supported-report>
-              <report>sync-collection</report>
-          </supported-report>
-          <supported-report>
-              <report>expand-property</report>
-          </supported-report>
-          <supported-report>
-              <report>principal-search-property-set</report>
-          </supported-report>
 EOS
         when 'supported-calendar-component-set'
           <<-EOS
@@ -80,26 +61,7 @@ EOS
           <<-EOS
             <A:privilege>
               <A:all />
-              <A:read />
-              <A:write />
-              <A:write-properties />
-              <A:write-content />
             </A:privilege>
-EOS
-        when 'supported-report-set'
-	  <<-EOS
-          <supported-report>
-              <report>principal-property-search</report>
-          </supported-report>
-          <supported-report>
-              <report>sync-collection</report>
-          </supported-report>
-          <supported-report>
-              <report>expand-property</report>
-          </supported-report>
-          <supported-report>
-              <report>principal-search-property-set</report>
-          </supported-report>
 EOS
             when 'resourcetype'
               <<-EOS
