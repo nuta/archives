@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151214064446) do
+ActiveRecord::Schema.define(version: 20160401030220) do
 
   create_table "calendars", force: :cascade do |t|
     t.text     "props_json"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20151214064446) do
     t.string   "uri"
   end
 
+  add_index "calendars", ["uri"], name: "index_calendars_on_uri", unique: true
   add_index "calendars", ["user_id"], name: "index_calendars_on_user_id"
 
   create_table "changes", force: :cascade do |t|
@@ -47,6 +48,7 @@ ActiveRecord::Schema.define(version: 20151214064446) do
   end
 
   add_index "schedules", ["calendar_id"], name: "index_schedules_on_calendar_id"
+  add_index "schedules", ["uri"], name: "index_schedules_on_uri", unique: true
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
@@ -55,5 +57,7 @@ ActiveRecord::Schema.define(version: 20151214064446) do
     t.string   "password_hash"
     t.string   "password_salt"
   end
+
+  add_index "users", ["name"], name: "index_users_on_name", unique: true
 
 end
