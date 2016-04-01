@@ -22,6 +22,15 @@ module Propfind
               <A:all />
             </A:privilege>
 EOS
+        when 'supported-report-set'
+          <<-EOS
+          <supported-report>
+            <report>calendar-multiget</report>
+          </supported-report>
+          <supported-report>
+            <report>calendar-query</report>
+          </supported-report>
+EOS
         when 'supported-calendar-component-set'
           <<-EOS
             <CALDAV:comp name="VTODO" />
@@ -62,6 +71,15 @@ EOS
             <A:privilege>
               <A:all />
             </A:privilege>
+EOS
+        when 'supported-report-set'
+          <<-EOS
+          <supported-report>
+            <report>calendar-multiget</report>
+          </supported-report>
+          <supported-report>
+            <report>calendar-query</report>
+          </supported-report>
 EOS
             when 'resourcetype'
               <<-EOS
