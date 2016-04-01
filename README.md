@@ -5,7 +5,7 @@ Busybook
 [![Code Climate](https://codeclimate.com/github/seiyanuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/seiyanuta/busybook)
 [![Dependency Status](https://gemnasium.com/seiyanuta/busybook.svg)](https://gemnasium.com/seiyanuta/busybook)
 
-Busybook is a CalDAV/CardDAV server out of the box powered by Ruby on Rails.
+Busybook is a CalDAV server out of the box powered by Ruby on Rails.
 
 ## Installation
 First, install dependencies.
@@ -61,18 +61,12 @@ Busybook stores all data in the database so simply you can backup and restore by
   - does *not* support `VJOURNAL`
 - [caldav-ctag-03: Calendar Collection Entity Tag (CTag) in CalDAV](https://trac.calendarserver.org/browser/CalendarServer/trunk/doc/Extensions/caldav-ctag.txt)
   - supported
+- [RFC3744: WebDAV Access Control Protocol](https://tools.ietf.org/html/rfc3744)
+  - supports some pseudo PROPFIND responses for Apple's implementations
 - [RFC5785: Defining Well-Known Uniform Resource Identifiers (URIs)](https://tools.ietf.org/html/rfc5785)
   - supported
 - [RFC6638: Scheduling Extensions to CalDAV](http://tools.ietf.org/html/rfc6638)
   - *not* supported
-- [RFC3744: WebDAV Access Control Protocol](https://tools.ietf.org/html/rfc3744)
-  - *not* supported
-
-## ToDo
-- [ ] principals
-- [ ] CardDAV
-- [ ] documentation
-- [ ] Web UI
 
 ## License
 Public domain
