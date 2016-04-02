@@ -36,7 +36,6 @@ class Schedule < ActiveRecord::Base
       dst.attributes = src.attributes.except('id', 'uri', 'calendar')
 
       dst.save
-      Change.create(calendar: dst.calendar, uri: dst.uri, is_delete: false)
     end
   end
 
@@ -49,8 +48,6 @@ class Schedule < ActiveRecord::Base
 
       src.destroy
       dst.save
-      Change.create(calendar: src.calendar, uri: src.uri, is_delete: true)
-      Change.create(calendar: dst.calendar, uri: dst.uri, is_delete: false)
     end
   end
 
@@ -69,19 +66,5 @@ class Schedule < ActiveRecord::Base
     self.date_end   = ics.comp('DTEND',   date: true)
     self.uid        = ics.comp('UID')
     self.summary    = ics.comp('SUMMARY')
-  end
-
-  def save
-    ActiveRecord::Base.transaction do
-      super
-      Change.create(calendar: self.calendar, uri: self.uri, is_delete: false)
-    end
-  end
-
-  def destroy
-    ActiveRecord::Base.transaction do
-      Change.create(calendar: self.calendar, uri: self.uri, is_delete: true)
-      super
-    end
   end
 end

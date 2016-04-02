@@ -14,8 +14,8 @@ module Propfind
         when 'principal-URL'
           '<A:href>/calendar/</A:href>'
         when 'getctag'
-          c = Change.order('updated_at DESC').first
-         (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
+          s = Schedule.order('updated_at').last
+          (s)? s.updated_at.to_i.to_s : ''
         when 'current-user-privilege-set'
           <<-EOS
             <A:privilege>
@@ -64,8 +64,8 @@ EOS
           else
             case prop
             when 'getctag'
-              c = Change.where(calendar: cal).order('updated_at DESC').first
-              (c)? Digest::MD5.hexdigest(c.id.to_s) : ''
+              s = Schedule.where(calendar: cal).order('updated_at').last
+              (s)? s.updated_at.to_i.to_s : ''
         when 'current-user-privilege-set'
           <<-EOS
             <A:privilege>

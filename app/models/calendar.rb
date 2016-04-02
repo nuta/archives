@@ -1,8 +1,6 @@
 class Calendar < ActiveRecord::Base
   belongs_to :user
   has_many :schedules, dependent: :destroy
-  has_many :cal_changes,
-           class_name: 'Change', dependent: :destroy
   validates :uri, uniqueness: true
 
   def props
@@ -26,12 +24,5 @@ class Calendar < ActiveRecord::Base
     end
 
     nil
-  end
-
-  def save
-    ActiveRecord::Base.transaction do
-      super
-      Change.create(calendar: self, uri: '', is_delete: false)
-    end
   end
 end
