@@ -66,20 +66,20 @@ EOS
             when 'getctag'
               s = Schedule.where(calendar: cal).order('updated_at').last
               (s)? s.updated_at.to_i.to_s : ''
-        when 'current-user-privilege-set'
-          <<-EOS
-            <A:privilege>
-              <A:all />
-            </A:privilege>
+            when 'current-user-privilege-set'
+              <<-EOS
+                <A:privilege>
+                  <A:all />
+                </A:privilege>
 EOS
-        when 'supported-report-set'
-          <<-EOS
-          <supported-report>
-            <report>calendar-multiget</report>
-          </supported-report>
-          <supported-report>
-            <report>calendar-query</report>
-          </supported-report>
+            when 'supported-report-set'
+              <<-EOS
+              <supported-report>
+                <report>calendar-multiget</report>
+              </supported-report>
+              <supported-report>
+                <report>calendar-query</report>
+              </supported-report>
 EOS
             when 'resourcetype'
               <<-EOS
