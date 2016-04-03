@@ -42,7 +42,7 @@ class CalendarController < ApplicationController
     sched = Schedule.new(uri: uri) unless sched
     sched.calendar = Calendar.find_by_uri!(calendar)
     sched.set_ics(rawrequest)
-    sched.save
+    sched.save!
 
     head :status => :created
   end
@@ -117,7 +117,7 @@ class CalendarController < ApplicationController
     end
 
     cal.props = cal_props
-    cal.save
+    cal.save!
 
     res = respond_xml_request('/A:propertyupdate/*/A:prop/*') do |props|
       results = handle_props(props) { '' }

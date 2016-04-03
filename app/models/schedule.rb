@@ -33,7 +33,7 @@ class Schedule < ActiveRecord::Base
       dst.calendar = Calendar.find_by_uri!(calendar)
       dst.attributes = src.attributes.except('id', 'uri', 'calendar')
 
-      dst.save
+      dst.save!
     end
   end
 
@@ -45,7 +45,7 @@ class Schedule < ActiveRecord::Base
       dst.attributes = src.attributes.except('id', 'uri', 'calendar')
 
       src.destroy
-      dst.save
+      dst.save!
     end
   end
 
