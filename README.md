@@ -72,6 +72,9 @@ Busybook stores all data in the database so simply you can backup and restore by
 Public domain
 
 ## Changelog
+- **v0.5.0**
+  - init: update command
+  - bug fixes
 - **v0.4.0**
   - refactor
 - **v0.3.0**
