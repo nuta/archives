@@ -84,7 +84,10 @@ class CalendarController < ApplicationController
 
   def report
     xml = Nokogiri::XML(rawrequest)
-    res = case xml.children[0].name
+    type = xml.children[0].name
+
+    logger.info "REPORT type: #{type}"
+    res = case type
           when 'calendar-multiget'
             report_multiget(xml)
           when 'calendar-query'
@@ -98,7 +101,7 @@ class CalendarController < ApplicationController
 
   def proppatch
     if params[:calendar_object] != "" || params[:calendar] == ""
-      # PROPPATCH to a calendar object or / is not supported
+      logger.warn "PROPPATCH to a calendar object or / is not supported"
       return head :status => :not_implemented
     end
 
@@ -129,8 +132,10 @@ class CalendarController < ApplicationController
 
   def propfind
     if params[:calendar] != '' and request.headers["Depth"] == "1"
+      logger.info "PROPFIND target: object"
       xml = propfind_objects
     else
+      logger.info "PROPFIND target: collections"
       xml = propfind_collections
     end
 
