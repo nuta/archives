@@ -2,8 +2,6 @@ class Schedule < ActiveRecord::Base
   belongs_to :calendar
 
   validates :component,  presence: true
-  validates :date_start, presence: true
-  validates :date_end,   presence: true
   validates :uid,        presence: true
   validates :uri,        presence: true, uniqueness: true
   validates :ics,        presence: true
