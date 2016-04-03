@@ -25,10 +25,10 @@ EOS
         when 'supported-report-set'
           <<-EOS
           <supported-report>
-            <report>calendar-multiget</report>
+            <report><CALDAV:calendar-multiget /></report>
           </supported-report>
           <supported-report>
-            <report>calendar-query</report>
+            <report><CALDAV:calendar-query /></report>
           </supported-report>
 EOS
         when 'supported-calendar-component-set'
@@ -75,10 +75,10 @@ EOS
             when 'supported-report-set'
               <<-EOS
               <supported-report>
-                <report>calendar-multiget</report>
+                <report><CALDAV:calendar-multiget /></report>
               </supported-report>
               <supported-report>
-                <report>calendar-query</report>
+                <report><CALDAV:calendar-query /></report>
               </supported-report>
 EOS
             when 'resourcetype'
