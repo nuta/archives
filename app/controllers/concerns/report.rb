@@ -41,8 +41,7 @@ module Report
       responses = []
       for uri in uris
         # TODO: return 404 reponse if it does not exists
-        sched_uri = File.basename(uri)
-        sched = Schedule.find_by_uri!(sched_uri)
+        sched = Schedule.find_by_uri!(URI.decode(File.basename(uri)))
 
         results = handle_props(props) do |prop|
           case prop
