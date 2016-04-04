@@ -18,6 +18,7 @@ module Report
 
       responses = []
       for sched in scheds
+        calendar_uri ||= sched.calendar.uri
         results = handle_props(props) do |prop|
           case prop
           when 'getetag'
@@ -26,7 +27,7 @@ module Report
 	    sched.ics.encode(xml: :text)
           end
         end
-        responses << ["/calendar/#{sched.calendar.uri}/#{sched.uri}", results]
+        responses << ["/calendar/#{calendar_uri}/#{sched.uri}", results]
       end
       responses
     end
