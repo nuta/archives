@@ -55,7 +55,8 @@ Busybook stores all data in the database so simply you can backup and restore by
   - supports `GET`, `PUT`, `DELETE`, `OPTIONS`, `MKCALENDAR`, `PROPFIND`, `MOVE`, `COPY`, and `PROPPATCH` HTTP methods
   - does *not* support `HEAD`, `POST`, `LOCK`, `UNLOCK`, and `MKCOL` HTTP methods
 - [RFC4791: Calendaring Extensions to WebDAV (CalDAV)](http://tools.ietf.org/html/rfc4791)
-  - supports `REPORT` and `MKCALENDAR` HTTP method
+  - supports `REPORT` HTTP method and its `time-range` comp-filter
+  - supports `MKCALENDAR` HTTP method
 - [RFC5545: iCalendar](http://tools.ietf.org/html/rfc5545)
   - supports `VEVENT` and `VTODO`
   - does *not* support `VJOURNAL`
