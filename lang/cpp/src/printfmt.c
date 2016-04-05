@@ -33,7 +33,7 @@ static bool isalphabet (const char ch) {
  *  @param[in] s  the string to print
  *
  */
-static void print_str (const char *s) {
+void print_str (const char *s) {
 
     for (int i=0; s[i] != '\0'; i++)
         hal_printchar(s[i]);
@@ -283,7 +283,6 @@ static void vprintfmt (const char *fmt, va_list vargs) {
 static mutex_t lock = MUTEX_UNLOCKED;
 
 void printfmt(const char *format, ...) {
-
     va_list vargs;
 
     lock_mutex(&lock);

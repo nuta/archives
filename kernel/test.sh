@@ -1,0 +1,12 @@
+set -e
+echo "linking"
+arm-elf-eabi-ld -Map build/release/executable.map -nostdlib -nodefaultlibs -Tpackages/arm/src/executable.ld /usr/local/Cellar/arm-elf-gcc/5.3.0/lib/gcc/arm-elf-eabi/5.3.0/libgcc.a /usr/local/Cellar/arm-elf-gcc/5.3.0/lib/gcc/arm-elf-eabi/5.3.0/libgcc.a -o build/release/application build/release/kernel/src/channel.o build/release/kernel/src/channel.connect.o build/release/kernel/src/datetime.o build/release/kernel/src/datetime.delay.o build/release/kernel/src/datetime.get_date.o build/release/kernel/src/datetime.set_interval_timer.o build/release/kernel/src/datetime.set_oneshot_timer.o build/release/kernel/src/handler.o build/release/kernel/src/io.o build/release/kernel/src/io.read16.o build/release/kernel/src/io.read32.o build/release/kernel/src/io.read64.o build/release/kernel/src/io.read8.o build/release/kernel/src/io.write16.o build/release/kernel/src/io.write32.o build/release/kernel/src/io.write64.o build/release/kernel/src/io.write8.o build/release/kernel/src/memory.o build/release/kernel/src/memory.get_page_size.o build/release/kernel/src/memory.map.o build/release/kernel/src/memory.unmap.o build/release/kernel/src/pager.fill.o build/release/kernel/src/startup.o build/release/kernel/src/syscall.o build/release/kernel/src/thread.block.o build/release/kernel/src/thread.o build/release/kernel/src/thread.create.o build/release/kernel/src/thread.delete.o build/release/kernel/src/thread.get_current_thread.o build/release/kernel/src/thread.set.o build/release/kernel/src/thread.start.o build/release/kernel/src/thread.unblock.o build/release/kernel/tests/test.o build/release/arm/src/startup.o build/release/arm/src/debug.o build/release/arm/src/thread.o build/release/arm/src/memory.o build/release/arm/src/hw.o build/release/arm/src/vm.o build/release/arm/src/cpu.o build/release/arm/src/io.o build/release/arm/src/init.o build/release/arm/src/callback.o build/release/cpp/src/channel.o build/release/cpp/src/ctype.o build/release/cpp/src/string.o build/release/cpp/src/syscall.o build/release/cpp/src/memory.o build/release/cpp/src/mutex.o build/release/cpp/src/printfmt.o build/release/start.o \
+$(arm-elf-eabi-gcc -print-libgcc-file-name)
+echo "converting"
+cp  build/release/application .
+arm-elf-eabi-objcopy -Obinary application resea.img
+test -d /Volumes/RESEA
+echo "copying"
+cp resea.img /Volumes/RESEA
+echo "unmounting"
+diskutil umountDisk /Volumes/RESEA

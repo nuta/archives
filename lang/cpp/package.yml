@@ -47,7 +47,7 @@ global_config:
         genstub: ./packages/cpp/genstub
   CFLAGS:
     default: >
-      -Wall -g3 -std=c99 -Wno-incompatible-library-redeclaration
+      -Wall -ggdb3 -std=c99 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color     
       -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/c
 
