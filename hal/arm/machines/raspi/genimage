@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+cp $1 $2
+$OBJCOPY -O binary $2

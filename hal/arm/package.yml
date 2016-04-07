@@ -31,25 +31,18 @@ type:
 interface:
 
 #
+#  Machines
+#
+includes:
+  - machines/raspi/config.yml
+  - machines/versatileab/config.yml
+
+#
 #  Config
 #
 global_config:
-  HAL_LINK:
-    default: >
-      $(LD) -Map $(BUILD_DIR)/executable.map
-      -nostdlib -nodefaultlibs
-      -Tpackages/arm/src/executable.ld
-      $(LIBGCC)
-      -o
-  HAL_RUN:
-    default: packages/arm/run
   HAL_GENSTART:
     default: ./packages/posix_host/genstart
-  CFLAGS:
-   append_words: >
-     -ffreestanding
-     -mcpu=arm1176jzf-s -mfloat-abi=soft
-     -Ipackages/arm/src 
 
 config:
   SOURCES:

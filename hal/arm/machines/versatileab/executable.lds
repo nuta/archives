@@ -3,7 +3,6 @@ ENTRY(arm_init);
  
 SECTIONS
 {
-/*    . = 0x00008000; */
     . = 0x00010000;
 
     .text :{

@@ -1,0 +1,25 @@
+include_if: "MACHINE == 'versatileab'"
+
+global_config:
+  CFLAGS:
+    append_words: >
+      -ffreestanding
+      -Ipackages/arm/src 
+      -Ipackages/arm/machines/versatileab/include
+      -mcpu=arm1176jzf-s -mfloat-abi=soft
+  HAL_RUN:
+    default: packages/arm/machines/versatileab/run
+  HAL_GENIMAGE:
+    default: packages/arm/machines/versatileab/genimage
+  HAL_LINK:
+    default: >
+      $(LD) -Map $(BUILD_DIR)/executable.map
+      -nostdlib -nodefaultlibs
+      -Tpackages/arm/machines/versatileab/executable.lds
+      -o
+
+config:
+  LIBS:
+    set:
+      - '$(shell $(CC) -print-libgcc-file-name)'
+
