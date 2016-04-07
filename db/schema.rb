@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160402024705) do
+ActiveRecord::Schema.define(version: 20160407084137) do
 
   create_table "calendars", force: :cascade do |t|
     t.text     "props_json"
@@ -30,7 +30,6 @@ ActiveRecord::Schema.define(version: 20160402024705) do
     t.datetime "date_start"
     t.datetime "date_end"
     t.string   "uri"
-    t.string   "uid"
     t.text     "ics"
     t.integer  "calendar_id"
     t.datetime "created_at",  null: false

@@ -2,7 +2,6 @@ class Schedule < ActiveRecord::Base
   belongs_to :calendar
 
   validates :component,  presence: true
-  validates :uid,        presence: true
   validates :uri,        presence: true, uniqueness: true
   validates :ics,        presence: true
 
@@ -62,7 +61,6 @@ class Schedule < ActiveRecord::Base
     self.component  = ics.comp_type
     self.date_start = ics.comp('DTSTART', date: true)
     self.date_end   = ics.comp('DTEND',   date: true)
-    self.uid        = ics.comp('UID')
     self.summary    = ics.comp('SUMMARY')
   end
 end
