@@ -79,6 +79,7 @@ def load_packages(builtin_packages, config=None):
     all_packages = []
     local_config = {}
     config['OBJS'] = []
+    config['LIBS'] = []
     config['STUBS'] = []
     config['LANG'] = {}
     while len(packages) > 0:
@@ -90,6 +91,24 @@ def load_packages(builtin_packages, config=None):
             config['CATEGORY'] = 'application'
         if config.get('CATEGORY') != 'application' and yml['category'] == 'library':
             config['CATEGORY'] = 'library'
+
+        for include in yml.get('includes', []):
+            d = get_package_dir(package)
+            include_yml = load_yaml(os.path.join(d, include))
+            try:
+                include_if = eval(include_yml['include_if'], config)
+            except Exception as e:
+                error("eval(include_if) in {}: {}".format(
+                    package, str(e)))
+
+            if include_if:
+                for k,v in include_yml.items():
+                    if k in 'include_if':
+                        continue
+                    if isinstance(yml[k], dict):
+                        yml[k].update(v)
+                    else:
+                        yml[k] = v
 
         # add dependent packages
         for depend in yml['requires']:
@@ -143,6 +162,8 @@ def load_packages(builtin_packages, config=None):
                         for src in v['set']:
                             obj = os.path.splitext(src)[0] + '.o'
                             config['OBJS'].append(os.path.join(config['BUILD_DIR'], package, obj))
+                    if k == 'LIBS':
+                        config['LIBS'] += v['set']
                     else:
                         local_config[package][k] = v['set']
                 else:

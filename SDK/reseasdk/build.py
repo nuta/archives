@@ -19,7 +19,7 @@ $(VERBOSE).SILENT:
 #  global config
 #
 {% for k,v in config.items() %}
-{% if k not in ['LANG', 'OBJS', 'STUBS'] %}
+{% if k not in ['LANG', 'OBJS', 'STUBS', '__builtins__'] %}
 export {{ k }} = {{ v }}
 {% endif %}
 {% endfor %}
@@ -29,7 +29,7 @@ export {{ k }} = {{ v }}
 #
 default: $(BUILD_DIR)/{{ config['CATEGORY'] }}
 $(BUILD_DIR)/{{ config['CATEGORY'] }}: \\
-    {% for obj in config['OBJS'] %}
+    {% for obj in config['OBJS'] + config['LIBS'] %}
     {{ obj }} \\
     {% endfor %}
 
