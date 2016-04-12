@@ -42,6 +42,8 @@ global_config:
     default: packages/x86/run
   HAL_GENSTART:
     default: ./packages/posix_host/genstart
+  HAL_GENIMAGE:
+    default: ./packages/x86/genimage
   CFLAGS:
     append_words: >
       -m64 -ffreestanding -mno-sse -mno-mmx
