@@ -111,7 +111,7 @@ def main(args):
             for service_name, service in services_.items():
                 if service_name.endswith("_reply"):
                     continue
-                service_args = [name, interface_name, service_name]
+                service_args = ["channel_t __ch"]
                 handler_args = ["__ch"]
                 _handler_args = ["channel_t __ch"]
                 unmarshall = []
