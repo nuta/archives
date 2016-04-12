@@ -17,16 +17,20 @@ Usage: reseasdk run
 def run(args):
     config = build(args)
 
+    env = os.environ.copy()
+    env.update(config)
+
     plan('Generating a disk image')
     cmd = [config['HAL_GENIMAGE'], config['BUILD_DIR'] + '/application',
            config['BUILD_DIR'] + '/disk.img']
     progress(' '.join(cmd))
-    subprocess.Popen(cmd).wait()
+
+    subprocess.Popen(cmd, env=env).wait()
 
     plan('Launching an emulator')
     cmd = [config['HAL_RUN'], config['BUILD_DIR'] + '/disk.img']
     progress(' '.join(cmd))
-    run_emulator(cmd, env=config)
+    run_emulator(cmd, env=env)
 
 def main(args):
     parser = argparse.ArgumentParser(prog='reseasdk run',
