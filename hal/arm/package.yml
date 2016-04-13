@@ -54,6 +54,5 @@ config:
       - src/hw.c
       - src/vm.c
       - src/cpu.c
-      - src/io.c
       - src/init.S
       - src/callback.c
