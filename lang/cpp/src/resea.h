@@ -142,18 +142,20 @@ NORETURN void serve_channel(channel_t ch, handler_t handler);
  */
 #define MEMORY_BARRIER() __asm__ __volatile__("": : :"memory")
 #define PTR2ADDR(x) ((uintptr_t) (x))
-result_t IORead8(uint8_t iospace, uintmax_t base,
-               offset_t offset, uint8_t *data);
-result_t IORead16(uint8_t iospace, uintmax_t base,
-                offset_t offset, uint16_t *data);
-result_t IORead32(uint8_t iospace, uintmax_t base,
-                offset_t offset, uint32_t *data);
-result_t IOWrite8(uint8_t iospace, uintmax_t base,
-               offset_t offset, uint8_t data);
-result_t IOWrite16(uint8_t iospace, uintmax_t base,
-                offset_t offset, uint16_t data);
-result_t IOWrite32(uint8_t iospace, uintmax_t base,
-                offset_t offset, uint32_t data);
+
+
+// TODO: remove
+enum iospace_type{
+  IOSPACE_PORT = 1, // port mapped IO
+  IOSPACE_MEM  = 2, // memory mapped IO
+};
+
+uint8_t io_read8(enum iospace_type iospace, uintmax_t base, offset_t offset);
+uint16_t io_read16(enum iospace_type iospace, uintmax_t base, offset_t offset);
+uint32_t io_read32(enum iospace_type iospace, uintmax_t base, offset_t offset);
+void io_write8(enum iospace_type iospace, uintmax_t base, offset_t offset, uint8_t data);
+void io_write16(enum iospace_type iospace, uintmax_t base, offset_t offset, uint16_t data);
+void io_write32(enum iospace_type iospace, uintmax_t base, offset_t offset, uint32_t data);
 
 /*
  * Memory

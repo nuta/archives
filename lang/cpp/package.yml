@@ -62,6 +62,7 @@ config:
       - src/memory.c
       - src/mutex.c
       - src/printfmt.c
+      - src/io.c
 
 #
 #  Type definitions

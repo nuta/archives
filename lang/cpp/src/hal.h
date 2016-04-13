@@ -26,21 +26,6 @@ enum exception_type {
 void hal_set_callback(enum hal_callback_type type, void (*handler)());
 void hal_call_callback(enum hal_callback_type type, ...);
 
-// IO / Interrupt
-enum iospace_type{
-  IOSPACE_PORT = 1, // port mapped IO
-  IOSPACE_MEM  = 2, // memory mapped IO
-};
-
-uint8_t  hal_io_read8(enum iospace_type iospace, uintmax_t base, offset_t offset);
-uint16_t hal_io_read16(enum iospace_type iospace, uintmax_t base, offset_t offset);
-uint32_t hal_io_read32(enum iospace_type iospace, uintmax_t base, offset_t offset);
-void hal_io_write8(enum iospace_type iospace, uintmax_t base,
-                   offset_t offset, uint8_t data);
-void hal_io_write16(enum iospace_type iospace, uintmax_t base,
-                    offset_t offset, uint16_t data);
-void hal_io_write32(enum iospace_type iospace, uintmax_t base,
-                    offset_t offset, uint32_t data);
 void hal_wait_interrupt(void);
 bool hal_interrupt_enabled(void);
 void hal_enable_interrupt(void);
