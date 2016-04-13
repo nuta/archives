@@ -73,7 +73,7 @@ void x86_init_vm(void) {
 void hal_create_vm_space(struct vm_space *vms) {
 
     init_mutex(&vms->hal.lock, MUTEX_UNLOCKED);
-    vms->hal.pml4 = allocMemory(
+    vms->hal.pml4 = kernel_allocate_memory(
                         sizeof(uint64_t) * PAGE_ENTRY_NUM, 0);
 
     /*

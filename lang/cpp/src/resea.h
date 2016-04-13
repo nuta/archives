@@ -167,7 +167,7 @@ enum{
 };
 
 void *allocMemory(size_t size, uint32_t flags);
-void *allocPhysicalMemory(paddr_t addr, size_t size, uint32_t flags, paddr_t *alloced_addr);
 void freeMemory(void *p);
+void *allocPhysicalMemory(paddr_t addr, size_t size, uint32_t flags, paddr_t *alloced_addr); // TODO: remove
 
 #endif

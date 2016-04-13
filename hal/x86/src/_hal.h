@@ -45,4 +45,6 @@ struct x86_cpuvar{
 extern struct x86_cpuvar x86_cpuvars[CPU_MAX_NUM];
 #define CPUVAR ((struct x86_cpuvar *) &x86_cpuvars[hal_get_cpuid()])
 
+void *kernel_allocate_memory(size_t size, uint32_t flags); // TODO: remove
+
 #endif

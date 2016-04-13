@@ -201,7 +201,7 @@ UNUSED static void pfree(paddr_t p, size_t num) {
 }
 
 
-void freeMemory(void *p) {
+void kernel_release_memory(void *p) {
   /* TODO */
 }
 
@@ -214,7 +214,7 @@ void freeMemory(void *p) {
  *  @return  The pointer to the allocated memory block.
  *
  */
-void *allocMemory (size_t size, uint32_t flags) {
+void *kernel_allocate_memory(size_t size, uint32_t flags) {
     paddr_t paddr;
 
     return allocPhysicalMemory(0, size, flags, &paddr);
