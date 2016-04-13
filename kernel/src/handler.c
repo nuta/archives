@@ -54,80 +54,21 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_datetime_delay(__ch, (uintmax_t) a0);
             return;
     }
-    case SERVICE(io, read8):
+    case SERVICE(io, allocate):
     {
-        DEBUG("received io.read8");
+        DEBUG("received io.allocate");
             payload_t a0 = payloads[2];
             payload_t a1 = payloads[3];
             payload_t a2 = payloads[4];
-            kernel_io_read8(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2);
+            kernel_io_allocate(__ch, (io_IOSpace) a0, (uintptr_t) a1, (size_t) a2);
             return;
     }
-    case SERVICE(io, read16):
+    case SERVICE(io, release):
     {
-        DEBUG("received io.read16");
+        DEBUG("received io.release");
             payload_t a0 = payloads[2];
             payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            kernel_io_read16(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2);
-            return;
-    }
-    case SERVICE(io, read32):
-    {
-        DEBUG("received io.read32");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            kernel_io_read32(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2);
-            return;
-    }
-    case SERVICE(io, read64):
-    {
-        DEBUG("received io.read64");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            kernel_io_read64(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2);
-            return;
-    }
-    case SERVICE(io, write8):
-    {
-        DEBUG("received io.write8");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            payload_t a3 = payloads[5];
-            kernel_io_write8(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2, (uint8_t) a3);
-            return;
-    }
-    case SERVICE(io, write16):
-    {
-        DEBUG("received io.write16");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            payload_t a3 = payloads[5];
-            kernel_io_write16(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2, (uint16_t) a3);
-            return;
-    }
-    case SERVICE(io, write32):
-    {
-        DEBUG("received io.write32");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            payload_t a3 = payloads[5];
-            kernel_io_write32(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2, (uint32_t) a3);
-            return;
-    }
-    case SERVICE(io, write64):
-    {
-        DEBUG("received io.write64");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            payload_t a3 = payloads[5];
-            kernel_io_write64(__ch, (io_IOSpace) a0, (uintptr_t) a1, (offset_t) a2, (uint64_t) a3);
+            kernel_io_release(__ch, (io_IOSpace) a0, (uintptr_t) a1);
             return;
     }
     case SERVICE(thread, create):
@@ -206,6 +147,21 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
     {
         DEBUG("received memory.get_page_size");
             kernel_memory_get_page_size(__ch);
+            return;
+    }
+    case SERVICE(memory, allocate):
+    {
+        DEBUG("received memory.allocate");
+            payload_t a0 = payloads[2];
+            payload_t a1 = payloads[3];
+            kernel_memory_allocate(__ch, (size_t) a0, (uint32_t) a1);
+            return;
+    }
+    case SERVICE(memory, release):
+    {
+        DEBUG("received memory.release");
+            payload_t a0 = payloads[2];
+            kernel_memory_release(__ch, (uintptr_t) a0);
             return;
     }
     case SERVICE(channel, connect):

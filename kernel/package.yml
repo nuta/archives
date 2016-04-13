@@ -58,14 +58,8 @@ config:
     - src/datetime.set_oneshot_timer.c
     - src/handler.c
     - src/io.c
-    - src/io.read16.c
-    - src/io.read32.c
-    - src/io.read64.c
-    - src/io.read8.c
-    - src/io.write16.c
-    - src/io.write32.c
-    - src/io.write64.c
-    - src/io.write8.c
+    - src/io.allocate.c
+    - src/io.release.c
     - src/memory.c
     - src/memory.allocate.c
     - src/memory.release.c

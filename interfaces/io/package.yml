@@ -37,138 +37,27 @@ type:
 #  Interface definitions
 #
 interface:
-  read8:
+  allocate:
     id: 1
     payloads:
       - name: iospace
         type: io(IOSpace)
       - name: addr
         type: Addr
-      - name: offset
-        type: Offset
-  read8_reply:
+      - name: size
+        type: Size
+  allocate_reply:
     id: 2
     payloads:
       - name: result
         type: Result
-      - name: data
-        type: UInt8
+      - name: addr
+        type: Addr
 
-  read16:
+  release:
     id: 3
     payloads:
       - name: iospace
         type: io(IOSpace)
       - name: addr
         type: Addr
-      - name: offset
-        type: Offset
-  read16_reply:
-    id: 4
-    payloads:
-      - name: result
-        type: Result
-      - name: data
-        type: UInt16
-
-  read32:
-    id: 5
-    payloads:
-      - name: iospace
-        type: io(IOSpace)
-      - name: addr
-        type: Addr
-      - name: offset
-        type: Offset
-  read32_reply:
-    id: 6
-    payloads:
-      - name: result
-        type: Result
-      - name: data
-        type: UInt32
-
-  read64:
-    id: 7
-    payloads:
-      - name: iospace
-        type: io(IOSpace)
-      - name: addr
-        type: Addr
-      - name: offset
-        type: Offset
-  read64_reply:
-    id: 8
-    payloads:
-      - name: result
-        type: Result
-      - name: data
-        type: UInt64
-
-  write8:
-    id: 9
-    payloads:
-      - name: iospace
-        type: io(IOSpace)
-      - name: addr
-        type: Addr
-      - name: offset
-        type: Offset
-      - name: data
-        type: UInt8
-  write8_reply:
-    id: 10
-    payloads:
-      - name: result
-        type: Result
-
-  write16:
-    id: 11
-    payloads:
-      - name: iospace
-        type: io(IOSpace)
-      - name: addr
-        type: Addr
-      - name: offset
-        type: Offset
-      - name: data
-        type: UInt16
-  write16_reply:
-    id: 12
-    payloads:
-      - name: result
-        type: Result
-
-  write32:
-    id: 13
-    payloads:
-      - name: iospace
-        type: io(IOSpace)
-      - name: addr
-        type: Addr
-      - name: offset
-        type: Offset
-      - name: data
-        type: UInt32
-  write32_reply:
-    id: 14
-    payloads:
-      - name: result
-        type: Result
-
-  write64:
-    id: 15
-    payloads:
-      - name: iospace
-        type: io(IOSpace)
-      - name: addr
-        type: Addr
-      - name: offset
-        type: Offset
-      - name: data
-        type: UInt64
-  write64_reply:
-    id: 16
-    payloads:
-      - name: result
-        type: Result
