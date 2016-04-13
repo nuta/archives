@@ -57,7 +57,6 @@ config:
     - src/datetime.set_interval_timer.c
     - src/datetime.set_oneshot_timer.c
     - src/handler.c
-    - src/io.c
     - src/io.allocate.c
     - src/io.release.c
     - src/memory.c
