@@ -64,7 +64,6 @@ config:
       - src/init.c
       - src/interrupt.c
       - src/interrupt_handler.c
-      - src/io.c
       - src/ioapic.c
       - src/localapic.c
       - src/pic.c
