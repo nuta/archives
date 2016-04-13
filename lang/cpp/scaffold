@@ -73,7 +73,7 @@ SERVICE_C_TEMPLATE = """\
 {% endfor %}
 
 /** handles {{ interface_name }}.{{ service_name }} */
-{{name}}_{{interface_name}}_{{service_name}}({{ service_args | join(", ") }}) {
+void {{name}}_{{interface_name}}_{{service_name}}({{ service_args | join(", ") }}) {
 
 }
 
