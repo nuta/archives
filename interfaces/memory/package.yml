@@ -77,4 +77,25 @@ interface:
       - name: size
         type: Size
 
-# TODO: get_mappable_range, markas_clean_pages, get_dirty_pages, alloc_memory (for DMA)
+  allocate:
+    id: 7
+    payloads:
+      - name: size
+        type: Size
+      - name: flags
+        type: UInt32
+  allocate_reply:
+    id: 8
+    payloads:
+      - name: result
+        type: Result
+      - name: addr
+        type: Addr
+
+  release:
+    id: 9
+    payloads:
+      - name: addr
+        type: Addr
+
+# TODO: get_mappable_range, markas_clean_pages, get_dirty_pages
