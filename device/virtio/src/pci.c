@@ -12,8 +12,8 @@ static uint16_t _pci_read_config16(uint16_t bus, uint16_t dev, offset_t offset){
   /* NOTE: offset must be multiple of 4 */
   addr = (uint32_t) ((1 << 31) | (bus << 16) | (dev << 11) | (offset & 0xfc));
 
-  IOWrite32(IO_IOSPACE_PORT, 0, PCI_IO_ADDR, addr);
-  IORead32(IO_IOSPACE_PORT,  0, PCI_IO_DATA, &data);
+  io_write32(IO_IOSPACE_PORT, 0, PCI_IO_ADDR, addr);
+  data = io_read32(IO_IOSPACE_PORT,  0, PCI_IO_DATA);
 
   return (uint16_t) (data >> (offset & 3) * 8);
 }
@@ -32,8 +32,8 @@ static uint32_t _pci_read_config32(uint16_t bus, uint16_t dev, offset_t offset){
   /* NOTE: offset must be multiple of 4 */
   addr = (uint32_t) ((1 << 31) | (bus << 16) | (dev << 11) | (offset & 0xfc));
 
-  IOWrite32(IO_IOSPACE_PORT, 0, PCI_IO_ADDR, addr);
-  IORead32(IO_IOSPACE_PORT,  0, PCI_IO_DATA, &data);
+  io_write32(IO_IOSPACE_PORT, 0, PCI_IO_ADDR, addr);
+  data = io_read32(IO_IOSPACE_PORT,  0, PCI_IO_DATA);
 
   return (uint32_t) data;
 }

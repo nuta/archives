@@ -103,7 +103,7 @@ bool virtio_net_init(void){
   virtio_activate_device(&device);
 
   for(int i=0; i < 6; i++) 
-    IORead8(device.iospace, device.iobase, VIRTIO_IO_NET_MAC_ADDR + i, &mac_addr[i]);
+    mac_addr[i] = io_read8(device.iospace, device.iobase, VIRTIO_IO_NET_MAC_ADDR + i);
 
   INFO("virtio-net: MAC address is %x:%x:%x:%x:%x:%x",
        mac_addr[0], mac_addr[1], mac_addr[2],

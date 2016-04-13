@@ -119,7 +119,7 @@ int virtio_send_request(struct virtio_device *device, int queue_index,
   
     used_index = queue->used->index;
     /* notify the device */
-    IOWrite16(device->iospace, device->iobase,
+    io_write16(device->iospace, device->iobase,
               VIRTIO_IO_QUEUE_NOTIFY,
               queue->number);
 
@@ -147,7 +147,6 @@ int virtio_send_request(struct virtio_device *device, int queue_index,
  *  @returns  0 on success or 1 on fail
  */
 int virtio_setup_device(struct virtio_device *device, struct pci_device *pci){
-    uint8_t unused;
     uint32_t bar0;
   
     /* get iospace and iobase from BAR0 in the PCI config space */
@@ -156,11 +155,11 @@ int virtio_setup_device(struct virtio_device *device, struct pci_device *pci){
     device->iospace = (bar0 & 1)? IO_IOSPACE_PORT : IO_IOSPACE_MEM;
   
     /* reset */
-    IOWrite8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, 0x00);
-    IORead8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, &unused);
+    io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, 0x00);
+    io_read8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS);
   
     /* tell to the device that we know how to use */
-    IOWrite8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
+    io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
              VIRTIO_STATUS_ACK | VIRTIO_STATUS_DRIVER);
   
     return 0;
@@ -174,10 +173,8 @@ int virtio_setup_device(struct virtio_device *device, struct pci_device *pci){
  *  @return  The features supported by the device.
  */
 uint32_t virtio_get_features(struct virtio_device *device) {
-    uint32_t data;
   
-    IORead32(device->iospace, device->iobase, VIRTIO_IO_DEVICE_FEATS, &data);
-    return data;
+    return io_read32(device->iospace, device->iobase, VIRTIO_IO_DEVICE_FEATS);
 }
 
 
@@ -190,11 +187,11 @@ uint32_t virtio_get_features(struct virtio_device *device) {
 void virtio_set_features(struct virtio_device *device, uint32_t features) {
     uint8_t old;
   
-    IOWrite32(device->iospace, device->iobase, VIRTIO_IO_GUEST_FEATS, features);
+    io_write32(device->iospace, device->iobase, VIRTIO_IO_GUEST_FEATS, features);
   
     /* feature negotiation finished */
-    IORead8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, &old);
-    IOWrite8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
+    old = io_read8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS);
+    io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
              VIRTIO_STATUS_FEATURES_OK | old);
 }
 
@@ -207,8 +204,8 @@ void virtio_set_features(struct virtio_device *device, uint32_t features) {
 void virtio_activate_device(struct virtio_device *device) {
     uint8_t old;
   
-    IORead8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, &old);
-    IOWrite8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
+    old = io_read8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS);
+    io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
              VIRTIO_STATUS_DRIVER_OK | old);
 }
 
@@ -228,8 +225,8 @@ int virtio_init_queue(struct virtio_device *device, int queue_index) {
     uintptr_t addr;
   
     /* get the number of queue */
-    IOWrite16(device->iospace, device->iobase, VIRTIO_IO_QUEUE_SELECT, queue_index);
-    IORead16(device->iospace, device->iobase, VIRTIO_IO_QUEUE_SIZE, &queue->queue_num);
+    io_write16(device->iospace, device->iobase, VIRTIO_IO_QUEUE_SELECT, queue_index);
+    queue->queue_num = io_read16(device->iospace, device->iobase, VIRTIO_IO_QUEUE_SIZE);
   
     if (queue->queue_num == 0) {
         WARN("the number of queue #%d is 0", queue_index);
@@ -263,6 +260,6 @@ int virtio_init_queue(struct virtio_device *device, int queue_index) {
     queue->last_used_index = 0;
   
     /* tell the device the physical address of the queue */
-    IOWrite32(device->iospace, device->iobase, VIRTIO_IO_QUEUE_ADDR, phy_buf >> 12);
+    io_write32(device->iospace, device->iobase, VIRTIO_IO_QUEUE_ADDR, phy_buf >> 12);
     return 0;
 }
