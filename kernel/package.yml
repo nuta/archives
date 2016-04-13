@@ -67,6 +67,8 @@ config:
     - src/io.write64.c
     - src/io.write8.c
     - src/memory.c
+    - src/memory.allocate.c
+    - src/memory.release.c
     - src/memory.get_page_size.c
     - src/memory.map.c
     - src/memory.unmap.c
