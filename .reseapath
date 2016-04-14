@@ -6,4 +6,5 @@ device
 exec
 fs
 libs
+misc
 interfaces

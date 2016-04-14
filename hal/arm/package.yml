@@ -12,7 +12,7 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Required packages
-requires: [cpp]
+requires: [cpp, genstartc]
 
 # Interfaces which this package uses
 uses: []
@@ -42,7 +42,7 @@ includes:
 #
 global_config:
   HAL_GENSTART:
-    default: ./packages/posix_host/genstart
+    default: ./packages/genstartc/genstartc
 
 config:
   SOURCES:
