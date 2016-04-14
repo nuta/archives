@@ -10,8 +10,8 @@
 #define CHANNELS_MAX 64
 
 struct channel {
-    ident_t    dest;    // thread group
-    channel_t  dest_ch;
+    ident_t    linked_group;
+    channel_t  linked_to;
     channel_t  transfer_to;
     bool       used;
     uintptr_t  handler;

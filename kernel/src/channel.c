@@ -48,12 +48,12 @@ result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t
 result_t kernel_link_channels(struct thread_group *group1, channel_t ch1,
                                  struct thread_group *group2, channel_t ch2) {
 
-    group1->channels[ch1].used    = true;
-    group1->channels[ch1].dest    = group2->id;
-    group1->channels[ch1].dest_ch = ch2;
-    group2->channels[ch2].used    = true;
-    group2->channels[ch2].dest    = group1->id;
-    group2->channels[ch2].dest_ch = ch1;
+    group1->channels[ch1].used         = true;
+    group1->channels[ch1].linked_group = group2->id;
+    group1->channels[ch1].linked_to    = ch2;
+    group2->channels[ch2].used         = true;
+    group2->channels[ch2].linked_group = group1->id;
+    group2->channels[ch2].linked_to    = ch1;
 
     DEBUG("connect @%d:%d <=> @%d:%d", group1->id, ch1, group2->id, ch2);
     return OK;

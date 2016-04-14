@@ -10,13 +10,13 @@ static result_t send(channel_t ch, payload_t *m) {
     src_group = kernel_get_current_thread_group();
     src = &src_group->channels[ch];
 
-    if (!src->used || !src->dest_ch) {
+    if (!src->used || !src->linked_to) {
        WARN("unconnected channel (%d), aborting", ch);
        return E_UNCONNECTED;
     }
 
-    dest_group = kernel_get_thread_group(src->dest);
-    dest = &dest_group->channels[src->dest_ch];
+    dest_group = kernel_get_thread_group(src->linked_group);
+    dest = &dest_group->channels[src->linked_to];
     if (dest->transfer_to) {
        dest = &dest_group->channels[dest->transfer_to];
     }
@@ -32,13 +32,13 @@ static result_t send(channel_t ch, payload_t *m) {
 
         if (handler) {
             INFO("send to handler: @%d:%d -> @%d:%d (handler=%p)",
-                 src_group->id, ch, dest_group->id, src->dest_ch,
+                 src_group->id, ch, dest_group->id, src->linked_to,
                  handler);
-            handler(src->dest_ch, m);
+            handler(src->linked_to, m);
         } else {
             size_t size = 24; // XXX
             INFO("send to queue: @%d:%d -> @%d:%d (queue=%p)",
-                 src_group->id, ch, dest_group->id, src->dest_ch,
+                 src_group->id, ch, dest_group->id, src->linked_to,
                  dest->buf);
             if (dest->buf == (uintptr_t) NULL) {
                 WARN("buffer is not set");
