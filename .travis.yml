@@ -1,4 +1,8 @@
 language: ruby
+services:
+  - postgresql
+  - mysql
+
 rvm:
   - 2.2.0
   - 2.1.0
@@ -8,9 +12,15 @@ cache:
   directories:
     - vendor/bundle
 
+env:
+  - DB=sqlite
+  - DB=postgres
+  - DB=mysql
+
 install:
-  - cp config/database.yml.example config/database.yml
   - bundle install --jobs 4 --path vendor/bundle
+  - mysql -e 'create database busybook'
+  - psql -c 'create database busybook' -U postgres
   - bundle exec rake db:migrate
   - bundle exec rake user:add username=guest password=123
 
