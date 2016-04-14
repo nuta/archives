@@ -20,9 +20,10 @@ deploy_resea_net() {
 
     git add -A
     git commit -m "$commit_msg"
-    git push --quiet "https://${GH_TOKEN}@github.com/resea/resea.github.io" master> /dev/null 2>&1
+    git push --quiet "https://${GH_TOKEN}@github.com/resea/resea.github.io" master> err 2>&1
     if [ "$?" != "0" ] ; then
         echo "failed to git push"
+	cat err
         exit 1
     fi
     echo "deployed"
