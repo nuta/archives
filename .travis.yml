@@ -14,7 +14,7 @@ cache:
 
 env:
   - DB=sqlite
-  - DB=postgres
+  - DB=postgresql
   - DB=mysql
 
 install:

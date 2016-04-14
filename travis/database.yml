@@ -3,7 +3,7 @@ sqlite: &sqlite
   database: db/test.sqlite3
 
 mysql: &mysql
-  adapter: mysql
+  adapter: mysql2
   username: root
 
 postgresql: &postgresql
