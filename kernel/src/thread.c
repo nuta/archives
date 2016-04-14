@@ -257,7 +257,7 @@ result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_si
     *r_thread = thread;
     *r_group  = group;
 
-    INFO("created a new thread #%d", thread);
+    INFO("created a new thread #%d:%d", group, thread);
     return OK;
 }
 

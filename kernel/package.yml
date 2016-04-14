@@ -51,6 +51,7 @@ config:
     set:
     - src/channel.c
     - src/channel.connect.c
+    - src/channel.register.c
     - src/datetime.c
     - src/datetime.delay.c
     - src/datetime.get_date.c

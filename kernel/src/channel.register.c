@@ -9,9 +9,9 @@
 #include "kernel.h"
 
 
-/** handles channel.connect */
-void kernel_channel_connect(channel_t __ch, uintmax_t channel, interface_t interface) {
+/** handles channel.register */
+void kernel_channel_register(channel_t __ch, uintmax_t channel, interface_t interface) {
 
-    kernel_connect_channel(channel, interface);
-    send_channel_connect_reply(__ch, OK);
+    kernel_register_channel(channel, interface);
+    send_channel_register_reply(__ch, OK);
 }

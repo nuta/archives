@@ -68,6 +68,10 @@ void kernel_channel_startup(void);
 ident_t kernel_alloc_channel_id(struct thread_group *group);
 result_t kernel_connect_channels(struct thread_group *group1, channel_t ch1,
                                struct thread_group *group2, channel_t ch2) ;
+result_t kernel_connect_channel(channel_t ch, interface_t interface);
+result_t kernel_register_channel(channel_t ch, interface_t interface);
+result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t dst);
+
 
 /*
  *  Datetime

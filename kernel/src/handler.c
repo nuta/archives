@@ -168,7 +168,16 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
     {
         DEBUG("received channel.connect");
             payload_t a0 = payloads[2];
-            kernel_channel_connect(__ch, (interface_t) a0);
+            payload_t a1 = payloads[3];
+            kernel_channel_connect(__ch, (uintmax_t) a0, (interface_t) a1);
+            return;
+    }
+    case SERVICE(channel, register):
+    {
+        DEBUG("received channel.register");
+            payload_t a0 = payloads[2];
+            payload_t a1 = payloads[3];
+            kernel_channel_register(__ch, (uintmax_t) a0, (interface_t) a1);
             return;
     }
     }

@@ -36,7 +36,7 @@ result_t sys_send(channel_t ch, payload_t *m) {
                  handler);
             handler(src->dest_ch, m);
         } else {
-            size_t size = 64; // XXX
+            size_t size = 24; // XXX
             INFO("send to queue: @%d:%d -> @%d:%d (queue=%p)",
                  src_group->id, ch, dest_group->id, src->dest_ch,
                  dest->buf);

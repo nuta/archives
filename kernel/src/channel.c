@@ -55,12 +55,12 @@ result_t kernel_connect_channels(struct thread_group *group1, channel_t ch1,
     group2->channels[ch2].dest    = group1->id;
     group2->channels[ch2].dest_ch = ch1;
 
-    DEBUG("connect @%d:%d => @%d:%d", group1->id, ch1, group2->id, ch2);
+    DEBUG("connect @%d:%d <=> @%d:%d", group1->id, ch1, group2->id, ch2);
     return OK;
 }
 
 
-result_t register_channel(channel_t ch, interface_t interface) {
+result_t kernel_register_channel(channel_t ch, interface_t interface) {
 
     lock_mutex(&servers_lock);
 
@@ -88,7 +88,7 @@ result_t register_channel(channel_t ch, interface_t interface) {
 }
 
 
-result_t connect_channel(channel_t ch, interface_t interface) {
+result_t kernel_connect_channel(channel_t ch, interface_t interface) {
     struct thread_group *current_group, *server_group;
     bool retried = false;
     channel_t server_new_ch;

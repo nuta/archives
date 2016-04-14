@@ -7,6 +7,7 @@
 
 static channel_t ch;
 
+// this startup() should be return
 void kernel_startup(void) {
     INFO("starting Resea");
     INFO("built on " __DATE__);
@@ -22,6 +23,7 @@ void kernel_startup(void) {
     register_channel(ch, INTERFACE(memory));
     register_channel(ch, INTERFACE(datetime));
     register_channel(ch, INTERFACE(channel));
+    INFO("created a kernel server at @%d", ch);
 
     hal_create_vm_space(&kernel_get_current_thread_group()->vm); /* XXX */
 }
