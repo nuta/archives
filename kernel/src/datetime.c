@@ -10,7 +10,7 @@ result_t kernel_get_date(uint32_t *year, uint32_t *date, uint32_t *nsec) {
 
     /* XXX */
     if (!datetime_device_ch) {
-        sys_open(&datetime_device_ch);
+        datetime_device_ch = sys_open();
         connect_channel(datetime_device_ch, INTERFACE(datetime_device));
     }
 

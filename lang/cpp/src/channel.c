@@ -8,8 +8,8 @@ channel_t connect_to_channel_server(void) {
     // a channel server
     channel_t client, server;
 
-    sys_open(&client);  // client (our) side
-    sys_open(&server);  // server side
+    client = sys_open();  // client (our) side
+    server = sys_open();  // server side
     sys_link(client, server);
     sys_transfer(server, 1);
 

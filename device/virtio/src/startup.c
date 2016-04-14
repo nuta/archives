@@ -11,7 +11,7 @@ handler_t virtio_handler;
 void virtio_startup(void) {
     channel_t ch;
 
-    sys_open(&ch);
+    ch = sys_open();
     sys_setoptions(ch, virtio_handler, NULL, 0);
 
     INFO("discovering virtio-blk");

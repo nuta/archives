@@ -18,7 +18,7 @@ void *allocMemory (size_t size, uint32_t flags) {
     uintptr_t p;
 
     if (!memory_ch) {
-        sys_open(&memory_ch);
+        memory_ch = sys_open();
         connect_channel(memory_ch, INTERFACE(memory));
     }
 

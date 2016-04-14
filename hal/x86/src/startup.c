@@ -6,6 +6,6 @@ static channel_t ch;
 
 void hal_startup(void) {
 
-    sys_open(&ch);
+    ch = sys_open();
     sys_setoptions(ch, &x86_handler, NULL, 0);
 }

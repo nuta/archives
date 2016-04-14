@@ -122,18 +122,18 @@ enum SyscallType{
 /*
  *  System calls
  */
-result_t sys_open(channel_t *ch);
+channel_t sys_open(void);
 result_t sys_close(channel_t ch);
 result_t sys_wait(channel_t ch);
 result_t sys_setoptions(channel_t id, handler_t handler, void *buffer, size_t size);
 result_t sys_send(channel_t ch, payload_t *m);
-result_t sys_recv(channel_t channel, payload_t **m);
+payload_t *sys_recv(channel_t channel);
 result_t sys_call(channel_t ch, payload_t *m, void *buffer, size_t buffer_size);
 result_t sys_link(channel_t ch1, channel_t ch2);
 result_t sys_transfer(channel_t ch1, channel_t ch2);
 
 /*
- *  channel_t
+ *  Channel
  */
 result_t connect_channel(channel_t ch, interface_t interface);
 result_t register_channel(channel_t ch, interface_t interface);

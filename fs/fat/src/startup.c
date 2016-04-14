@@ -38,11 +38,11 @@ void fat_startup(void) {
     channel_t ch;
 
     INFO("starting");
-    sys_open(&storage_device_ch);
+    storage_device_ch = sys_open();
     connect_channel(storage_device_ch, INTERFACE(storage_device));
     fat_opendisk(&fat_the_disk, storage_device_ch, read_disk, write_disk);
 
-    sys_open(&ch);
+    ch = sys_open();
     register_channel(ch, INTERFACE(fs));
     serve_channel(ch, fat_handler);
 }

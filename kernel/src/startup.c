@@ -17,7 +17,7 @@ void kernel_startup(void) {
     kernel_memory_startup();
     kernel_datetime_startup(); 
 
-    sys_open(&ch);
+    ch = sys_open();
     sys_setoptions(ch, &kernel_handler, NULL, 0);
     register_channel(ch, INTERFACE(thread));
     register_channel(ch, INTERFACE(memory));
