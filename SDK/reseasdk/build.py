@@ -189,6 +189,9 @@ def build(args):
     # generate makefile if needed
     makefile = config['BUILD_DIR'] + '/Makefile'
     if args.r or not os.path.exists(makefile):
+        for package, c in local_config.items():
+            local_config[package] = dict_to_strdict(c)
+
         with open(config['BUILD_DIR'] + '/Makefile', 'w') as f:
             f.write(render(MAKEFILE_TEMPLATE, locals()))
 
