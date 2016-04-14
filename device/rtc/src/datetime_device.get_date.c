@@ -16,8 +16,8 @@
 static uint8_t read_cmos(int reg) {
     uint8_t data;
 
-    io_write8(IO_IOSPACE_PORT, 0, 0x70, reg);
-    return io_read8(IO_IOSPACE_PORT, 0, 0x71);
+    io_write8(IO_SPACE_PORT, 0, 0x70, reg);
+    return io_read8(IO_SPACE_PORT, 0, 0x71);
 }
 
 

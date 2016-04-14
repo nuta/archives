@@ -10,7 +10,7 @@
 void fat_fs_open(channel_t __ch, 
        uchar_t* path,
        size_t path_size,
-       fs_FileMode mode) {
+       fs_filemode_t mode) {
 
     result_t result;
     ident_t file;

@@ -26,12 +26,12 @@ implements: []
 #  Type definitions
 #
 type:
-  IOSpace:
+  space:
     type: const
     size: uint8
     consts:
-      IOSPACE_PORT: 1
-      IOSPACE_MEM:  2
+      SPACE_PORT: 1
+      SPACE_MEM:  2
 
 #
 #  interface definitions
@@ -41,7 +41,7 @@ interface:
     id: 1
     payloads:
       - name: iospace
-        type: io(IOSpace)
+        type: io(space)
       - name: addr
         type: addr
       - name: size
@@ -58,6 +58,6 @@ interface:
     id: 3
     payloads:
       - name: iospace
-        type: io(IOSpace)
+        type: io(space)
       - name: addr
         type: addr

@@ -10,7 +10,7 @@
 #include "kernel.h"
 
 /** handles io.allocate */
-void kernel_io_allocate(channel_t __ch, io_IOSpace iospace, uintptr_t addr, size_t size) {
+void kernel_io_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size_t size) {
     uintptr_t vaddr;
 
     switch (iospace) {

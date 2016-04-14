@@ -60,7 +60,7 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             payload_t a0 = payloads[2];
             payload_t a1 = payloads[3];
             payload_t a2 = payloads[4];
-            kernel_io_allocate(__ch, (io_IOSpace) a0, (uintptr_t) a1, (size_t) a2);
+            kernel_io_allocate(__ch, (io_space_t) a0, (uintptr_t) a1, (size_t) a2);
             return;
     }
     case SERVICE(io, release):
@@ -68,7 +68,7 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
         DEBUG("received io.release");
             payload_t a0 = payloads[2];
             payload_t a1 = payloads[3];
-            kernel_io_release(__ch, (io_IOSpace) a0, (uintptr_t) a1);
+            kernel_io_release(__ch, (io_space_t) a0, (uintptr_t) a1);
             return;
     }
     case SERVICE(thread, create):

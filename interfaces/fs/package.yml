@@ -27,7 +27,7 @@ implements: [pager]
 #  Type definitions
 #
 type:
-  FileMode:
+  filemode:
     type: const
     size: uint32
     consts:
@@ -47,7 +47,7 @@ interface:
         type: Array<uchar>
         attrs: [readonly]
       - name: mode
-        type: fs(FileMode)
+        type: fs(filemode)
   open_reply:
     id: 2
     payloads:

@@ -143,17 +143,17 @@ def type_decl(interface_name, type_name, type_):
         s += "typedef struct{\n"
         for member in type_["members"]:
             s += "{type} {name};\n".format(**member)
-        s += "}} {}_{};\n".format(interface_name, type_name)
+        s += "}} {}_{}_t;\n".format(interface_name, type_name)
 
     elif type_["type"] == "const":
         size = type_["size"]
-        s += "typedef {} {}_{};\n".format(ctype(size), interface_name, type_name)
+        s += "typedef {} {}_{}_t;\n".format(ctype(size), interface_name, type_name)
         for name,val in type_["consts"].items():
             interface_name_ = interface_name.upper()
             s += "#define {interface_name_}_{name} ({val})\n".format(**locals())
 
     elif type_["type"] == "alias":
-        s += "typedef {} {}_{};\n".format(ctype(type_["alias_of"]),
+        s += "typedef {} {}_{}_t;\n".format(ctype(type_["alias_of"]),
                                           interface_name, type_name)
 
     else:

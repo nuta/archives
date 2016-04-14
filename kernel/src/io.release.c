@@ -8,7 +8,7 @@
 #include <resea/pager.h>
 
 /** handles io.release */
-void kernel_io_release(channel_t __ch, io_IOSpace iospace, uintptr_t addr) {
+void kernel_io_release(channel_t __ch, io_space_t iospace, uintptr_t addr) {
 
     // TODO
 }

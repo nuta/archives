@@ -17,7 +17,7 @@ void fat_handler(channel_t __ch, payload_t *payloads) {
         DEBUG("received fs.open");
             payload_t a0 = payloads[2];
             payload_t a1 = payloads[3];
-            fat_fs_open(__ch, (uchar_t*) a0, (fs_FileMode) a1);
+            fat_fs_open(__ch, (uchar_t*) a0, (fs_filemode_t) a1);
             return;
     }
     case SERVICE(fs, close):

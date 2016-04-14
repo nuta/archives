@@ -39,6 +39,6 @@ def ctype(type_):
     # foo(Bar)
     m = re.match('([a-zA-Z0-9_]+)\(([a-zA-Z0-9_]+)\)', type_)
     if m is not None:
-        return '{}_{}'.format(m.group(1), m.group(2))
+        return '{}_{}_t'.format(m.group(1), m.group(2))
 
     sys.exit("error: unknown type: '{}'".format(type_))

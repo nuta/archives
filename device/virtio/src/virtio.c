@@ -152,7 +152,7 @@ int virtio_setup_device(struct virtio_device *device, struct pci_device *pci){
     /* get iospace and iobase from BAR0 in the PCI config space */
     bar0 = pci_read_config32(pci, PCI_CONFIG_BAR0);
     device->iobase  = bar0 & 0xfffffffc;
-    device->iospace = (bar0 & 1)? IO_IOSPACE_PORT : IO_IOSPACE_MEM;
+    device->iospace = (bar0 & 1)? IO_SPACE_PORT : IO_SPACE_MEM;
   
     /* reset */
     io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, 0x00);

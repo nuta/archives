@@ -1,5 +1,5 @@
 #include <resea.h>
-void fat_fs_open(channel_t __ch, uchar_t* a0, fs_FileMode a1);
+void fat_fs_open(channel_t __ch, uchar_t* a0, fs_filemode_t a1);
 void fat_fs_close(channel_t __ch, ident_t a0);
 void fat_fs_read(channel_t __ch, ident_t a0, offset_t a1);
 void fat_fs_write(channel_t __ch, ident_t a0, offset_t a1, void * a2);
