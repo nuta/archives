@@ -1,39 +1,36 @@
 #include <resea.h>
+#include <resea/channel.h>
 
-#ifndef KERNEL
-/**
- *  Creates a new channel to a server
- *
- *  @param[in]  interface  The interface of a server to be connected.
- *  @param[out] ch         The channel to be set up.
- *
- *  @note  In a same executable of core package, this symbol will be overwritten
- *         by core's implementation. Namely, it calls core directly.
- *
- */
+
+channel_t connect_to_channel_server(void) {
+
+    // we assume that the first (1) channel is listened by
+    // a channel server
+    channel_t client, server;
+
+    sys_open(&client);  // client (our) side
+    sys_open(&server);  // server side
+    sys_link(client, server);
+    sys_transfer(server, 1);
+
+    return client;
+}
+
+
 result_t connect_channel(channel_t ch, interface_t interface) {
+    result_t r;
 
-    WARN("connect_channel() is not implemented yet");
-    return E_NOTSUPPORTED;
+    call_channel_connect(connect_to_channel_server(), ch, interface, &r);
+    return r;
 }
 
 
-/**
- *  Registers a new server
- *
- *  @param[in] channel   The channel ID of the thread group to be registered.
- *  @param[in] interface  The interface of the server.
- *
- *  @note  In a same executable of core package, this symbol will be overwritten
- *         by core's implementation. Namely, it calls core directly.
- *
- */
 result_t register_channel(channel_t ch, interface_t interface) {
+    result_t r;
 
-    WARN("register_channel() is not implemented yet");
-    return E_NOTSUPPORTED;
+    call_channel_register(connect_to_channel_server(), ch, interface, &r);
+    return r;
 }
-#endif
 
 
 /**
