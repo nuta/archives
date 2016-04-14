@@ -1,5 +1,7 @@
 #include <hal.h>
 #include <resea.h>
+#include <resea/cpp/io.h>
+#include <resea/cpp/memory.h>
 #include <resea/pager.h>
 #include <string.h>
 #include "kernel.h"

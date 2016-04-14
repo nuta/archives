@@ -1,5 +1,6 @@
 #include <hal.h>
 #include <resea.h>
+#include <resea/cpp/memory.h>
 
 
 static void set_page_attrs (uint64_t *page, page_attrs_t attrs) {
@@ -37,7 +38,7 @@ static paddr_t lookup_page_entry (struct vm_space *vms, uintptr_t v, bool alloca
                 paddr_t paddr;
 
                 allocPhysicalMemory(0, sizeof(uint64_t) * PAGE_ENTRY_NUM,
-                  ALLOCMEM_PAGE_ALIGNED | ALLOCMEM_CONTINUOUS,
+                  MEMORY_ALLOCMEM_PAGE_ALIGNED | MEMORY_ALLOCMEM_CONTINUOUS,
                   &paddr);
 
                 t[idx] = paddr;

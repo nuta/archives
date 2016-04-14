@@ -34,6 +34,15 @@ type:
       MAP_READ:  0x0001
       MAP_WRITE: 0x0002
       MAP_EXEC:  0x0004
+  allocmem:
+    type: const
+    size: uint16
+    consts:
+      ALLOCMEM_NORMAL:       0x0000  # no requirements
+      ALLOCMEM_PAGE_ALIGNED: 0x0001  # aligned to PAGE_SIZE */
+      ALLOCMEM_CONTINUOUS:   0x0004 # straight in physical memory space
+      ALLOCMEM_ZEROED:       0x0008 # zero-filled
+      ALLOCMEM_USER:         0x0010 # map in user virtual memory, used by kernel
 
 interface:
   map:

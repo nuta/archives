@@ -14,10 +14,10 @@ void kernel_io_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size
     uintptr_t vaddr;
 
     switch (iospace) {
-    case IOSPACE_PORT: // TODO: permit
+    case IO_SPACE_PORT: // TODO: permit
         vaddr = addr;
 	break;
-    case IOSPACE_MEM:
+    case IO_SPACE_MEM:
 	vaddr = kernel_vmalloc(size);
         hal_link_page(&kernel_get_current_thread_group()->vm, vaddr,
 	              size / PAGE_SIZE, addr, PAGE_PRESENT | PAGE_WRITABLE);

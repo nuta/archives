@@ -2,6 +2,7 @@
 #include <resea/fat.h>
 #include <resea/fs.h>
 #include <resea/pager.h>
+#include <resea/cpp/memory.h>
 #include "fat.h"
 #include "file.h"
 
@@ -16,7 +17,7 @@ void fat_fs_read(channel_t __ch,
     void* data;
     size_t r_size;
 
-    data   = allocMemory(size, ALLOCMEM_NORMAL); // TODO: free on failure
+    data   = allocMemory(size, MEMORY_ALLOCMEM_NORMAL); // TODO: free on failure
     result = fat_read(&fat_the_disk, fat_get_file_by_id(file),
                       offset, data, size, &r_size);
 

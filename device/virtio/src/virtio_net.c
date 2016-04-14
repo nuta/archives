@@ -1,5 +1,7 @@
-#include <resea.h>
 #include <string.h>
+#include <resea.h>
+#include <resea/cpp/io.h>
+#include <resea/cpp/memory.h>
 #include "pci.h"
 #include "virtio.h"
 #include "virtio_net.h"
@@ -26,7 +28,7 @@ result_t virtio_net_transmit(void *data, size_t size) {
     rs[0].size  = sizeof(header);
     rs[0].flags = 0; // READONLY
 
-    addr = PTR2ADDR(allocPhysicalMemory(0, size, ALLOCMEM_CONTINUOUS, &paddr));
+    addr = PTR2ADDR(allocPhysicalMemory(0, size, MEMORY_ALLOCMEM_CONTINUOUS, &paddr));
     memcpy((void *) addr, data, size);
 
     rs[1].data  = paddr;
@@ -60,7 +62,7 @@ retry:
 
     // addr is a physical address so we must convert it to a virtual address
     *size = desc->len;
-    *data = allocMemory(*size, ALLOCMEM_NORMAL);
+    *data = allocMemory(*size, MEMORY_ALLOCMEM_NORMAL);
 
     /* the magic number '10' in 2nd arg. is the size of virtio-net's packet header */
     memcpy(*data,
@@ -114,7 +116,7 @@ bool virtio_net_init(void){
       fill_num = 128;
 
   dma_addr = PTR2ADDR(allocPhysicalMemory(0, 0x800 * fill_num,
-                                          ALLOCMEM_CONTINUOUS, &dma_paddr));
+                                          MEMORY_ALLOCMEM_CONTINUOUS, &dma_paddr));
 
   INFO("virtio-net: filling avail_ring to receive packets (num=%d)", fill_num);
   INFO("virtio-net: avail_ring dma_addr=%p, dma_paddr=%p", dma_addr, dma_paddr);

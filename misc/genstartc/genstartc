@@ -6,6 +6,7 @@ import jinja2
 
 TEMPLATE = """
 #include <resea.h>
+#include <resea/memory.h>
 #undef PACKAGE_NAME
 #define PACKAGE_NAME "start_apps"
 #define DEFAULT_THREAD_SIZE 0x4000
@@ -48,12 +49,12 @@ void start_apps(void){
 {% if test %}
     kernel_set_thread(thread,
                     (uintptr_t) app_entrypoint, (uintptr_t) {{ app }}_test,
-                    (uintptr_t) kernel_allocate_memory(DEFAULT_THREAD_SIZE, ALLOCMEM_NORMAL),
+                    (uintptr_t) kernel_allocate_memory(DEFAULT_THREAD_SIZE, MEMORY_ALLOCMEM_NORMAL),
                     DEFAULT_THREAD_SIZE);
 {% else %}
     kernel_set_thread(thread,
                     (uintptr_t) app_entrypoint, (uintptr_t) {{ app }}_startup,
-                    (uintptr_t) kernel_allocate_memory(DEFAULT_THREAD_SIZE, ALLOCMEM_NORMAL),
+                    (uintptr_t) kernel_allocate_memory(DEFAULT_THREAD_SIZE, MEMORY_ALLOCMEM_NORMAL),
                     DEFAULT_THREAD_SIZE);
     kernel_set_thread_status(thread, THREAD_RUNNABLE);
 {% endif %}

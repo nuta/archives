@@ -1,7 +1,8 @@
 #include "virtio.h"
 #include "pci.h"
 #include <resea.h>
-#include <resea/io.h>
+#include <resea/cpp/io.h>
+#include <resea/cpp/memory.h>
 
 
 /**
@@ -238,7 +239,7 @@ int virtio_init_queue(struct virtio_device *device, int queue_index) {
                  sizeof(struct virtio_desc)*queue->queue_num;
   
     buf = allocPhysicalMemory(0, queue_size,
-                              ALLOCMEM_PAGE_ALIGNED | ALLOCMEM_CONTINUOUS, &phy_buf);
+                              MEMORY_ALLOCMEM_PAGE_ALIGNED | MEMORY_ALLOCMEM_CONTINUOUS, &phy_buf);
   
     queue->number = queue_index;
   

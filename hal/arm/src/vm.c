@@ -2,11 +2,6 @@
 #include <resea.h>
 
 
-void x86_init_vm(void) {
-
-}
-
-
 void hal_create_vm_space(struct vm_space *vms) {
 
     WARN("hal_create_vm_space(): is not supported");

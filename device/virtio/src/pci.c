@@ -1,5 +1,7 @@
 #include "pci.h"
-#include <resea/io.h>
+#include <resea.h>
+#include <resea/cpp/memory.h>
+#include <resea/cpp/io.h>
 
 #define PCI_IO_ADDR 0x0cf8
 #define PCI_IO_DATA 0x0cfc

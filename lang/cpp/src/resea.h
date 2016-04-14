@@ -49,7 +49,7 @@ enum result_tValue{
 };
 
 // TODO: decorate these in payload header
-#define MOVE(p) ((void *) (PTR2ADDR(p) | 1))
+#define MOVE(p) ((void *) ((uintptr_t) (p) | 1))
 #define OURS_CHANNEL()
 #define THEIRS_CHANNEL()
 
@@ -138,41 +138,5 @@ result_t sys_transfer(channel_t ch1, channel_t ch2);
 result_t connect_channel(channel_t ch, interface_t interface);
 result_t register_channel(channel_t ch, interface_t interface);
 NORETURN void serve_channel(channel_t ch, handler_t handler);
-
-
-/*
- *  IO
- */
-#define MEMORY_BARRIER() __asm__ __volatile__("": : :"memory")
-#define PTR2ADDR(x) ((uintptr_t) (x))
-
-
-// TODO: remove
-enum iospace_type{
-  IOSPACE_PORT = 1, // port mapped IO
-  IOSPACE_MEM  = 2, // memory mapped IO
-};
-
-uint8_t io_read8(enum iospace_type iospace, uintmax_t base, offset_t offset);
-uint16_t io_read16(enum iospace_type iospace, uintmax_t base, offset_t offset);
-uint32_t io_read32(enum iospace_type iospace, uintmax_t base, offset_t offset);
-void io_write8(enum iospace_type iospace, uintmax_t base, offset_t offset, uint8_t data);
-void io_write16(enum iospace_type iospace, uintmax_t base, offset_t offset, uint16_t data);
-void io_write32(enum iospace_type iospace, uintmax_t base, offset_t offset, uint32_t data);
-
-/*
- * Memory
- */
-enum{
-  ALLOCMEM_NORMAL       = 0,        /* no requirements */
-  ALLOCMEM_PAGE_ALIGNED = (1 << 1), /* aligned to PAGE_SIZE */
-  ALLOCMEM_CONTINUOUS   = (1 << 2), /* straight in physical memory space */
-  ALLOCMEM_ZEROED       = (1 << 3), /* zero-filled */
-  ALLOCMEM_USER         = (1 << 4), /* map in user virtual memory, used by kernel */
-};
-
-void *allocMemory(size_t size, uint32_t flags);
-void freeMemory(void *p);
-void *allocPhysicalMemory(paddr_t addr, size_t size, uint32_t flags, paddr_t *alloced_addr); // TODO: remove
 
 #endif
