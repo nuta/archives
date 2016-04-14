@@ -321,18 +321,14 @@ NORETURN void kernel_start_threading(void) {
  *  Initializes the threading system
  */
 void kernel_thread_startup(void) {
+    ident_t group, thread;
 
     INFO("initializing the thread system");
 
-    /* create the kernel's thread group and a temporary thread */
-    thread_groups[1].id  = 1;
-    thread_groups[1].num = 1;
-    thread_groups[1].vm.areas_num = 0;
-    init_mutex(&thread_groups[1].lock, MUTEX_UNLOCKED);
-
-    threads[0].status = THREAD_BLOCKED;
-    threads[0].group  = &thread_groups[1];
-    hal_set_current_thread_id(0);
+    // create the kernel's thread group and a temporary thread
+    kernel_create_thread(0, NULL, 0, &thread, &group);
+    hal_set_current_thread_id(thread);
+    DEBUG("set current thread:#%d.%d", group, thread);
 
     hal_set_callback(HAL_CALLBACK_TIMER_TICK, kernel_hard_switch_thread);
 }

@@ -13,8 +13,8 @@ void kernel_startup(void) {
     INFO("built on " __DATE__);
 
     kernel_channel_startup();
-    kernel_thread_startup();
     kernel_memory_startup();
+    kernel_thread_startup();
     kernel_datetime_startup(); 
 
     ch = sys_open();
@@ -24,7 +24,5 @@ void kernel_startup(void) {
     register_channel(ch, INTERFACE(datetime));
     register_channel(ch, INTERFACE(channel));
     INFO("created a kernel server at @%d", ch);
-
-    hal_create_vm_space(&kernel_get_current_thread_group()->vm); /* XXX */
 }
 
