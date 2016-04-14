@@ -25,7 +25,7 @@ void hal_set_thread(struct hal_thread *t, bool is_kernel,
     t->regs.rsp    = (uint64_t) stack + stack_size;
     t->regs.rip    = (uint64_t) entry;
     t->regs.rdi    = (uint64_t) arg; // the 1st argument
-    t->fregs       = kernel_allocate_memory(XSAVE_AREA_SIZE, MEMORY_ALLOCMEM_PAGE_ALIGNED);
+    t->fregs       = kernel_allocate_memory(XSAVE_AREA_SIZE, MEMORY_ALLOC_PAGE_ALIGNED);
 
     if (!is_kernel) {
         t->regs.cs = USER_CODE64_SEG | 3;

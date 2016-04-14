@@ -48,7 +48,7 @@ result_t virtio_blk_write(uintmax_t sector, size_t n, const void *data) {
 
     DEBUG("write: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
   
-    header = allocPhysicalMemory(0, sizeof(*header), MEMORY_ALLOCMEM_CONTINUOUS,
+    header = allocPhysicalMemory(0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
                                  &header_paddr);
     header->type   = VIRTIO_BLK_WRITE;
     header->sector = sector;
@@ -56,14 +56,14 @@ result_t virtio_blk_write(uintmax_t sector, size_t n, const void *data) {
     rs[0].size  = sizeof(*header);
     rs[0].flags = 0; // READONLY
   
-    buf = allocPhysicalMemory(0, data_size, MEMORY_ALLOCMEM_CONTINUOUS, &paddr);
+    buf = allocPhysicalMemory(0, data_size, MEMORY_ALLOC_CONTINUOUS, &paddr);
     memcpy(buf, data, data_size);
     INFO("buf=%p, data=%p, size=%d (%s)", buf, data, data_size, data);
     rs[1].data  = (uint64_t) paddr;
     rs[1].size  = data_size;
     rs[1].flags = 0; // READONLY
   
-    allocPhysicalMemory(0, sizeof(*status), MEMORY_ALLOCMEM_CONTINUOUS, &status_paddr);
+    allocPhysicalMemory(0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS, &status_paddr);
     rs[2].data  = (uint64_t) status_paddr;
     rs[2].size  = sizeof(*status);
     rs[2].flags = VIRTIO_DESC_F_WRITE;
@@ -85,7 +85,7 @@ result_t virtio_blk_read(uintmax_t sector, size_t n, void **data) {
  
     DEBUG("read: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
  
-    header = allocPhysicalMemory(0, sizeof(*header), MEMORY_ALLOCMEM_CONTINUOUS,
+    header = allocPhysicalMemory(0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
                                  &header_paddr);
     header->type   = VIRTIO_BLK_READ;
     header->sector = sector;
@@ -93,12 +93,12 @@ result_t virtio_blk_read(uintmax_t sector, size_t n, void **data) {
     rs[0].size  = sizeof(*header);
     rs[0].flags = 0; // READONLY
   
-    buf = allocPhysicalMemory(0, data_size, MEMORY_ALLOCMEM_CONTINUOUS, &paddr);
+    buf = allocPhysicalMemory(0, data_size, MEMORY_ALLOC_CONTINUOUS, &paddr);
     rs[1].data  = (uint64_t) paddr;
     rs[1].size  = data_size;
     rs[1].flags = VIRTIO_DESC_F_WRITE;
   
-    allocPhysicalMemory(0, sizeof(*status), MEMORY_ALLOCMEM_CONTINUOUS, &status_paddr);
+    allocPhysicalMemory(0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS, &status_paddr);
     rs[2].data  = (uint64_t) status_paddr;
     rs[2].size  = sizeof(*status);
     rs[2].flags = VIRTIO_DESC_F_WRITE;

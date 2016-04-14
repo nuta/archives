@@ -38,7 +38,7 @@ static paddr_t lookup_page_entry (struct vm_space *vms, uintptr_t v, bool alloca
                 paddr_t paddr;
 
                 allocPhysicalMemory(0, sizeof(uint64_t) * PAGE_ENTRY_NUM,
-                  MEMORY_ALLOCMEM_PAGE_ALIGNED | MEMORY_ALLOCMEM_CONTINUOUS,
+                  MEMORY_ALLOC_PAGE_ALIGNED | MEMORY_ALLOC_CONTINUOUS,
                   &paddr);
 
                 t[idx] = paddr;

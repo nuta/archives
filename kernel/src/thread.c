@@ -131,7 +131,7 @@ static ident_t create_thread_group(void) {
 
     g = kernel_get_thread_group(id);
     g->id                = id;
-    g->vm.dynamic_vpages = kernel_allocate_memory(kernel_get_dynamic_vpages_num(), MEMORY_ALLOCMEM_NORMAL);
+    g->vm.dynamic_vpages = kernel_allocate_memory(kernel_get_dynamic_vpages_num(), MEMORY_ALLOC_NORMAL);
     g->vm.areas_num      = 0;
     g->num               = 0;
 
