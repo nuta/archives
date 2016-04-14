@@ -113,7 +113,9 @@ enum SyscallType{
   SYSCALL_SEND       = 5,
   SYSCALL_RECV       = 6,
   SYSCALL_WAIT       = 7,
-  SYSCALL_CALL       = 8
+  SYSCALL_CALL       = 8,
+  SYSCALL_LINK       = 9,
+  SYSCALL_TRANSFER   = 10,
 };
 
 
@@ -127,7 +129,8 @@ result_t sys_setoptions(channel_t id, handler_t handler, void *buffer, size_t si
 result_t sys_send(channel_t ch, payload_t *m);
 result_t sys_recv(channel_t channel, payload_t **m);
 result_t sys_call(channel_t ch, payload_t *m, void *buffer, size_t buffer_size);
-
+result_t sys_link(channel_t ch1, channel_t ch2);
+result_t sys_transfer(channel_t ch1, channel_t ch2);
 
 /*
  *  channel_t

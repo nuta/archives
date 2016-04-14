@@ -99,6 +99,44 @@ result_t sys_setoptions(channel_t channel, handler_t *handler, void *buffer, siz
 }
 
 
+result_t sys_link(channel_t ch1, channel_t ch2) {
+    struct thread_group *g;
+
+    g = kernel_get_current_thread_group();
+    if (ch1 > CHANNELS_MAX || !g->channels[ch1].used) {
+        WARN("invalid channel ID");
+        return E_INVALID;
+    }
+
+    if (ch2 > CHANNELS_MAX || !g->channels[ch2].used) {
+        WARN("invalid channel ID");
+        return E_INVALID;
+    }
+
+    kernel_connect_channels(g, ch1, g, ch2);
+    return OK;
+}
+
+
+result_t sys_transfer(channel_t ch1, channel_t ch2) {
+    struct thread_group *g;
+
+    g = kernel_get_current_thread_group();
+    if (ch1 > CHANNELS_MAX || !g->channels[ch1].used) {
+        WARN("invalid channel ID");
+        return E_INVALID;
+    }
+
+    if (ch2 > CHANNELS_MAX || !g->channels[ch2].used) {
+        WARN("invalid channel ID");
+        return E_INVALID;
+    }
+
+    kernel_transfer_to(g, ch1, ch2);
+    return OK;
+}
+
+
 result_t sys_open(channel_t *ch) {
 
     *ch = kernel_alloc_channel_id(kernel_get_current_thread_group());
@@ -146,6 +184,14 @@ result_t kernel_syscall(enum SyscallType type, uintmax_t r1, uintmax_t r2, uintm
      case SYSCALL_CALL:
         DEBUG("syscall: call(%p, %p)", (void *) r1, (void *) r2);
         r = sys_call((channel_t) r1, (payload_t *) r2, (void *) r3, (size_t) r4);
+        break;
+    case SYSCALL_LINK:
+        DEBUG("syscall: link(%d, %d)", r1, r2);
+        r = sys_link((channel_t) r1, (channel_t) r2);
+        break;
+    case SYSCALL_TRANSFER:
+        DEBUG("syscall: transfer(%d, %d)", r1, r2);
+        r = sys_transfer((channel_t) r1, (channel_t) r2);
         break;
     default:
         WARN("syscall: unknown type: %d", type);
