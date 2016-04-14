@@ -2,7 +2,7 @@
 set -e
 
 deploy_resea_net() {
-    commit_msg="auto deploy: $(git log --format=%B -n1|tr -d '\n')"
+    commit_msg="resea: $(git log --format=%B -n1|tr -d '\n')"
 
     git clone https://github.com/resea/resea.github.io
     reseasdk alldocs --outdir resea.net/docs/master
