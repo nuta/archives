@@ -1,17 +1,20 @@
 #include <resea.h>
 #include <resea/channel.h>
 
-
-channel_t connect_to_channel_server(void) {
-
-    // we assume that the first (1) channel is listened by
-    // a channel server
+/**
+ *  Connects to a thread group local channel
+ *
+ *  @param[in] id  The server's channel.
+ *  @return A client side channel connected to the server.
+ *
+ */
+channel_t connect_to_local(channel_t id) {
     channel_t client, server;
 
     client = sys_open();  // client (our) side
     server = sys_open();  // server side
     sys_link(client, server);
-    sys_transfer(server, 1);
+    sys_transfer(server, id);
 
     return client;
 }
@@ -20,7 +23,8 @@ channel_t connect_to_channel_server(void) {
 result_t connect_channel(channel_t ch, interface_t interface) {
     result_t r;
 
-    call_channel_connect(connect_to_channel_server(), ch, interface, &r);
+    // we assume that the first (1) channel is listened by a channel server
+    call_channel_connect(connect_to_local(1), ch, interface, &r);
     return r;
 }
 
@@ -28,7 +32,8 @@ result_t connect_channel(channel_t ch, interface_t interface) {
 result_t register_channel(channel_t ch, interface_t interface) {
     result_t r;
 
-    call_channel_register(connect_to_channel_server(), ch, interface, &r);
+    // we assume that the first (1) channel is listened by a channel server
+    call_channel_register(connect_to_local(1), ch, interface, &r);
     return r;
 }
 
