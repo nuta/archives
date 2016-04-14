@@ -120,7 +120,7 @@ def load_yaml(path, validator=None):
     yml = yaml.safe_load(open(path))
     if validator is not None:
         try:
-            validator(yml)
+            yml = validator(yml)
         except ValidationError as e:
             error("validation error in '{}': {}".format(path, str(e)))
     return yml

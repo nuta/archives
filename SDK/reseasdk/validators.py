@@ -33,65 +33,75 @@ def validate_package_yml(d):
         desc = 'name should matches /^[a-zA-Z][a-z0-9_]*$/'
         assert re.match('^[a-zA-Z][a-zA-Z0-9_]*$', d['name'])
 
-        for x in ['requires', 'implements']:
+        for x in ['requires', 'implements', 'uses', 'conflicts']:
+            if x not in d or d[x] is None:
+                d[x] = []
             desc = '{} should be a list'.format(x)
             assert isinstance(d[x], list)
 
+        for x in ['interface', 'type']:
+            if x not in d or d[x] is None:
+                d[x] = {}
+            desc = '{} should be a dict'.format(x)
+            assert isinstance(d[x], dict)
+
+        # category
         cats = ['application', 'library', 'interface', 'group', 'misc']
         desc = 'category should be one of the following: {}'.format(
             ', '.join(cats))
         assert d['category'] in cats
 
-        if d['interface'] is not None:
-            desc = "'interface' should be a dict"
-            assert isinstance(d['interface'], dict)
+        # interface
+        for name, i in d['interface'].items():
+            desc = '.{}: service name should matches ' \
+                   '/^[a-z][a-zA-Z0-9_]*$/'.format(name)
+            assert re.match('^[a-z][a-zA-Z0-9_]*$', name)
 
-            for name, i in d['interface'].items():
-                desc = '.{}: service name should matches ' \
-                       '/^[a-z][a-zA-Z0-9_]*$/'.format(name)
-                assert re.match('^[a-z][a-zA-Z0-9_]*$', name)
+            desc = ".{}: service should have 'payloads'" \
+                   "and 'id'".format(name)
+            assert 'payloads' in i and 'id' in i
 
-                desc = ".{}: service should have 'payloads'" \
-                       "and 'id'".format(name)
-                assert 'payloads' in i and 'id' in i
+            desc = '.{}: service ID should an int and it should be' \
+                   'larger than 0'.format(name)
+            assert isinstance(i['id'], int) and i['id'] > 0
 
-                desc = '.{}: service ID should an int and it should be' \
-                       'larger than 0'.format(name)
-                assert isinstance(i['id'], int) and i['id'] > 0
+            desc = ".{}: 'payloads' should be a list or None".format(name)
+            assert isinstance(i['payloads'], list) or i['payloads'] is None
+            if i['payloads'] is not None:
+               for x in i['payloads']:
+                   desc = ".{}: interface should have" \
+                          "'name' and 'type'".format(name)
+                   assert 'name' in x and 'type' in x
 
-                desc = ".{}: 'payloads' should be a list or None".format(name)
-                assert isinstance(i['payloads'], list) or i['payloads'] is None
-                if i['payloads'] is not None:
-                   for x in i['payloads']:
-                       desc = ".{}: interface should have" \
-                              "'name' and 'type'".format(name)
-                       assert 'name' in x and 'type' in x
+                   desc = '.{}({}): payload name should matches ' \
+                          '/^[a-z][a-zA-Z0-9_]*$/'.format(
+                              name, x['name'])
+                   assert re.match('^[a-z][a-zA-Z0-9_]*$', x['name'])
 
-                       desc = '.{}({}): payload name should matches ' \
-                              '/^[a-z][a-zA-Z0-9_]*$/'.format(
-                                  name, x['name'])
-                       assert re.match('^[a-z][a-zA-Z0-9_]*$', x['name'])
+        # type
+        for name, t in d['type'].items():
+            desc = '.{}: interface name should matches ' \
+                   '/^[a-z][a-zA-Z0-9_]*$/'.format(name)
+            assert re.match('^[a-zA-Z][a-zA-Z0-9_]*$', name)
 
-        if d['type'] is not None:
-            desc = "'type' should be a dict"
-            assert isinstance(d['type'], dict)
+            desc = "{}: type should have 'type'".format(name)
+            assert 'type' in t
 
-            for name, t in d['type'].items():
-                desc = '.{}: interface name should matches ' \
-                       '/^[a-z][a-zA-Z0-9_]*$/'.format(name)
-                assert re.match('^[a-zA-Z][a-zA-Z0-9_]*$', name)
+            if t['type'] == 'const':
+                desc = "{}: type should have 'size'".format(name)
+                assert 'size' in t
+                desc = "{}: const type should have 'consts'".format(name)
+                assert 'consts' in t
+            else:
+                desc = "{}: unknown type: '{}'".format(name, t['type'])
+                assert False
 
-                desc = "{}: type should have 'type'".format(name)
-                assert 'type' in t
+        # config
+        for x in ['config', 'global_config']:
+            if isinstance(d.get(x), dict):
+                d[x] = [d[x]]
 
-                if t['type'] == 'const':
-                    desc = "{}: type should have 'size'".format(name)
-                    assert 'size' in t
-                    desc = "{}: const type should have 'consts'".format(name)
-                    assert 'consts' in t
-                else:
-                    desc = "{}: unknown type: '{}'".format(name, t['type'])
-                    assert False
+        return d
 
     except (KeyError, IndexError, AssertionError) as e:
         raise ValidationError(desc)

@@ -125,9 +125,16 @@ def load_packages(builtin_packages, config=None):
 
         if package in builtin_packages:
             # load global config
-            for k,v in yml.get('global_config', {}).items():
-                if v.get('default'):
-                    config[k] = v['default']
+            for cs in yml.get('global_config', []):
+                if cs.get('if') and not eval(cs['if'], config):
+                    continue
+
+                for k,v in cs.items():
+                    if k == 'if':
+                        continue
+
+                    if v.get('default'):
+                        config[k] = v['default']
         else:
             if package in builtin_packages:
                 builtin_packages.append(package)
@@ -137,35 +144,49 @@ def load_packages(builtin_packages, config=None):
         config['STUBS'].append(package)
 
         # load global config
-        for k,v in yml.get('global_config', {}).items():
-            if v.get('append'):
-                val = v['append']
-                if isinstance(val, dict):
-                    config[k].update(val)
+        for cs in yml.get('global_config', []):
+            if cs.get('if') and not eval(cs['if'], config):
+                continue
+
+            for k,v in cs.items():
+                if k == 'if':
+                    continue
+
+                if v.get('append'):
+                    val = v['append']
+                    if isinstance(val, dict):
+                        config[k].update(val)
+                    else:
+                        error("unexpected global_config type: '{}'".format(type(val)))
+                elif v.get('append_words'):
+                    config[k] = config[k].strip() + ' ' + v['append_words'].strip()
+                elif v.get('default'):
+                    pass
                 else:
-                    error("unexpected global_config type: '{}'".format(type(val)))
-            elif v.get('append_words'):
-                config[k] = config[k].strip() + ' ' + v['append_words'].strip()
-            elif v.get('default'):
-                pass
-            else:
-                error("unsupported global_config: '{}'".format(repr(v)))
+                    error("unsupported global_config: '{}'".format(repr(v)))
 
         if yml['category'] in ['application', 'library']:
             # load config
             local_config[package] = {}
-            for k,v in yml.get('config', {}).items():
-                if v.get('append'):
-                    local_config[package][k] = config[k] + v['append']
-                elif v.get('set'):
-                    if k == 'SOURCES':
-                        for src in v['set']:
-                            obj = os.path.splitext(src)[0] + '.o'
-                            config['OBJS'].append(os.path.join(config['BUILD_DIR'], package, obj))
-                    if k == 'LIBS':
-                        config['LIBS'] += v['set']
+            for cs in yml.get('config', []):
+                if cs.get('if') and not eval(cs['if'], config):
+                    continue
+
+                for k,v in cs.items():
+                    if k == 'if':
+                        continue
+
+                    if v.get('append'):
+                        local_config[package][k] = config[k] + v['append']
+                    elif v.get('set'):
+                        if k == 'SOURCES':
+                            for src in v['set']:
+                                obj = os.path.splitext(src)[0] + '.o'
+                                config['OBJS'].append(os.path.join(config['BUILD_DIR'], package, obj))
+                        if k == 'LIBS':
+                            config['LIBS'] += v['set']
+                        else:
+                            local_config[package][k] = v['set']
                     else:
-                        local_config[package][k] = v['set']
-                else:
-                    error("invalid local config: '{}' (expected set or append)".format(k))
+                            error("invalid local config: '{}' (expected set or append)".format(k))
     return config, local_config
