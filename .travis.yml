@@ -19,8 +19,8 @@ env:
 
 install:
   - cp travis/database.yml config/database.yml
-  - mysql -e 'create database busybook'
-  - psql -c 'create database busybook' -U postgres
+  - mysql -e 'create database busybook_test'
+  - psql -c 'create database busybook_test' -U postgres
   - bundle install --jobs 4 --path vendor/bundle
   - bundle exec rake db:migrate
   - bundle exec rake user:add username=guest password=123
