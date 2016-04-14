@@ -7,6 +7,7 @@ debug:
 	py.test -v --doctest-modules --pdb $(TEST_TARGET_DIRS)
 
 install:
+	make clean
 	python3 setup.py install
 	make clean
 
