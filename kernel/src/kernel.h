@@ -21,11 +21,12 @@ struct channel {
 };
 
 struct thread_group {
-    ident_t    id;
-    size_t  num; /* the number of threads belong to */
-    mutex_t lock;
-    struct vm_space vm;
-    struct channel channels[CHANNELS_MAX];
+    ident_t  id;
+    size_t   num; // the number of threads belong to
+    bool     used;
+    mutex_t  lock;
+    struct   vm_space vm;
+    struct   channel channels[CHANNELS_MAX];
 };
 
 struct thread {

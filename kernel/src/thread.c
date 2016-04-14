@@ -101,17 +101,16 @@ static ident_t alloc_thread_group_id(void) {
     lock_mutex(&lock);
 
     for (i=1; i < THREAD_NUM_MAX; i++) {
-        if (thread_groups[i].num == 0)
+        if (!thread_groups[i].used)
             break;
     }
 
-    if (thread_groups[i].num == 0) {
-        thread_groups[i].num++;
-    } else {
+    if (thread_groups[i].used) {
         BUG("alloc_thread_group_id(): failed to allocate a thread_gruop struct");
-        i = 0;
+        return 0;
     }
 
+    thread_groups[i].used = true;
     unlock_mutex(&lock);
     return i;
 }
@@ -246,13 +245,13 @@ result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_si
     if (group == 0) {
         group = create_thread_group();
     } else {
-        BUG_IF(group >= THREAD_NUM_MAX || thread_groups[group].num == 0,
-               "invalid group ID or trying to join uncreated group");
-        thread_groups[group].num++;
+        BUG_IF(group >= THREAD_NUM_MAX, "invalid group ID");
+	BUG_IF(!thread_groups[group].used, "tried to join uncreated group");
     }
 
     thread = alloc_thread_id();
     threads[thread].group = &thread_groups[group];
+    thread_groups[group].num++;
 
     *r_thread = thread;
     *r_group  = group;
