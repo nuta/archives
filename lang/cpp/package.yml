@@ -53,16 +53,20 @@ global_config:
 
 
 config:
-  SOURCES:
-    set:
-      - src/channel.c
-      - src/ctype.c
-      - src/string.c
-      - src/syscall.c
-      - src/memory.c
-      - src/mutex.c
-      - src/printfmt.c
-      - src/io.c
+  - SOURCES:
+      set:
+        - src/channel.c
+        - src/ctype.c
+        - src/string.c
+        - src/syscall.c
+        - src/memory.c
+        - src/mutex.c
+        - src/printfmt.c
+        - src/io.c
+  - if: "HAL == 'x86'"
+    SOURCES:
+      set:
+        - src/x86.c
 
 #
 #  Type definitions
