@@ -1,5 +1,5 @@
 #include <resea.h>
-
+#include "cpp.h"
 
 uint8_t io_read8(enum iospace_type iospace, uintmax_t base, offset_t offset) {
 
