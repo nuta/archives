@@ -62,7 +62,7 @@ retry:
 
     // addr is a physical address so we must convert it to a virtual address
     *size = desc->len;
-    *data = allocMemory(*size, MEMORY_ALLOCMEM_NORMAL);
+    *data = allocate_memory(*size, MEMORY_ALLOCMEM_NORMAL);
 
     /* the magic number '10' in 2nd arg. is the size of virtio-net's packet header */
     memcpy(*data,

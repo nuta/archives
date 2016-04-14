@@ -13,7 +13,7 @@ static channel_t memory_ch = 0;
  *           NULL on failure.
  *
  */
-void *allocMemory (size_t size, uint32_t flags) {
+void *allocate_memory (size_t size, uint32_t flags) {
     result_t r;
     uintptr_t p;
 

@@ -17,7 +17,7 @@ void fat_fs_read(channel_t __ch,
     void* data;
     size_t r_size;
 
-    data   = allocMemory(size, MEMORY_ALLOCMEM_NORMAL); // TODO: free on failure
+    data   = allocate_memory(size, MEMORY_ALLOCMEM_NORMAL); // TODO: free on failure
     result = fat_read(&fat_the_disk, fat_get_file_by_id(file),
                       offset, data, size, &r_size);
 
