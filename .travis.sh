@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 deploy_resea_net() {
     commit_msg="auto deploy: $(git log --format=%B -n1|tr -d '\n')"
