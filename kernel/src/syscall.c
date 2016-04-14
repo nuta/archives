@@ -112,7 +112,7 @@ static result_t link(channel_t ch1, channel_t ch2) {
         return E_INVALID;
     }
 
-    kernel_connect_channels(g, ch1, g, ch2);
+    kernel_link_channels(g, ch1, g, ch2);
     return OK;
 }
 

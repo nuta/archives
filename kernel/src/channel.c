@@ -45,7 +45,7 @@ result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t
 }
 
 
-result_t kernel_connect_channels(struct thread_group *group1, channel_t ch1,
+result_t kernel_link_channels(struct thread_group *group1, channel_t ch1,
                                  struct thread_group *group2, channel_t ch2) {
 
     group1->channels[ch1].used    = true;
@@ -121,7 +121,7 @@ retry:
 
     server_new_ch = kernel_alloc_channel_id(server_group);
     kernel_transfer_to(server_group, server_new_ch, servers[i].ch);
-    kernel_connect_channels(current_group, ch, server_group, server_new_ch);
+    kernel_link_channels(current_group, ch, server_group, server_new_ch);
     return OK;
 }
 
