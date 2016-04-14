@@ -94,7 +94,7 @@ size_t kernel_get_dynamic_vpages_num(void) {
  *  @return  The beginning virtual address of the allocated virtual pages.
  *
  */
-uintptr_t vmalloc(size_t size) {
+uintptr_t kernel_vmalloc(size_t size) {
     void *p;
     size_t num = size / PAGE_SIZE + ((size % PAGE_SIZE == 0)? 0:1);
     struct thread_group *group = kernel_get_current_thread_group();
