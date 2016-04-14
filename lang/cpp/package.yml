@@ -67,6 +67,10 @@ config:
     SOURCES:
       set:
         - src/x86.c
+  - if: "HAL == 'posix_host'"
+    SOURCES:
+      set:
+        - src/posix_host.c
 
 #
 #  Type definitions
