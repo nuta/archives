@@ -30,7 +30,6 @@ typedef void handler_t ();
  */
 typedef uint8_t  mutex_t;
 #define MUTEX_LOCKED   (1 << 1)
-#define MUTEX_INTERRUPT_ENABLED  (1 << 2)
 #define MUTEX_UNLOCKED 0
 
 void init_mutex (mutex_t *m, int init);
@@ -50,16 +49,11 @@ enum result_tValue{
 
 // TODO: decorate these in payload header
 #define MOVE(p) ((void *) ((uintptr_t) (p) | 1))
-#define OURS_CHANNEL()
-#define THEIRS_CHANNEL()
 
 /*
  *  Logging TODO
  */
 void printfmt (const char *format, ...);
-
-#define __TOSTR(x)  #x
-
 
 #ifndef PACKAGE_NAME
 #define PACKAGE_NAME  "somewhere"
@@ -75,6 +69,9 @@ void printfmt (const char *format, ...);
 #define MSG(fmt, ...)    printfmt("[" PACKAGE_NAME "] MSG: "   fmt, ##__VA_ARGS__)
 #undef WARN
 #define WARN(fmt, ...)   printfmt("[" PACKAGE_NAME "] WARN: "  fmt, ##__VA_ARGS__)
+
+
+void hal_panic(void);
 
 #define BUG_IF(cond, fmt, ...)  do { \
   if (cond) \
@@ -94,7 +91,7 @@ void printfmt (const char *format, ...);
 #define TEST_EXPECT(cond)            printfmt("[" PACKAGE_NAME "] TEST: <%s> " #cond, (cond)? "pass":"fail")
 #define TEST_END() do { \
                 printfmt("[" PACKAGE_NAME "] TEST: end"); \
-                for(;;); /* FIXME */ \
+                hal_panic(); \
             } while(0)
 
 /*
@@ -105,7 +102,7 @@ void printfmt (const char *format, ...);
 #define ALIGN(x, align) (((x) + (align) - 1) & ~((align) - 1))
 
 /* system calls */
-enum SyscallType{
+enum {
   SYSCALL_OPEN       = 1,
   SYSCALL_CLOSE      = 2,
   SYSCALL_SETOPTIONS = 3,
