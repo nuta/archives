@@ -34,6 +34,9 @@ interface:
   connect:
     id: 1
     payloads:
+      - name: channel
+        type: UIntMax
+        description: The channel ID
       - name: interface
         type: Interface
   connect_reply:
@@ -41,5 +44,17 @@ interface:
     payloads:
       - name: result
         type: Result
-      - name: ch
-        type: Channel
+
+  register:
+    id: 3
+    payloads:
+      - name: channel
+        type: UIntMax
+        description: The channel ID
+      - name: interface
+        type: Interface
+  register_reply:
+    id: 4
+    payloads:
+      - name: result
+        type: Result
