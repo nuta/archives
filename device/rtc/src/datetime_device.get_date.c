@@ -21,8 +21,8 @@ static uint8_t read_cmos(int reg) {
 }
 
 
-static UInt bcd_to_binary(UInt x) {
-    UInt r = 0;
+static uint32_t bcd_to_binary(uint32_t x) {
+    uint32_t r = 0;
 
     for (int i=1; x > 0; i*=10) {
         r += (x & 0x0f) * i;
