@@ -16,10 +16,10 @@ homepage: http://resea.net
 requires: []
 lib_requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 
@@ -29,7 +29,7 @@ implements: []
 type:
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   receive:
@@ -39,21 +39,21 @@ interface:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: data
-        type: Data
+        type: data
 
   transmit:
     id: 3
     payloads:
       - name: data
-        type: Data
+        type: data
         attrs: [readonly]
   transmit_reply:
     id: 4
     payloads:
       - name: result
-        type: Result
+        type: result
 
   get_hardware_address:
     id: 5
@@ -62,6 +62,6 @@ interface:
     id: 6
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: addr
-        type: Data
+        type: data

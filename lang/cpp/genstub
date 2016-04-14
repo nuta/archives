@@ -31,7 +31,7 @@ def load_payload_defs(interface_name, service_name, service, name_prefix=None):
         if is_ool_type(p['type']):
             # size of an OoL payload
             defs.append({
-                'type': 'Size',
+                'type': 'size',
                 'name': p['name'] + '_size'
             })
 
@@ -48,7 +48,7 @@ def load_payload_defs(interface_name, service_name, service, name_prefix=None):
                     continue
 
                 if isinstance(q, dict):
-                    if q['type'] == 'Channel':
+                    if q['type'] == 'channel':
                         header |= 0x03 << (i * 4)
                     elif is_ool_type(q['type']):
                         header |= 0x02 << (i * 4)
@@ -112,7 +112,7 @@ def call_decl(interface_name, service_name, service):
             n += 1
 
             if is_ool_type(p['type']):
-                unmarshall.append((n, ctype('Size'), '__r_' + p['name'] + '_size'))
+                unmarshall.append((n, ctype('size'), '__r_' + p['name'] + '_size'))
                 n += 1
 
         args = ['channel_t __ch']

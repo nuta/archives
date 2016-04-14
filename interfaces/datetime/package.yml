@@ -15,10 +15,10 @@ homepage: http://resea.net
 # Required packages
 requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 
@@ -29,7 +29,7 @@ type:
 
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   get_date:
@@ -39,49 +39,49 @@ interface:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: year
-        type: UInt32
+        type: uint32
       - name: date
-        type: UInt32
+        type: uint32
         description: unused:month:day:hour:min:sec (6, 4, 5, 5, 6, 6 bits respectively)
       - name: nsec
-        type: UInt32
+        type: uint32
 
   set_oneshot_timer:
     id: 3
     payloads:
       - name: ch
-        type: Channel
+        type: channel
       - name: msec
-        type: UIntMax
+        type: uintmax
   set_oneshot_timer_reply:
     id: 4
     payloads:
       - name: result
-        type: Result
+        type: result
 
   set_interval_timer:
     id: 5
     payloads:
       - name: ch
-        type: Channel
+        type: channel
       - name: msec
-        type: UIntMax
+        type: uintmax
   set_interval_timer_reply:
     id: 6
     payloads:
       - name: result
-        type: Result
+        type: result
 
   delay:
     id: 7
     description: Delays returning
     payloads:
       - name: msec
-        type: UIntMax
+        type: uintmax
   delay_reply:
     id: 8
     payloads:
       - name: result
-        type: Result
+        type: result

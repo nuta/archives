@@ -16,10 +16,10 @@ homepage: http://resea.net
 requires: []
 lib_requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 
@@ -29,79 +29,79 @@ implements: []
 type:
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   create:
     id: 1
     payloads:
       - name: group
-        type: Id
+        type: id
       - name: name
-        type: Array<UChar>
+        type: Array<uchar>
         attrs: [readonly]
   create_reply:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: thread
-        type: Id
+        type: id
       - name: group
-        type: Id
+        type: id
 
   delete:
     id: 3
     payloads:
       - name: thread
-        type: Id
+        type: id
   delete_reply:
     id: 4
     payloads:
       - name: result
-        type: Result
+        type: result
 
   start:
     id: 5
     payloads:
       - name: thread
-        type: Id
+        type: id
   start_reply:
     id: 6
     payloads:
       - name: result
-        type: Result
+        type: result
 
   block:
     id: 7
     payloads:
       - name: thread
-        type: Id
+        type: id
 
   unblock:
     id: 8
     payloads:
       - name: thread
-        type: Id
+        type: id
 
   set:
     id: 9
     payloads:
       - name: thread
-        type: Id
+        type: id
       - name: entry
-        type: Addr
+        type: addr
       - name: arg
-        type: Addr
+        type: addr
       - name: stack
-        type: Addr
+        type: addr
       - name: stack_size
-        type: Size
+        type: size
   set_reply:
     id: 10
     payloads:
       - name: result
-        type: Result
+        type: result
 
   get_current_thread:
     id: 11
@@ -111,9 +111,9 @@ interface:
     id: 12
     payloads:
       - name: thread
-        type: Id
+        type: id
       - name: group
-        type: Id
+        type: id
 
 # TODO:
 #

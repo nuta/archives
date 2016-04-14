@@ -16,10 +16,10 @@ homepage: http://resea.net
 requires: []
 lib_requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 #
@@ -28,13 +28,13 @@ implements: []
 type:
   IOSpace:
     type: const
-    size: UInt8
+    size: uint8
     consts:
       IOSPACE_PORT: 1
       IOSPACE_MEM:  2
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   allocate:
@@ -43,16 +43,16 @@ interface:
       - name: iospace
         type: io(IOSpace)
       - name: addr
-        type: Addr
+        type: addr
       - name: size
-        type: Size
+        type: size
   allocate_reply:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: addr
-        type: Addr
+        type: addr
 
   release:
     id: 3
@@ -60,4 +60,4 @@ interface:
       - name: iospace
         type: io(IOSpace)
       - name: addr
-        type: Addr
+        type: addr

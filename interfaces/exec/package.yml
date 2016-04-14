@@ -16,10 +16,10 @@ homepage: http://resea.net
 requires: []
 lib_requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 #
@@ -28,30 +28,30 @@ implements: []
 type:
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   create:
     id: 1
     payloads:
       - name: name
-        type: Array<UChar>
+        type: Array<uchar>
         attrs: [readonly]
         size: name_size
       - name: name_size
-        type: Size
+        type: size
       - name: fs
-        type: Channel
+        type: channel
       - name: file
-        type: Id
+        type: id
       - name: group
-        type: Id
+        type: id
   create_reply:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: group
-        type: Id
+        type: id
       - name: thread
-        type: Id
+        type: id

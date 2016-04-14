@@ -16,10 +16,10 @@ homepage: http://resea.net
 requires: []
 lib_requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: [pager]
 
 
@@ -29,7 +29,7 @@ implements: [pager]
 type:
   FileMode:
     type: const
-    size: UInt32
+    size: uint32
     consts:
       FILEMODE_READ:   0x0001
       FILEMODE_WRITE:  0x0004
@@ -37,14 +37,14 @@ type:
 
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   open:
     id: 1
     payloads:
       - name: path
-        type: Array<UChar>
+        type: Array<uchar>
         attrs: [readonly]
       - name: mode
         type: fs(FileMode)
@@ -52,48 +52,48 @@ interface:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: file
-        type: Id
+        type: id
 
   close:
     id: 3
     payloads:
       - name: file
-        type: Id
+        type: id
   close_reply:
     id: 4
     payloads:
       - name: result
-        type: Result
+        type: result
 
   read:
     id: 5
     payloads:
       - name: file
-        type: Id
+        type: id
       - name: offset
-        type: Offset
+        type: offset
   read_reply:
     id: 6
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: data
-        type: Data
+        type: data
 
   write:
     id: 7
     payloads:
       - name: file
-        type: Id
+        type: id
       - name: offset
-        type: Offset
+        type: offset
       - name: data
-        type: Data
+        type: data
         attrs: [readonly]
   write_reply:
     id: 8
     payloads:
       - name: result
-        type: Result
+        type: result

@@ -16,20 +16,20 @@ homepage: http://resea.net
 requires: []
 lib_requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 
 #
-#  Interface definitions
+#  interface definitions
 #
 type:
   MapFlags:
     type: const
-    size: UInt16
+    size: uint16
     consts:
       MAP_READ:  0x0001
       MAP_WRITE: 0x0002
@@ -40,33 +40,33 @@ interface:
     id: 1
     payloads:
       - name: group
-        type: Id
+        type: id
       - name: addr
-        type: Addr
+        type: addr
       - name: size
-        type: Size
+        type: size
       - name: pager
-        type: Channel
+        type: channel
       - name: pager_arg
-        type: Id
+        type: id
       - name: offset
-        type: Offset
+        type: offset
   map_reply:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
 
   unmap:
     id: 3
     payloads:
       - name: addr
-        type: Addr
+        type: addr
   unmap_reply:
     id: 4
     payloads:
       - name: result
-        type: Result
+        type: result
 
   get_page_size:
     id: 5
@@ -75,27 +75,27 @@ interface:
     id: 6
     payloads:
       - name: size
-        type: Size
+        type: size
 
   allocate:
     id: 7
     payloads:
       - name: size
-        type: Size
+        type: size
       - name: flags
-        type: UInt32
+        type: uint32
   allocate_reply:
     id: 8
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: addr
-        type: Addr
+        type: addr
 
   release:
     id: 9
     payloads:
       - name: addr
-        type: Addr
+        type: addr
 
 # TODO: get_mappable_range, markas_clean_pages, get_dirty_pages

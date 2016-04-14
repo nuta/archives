@@ -15,10 +15,10 @@ homepage:    # e.g. http://example.com/foo/bar
 # Required packages
 requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 
@@ -29,7 +29,7 @@ type:
 
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   get_date:
@@ -41,12 +41,12 @@ interface:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: year
-        type: UInt32
+        type: uint32
       - name: date
-        type: UInt32
+        type: uint32
         description: unused:month:day:hour:min:sec (6, 4, 5, 5, 6, 6 bits respectively)
       - name: nsec
-        type: UInt32
+        type: uint32
         description: nano sec.

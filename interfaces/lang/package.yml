@@ -12,10 +12,10 @@ info:
 # Required packages
 requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 #
@@ -24,6 +24,6 @@ implements: []
 type:
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:

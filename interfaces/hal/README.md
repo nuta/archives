@@ -8,5 +8,5 @@ An interface implemented by Hardware Abstraction Layers.
 - `HAL_DEBUG`: same as `HAL_TEST` except launching a debugger
 - `HAL_GENSTART`: a script to generate the applications startup
 
-### C Interfaces
+### C interfaces
 C API which HALs MUST implement is described in `hal.h`, a header file included in `cpp` package.

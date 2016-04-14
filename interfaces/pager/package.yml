@@ -16,10 +16,10 @@ homepage: http://resea.net
 requires: []
 lib_requires: []
 
-# Interfaces which this package uses
+# interfaces which this package uses
 uses: []
 
-# Interfaces which this package implements
+# interfaces which this package implements
 implements: []
 
 
@@ -29,22 +29,22 @@ implements: []
 type:
 
 #
-#  Interface definitions
+#  interface definitions
 #
 interface:
   fill:
     id: 1
     payloads:
       - name: id
-        type: Id
+        type: id
       - name: offset
-        type: Offset
+        type: offset
       - name: size
-        type: Size
+        type: size
   fill_reply:
     id: 2
     payloads:
       - name: result
-        type: Result
+        type: result
       - name: data
-        type: Data
+        type: data
