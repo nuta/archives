@@ -12,8 +12,7 @@ deploy_resea_net() {
     git config user.name "Travis CI"
     git config user.email "travis@resea.net"
     
-    git diff --exit-code > /dev/null
-    if [ "$?" = "0" ] ; then
+    if [ "$(git status --porcelain)" = "" ] ; then
         echo "nothing to commit, aborting deployment"
         exit 0
     fi
