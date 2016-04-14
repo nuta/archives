@@ -88,7 +88,7 @@ void hal_create_vm_space(struct vm_space *vms) {
 void hal_remove_vm_space(struct vm_space *vms) {
 
     /* TODO
-      free_memory_block(vms->hal.pml4);
+      release_memory_block(vms->hal.pml4);
     */
 }
 

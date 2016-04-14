@@ -4,7 +4,7 @@
 #include <resea/memory.h>
 
 void *allocate_memory(size_t size, memory_allocmem_t flags);
-void freeMemory(void *p);
+void release_memory(void *p);
 void *allocPhysicalMemory(paddr_t addr, size_t size, uint32_t flags, paddr_t *alloced_addr); // TODO: remove
 
 #endif

@@ -27,7 +27,7 @@ void *allocate_memory (size_t size, uint32_t flags) {
 }
 
 
- void freeMemory(void *p){
+ void release_memory(void *p){
 
     /* TODO */
 }
