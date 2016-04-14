@@ -10,7 +10,7 @@ void hal_set_current_thread_id(ident_t id) {
 
 ident_t hal_get_current_thread_id(void) {
 
-    return 0;
+    return 1; // XXX
 }
 
 
