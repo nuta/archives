@@ -26,7 +26,7 @@ implements: []
 #
 #  Type definitions
 #
-type:
+types:
 
 #
 #  interface definitions

@@ -190,8 +190,8 @@ def main(args):
     #
     #  Types (typedef and struct)
     #
-    if isinstance(package_yml["type"], dict):
-        for name,type_ in package_yml["type"].items():
+    if isinstance(package_yml["types"], dict):
+        for name,type_ in package_yml["types"].items():
             s += type_decl(package_yml["name"], name, type_)
         s += "\n"
 

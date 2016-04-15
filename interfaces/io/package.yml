@@ -25,7 +25,7 @@ implements: []
 #
 #  Type definitions
 #
-type:
+types:
   space:
     type: const
     size: uint8

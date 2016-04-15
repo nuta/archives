@@ -26,7 +26,7 @@ implements: []
 #
 #  interface definitions
 #
-type:
+types:
   MapFlags:
     type: const
     size: uint16

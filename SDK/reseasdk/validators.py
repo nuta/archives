@@ -39,7 +39,7 @@ def validate_package_yml(d):
             desc = '{} should be a list'.format(x)
             assert isinstance(d[x], list)
 
-        for x in ['interface', 'type']:
+        for x in ['interface', 'types']:
             if x not in d or d[x] is None:
                 d[x] = {}
             desc = '{} should be a dict'.format(x)
@@ -78,8 +78,8 @@ def validate_package_yml(d):
                               name, x['name'])
                    assert re.match('^[a-z][a-zA-Z0-9_]*$', x['name'])
 
-        # type
-        for name, t in d['type'].items():
+        # types
+        for name, t in d['types'].items():
             desc = '.{}: interface name should matches ' \
                    '/^[a-z][a-zA-Z0-9_]*$/'.format(name)
             assert re.match('^[a-zA-Z][a-zA-Z0-9_]*$', name)
