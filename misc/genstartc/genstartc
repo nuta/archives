@@ -6,21 +6,11 @@ import jinja2
 
 TEMPLATE = """
 #include <resea.h>
-#include <resea/memory.h>
+#include <hal.h>
+
 #undef PACKAGE_NAME
 #define PACKAGE_NAME "start_apps"
-#define DEFAULT_THREAD_SIZE 0x4000
 
-/* FIXME */
-#define THREAD_RUNNABLE 1
-void *kernel_allocate_memory(size_t size, uint32_t flags);
-
-result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_size,
-                          ident_t *r_thread, ident_t *r_group);
-result_t kernel_set_thread(ident_t thread, uintptr_t entry, uintptr_t arg,
-                       uintptr_t stack, size_t stack_size);
-result_t kernel_set_thread_status(ident_t thread, int status);
-void kernel_start_threading(void);
 {% for app in apps %}
 {% if test %}
 void {{ app }}_test();
@@ -37,27 +27,17 @@ static void app_entrypoint (void (*startup)()) {
 
 void start_apps(void){
 
-{% if with_threading %}
-    ident_t thread, group;
-{% endif %}
-
 {% for app in apps %}
 {% if with_threading %}
     INFO("starting '{{ app }}'");
-    kernel_create_thread(1, (const uchar_t *) "{{ app }}",
-                       {{ app | length }}, &thread, &group);
-{% if test %}
-    kernel_set_thread(thread,
-                    (uintptr_t) app_entrypoint, (uintptr_t) {{ app }}_test,
-                    (uintptr_t) kernel_allocate_memory(DEFAULT_THREAD_SIZE, MEMORY_ALLOC_NORMAL),
-                    DEFAULT_THREAD_SIZE);
+    hal_call_callback(HAL_CALLBACK_RUN_THREAD,
+        1, "{{ app }}", app_entrypoint,
+{%if test %}
+        {{ app }}test
 {% else %}
-    kernel_set_thread(thread,
-                    (uintptr_t) app_entrypoint, (uintptr_t) {{ app }}_startup,
-                    (uintptr_t) kernel_allocate_memory(DEFAULT_THREAD_SIZE, MEMORY_ALLOC_NORMAL),
-                    DEFAULT_THREAD_SIZE);
-    kernel_set_thread_status(thread, THREAD_RUNNABLE);
+        {{ app }}_startup
 {% endif %}
+    );
 
 {% else %}
     INFO("starting {{ app }} (direct-startup)");
@@ -67,7 +47,7 @@ void start_apps(void){
 
 {% if with_threading %}
     INFO("starting threading");
-    kernel_start_threading();
+    hal_call_callback(HAL_CALLBACK_START_THREADING);
 {% endif %}
 }
 """
