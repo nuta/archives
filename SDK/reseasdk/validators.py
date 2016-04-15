@@ -10,30 +10,21 @@ def validate_package_yml(d):
         desc = 'it should be a dict'
         assert isinstance(d, dict)
 
-        toplevel_keys = [
-            'name',
-            'category',
-            'license',
-            'description',
-            'author',
-            'email',
-            'homepage',
-            'info',
-            'warning',
-            'type',
-            'interface',
-            'requires',
-            'implements',
-            'uses',
-        ]
-        for x in toplevel_keys:
-            desc = "it should have '{}'".format(x)
+        for x in ['name', 'category', 'license', 'homepage']:
+            desc = "'{}' is undefined".format(x)
             assert x in d
 
-        desc = 'name should matches /^[a-zA-Z][a-z0-9_]*$/'
-        assert re.match('^[a-zA-Z][a-zA-Z0-9_]*$', d['name'])
+        desc = 'name should matches /^[a-z][a-z0-9_]*$/'
+        assert re.match('^[a-z][a-z0-9_]*$', d['name'])
 
-        for x in ['requires', 'implements', 'uses', 'conflicts']:
+        for x in ['description', 'author', 'email', 'info', 'warning']:
+            desc = '{} should be a string'.format(x)
+            if x not in d or d[x] is None:
+                d[x] = ""
+            assert isinstance(d[x], str)
+
+        for x in ['requires', 'implements', 'requires', 'implements',
+                  'uses', 'conflicts']:
             if x not in d or d[x] is None:
                 d[x] = []
             desc = '{} should be a list'.format(x)
@@ -54,8 +45,8 @@ def validate_package_yml(d):
         # interface
         for name, i in d['interface'].items():
             desc = '.{}: service name should matches ' \
-                   '/^[a-z][a-zA-Z0-9_]*$/'.format(name)
-            assert re.match('^[a-z][a-zA-Z0-9_]*$', name)
+                   '/^[a-z][a-z0-9_]*$/'.format(name)
+            assert re.match('^[a-z][a-z0-9_]*$', name)
 
             desc = ".{}: service should have 'payloads'" \
                    "and 'id'".format(name)
@@ -74,15 +65,15 @@ def validate_package_yml(d):
                    assert 'name' in x and 'type' in x
 
                    desc = '.{}({}): payload name should matches ' \
-                          '/^[a-z][a-zA-Z0-9_]*$/'.format(
+                          '/^[a-z][a-z0-9_]*$/'.format(
                               name, x['name'])
-                   assert re.match('^[a-z][a-zA-Z0-9_]*$', x['name'])
+                   assert re.match('^[a-z][a-z0-9_]*$', x['name'])
 
         # types
         for name, t in d['types'].items():
-            desc = '.{}: interface name should matches ' \
-                   '/^[a-z][a-zA-Z0-9_]*$/'.format(name)
-            assert re.match('^[a-zA-Z][a-zA-Z0-9_]*$', name)
+            desc = '.{}: type name should matches ' \
+                   '/^[a-z][a-z0-9_]*$/'.format(name)
+            assert re.match('^[a-z][a-z0-9_]*$', name)
 
             desc = "{}: type should have 'type'".format(name)
             assert 'type' in t
