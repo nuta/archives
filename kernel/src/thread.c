@@ -8,6 +8,7 @@
 static struct thread threads[THREAD_NUM_MAX];
 static struct thread_group thread_groups[THREAD_NUM_MAX];
 static mutex_t lock = MUTEX_UNLOCKED;
+static bool started_threading = false;
 
 
 /**
@@ -299,6 +300,9 @@ void kernel_switch_thread(void) {
 void kernel_hard_switch_thread(void) {
     struct thread *t;
 
+    if (!started_threading)
+        return;
+
     t = &threads[hal_get_current_thread_id()];
     hal_save_thread(&t->hal);
     t->status = THREAD_RUNNABLE;
@@ -307,13 +311,25 @@ void kernel_hard_switch_thread(void) {
 }
 
 
-/**
- *  Starts threading
- *
- *  @note  It does a context switch so it does not return.
- */
-NORETURN void kernel_start_threading(void) {
+static void run_thread(ident_t group, const char *name, uintptr_t entry, uintptr_t arg) {
+    ident_t thread;
+    UNUSED ident_t r_group;
+    uintptr_t stack;
+    size_t stack_size;
 
+    stack_size = 0x4000; // TODO
+    INFO("group=%p", group
+    );
+    stack = (uintptr_t) kernel_allocate_memory(stack_size, MEMORY_ALLOC_NORMAL);
+    kernel_create_thread(group, (const uchar_t *) name, strlen(name), &thread, &r_group);
+    kernel_set_thread(thread, entry, arg, stack, stack_size);
+    kernel_set_thread_status(thread, THREAD_RUNNABLE);
+}
+
+
+NORETURN static void start_threading(void) {
+
+    started_threading = true;
     kernel_resume_next_thread();
 }
 
@@ -332,4 +348,6 @@ void kernel_thread_startup(void) {
     DEBUG("set current thread:#%d.%d", group, thread);
 
     hal_set_callback(HAL_CALLBACK_TIMER_TICK, kernel_hard_switch_thread);
+    hal_set_callback(HAL_CALLBACK_RUN_THREAD, run_thread);
+    hal_set_callback(HAL_CALLBACK_START_THREADING, start_threading);
 }
