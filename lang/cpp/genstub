@@ -15,17 +15,17 @@ class GeneratingError(Exception):
     pass
 
 
-def load_payload_defs(interface_name, service_name, service, name_prefix=None):
+def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None):
 
     if name_prefix is None:
         name_prefix = ''
 
     defs = [{
         'type': '',
-        'name': 'SERVICE({}, {})'.format(interface_name, service_name)
+        'name': 'MSGTYPE({}, {})'.format(interface_name, msgtype_name)
     }]
 
-    for p in service['payloads']:
+    for p in msgtype['payloads']:
         defs.append(p)
 
         if is_ool_type(p['type']):
@@ -62,7 +62,7 @@ def load_payload_defs(interface_name, service_name, service, name_prefix=None):
     return payloads
 
 
-def call_decl(interface_name, service_name, service):
+def call_decl(interface_name, msgtype_name, msgtype):
     send_tmpl = """
 {{ func }} {
     payload_t __payloads[{{ size }}];
@@ -95,16 +95,16 @@ def call_decl(interface_name, service_name, service):
     code = ''
     decls = ''
 
-    if service_name + '_reply' in services:
-        reply_service = services[service_name + '_reply']
-        arg_payloads = load_payload_defs(interface_name, service_name, service)
-        ret_payloads = load_payload_defs(interface_name, service_name, reply_service, '__r_')
+    if msgtype_name + '_reply' in msgtypes:
+        reply_msgtype = msgtypes[msgtype_name + '_reply']
+        arg_payloads = load_payload_defs(interface_name, msgtype_name, msgtype)
+        ret_payloads = load_payload_defs(interface_name, msgtype_name, reply_msgtype, '__r_')
         arg_size = len(arg_payloads)
         ret_size = len(ret_payloads)
 
         unmarshall = []
-        n = 2 # skip the first payload header and service
-        for i, p in enumerate(reply_service['payloads']):
+        n = 2 # skip the first payload header and msgtype
+        for i, p in enumerate(reply_msgtype['payloads']):
             if n % 9 == 0:
                 n += 1 # skip payload headers
 
@@ -120,16 +120,16 @@ def call_decl(interface_name, service_name, service):
         args += [ '{}* {}'.format(*ret) for ret in ret_payloads[1:] if ret[0] != '']
 
         func = "static inline void call_{}_{}({})".format(
-            interface_name, service_name, ", ".join(args))
+            interface_name, msgtype_name, ", ".join(args))
 
         decls += func + ";\n"
         code += jinja2.Template(call_tmpl).render(**locals())
 
-    payloads = load_payload_defs(interface_name, service_name, service)
+    payloads = load_payload_defs(interface_name, msgtype_name, msgtype)
     size = len(payloads)
     args = ['channel_t __ch'] + [ '{} {}'.format(*p) for p in payloads[1:] if p[0] != '']
     func = "static inline void send_{}_{}({})".format(
-        interface_name, service_name, ", ".join(args))
+        interface_name, msgtype_name, ", ".join(args))
     decls += func + ";\n"
     code += jinja2.Template(send_tmpl).render(**locals())
     
@@ -163,11 +163,11 @@ def type_decl(interface_name, type_name, type_):
     return s
 
 
-def id_decl(interface_name, interface_id, name, service):
-    """Returns a declaration of `__service_`"""
+def id_decl(interface_name, interface_id, name, msgtype):
+    """Returns a declaration of `__msgtype_`"""
     tmpl = """
-#define __service_{{ interface_name }}_{{ name }} \
-            (({{ interface_id }} << 16) | {{ service['id'] }})
+#define __msgtype_{{ interface_name }}_{{ name }} \
+            (({{ interface_id }} << 16) | {{ msgtype['id'] }})
 
 """
 
@@ -175,7 +175,7 @@ def id_decl(interface_name, interface_id, name, service):
 
 def main(args):
     """Generates stubs of arg.package_yml into args.output"""
-    global services
+    global msgtypes
 
     package_yml = load_yaml(args.package_yml, validator=validate_package_yml)
 
@@ -206,14 +206,14 @@ def main(args):
     #  send and recv
     #
     if "interface" in package_yml and package_yml["interface"] is not None:
-        services = package_yml["interface"]
+        msgtypes = package_yml["interface"]
         _s = ""
-        for name,service in services.items():
-            if service["payloads"] is None:
-                service["payloads"] = []
+        for name,msgtype in msgtypes.items():
+            if msgtype["payloads"] is None:
+                msgtype["payloads"] = []
 
-            s += id_decl(package_yml["name"], package_yml["id"], name, service)
-            d, __s = call_decl(package_yml["name"], name, service)
+            s += id_decl(package_yml["name"], package_yml["id"], name, msgtype)
+            d, __s = call_decl(package_yml["name"], name, msgtype)
             s += d
             _s += __s
         s += _s

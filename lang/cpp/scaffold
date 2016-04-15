@@ -35,45 +35,45 @@ HANDLER_C_TEMPLATE = """\
 
 void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (service)");
+        WARN("the first payload is not inline one (expected inline msgtype_t)");
         return;
     }
 
     switch (payloads[1]) {
-{% for interface, service, args, _, unmarshall in services %}
-    case SERVICE({{ interface }}, {{ service }}):
+{% for interface, msgtype, args, _, unmarshall in msgtypes %}
+    case HANDLE({{ interface }}, {{ msgtype }}):
     {
-        DEBUG("received {{ interface }}.{{ service }}");
+        DEBUG("received {{ interface }}.{{ msgtype }}");
         {% for i, arg in unmarshall %}
             payload_t {{ arg }} = payloads[{{ i }}];
         {% endfor %}
-            {{ name }}_{{ interface }}_{{ service }}({{ args | join(", ") }});
+            {{ name }}_{{ interface }}_{{ msgtype }}({{ args | join(", ") }});
             return;
     }
 {% endfor %}
     }
 
-    WARN("unsupported service: interface=%d, serivce=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
 }
 
 """
 
 HANDLER_H_TEMPLATE = """\
 #include <resea.h>
-{% for interface, service, _, args, _ in services %}
-void {{ name }}_{{ interface }}_{{ service }}({{ args | join(", ") }});
+{% for interface, msgtype, _, args, _ in msgtypes %}
+void {{ name }}_{{ interface }}_{{ msgtype }}({{ args | join(", ") }});
 {% endfor %}
 
 """
 
-SERVICE_C_TEMPLATE = """\
+HANDLE_C_TEMPLATE = """\
 #include <resea.h>
 {% for implement in all_implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
 
-/** handles {{ interface_name }}.{{ service_name }} */
-void {{name}}_{{interface_name}}_{{service_name}}({{ service_args | join(", ") }}) {
+/** handles {{ interface_name }}.{{ msgtype_name }} */
+void {{name}}_{{interface_name}}_{{msgtype_name}}({{ msgtype_args | join(", ") }}) {
 
 }
 
@@ -94,7 +94,7 @@ def main(args):
     name = package_yml["name"]
     implements = [name]
     all_implements = [name]
-    services = []
+    msgtypes = []
 
     while len(implements) > 0:
         implement = implements.pop()
@@ -106,21 +106,21 @@ def main(args):
 
         if "interface" in yml and yml["interface"] is not None:
             interface_name = yml["name"]
-            services_ = OrderedDict(sorted(yml["interface"].items(),
+            msgtypes_ = OrderedDict(sorted(yml["interface"].items(),
                                           key=lambda e: e[1]["id"]))
-            for service_name, service in services_.items():
-                if service_name.endswith("_reply"):
+            for msgtype_name, msgtype in msgtypes_.items():
+                if msgtype_name.endswith("_reply"):
                     continue
-                service_args = ["channel_t __ch"]
+                msgtype_args = ["channel_t __ch"]
                 handler_args = ["__ch"]
                 _handler_args = ["channel_t __ch"]
                 unmarshall = []
 
-                payloads = service.get("payloads")
+                payloads = msgtype.get("payloads")
                 if payloads is None:
                     payloads = []
 
-                n = 2 # skip the first payload header and service
+                n = 2 # skip the first payload header and msgtype
                 for i, p in enumerate(payloads):
                     if n % 9 == 0:
                         n += 1 # skip payload headers
@@ -128,14 +128,14 @@ def main(args):
                     n += 1
 
                 for i, p in enumerate(payloads):
-                    service_args.append("{} {}".format(ctype(p["type"]), p["name"]))
+                    msgtype_args.append("{} {}".format(ctype(p["type"]), p["name"]))
                     handler_args.append("({}) a{}".format(ctype(p["type"]), i))
                     _handler_args.append("{} a{}".format(ctype(p["type"]), i))
 
                 create_file("{}/src/{}.{}.c".format(args.output_dir,
-interface_name, service_name),
-                            render(SERVICE_C_TEMPLATE, locals()))
-                services.append((interface_name, service_name, handler_args, _handler_args,
+interface_name, msgtype_name),
+                            render(HANDLE_C_TEMPLATE, locals()))
+                msgtypes.append((interface_name, msgtype_name, handler_args, _handler_args,
                     unmarshall))
 
     create_file("{}/src/handler.c".format(args.output_dir),

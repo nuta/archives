@@ -7,12 +7,12 @@
 
 void virtio_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (service)");
+        WARN("the first payload is not inline one (expected inline msgtype_t)");
         return;
     }
 
     switch (payloads[1]) {
-    case SERVICE(storage_device, read):
+    case MSGTYPE(storage_device, read):
     {
         DEBUG("received storage_device.read");
             payload_t a0 = payloads[2];
@@ -20,7 +20,7 @@ void virtio_handler(channel_t __ch, payload_t *payloads) {
             virtio_storage_device_read(__ch, (offset_t) a0, (size_t) a1);
             return;
     }
-    case SERVICE(storage_device, write):
+    case MSGTYPE(storage_device, write):
     {
         DEBUG("received storage_device.write");
             payload_t a0 = payloads[2];
@@ -28,20 +28,20 @@ void virtio_handler(channel_t __ch, payload_t *payloads) {
             virtio_storage_device_write(__ch, (offset_t) a0, (void *) a1);
             return;
     }
-    case SERVICE(net_device, receive):
+    case MSGTYPE(net_device, receive):
     {
         DEBUG("received net_device.receive");
             virtio_net_device_receive(__ch);
             return;
     }
-    case SERVICE(net_device, transmit):
+    case MSGTYPE(net_device, transmit):
     {
         DEBUG("received net_device.transmit");
             payload_t a0 = payloads[2];
             virtio_net_device_transmit(__ch, (void *) a0);
             return;
     }
-    case SERVICE(net_device, get_hardware_address):
+    case MSGTYPE(net_device, get_hardware_address):
     {
         DEBUG("received net_device.get_hardware_address");
             virtio_net_device_get_hardware_address(__ch);
@@ -49,5 +49,5 @@ void virtio_handler(channel_t __ch, payload_t *payloads) {
     }
     }
 
-    WARN("unsupported service: interface=%d, serivce=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
 }

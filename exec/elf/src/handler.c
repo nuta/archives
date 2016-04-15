@@ -6,12 +6,12 @@
 
 void elf_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (service)");
+        WARN("the first payload is not inline one (expected inline msgtype_t)");
         return;
     }
 
     switch (payloads[1]) {
-    case SERVICE(exec, create):
+    case MSGTYPE(exec, create):
     {
         DEBUG("received exec.create");
             payload_t a0 = payloads[2];
@@ -24,5 +24,5 @@ void elf_handler(channel_t __ch, payload_t *payloads) {
     }
     }
 
-    WARN("unsupported service: interface=%d, serivce=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
 }

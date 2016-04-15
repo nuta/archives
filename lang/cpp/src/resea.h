@@ -19,8 +19,8 @@ typedef uintmax_t ident_t;
 typedef uintmax_t paddr_t;
 typedef uintmax_t offset_t;
 typedef payload_t channel_t;
-typedef payload_t service_t;
-typedef service_t interface_t;
+typedef payload_t msgtype_t;
+typedef msgtype_t interface_t;
 typedef uint8_t   result_t;
 typedef uint8_t uchar_t; /* UTF-8 */
 typedef void handler_t ();
@@ -97,8 +97,8 @@ void hal_panic(void);
 /*
  *  Useful macros
  */
-#define INTERFACE(itf)         __interface_##itf
-#define SERVICE(itf, service)  __service_##itf##_##service
+#define INTERFACE(i)      __interface_##i
+#define MSGTYPE(i, type)  __msgtype_##i##_##type
 #define ALIGN(x, align) (((x) + (align) - 1) & ~((align) - 1))
 
 /* system calls */

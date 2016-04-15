@@ -7,12 +7,12 @@
 
 void fat_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (service)");
+        WARN("the first payload is not inline one (expected inline msgtype_t)");
         return;
     }
 
     switch (payloads[1]) {
-    case SERVICE(fs, open):
+    case MSGTYPE(fs, open):
     {
         DEBUG("received fs.open");
             payload_t a0 = payloads[2];
@@ -20,14 +20,14 @@ void fat_handler(channel_t __ch, payload_t *payloads) {
             fat_fs_open(__ch, (uchar_t*) a0, (fs_filemode_t) a1);
             return;
     }
-    case SERVICE(fs, close):
+    case MSGTYPE(fs, close):
     {
         DEBUG("received fs.close");
             payload_t a0 = payloads[2];
             fat_fs_close(__ch, (ident_t) a0);
             return;
     }
-    case SERVICE(fs, read):
+    case MSGTYPE(fs, read):
     {
         DEBUG("received fs.read");
             payload_t a0 = payloads[2];
@@ -35,7 +35,7 @@ void fat_handler(channel_t __ch, payload_t *payloads) {
             fat_fs_read(__ch, (ident_t) a0, (offset_t) a1);
             return;
     }
-    case SERVICE(fs, write):
+    case MSGTYPE(fs, write):
     {
         DEBUG("received fs.write");
             payload_t a0 = payloads[2];
@@ -44,7 +44,7 @@ void fat_handler(channel_t __ch, payload_t *payloads) {
             fat_fs_write(__ch, (ident_t) a0, (offset_t) a1, (void *) a2);
             return;
     }
-    case SERVICE(pager, fill):
+    case MSGTYPE(pager, fill):
     {
         DEBUG("received pager.fill");
             payload_t a0 = payloads[2];
@@ -55,5 +55,5 @@ void fat_handler(channel_t __ch, payload_t *payloads) {
     }
     }
 
-    WARN("unsupported service: interface=%d, serivce=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
 }

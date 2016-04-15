@@ -44,15 +44,15 @@ def validate_package_yml(d):
 
         # interface
         for name, i in d['interface'].items():
-            desc = '.{}: service name should matches ' \
+            desc = '.{}: message type name should matches ' \
                    '/^[a-z][a-z0-9_]*$/'.format(name)
             assert re.match('^[a-z][a-z0-9_]*$', name)
 
-            desc = ".{}: service should have 'payloads'" \
+            desc = ".{}: message type should have 'payloads'" \
                    "and 'id'".format(name)
             assert 'payloads' in i and 'id' in i
 
-            desc = '.{}: service ID should an int and it should be' \
+            desc = '.{}: message type ID should an int and it should be' \
                    'larger than 0'.format(name)
             assert isinstance(i['id'], int) and i['id'] > 0
 

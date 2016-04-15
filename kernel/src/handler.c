@@ -11,12 +11,12 @@
 
 void kernel_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (service)");
+        WARN("the first payload is not inline one (expected inline msgtype_t)");
         return;
     }
 
     switch (payloads[1]) {
-    case SERVICE(pager, fill):
+    case MSGTYPE(pager, fill):
     {
         DEBUG("received pager.fill");
             payload_t a0 = payloads[2];
@@ -25,13 +25,13 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_pager_fill(__ch, (ident_t) a0, (offset_t) a1, (size_t) a2);
             return;
     }
-    case SERVICE(datetime, get_date):
+    case MSGTYPE(datetime, get_date):
     {
         DEBUG("received datetime.get_date");
             kernel_datetime_get_date(__ch);
             return;
     }
-    case SERVICE(datetime, set_oneshot_timer):
+    case MSGTYPE(datetime, set_oneshot_timer):
     {
         DEBUG("received datetime.set_oneshot_timer");
             payload_t a0 = payloads[2];
@@ -39,7 +39,7 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_datetime_set_oneshot_timer(__ch, (channel_t) a0, (uintmax_t) a1);
             return;
     }
-    case SERVICE(datetime, set_interval_timer):
+    case MSGTYPE(datetime, set_interval_timer):
     {
         DEBUG("received datetime.set_interval_timer");
             payload_t a0 = payloads[2];
@@ -47,14 +47,14 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_datetime_set_interval_timer(__ch, (channel_t) a0, (uintmax_t) a1);
             return;
     }
-    case SERVICE(datetime, delay):
+    case MSGTYPE(datetime, delay):
     {
         DEBUG("received datetime.delay");
             payload_t a0 = payloads[2];
             kernel_datetime_delay(__ch, (uintmax_t) a0);
             return;
     }
-    case SERVICE(io, allocate):
+    case MSGTYPE(io, allocate):
     {
         DEBUG("received io.allocate");
             payload_t a0 = payloads[2];
@@ -63,7 +63,7 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_io_allocate(__ch, (io_space_t) a0, (uintptr_t) a1, (size_t) a2);
             return;
     }
-    case SERVICE(io, release):
+    case MSGTYPE(io, release):
     {
         DEBUG("received io.release");
             payload_t a0 = payloads[2];
@@ -71,7 +71,7 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_io_release(__ch, (io_space_t) a0, (uintptr_t) a1);
             return;
     }
-    case SERVICE(thread, create):
+    case MSGTYPE(thread, create):
     {
         DEBUG("received thread.create");
             payload_t a0 = payloads[2];
@@ -79,35 +79,35 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_thread_create(__ch, (ident_t) a0, (uchar_t*) a1);
             return;
     }
-    case SERVICE(thread, delete):
+    case MSGTYPE(thread, delete):
     {
         DEBUG("received thread.delete");
             payload_t a0 = payloads[2];
             kernel_thread_delete(__ch, (ident_t) a0);
             return;
     }
-    case SERVICE(thread, start):
+    case MSGTYPE(thread, start):
     {
         DEBUG("received thread.start");
             payload_t a0 = payloads[2];
             kernel_thread_start(__ch, (ident_t) a0);
             return;
     }
-    case SERVICE(thread, block):
+    case MSGTYPE(thread, block):
     {
         DEBUG("received thread.block");
             payload_t a0 = payloads[2];
             kernel_thread_block(__ch, (ident_t) a0);
             return;
     }
-    case SERVICE(thread, unblock):
+    case MSGTYPE(thread, unblock):
     {
         DEBUG("received thread.unblock");
             payload_t a0 = payloads[2];
             kernel_thread_unblock(__ch, (ident_t) a0);
             return;
     }
-    case SERVICE(thread, set):
+    case MSGTYPE(thread, set):
     {
         DEBUG("received thread.set");
             payload_t a0 = payloads[2];
@@ -118,13 +118,13 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_thread_set(__ch, (ident_t) a0, (uintptr_t) a1, (uintptr_t) a2, (uintptr_t) a3, (size_t) a4);
             return;
     }
-    case SERVICE(thread, get_current_thread):
+    case MSGTYPE(thread, get_current_thread):
     {
         DEBUG("received thread.get_current_thread");
             kernel_thread_get_current_thread(__ch);
             return;
     }
-    case SERVICE(memory, map):
+    case MSGTYPE(memory, map):
     {
         DEBUG("received memory.map");
             payload_t a0 = payloads[2];
@@ -136,20 +136,20 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_memory_map(__ch, (ident_t) a0, (uintptr_t) a1, (size_t) a2, (channel_t) a3, (ident_t) a4, (offset_t) a5);
             return;
     }
-    case SERVICE(memory, unmap):
+    case MSGTYPE(memory, unmap):
     {
         DEBUG("received memory.unmap");
             payload_t a0 = payloads[2];
             kernel_memory_unmap(__ch, (uintptr_t) a0);
             return;
     }
-    case SERVICE(memory, get_page_size):
+    case MSGTYPE(memory, get_page_size):
     {
         DEBUG("received memory.get_page_size");
             kernel_memory_get_page_size(__ch);
             return;
     }
-    case SERVICE(memory, allocate):
+    case MSGTYPE(memory, allocate):
     {
         DEBUG("received memory.allocate");
             payload_t a0 = payloads[2];
@@ -157,14 +157,14 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_memory_allocate(__ch, (size_t) a0, (uint32_t) a1);
             return;
     }
-    case SERVICE(memory, release):
+    case MSGTYPE(memory, release):
     {
         DEBUG("received memory.release");
             payload_t a0 = payloads[2];
             kernel_memory_release(__ch, (uintptr_t) a0);
             return;
     }
-    case SERVICE(channel, connect):
+    case MSGTYPE(channel, connect):
     {
         DEBUG("received channel.connect");
             payload_t a0 = payloads[2];
@@ -172,7 +172,7 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_channel_connect(__ch, (uintmax_t) a0, (interface_t) a1);
             return;
     }
-    case SERVICE(channel, register):
+    case MSGTYPE(channel, register):
     {
         DEBUG("received channel.register");
             payload_t a0 = payloads[2];
@@ -182,5 +182,5 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
     }
     }
 
-    WARN("unsupported service: interface=%d, serivce=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
 }
