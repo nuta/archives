@@ -117,7 +117,7 @@ def run_emulator(cmd, test=False, env=None, save_log=None):
     while True:
         l = p.stdout.readline().decode('utf-8').strip()
 
-        if p.poll() is not None:
+        if l == "" and p.poll() is not None:
             if test:
                 error("the test program finished without 'TEST: end'")
             sys.exit(0)
