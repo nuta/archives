@@ -7,25 +7,18 @@ Busybook
 
 Busybook is a CalDAV server out of the box powered by Ruby on Rails.
 
-## Installation
-First, install dependencies.
+## Quickstart
 ```
-$ sudo apt-get install wget git ruby2.0 ruby2.0-dev libsqlite3-dev zlib1g-dev
-```
+$ git clone https://github.com/seiyanuta/busybook
+$ cd busybook
 
-Next, download Busybook init script.
-```
-$ wget https://raw.githubusercontent.com/seiyanuta/busybook/master/init/busybook.init
-$ vim busybook.init
-$ sudo cp busybook.init /etc/init.d/busybook
-$ sudo chmod 777 /etc/init.d/busybook
-```
+$ cp config/database.yml.config database.yml
+$ vim database.yml
 
-Now you are ready for launching Busybook.
-```
-$ sudo service busybook setup          # install
-$ sudo service busybook rake user:add  # add an user
-$ sudo service busybook start          # launch!
+$ sudo docker build -t busybook .
+# sudo docker run -i --name=busybook busybook
+
+$ sudo docker exec -it rake user:add
 ```
 
 ## Configuration

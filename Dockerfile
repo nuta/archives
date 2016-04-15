@@ -7,5 +7,6 @@ ADD database.yml /app/config/database.yml
 
 WORKDIR /app
 RUN bundle install
+RUN rake db:migrate
 
-CMD rails s -b 0.0.0.0
+ENTRYPOINT ["rails", "s", "-b", "0.0.0.0"]
