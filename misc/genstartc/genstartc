@@ -33,7 +33,7 @@ void start_apps(void){
     hal_call_callback(HAL_CALLBACK_RUN_THREAD,
         1, "{{ app }}", app_entrypoint,
 {%if test %}
-        {{ app }}test
+        {{ app }}_test
 {% else %}
         {{ app }}_startup
 {% endif %}
