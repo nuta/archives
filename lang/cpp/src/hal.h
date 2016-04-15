@@ -11,7 +11,10 @@ enum hal_callback_type {
   HAL_CALLBACK_SYSCALL         = 2,
   HAL_CALLBACK_TIMER_TICK      = 3,
   HAL_CALLBACK_GET_NEXT_THREAD = 4,
-  HAL_CALLBACK_MAX             = 5
+  HAL_CALLBACK_ALLOCATE_MEMORY = 5,
+  HAL_CALLBACK_RUN_THREAD      = 6,
+  HAL_CALLBACK_START_THREADING = 7,
+  HAL_CALLBACK_MAX             = 8
 };
 
 enum exception_type {
