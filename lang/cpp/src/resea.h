@@ -36,7 +36,7 @@ void init_mutex (mutex_t *m, int init);
 void lock_mutex (mutex_t *m);
 void unlock_mutex (mutex_t *m);
 
-enum result_tValue{
+enum {
   OK             = 1,
   E_NOTFOUND     = 2,
   E_NOTSUPPORTED = 3,
