@@ -6,9 +6,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define PACKED   __attribute__((packed))
-#define NORETURN __attribute__((noreturn))
-#define UNUSED   __attribute__((unused))
+#define PACKED      __attribute__((packed))
+#define NORETURN    __attribute__((noreturn))
+#define UNUSED      __attribute__((unused))
+#define DEPRECATED  __attribute__((deprecated))
 
 #ifndef NULL
 #define NULL  ((void *) 0)
