@@ -20,24 +20,6 @@ channel_t connect_to_local(channel_t id) {
 }
 
 
-result_t connect_channel(channel_t ch, interface_t interface) {
-    result_t r;
-
-    // we assume that the first (1) channel is listened by a channel server
-    call_channel_connect(connect_to_local(1), ch, interface, &r);
-    return r;
-}
-
-
-result_t register_channel(channel_t ch, interface_t interface) {
-    result_t r;
-
-    // we assume that the first (1) channel is listened by a channel server
-    call_channel_register(connect_to_local(1), ch, interface, &r);
-    return r;
-}
-
-
 /**
  *  Serve channel forever
  *

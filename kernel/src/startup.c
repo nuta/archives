@@ -19,10 +19,10 @@ void kernel_startup(void) {
 
     ch = sys_open();
     sys_setoptions(ch, &kernel_handler, NULL, 0);
-    register_channel(ch, INTERFACE(thread));
-    register_channel(ch, INTERFACE(memory));
-    register_channel(ch, INTERFACE(datetime));
-    register_channel(ch, INTERFACE(channel));
+    kernel_register_channel(ch, INTERFACE(thread));
+    kernel_register_channel(ch, INTERFACE(memory));
+    kernel_register_channel(ch, INTERFACE(datetime));
+    kernel_register_channel(ch, INTERFACE(channel));
     INFO("created a kernel server at @%d", ch);
 }
 

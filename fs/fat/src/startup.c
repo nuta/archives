@@ -1,4 +1,5 @@
 #include <resea.h>
+#include <resea/channel.h>
 #include <resea/fs.h>
 #include <resea/storage_device.h>
 #include "fat.h"
@@ -36,13 +37,18 @@ handler_t fat_handler;
 
 void fat_startup(void) {
     channel_t ch;
+    result_t r;
 
     INFO("starting");
+
     storage_device_ch = sys_open();
-    connect_channel(storage_device_ch, INTERFACE(storage_device));
+    call_channel_connect(connect_to_local(1), storage_device_ch,
+        INTERFACE(storage_device), &r);
+
     fat_opendisk(&fat_the_disk, storage_device_ch, read_disk, write_disk);
 
     ch = sys_open();
-    register_channel(ch, INTERFACE(fs));
+    call_channel_register(connect_to_local(1), ch,
+        INTERFACE(fs), &r);
     serve_channel(ch, fat_handler);
 }

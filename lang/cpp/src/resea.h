@@ -133,8 +133,7 @@ result_t sys_transfer(channel_t ch1, channel_t ch2);
 /*
  *  Channel
  */
-result_t connect_channel(channel_t ch, interface_t interface);
-result_t register_channel(channel_t ch, interface_t interface);
+channel_t connect_to_local(channel_t id);
 NORETURN void serve_channel(channel_t ch, handler_t handler);
 
 #endif
