@@ -221,9 +221,9 @@ void virtio_activate_device(struct virtio_device *device) {
 int virtio_init_queue(struct virtio_device *device, int queue_index) {
     struct virtio_queue *queue = &device->queues[queue_index];
     size_t queue_size;
-    void *buf;
-    paddr_t phy_buf;
+    paddr_t paddr;
     uintptr_t addr;
+    result_t r;
   
     /* get the number of queue */
     io_write16(device->iospace, device->iobase, VIRTIO_IO_QUEUE_SELECT, queue_index);
@@ -238,13 +238,13 @@ int virtio_init_queue(struct virtio_device *device, int queue_index) {
                  sizeof(uint16_t)*queue->queue_num*2 +
                  sizeof(struct virtio_desc)*queue->queue_num;
   
-    buf = allocPhysicalMemory(0, queue_size,
-                              MEMORY_ALLOC_PAGE_ALIGNED | MEMORY_ALLOC_CONTINUOUS, &phy_buf);
+    call_memory_allocate_physical(get_memory_ch(),
+        0, queue_size, MEMORY_ALLOC_PAGE_ALIGNED | MEMORY_ALLOC_CONTINUOUS,
+	&r, &addr, &paddr);
   
     queue->number = queue_index;
   
     /* virtio_desc */
-    addr = PTR2ADDR(buf);
     queue->desc = (void *) addr;
   
     /* avail_ring */
@@ -261,6 +261,6 @@ int virtio_init_queue(struct virtio_device *device, int queue_index) {
     queue->last_used_index = 0;
   
     /* tell the device the physical address of the queue */
-    io_write32(device->iospace, device->iobase, VIRTIO_IO_QUEUE_ADDR, phy_buf >> 12);
+    io_write32(device->iospace, device->iobase, VIRTIO_IO_QUEUE_ADDR, paddr >> 12);
     return 0;
 }

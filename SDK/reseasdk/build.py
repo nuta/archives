@@ -166,7 +166,7 @@ def build(args):
         config['BUILTIN_APPS'] = ",".join(config['BUILTIN_APPS'].split(',') + [config['PACKAGE']])
 
     # resolve dependencies
-    config, local_config = load_packages(builtin_packages, config)
+    config, local_config = load_packages(builtin_packages, config, enable_if=True)
     plan('as {CATEGORY} with {HAL} HAL in {BUILD_DIR}'.format(**config))
 
     # start.o

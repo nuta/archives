@@ -41,29 +41,38 @@ result_t virtio_blk_write(uintmax_t sector, size_t n, const void *data) {
     struct virtio_blk_request_header *header;
     size_t data_size;
     uint8_t *status;
-    paddr_t paddr, header_paddr, status_paddr;
-    void *buf;
+    uintptr_t status_addr, buf_addr;
+    paddr_t buf_paddr, header_paddr, status_paddr;
+    result_t r;
   
     data_size = n * VIRTIO_BLK_SECTOR_SIZE;
 
     DEBUG("write: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
   
-    header = allocPhysicalMemory(0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
-                                 &header_paddr);
+    call_memory_allocate_physical(get_memory_ch(),
+        0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
+        &r, (uintptr_t *) &header, &header_paddr);
+
+    call_memory_allocate_physical(get_memory_ch(),
+        0, data_size, MEMORY_ALLOC_CONTINUOUS,
+        &r, &buf_addr, &buf_paddr);
+
+    call_memory_allocate_physical(get_memory_ch(),
+        0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS,
+        &r, &status_addr, &status_paddr);
+
     header->type   = VIRTIO_BLK_WRITE;
     header->sector = sector;
     rs[0].data  = (uint64_t) header_paddr;
     rs[0].size  = sizeof(*header);
     rs[0].flags = 0; // READONLY
   
-    buf = allocPhysicalMemory(0, data_size, MEMORY_ALLOC_CONTINUOUS, &paddr);
-    memcpy(buf, data, data_size);
-    INFO("buf=%p, data=%p, size=%d (%s)", buf, data, data_size, data);
-    rs[1].data  = (uint64_t) paddr;
+    memcpy((void *) buf_addr, data, data_size);
+    INFO("buf=%p, data=%p, size=%d (%s)", buf_addr, data, data_size, data);
+    rs[1].data  = (uint64_t) buf_paddr;
     rs[1].size  = data_size;
     rs[1].flags = 0; // READONLY
   
-    allocPhysicalMemory(0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS, &status_paddr);
     rs[2].data  = (uint64_t) status_paddr;
     rs[2].size  = sizeof(*status);
     rs[2].flags = VIRTIO_DESC_F_WRITE;
@@ -79,33 +88,42 @@ result_t virtio_blk_read(uintmax_t sector, size_t n, void **data) {
     size_t data_size;
     uint8_t *status;
     paddr_t paddr, header_paddr, status_paddr;
-    void *buf;
+    uintptr_t buf_addr, status_addr;
+    result_t r;
   
     data_size = n * VIRTIO_BLK_SECTOR_SIZE;
  
     DEBUG("read: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
- 
-    header = allocPhysicalMemory(0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
-                                 &header_paddr);
+
+    call_memory_allocate_physical(get_memory_ch(),
+        0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
+        &r, (uintptr_t *) &header, &header_paddr);
+
+    call_memory_allocate_physical(get_memory_ch(),
+        0, data_size, MEMORY_ALLOC_CONTINUOUS,
+        &r, &buf_addr, &paddr);
+
+    call_memory_allocate_physical(get_memory_ch(),
+        0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS,
+        &r, &status_addr, &status_paddr);
+
     header->type   = VIRTIO_BLK_READ;
     header->sector = sector;
     rs[0].data  = (uint64_t) header_paddr;
     rs[0].size  = sizeof(*header);
     rs[0].flags = 0; // READONLY
   
-    buf = allocPhysicalMemory(0, data_size, MEMORY_ALLOC_CONTINUOUS, &paddr);
     rs[1].data  = (uint64_t) paddr;
     rs[1].size  = data_size;
     rs[1].flags = VIRTIO_DESC_F_WRITE;
   
-    allocPhysicalMemory(0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS, &status_paddr);
     rs[2].data  = (uint64_t) status_paddr;
     rs[2].size  = sizeof(*status);
     rs[2].flags = VIRTIO_DESC_F_WRITE;
   
     virtio_send_request(&device, VIRTIO_BLK_RQUEUE, (struct virtio_request *) &rs, 3);
   
-    *data = buf;
+    *data = (void *) buf_addr;
     return OK;
 }
 

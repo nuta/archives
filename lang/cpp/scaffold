@@ -41,7 +41,7 @@ void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
 
     switch (payloads[1]) {
 {% for interface, msgtype, args, _, unmarshall in msgtypes %}
-    case HANDLE({{ interface }}, {{ msgtype }}):
+    case MSGTYPE({{ interface }}, {{ msgtype }}):
     {
         DEBUG("received {{ interface }}.{{ msgtype }}");
         {% for i, arg in unmarshall %}

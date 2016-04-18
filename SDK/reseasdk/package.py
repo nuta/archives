@@ -67,7 +67,7 @@ def load_package_yml(package):
     return yml
 
 
-def load_packages(builtin_packages, config=None):
+def load_packages(builtin_packages, config=None, enable_if=False):
     """Returns packages config"""
 
     if config is None:
@@ -96,7 +96,7 @@ def load_packages(builtin_packages, config=None):
             d = get_package_dir(package)
             include_yml = load_yaml(os.path.join(d, include))
             try:
-                include_if = eval(include_yml['include_if'], config)
+                include_if = enable_if and eval(include_yml['include_if'], config)
             except Exception as e:
                 error("eval(include_if) in {}: {}".format(
                     package, str(e)))
@@ -126,7 +126,7 @@ def load_packages(builtin_packages, config=None):
         if package in builtin_packages:
             # load global config
             for cs in yml.get('global_config', []):
-                if cs.get('if') and not eval(cs['if'], config):
+                if enable_if and cs.get('if') and not eval(cs['if'], config):
                     continue
 
                 for k,v in cs.items():
@@ -169,7 +169,7 @@ def load_packages(builtin_packages, config=None):
             # load config
             local_config[package] = {}
             for cs in yml.get('config', []):
-                if cs.get('if') and not eval(cs['if'], config):
+                if enable_if and cs.get('if') and not eval(cs['if'], config):
                     continue
 
                 for k,v in cs.items():

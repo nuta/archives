@@ -17,6 +17,7 @@ result_t virtio_net_transmit(void *data, size_t size) {
     struct virtio_net_request_header header;
     uintptr_t addr;
     paddr_t paddr;
+    result_t r;
   
     header.gso_type    = 0;
     header.hdr_len     = 0;
@@ -28,7 +29,10 @@ result_t virtio_net_transmit(void *data, size_t size) {
     rs[0].size  = sizeof(header);
     rs[0].flags = 0; // READONLY
 
-    addr = PTR2ADDR(allocPhysicalMemory(0, size, MEMORY_ALLOC_CONTINUOUS, &paddr));
+    call_memory_allocate_physical(get_memory_ch(),
+        0, size, MEMORY_ALLOC_CONTINUOUS,
+        &r, &addr, &paddr);
+
     memcpy((void *) addr, data, size);
 
     rs[1].data  = paddr;
@@ -86,6 +90,7 @@ void virtio_net_get_hwaddr(uint8_t *hwaddr) {
 bool virtio_net_init(void){
   struct pci_device pci;
   uint32_t feats;
+  result_t r;
 
   if(!pci_lookup(&pci, VIRTIO_PCI_VENDOR, VIRTIO_PCI_DEVICEID,
                  VIRTIO_PCI_SUBSYS_NET)){
@@ -115,8 +120,9 @@ bool virtio_net_init(void){
   if (fill_num > 128)
       fill_num = 128;
 
-  dma_addr = PTR2ADDR(allocPhysicalMemory(0, 0x800 * fill_num,
-                                          MEMORY_ALLOC_CONTINUOUS, &dma_paddr));
+  call_memory_allocate_physical(get_memory_ch(),
+      0, 0x800 * fill_num, MEMORY_ALLOC_CONTINUOUS,
+      &r, &dma_addr, &dma_paddr);
 
   INFO("virtio-net: filling avail_ring to receive packets (num=%d)", fill_num);
   INFO("virtio-net: avail_ring dma_addr=%p, dma_paddr=%p", dma_addr, dma_paddr);

@@ -107,4 +107,23 @@ interface:
       - name: addr
         type: addr
 
+  allocate_physical:
+    id: 10
+    payloads:
+      - name: paddr
+        type: paddr
+      - name: size
+        type: size
+      - name: flags
+        type: uint32
+  allocate_physical_reply:
+    id: 11
+    payloads:
+      - name: result
+        type: result
+      - name: addr
+        type: addr
+      - name: paddr
+        type: paddr
+
 # TODO: get_mappable_range, markas_clean_pages, get_dirty_pages

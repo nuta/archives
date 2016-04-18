@@ -217,31 +217,36 @@ void kernel_release_memory(void *p) {
  *
  */
 void *kernel_allocate_memory(size_t size, uint32_t flags) {
+    uintptr_t addr;
     paddr_t paddr;
 
-    return allocPhysicalMemory(0, size, flags, &paddr);
+    kernel_allocate_memory_at(0, size, flags, &addr, &paddr);
+    return (void *) addr;
 }
 
 
-void *allocPhysicalMemory(paddr_t addr, size_t size, uint32_t flags, paddr_t *alloced_addr){
+result_t kernel_allocate_memory_at(paddr_t at, size_t size, uint32_t flags,
+                                   uintptr_t *addr, paddr_t *paddr) {
     size_t required;
-    paddr_t paddr;
-    void *p;
 
     // calculate the number of pages large enough for `size`
     required = (size / PAGE_SIZE) + 1;
 
     // allocate physical memory pages
-    if ((paddr = pmalloc(required)) == 0)
-        PANIC("pmalloc: failed to allocate memory");
+    if (!at) {
+        if ((*paddr = pmalloc(required)) == 0)
+            PANIC("pmalloc: failed to allocate memory");
+    } else {
+        WARN("at != 0 in %s()", __func__); // TODO
+	*paddr = at;
+    }
 
-    p = (void *) hal_paddr_to_vaddr(paddr);
+    *addr = hal_paddr_to_vaddr(*paddr);
 
     // zero clear
-    memset(p, 0x00, size);
+    memset((void *) *addr, 0x00, size);
 
-    *alloced_addr = paddr;
-    return p;
+    return OK; // FIXME
 }
 
 
@@ -296,4 +301,5 @@ void kernel_memory_startup(void) {
     INFO("initializing the memory system");
 
     init_memory();
+    hal_set_callback(HAL_CALLBACK_ALLOCATE_MEMORY, kernel_allocate_memory_at);
 }

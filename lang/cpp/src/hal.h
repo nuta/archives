@@ -26,8 +26,8 @@ enum exception_type {
   EXCEPTION_HARDWARE_ERROR,
 };
 
-void hal_set_callback(enum hal_callback_type type, void (*handler)());
-void hal_call_callback(enum hal_callback_type type, ...);
+void hal_set_callback(enum hal_callback_type type, result_t (*handler)());
+result_t hal_call_callback(enum hal_callback_type type, ...);
 
 void hal_wait_interrupt(void);
 bool hal_interrupt_enabled(void);

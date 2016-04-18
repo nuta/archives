@@ -164,6 +164,15 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_memory_release(__ch, (uintptr_t) a0);
             return;
     }
+    case MSGTYPE(memory, allocate_physical):
+    {
+        DEBUG("received memory.allocate_physical");
+            payload_t a0 = payloads[2];
+            payload_t a1 = payloads[3];
+            payload_t a2 = payloads[4];
+            kernel_memory_allocate_physical(__ch, (paddr_t) a0, (size_t) a1, (uint32_t) a2);
+            return;
+    }
     case MSGTYPE(channel, connect):
     {
         DEBUG("received channel.connect");

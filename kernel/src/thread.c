@@ -311,7 +311,7 @@ void kernel_hard_switch_thread(void) {
 }
 
 
-static void run_thread(ident_t group, const char *name, uintptr_t entry, uintptr_t arg) {
+static result_t run_thread(ident_t group, const char *name, uintptr_t entry, uintptr_t arg) {
     ident_t thread;
     UNUSED ident_t r_group;
     uintptr_t stack;
@@ -324,6 +324,7 @@ static void run_thread(ident_t group, const char *name, uintptr_t entry, uintptr
     kernel_create_thread(group, (const uchar_t *) name, strlen(name), &thread, &r_group);
     kernel_set_thread(thread, entry, arg, stack, stack_size);
     kernel_set_thread_status(thread, THREAD_RUNNABLE);
+    return OK;
 }
 
 
@@ -347,7 +348,7 @@ void kernel_thread_startup(void) {
     hal_set_current_thread_id(thread);
     DEBUG("set current thread:#%d.%d", group, thread);
 
-    hal_set_callback(HAL_CALLBACK_TIMER_TICK, kernel_hard_switch_thread);
-    hal_set_callback(HAL_CALLBACK_RUN_THREAD, run_thread);
-    hal_set_callback(HAL_CALLBACK_START_THREADING, start_threading);
+    hal_set_callback(HAL_CALLBACK_RUN_THREAD,      run_thread);
+    hal_set_callback(HAL_CALLBACK_TIMER_TICK,      (result_t (*)()) kernel_hard_switch_thread);
+    hal_set_callback(HAL_CALLBACK_START_THREADING, (result_t (*)()) start_threading);
 }

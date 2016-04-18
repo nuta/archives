@@ -59,6 +59,8 @@ void kernel_hard_switch_thread(void);
  */
 void kernel_memory_startup(void);
 void *kernel_allocate_memory(size_t size, uint32_t flags);
+result_t kernel_allocate_memory_at(paddr_t at, size_t size, uint32_t flags,
+                                   uintptr_t *addr, paddr_t *paddr);
 size_t kernel_get_dynamic_vpages_num(void);
 uintptr_t kernel_vmalloc(size_t size);
 

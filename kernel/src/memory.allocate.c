@@ -13,10 +13,8 @@
 void kernel_memory_allocate(channel_t __ch, size_t size, uint32_t flags) {
      result_t r;
      uintptr_t addr;
+     paddr_t paddr;
 
-     addr = (uintptr_t) kernel_allocate_memory(size, flags);
-     r = (addr)? OK : E_NOSPACE;
-
+     r = kernel_allocate_memory_at(0, size, flags, &addr, &paddr);
      send_memory_allocate_reply(__ch, r, addr);
-    
 }

@@ -18,5 +18,6 @@ void kernel_memory_unmap(channel_t __ch, uintptr_t a0);
 void kernel_memory_get_page_size(channel_t __ch);
 void kernel_memory_allocate(channel_t __ch, size_t a0, uint32_t a1);
 void kernel_memory_release(channel_t __ch, uintptr_t a0);
+void kernel_memory_allocate_physical(channel_t __ch, paddr_t a0, size_t a1, uint32_t a2);
 void kernel_channel_connect(channel_t __ch, uintmax_t a0, interface_t a1);
 void kernel_channel_register(channel_t __ch, uintmax_t a0, interface_t a1);
