@@ -1,4 +1,6 @@
 class WellKnownController < ApplicationController
+  skip_before_action :authenticate, only: [:redirect]
+
   def redirect
     case params[:type]
     when 'caldav'
