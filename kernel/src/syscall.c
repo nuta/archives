@@ -3,7 +3,7 @@
 #include "kernel.h"
 
 
-static result_t send(channel_t ch, payload_t *m) {
+static result_t send(channel_t ch, payload_t *m, size_t size) {
     struct thread_group *src_group, *dest_group;
     struct channel *src, *dest;
 
@@ -36,7 +36,6 @@ static result_t send(channel_t ch, payload_t *m) {
                  handler);
             handler(src->linked_to, m);
         } else {
-            size_t size = 24; // XXX
             INFO("send to queue: @%d:%d -> @%d:%d (queue=%p)",
                  src_group->id, ch, dest_group->id, src->linked_to,
                  dest->buf);
@@ -86,13 +85,13 @@ static result_t setoptions(channel_t channel, handler_t *handler, void *buffer, 
 
 
 
-static result_t call(channel_t ch, payload_t *m, void *buffer, size_t buffer_size) {
+static result_t call(channel_t ch, payload_t *m, size_t size, void *buffer, size_t buffer_size) {
     result_t r;
 
     if ((r = setoptions(ch, NULL, buffer, buffer_size)) != OK)
         return r;
 
-    if ((r = send(ch, m)) != OK)
+    if ((r = send(ch, m, size)) != OK)
         return r;
 
     return wait(ch);
@@ -152,7 +151,7 @@ static result_t close(channel_t id) {
 // NOTE: If you want to change this defition do care about
 //       system call wrappers in lang libraries.
 result_t kernel_syscall(int type, uintmax_t r1, uintmax_t r2,
-                        uintmax_t r3, uintmax_t r4, uintmax_t *ret) {
+                        uintmax_t r3, uintmax_t r4, uintmax_t r5, uintmax_t *ret) {
     result_t r;
 
     switch (type) {
@@ -170,7 +169,7 @@ result_t kernel_syscall(int type, uintmax_t r1, uintmax_t r2,
         break;
     case SYSCALL_SEND:
         DEBUG("syscall: send(%p)", (void *) r1);
-        r = send((channel_t) r1, (payload_t *) r2);
+        r = send((channel_t) r1, (payload_t *) r2, (size_t) r3);
         break;
     case SYSCALL_RECV:
         DEBUG("syscall: recv(%d)", r1);
@@ -182,7 +181,7 @@ result_t kernel_syscall(int type, uintmax_t r1, uintmax_t r2,
         break;
      case SYSCALL_CALL:
         DEBUG("syscall: call(%p, %p)", (void *) r1, (void *) r2);
-        r = call((channel_t) r1, (payload_t *) r2, (void *) r3, (size_t) r4);
+        r = call((channel_t) r1, (payload_t *) r2, (size_t) r3, (void *) r4, (size_t) r5);
         break;
     case SYSCALL_LINK:
         DEBUG("syscall: link(%d, %d)", r1, r2);

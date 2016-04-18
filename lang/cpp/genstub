@@ -71,7 +71,7 @@ def call_decl(interface_name, msgtype_name, msgtype):
     __payloads[{{ loop.index0 }}] = (payload_t) {{ name }};
 {%- endfor %}
 
-    sys_send(__ch, (payload_t *) &__payloads);
+    sys_send(__ch, (payload_t *) &__payloads, sizeof(__payloads));
 }
 
 """
@@ -84,7 +84,7 @@ def call_decl(interface_name, msgtype_name, msgtype):
     __arg[{{ loop.index0 }}] = (payload_t) {{ name }};
 {%- endfor %}
 
-    sys_call(__ch, (payload_t *) &__arg, (payload_t *) &__ret, sizeof(__ret));
+    sys_call(__ch, (payload_t *) &__arg, sizeof(__arg), (payload_t *) &__ret, sizeof(__ret));
 
 {% for n, type, name in unmarshall %}
     *{{ name }} = ({{ type }}) __ret[{{ n }}];
