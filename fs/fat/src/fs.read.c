@@ -21,5 +21,8 @@ void fat_fs_read(channel_t __ch,
     result = fat_read(&fat_the_disk, fat_get_file_by_id(file),
                       offset, data, size, &r_size);
 
-    send_fs_read_reply(__ch, result, MOVE(data), size);
+    sendas_fs_read_reply(__ch,
+        result, PAYLOAD_INLINE,
+	data,   PAYLOAD_MOVE_OOL,
+	size,   PAYLOAD_INLINE);
 }

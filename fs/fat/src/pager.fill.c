@@ -21,5 +21,8 @@ void fat_pager_fill(
     result = fat_read(&fat_the_disk, fat_get_file_by_id(id),
                       offset, data, size, &r_size);
 
-    send_pager_fill_reply(__ch, result, MOVE(data), r_size);
+    sendas_pager_fill_reply(__ch,
+        result,  PAYLOAD_INLINE,
+	data,    PAYLOAD_MOVE_OOL,
+	r_size,  PAYLOAD_INLINE);
 }
