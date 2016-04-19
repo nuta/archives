@@ -15,7 +15,8 @@ class GeneratingError(Exception):
     pass
 
 
-def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None, callas=False):
+def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None,
+                      with_type_args=False):
 
     if name_prefix is None:
         name_prefix = ''
@@ -49,7 +50,7 @@ def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None, c
                     continue
 
                 if isinstance(q, dict):
-                    if callas and q['type'] != '':
+                    if with_type_args and q['type'] != '':
                         header += '| ({} << {})'.format("type" + str(j), i * 4)
                         j += 1
                     else:
@@ -80,25 +81,8 @@ def call_decl(interface_name, msgtype_name, msgtype):
 }
 
 """
+
     call_tmpl = """
-{{ func }} {
-    payload_t __arg[{{ arg_size }}];
-    payload_t __ret[{{ ret_size }}];
-
-{% for type, name in arg_payloads %}
-    __arg[{{ loop.index0 }}] = (payload_t) {{ name }};
-{%- endfor %}
-
-    sys_call(__ch, (payload_t *) &__arg, sizeof(__arg), (payload_t *) &__ret, sizeof(__ret));
-
-{% for n, type, name in unmarshall %}
-    *{{ name }} = ({{ type }}) __ret[{{ n }}];
-{%- endfor %}
-}
-
-"""
-
-    callas_tmpl = """
 {{ func }} {
     payload_t __arg[{{ arg_size }}];
     payload_t __ret[{{ ret_size }}];
@@ -151,7 +135,7 @@ def call_decl(interface_name, msgtype_name, msgtype):
 
         # callas
         arg_payloads = load_payload_defs(interface_name, msgtype_name, msgtype,
-                           callas=True)
+                           with_type_args=True)
 
         args = ['channel_t __ch']
         i = 1
@@ -167,7 +151,7 @@ def call_decl(interface_name, msgtype_name, msgtype):
             interface_name, msgtype_name, ", ".join(args))
 
         decls += func + ";\n"
-        code += jinja2.Template(callas_tmpl).render(**locals())
+        code += jinja2.Template(call_tmpl).render(**locals())
 
 
     payloads = load_payload_defs(interface_name, msgtype_name, msgtype)
@@ -177,7 +161,24 @@ def call_decl(interface_name, msgtype_name, msgtype):
         interface_name, msgtype_name, ", ".join(args))
     decls += func + ";\n"
     code += jinja2.Template(send_tmpl).render(**locals())
-    
+ 
+    # sendas
+    payloads = load_payload_defs(interface_name, msgtype_name, msgtype,
+                   with_type_args=True)
+
+    args = ['channel_t __ch']
+    i = 1
+    for p in payloads[1:]:
+        if p[0] != '':
+            args.append('{} {}'.format(*p))
+            args.append('payloadtype_t type{}'.format(i))
+            i += 1
+
+    func = "static inline void sendas_{}_{}({})".format(
+        interface_name, msgtype_name, ", ".join(args))
+    decls += func + ";\n"
+    code += jinja2.Template(send_tmpl).render(**locals())
+
     return decls, code
 
 
