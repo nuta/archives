@@ -50,7 +50,7 @@ enum {
 };
 
 /*
- *  Logging TODO
+ *  Logging
  */
 void printfmt (const char *format, ...);
 
