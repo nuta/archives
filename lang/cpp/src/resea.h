@@ -16,6 +16,7 @@
 #endif
 
 typedef uintmax_t payload_t;
+typedef uint8_t payloadtype_t;
 typedef uintmax_t ident_t;
 typedef uintmax_t paddr_t;
 typedef uintmax_t offset_t;
@@ -102,7 +103,9 @@ void hal_panic(void);
 #define MSGTYPE(i, type)  __msgtype_##i##_##type
 #define ALIGN(x, align) (((x) + (align) - 1) & ~((align) - 1))
 
-/* system calls */
+/*
+ *  System calls
+ */
 enum {
   SYSCALL_OPEN       = 1,
   SYSCALL_CLOSE      = 2,
@@ -116,10 +119,6 @@ enum {
   SYSCALL_TRANSFER   = 10,
 };
 
-
-/*
- *  System calls
- */
 channel_t sys_open(void);
 result_t sys_close(channel_t ch);
 result_t sys_wait(channel_t ch);
@@ -130,10 +129,23 @@ result_t sys_call(channel_t ch, payload_t *m, size_t size, void *buffer, size_t 
 result_t sys_link(channel_t ch1, channel_t ch2);
 result_t sys_transfer(channel_t ch1, channel_t ch2);
 
+
 /*
  *  Channel
  */
 channel_t connect_to_local(channel_t id);
 NORETURN void serve_channel(channel_t ch, handler_t handler);
+
+
+/*
+ *  Message
+ */
+enum {
+  PAYLOAD_INLINE   = 1,
+  PAYLOAD_OOL      = 2,
+  PAYLOAD_CHANNEL  = 3,
+  PAYLOAD_MOVE_OOL = 4,
+};
+
 
 #endif
