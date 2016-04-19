@@ -15,7 +15,7 @@ class GeneratingError(Exception):
     pass
 
 
-def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None):
+def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None, callas=False):
 
     if name_prefix is None:
         name_prefix = ''
@@ -36,27 +36,32 @@ def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None):
             })
 
     payloads = []
+    j = 1
     for i, p in enumerate(defs):
         if i % 8 == 0:
             # inject a payload header
-            header = 0
+            header = '0'
             size_payload = False
             for i, q in enumerate(defs[i:i+8]):
                 if size_payload:
-                    header |= 0x0f << (i * 4)
+                    header += ' | (0x0f << {})'.format(i * 4)
                     size_payload = False
                     continue
 
                 if isinstance(q, dict):
-                    if q['type'] == 'channel':
-                        header |= 0x03 << (i * 4)
-                    elif is_ool_type(q['type']):
-                        header |= 0x02 << (i * 4)
-                        size_payload = True
+                    if callas and q['type'] != '':
+                        header += '| ({} << {})'.format("type" + str(j), i * 4)
+                        j += 1
                     else:
-                        header |= 0x01 << (i * 4)
+                        if q['type'] == 'channel':
+                            header += '| (0x03 << {})'.format(i * 4)
+                        elif is_ool_type(q['type']):
+                            header += '| (0x02 << {})'.format(i * 4)
+                            size_payload = True
+                        else:
+                            header += '| (0x01 << {})'.format(i * 4)
 
-            payloads.append(('', hex(header)))
+            payloads.append(('', header))
         payloads.append((ctype(p['type']), name_prefix + p['name'])) # payload
 
     return payloads
@@ -92,6 +97,25 @@ def call_decl(interface_name, msgtype_name, msgtype):
 }
 
 """
+
+    callas_tmpl = """
+{{ func }} {
+    payload_t __arg[{{ arg_size }}];
+    payload_t __ret[{{ ret_size }}];
+
+{% for type, name in arg_payloads %}
+    __arg[{{ loop.index0 }}] = (payload_t) {{ name }};
+{%- endfor %}
+
+    sys_call(__ch, (payload_t *) &__arg, sizeof(__arg), (payload_t *) &__ret, sizeof(__ret));
+
+{% for n, type, name in unmarshall %}
+    *{{ name }} = ({{ type }}) __ret[{{ n }}];
+{%- endfor %}
+}
+
+"""
+
     code = ''
     decls = ''
 
@@ -124,6 +148,27 @@ def call_decl(interface_name, msgtype_name, msgtype):
 
         decls += func + ";\n"
         code += jinja2.Template(call_tmpl).render(**locals())
+
+        # callas
+        arg_payloads = load_payload_defs(interface_name, msgtype_name, msgtype,
+                           callas=True)
+
+        args = ['channel_t __ch']
+        i = 1
+        for arg in arg_payloads[1:]:
+            if arg[0] != '':
+                args.append('{} {}'.format(*arg))
+                args.append('payloadtype_t type{}'.format(i))
+                i += 1
+
+        args += [ '{}* {}'.format(*ret) for ret in ret_payloads[1:] if ret[0] != '']
+
+        func = "static inline void callas_{}_{}({})".format(
+            interface_name, msgtype_name, ", ".join(args))
+
+        decls += func + ";\n"
+        code += jinja2.Template(callas_tmpl).render(**locals())
+
 
     payloads = load_payload_defs(interface_name, msgtype_name, msgtype)
     size = len(payloads)
