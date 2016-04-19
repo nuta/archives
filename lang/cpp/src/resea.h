@@ -49,9 +49,6 @@ enum {
   E_INUSE        = 8
 };
 
-// TODO: decorate these in payload header
-#define MOVE(p) ((void *) ((uintptr_t) (p) | 1))
-
 /*
  *  Logging TODO
  */
