@@ -11,5 +11,8 @@ void virtio_net_device_get_hardware_address(channel_t __ch) {
 
     hwaddr = allocate_memory(6, MEMORY_ALLOC_NORMAL);
     virtio_net_get_hwaddr(hwaddr);
-    send_net_device_get_hardware_address_reply(__ch, OK, MOVE(hwaddr), 6);
+    sendas_net_device_get_hardware_address_reply(__ch,
+        OK, PAYLOAD_INLINE,
+        hwaddr, PAYLOAD_MOVE_OOL,
+	6, PAYLOAD_INLINE);
 }

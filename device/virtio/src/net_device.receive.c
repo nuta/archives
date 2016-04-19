@@ -11,5 +11,8 @@ void virtio_net_device_receive(channel_t __ch) {
     size_t size;
 
     result = virtio_net_receive(&data, &size);
-    send_net_device_receive_reply(__ch, result, MOVE(data), size);
+    sendas_net_device_receive_reply(__ch,
+        result, PAYLOAD_INLINE,
+        data,  PAYLOAD_MOVE_OOL,
+	size, PAYLOAD_INLINE);
 }

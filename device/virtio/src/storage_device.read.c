@@ -22,6 +22,10 @@ void virtio_storage_device_read(channel_t __ch, offset_t offset, size_t size){
         result = virtio_blk_read(offset / VIRTIO_BLK_SECTOR_SIZE,
                                  size / VIRTIO_BLK_SECTOR_SIZE,
                                  &data);
-        send_storage_device_read_reply(__ch, result, MOVE(data), size);
+
+        sendas_storage_device_read_reply(__ch,
+	    result, PAYLOAD_INLINE,
+	    data,   PAYLOAD_MOVE_OOL,
+	    size,   PAYLOAD_INLINE);
     }
 }
