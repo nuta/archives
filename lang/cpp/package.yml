@@ -30,11 +30,13 @@ global_config:
           prefix: resea/
           suffix: .h
         compile: '$(CC) $(CFLAGS) -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
+        mkdeps:  ./packages/cpp/mkdeps
         scaffold: ./packages/cpp/scaffold
         genstub: ./packages/cpp/genstub
       asm:
         ext:  S
         abbrev: AS
+        mkdeps: touch
         compile: "$(CC) $(CFLAGS) -c -o"
       cpp:
         ext:  cpp
@@ -43,6 +45,7 @@ global_config:
           prefix: resea/
           suffix: .hpp
         compile: echo
+        mkdeps: touch
         scaffold: ./packages/cpp/scaffold
         genstub: ./packages/cpp/genstub
   CFLAGS:
