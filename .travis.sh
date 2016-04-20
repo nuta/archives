@@ -38,6 +38,6 @@ resea.net)
     ;;
 *)
     cd $TARGET
-    reseasdk test --all-in-one HAL=posix_host
+    reseasdk test HAL=posix_host
     ;;
 esac
