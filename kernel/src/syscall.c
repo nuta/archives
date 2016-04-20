@@ -17,14 +17,59 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
 
     dest_group = kernel_get_thread_group(src->linked_group);
     dest = &dest_group->channels[src->linked_to];
+
     if (dest->transfer_to) {
        dest = &dest_group->channels[dest->transfer_to];
     }
 
-    // TODO: channel payload
     // TODO: session payload
     // TODO: deny empty payloads (require at least one payload header)
     // TODO: validate payloads size
+
+    if (size % sizeof(payload_t) != 0) {
+        WARN("message size must be a multiple of sizeof(payload_t)");
+        return E_INVALID;
+    }
+
+    if (size < sizeof(payload_t)) {
+        // we need at least one payload header
+        WARN("message is too short");
+        return E_INVALID;
+    }
+
+    // foreach payload
+    payload_t header;
+    size_t payloads_num = size / sizeof(payload_t);
+
+    for (int i = 0; i < payloads_num; i++) {
+        if (i % 8 == 0) {
+            header = m[i];
+        } else {
+            int type = (header >> (4 * (i % 8))) & 0x0f;
+         
+            switch (type) {
+            case PAYLOAD_INLINE:
+                break;
+            case PAYLOAD_OOL:
+                WARN("OoL payload is not supported yet, handling as an inline");
+                break;
+            case PAYLOAD_MOVE_OOL:
+                WARN("move OoL payload is not supported yet, handling as an inline");
+                break;
+            case PAYLOAD_CHANNEL:
+                if (kernel_get_channel(src_group, m[i])->linked_to) {
+                    WARN("channel (%d th payload) is already linked", i);
+                    return E_INVALID;
+                }
+
+                kernel_link_channels(src_group, m[i], dest_group, kernel_alloc_channel_id(dest_group));
+                break;
+            default:
+                WARN("unknown payload type (%d), handling as an inline",
+                     type);
+            }
+        }
+    }
 
     if (dest_group->id == 1) {
         // destination thread group is in the kernel space

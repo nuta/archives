@@ -35,6 +35,12 @@ ident_t kernel_alloc_channel_id(struct thread_group *group) {
 }
 
 
+struct channel *kernel_get_channel(struct thread_group *group, channel_t ch) {
+
+    return &group->channels[ch];
+}
+
+
 result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t dst) {
 
     group->channels[src].used    = true;
