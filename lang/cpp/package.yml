@@ -55,8 +55,9 @@ global_config:
 config:
   - SOURCES:
       set:
-        - src/channel.c
         - src/ctype.c
+        - src/hal_callback.c
+        - src/channel.c
         - src/string.c
         - src/syscall.c
         - src/memory.c

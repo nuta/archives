@@ -30,7 +30,7 @@ void start_apps(void){
 {% for app in apps %}
 {% if with_threading %}
     INFO("starting '{{ app }}'");
-    hal_call_callback(HAL_CALLBACK_RUN_THREAD,
+    call_hal_callback(HAL_CALLBACK_RUN_THREAD,
         1, "{{ app }}", app_entrypoint,
 {%if test %}
         {{ app }}_test
@@ -47,7 +47,7 @@ void start_apps(void){
 
 {% if with_threading %}
     INFO("starting threading");
-    hal_call_callback(HAL_CALLBACK_START_THREADING);
+    call_hal_callback(HAL_CALLBACK_START_THREADING);
 {% endif %}
 }
 """

@@ -38,8 +38,8 @@ void x86_interrupt_handler (uint8_t vector) {
     x86_ack_interrupt();
 
     if (vector == x86_timer_vector)
-        hal_call_callback(HAL_CALLBACK_TIMER_TICK);
+        call_hal_callback(HAL_CALLBACK_TIMER_TICK);
     else
-        hal_call_callback(HAL_CALLBACK_INTERRUPT, vector);
+        call_hal_callback(HAL_CALLBACK_INTERRUPT, vector);
 }
 

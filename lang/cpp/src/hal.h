@@ -17,6 +17,12 @@ enum hal_callback_type {
   HAL_CALLBACK_MAX             = 8
 };
 
+typedef result_t (*hal_handler_t)();
+
+hal_handler_t hal_get_callback(enum hal_callback_type type);
+void hal_set_callback(enum hal_callback_type type, hal_handler_t handler);
+result_t call_hal_callback(enum hal_callback_type type, ...); // implemented in cpp
+
 enum exception_type {
   EXCEPTION_DIVIDE_BY_ZERO,
   EXCEPTION_PROTECTION_FAULT,
@@ -25,9 +31,6 @@ enum exception_type {
   EXCEPTION_KERNEL_FAULT,  // exceptions caused by kernel's bug
   EXCEPTION_HARDWARE_ERROR,
 };
-
-void hal_set_callback(enum hal_callback_type type, result_t (*handler)());
-result_t hal_call_callback(enum hal_callback_type type, ...);
 
 void hal_wait_interrupt(void);
 bool hal_interrupt_enabled(void);
