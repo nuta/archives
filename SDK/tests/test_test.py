@@ -11,6 +11,6 @@ def test_test(package, capsys):
         shutil.rmtree(build_dir)
 
     with pytest.raises(SystemExit):
-        reseasdk.main(['test', 'BUILTIN_APPS=kernel', 'HAL=posix_host'])
+        reseasdk.main(['test', 'BUILTIN_APPS=[kernel]', 'HAL=posix_host'])
 
     assert 'tests passed' in capsys.readouterr()[0]
