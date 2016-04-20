@@ -146,6 +146,12 @@ def build(args):
         'RESEAPATH': '',
         'PACKAGE': yml['name']
     }
+
+    configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
+    for configset in args.configset:
+        path = os.path.join(configsets_dir, configset + '.yml')
+        config.update(load_yaml(path)['global_config'])
+
     cmdline_config = get_cmdline_config(args.config)
     config.update(cmdline_config)
 
@@ -211,6 +217,7 @@ def add_build_arguments(parser):
     parser.add_argument('--prettify', action='store_false', help="prettify output")
     parser.add_argument('--all-in-one', action='store_true', help='embed all required applications')
     parser.add_argument('--single-app', action='store_true', help='no threading')
+    parser.add_argument('--configset', nargs="*", help='config sets')
     parser.add_argument('config', nargs='*', help='config variables (FOO=bar)')
     return parser
 
