@@ -19,7 +19,7 @@ $(VERBOSE).SILENT:
 #  global config
 #
 {% for k,v in config.items() %}
-{% if k not in ['LANG', 'OBJS', 'STUBS', '__builtins__'] %}
+{% if k not in ['LANG', 'OBJS', 'DEPS', 'STUBS', '__builtins__'] %}
 export {{ k }} = {{ v }}
 {% endif %}
 {% endfor %}
@@ -69,10 +69,15 @@ packages/%/package.yml
 \tPACKAGE_NAME=$(PACKAGE_NAME) {{ lang['genstub'] }} $@ $<
 {% endif %}
 
-$(BUILD_DIR)/%.o: packages/%.{{ lang['ext'] }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
+$(BUILD_DIR)/%.o: packages/%.{{ lang['ext'] }} $(BUILD_DIR)/%.deps $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
 \t$(MKDIR) -p $(@D)
 \t$(CMDECHO) '{{ lang['abbrev'] }}' $@
 \tPACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['compile'] }} $@ $<'
+
+$(BUILD_DIR)/%.deps: packages/%.{{ lang['ext'] }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
+\t$(MKDIR) -p $(@D)
+\t$(CMDECHO) 'MKDEPS' $@
+\techo "$(@:.deps=.o): `PACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['mkdeps'] }} $<'`" > $@
 {% endfor %}
 
 #
@@ -84,6 +89,13 @@ $(BUILD_DIR)/{{ package_name }}/%: PACKAGE_NAME = {{ package_name }}
 {% for k,v in config.items() %}
 $(BUILD_DIR)/{{ package_name }}/%: {{ k }} = {{ v }}
 {% endfor %}
+{% endfor %}
+
+#
+#  deps
+#
+{% for path in config['DEPS'] %}
+-include {{ path }}
 {% endfor %}
 """
 
@@ -184,6 +196,9 @@ def build(args):
         apps.remove('kernel')
 
     config['GENSTART_ARGS'] = ' '.join(apps)
+
+    # deps
+    config['DEPS'] = list(map(lambda x: os.path.splitext(x)[0] + '.deps', config['OBJS']))
 
     # override global config with command line variables
     config.update(cmdline_config)
