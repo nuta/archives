@@ -154,7 +154,7 @@ def build(args):
         'LD_R': '$(LD) -r -o',
         'MKDIR': 'mkdir',
         'CMDECHO': 'echo "-->"',
-        'BUILTIN_APPS': '',
+        'BUILTIN_APPS': [],
         'RESEAPATH': '',
         'PACKAGE': yml['name']
     }
@@ -179,7 +179,7 @@ def build(args):
         builtin_packages.append('kernel')
 
     if config['PACKAGE'] not in config['BUILTIN_APPS']:
-        config['BUILTIN_APPS'] = ",".join(config['BUILTIN_APPS'].split(',') + [config['PACKAGE']])
+        config['BUILTIN_APPS'] = config['BUILTIN_APPS'] + [config['PACKAGE']]
 
     # resolve dependencies
     config, local_config = load_packages(builtin_packages, config, enable_if=True)
