@@ -115,9 +115,15 @@ def render(tmpl, vars):
         lstrip_blocks=True).from_string(tmpl).render(vars)
 
 
-def load_yaml(path, validator=None):
+def load_yaml(path, **kwargs):
     """Loads a yaml file."""
-    yml = yaml.safe_load(open(path))
+    return loads_yaml(open(path).read(), **kwargs)
+    return yml
+
+
+def loads_yaml(s, validator=None):
+    """Loads a yaml string."""
+    yml = yaml.safe_load(s)
     if validator is not None:
         try:
             yml = validator(yml)

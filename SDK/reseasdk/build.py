@@ -5,7 +5,7 @@ import sys
 from termcolor import colored
 from reseasdk.package import get_package, load_package_yml, load_packages
 from reseasdk.helpers import render, info, notice, error, generating, \
-    load_yaml, dict_to_strdict, plan, progress
+    load_yaml, loads_yaml, dict_to_strdict, plan, progress
 from reseasdk.validators import validate_package_yml
 
 MAKEFILE_TEMPLATE = """\
@@ -132,9 +132,9 @@ def get_cmdline_config(args):
     cmdline_config = {}
     for arg in args:
         if '=' not in arg:
-            error('invalid default variable (should be FOO=bar form): {}'.format(c))
-        k, v = arg.split('=', 1)
-        cmdline_config[k] = v
+            error('invalid default variable (should be "VAR_NAME=yaml" form): {}'.format(c))
+        k, v = map(lambda x: x.strip(), arg.split('=', 1))
+        cmdline_config[k] = loads_yaml(v)
     return cmdline_config
 
 
@@ -172,9 +172,7 @@ def build(args):
     if 'HAL' not in config:
         error('HAL is not speicified')
 
-    # TODO: use json in BUILTIN_APPS
-    builtin_packages = [config['PACKAGE'], config['HAL']] + \
-        list(filter(lambda x: x != '', config['BUILTIN_APPS'].split(',')))
+    builtin_packages = [config['PACKAGE'], config['HAL']] + config['BUILTIN_APPS']
 
     # add kernel to run tests
     if args.env == 'test' and 'kernel' not in builtin_packages:
@@ -191,7 +189,7 @@ def build(args):
     config['OBJS'].append(os.path.join(config['BUILD_DIR'], 'start.o'))
     config['START_SOURCE_EXT'] = config['LANG']['c']['ext'] # FIXME
     
-    apps = config['BUILTIN_APPS'].split(',')
+    apps = config['BUILTIN_APPS']
     if args.env != 'test' and 'kernel' in apps:
         apps.remove('kernel')
 
