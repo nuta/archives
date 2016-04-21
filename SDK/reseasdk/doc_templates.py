@@ -12,13 +12,18 @@ HEADER = """
 {% endif %}
 </head>
 <body>
+<div class="container">
 <div class="header">
-  <h2>{{ title }}</h2>
+  <h1><img src="http://resea.net/resea.svg" alt="logo"><span>{{ title }}</span></h1>
+  <p class="revision">{{ revision }}</p>
 </div>
+<div class="body">
 """
 
 
 FOOTER = """
+</div>
+</div>
 </body>
 </html>
 """
@@ -32,20 +37,56 @@ body {
 }
 
 .header {
-  background: #415192;
-  border-bottom: 3px solid #aaa;
-  padding: 0.8em 0.5em 0.8em;
+  border-bottom: 1px solid #555;
+  padding-bottom: 10px;
 }
 
-.header h2 {
-  color: #fefefe;
+.header h1 {
+  display: inline;
   margin: 0;
+}
+
+.header h1 img {
+  position: relative;
+  top: 5px;
+  height: 40px;
+}
+
+.header h1 span {
+  margin-left: 20px;
+  font-size: 25px;
+  font-family: "Source Code Pro", sans-serif;
+  font-weight: 400;
+}
+
+.revision {
+  display: inline;
+  float: right;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.header:after {
+  clear: both;
 }
 
 .container {
   max-width: 850px;
   margin: 0 auto 0;
+  padding: 0 50px 0;
 }
+
+.body {
+  padding: 0 30px 0;
+  color: #333;
+}
+
+h2 {
+  margin-top: 90px;
+  margin-bottom: 40px;
+  font-weight: normal;
+}
+
 """
 
 PACKAGE_DOC_CSS = COMMON_CSS + """
@@ -118,63 +159,71 @@ INDEX_DOC_CSS = COMMON_CSS + """
 """
 
 INDEX_DOC = HEADER + """
-<div class="container">
-  <h2>References</h2>
-  <p><a href="packages">Package References</a>: Documentaion for Resea packages.</p>
-</div>
+<h2>Tutorial</h2>
+<p><a href="http://resea.net/resea-by-example">Resea by Example</a>: Learn Resea by Examples</p>
+
+<h2>References</h2>
+<p><a href="packages">Package References</a>: Documentaion for Resea packages.</p>
+
+<h2>Specifications</h2>
+<p><a href="thread.html">Thread and Thread Group</a>: A execution unit and set of threads.</p>
+<p><a href="channel.html">Channel</a>: A endpoint of communication.</p>
+<p><a href="message.html">Message</a>: Message structure, payload types, etc.</p>
+<p><a href="interface.html">Interface</a>: A defition of structured messages.</p>
+
+
+<h2>SDK</h2>
+<p><a href="commands.html">Commands</a>: How to use SDK.</p>
+<p><a href="package.yml.html">package.yml</a>: The essential file for a package.</p>
 """
 
 PACKAGE_INDEX_DOC = HEADER + """
-<div class="container">
-  <ul>
-  {% for package in packages %}
-    <li><a href="{{ package['name'] }}">{{ package['name'] }} - <span class="summary">{{ package['summary'] }}</span></a></li>
-  {% endfor %}
-  </ul>
-</div>
+<ul>
+{% for package in packages %}
+  <li><a href="{{ package['name'] }}">{{ package['name'] }} - <span class="summary">{{ package['summary'] }}</span></a></li>
+{% endfor %}
+</ul>
 """ + FOOTER
 
 
 PACKAGE_DOC = HEADER + """
-<div class="container">
-  <div class="main">
-    <h1 class="name">{{ name }}</h1>
-    <p class="description">{{ summary }}</p>
-    <div class="readme markdown">
-      {{ readme }}
-    </div>
+<div class="main">
+  <h1 class="name">{{ name }}</h1>
+  <p class="description">{{ summary }}</p>
+  <div class="readme markdown">
+    {{ readme }}
   </div>
+</div>
 
-  <div class="sidebar">
-    <h3>Profile</h3>
-    <ul>
-      <li class="category">{{ category }}</li>
-      <li>created by {{ author }}</li>
-      <li>{{ license }}</li>
-      <li><a href="{{ homepage }}">{{ homepage or '' }}</a></li>
-    </ul>
-    
-    <h3>Implements</h3>
-    <ul>
-    {% for i in implements %}
-      <li>{{ i }}</li>
-    {% endfor %}
-    </ul>
+<div class="sidebar">
+  <h3>Profile</h3>
+  <ul>
+    <li class="category">{{ category }}</li>
+    <li>created by {{ author }}</li>
+    <li>{{ license }}</li>
+    <li><a href="{{ homepage }}">{{ homepage or '' }}</a></li>
+  </ul>
   
-    <h3>Uses</h3>
-    <ul>
-    {% for i in uses %}
-      <li>{{ i }}</li>
-    {% endfor %}
-    </ul>
-  
-    <h3>Requires</h3>
-    <ul>
-    {% for i in requires %}
-      <li>{{ i }}</li>
-    {% endfor %}
-    </ul>
-  </div>
+  <h3>Implements</h3>
+  <ul>
+  {% for i in implements %}
+    <li>{{ i }}</li>
+  {% endfor %}
+  </ul>
+
+  <h3>Uses</h3>
+  <ul>
+  {% for i in uses %}
+    <li>{{ i }}</li>
+  {% endfor %}
+  </ul>
+
+  <h3>Requires</h3>
+  <ul>
+  {% for i in requires %}
+    <li>{{ i }}</li>
+  {% endfor %}
+  </ul>
 </div>
 """ + FOOTER
 

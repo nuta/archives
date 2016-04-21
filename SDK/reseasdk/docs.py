@@ -11,7 +11,7 @@ def md2html(path):
                output_format='html5')
 
 
-def generate_package_doc(indir, outdir):
+def generate_package_doc(indir, outdir, revision):
     os.makedirs(outdir, exist_ok=True)
 
     try:
@@ -23,7 +23,8 @@ def generate_package_doc(indir, outdir):
     yml.update({
        'title': 'Resea Documentation - {}'.format(yml['name']),
        'css': PACKAGE_DOC_CSS,
-       'readme': md2html(os.path.join(indir, 'README.md'))
+       'readme': md2html(os.path.join(indir, 'README.md')),
+       'revision': revision
     })
 
     generating('GENDOC', os.path.join(outdir, 'index.html'))
@@ -39,21 +40,23 @@ def generate_package_doc(indir, outdir):
              }))
 
 
-def generate_package_index_doc(packages, out_path):
+def generate_package_index_doc(packages, out_path, revision):
     generating('GENDOC', out_path)
     with open(out_path, 'w') as f:
         f.write(render(PACKAGE_INDEX_DOC, {
             'title': 'Resea Documentation - Packages',
             'css': PACKAGE_INDEX_DOC_CSS,
-            'packages': packages
+            'packages': packages,
+            'revision': revision
         }))
 
 
-def generate_index_doc(out_path):
+def generate_index_doc(out_path, revision):
     generating('GENDOC', out_path)
     with open(out_path, 'w') as f:
         f.write(render(INDEX_DOC, {
             'title': 'Resea Documentation',
             'css': INDEX_DOC_CSS,
+            'revision': revision
         }))
 
