@@ -54,7 +54,7 @@ implements: []
 #
 #  Type definitions
 #
-type:
+types:
 
 
 #
