@@ -117,9 +117,8 @@ def run_make(makefile, env, prettify=False):
         if prettify and l.startswith('--> '):
             try:
                 cmd, rest = l.lstrip('--> ').split(' ', 1)
-                print('{:<8} {}'.format(
-                      colored(cmd, 'magenta', attrs=['bold']),
-                      colored(rest, 'yellow')))
+                print(colored('{:<8}'.format(cmd), 'magenta', attrs=['bold']),
+                      colored(rest, 'yellow'))
             except ValueError:
                 print(l)
         else:
