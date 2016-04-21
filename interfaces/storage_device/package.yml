@@ -1,5 +1,5 @@
 name: storage_device
-id: 14
+id: 101
 category: interface
 license: Public Domain
 summary: The interface of storage devices

@@ -1,6 +1,6 @@
 name: datetime
 category: interface
-id: 11
+id: 6
 license: Public Domain
 summary: The interface of date/time management
 description: # longer explanation
