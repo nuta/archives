@@ -21,8 +21,7 @@ void {{ app }}_startup();
 
 static void app_entrypoint (void (*startup)()) {
   startup();
-  BUG("startup() returned");
-  for(;;); // FIXME
+  PANIC("startup() returned");
 }
 
 void start_apps(void){
