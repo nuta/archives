@@ -189,4 +189,6 @@ def load_packages(builtin_packages, config=None, enable_if=False):
                             local_config[package][k] = v['set']
                     else:
                             error("invalid local config: '{}' (expected set or append)".format(k))
+
+    del config['__builtins__'] # FIXME
     return config, local_config

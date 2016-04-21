@@ -1,5 +1,7 @@
+import json
 import multiprocessing
 import os
+import shutil
 import subprocess
 import sys
 from termcolor import colored
@@ -199,10 +201,24 @@ def build(args):
 
     # override global config with command line variables
     config.update(cmdline_config)
-    
+   
+    # clean up if build config have been changed
+    try:
+        prev_config = json.load(open(os.path.join(config['BUILD_DIR'], 'buildconfig.json')))
+    except FileNotFoundError:
+        prev_config = None
+
+    if prev_config and prev_config != config:
+        plan('detected build config changes; cleaning the build directory')
+        progress('deleting {}'.format(config['BUILD_DIR'])) 
+        shutil.rmtree(config['BUILD_DIR'])
+
     # generate the build directory
     if not os.path.exists(config['BUILD_DIR']):
         os.makedirs(config['BUILD_DIR'], exist_ok=True)
+
+    # save the build config to detect its changes
+    json.dump(config, open(os.path.join(config['BUILD_DIR'], 'buildconfig.json'), 'w'))
 
     # generate makefile if needed
     makefile = config['BUILD_DIR'] + '/Makefile'
