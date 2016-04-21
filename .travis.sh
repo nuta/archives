@@ -3,9 +3,10 @@ set -e
 
 deploy_resea_net() {
     commit_msg="resea: $(git log --format=%B -n1|tr -d '\n')"
+    revision=master
 
     git clone https://github.com/resea/resea.github.io
-    reseasdk alldocs --outdir resea.net/docs/master
+    reseasdk alldocs --revision $revision --outdir resea.net/docs/master
     cd resea.github.io
     cp -r ../resea.net/* .
 
