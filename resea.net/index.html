@@ -11,8 +11,8 @@ body {
 }
 
 .container {
-  width: 500px;
-  margin: 3em auto 0;
+  width: 600px;
+  margin: 100px auto 0;
 }
 
 .header {
@@ -39,41 +39,32 @@ h2 {
   font-style: italic;
   font-size: 20px;
   font-family: 'Lucida Grande', sans-serif;
-  margin-top: 40px;
+  margin-top: 15px;
+  margin-bottom: 80px;
 }
 
-.header ul {
+.links {
   list-style-type: none;
   padding-left: 0;
 }
 
-.header li {
-  display: inline;
-}
-
-.header li:not(:last-child) {
-  margin-right: 2em;
-}
-
-.separator {
-  width: 100%;
-  border-top: 5px solid #BF9F78;
-  border-bottom: 3px solid #D97762;
-  margin-top: 20px;
-  margin-bottom: 30px;
+.links li {
+  display: inline-block;
+  margin: 15px;
 }
 
 .links a {
   text-decoration: none;
-  font-size: 19px;
-}
-
-.links a:link {
-  color: #5C9DF2;
+  font-size: 23px;
+  background: #5c9df2;
+  padding: 12px;
+  color: #ffffff;
+  border-bottom: 2px solid #324759;
 }
 
 .links a:hover {
-  color: #324759;
+  background: #92bf00;
+  transition: background 0.3s ease-in-out;
 }
 
 </style>
@@ -85,9 +76,10 @@ h2 {
   <div class="header">
     <img src="resea.svg" alt="logo" class="logo">
     <h1>Resea</h1>
-    <h2>A sweet operating system kernel for everybody.</h2>
+    <h2>A sweet operating system kernel for hackers.</h2>
     <div class="separator"></div>
     <ul class="links">
+      <li><a href="docs/master">Get Started</a></li>
       <li><a href="docs/master">Documentation</a></li>
       <li><a href="https://github.com/resea/resea">GitHub</a></li>
     </ul>
