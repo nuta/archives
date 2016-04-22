@@ -14,7 +14,7 @@ class CalendarController < ApplicationController
   def options
     methods = %w(OPTIONS GET PUT DELETE MKCALENDAR PROPFIND PROPPATCH REPORT COPY MOVE)
     headers['Allow'] = methods.join(', ')
-    headers['DAV']   = '1, 2, calendar-access'
+    headers['DAV']   = '1, 2, calendar-access, calendarserver-subscribed'
     head :ok
   end
 
