@@ -21,21 +21,6 @@ $ sudo docker build -t busybook .
 $ sudo docker exec -it rake user:add
 ```
 
-## Configuration
-### Database
-Edit `/var/lib/busybook/database.yml`. By default it is a sqlite3 database. Refer [Ruby on Rails Guides](http://guides.rubyonrails.org/configuring.html#configuring-a-database).
-
-### Adding users
-```
-service busybook rake user:add
-```
-
-or
-
-```
-service busybook rake user:add username=joey password=howyoudoing
-```
-
 ## Backup
 Busybook stores all data in the database so simply you can backup and restore by RDBMS's command like [pg_dump](http://www.postgresql.org/docs/9.5/static/app-pgdump.html).
 
