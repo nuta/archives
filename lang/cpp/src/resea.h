@@ -96,8 +96,6 @@ void hal_panic(void);
 /*
  *  Useful macros
  */
-#define INTERFACE(i)      __interface_##i
-#define MSGTYPE(i, type)  __msgtype_##i##_##type
 #define ALIGN(x, align) (((x) + (align) - 1) & ~((align) - 1))
 
 /*
@@ -137,6 +135,12 @@ NORETURN void serve_channel(channel_t ch, handler_t handler);
 /*
  *  Message
  */
+#define INTERFACE(i)         __interface_##i
+#define MSGTYPE(i, type)     __msgtype_##i##_##type
+#define __PTYPE(i, t, p)     __ptype_##i##_##t##_##p
+#define __PINDEX(i, t, p)    __pindex_##i##_##t##_##p
+#define EXTRACT(m, i, t, p)  ((__PTYPE(i, t, p)) (((payload_t *) (m))[__PINDEX(i, t, p)]))
+
 enum {
   PAYLOAD_NULL     = 0,
   PAYLOAD_INLINE   = 1,

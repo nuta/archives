@@ -155,6 +155,16 @@ def call_decl(interface_name, msgtype_name, msgtype):
 
 
     payloads = load_payload_defs(interface_name, msgtype_name, msgtype)
+
+    for i, p in enumerate(payloads):
+        if p[0] == '':
+            continue
+
+        code += "typedef {} __ptype_{}_{}_{};\n".format(p[0], interface_name, msgtype_name,
+                    p[1])
+        code += "static const int __pindex_{}_{}_{} = {};\n".format(interface_name, msgtype_name,
+                    p[1], i)
+
     size = len(payloads)
     args = ['channel_t __ch'] + [ '{} {}'.format(*p) for p in payloads[1:] if p[0] != '']
     func = "static inline void send_{}_{}({})".format(
