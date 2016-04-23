@@ -25,27 +25,19 @@ class Schedule < ActiveRecord::Base
     self.where(calendar: Calendar.find_by_uri!(calendar)).where(sql, *args)
   end
 
-  def Schedule.copy(src_path, calendar, calendar_object)
+  def copy_to(calendar, calendar_object)
     ActiveRecord::Base.transaction do
-      src = Schedule.find_by_uri!(src_path)
       dst = Schedule.new(uri: calendar_object)
       dst.calendar = Calendar.find_by_uri!(calendar)
-      dst.attributes = src.attributes.except('id', 'uri', 'calendar')
+      dst.attributes = self.attributes.except('id', 'uri', 'calendar')
 
       dst.save!
     end
   end
 
-  def Schedule.move(src_path, calendar, calendar_object)
-    ActiveRecord::Base.transaction do
-      src = Schedule.find_by_uri!(src_path)
-      dst = Schedule.new(uri: calendar_object)
-      dst.calendar = Calendar.find_by_uri!(calendar)
-      dst.attributes = src.attributes.except('id', 'uri', 'calendar')
-
-      src.destroy
-      dst.save!
-    end
+  def move_to(calendar)
+    self.calendar = Calendar.find_by_uri!(calendar)
+    self.save!
   end
 
   def set_ics(body)

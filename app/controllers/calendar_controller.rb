@@ -60,12 +60,12 @@ class CalendarController < ApplicationController
   end
 
   def copy
-    Schedule.copy(@src, @dst[:calendar], @dst[:calendar_object])
+    @src.copy_to(@dst[:calendar], @dst[:calendar_object])
     head :status => :no_content
   end
 
   def move
-    Schedule.move(@src, @dst[:calendar], @dst[:calendar_object])
+    @src.move_to(@dst[:calendar])
     head :status => :created
   end
 
@@ -145,7 +145,7 @@ class CalendarController < ApplicationController
   private
 
   def set_src_and_dst
-    @src = params[:calendar_object]
+    @src = Schedule.find_by_uri!(params[:calendar_object])
 
     begin
       @dst = Rails.application.routes.recognize_path(request.headers[:destination])
