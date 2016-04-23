@@ -21,7 +21,7 @@ $(VERBOSE).SILENT:
 #  global config
 #
 {% for k,v in config.items() %}
-{% if k not in ['LANG', 'OBJS', 'DEPS', 'STUBS', '__builtins__'] %}
+{% if k not in ['LANG', 'OBJS', 'DEPS', 'STUBS'] %}
 export {{ k }} = {{ v }}
 {% endif %}
 {% endfor %}
