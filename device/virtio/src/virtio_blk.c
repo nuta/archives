@@ -1,38 +1,56 @@
 #include <resea.h>
+#include <resea/channel.h>
+#include <resea/pci.h>
+#include <resea/storage_device.h>
 #include <resea/cpp/io.h>
 #include <resea/cpp/memory.h>
 #include <string.h>
 #include "virtio.h"
 #include "virtio_blk.h"
-#include "pci.h"
 
 static struct virtio_device device;
 
-void virtio_blk_test(void);
 
-bool virtio_blk_init(void){
-    struct pci_device pci;
-    uint32_t feats;
+static void new_device_handler(channel_t ch, payload_t *m) {
+    uint16_t bus, dev;
+    uint32_t feats, bar0;
+    void *config;
+    result_t r;
+
+    switch (m[1]) {
+    case MSGTYPE(pci, new_device):
+        config = EXTRACT(m, pci, new_device, header);
+        DEBUG("virtio-blk device found: PCI bus=%d, dev=%d", bus, dev);
   
-    if (!pci_lookup(&pci, VIRTIO_PCI_VENDOR, 0x1001 /* XXX */,
-                    VIRTIO_PCI_SUBSYS_BLOCK)){
-        DEBUG("virtio-blk device not found");
-        return false;
+        // setup the device
+        virtio_setup_device(&device, bar0);
+        feats = virtio_get_features(&device);
+        virtio_set_features(&device, feats);
+        virtio_init_queue(&device, VIRTIO_BLK_RQUEUE);
+        virtio_activate_device(&device);
+
+        DEBUG("virtio-blk: device ready");
+        call_channel_register(connect_to_local(1), virtio_server,
+            INTERFACE(storage_device), &r);
+        break;
     }
-  
-    DEBUG("virtio-blk device found: PCI bus=%d, dev=%d", pci.bus, pci.dev);
-  
-    /* setup the device */
-    virtio_setup_device(&device, &pci);
-    feats = virtio_get_features(&device);
-    virtio_set_features(&device, feats);
-    virtio_init_queue(&device, VIRTIO_BLK_RQUEUE);
-    virtio_activate_device(&device);
+}
 
-    DEBUG("virtio-blk: device ready");
 
-//    virtio_blk_test();
-    return true;
+void virtio_blk_init(void){
+    channel_t pci_server, pci_client;
+    result_t r;
+
+    pci_server = sys_open();
+    call_channel_connect(connect_to_local(1), pci_server, INTERFACE(pci), &r);
+
+    pci_client = sys_open();
+    sys_setoptions(pci_client, new_device_handler, NULL, 0);
+
+    call_pci_listen(pci_server, pci_client,
+        VIRTIO_PCI_VENDOR, PCI_ID_ANY,
+        PCI_ID_ANY, VIRTIO_PCI_SUBSYS_BLOCK,
+        &r);
 }
 
 
@@ -125,19 +143,4 @@ result_t virtio_blk_read(uintmax_t sector, size_t n, void **data) {
   
     *data = (void *) buf_addr;
     return OK;
-}
-
-
-void virtio_blk_test(void){
-    uint8_t buf[512];
-    void *data;
-    const char *test_str = "Hello virtio-blk!";
-  
-    strcpy_s((char *) &buf, sizeof(buf), test_str);
-    DEBUG("storage_test: writing");
-    virtio_blk_write(0, 1, test_str);
-    DEBUG("storage_test: reading");
-    virtio_blk_read(0, 1, &data);
-    DEBUG("storage_test: %s (read data: \"%s\")",
-            (!strcmp((const char *) data, test_str))? "OK" : "FAIL", data);
 }

@@ -2,7 +2,6 @@
 #include <resea.h>
 #include <resea/cpp/io.h>
 #include <resea/cpp/memory.h>
-#include "pci.h"
 #include "virtio.h"
 #include "virtio_net.h"
 
@@ -88,6 +87,7 @@ void virtio_net_get_hwaddr(uint8_t *hwaddr) {
 
 
 bool virtio_net_init(void){
+/*
   struct pci_device pci;
   uint32_t feats;
   result_t r;
@@ -100,7 +100,7 @@ bool virtio_net_init(void){
 
   INFO("virtio-net device found: PCI bus=%d, dev=%d", pci.bus, pci.dev);
 
-  /* setup the device */
+  // setup the device
   virtio_setup_device(&device, &pci);
   feats = virtio_get_features(&device);
   virtio_set_features(&device, feats);
@@ -141,4 +141,5 @@ bool virtio_net_init(void){
 
   INFO("virtio-net: device ready");
   return true;
+*/
 }

@@ -82,7 +82,7 @@ struct virtio_desc *virtio_get_used(struct virtio_device *device,
                                     int queue_index);
 int virtio_send_request(struct virtio_device *device, int queue_index,
                         struct virtio_request *rs, int request_num);
-int virtio_setup_device(struct virtio_device *device, struct pci_device *pci);
+int virtio_setup_device(struct virtio_device *device, uint32_t bar0);
 uint32_t virtio_get_features(struct virtio_device *device);
 void virtio_set_features(struct virtio_device *device, uint32_t features);
 int virtio_init_queue(struct virtio_device *device, int queue_index);
@@ -90,5 +90,7 @@ void virtio_activate_device(struct virtio_device *device);
 void virtio_free_desc(struct virtio_device *device,
                       int queue_index,
                       struct virtio_desc *desc);
+
+extern channel_t virtio_server;
 
 #endif

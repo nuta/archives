@@ -1,5 +1,4 @@
 #include "virtio.h"
-#include "pci.h"
 #include <resea.h>
 #include <resea/cpp/io.h>
 #include <resea/cpp/memory.h>
@@ -144,14 +143,12 @@ int virtio_send_request(struct virtio_device *device, int queue_index,
  *  4. virtio_activate_device()
  *
  *  @param[in] device  The virtio_device.
- *  @param[in] pci     The pci_device of the virtio device.
+ *  @param[in] bar0    #BAR0 (PCI config space) of the virtio device.
  *  @returns  0 on success or 1 on fail
  */
-int virtio_setup_device(struct virtio_device *device, struct pci_device *pci){
-    uint32_t bar0;
+int virtio_setup_device(struct virtio_device *device, uint32_t bar0) {
   
     /* get iospace and iobase from BAR0 in the PCI config space */
-    bar0 = pci_read_config32(pci, PCI_CONFIG_BAR0);
     device->iobase  = bar0 & 0xfffffffc;
     device->iospace = (bar0 & 1)? IO_SPACE_PORT : IO_SPACE_MEM;
   

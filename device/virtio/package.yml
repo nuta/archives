@@ -50,4 +50,3 @@ config:
       - src/virtio.c
       - src/virtio_net.c
       - src/virtio_blk.c
-      - src/pci.c
