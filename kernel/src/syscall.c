@@ -62,7 +62,9 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
                     return E_INVALID;
                 }
 
-                kernel_link_channels(src_group, m[i], dest_group, kernel_alloc_channel_id(dest_group));
+                channel_t dest_ch = kernel_alloc_channel_id(dest_group);
+                kernel_link_channels(src_group, m[i], dest_group, dest_ch);
+                m[i] = dest_ch;
                 break;
             case PAYLOAD_NULL:
                 break;
