@@ -138,6 +138,7 @@ NORETURN void serve_channel(channel_t ch, handler_t handler);
  *  Message
  */
 enum {
+  PAYLOAD_NULL     = 0,
   PAYLOAD_INLINE   = 1,
   PAYLOAD_OOL      = 2,
   PAYLOAD_CHANNEL  = 3,

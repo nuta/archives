@@ -64,6 +64,8 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
 
                 kernel_link_channels(src_group, m[i], dest_group, kernel_alloc_channel_id(dest_group));
                 break;
+            case PAYLOAD_NULL:
+                break;
             default:
                 WARN("unknown payload type (%d), handling as an inline",
                      type);
