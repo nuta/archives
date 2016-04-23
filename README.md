@@ -51,6 +51,9 @@ Busybook stores all data in the database so simply you can backup and restore by
 Public domain
 
 ## Changelog
+- **v0.6.1**
+  - support calendar subscriptions
+  - fix MOVE method
 - **v0.6.0**
   - fix /.well-known redirection
   - add Dockerfile
