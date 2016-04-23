@@ -1,0 +1,74 @@
+name: pci
+category: application
+id: 1005
+license: Public Domain
+summary: A device driver for virtio devices
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage:    # e.g. http://example.com/foo/bar
+
+# Required packages
+requires: [io, cpp]
+lang: c
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+  pci_id:
+    type: const
+    size: uint32
+    consts:
+      ID_ANY:  0xffffffff
+
+#
+#  Interface definitions
+#
+interface:
+  listen:
+    id: 1
+    payloads:
+      - name: ch
+        type: channel
+      - name: vendor
+        type: uint32
+      - name: device
+        type: uint32
+      - name: subvendor
+        type: uint32
+      - name: subdevice
+        type: uint32
+  listen_reply:
+    id: 2
+    payloads:
+      - name: result
+        type: result
+
+  new_device:
+    id: 3
+    payloads:
+      - name: header
+        type: data
+
+#
+#  Config
+#
+config:
+  SOURCES:
+    set:
+      - src/handler.c
+      - src/startup.c
+      - src/pci.c
+      - src/pci.listen.c
