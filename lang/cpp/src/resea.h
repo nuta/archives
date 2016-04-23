@@ -28,7 +28,7 @@ typedef uint8_t uchar_t; /* UTF-8 */
 typedef void handler_t ();
 
 /*
- *  mutex_t
+ *  Mutex
  */
 typedef uint8_t  mutex_t;
 #define MUTEX_LOCKED   (1 << 1)
