@@ -1,0 +1,44 @@
+name: libpci
+category: library
+license: Public Domain
+summary: C library for PCI-supported device drivers.
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage:    # e.g. http://example.com/foo/bar
+
+# Prefered language
+lang: c
+
+# Required packages
+requires: [cpp]
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  CFLAGS:
+    append_words: -Ipackages/libpci/include
+
