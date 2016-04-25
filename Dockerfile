@@ -4,4 +4,4 @@ MAINTAINER Seiya Nuta <nuta@seiya.me>
 RUN mkdir -p /app
 ADD . /app
 WORKDIR /app
-RUN bundle install
+RUN bundle install --deployment --without development --jobs 2
