@@ -19,7 +19,7 @@ struct virtio_net_request_header {
 } PACKED;
 
 
-bool virtio_net_init(void);
+void virtio_net_init(void);
 result_t virtio_net_transmit(void *data, size_t size);
 result_t virtio_net_receive(void **data, size_t *size);
 void virtio_net_get_hwaddr(uint8_t *hwaddr);

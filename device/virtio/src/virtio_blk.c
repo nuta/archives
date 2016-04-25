@@ -5,6 +5,7 @@
 #include <resea/cpp/io.h>
 #include <resea/cpp/memory.h>
 #include <string.h>
+#include <libpci/pci.h>
 #include "virtio.h"
 #include "virtio_blk.h"
 
@@ -12,15 +13,17 @@ static struct virtio_device device;
 
 
 static void new_device_handler(channel_t ch, payload_t *m) {
-    uint16_t bus, dev;
     uint32_t feats, bar0;
-    void *config;
     result_t r;
+    struct libpci_config_header *config;
 
     switch (m[1]) {
     case MSGTYPE(pci, new_device):
         config = EXTRACT(m, pci, new_device, header);
-        DEBUG("virtio-blk device found: PCI bus=%d, dev=%d", bus, dev);
+        bar0   = config->bar0;
+
+        DEBUG("virtio-blk device found (%x:%x)",
+            config->vendor, config->device);
   
         // setup the device
         virtio_setup_device(&device, bar0);
