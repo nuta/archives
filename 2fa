@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+import argparse
+from collections import OrderedDict
+import json
+import subprocess
+import sys
+import time
+import pyotp
+
+
+def load_services():
+    try:
+        services = json.load(open('2fa.json'))
+    except json.decoder.JSONDecodeError:
+        return {}
+
+    if services is None:
+        return {}
+
+    return OrderedDict(sorted(services.items()))
+
+
+def save_services(services):
+    #subprocess.Popen(['gpg2', '-e' '']).wait()
+    return json.dump(services, open('2fa.json', 'w'))
+
+
+def totp(secret):
+    return pyotp.TOTP(secret).now()
+
+
+def main(argv):
+    services = load_services()
+
+    if len(argv) > 1:
+        parser = argparse.ArgumentParser(description='2-factor auth token generator')
+        parser.add_argument('name')
+        parser.add_argument('secret')
+
+        args = parser.parse_args(argv[1:])
+        secret = args.secret.replace(' ', '')
+        services.update({args.name: secret})
+        save_services(services)
+    else:
+        lines = len(services.keys())
+        while True:
+            expire = 30 - (int(time.time()) % 30)
+
+            for name, secret in services.items():
+                print("{:<20}{}\t({})".format(name, totp(secret), expire))
+
+            for i in range(lines):
+                print("\x1b[1F\x1b[0K", end="")
+
+            time.sleep(1)
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv)
+    except KeyboardInterrupt:
+        pass
