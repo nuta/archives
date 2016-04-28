@@ -98,7 +98,10 @@ def main(argv):
             expire = 30 - (int(time.time()) % 30)
 
             for name, secret in services.items():
-                print("{:<20}{}\t({})".format(name, totp(secret), expire))
+                if 5 < expire:
+                    print("\x1b[01;34m{:<20}{}\t({})\x1b[0m".format(name, totp(secret), expire))
+                else:
+                    print("\x1b[0;31m{:<20}{}\t({})\x1b[0m".format(name, totp(secret), expire))
 
             for i in range(lines):
                 print("\x1b[1F\x1b[0K", end="")
