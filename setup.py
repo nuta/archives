@@ -7,7 +7,7 @@ setup(
     long_description='',
     url='https://github.com/seiyanuta/2fa',
     scripts=['2fa'],
-    install_requires=['pyotp'],
+    install_requires=['pyqrcode'],
     packages=find_packages(),
     classifiers = [
         'Operating System :: POSIX',
