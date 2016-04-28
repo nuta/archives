@@ -1,16 +1,61 @@
 #!/usr/bin/env python3
 import argparse
 from collections import OrderedDict
+import configparser
 import json
+import os
 import subprocess
 import sys
 import time
 import pyotp
 
 
+USAGE = """\
+Usage: 2fa              -- Generate codes
+       2fa name title   -- Registers a secret
+"""
+
+DEFAULT_CONFIG = """\
+[gpg]
+program = gpg2
+user = nuta@seiya.me
+"""
+
+def get_secrets_path():
+    return os.path.expanduser('~/.2fa.secrets')
+
+
+def load_config():
+    global config
+
+    path = os.path.expanduser('~/.2fa.conf')
+    config = configparser.ConfigParser()
+
+    try:
+        config.read_file(open(path))
+    except FileNotFoundError:
+        with open(path, 'w') as f:
+            f.write(DEFAULT_CONFIG)
+        return load_config()
+
+    return config
+
+
+def run_gpg(args, input=None):
+    return subprocess.run([config['gpg']['program']] + args, input=input,
+               check=True, stdout=subprocess.PIPE).stdout
+
+
 def load_services():
     try:
-        services = json.load(open('2fa.json'))
+        encrypted = open(get_secrets_path(), 'rb').read()
+    except FileNotFoundError:
+        return {}
+
+    secrets = run_gpg(['-d'], input=encrypted).decode('utf-8')
+
+    try:
+        services = json.loads(secrets)
     except json.decoder.JSONDecodeError:
         return {}
 
@@ -21,8 +66,9 @@ def load_services():
 
 
 def save_services(services):
-    #subprocess.Popen(['gpg2', '-e' '']).wait()
-    return json.dump(services, open('2fa.json', 'w'))
+    encrypted = run_gpg(['-e', '-r', 'nuta@seiya.me'],
+        input=bytes(json.dumps(services), encoding='utf-8'))
+    return open(get_secrets_path(), 'wb').write(encrypted)
 
 
 def totp(secret):
@@ -30,6 +76,7 @@ def totp(secret):
 
 
 def main(argv):
+    load_config()
     services = load_services()
 
     if len(argv) > 1:
@@ -42,6 +89,10 @@ def main(argv):
         services.update({args.name: secret})
         save_services(services)
     else:
+        print()
+        if len(services) == 0:
+            sys.exit(USAGE)
+
         lines = len(services.keys())
         while True:
             expire = 30 - (int(time.time()) % 30)
