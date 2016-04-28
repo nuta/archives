@@ -1,4 +1,4 @@
 global_config:
     HAL: x86
-    CC: x86-elf-gcc
-    LD: x86-elf-ld
+    CC: x86_64-elf-gcc
+    LD: x86_64-elf-ld
