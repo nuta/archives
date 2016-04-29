@@ -55,7 +55,7 @@ def load_services():
     except FileNotFoundError:
         return {}
 
-    secrets = run_gpg(['-d'], input=encrypted).decode('utf-8')
+    secrets = run_gpg(['-d', '--batch', '--no-tty'], input=encrypted).decode('utf-8')
 
     try:
         services = json.loads(secrets)
