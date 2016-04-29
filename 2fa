@@ -69,7 +69,7 @@ def load_services():
 
 
 def save_services(services):
-    encrypted = run_gpg(['-e', '-r', 'nuta@seiya.me'],
+    encrypted = run_gpg(['-e', '-r', config['gpg']['user']],
         input=bytes(json.dumps(services), encoding='utf-8'))
     return open(get_secrets_path(), 'wb').write(encrypted)
 
