@@ -1,6 +1,6 @@
 PyYAML
 termcolor
 jinja2
-markdown
+markdown2
 watchdog
 pytest
