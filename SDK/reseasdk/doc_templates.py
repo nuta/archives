@@ -79,12 +79,27 @@ body {
 .body {
   padding: 0 30px 0;
   color: #333;
+  line-height: 28px;
+  font-size: 16px;
 }
 
 h2 {
-  margin-top: 90px;
+  margin-top: 70px;
   margin-bottom: 40px;
   font-weight: normal;
+}
+
+pre code:only-child {
+  padding: 20px;
+  display: block;
+  border-left: #e5e5e5 5px solid;
+  white-space: pre;
+}
+
+code {
+  background: #f8f8f8;
+  line-height: 19px;
+  font-size: 13px;
 }
 
 """
