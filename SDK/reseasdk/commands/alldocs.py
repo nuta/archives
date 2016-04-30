@@ -3,7 +3,7 @@ from glob import glob
 import os
 from reseasdk.helpers import progress, load_yaml
 from reseasdk.docs import generate_package_doc, generate_package_index_doc, \
-    generate_index_doc
+    generate_documentation_dir, generate_index_doc
 
 SHORT_HELP = "generate docomentation"
 LONG_HELP = """
@@ -21,6 +21,8 @@ def alldocs(args):
         'revision': args.revision
     }
     
+    generate_documentation_dir('Documentation', os.path.join(args.outdir), **kwargs)
+
     for f in files:
         if '/packages/' in f:
             continue

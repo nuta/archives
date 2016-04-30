@@ -1,14 +1,26 @@
 from glob import glob
 import os
-import markdown
+import markdown2
 from reseasdk.doc_templates import *
 from reseasdk.helpers import generating, load_yaml, render, error
 from reseasdk.validators import validate_package_yml
 
 
 def md2html(path):
-    return markdown.markdown(open(path).read(),
-               output_format='html5')
+    return markdown2.markdown(open(path).read(),
+               extras=['fenced-code-blocks', 'footnotes', 'tables'])
+
+
+def generate_documentation_dir(indir, outdir, revision):
+    for path in glob(os.path.join(indir, '*.md')):
+        with open(os.path.join(outdir, 
+            os.path.splitext(os.path.basename(path))[0] + '.html'), 'w') as f:
+             f.write(render(DOC, {
+                 'title': 'Resea Documentation',
+                 'body': md2html(path),
+                 'css': PACKAGE_DOC_CSS,
+                 'revision': revision
+             }))
 
 
 def generate_package_doc(indir, outdir, revision):
@@ -31,13 +43,7 @@ def generate_package_doc(indir, outdir, revision):
     with open(os.path.join(outdir, 'index.html'), 'w') as f:
         f.write(render(PACKAGE_DOC, yml))
 
-    for path in glob('Documentation/*.md'):
-        with open(os.path.join(outdir, os.path.basename(path)), 'w') as f:
-             f.write(render(DOC, {
-                 'title': 'Resea Documentation',
-                 'body': md2html(path),
-                 'css': PACKAGE_DOC_CSS
-             }))
+    generate_documentation_dir(os.path.join(indir, 'Documentation'), outdir, revision)
 
 
 def generate_package_index_doc(packages, out_path, revision):
