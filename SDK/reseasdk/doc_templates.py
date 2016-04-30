@@ -182,10 +182,8 @@ INDEX_DOC = HEADER + """
 
 <h2>Specifications</h2>
 <p><a href="thread.html">Thread and Thread Group</a>: A execution unit and set of threads.</p>
-<p><a href="channel.html">Channel</a>: A endpoint of communication.</p>
-<p><a href="message.html">Message</a>: Message structure, payload types, etc.</p>
-<p><a href="interface.html">Interface</a>: A defition of structured messages.</p>
-
+<p><a href="messaging.html">Messaging</a>: A inter-thread communication.</p>
+<p><a href="package.html">Package and Executable</a>: A isolated component.</p>
 
 <h2>SDK</h2>
 <p><a href="commands.html">Commands</a>: How to use SDK.</p>
