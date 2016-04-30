@@ -6,7 +6,7 @@ deploy_resea_net() {
     revision=master
 
     git clone https://github.com/resea/resea.github.io
-    reseasdk alldocs --revision $revision --outdir resea.net/docs/master
+    reseasdk alldocs --revision $revision --outdir resea.net/docs/$revision
     cd resea.github.io
     cp -r ../resea.net/* .
 
