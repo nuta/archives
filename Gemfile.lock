@@ -42,7 +42,7 @@ GEM
     bullet (5.0.0)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.9.0)
-    byebug (8.2.4)
+    byebug (8.2.5)
     choice (0.2.0)
     coderay (1.1.1)
     colorize (0.7.7)
