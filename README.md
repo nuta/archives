@@ -7,23 +7,6 @@ Busybook
 
 Busybook is a CalDAV server out of the box powered by Ruby on Rails.
 
-## Quickstart
-```
-$ git clone https://github.com/seiyanuta/busybook
-$ cd busybook
-
-$ cp config/database.yml.config database.yml
-$ vim database.yml
-
-$ sudo docker build -t busybook .
-# sudo docker run -i --name=busybook busybook
-
-$ sudo docker exec -it rake user:add
-```
-
-## Backup
-Busybook stores all data in the database so simply you can backup and restore by RDBMS's command like [pg_dump](http://www.postgresql.org/docs/9.5/static/app-pgdump.html).
-
 ## Supported clients
 - OS X 10.11 (El Capitan): Calendar and Reminder
 - iOS 9: Calendar and Reminder
