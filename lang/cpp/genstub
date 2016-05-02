@@ -55,9 +55,9 @@ def load_payload_defs(interface_name, msgtype_name, msgtype, name_prefix=None,
                         j += 1
                     else:
                         if q['type'] == 'channel':
-                            header += '| (0x03 << {})'.format(i * 4)
-                        elif is_ool_type(q['type']):
                             header += '| (0x02 << {})'.format(i * 4)
+                        elif is_ool_type(q['type']):
+                            header += '| (0x03 << {})'.format(i * 4)
                             size_payload = True
                         else:
                             header += '| (0x01 << {})'.format(i * 4)

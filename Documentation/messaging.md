@@ -33,8 +33,8 @@ is equal and it depends on the environment. Generally it is `sizeof(uintmax_t)`.
 |----------------------|
 |   Payload Header 1   |                 0x0: NULL payload
 |----------------------|                 0x1: inline payload
-|       Payload 8      |                 0x2: out-of-line payload (copy)
-|----------------------|                 0x3: channel payload
+|       Payload 8      |                 0x2: channel payload
+|----------------------|                 0x3: out-of-line payload (copy)
 |           .          |                 0x4: out-of-line payload (move)
 |           .          |                 0x5-0xf: undefined
 |           .          |
@@ -73,6 +73,7 @@ structures of messages.
 - 6: datetime
 - 7: exec
 - 8: fs
+- 9: tcpip
 - 100: net_device
 - 101: storage_device
 - 102: datetime_device
