@@ -255,7 +255,7 @@ def main(args):
     #  Inteface IDs
     #
     if "id" in package_yml:
-        s += "#define __interface_{} ({} << 24)\n".format(
+        s += "#define __interface_{} ({} << 12)\n".format(
             package_yml["name"], package_yml["id"])
 
     #
