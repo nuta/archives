@@ -1,9 +1,9 @@
 from glob import glob
 import os
 import markdown2
-from reseasdk.doc_templates import *
-from reseasdk.helpers import generating, load_yaml, render, error
-from reseasdk.validators import validate_package_yml
+from resea.doc_templates import *
+from resea.helpers import generating, load_yaml, render, error
+from resea.validators import validate_package_yml
 
 
 def md2html(path):

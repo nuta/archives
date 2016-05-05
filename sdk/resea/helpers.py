@@ -10,7 +10,7 @@ import sys
 import yaml
 import jinja2
 from termcolor import colored, cprint
-from reseasdk.validators import ValidationError
+from resea.validators import ValidationError
 
 def error(msg):
     """Prints an error message and terminate the program."""

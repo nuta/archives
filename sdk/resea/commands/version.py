@@ -1,8 +1,8 @@
-from reseasdk import __version__
+from resea import __version__
 
 SHORT_HELP = "print the version"
 LONG_HELP = """
-Usage: reseasdk version
+Usage: resea version
 """
 
 

@@ -5,10 +5,10 @@ import shutil
 import subprocess
 import sys
 from termcolor import colored
-from reseasdk.package import get_package, load_package_yml, load_packages
-from reseasdk.helpers import render, info, notice, error, generating, \
+from resea.package import get_package, load_package_yml, load_packages
+from resea.helpers import render, info, notice, error, generating, \
     load_yaml, loads_yaml, dict_to_strdict, plan, progress
-from reseasdk.validators import validate_package_yml
+from resea.validators import validate_package_yml
 
 MAKEFILE_TEMPLATE = """\
 .PHONY: _default

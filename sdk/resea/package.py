@@ -1,7 +1,7 @@
 from copy import copy
 import os
-from reseasdk.helpers import load_yaml, error
-from reseasdk.validators import validate_package_yml, ValidationError
+from resea.helpers import load_yaml, error
+from resea.validators import validate_package_yml, ValidationError
 
 paths = None # cache
 def load_reseapath():

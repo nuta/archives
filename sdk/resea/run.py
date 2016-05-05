@@ -4,7 +4,7 @@ import atexit
 import datetime
 import subprocess
 from termcolor import cprint, colored
-from reseasdk.helpers import info, error, progress
+from resea.helpers import info, error, progress
 
 
 def lprint(s):

@@ -6,9 +6,9 @@ import re
 import sys
 import traceback
 import yaml
-from reseasdk.defines import PAYLOAD_NUM
-from reseasdk.package import load_package_yml
-from reseasdk.helpers import render, error, generating
+from resea.defines import PAYLOAD_NUM
+from resea.package import load_package_yml
+from resea.helpers import render, error, generating
 from helpers import ctype
 
 

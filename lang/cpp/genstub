@@ -5,10 +5,10 @@ import sys
 import traceback
 import yaml
 import jinja2
-from reseasdk.defines import PAYLOAD_NUM
-from reseasdk.helpers import load_yaml
-from reseasdk.support import is_ool_type
-from reseasdk.validators import validate_package_yml
+from resea.defines import PAYLOAD_NUM
+from resea.helpers import load_yaml
+from resea.support import is_ool_type
+from resea.validators import validate_package_yml
 from helpers import ctype
 
 class GeneratingError(Exception):

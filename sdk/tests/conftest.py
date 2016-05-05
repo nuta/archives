@@ -1,7 +1,7 @@
 import os
 import yaml
 import pytest
-import reseasdk
+import resea
 import subprocess
 
 
@@ -10,7 +10,7 @@ def package(request):
     """ Creates a package named hello. """
 
     if not os.path.exists('hello'):
-        reseasdk.main(['new', 'hello'])
+        resea.main(['new', 'hello'])
 
     os.chdir('hello')
 

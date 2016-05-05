@@ -2,14 +2,14 @@ import os
 import sys
 import argparse
 import subprocess
-from reseasdk.package import load_package_yml, load_packages
-from reseasdk.validators import validate_package_yml
-from reseasdk.helpers import load_yaml, error
+from resea.package import load_package_yml, load_packages
+from resea.validators import validate_package_yml
+from resea.helpers import load_yaml, error
 
 
 SHORT_HELP = "generate boilterplate files"
 LONG_HELP = """
-Usage: reseasdk scaffold
+Usage: resea scaffold
 """
 
 
@@ -33,7 +33,7 @@ def scaffold(args):
 
 
 def main(args_):
-    parser = argparse.ArgumentParser(prog='reseasdk scaffold',
+    parser = argparse.ArgumentParser(prog='resea scaffold',
                                      description='Generate boilerplate files')
     args = parser.parse_args(args_)
 

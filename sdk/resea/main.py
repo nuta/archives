@@ -1,4 +1,4 @@
-from reseasdk.helpers import import_module, error
+from resea.helpers import import_module, error
 
 
 def main(args):
@@ -8,7 +8,7 @@ def main(args):
         command = 'help'
 
     try:
-        m = import_module('reseasdk.commands.{}'.format(command))
+        m = import_module('resea.commands.{}'.format(command))
     except ImportError:
         error('command not found: {}'.format(command))
 

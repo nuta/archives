@@ -1,14 +1,14 @@
-import reseasdk
+import resea
 
 
 def test_help(capsys):
-    reseasdk.main(['help'])
+    resea.main(['help'])
     assert capsys.readouterr()[0].startswith('Usage: ')
 
-    reseasdk.main([])
+    resea.main([])
     assert capsys.readouterr()[0].startswith('Usage: ')
 
-    for command in reseasdk.command_list:
-        reseasdk.main(['help', command])
+    for command in resea.command_list:
+        resea.main(['help', command])
         assert capsys.readouterr()[0].startswith('Usage: ')
 

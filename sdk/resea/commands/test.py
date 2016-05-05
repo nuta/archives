@@ -8,14 +8,14 @@ import threading
 import watchdog
 import watchdog.events
 import watchdog.observers
-from reseasdk.run import run_emulator
-from reseasdk.helpers import info, notice, error, plan
-from reseasdk.build import build, add_build_arguments
+from resea.run import run_emulator
+from resea.helpers import info, notice, error, plan
+from resea.build import build, add_build_arguments
 
 
 SHORT_HELP = "build and run tests"
 LONG_HELP = """
-Usage: reseasdk test
+Usage: resea test
 """
 
 
@@ -100,7 +100,7 @@ def test(args):
 
 
 def main(args_):
-    parser = argparse.ArgumentParser(prog='reseasdk test',
+    parser = argparse.ArgumentParser(prog='resea test',
                                      description='test an executable')
     parser = add_build_arguments(parser)
     parser.add_argument('-P', action='store_true', help='Poll file changes and run tests automatically')

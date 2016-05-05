@@ -3,13 +3,13 @@ import os
 import re
 import sys
 import jinja2
-import reseasdk
-from reseasdk.helpers import error, generating, exec_cmd
+import resea
+from resea.helpers import error, generating, exec_cmd
 
 
 SHORT_HELP = "generate a porject boilterplate files"
 LONG_HELP = """
-Usage: reseasdk new package_name
+Usage: resea new package_name
 """
 
 
@@ -81,7 +81,7 @@ PACKAGE_NAME_REGEX = '[a-z_][a-z0-9_]*'
 
 
 def main(args_):
-    parser = argparse.ArgumentParser(prog='reseasdk new',
+    parser = argparse.ArgumentParser(prog='resea new',
                                      description='create a new package')
     parser.add_argument('--git', action='store_true',
                         help='git init in the created directory')

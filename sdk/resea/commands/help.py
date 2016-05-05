@@ -1,5 +1,5 @@
-from reseasdk.helpers import import_module
-from reseasdk import command_list
+from resea.helpers import import_module
+from resea import command_list
 
 
 def main(args):
@@ -9,13 +9,13 @@ def main(args):
         cmd = ''
 
     if cmd == '':
-        print("Usage: reseasdk command")
+        print("Usage: resea command")
         print("")
         print("Commands:")
 
         for c in command_list:
-            m = import_module("reseasdk.commands.{}".format(c))
+            m = import_module("resea.commands.{}".format(c))
             print("  {:<10}{}".format(c, m.SHORT_HELP))
     else:
-        m = import_module("reseasdk.commands.{}".format(cmd))
+        m = import_module("resea.commands.{}".format(cmd))
         print(m.LONG_HELP.strip() + "\n")

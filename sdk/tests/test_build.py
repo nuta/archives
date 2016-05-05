@@ -2,7 +2,7 @@ import os
 import yaml
 import shutil
 import pytest
-import reseasdk
+import resea
 
 
 def test_build(package):
@@ -10,8 +10,8 @@ def test_build(package):
     if os.path.exists(build_dir):
         shutil.rmtree(build_dir)
 
-    reseasdk.main(['build', 'BUILTIN_APPS=[kernel]', 'HAL=posix_host'])
+    resea.main(['build', 'BUILTIN_APPS=[kernel]', 'HAL=posix_host'])
     assert os.path.exists('build/release/application')
 
-    reseasdk.main(['clean'])
+    resea.main(['clean'])
     assert not os.path.exists('build')

@@ -1,13 +1,13 @@
 import argparse
 from glob import glob
 import os
-from reseasdk.helpers import progress, load_yaml
-from reseasdk.docs import generate_package_doc, generate_package_index_doc, \
+from resea.helpers import progress, load_yaml
+from resea.docs import generate_package_doc, generate_package_index_doc, \
     generate_documentation_dir, generate_index_doc
 
 SHORT_HELP = "generate docomentation"
 LONG_HELP = """
-Usage: reseasdk alldocs --revision REVISION --outdir DIR
+Usage: resea alldocs --revision REVISION --outdir DIR
 """
 
 def alldocs(args):
@@ -43,7 +43,7 @@ def alldocs(args):
         **kwargs)
 
 def main(args):
-    parser = argparse.ArgumentParser(prog='reseasdk docs',
+    parser = argparse.ArgumentParser(prog='resea docs',
                                      description='Generate HTML docs')
     parser.add_argument('--outdir', default="html_docs")
     parser.add_argument('--revision', default="unknown_revision")
