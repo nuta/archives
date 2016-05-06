@@ -8,7 +8,7 @@
 
 
 /** handles fs.read */
-extern "C" void fat_fs_read(channel_t __ch,
+void fat_fs_read(channel_t __ch,
        ident_t file,
        offset_t offset,
        size_t size) {

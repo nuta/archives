@@ -33,7 +33,8 @@ void fat_handler(channel_t __ch, payload_t *payloads) {
         DEBUG("received fs.read");
             payload_t a0 = payloads[2];
             payload_t a1 = payloads[3];
-            fat_fs_read(__ch, (ident_t) a0, (offset_t) a1);
+            payload_t a2 = payloads[4];
+            fat_fs_read(__ch, (ident_t) a0, (offset_t) a1, (size_t) a2);
             return;
     }
     case MSGTYPE(fs, write):
