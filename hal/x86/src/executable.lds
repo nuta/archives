@@ -6,8 +6,8 @@ SECTIONS {
   . = 0x00100000;
 
   .bootstrap :{
-    build/release/x86/src/start.o(.text);
-    build/release/x86/src/_start.o(.text);
+    build/release/x86/src/init.o(.text);
+    build/release/x86/src/init2.o(.text);
  }
 
  . += 0xffff800000000000;

@@ -37,7 +37,7 @@ interface:
 #
 global_config:
   HAL_LINK:
-    default: $(LD) -Map $(BUILD_DIR)/executable.map -nostdlib -nodefaultlibs -Tpackages/x86/src/executable.ld -o
+    default: $(LD) -Map $(BUILD_DIR)/executable.map -nostdlib -nodefaultlibs -Tpackages/x86/src/executable.lds -o
   HAL_RUN:
     default: packages/x86/run
   HAL_GENSTART:
@@ -61,22 +61,22 @@ config:
   SOURCES:
     set:
       - src/startup.cpp
-      - src/asm.cpp
+      - src/asm.S
       - src/exception.cpp
       - src/gdt.cpp
       - src/global.cpp
       - src/handler.cpp
       - src/idt.cpp
-      - src/init.cpp
+      - src/init.S
+      - src/init2.cpp
       - src/interrupt.cpp
-      - src/interrupt_handler.cpp
+      - src/interrupt_handler.S
       - src/ioapic.cpp
       - src/localapic.cpp
       - src/pic.cpp
       - src/print.cpp
       - src/smp.cpp
-      - src/start.cpp
-      - src/_start.cpp
+      - src/startup.cpp
       - src/thread.cpp
       - src/tss.cpp
       - src/vm.cpp
