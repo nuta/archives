@@ -74,6 +74,8 @@ interface:
         type: id
       - name: offset
         type: offset
+      - name: size
+        type: size
   read_reply:
     id: 6
     payloads:
