@@ -242,6 +242,9 @@ def main(args):
     s += "#ifndef __RESEA_{}__H__\n".format(package_yml["name"])
     s += "#define __RESEA_{}__H__\n".format(package_yml["name"])
     s += "#include <resea.h>\n"
+    s += "#ifdef __cplusplus\n"
+    s += "extern \"C\" {\n"
+    s += "#endif\n"
 
     #
     #  Types (typedef and struct)
@@ -277,6 +280,9 @@ def main(args):
     #
     #  Footer
     #
+    s += "#ifdef __cplusplus\n"
+    s += "}\n"
+    s += "#endif\n"
     s += "#endif\n"
     with open(args.output, "w") as f:
         f.write(s)

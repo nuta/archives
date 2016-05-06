@@ -1,35 +1,35 @@
 OUTPUT_FORMAT("elf64-x86-64");
 ENTRY(x86_start);
 
-SECTIONS{
+SECTIONS {
 
   . = 0x00100000;
 
   .bootstrap :{
-    *(.boot);
-    *(.boot2);
-  }
+    build/release/x86/src/start.o(.text);
+    build/release/x86/src/_start.o(.text);
+ }
 
-  . += 0xffff800000000000;
+ . += 0xffff800000000000;
 
-  .text : AT(ADDR(.text) - 0xffff800000000000) {
-    *(.text);
-  }
+ .text :{
+   *(.text);
+ }
 
-  .data : AT(ADDR(.data) - 0xffff800000000000) {
-    *(.data);
-  }
+ .data :{
+   *(.data);
+ }
 
-  .rodata :{
-    *(.rodata*);
-  }
+ .rodata :{
+   *(.rodata*);
+ }
 
-  .bss :{
-    *(.bss);
-  }
+ .bss :{
+   *(.bss);
+ }
 
-  /DISCARD/ :{
-    *(*.eh_frame);
-  }
+ /DISCARD/ :{
+   *(*.eh_frame);
+ }
 }
 

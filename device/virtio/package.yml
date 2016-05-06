@@ -40,13 +40,13 @@ interface:
 config:
   SOURCES:
     set:
-      - src/net_device.receive.c
-      - src/net_device.transmit.c
-      - src/net_device.get_hardware_address.c
-      - src/storage_device.read.c
-      - src/storage_device.write.c
-      - src/handler.c
-      - src/startup.c
-      - src/virtio.c
-      - src/virtio_net.c
-      - src/virtio_blk.c
+      - src/net_device.receive.cpp
+      - src/net_device.transmit.cpp
+      - src/net_device.get_hardware_address.cpp
+      - src/storage_device.read.cpp
+      - src/storage_device.write.cpp
+      - src/handler.cpp
+      - src/startup.cpp
+      - src/virtio.cpp
+      - src/virtio_net.cpp
+      - src/virtio_blk.cpp

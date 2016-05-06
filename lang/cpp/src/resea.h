@@ -6,6 +6,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define PACKED      __attribute__((packed))
 #define NORETURN    __attribute__((noreturn))
 #define UNUSED      __attribute__((unused))
@@ -25,7 +29,7 @@ typedef payload_t msgtype_t;
 typedef msgtype_t interface_t;
 typedef uint8_t   result_t;
 typedef uint8_t uchar_t; /* UTF-8 */
-typedef void handler_t ();
+typedef void handler_t (channel_t, payload_t *);
 
 /*
  *  Mutex
@@ -150,4 +154,7 @@ enum {
 };
 
 
+#ifdef __cplusplus
+}
+#endif
 #endif

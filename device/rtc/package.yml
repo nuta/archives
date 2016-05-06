@@ -38,6 +38,6 @@ interface:
 config:
   SOURCES:
     set:
-      - src/startup.c
-      - src/handler.c
-      - src/datetime_device.get_date.c
+      - src/startup.cpp
+      - src/handler.cpp
+      - src/datetime_device.get_date.cpp

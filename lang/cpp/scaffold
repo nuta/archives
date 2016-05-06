@@ -8,6 +8,7 @@ import traceback
 import yaml
 from resea.defines import PAYLOAD_NUM
 from resea.package import load_package_yml
+from resea.support import is_ool_type
 from resea.helpers import render, error, generating
 from helpers import ctype
 
@@ -60,6 +61,7 @@ void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
 
 HANDLER_H_TEMPLATE = """\
 #include <resea.h>
+
 {% for interface, msgtype, _, args, _ in msgtypes %}
 void {{ name }}_{{ interface }}_{{ msgtype }}({{ args | join(", ") }});
 {% endfor %}
@@ -120,14 +122,24 @@ def main(args):
                 if payloads is None:
                     payloads = []
 
+                defs = []
+                for p in payloads:
+                    defs.append(p)
+                    if is_ool_type(p['type']):
+                        # size of an OoL payload
+                        defs.append({
+                            'type': 'size',
+                            'name': p['name'] + '_size'
+                        })
+
                 n = 2 # skip the first payload header and msgtype
-                for i, p in enumerate(payloads):
-                    if n % 9 == 0:
+                for i, p in enumerate(defs):
+                    if n % 8 == 0:
                         n += 1 # skip payload headers
                     unmarshall.append((n, 'a' + str(i)))
                     n += 1
 
-                for i, p in enumerate(payloads):
+                for i, p in enumerate(defs):
                     msgtype_args.append("{} {}".format(ctype(p["type"]), p["name"]))
                     handler_args.append("({}) a{}".format(ctype(p["type"]), i))
                     _handler_args.append("{} a{}".format(ctype(p["type"]), i))

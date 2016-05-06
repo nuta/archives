@@ -4,6 +4,9 @@
 #include <resea.h>
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct x86_thread_regs{
   uint64_t  rax;
@@ -181,6 +184,31 @@ struct grub_mmap_entry {
     uint32_t reserved;
 } PACKED;
 
+
+/*
+ *  Exceptions
+ */
+void x86_exp_handler0 (uint64_t rip);
+void x86_exp_handler1 (uint64_t rip);
+void x86_exp_handler2 (uint64_t rip);
+void x86_exp_handler3 (uint64_t rip);
+void x86_exp_handler4 (uint64_t rip);
+void x86_exp_handler5 (uint64_t rip);
+void x86_exp_handler6 (uint64_t rip);
+void x86_exp_handler7 (uint64_t rip);
+void x86_exp_handler8 (uint64_t rip, uint64_t errcode);
+void x86_exp_handler9 (uint64_t rip);
+void x86_exp_handler10 (uint64_t rip, uint64_t errcode);
+void x86_exp_handler11 (uint64_t rip, uint64_t errcode);
+void x86_exp_handler12 (uint64_t rip, uint64_t errcode);
+void x86_exp_handler13 (uint64_t rip, uint64_t errcode);
+void x86_exp_handler14 (uint64_t rip, uint64_t errcode);
+void x86_exp_handler15 (uint64_t rip);
+void x86_exp_handler16 (uint64_t rip);
+void x86_exp_handler17 (uint64_t rip, uint64_t errcode);
+void x86_exp_handler18 (uint64_t rip);
+void x86_exp_handler19 (uint64_t rip);
+void x86_exp_handler20 (uint64_t rip);
 
 /*
  * handler
@@ -405,5 +433,13 @@ void x86_init_smp(void);
 
 void x86_init_vm(void);
 
+/*
+ *  init
+ */
+void x86_init (void *binfo);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

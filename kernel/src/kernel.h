@@ -29,12 +29,14 @@ struct thread_group {
     struct   channel channels[CHANNELS_MAX];
 };
 
+enum thread_status {
+  THREAD_UNUSED,
+  THREAD_RUNNABLE,
+  THREAD_BLOCKED
+};
+
 struct thread {
-    enum {
-      THREAD_UNUSED,
-      THREAD_RUNNABLE,
-      THREAD_BLOCKED
-    } status;
+    enum thread_status status;
     struct hal_thread hal;
     struct thread_group *group;
 };
@@ -49,8 +51,8 @@ result_t  kernel_create_thread(ident_t group, const uchar_t *name, size_t name_s
                            ident_t *r_thread, ident_t *r_group);
 result_t kernel_set_thread(ident_t thread, uintptr_t entry, uintptr_t arg,
                        uintptr_t stack, size_t stack_size);
-result_t kernel_set_thread_status(ident_t thread, int status);
-void kernel_resume_next_thread(void);
+result_t kernel_set_thread_status(ident_t thread, enum thread_status status);
+extern "C" NORETURN void kernel_resume_next_thread(void);
 void kernel_switch_thread(void);
 void kernel_hard_switch_thread(void);
 

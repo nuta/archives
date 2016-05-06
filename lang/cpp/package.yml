@@ -30,7 +30,7 @@ global_config:
           prefix: resea/
           suffix: .h
         compile: '$(CC) $(CFLAGS) -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
-        mkdeps:  ./packages/cpp/mkdeps
+        mkdeps:  ./packages/cpp/mkdeps "$(CXX) $(CXXFLAGS)"
         scaffold: ./packages/cpp/scaffold
         genstub: ./packages/cpp/genstub
       asm:
@@ -43,9 +43,9 @@ global_config:
         abbrev: CXX
         stub:
           prefix: resea/
-          suffix: .hpp
-        compile: echo
-        mkdeps: touch
+          suffix: .h
+        compile: '$(CXX) $(CXXFLAGS) -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
+        mkdeps:  ./packages/cpp/mkdeps "$(CXX) $(CXXFLAGS)"
         scaffold: ./packages/cpp/scaffold
         genstub: ./packages/cpp/genstub
   CFLAGS:
@@ -53,28 +53,33 @@ global_config:
       -Wall -ggdb3 -std=c99 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color     
       -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/c
+  CXXFLAGS:
+    default: >
+      -Wall -ggdb3 -std=c++14 -Wno-incompatible-library-redeclaration
+      -fdiagnostics-color     
+      -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/cpp
 
 
 config:
   - SOURCES:
       set:
-        - src/ctype.c
-        - src/hal_callback.c
-        - src/channel.c
-        - src/string.c
-        - src/syscall.c
-        - src/memory.c
-        - src/mutex.c
-        - src/printfmt.c
-        - src/io.c
+        - src/ctype.cpp
+        - src/hal_callback.cpp
+        - src/channel.cpp
+        - src/string.cpp
+        - src/syscall.cpp
+        - src/memory.cpp
+        - src/mutex.cpp
+        - src/printfmt.cpp
+        - src/io.cpp
   - if: "HAL == 'x86'"
     SOURCES:
       set:
-        - src/x86.c
+        - src/x86.cpp
   - if: "HAL == 'posix_host'"
     SOURCES:
       set:
-        - src/posix_host.c
+        - src/posix_host.cpp
 
 #
 #  Type definitions

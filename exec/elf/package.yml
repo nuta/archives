@@ -40,7 +40,7 @@ interface:
 config:
   SOURCES:
     set:
-      - src/startup.c
-      - src/elf.c
-      - src/handler.c
-      - src/exec.create.c
+      - src/startup.cpp
+      - src/elf.cpp
+      - src/handler.cpp
+      - src/exec.create.cpp

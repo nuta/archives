@@ -68,7 +68,8 @@ interface:
 config:
   SOURCES:
     set:
-      - src/handler.c
-      - src/startup.c
-      - src/pci.c
-      - src/pci.listen.c
+      - src/handler.cpp
+      - src/startup.cpp
+      - src/pci.cpp
+      - src/pci.listen.cpp
+      - src/pci.new_device.cpp # TODO: remove this

@@ -4,6 +4,10 @@
 #include <resea.h>
 #include <_hal.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // HAL handler_t
 enum hal_callback_type {
   HAL_CALLBACK_INTERRUPT       = 0,
@@ -17,10 +21,8 @@ enum hal_callback_type {
   HAL_CALLBACK_MAX             = 8
 };
 
-typedef result_t (*hal_handler_t)();
-
-hal_handler_t hal_get_callback(enum hal_callback_type type);
-void hal_set_callback(enum hal_callback_type type, hal_handler_t handler);
+void * hal_get_callback(enum hal_callback_type type);
+void hal_set_callback(enum hal_callback_type type, void *handler);
 result_t call_hal_callback(enum hal_callback_type type, ...); // implemented in cpp
 
 enum exception_type {
@@ -120,5 +122,8 @@ void hal_set_current_thread_id(ident_t thread);
 // misc.
 void hal_printchar(char c);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
 

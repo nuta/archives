@@ -46,11 +46,11 @@ global_config:
 config:
   SOURCES:
     set:
-      - src/main.c
-      - src/debug.c
-      - src/thread.c
-      - src/memory.c
-      - src/hw.c
-      - src/vm.c
-      - src/cpu.c
-      - src/callback.c
+      - src/main.cpp
+      - src/debug.cpp
+      - src/thread.cpp
+      - src/memory.cpp
+      - src/hw.cpp
+      - src/vm.cpp
+      - src/cpu.cpp
+      - src/callback.cpp

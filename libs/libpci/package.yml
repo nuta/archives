@@ -41,4 +41,6 @@ interface:
 global_config:
   CFLAGS:
     append_words: -Ipackages/libpci/include
+  CXXFLAGS:
+    append_words: -Ipackages/libpci/include
 

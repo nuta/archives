@@ -42,16 +42,16 @@ interface:
 config:
   SOURCES:
     set:
-      - src/api.c
-      - src/arp.c
-      - src/endian.c
-      - src/icmp.c 
-      - src/instance.c 
-      - src/ip.c 
-      - src/ipv4.c
-      - src/malloc.c
-      - src/mbuf.c
-      - src/receive.c
-      - src/udp.c
-      - src/session.c
-      - src/startup.c
+      - src/api.cpp
+      - src/arp.cpp
+      - src/endian.cpp
+      - src/icmp.cpp
+      - src/instance.cpp
+      - src/ip.cpp
+      - src/ipv4.cpp
+      - src/malloc.cpp
+      - src/mbuf.cpp
+      - src/receive.cpp
+      - src/udp.cpp
+      - src/session.cpp
+      - src/startup.cpp

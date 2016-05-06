@@ -1,2 +1,2 @@
 #!/bin/sh
-$CC $CFLAGS -M $1 | sed -e 's/.*://' | tr -d '\n' | tr -d '\\'
+$1 -M $2 | sed -e 's/.*://' | tr -d '\n' | tr -d '\\'

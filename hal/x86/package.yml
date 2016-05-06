@@ -50,31 +50,37 @@ global_config:
       -fno-stack-protector -mno-red-zone
       -mcmodel=large 
       -Ipackages/x86/src
+  CXXFLAGS:
+    append_words: >
+      -m64 -ffreestanding -mno-sse -mno-mmx
+      -fno-stack-protector -mno-red-zone
+      -mcmodel=large 
+      -Ipackages/x86/src
 
 config:
   SOURCES:
     set:
-      - src/startup.c
-      - src/asm.c
-      - src/exception.c
-      - src/gdt.c
-      - src/global.c
-      - src/handler.c
-      - src/idt.c
-      - src/init.c
-      - src/interrupt.c
-      - src/interrupt_handler.c
-      - src/ioapic.c
-      - src/localapic.c
-      - src/pic.c
-      - src/print.c
-      - src/smp.c
-      - src/start.c
-      - src/_start.c
-      - src/thread.c
-      - src/tss.c
-      - src/vm.c
-      - src/cpu.c
-      - src/handler.c
-      - src/callback.c
+      - src/startup.cpp
+      - src/asm.cpp
+      - src/exception.cpp
+      - src/gdt.cpp
+      - src/global.cpp
+      - src/handler.cpp
+      - src/idt.cpp
+      - src/init.cpp
+      - src/interrupt.cpp
+      - src/interrupt_handler.cpp
+      - src/ioapic.cpp
+      - src/localapic.cpp
+      - src/pic.cpp
+      - src/print.cpp
+      - src/smp.cpp
+      - src/start.cpp
+      - src/_start.cpp
+      - src/thread.cpp
+      - src/tss.cpp
+      - src/vm.cpp
+      - src/cpu.cpp
+      - src/handler.cpp
+      - src/callback.cpp
 

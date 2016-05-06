@@ -1,12 +1,10 @@
 #include "x86_asm.h"
 
-
 #define MULTIBOOT_MAGIC    0xe85250d6
 #define MULTIBOOT_ARCH     0 // i386
 #define MULTIBOOT_LENGTH   multiboot2_header_end - multiboot2_header
 #define MULTIBOOT_CHECKSUM -(MULTIBOOT_MAGIC + MULTIBOOT_ARCH +  MULTIBOOT_LENGTH)
 
-.section .boot
 .code32
 
 .global C_SYMBOL(x86_start)
@@ -55,7 +53,6 @@ new_gdt:
   mov  es, ax
 
 /*
-*
 *  check if long mode (IA-32e) available
 *
 */
@@ -244,4 +241,3 @@ grub_boot_info: .long 0
 stack:
 
 x86_init_entrypoint:
-

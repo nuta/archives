@@ -13,7 +13,7 @@ homepage: http://resea.net
 
 # Required packages
 requires: [cpp]
-lang: c
+lang: cpp
 
 # Interfaces which this package uses
 uses:
@@ -41,13 +41,13 @@ interface:
 config:
   SOURCES:
     set:
-      - src/startup.c
-      - src/handler.c
-      - src/fat.c
-      - src/file.c
-      - src/fs.open.c
-      - src/fs.close.c
-      - src/fs.read.c
-      - src/fs.write.c
-      - src/pager.fill.c
-      - tests/test.c
+      - src/startup.cpp
+      - src/handler.cpp
+      - src/fat.cpp
+      - src/file.cpp
+      - src/fs.open.cpp
+      - src/fs.close.cpp
+      - src/fs.read.cpp
+      - src/fs.write.cpp
+      - src/pager.fill.cpp
+      - tests/test.cpp
