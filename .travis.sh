@@ -32,7 +32,7 @@ deploy_resea_net() {
 
 case $TARGET in
 SDK)
-    cd SDK
+    cd sdk
     make test 
     ;;
 resea.net)

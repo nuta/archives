@@ -12,7 +12,7 @@ addons:
             - gcc-5
 
 install:
-  - cd SDK && python setup.py install && cd ..
+  - cd sdk && python setup.py install && cd ..
 
 script:
   - "./.travis.sh"
