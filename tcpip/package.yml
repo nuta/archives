@@ -40,18 +40,22 @@ interface:
 #  Config
 #
 config:
-  SOURCES:
-    set:
-      - src/api.cpp
-      - src/arp.cpp
-      - src/endian.cpp
-      - src/icmp.cpp
-      - src/instance.cpp
-      - src/ip.cpp
-      - src/ipv4.cpp
-      - src/malloc.cpp
-      - src/mbuf.cpp
-      - src/receive.cpp
-      - src/udp.cpp
-      - src/session.cpp
-      - src/startup.cpp
+  - SOURCES:
+      set:
+        - src/api.cpp
+        - src/arp.cpp
+        - src/endian.cpp
+        - src/icmp.cpp
+        - src/instance.cpp
+        - src/ip.cpp
+        - src/ipv4.cpp
+        - src/malloc.cpp
+        - src/mbuf.cpp
+        - src/receive.cpp
+        - src/udp.cpp
+        - src/session.cpp
+        - src/startup.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      set:
+        - tests/test.cpp

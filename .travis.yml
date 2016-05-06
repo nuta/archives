@@ -24,6 +24,7 @@ env:
   matrix:
     - TARGET=kernel
     - TARGET=fs/fat
+    - TARGET=tcpip
     - TARGET=resea.net
     - TARGET=SDK
   global:
