@@ -39,17 +39,17 @@ interface:
 #  Config
 #
 config:
-  SOURCES:
-    set:
-      - src/startup.cpp
-      - src/handler.cpp
-      - src/fat.cpp
-      - src/file.cpp
-      - src/fs.open.cpp
-      - src/fs.close.cpp
-      - src/fs.read.cpp
-      - src/fs.write.cpp
-      - src/pager.fill.cpp
+  - SOURCES:
+      set:
+        - src/startup.cpp
+        - src/handler.cpp
+        - src/fat.cpp
+        - src/file.cpp
+        - src/fs.open.cpp
+        - src/fs.close.cpp
+        - src/fs.read.cpp
+        - src/fs.write.cpp
+        - src/pager.fill.cpp
   - if: "ENV == 'test'"
     SOURCES:
       set:
