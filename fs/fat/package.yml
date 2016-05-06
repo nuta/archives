@@ -50,4 +50,7 @@ config:
       - src/fs.read.cpp
       - src/fs.write.cpp
       - src/pager.fill.cpp
-      - tests/test.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      set:
+        - tests/test.cpp
