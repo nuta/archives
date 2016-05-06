@@ -72,6 +72,10 @@ config:
         - src/mutex.cpp
         - src/printfmt.cpp
         - src/io.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      set:
+        - tests/test.cpp
   - if: "HAL == 'x86'"
     SOURCES:
       set:
