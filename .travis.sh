@@ -7,7 +7,7 @@ deploy_resea_net() {
 
     git clone https://github.com/resea/resea.github.io
     mkdir -p resea.net/docs/$revision
-    reseasdk alldocs --revision $revision --outdir resea.net/docs/$revision
+    resea alldocs --revision $revision --outdir resea.net/docs/$revision
     cd resea.github.io
     cp -r ../resea.net/* .
 
@@ -40,6 +40,6 @@ resea.net)
     ;;
 *)
     cd $TARGET
-    reseasdk test HAL=posix_host
+    resea test HAL=posix_host
     ;;
 esac
