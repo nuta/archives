@@ -40,6 +40,9 @@ resea.net)
     ;;
 *)
     cd $TARGET
-    resea test HAL=posix_host
+    resea validate
+    if [[ ! $TARGET =~ ^interfaces ]]; then 
+        resea test HAL=posix_host
+    fi
     ;;
 esac

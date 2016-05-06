@@ -26,6 +26,19 @@ env:
     - TARGET=fs/fat
     - TARGET=tcpip
     - TARGET=lang/cpp
+    - TARGET=interfaces/channel
+    - TARGET=interfaces/datetime
+    - TARGET=interfaces/exec
+    - TARGET=interfaces/fs
+    - TARGET=interfaces/hal
+    - TARGET=interfaces/io
+    - TARGET=interfaces/lang
+    - TARGET=interfaces/memory
+    - TARGET=interfaces/pager
+    - TARGET=interfaces/thread
+    - TARGET=interfaces/storage_device
+    - TARGET=interfaces/net_device
+    - TARGET=interfaces/datetime_device
     - TARGET=resea.net
     - TARGET=SDK
   global:
