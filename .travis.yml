@@ -25,7 +25,7 @@ env:
     - TARGET=kernel
     - TARGET=fs/fat
     - TARGET=tcpip
-    - TARGET=cpp
+    - TARGET=lang/cpp
     - TARGET=resea.net
     - TARGET=SDK
   global:
