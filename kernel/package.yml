@@ -49,35 +49,38 @@ global_config:
     append_words: -DKERNEL
 
 config:
-  SOURCES:
-    set:
-    - src/channel.cpp
-    - src/channel.connect.cpp
-    - src/channel.register.cpp
-    - src/datetime.cpp
-    - src/datetime.delay.cpp
-    - src/datetime.get_date.cpp
-    - src/datetime.set_interval_timer.cpp
-    - src/datetime.set_oneshot_timer.cpp
-    - src/handler.cpp
-    - src/io.allocate.cpp
-    - src/io.release.cpp
-    - src/memory.cpp
-    - src/memory.allocate.cpp
-    - src/memory.allocate_physical.cpp
-    - src/memory.release.cpp
-    - src/memory.get_page_size.cpp
-    - src/memory.map.cpp
-    - src/memory.unmap.cpp
-    - src/pager.fill.cpp
-    - src/startup.cpp
-    - src/syscall.cpp
-    - src/thread.block.cpp
-    - src/thread.cpp
-    - src/thread.create.cpp
-    - src/thread.delete.cpp
-    - src/thread.get_current_thread.cpp
-    - src/thread.set.cpp
-    - src/thread.start.cpp
-    - src/thread.unblock.cpp
-    - tests/test.cpp
+  - SOURCES:
+      set:
+        - src/channel.cpp
+        - src/channel.connect.cpp
+        - src/channel.register.cpp
+        - src/datetime.cpp
+        - src/datetime.delay.cpp
+        - src/datetime.get_date.cpp
+        - src/datetime.set_interval_timer.cpp
+        - src/datetime.set_oneshot_timer.cpp
+        - src/handler.cpp
+        - src/io.allocate.cpp
+        - src/io.release.cpp
+        - src/memory.cpp
+        - src/memory.allocate.cpp
+        - src/memory.allocate_physical.cpp
+        - src/memory.release.cpp
+        - src/memory.get_page_size.cpp
+        - src/memory.map.cpp
+        - src/memory.unmap.cpp
+        - src/pager.fill.cpp
+        - src/startup.cpp
+        - src/syscall.cpp
+        - src/thread.block.cpp
+        - src/thread.cpp
+        - src/thread.create.cpp
+        - src/thread.delete.cpp
+        - src/thread.get_current_thread.cpp
+        - src/thread.set.cpp
+        - src/thread.start.cpp
+        - src/thread.unblock.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      set:
+        - tests/test.cpp
