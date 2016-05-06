@@ -1,5 +1,6 @@
 #include <hal.h>
-void exit(int);
+#include <stdlib.h>
+
 
 void hal_panic(void) {
 

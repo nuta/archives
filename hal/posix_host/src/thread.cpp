@@ -18,7 +18,7 @@ void hal_set_thread(struct hal_thread *t, bool is_kernel,
                     uintptr_t entry, uintptr_t arg, uintptr_t stack, uintptr_t stack_size) {
 
     pthread_t thread;
-    pthread_create(&thread, nullptr, (void *) entry, (void *) arg);
+    pthread_create(&thread, nullptr, (void *(*)(void *)) entry, (void *) arg);
 }
 
 

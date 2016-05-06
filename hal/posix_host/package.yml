@@ -42,6 +42,8 @@ global_config:
     default: ./packages/genstartc/genstartc
   CFLAGS:
    append_words: -Ipackages/posix_host/src -DPOSIX_HOST
+  CXXFLAGS:
+   append_words: -Ipackages/posix_host/src -DPOSIX_HOST
 
 config:
   SOURCES:

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <resea.h>
 
-void start_apps(void);
+extern "C" void start_apps(void);
 void kernel_startup(void);
 
 
