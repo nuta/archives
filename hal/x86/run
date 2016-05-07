@@ -1,15 +1,8 @@
 #!/bin/sh
-[ -z $QEMU ] && QEMU=qemu-system-x86_64
-[ ! -f hdd.img ] && dd if=/dev/zero of=hdd.img bs=1048576 count=8
-
 exec $QEMU \
     -m 256 -localtime -nographic \
     -no-reboot -boot d \
     -cpu SandyBridge \
     -net user -net nic,model=virtio \
     -net dump,file=qemu.pcap \
-    -redir tcp:50080::80 \
-    -redir tcp:50022::22 \
-    -drive id=drive0,file=hdd.img,if=none,format=raw \
-    -device virtio-blk-pci,drive=drive0 \
     -cdrom $1
