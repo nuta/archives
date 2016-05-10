@@ -3,9 +3,8 @@
 #include "printf.h"
 
 
-void tcpip_receive_icmp(struct tcpip_instance *instance,
-  struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
-  const void *payload, size_t size) {
+void tcpip_receive_icmp(struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
+                        const void *payload, size_t size) {
 
     struct tcpip_icmp_header *header = (struct tcpip_icmp_header *) payload;
     uint8_t type, code, checksum;

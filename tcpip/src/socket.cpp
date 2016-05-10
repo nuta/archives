@@ -1,8 +1,11 @@
 #include <string.h>
-#include "session.h"
+#include "socket.h"
+#include "malloc.h"
 #include "ipv4.h"
 #include "printf.h"
 
+static struct tcpip_socket *sockets;
+static size_t sockets_max;
 
 static int compare_addr(struct tcpip_addr *addr1, struct tcpip_addr *addr2) {
 
@@ -28,12 +31,11 @@ static int compare_addr(struct tcpip_addr *addr1, struct tcpip_addr *addr2) {
     return 1;
 }
 
-struct tcpip_session *tcpip_get_session(struct tcpip_instance *instance,
-                                        struct tcpip_addr *remote_addr,
-                                        struct tcpip_addr *local_addr) {
+struct tcpip_socket *tcpip_get_socket(struct tcpip_addr *remote_addr,
+                                      struct tcpip_addr *local_addr) {
 
-    for (int i = 0; i < instance->sessions_max; i++) {
-        struct tcpip_session *s = &instance->sessions[i];
+    for (size_t i = 0; i < sockets_max; i++) {
+        struct tcpip_socket *s = &sockets[i];
         if (s->used &&
             compare_addr(remote_addr, &s->remote_addr) &&
             compare_addr(local_addr,  &s->local_addr)) {
@@ -46,24 +48,21 @@ struct tcpip_session *tcpip_get_session(struct tcpip_instance *instance,
 }
 
 
-void tcpip_destroy_session(struct tcpip_session *session) {
+void tcpip_destroy_socket(struct tcpip_socket *socket) {
     // TODO
 }
 
 
-struct tcpip_session *tcpip_create_session(struct tcpip_instance *instance) {
+struct tcpip_socket *tcpip_create_socket() {
 
-    for (int i = 0; i < instance->sessions_max; i++) {
-        struct tcpip_session *s = &instance->sessions[i];
+    for (size_t i = 0; i < sockets_max; i++) {
+        struct tcpip_socket *s = &sockets[i];
 
         if (!s->used) {
             // TODO: lock
             s->used = 1;
-            s->instance    = instance;
-            s->rx.instance = instance;
             s->rx.first    = nullptr;
             s->rx.last     = nullptr;
-            s->tx.instance = instance;
             s->tx.first    = nullptr;
             s->tx.last     = nullptr;
             return s;
@@ -75,17 +74,23 @@ struct tcpip_session *tcpip_create_session(struct tcpip_instance *instance) {
 
 
 /* Retuns 0 on success */
-int tcpip_bind_session(struct tcpip_session *session, struct tcpip_addr *addr) {
+int tcpip_bind_socket(struct tcpip_socket *socket, struct tcpip_addr *addr) {
     struct tcpip_addr default_remote_addr;
 
     default_remote_addr.protocol  = addr->protocol;
     default_remote_addr.port      = TCPIP_PORT_ANY;
     default_remote_addr.ipv4_addr = TCPIP_IPV4_ADDR_ANY; // TODO: support IPV6
 
-    // TODO: check conflicts with exsisting sessions
-    memcpy(&session->local_addr, addr, sizeof(*addr));
-    memcpy(&session->remote_addr, &default_remote_addr, sizeof(default_remote_addr));
+    // TODO: check conflicts with exsisting sockets
+    memcpy(&socket->local_addr, addr, sizeof(*addr));
+    memcpy(&socket->remote_addr, &default_remote_addr, sizeof(default_remote_addr));
 
     return 0;
 }
 
+
+void tcpip_init_socket() {
+
+    sockets     = (struct tcpip_socket *) tcpip_malloc(sizeof(struct tcpip_socket) * 256);
+    sockets_max = 256;
+}

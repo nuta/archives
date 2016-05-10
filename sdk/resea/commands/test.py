@@ -35,9 +35,9 @@ class FSEventHandler(watchdog.events.FileSystemEventHandler):
 
         def is_target_ext(path):
             exts = [
-                'c', 'h', 'S',
+                'c', 'h', 'S', 'cpp',
                 'yml',
-                'ld',
+                'lds',
                 'cfg',
                 'sh', 'py'
             ]

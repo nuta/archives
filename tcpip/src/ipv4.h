@@ -2,7 +2,6 @@
 #define __TCPIP_IPV4_H__
 
 #include "types.h"
-#include "instance.h"
 
 struct tcpip_ipv4_header {
     uint8_t   version;
@@ -22,7 +21,7 @@ struct tcpip_ipv4_header {
 
 #define TCPIP_IPV4_ADDR_ANY  0
 
-void tcpip_receive_ipv4(struct tcpip_instance *instance, const void *payload, size_t size);
+void tcpip_receive_ipv4(const void *payload, size_t size);
 
 #endif
 

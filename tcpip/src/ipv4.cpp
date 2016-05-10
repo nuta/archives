@@ -5,7 +5,7 @@
 #include "printf.h"
 
 
-void tcpip_receive_ipv4(struct tcpip_instance *instance, const void *payload, size_t size) {
+void tcpip_receive_ipv4(const void *payload, size_t size) {
 
     struct tcpip_ipv4_header *header = (struct tcpip_ipv4_header *) payload;
     uint8_t version, proto;
@@ -40,10 +40,10 @@ void tcpip_receive_ipv4(struct tcpip_instance *instance, const void *payload, si
 
     switch (proto) {
     case TCPIP_IPTYPE_ICMP:
-	tcpip_receive_icmp(instance, &src, &dest, ptr, len);
+	tcpip_receive_icmp(&src, &dest, ptr, len);
 	break;
     case TCPIP_IPTYPE_UDP:
-	tcpip_receive_udp(instance, &src, &dest, ptr, len);
+	tcpip_receive_udp(&src, &dest, ptr, len);
 	break;
     default: WARN("unknown proto type (proto=%04x)", proto);
     }

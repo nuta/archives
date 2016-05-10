@@ -2,8 +2,7 @@
 #define __TCPIP_UDP_H__
 
 #include "types.h"
-#include "instance.h"
-#include "session.h"
+#include "socket.h"
 
 struct tcpip_udp_header {
     uint16_t  src_port;
@@ -16,11 +15,10 @@ struct tcpip_udp_header {
 #define TCPIP_IPTYPE_UDP   0x11
 
 
-size_t tcpip_send_udp(struct tcpip_session *session,
+size_t tcpip_send_udp(struct tcpip_socket *socket,
                       const void *payload, size_t size,
                       int flags, struct tcpip_addr *addr);
-void tcpip_receive_udp(struct tcpip_instance *instance,
-  struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
+void tcpip_receive_udp(struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
   const void *payload, size_t size);
 
 #endif

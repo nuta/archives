@@ -2,8 +2,6 @@
 #define __TCPIP_ARP_H__
 
 #include "types.h"
-#include "instance.h"
-
 
 #define TCPIP_ARP_REQUEST  1 
 #define TCPIP_ARP_REPLY    2
@@ -20,6 +18,6 @@ struct tcpip_arp_header {
     uint32_t  target_proto_addr;
 } TCPIP_PACKED;
 
-void tcpip_receive_arp(struct tcpip_instance *instance, const void *payload, size_t size);
+void tcpip_receive_arp(const void *payload, size_t size);
 
 #endif

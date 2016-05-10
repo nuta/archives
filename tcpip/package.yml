@@ -46,14 +46,13 @@ config:
         - src/arp.cpp
         - src/endian.cpp
         - src/icmp.cpp
-        - src/instance.cpp
         - src/ip.cpp
         - src/ipv4.cpp
         - src/malloc.cpp
         - src/mbuf.cpp
         - src/receive.cpp
         - src/udp.cpp
-        - src/session.cpp
+        - src/socket.cpp
         - src/startup.cpp
   - if: "ENV == 'test'"
     SOURCES:

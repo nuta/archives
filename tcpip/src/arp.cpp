@@ -4,7 +4,7 @@
 #include "printf.h"
 
 
-void tcpip_receive_arp(struct tcpip_instance *instance, const void *payload, size_t size) {
+void tcpip_receive_arp(const void *payload, size_t size) {
     struct tcpip_arp_header *header = (struct tcpip_arp_header *) payload;
     uint8_t sender_hw_addr[6], target_hw_addr[6];
     uint16_t proto_type, op;

@@ -2,7 +2,6 @@
 #define __TCPIP_ICMP_H__
 
 #include "types.h"
-#include "instance.h"
 
 struct tcpip_icmp_header {
     uint8_t   type;
@@ -14,9 +13,8 @@ struct tcpip_icmp_header {
 #define TCPIP_ICMPTYPE_ECHO_REPLY    0
 #define TCPIP_ICMPTYPE_ECHO_REQUEST  8
 
-void tcpip_receive_icmp(struct tcpip_instance *instance,
-  struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
-  const void *payload, size_t size);
+void tcpip_receive_icmp(struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
+                        const void *payload, size_t size);
 
 #endif
 

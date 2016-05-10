@@ -4,10 +4,10 @@
 #include "printf.h"
 
 
-struct tcpip_mbuf *tcpip_allocate_mbuf(struct tcpip_instance *instance) {
+struct tcpip_mbuf *tcpip_allocate_mbuf(void) {
     struct tcpip_mbuf *mbuf;
 
-    mbuf = (struct tcpip_mbuf *) tcpip_malloc(instance, TCPIP_MBUF_SIZE);
+    mbuf = (struct tcpip_mbuf *) tcpip_malloc(TCPIP_MBUF_SIZE);
     mbuf->next   = nullptr;
     mbuf->begin  = 0;
     mbuf->length = 0;
@@ -16,9 +16,9 @@ struct tcpip_mbuf *tcpip_allocate_mbuf(struct tcpip_instance *instance) {
 }
 
 
-void tcpip_free_mbuf(struct tcpip_instance *instance, struct tcpip_mbuf *mbuf) {
+void tcpip_free_mbuf(struct tcpip_mbuf *mbuf) {
 
-     tcpip_free(instance, mbuf);
+     tcpip_free(mbuf);
 }
 
 
@@ -30,7 +30,7 @@ void tcpip_append_mbuf(struct tcpip_mqueue *mqueue, struct tcpip_addr *addr,
 
     while (size > 0) {
         // TODO: lock
-        struct tcpip_mbuf *new_last = tcpip_allocate_mbuf(mqueue->instance);
+        struct tcpip_mbuf *new_last = tcpip_allocate_mbuf();
         size_t copy_size = ((size >= TCPIP_MBUF_DATA_SIZE)? TCPIP_MBUF_DATA_SIZE : size);
 
         new_last->flags  = flags;
@@ -77,7 +77,7 @@ size_t tcpip_pop_mbuf(struct tcpip_mqueue *mqueue,
         }
 
         next = m->next;
-        tcpip_free_mbuf(mqueue->instance, m);
+        tcpip_free_mbuf(m);
 
         if (m->flags & TCPIP_MBUF_END)
             break;

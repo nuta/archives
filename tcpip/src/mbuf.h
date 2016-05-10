@@ -10,7 +10,6 @@
 #define TCPIP_MBUF_DATA_SIZE   (TCPIP_MBUF_SIZE - TCPIP_MBUF_HEADER_SIZE)
 
 struct tcpip_mqueue {
-    struct tcpip_instance* instance;
     struct tcpip_mbuf *first;
     struct tcpip_mbuf *last;
 };
@@ -25,8 +24,8 @@ struct tcpip_mbuf {
 };
 
 
-struct tcpip_mbuf *tcpip_allocate_mbuf(struct tcpip_instance *instance);
-void tcpip_free_mbuf(struct tcpip_instance *instance, struct tcpip_mbuf *mbuf);
+struct tcpip_mbuf *tcpip_allocate_mbuf();
+void tcpip_free_mbuf(struct tcpip_mbuf *mbuf);
 void tcpip_append_mbuf(struct tcpip_mqueue *mqueue, struct tcpip_addr *addr,
                        const void *buf, size_t size, int flags);
 size_t tcpip_pop_mbuf(struct tcpip_mqueue *mqueue,
