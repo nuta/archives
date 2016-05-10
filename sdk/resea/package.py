@@ -133,7 +133,7 @@ def load_packages(builtin_packages, config=None, enable_if=False):
                     if k == 'if':
                         continue
 
-                    if v.get('default'):
+                    if k not in config and v.get('default'):
                         config[k] = v['default']
         else:
             if package in builtin_packages:

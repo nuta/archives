@@ -49,12 +49,12 @@ global_config:
         scaffold: ./packages/cpp/scaffold
         genstub: ./packages/cpp/genstub
   CFLAGS:
-    default: >
+    append_words: >
       -Wall -ggdb3 -std=c99 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color     
       -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/c
   CXXFLAGS:
-    default: >
+    append_words: >
       -Wall -ggdb3 -std=c++14 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color     
       -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/cpp

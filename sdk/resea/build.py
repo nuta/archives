@@ -102,10 +102,10 @@ $(BUILD_DIR)/{{ package_name }}/%: {{ k }} = {{ v }}
 """
 
 
-def run_make(makefile, env, prettify=False):
+def run_make(make, makefile, env, prettify=False):
     """Executes make(1)"""
     try:
-        p = subprocess.Popen(['make', '-f', makefile],
+        p = subprocess.Popen(make.split(' ') + ['-f', makefile],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
                              env=env)
@@ -149,6 +149,7 @@ def build(args):
         error("'package.yml' not found (are you in a package directory?)")
 
     config = {
+        'MAKE': 'make',
         'ENV': args.env,
         'BUILD_DIR': 'build/' + args.env,
         'MAKEFLAGS': '-j' + str(multiprocessing.cpu_count()),
@@ -198,9 +199,6 @@ def build(args):
 
     # deps
     config['DEPS'] = list(map(lambda x: os.path.splitext(x)[0] + '.deps', config['OBJS']))
-
-    # override global config with command line variables
-    config.update(cmdline_config)
    
     # clean up if build config have been changed
     try:
@@ -231,7 +229,8 @@ def build(args):
 
     # Everything is ready now. Let's start building!
     progress('executing make')
-    if run_make(makefile, os.environ.copy().update(dict_to_strdict(config)),
+    if run_make(config['MAKE'], makefile,
+            os.environ.copy().update(dict_to_strdict(config)),
             args.prettify) != 0:
         error('something went wrong in make(1)')
 

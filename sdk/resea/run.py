@@ -135,7 +135,7 @@ def run_emulator(cmd, test=False, env=None, save_log=None):
                            'red')
             p.terminate()
             p.kill()
-            sys.exit(0)
+            return
         elif result == 'pass':
             passed += 1
             f.write(l + '\n')
@@ -152,4 +152,4 @@ def run_emulator(cmd, test=False, env=None, save_log=None):
                 # kernel panic
                 p.terminate()
                 p.kill()
-                sys.exit(0)
+                return
