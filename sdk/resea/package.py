@@ -159,7 +159,7 @@ def load_packages(builtin_packages, config=None, enable_if=False):
                     else:
                         error("unexpected global_config type: '{}'".format(type(val)))
                 elif v.get('append_words'):
-                    config[k] = config[k].strip() + ' ' + v['append_words'].strip()
+                    config[k] = config.get(k, '').strip() + ' ' + v['append_words'].strip()
                 elif v.get('default'):
                     pass
                 else:
