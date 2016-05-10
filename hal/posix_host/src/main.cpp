@@ -2,7 +2,7 @@
 #include <resea.h>
 
 extern "C" void start_apps(void);
-void kernel_startup(void);
+extern "C" void kernel_startup(void);
 
 
 void hal_startup(void) {
