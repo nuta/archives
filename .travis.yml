@@ -47,3 +47,8 @@ env:
     - CC=gcc-5
     - CXX=g++-5
     - secure: "cg2XxwTYCzX7JBGW4yJxhkJ1Hq1RboWb5/ytCnLrgf8UyW2CcE0egTvoVOQEX++fRZNMGvU1A66pYloCERLiLI/ETsHbLoMvpY6msKF1615vZpTgX2spFVUcbimcOin2ad3PxghN2vWiFDM/A4xbnBiAQ8QqirVQskXIPHciQTsyPcJPZgcqEfO1BLLkXUqHyNGWGw0vjn6AAucfIZsjCVzQXrhtuOcQbbbEI4AgwyGLXqtzyAmXEEJ3SCmR7Y+Ecu8skV3W73s/4X9j83ziB2FSLtb21vnPd8BdZfsr9FUEa6GzB89F9NdgBaLkhTAWl7+3BvAOM0HE5ebV1P3OrJMWdlnuG0xoJwXQ7mpg7NhaNeJj6kukiV7KYLOd0eiwF7oBP05WcUz19QV5tScnfScAc5G3Kn5vMvk18Z0Pv9JS1c6KcHK6PrirOUwHC7uU1Tm3fPqskp1iFjXigcTm9c8wn53X8idNcUBAxwoa78u41WkDVG3Znk3HIhOdKVv2uRewvCjd1E3RbwwO3+yJouEkf+fxUT0qJ78riVN4dafy3X5VJJAxtkbMK/WNhAikigG5K2KhkcBvhdj2DN5vII8eSNf4t6pPJSahSRb91bmGvWtEV1eilONurGY+opxhTnD41foGavcaqEQdK2xCjcH24nPHcGMO52EXXpCiELE="
+
+notifications:
+  email:
+    on_success: changed
+    on_failure: never
