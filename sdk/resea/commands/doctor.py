@@ -1,4 +1,5 @@
 import os
+import sys
 import glob
 import tempfile
 import subprocess
@@ -39,8 +40,7 @@ def main(argv_):
     try:
         yml = load_yaml('package.yml', validator=validate_package_yml)
     except FileNotFoundError:
-        notice("'package.yml' not found")
-        sys.exit()
+        sys.exit("'package.yml' not found")
 
     if yml['category'] in ['application', 'library']:
         tmp_dir = tempfile.mkdtemp(prefix='resea-doctor-')
