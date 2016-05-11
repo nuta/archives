@@ -24,11 +24,13 @@ os_requirements:
         - "./packages/cpp/osx/x86_64-elf-binutils.rb"
         - "./packages/cpp/osx/arm-elf-eabi-gcc.rb"
         - "./packages/cpp/osx/arm-elf-eabi-binutils.rb"
+        - lcov
   ubuntu:
     apt:
       packages:
         - clang
         - gcc
+        - lcov
 
 # Interfaces which this package uses
 uses: [memory, io]
