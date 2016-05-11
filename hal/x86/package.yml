@@ -15,6 +15,13 @@ homepage: http://resea.net
 depends: [cpp, genstartc]
 lang: c
 
+# OS requirements
+os_requirements:
+  osx:
+    homebrew:
+      packages:
+        - "./packages/x86/osx/grub.rb --HEAD"
+
 # Interfaces which this package uses
 uses: [posix_host] # we use genstart in posix_host
 
