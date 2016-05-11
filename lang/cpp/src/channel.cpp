@@ -1,6 +1,25 @@
 #include <resea.h>
 #include <resea/channel.h>
 
+
+channel_t create_channel() {
+
+    return sys_open();
+}
+
+
+void close_channel(channel_t channel) {
+
+    sys_close(channel);
+}
+
+
+void set_channel_handler(channel_t channel, handler_t handler) {
+
+    sys_setoptions(channel, handler, nullptr, 0);
+}
+
+
 /**
  *  Connects to a thread group local channel
  *
@@ -11,8 +30,8 @@
 channel_t connect_to_local(channel_t id) {
     channel_t client, server;
 
-    client = sys_open();  // client (our) side
-    server = sys_open();  // server side
+    client = create_channel();  // client (our) side
+    server = create_channel();  // server side
     sys_link(client, server);
     sys_transfer(server, id);
 
@@ -29,7 +48,7 @@ channel_t connect_to_local(channel_t id) {
  */
 NORETURN void serve_channel(channel_t ch, handler_t handler) {
 
-    sys_setoptions(ch, handler, nullptr, 0);
+    set_channel_handler(ch, handler);
     for(;;) {
         // TODO: receive a message, call handler, and free readonly payloads
     }

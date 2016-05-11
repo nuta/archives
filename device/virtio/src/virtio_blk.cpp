@@ -44,11 +44,11 @@ void virtio_blk_init(void){
     channel_t pci_server, pci_client;
     result_t r;
 
-    pci_server = sys_open();
+    pci_server = create_channel();
     call_channel_connect(connect_to_local(1), pci_server, INTERFACE(pci), &r);
 
-    pci_client = sys_open();
-    sys_setoptions(pci_client, new_device_handler, nullptr, 0);
+    pci_client = create_channel();
+    set_channel_handler(pci_client, new_device_handler);
 
     call_pci_listen(pci_server, pci_client,
         VIRTIO_PCI_VENDOR, PCI_ID_ANY,

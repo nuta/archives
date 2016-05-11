@@ -12,7 +12,7 @@ channel_t virtio_server;
 
 extern "C" void virtio_startup(void) {
 
-    virtio_server = sys_open();
+    virtio_server = create_channel();
     virtio_blk_init();
     virtio_net_init();
     serve_channel(virtio_server, &virtio_handler);

@@ -11,7 +11,7 @@ result_t kernel_get_date(uint32_t *year, uint32_t *date, uint32_t *nsec) {
 
     /* XXX */
     if (!datetime_device_ch) {
-        datetime_device_ch = sys_open();
+        datetime_device_ch = create_channel();
         call_channel_connect(connect_to_local(1), datetime_device_ch,
             INTERFACE(datetime_device), &r);
     }

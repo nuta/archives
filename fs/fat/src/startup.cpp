@@ -41,13 +41,13 @@ extern "C" void fat_startup(void) {
 
     INFO("starting");
 
-    storage_device_ch = sys_open();
+    storage_device_ch = create_channel();
     call_channel_connect(connect_to_local(1), storage_device_ch,
         INTERFACE(storage_device), &r);
 
     fat_opendisk(&fat_the_disk, storage_device_ch, read_disk, write_disk);
 
-    ch = sys_open();
+    ch = create_channel();
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(fs), &r);
     serve_channel(ch, fat_handler);

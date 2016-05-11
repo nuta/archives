@@ -9,7 +9,7 @@ result_t pci_startup(void) {
     channel_t ch;
     result_t r;
 
-    ch = sys_open();
+    ch = create_channel();
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(pci), &r);
 

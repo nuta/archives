@@ -8,7 +8,7 @@ channel_t get_memory_ch(void) {
     result_t r;
 
     if (!ch) {
-        ch = sys_open();
+        ch = create_channel();
         call_channel_connect(connect_to_local(1), ch,
             INTERFACE(memory), &r);
     }

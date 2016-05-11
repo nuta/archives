@@ -17,8 +17,8 @@ extern "C" void kernel_startup(void) {
     kernel_thread_startup();
     kernel_datetime_startup(); 
 
-    ch = sys_open();
-    sys_setoptions(ch, &kernel_handler, nullptr, 0);
+    ch = create_channel();
+    set_channel_handler(ch, &kernel_handler);
     kernel_register_channel(ch, INTERFACE(thread));
     kernel_register_channel(ch, INTERFACE(memory));
     kernel_register_channel(ch, INTERFACE(datetime));

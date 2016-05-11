@@ -136,6 +136,9 @@ result_t sys_transfer(channel_t ch1, channel_t ch2);
 /*
  *  Channel
  */
+channel_t create_channel();
+void close_channel(channel_t channel);
+void set_channel_handler(channel_t channel, handler_t handler);
 channel_t connect_to_local(channel_t id);
 NORETURN void serve_channel(channel_t ch, handler_t handler);
 

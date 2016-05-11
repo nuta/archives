@@ -10,7 +10,7 @@ extern "C" void rtc_startup(void) {
     channel_t ch;
     result_t r;
 
-    ch = sys_open();
+    ch = create_channel();
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(datetime_device), &r);
 

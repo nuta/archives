@@ -44,7 +44,7 @@ static void udp_client(channel_t ch, payload_t *m) {
 extern "C" void tcpip_test(void) {
     result_t r;
 
-    tcpip_ch = sys_open();
+    tcpip_ch = create_channel();
     call_channel_connect(connect_to_local(1), tcpip_ch, INTERFACE(tcpip), &r);
 
     //
@@ -63,10 +63,10 @@ extern "C" void tcpip_test(void) {
     ident_t server_sock, client_sock;
     channel_t udp_server_ch, udp_client_ch;
 
-    udp_server_ch = sys_open();
-    udp_client_ch = sys_open();
-    sys_setoptions(udp_server_ch, udp_server, nullptr, 0);
-    sys_setoptions(udp_client_ch, udp_client, nullptr, 0);
+    udp_server_ch = create_channel();
+    udp_client_ch = create_channel();
+    set_channel_handler(udp_server_ch, udp_server);
+    set_channel_handler(udp_client_ch, udp_client);
 
     call_tcpip_open(tcpip_ch, TCPIP_PROTOCOL_UDP, udp_server_ch, &r, &server_sock);
     call_tcpip_open(tcpip_ch, TCPIP_PROTOCOL_UDP, udp_client_ch, &r, &client_sock);

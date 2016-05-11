@@ -7,7 +7,7 @@ void elf_startup(void) {
     channel_t ch;
 
     INFO("starting");
-    sys_open(&ch);
+    create_channel(&ch);
     register_channel(ch, INTERFACE(exec));
     serve_channel(ch, &elf_handler);
     INFO("started");

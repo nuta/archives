@@ -12,8 +12,8 @@ void x86_init_localapic_timer(void);
 
 void hal_startup(void) {
 
-    ch = sys_open();
-    sys_setoptions(ch, &x86_handler, nullptr, 0);
+    ch = create_channel();
+    set_channel_handler(ch, &x86_handler);
 }
 
 
