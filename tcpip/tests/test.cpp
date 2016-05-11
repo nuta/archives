@@ -12,7 +12,7 @@ static void udp_server(channel_t ch, payload_t *m) {
     void *data;
     result_t r;
 
-    switch (m[1]) {
+    switch (EXTRACT_MSGID(m)) {
     case MSGID(tcpip, received):
         socket = EXTRACT(m, tcpip, received, socket);
         port   = EXTRACT(m, tcpip, received, port);

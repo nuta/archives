@@ -17,7 +17,7 @@ static void new_device_handler(channel_t ch, payload_t *m) {
     result_t r;
     struct libpci_config_header *config;
 
-    switch (m[1]) {
+    switch (EXTRACT_MSGID(m)) {
     case MSGID(pci, new_device):
         config = (struct libpci_config_header *) EXTRACT(m, pci, new_device, header);
         bar0   = config->bar0;

@@ -148,6 +148,7 @@ NORETURN void serve_channel(channel_t ch, handler_t handler);
 #define __PTYPE(i, t, p)     __ptype_##i##_##t##_##p
 #define __PINDEX(i, t, p)    __pindex_##i##_##t##_##p
 #define EXTRACT(m, i, t, p)  ((__PTYPE(i, t, p)) (((payload_t *) (m))[__PINDEX(i, t, p)]))
+#define EXTRACT_MSGID(m)     ((m)[1])
 
 enum {
   PAYLOAD_NULL     = 0,
