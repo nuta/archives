@@ -62,7 +62,7 @@ def main(argv_):
            'HAL=posix_host',
            'CFLAGS=-fprofile-arcs -ftest-coverage',
            'CXXFLAGS=-fprofile-arcs -ftest-coverage',
-           'HAL_LINK=gcc -fprofile-arcs -ftest-coverage -o'
+           'HAL_LINK=gcc -fprofile-arcs -ftest-coverage -pthread -o'
         ])
 
         progress('Collecting coverages')
