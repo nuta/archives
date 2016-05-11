@@ -95,7 +95,7 @@ def atexit_handler(p):
         pass
 
 
-def run_emulator(cmd, test=False, env=None, save_log=None):
+def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
     if save_log is None:
         save_log = '/dev/null'
     if env is None:
@@ -135,10 +135,13 @@ def run_emulator(cmd, test=False, env=None, save_log=None):
                 else:
                     cprint('ReseaSDK: {} tests failed'.format(failed),
                            'red')
-            progress('Waiting for termination')
-            time.sleep(3)
-            p.terminate()
-            p.kill()
+
+            if wait:
+               progress('Waiting for termination')  
+               p.wait()
+            else:
+                p.terminate()
+                p.kill()
             return
         elif result == 'pass':
             passed += 1

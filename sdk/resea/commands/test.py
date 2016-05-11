@@ -96,7 +96,7 @@ def test(args):
     config = build(args)
     plan('Invoking tests')
     run_emulator([config['HAL_RUN'], config['BUILD_DIR'] + '/application'],
-        test=True, env=config)
+        test=True, env=config, wait=args.wait)
 
 
 def main(args_):
@@ -104,6 +104,7 @@ def main(args_):
                                      description='test an executable')
     parser = add_build_arguments(parser)
     parser.add_argument('-P', action='store_true', help='Poll file changes and run tests automatically')
+    parser.add_argument('--wait', action='store_true', help='wait for termination')
     args = parser.parse_args(['--env=test'] + args_ + ['--', 'TEST=yes'])
 
     if args.P:

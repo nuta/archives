@@ -30,6 +30,7 @@ def main():
 
     plan('Testing with gcov')
     resea.commands.test.main([
+       '--wait',
        'HAL=posix_host',
        'CFLAGS=-fprofile-arcs -ftest-coverage',
        'CXXFLAGS=-fprofile-arcs -ftest-coverage',
