@@ -53,7 +53,7 @@ def main(argv_):
            'MAKE=scan-build -o {} make'.format(csa_dir),
            'CFLAGS=-fprofile-arcs -ftest-coverage',
            'CXXFLAGS=-fprofile-arcs -ftest-coverage',
-           'HAL_LINK=clang -fprofile-arcs -ftest-coverage -pthread -o'
+           'HAL_LINK=clang --coverage -pthread -o'
         ])
 
         # collect coverages
