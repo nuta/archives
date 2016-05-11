@@ -42,4 +42,4 @@ install:
   - docker build -t ci-image -f .travis.dockerfile .
 
 script:
-  - docker run ci-image
+  - docker run ci-image -e TARGET -e CC -e CXX -e GH_TOKEN
