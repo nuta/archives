@@ -6,7 +6,7 @@ from resea.helpers import plan, error
 def osx_install(requirements):
     def update():
         try:
-            subprocess.run(['apt-get', 'update', '-y'], check=True)
+            subprocess.run(['brew', 'update'], check=True)
         except subprocess.CalledProcessError:
             error('failed to update the list of packages'.format(args))
     
@@ -40,7 +40,7 @@ def osx_install(requirements):
 def ubuntu_install(requirements):
     def update():
         try:
-            subprocess.run(['brew', 'update'], check=True)
+            subprocess.run(['apt-get', 'update', '-y'], check=True)
         except subprocess.CalledProcessError:
             error('failed to update the list of packages'.format(args))
     
