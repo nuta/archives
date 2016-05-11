@@ -1,6 +1,7 @@
 from copy import copy
 import os
 from resea.helpers import load_yaml, error
+from resea.install import install_os_requirements
 from resea.validators import validate_package_yml, ValidationError
 
 paths = None # cache
@@ -86,6 +87,8 @@ def load_packages(builtin_packages, config=None, enable_if=False):
         package = packages.pop()
         all_packages.append(package)
         yml = load_package_yml(package)
+
+        install_os_requirements(yml['os_requirements'])
 
         if yml['category'] == 'application':
             config['CATEGORY'] = 'application'

@@ -30,7 +30,7 @@ def validate_package_yml(d):
             desc = '{} should be a list'.format(x)
             assert isinstance(d[x], list)
 
-        for x in ['interface', 'types']:
+        for x in ['os_requirements', 'interface', 'types']:
             if x not in d or d[x] is None:
                 d[x] = {}
             desc = '{} should be a dict'.format(x)
