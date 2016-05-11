@@ -15,8 +15,12 @@ extern "C" {
 #define UNUSED      __attribute__((unused))
 #define DEPRECATED  __attribute__((deprecated))
 
+#ifndef __cplusplus
+
 #ifndef NULL
 #define NULL  ((void *) 0)
+#endif
+
 #endif
 
 typedef uintmax_t payload_t;

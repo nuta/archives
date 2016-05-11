@@ -72,7 +72,7 @@ struct mbuf *tcpip_pack_mbuf(const void *buf, size_t size) {
                 m->next = next;
                 m = next;
             } else {
-                m->next = NULL;
+                m->next = nullptr;
                 break;
             }
         }
