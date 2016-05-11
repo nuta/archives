@@ -29,8 +29,8 @@ typedef uintmax_t ident_t;
 typedef uintmax_t paddr_t;
 typedef uintmax_t offset_t;
 typedef payload_t channel_t;
-typedef payload_t msgtype_t;
-typedef msgtype_t interface_t;
+typedef payload_t msgid_t;
+typedef msgid_t interface_t;
 typedef uint8_t   result_t;
 typedef uint8_t uchar_t; /* UTF-8 */
 typedef void handler_t (channel_t, payload_t *);
@@ -144,7 +144,7 @@ NORETURN void serve_channel(channel_t ch, handler_t handler);
  *  Message
  */
 #define INTERFACE(i)         __interface_##i
-#define MSGTYPE(i, type)     __msgtype_##i##_##type
+#define MSGID(i, type)     __msgid_##i##_##type
 #define __PTYPE(i, t, p)     __ptype_##i##_##t##_##p
 #define __PINDEX(i, t, p)    __pindex_##i##_##t##_##p
 #define EXTRACT(m, i, t, p)  ((__PTYPE(i, t, p)) (((payload_t *) (m))[__PINDEX(i, t, p)]))

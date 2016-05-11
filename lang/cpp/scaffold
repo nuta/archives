@@ -36,19 +36,19 @@ HANDLER_C_TEMPLATE = """\
 
 void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (expected inline msgtype_t)");
+        WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 
     switch (payloads[1]) {
-{% for interface, msgtype, args, _, unmarshall in msgtypes %}
-    case MSGTYPE({{ interface }}, {{ msgtype }}):
+{% for interface, msgid, args, _, unmarshall in msgids %}
+    case MSGID({{ interface }}, {{ msgid }}):
     {
-        DEBUG("received {{ interface }}.{{ msgtype }}");
+        DEBUG("received {{ interface }}.{{ msgid }}");
         {% for i, arg in unmarshall %}
             payload_t {{ arg }} = payloads[{{ i }}];
         {% endfor %}
-            {{ name }}_{{ interface }}_{{ msgtype }}({{ args | join(", ") }});
+            {{ name }}_{{ interface }}_{{ msgid }}({{ args | join(", ") }});
             return;
     }
 {% endfor %}
@@ -62,8 +62,8 @@ void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
 HANDLER_H_TEMPLATE = """\
 #include <resea.h>
 
-{% for interface, msgtype, _, args, _ in msgtypes %}
-void {{ name }}_{{ interface }}_{{ msgtype }}({{ args | join(", ") }});
+{% for interface, msgid, _, args, _ in msgids %}
+void {{ name }}_{{ interface }}_{{ msgid }}({{ args | join(", ") }});
 {% endfor %}
 
 """
@@ -74,8 +74,8 @@ HANDLE_C_TEMPLATE = """\
 #include <resea/{{ implement }}.h>
 {% endfor %}
 
-/** handles {{ interface_name }}.{{ msgtype_name }} */
-void {{name}}_{{interface_name}}_{{msgtype_name}}({{ msgtype_args | join(", ") }}) {
+/** handles {{ interface_name }}.{{ msgid_name }} */
+void {{name}}_{{interface_name}}_{{msgid_name}}({{ msgid_args | join(", ") }}) {
 
 }
 
@@ -96,7 +96,7 @@ def main(args):
     name = package_yml["name"]
     implements = [name]
     all_implements = [name]
-    msgtypes = []
+    msgids = []
 
     while len(implements) > 0:
         implement = implements.pop()
@@ -108,17 +108,17 @@ def main(args):
 
         if "interface" in yml and yml["interface"] is not None:
             interface_name = yml["name"]
-            msgtypes_ = OrderedDict(sorted(yml["interface"].items(),
+            msgids_ = OrderedDict(sorted(yml["interface"].items(),
                                           key=lambda e: e[1]["id"]))
-            for msgtype_name, msgtype in msgtypes_.items():
-                if msgtype_name.endswith("_reply"):
+            for msgid_name, msgid in msgids_.items():
+                if msgid_name.endswith("_reply"):
                     continue
-                msgtype_args = ["channel_t __ch"]
+                msgid_args = ["channel_t __ch"]
                 handler_args = ["__ch"]
                 _handler_args = ["channel_t __ch"]
                 unmarshall = []
 
-                payloads = msgtype.get("payloads")
+                payloads = msgid.get("payloads")
                 if payloads is None:
                     payloads = []
 
@@ -132,7 +132,7 @@ def main(args):
                             'name': p['name'] + '_size'
                         })
 
-                n = 2 # skip the first payload header and msgtype
+                n = 2 # skip the first payload header and msgid
                 for i, p in enumerate(defs):
                     if n % 9 == 0:
                         n += 1 # skip payload headers
@@ -140,14 +140,14 @@ def main(args):
                     n += 1
 
                 for i, p in enumerate(defs):
-                    msgtype_args.append("{} {}".format(ctype(p["type"]), p["name"]))
+                    msgid_args.append("{} {}".format(ctype(p["type"]), p["name"]))
                     handler_args.append("({}) a{}".format(ctype(p["type"]), i))
                     _handler_args.append("{} a{}".format(ctype(p["type"]), i))
 
                 create_file("{}/src/{}.{}.c".format(args.output_dir,
-interface_name, msgtype_name),
+interface_name, msgid_name),
                             render(HANDLE_C_TEMPLATE, locals()))
-                msgtypes.append((interface_name, msgtype_name, handler_args, _handler_args,
+                msgids.append((interface_name, msgid_name, handler_args, _handler_args,
                     unmarshall))
 
     create_file("{}/src/handler.c".format(args.output_dir),

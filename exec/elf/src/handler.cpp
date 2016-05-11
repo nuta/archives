@@ -6,12 +6,12 @@
 
 void elf_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (expected inline msgtype_t)");
+        WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 
     switch (payloads[1]) {
-    case MSGTYPE(exec, create):
+    case MSGID(exec, create):
     {
         DEBUG("received exec.create");
             payload_t a0 = payloads[2];

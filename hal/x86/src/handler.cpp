@@ -6,7 +6,7 @@
 
 void x86_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (expected inline msgtype_t)");
+        WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 

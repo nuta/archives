@@ -5,12 +5,12 @@
 
 void pci_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (expected inline msgtype_t)");
+        WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 
     switch (payloads[1]) {
-    case MSGTYPE(pci, listen):
+    case MSGID(pci, listen):
     {
         DEBUG("received pci.listen");
             payload_t a0 = payloads[2];
@@ -21,7 +21,7 @@ void pci_handler(channel_t __ch, payload_t *payloads) {
             pci_pci_listen(__ch, (channel_t) a0, (uint32_t) a1, (uint32_t) a2, (uint32_t) a3, (uint32_t) a4);
             return;
     }
-    case MSGTYPE(pci, new_device):
+    case MSGID(pci, new_device):
     {
         DEBUG("received pci.new_device");
             payload_t a0 = payloads[2];

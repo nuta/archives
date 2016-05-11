@@ -13,7 +13,7 @@ static void udp_server(channel_t ch, payload_t *m) {
     result_t r;
 
     switch (m[1]) {
-    case MSGTYPE(tcpip, received):
+    case MSGID(tcpip, received):
         socket = EXTRACT(m, tcpip, received, socket);
         port   = EXTRACT(m, tcpip, received, port);
         data   = EXTRACT(m, tcpip, received, payload);
@@ -31,7 +31,7 @@ static void udp_client(channel_t ch, payload_t *m) {
     void *data;
 
     switch (m[1]) {
-    case MSGTYPE(tcpip, received):
+    case MSGID(tcpip, received):
         data = EXTRACT(m, tcpip, received, payload);
         DEBUG("udp_client: received '%s'", data);
         if (strcmp((const char *) data, "HOWDY") == 0)

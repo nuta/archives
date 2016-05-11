@@ -10,7 +10,7 @@ def ctype(type_):
         'addr':      'uintptr_t',
         'paddr':     'paddr_t',
         'offset':    'offset_t',
-        'msgtype':   'msgtype_t',
+        'msgid':   'msgid_t',
         'interface': 'interface_t',
         'result':    'result_t',
         'uchar':     'uchar_t',

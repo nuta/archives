@@ -6,12 +6,12 @@
 
 void rtc_handler(channel_t __ch, payload_t *payloads) {
     if ((payloads[0] & 1) != 1) {
-        WARN("the first payload is not inline one (expected inline msgtype_t)");
+        WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 
     switch (payloads[1]) {
-    case MSGTYPE(datetime_device, get_date):
+    case MSGID(datetime_device, get_date):
     {
         DEBUG("received datetime_device.get_date");
             rtc_datetime_device_get_date(__ch);
