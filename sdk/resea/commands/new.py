@@ -21,6 +21,7 @@ README_TEMPLATE = """\
 GITIGNORE_TEMPLATE = """\
 /build
 /packages
+/tmp
 """
 
 PACKAGE_YML_TEMPLATE = """\

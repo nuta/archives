@@ -1,5 +1,4 @@
 *.pyc
-*.egg-info
 *.o
 *.img
 *.iso
@@ -10,14 +9,7 @@ GPATH
 GRTAGS
 GTAGS
 
-/SDK/.cache
-/SDK/build
-/SDK/dist
-/SDK/hello
-
 /resea.net/docs
 
 \#*\#
 .\#*
-
-/test.sh
