@@ -12,7 +12,7 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Required packages
-requires: [io, cpp]
+depends: [io, cpp]
 lang: c
 
 # Interfaces which this package uses

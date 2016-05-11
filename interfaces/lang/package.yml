@@ -10,7 +10,7 @@ warning:
 info: 
 
 # Required packages
-requires: []
+depends: []
 
 # interfaces which this package uses
 uses: []

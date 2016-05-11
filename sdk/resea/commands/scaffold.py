@@ -18,7 +18,7 @@ def scaffold(args):
         error("'package.yml' not found (are you in a package directory?)")
     yml = load_yaml('package.yml', validator=validate_package_yml)
 
-    config, _ = load_packages(yml['requires'])
+    config, _ = load_packages(yml['depends'])
 
     lang = yml.get("lang")
     if lang is None:

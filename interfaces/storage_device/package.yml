@@ -13,8 +13,8 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Required packages
-requires: []
-lib_requires: []
+depends: []
+lib_depends: []
 
 # interfaces which this package uses
 uses: []

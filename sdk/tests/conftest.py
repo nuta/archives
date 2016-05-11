@@ -17,7 +17,7 @@ def package(request):
     package_yml = yaml.load(open('package.yml'))
     package_yml['name'] = 'hello'
     package_yml['category'] = 'application'
-    package_yml['requires'] = []
+    package_yml['depends'] = []
     package_yml['config'] = {'SOURCES': {'set': ['src/startup.c', 'src/test.c']}}
     yaml.dump(package_yml, open('package.yml', 'w'))
 

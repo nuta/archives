@@ -13,7 +13,7 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Required packages
-requires: [thread, memory, cpp]
+depends: [thread, memory, cpp]
 lang: c
 
 # Interfaces which this package uses

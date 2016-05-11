@@ -23,7 +23,7 @@ def validate_package_yml(d):
                 d[x] = ""
             assert isinstance(d[x], str)
 
-        for x in ['requires', 'implements', 'requires', 'implements',
+        for x in ['depends', 'implements', 'depends', 'implements',
                   'uses', 'conflicts']:
             if x not in d or d[x] is None:
                 d[x] = []

@@ -13,7 +13,7 @@ email: nuta@seiya.me
 homepage:    # e.g. http://example.com/foo/bar
 
 # Required packages
-requires: [io, cpp, pci, libpci]
+depends: [io, cpp, pci, libpci]
 lang: c
 
 # Interfaces which this package uses

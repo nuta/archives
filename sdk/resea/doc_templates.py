@@ -233,7 +233,7 @@ PACKAGE_DOC = HEADER + """
 
   <h3>Requires</h3>
   <ul>
-  {% for i in requires %}
+  {% for i in depends %}
     <li>{{ i }}</li>
   {% endfor %}
   </ul>

@@ -16,7 +16,7 @@ homepage: http://resea.net
 lang: c
 
 # Required packages
-requires: [cpp]
+depends: [cpp]
 
 # Interfaces which this package uses
 uses: []

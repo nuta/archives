@@ -111,7 +111,7 @@ def load_packages(builtin_packages, config=None, enable_if=False):
                         yml[k] = v
 
         # add dependent packages
-        for depend in yml['requires']:
+        for depend in yml['depends']:
             if depend not in all_packages:
                 get_package(depend)
                 packages.append(depend)

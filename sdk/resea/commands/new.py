@@ -42,7 +42,7 @@ homepage:    # e.g. http://example.com/foo/bar
 # lang: c
 
 # Required packages
-requires: []
+depends: []
 
 # Interfaces which this package uses
 uses: []
