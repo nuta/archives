@@ -158,7 +158,8 @@ def build(args):
         'CMDECHO': 'echo "-->"',
         'BUILTIN_APPS': [],
         'RESEAPATH': '',
-        'PACKAGE': yml['name']
+        'PACKAGE': yml['name'],
+        'CATEGORY': yml['category']
     }
 
     configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
@@ -180,7 +181,7 @@ def build(args):
     if args.env == 'test' and 'kernel' not in builtin_packages:
         builtin_packages.append('kernel')
 
-    if config['PACKAGE'] not in config['BUILTIN_APPS']:
+    if config['CATEGORY'] == 'application' and config['PACKAGE'] not in config['BUILTIN_APPS']:
         config['BUILTIN_APPS'] = config['BUILTIN_APPS'] + [config['PACKAGE']]
 
     # resolve dependencies
