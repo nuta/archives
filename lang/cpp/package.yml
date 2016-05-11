@@ -22,6 +22,8 @@ os_requirements:
         - "./packages/cpp/osx/clang-static-analyzer.rb"
         - "./packages/cpp/osx/x86_64-elf-gcc.rb"
         - "./packages/cpp/osx/x86_64-elf-binutils.rb"
+        - "./packages/cpp/osx/arm-elf-eabi-gcc.rb"
+        - "./packages/cpp/osx/arm-elf-eabi-binutils.rb"
   ubuntu:
     apt:
       packages:
