@@ -20,6 +20,8 @@ os_requirements:
   osx:
     homebrew:
       packages:
+        - qemu
+        - xorriso
         - "./packages/x86/osx/grub.rb --HEAD"
 
 # Interfaces which this package uses
