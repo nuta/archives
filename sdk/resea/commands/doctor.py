@@ -1,14 +1,14 @@
+import datetime
 import os
 import sys
 import glob
-import tempfile
+import shutil
 import subprocess
 import webbrowser
+from resea.package import load_packages
 from resea.helpers import info, notice, plan, progress, load_yaml, render
 from resea.validators import validate_package_yml
-from resea.commands.build import main as build_main
-from resea.commands.clean import main as clean_main
-from resea.commands.test import main as test_main
+import resea.commands.clean
 
 
 INDEX_HTML = """\
@@ -19,18 +19,21 @@ INDEX_HTML = """\
   <title>Resea Doctor</title>
 </head>
 <body>
-<h1>Resea Doctor</h1>
+<h1>Resea Doctor Diagnosis</h1>
+<p>{{ created_at }}</p>
 <hr>
 <ul>
-  <li><a href="file:///{{ csa_dir }}/index.html">Static code analysis</a></li>
-  <li><a href="file:///{{ coverage_dir }}/index.html">Test coverage</a></li>
+{{ lang }}
 </ul>
 </body>
 </html>
 """
 
 def main(argv_):
-    clean_main([])
+    resea.commands.clean.main([])
+    tmp_dir = os.path.join('tmp', 'doctor')
+    shutil.rmtree(tmp_dir, ignore_errors=True)
+    os.makedirs(tmp_dir)
 
     plan('Validate the package')
     progress('check for the existence of README.md')
@@ -43,47 +46,29 @@ def main(argv_):
     except FileNotFoundError:
         sys.exit("'package.yml' not found")
 
-    if yml['category'] in ['application', 'library']:
-        tmp_dir = tempfile.mkdtemp(prefix='resea-doctor-')
+    config, _ = load_packages(yml['depends'])
+    lang = yml.get("lang")
+    if lang is None:
+        error("lang is not speicified in package.yml")
 
-        # TODO: move it into the cpp package
-        plan('Analysing with Clang Static Analyzer')
-        csa_dir = os.path.join(tmp_dir, 'csa')
-        build_main([
-           'HAL=posix_host',
-           'MAKE=scan-build -o {} make'.format(csa_dir),
-           'CC=clang',
-           'HAL_LINK=clang -pthread -o'
-        ])
+    # run lang's doctor
+    lang_html_path = os.path.join(tmp_dir, 'lang.html')
+    subprocess.run([config['LANG'][lang]['doctor'], lang_html_path,
+        tmp_dir], check=True)
 
-        # collect coverages
-        plan('Testing with gcov')
-        test_main([
-           'HAL=posix_host',
-           'CFLAGS=-fprofile-arcs -ftest-coverage',
-           'CXXFLAGS=-fprofile-arcs -ftest-coverage',
-           'HAL_LINK=gcc -fprofile-arcs -ftest-coverage -pthread -o'
-        ])
+    # generate index.html
+    progress('Generating index.html')
+    with open(lang_html_path) as f:
+        lang_html = f.read()
 
-        progress('Collecting coverages')
-        coverage_info = os.path.join(tmp_dir, 'coverage.info')
-        coverage_dir = os.path.join(tmp_dir, 'coverage')
-        subprocess.run(['lcov', '--capture', '--directory',
-            'build/test/' + yml['name'],
-            '--quiet', '--output-file', coverage_info],
-            check=True)
-        subprocess.run(['genhtml', coverage_info, '--quiet',
-            '--output-directory', coverage_dir],
-            check=True)
+    index_html_path = os.path.join(tmp_dir, 'index.html')
+    with open(index_html_path, 'w') as f:
+        f.write(render(INDEX_HTML, {
+                    'lang': lang_html,
+                    'created_at': str(datetime.datetime.now())
+                }))
 
-        # generate index.html
-        progress('Generating index.html')
-        csa_dir = glob.glob(os.path.join(csa_dir, '*'))[0]
-        index_html_path = os.path.join(tmp_dir, 'index.html')
-        with open(index_html_path, 'w') as f:
-            f.write(render(INDEX_HTML, locals()))
+    progress('Opening the results')
+    webbrowser.open_new_tab('file://' + os.path.abspath(index_html_path))
 
-        progress('Opening the results')
-        webbrowser.open_new_tab('file://' + index_html_path)
-
-        plan('Done all diagnosis. Check out the details in the web browser.')
+    plan('Done all diagnosis. Check out the details in the web browser.')

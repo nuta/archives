@@ -49,6 +49,7 @@ global_config:
         mkdeps:  ./packages/cpp/mkdeps "$(CXX) $(CXXFLAGS)"
         scaffold: ./packages/cpp/scaffold
         genstub: ./packages/cpp/genstub
+        doctor: ./packages/cpp/doctor
       asm:
         ext:  S
         abbrev: AS
@@ -64,6 +65,7 @@ global_config:
         mkdeps:  ./packages/cpp/mkdeps "$(CXX) $(CXXFLAGS)"
         scaffold: ./packages/cpp/scaffold
         genstub: ./packages/cpp/genstub
+        doctor: ./packages/cpp/doctor
   CFLAGS:
     append_words: >
       -Wall -ggdb3 -std=c99 -Wno-incompatible-library-redeclaration
