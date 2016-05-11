@@ -72,7 +72,7 @@ global_config:
   CXXFLAGS:
     append_words: >
       -Wall -ggdb3 -std=c++14 -Wno-incompatible-library-redeclaration
-      -fdiagnostics-color     
+      -fdiagnostics-color -fno-exceptions
       -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/cpp
 
 
