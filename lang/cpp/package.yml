@@ -22,6 +22,10 @@ os_requirements:
         - "./packages/cpp/osx/clang-static-analyzer.rb"
         - "./packages/cpp/osx/x86_64-elf-gcc.rb"
         - "./packages/cpp/osx/x86_64-elf-binutils.rb"
+  ubuntu:
+    apt:
+      packages:
+        - clang
 
 # Interfaces which this package uses
 uses: []
