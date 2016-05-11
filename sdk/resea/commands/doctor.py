@@ -6,7 +6,7 @@ import shutil
 import subprocess
 import webbrowser
 from resea.package import load_packages
-from resea.helpers import info, notice, plan, progress, load_yaml, render
+from resea.helpers import info, error, notice, plan, progress, load_yaml, render
 from resea.validators import validate_package_yml
 import resea.commands.clean
 
