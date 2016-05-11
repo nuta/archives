@@ -3,6 +3,7 @@ import sys
 import atexit
 import datetime
 import subprocess
+import time
 from termcolor import cprint, colored
 from resea.helpers import info, error, progress
 
@@ -85,9 +86,10 @@ def try_parse(l):
 
 
 def atexit_handler(p):
-    progress('Terminating the emulator')
     try:
         if p.poll() is not None:
+            progress('Terminating the emulator')
+            p.terminate()
             p.kill()
     except ProcessLookupError:
         pass
@@ -133,6 +135,8 @@ def run_emulator(cmd, test=False, env=None, save_log=None):
                 else:
                     cprint('ReseaSDK: {} tests failed'.format(failed),
                            'red')
+            progress('Waiting for termination')
+            time.sleep(3)
             p.terminate()
             p.kill()
             return
