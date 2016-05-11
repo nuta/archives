@@ -53,7 +53,7 @@ def main(argv_):
            'HAL=posix_host',
            'MAKE=scan-build -o {} make'.format(csa_dir),
            'CC=clang',
-           'HAL_LINK=clang -o'
+           'HAL_LINK=clang -pthread -o'
         ])
 
         # collect coverages
