@@ -14,6 +14,15 @@ homepage: http://resea.net   # e.g. http://example.com/foo/bar
 # Required packages
 depends: []
 
+# OS requirements
+os_requirements:
+  osx:
+    homebrew:
+      packages:
+        - "./packages/cpp/osx/clang-static-analyzer.rb"
+        - "./packages/cpp/osx/x86_64-elf-gcc.rb"
+        - "./packages/cpp/osx/x86_64-elf-binutils.rb"
+
 # Interfaces which this package uses
 uses: []
 
