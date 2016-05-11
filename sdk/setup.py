@@ -2,7 +2,6 @@ from setuptools import find_packages, setup
 
 exec(open("resea/version.py").read())
 
-
 setup_args = {
     'name': 'Resea',
     'version': __version__,
@@ -13,7 +12,7 @@ setup_args = {
     'license': 'Public Domain',
     'packages': ['resea', 'resea.commands'],
     'scripts': ['bin/resea'],
-    'install_depends': open('requirements.txt').read().strip().splitlines(),
+    'install_requires': open('requirements.txt').read().strip().splitlines(),
     'classifiers': [
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
