@@ -104,7 +104,7 @@ def main(args_):
                                      description='test an executable')
     parser = add_build_arguments(parser)
     parser.add_argument('-P', action='store_true', help='Poll file changes and run tests automatically')
-    args = parser.parse_args(['--env=test'] + args_ + ['TEST=yes'])
+    args = parser.parse_args(['--env=test'] + args_ + ['--', 'TEST=yes'])
 
     if args.P:
         autotest(args)
