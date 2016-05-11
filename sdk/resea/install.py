@@ -40,7 +40,7 @@ def osx_install(requirements):
 def ubuntu_install(requirements):
     def update():
         try:
-            subprocess.run(['apt-get', 'update', '-y'], check=True)
+            subprocess.run(['sudo', 'apt-get', 'update', '-y'], check=True)
         except subprocess.CalledProcessError:
             error('failed to update the list of packages'.format(args))
     
@@ -52,7 +52,7 @@ def ubuntu_install(requirements):
 
     def install(args):
         try:
-            subprocess.run(['apt-get', 'install', '-y'] + args, check=True)
+            subprocess.run(['sudo', 'apt-get', 'install', '-y'] + args, check=True)
         except subprocess.CalledProcessError:
             error('failed to install {}'.format(args))
         
