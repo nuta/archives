@@ -7,11 +7,9 @@ import resea
 
 def test_test(package, capsys):
     build_dir = 'build/test'
-    if os.path.exists(build_dir):
-        shutil.rmtree(build_dir)
+    shutil.rmtree(build_dir, ignore_errors=True)
 
-    with pytest.raises(SystemExit):
-        resea.main(['test', 'HAL=posix_host'])
+    resea.main(['test', 'HAL=posix_host'])
 
     assert 'tests passed' in capsys.readouterr()[0]
 

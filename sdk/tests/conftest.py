@@ -17,7 +17,8 @@ def package(request):
     package_yml = yaml.load(open('package.yml'))
     package_yml['name'] = 'hello'
     package_yml['category'] = 'application'
-    package_yml['depends'] = []
+    package_yml['lang'] = 'c'
+    package_yml['depends'] = ['cpp']
     package_yml['config'] = {'SOURCES': {'set': ['src/startup.c', 'src/test.c']}}
     yaml.dump(package_yml, open('package.yml', 'w'))
 
@@ -27,6 +28,7 @@ def package(request):
 void hello_startup(void){
 
   INFO("Hello, World!");
+  for (;;);
   // TODO: terminate itself
 }
 """)
@@ -34,7 +36,7 @@ void hello_startup(void){
     open('src/test.c', 'w').write("""\
 #include <resea.h>
 
-void hello_test(void){
+void hello_test(void) {
 
   TEST_EXPECT(123 == 124-1);
   TEST_END();
