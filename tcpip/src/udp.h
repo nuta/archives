@@ -9,16 +9,14 @@ struct tcpip_udp_header {
     uint16_t  dest_port;
     uint16_t  length;
     uint16_t  checksum;
-} TCPIP_PACKED;
+} PACKED;
 
-#define TCPIP_IPTYPE_ICMP  0x01
-#define TCPIP_IPTYPE_UDP   0x11
+#define IPTYPE_ICMP  0x01
+#define IPTYPE_UDP   0x11
 
-
-size_t tcpip_send_udp(struct tcpip_socket *socket,
-                      const void *payload, size_t size,
-                      int flags, struct tcpip_addr *addr);
-void tcpip_receive_udp(struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
-  const void *payload, size_t size);
+result_t tcpip_send_udp(struct socket *socket,
+                        struct mbuf *mbuf,
+                        int flags, struct addr *addr);
+void tcpip_receive_udp(struct addr *src_addr, struct addr *dest_addr, struct mbuf *mbuf);
 
 #endif

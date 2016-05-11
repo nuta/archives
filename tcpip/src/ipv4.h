@@ -1,5 +1,5 @@
-#ifndef __TCPIP_IPV4_H__
-#define __TCPIP_IPV4_H__
+#ifndef __TCPIP_PROTOCOL_IPV4_H__
+#define __TCPIP_PROTOCOL_IPV4_H__
 
 #include "types.h"
 
@@ -14,14 +14,18 @@ struct tcpip_ipv4_header {
     uint16_t  checksum;
     uint32_t  src_addr;
     uint32_t  dest_addr;
-} TCPIP_PACKED;
+} PACKED;
 
-#define TCPIP_IPTYPE_ICMP  0x01
-#define TCPIP_IPTYPE_UDP   0x11
+#define IPTYPE_ICMP  0x01
+#define IPTYPE_UDP   0x11
 
-#define TCPIP_IPV4_ADDR_ANY  0
+#define IPV4_ADDR_ANY  0
 
-void tcpip_receive_ipv4(const void *payload, size_t size);
+void tcpip_receive_ipv4(struct mbuf *mbuf);
+result_t tcpip_send_ipv4(struct socket *socket,
+                         struct mbuf *mbuf,
+                         uint8_t proto,
+                         int flags, struct addr *addr);
 
 #endif
 

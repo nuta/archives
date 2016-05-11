@@ -134,7 +134,7 @@ def main(args):
 
                 n = 2 # skip the first payload header and msgtype
                 for i, p in enumerate(defs):
-                    if n % 8 == 0:
+                    if n % 9 == 0:
                         n += 1 # skip payload headers
                     unmarshall.append((n, 'a' + str(i)))
                     n += 1

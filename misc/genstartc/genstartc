@@ -12,12 +12,12 @@ TEMPLATE = """
 #define PACKAGE_NAME "start_apps"
 
 {% for app in apps %}
-{% if test %}
-void {{ app }}_test();
-{% else %}
 void {{ app }}_startup();
-{% endif %}
 {% endfor %}
+
+{% if test %}
+void {{ test_target }}_test();
+{% endif %}
 
 static void app_entrypoint (void (*startup)()) {
   startup();
@@ -28,14 +28,10 @@ void start_apps(void){
 
 {% for app in apps %}
 {% if with_threading %}
-    INFO("starting '{{ app }}'");
+    INFO("starting {{ app }}");
     call_hal_callback(HAL_CALLBACK_RUN_THREAD,
         1, "{{ app }}", app_entrypoint,
-{%if test %}
-        {{ app }}_test
-{% else %}
         {{ app }}_startup
-{% endif %}
     );
 
 {% else %}
@@ -43,6 +39,14 @@ void start_apps(void){
     {{ app }}_startup();
 {% endif %}
 {% endfor %}
+
+{%if test %}
+    INFO("starting {{ test_target }} tests");
+    call_hal_callback(HAL_CALLBACK_RUN_THREAD,
+        1, "{{ test_target }}", app_entrypoint,
+        {{ test_target }}_test
+    );
+{% endif %}
 
 {% if with_threading %}
     INFO("starting threading");
@@ -55,6 +59,7 @@ def main():
     print(jinja2.Template(TEMPLATE).render(
         apps=sys.argv[1:],
         test=os.environ.get('TEST'),
+        test_target=os.environ.get('PACKAGE'),
         with_threading=os.environ.get('WITH_THREADING')))
 
 if __name__ == "__main__":

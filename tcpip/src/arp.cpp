@@ -4,14 +4,14 @@
 #include "printf.h"
 
 
-void tcpip_receive_arp(const void *payload, size_t size) {
-    struct tcpip_arp_header *header = (struct tcpip_arp_header *) payload;
+void tcpip_receive_arp(struct mbuf *mbuf) {
+    struct tcpip_arp_header *header = (struct tcpip_arp_header *) &mbuf->data[mbuf->begin];
     uint8_t sender_hw_addr[6], target_hw_addr[6];
     uint16_t proto_type, op;
     uint32_t sender_proto_addr, target_proto_addr;
 
-    if (size < sizeof(struct tcpip_arp_header)) {
-	WARN("too short ARP packet (size=%zu)", size);
+    if (mbuf->length - mbuf->begin < sizeof(struct tcpip_arp_header)) {
+	WARN("too short ARP packet (size=%zu)", mbuf->length - mbuf->begin);
 	return;
     }
 
@@ -27,13 +27,13 @@ void tcpip_receive_arp(const void *payload, size_t size) {
 	return;
     }
 
-    DEBUG("%s " TCPIP_FMT_MACADDR " (" TCPIP_FMT_IPV4ADDR ") -> "
-      TCPIP_FMT_MACADDR " (" TCPIP_FMT_IPV4ADDR ")",
+    DEBUG("%s " FMT_MACADDR " (" FMT_IPV4ADDR ") -> "
+      FMT_MACADDR " (" FMT_IPV4ADDR ")",
         (op == TCPIP_ARP_REQUEST)? "REQUEST" : "REPLY",
-	TCPIP_FMTARG_MACADDR(sender_hw_addr),
-	TCPIP_FMTARG_IPV4ADDR(sender_proto_addr),
-	TCPIP_FMTARG_MACADDR(target_hw_addr),
-	TCPIP_FMTARG_IPV4ADDR(target_proto_addr)
+	FMTARG_MACADDR(sender_hw_addr),
+	FMTARG_IPV4ADDR(sender_proto_addr),
+	FMTARG_MACADDR(target_hw_addr),
+	FMTARG_IPV4ADDR(target_proto_addr)
     );
 }
 

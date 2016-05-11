@@ -29,12 +29,96 @@ implements: []
 #  Type definitions
 #
 types:
+  protocol:
+    type: const
+    size: uint32
+    consts:
+      PROTOCOL_IPV4: 0x0001
+      PROTOCOL_IPV6: 0x0004
+      PROTOCOL_UDP:  0x0008
+      PROTOCOL_TCP:  0x0010
 
 
 #
 #  Interface definitions
 #
 interface:
+  open:
+    id: 1
+    payloads:
+      - name: transport
+        type: tcpip(protocol)
+      - name: handler
+        type: channel
+  open_reply:
+    id: 2
+    payloads:
+      - name: result
+        type: result
+      - name: socket
+        type: id
+
+  close:
+    id: 3
+    payloads:
+      - name: socket
+        type: id
+  close_reply:
+    id: 4
+    payloads:
+      - name: result
+        type: result
+
+  bind:
+    id: 5
+    payloads:
+      - name: socket
+        type: id
+      - name: network
+        type: tcpip(protocol)
+      - name: address
+        type: data
+      - name: port
+        type: uint16
+  bind_reply:
+    id: 6
+    payloads:
+      - name: result
+        type: result
+
+  sendto:
+    id: 7
+    payloads:
+      - name: socket
+        type: id
+      - name: network
+        type: tcpip(protocol)
+      - name: address
+        type: data
+      - name: port
+        type: uint16
+      - name: payload
+        type: data
+  sendto_reply:
+    id: 8
+    payloads:
+      - name: result
+        type: result
+
+  received:
+    id: 9
+    payloads:
+      - name: socket
+        type: id
+      - name: network
+        type: tcpip(protocol)
+      - name: address
+        type: data
+      - name: port
+        type: uint16
+      - name: payload
+        type: data
+
 
 #
 #  Config
@@ -42,7 +126,6 @@ interface:
 config:
   - SOURCES:
       set:
-        - src/api.cpp
         - src/arp.cpp
         - src/endian.cpp
         - src/icmp.cpp
@@ -54,6 +137,11 @@ config:
         - src/udp.cpp
         - src/socket.cpp
         - src/startup.cpp
+        - src/handler.cpp
+        - src/tcpip.open.cpp
+        - src/tcpip.close.cpp
+        - src/tcpip.bind.cpp
+        - src/tcpip.sendto.cpp
   - if: "ENV == 'test'"
     SOURCES:
       set:

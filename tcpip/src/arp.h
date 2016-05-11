@@ -2,6 +2,7 @@
 #define __TCPIP_ARP_H__
 
 #include "types.h"
+#include "mbuf.h"
 
 #define TCPIP_ARP_REQUEST  1 
 #define TCPIP_ARP_REPLY    2
@@ -16,8 +17,8 @@ struct tcpip_arp_header {
     uint32_t  sender_proto_addr;
     uint8_t   target_hw_addr[6];
     uint32_t  target_proto_addr;
-} TCPIP_PACKED;
+} PACKED;
 
-void tcpip_receive_arp(const void *payload, size_t size);
+void tcpip_receive_arp(struct mbuf *mbuf);
 
 #endif

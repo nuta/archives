@@ -5,8 +5,11 @@
 #include "socket.h"
 #include "mbuf.h"
 
-int tcpip_send_ip(struct tcpip_socket *socket,
-                  struct tcpip_mbuf *payload, size_t size,
-                  int flags, struct tcpip_addr *addr);
+void tcpip_parse_ip_addr(struct addr *addr, tcpip_protocol_t protocol,
+                         void *address, size_t address_size);
+result_t tcpip_send_ip(struct socket *socket,
+                       struct mbuf *mbuf,
+                       uint8_t proto,
+                       int flags, struct addr *addr);
 
 #endif

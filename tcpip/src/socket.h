@@ -3,25 +3,30 @@
 
 #include "types.h"
 #include "mbuf.h"
+#include <resea/tcpip.h>
 
-struct tcpip_socket {
+struct socket {
+    ident_t id;
     int used;
 
-    struct tcpip_addr local_addr;
-    struct tcpip_addr remote_addr;
+    struct addr local_addr;
+    struct addr remote_addr;
 
-    // Transmit (TX) and Receive (RX) queues
-    struct tcpip_mqueue tx;
-    struct tcpip_mqueue rx;
+    channel_t handler;
+    tcpip_protocol_t protocol;
+
+    // Transmit (TX) and queues
+    struct mbuf *tx;
 };
 
 
-struct tcpip_socket *tcpip_get_socket(struct tcpip_addr *remote_addr,
-                                      struct tcpip_addr *local_addr);
-int tcpip_bind_socket(struct tcpip_socket *socket, struct tcpip_addr *addr);
+struct socket *tcpip_get_socket_by_id(ident_t id);
+struct socket *tcpip_get_socket_by_addr(struct addr *remote_addr,
+                                      struct addr *local_addr);
+result_t tcpip_bind_socket(struct socket *socket, struct addr *addr);
 
-struct tcpip_socket *tcpip_create_socket();
-void tcpip_destroy_socket(struct tcpip_socket *socket);
+ident_t tcpip_create_socket();
+void tcpip_destroy_socket(struct socket *socket);
 
 void tcpip_init_socket();
 

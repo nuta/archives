@@ -3,14 +3,15 @@
 #include "printf.h"
 
 
-void tcpip_receive_icmp(struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
-                        const void *payload, size_t size) {
+void tcpip_receive_icmp(struct addr *src_addr, struct addr *dest_addr,
+                        struct mbuf *mbuf) {
 
-    struct tcpip_icmp_header *header = (struct tcpip_icmp_header *) payload;
+    struct tcpip_icmp_header *header;
     uint8_t type, code, checksum;
     uint32_t data;
-    char * type_str;
+    char const *type_str;
 
+    header = (struct tcpip_icmp_header *) &mbuf->data[mbuf->begin];
     type = header->type;
     code = header->code;
     checksum = tcpip_to_host_endian16(header->checksum);

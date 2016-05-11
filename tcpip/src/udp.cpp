@@ -1,76 +1,76 @@
+#include <resea/cpp/memory.h>
+#include <resea/tcpip.h>
 #include <assert.h>
 #include <string.h>
+#include "ip.h"
 #include "udp.h"
 #include "endian.h"
 #include "socket.h"
 #include "printf.h"
 
 
-size_t tcpip_send_udp(struct tcpip_socket *socket,
-                      const void *payload, size_t size,
-                      int flags, struct tcpip_addr *addr) {
+result_t tcpip_send_udp(struct socket *socket,
+                        struct mbuf *mbuf,
+                        int flags, struct addr *addr) {
 
-    assert(TCPIP_MBUF_DATA_SIZE >= sizeof(struct tcpip_udp_header));
+    struct mbuf *header_mbuf;
+    struct tcpip_udp_header *header;
 
-    uint8_t *p = (uint8_t *) payload;
-    struct tcpip_mbuf *first, *m, *next;
+    assert(MBUF_DATA_SIZE >= sizeof(struct tcpip_udp_header));
 
-    first = tcpip_allocate_mbuf();
-    struct tcpip_udp_header *header = (struct tcpip_udp_header *) &first->data;
+    header_mbuf = tcpip_allocate_mbuf();
+    header_mbuf->length = sizeof(struct tcpip_udp_header);
 
+    header = (struct tcpip_udp_header *) &header_mbuf->data;
     header->src_port  = tcpip_to_net_endian16(socket->local_addr.port);
     header->dest_port = tcpip_to_net_endian16(addr->port);
-    header->length    = tcpip_to_net_endian16(size);
+    header->length    = tcpip_to_net_endian16(mbuf->total_length);
     header->checksum  = 0x0000;
 
-    if (size > 0) {
-        m = tcpip_allocate_mbuf();
-        first->next = m;
-
-        while (size > 0) {
-            size_t copy_size = ((size >= TCPIP_MBUF_DATA_SIZE)? TCPIP_MBUF_DATA_SIZE : size);
-
-            memcpy(m, p, copy_size);
-            size -= copy_size;
-
-            if (size > 0) {
-                next = tcpip_allocate_mbuf();
-                m->next = next;
-                m = next;
-            }
-        }
-    }
-
-    return size;
+    tcpip_append_mbuf(header_mbuf, mbuf, false);
+    return tcpip_send_ip(socket, header_mbuf, IPTYPE_UDP, flags, addr);
 }
 
 
-void tcpip_receive_udp(struct tcpip_addr *src_addr, struct tcpip_addr *dest_addr,
-                       const void *payload, size_t size) {
+void tcpip_receive_udp(struct addr *src_addr, struct addr *dest_addr,
+                       struct mbuf *mbuf) {
 
-    struct tcpip_udp_header *header = (struct tcpip_udp_header *) payload;
+    struct tcpip_udp_header header;
     uint16_t src_port, dest_port, length, checksum;
-    struct tcpip_socket *socket;
+    struct socket *socket;
 
-    src_port  = tcpip_to_host_endian16(header->src_port);
-    dest_port = tcpip_to_host_endian16(header->dest_port);
-    length    = tcpip_to_host_endian16(header->length);
-    checksum  = tcpip_to_host_endian16(header->checksum);
+    if (tcpip_copy_from_mbuf(&header, mbuf, sizeof(header)) != OK) {
+        DEBUG("too short packet");
+        return;
+    }
 
-    DEBUG("%d -> %d (length=%d)", src_port, dest_port, length);
+    src_port  = tcpip_to_host_endian16(header.src_port);
+    dest_port = tcpip_to_host_endian16(header.dest_port);
+    length    = tcpip_to_host_endian16(header.length);
+    checksum  = tcpip_to_host_endian16(header.checksum);
+
+    DEBUG("received UDP: %d -> %d (length=%d)", src_port, dest_port, length);
 
     src_addr->port  = src_port;
     dest_addr->port = dest_port;
 
-    socket = tcpip_get_socket(src_addr, dest_addr);
+    socket = tcpip_get_socket_by_addr(src_addr, dest_addr);
 
     if (!socket) {
 	WARN("socket not found, ignoring");
 	return;
     }
 
-    tcpip_append_mbuf(&socket->rx, src_addr,
-        (void *) ((uintptr_t) payload + sizeof(struct tcpip_udp_header)),
-        size, TCPIP_MBUF_END);
+    void *payload = allocate_memory(length, MEMORY_ALLOC_NORMAL);
+    tcpip_copy_from_mbuf(payload, mbuf, length);
+
+    sendas_tcpip_received(socket->handler,
+        socket->id,          PAYLOAD_INLINE,
+        TCPIP_PROTOCOL_IPV4, PAYLOAD_INLINE,
+        (void *) "",         PAYLOAD_OOL,
+        0,                   PAYLOAD_INLINE, // TODO
+        src_port,            PAYLOAD_INLINE,
+        payload,             PAYLOAD_MOVE_OOL,
+        length,              PAYLOAD_INLINE);
 }
 
