@@ -12,7 +12,7 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Required packages
-depends: [cpp, genstartc]
+depends: [cpp, genstartc, kernel]
 
 # Interfaces which this package uses
 uses: []

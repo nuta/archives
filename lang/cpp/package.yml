@@ -30,7 +30,7 @@ os_requirements:
         - clang
 
 # Interfaces which this package uses
-uses: []
+uses: [memory, io]
 
 # Interfaces which this package implements
 implements: [lang]
