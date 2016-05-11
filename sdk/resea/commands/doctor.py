@@ -6,6 +6,7 @@ import subprocess
 import webbrowser
 from resea.helpers import info, notice, plan, progress, load_yaml, render
 from resea.validators import validate_package_yml
+from resea.commands.build import main as build_main
 from resea.commands.clean import main as clean_main
 from resea.commands.test import main as test_main
 
@@ -45,22 +46,30 @@ def main(argv_):
     if yml['category'] in ['application', 'library']:
         tmp_dir = tempfile.mkdtemp(prefix='resea-doctor-')
 
-        # build with Clang Static Analyzer and test with gcov
         # TODO: move it into the cpp package
+        plan('Analysing with Clang Static Analyzer')
         csa_dir = os.path.join(tmp_dir, 'csa')
-        test_main([
+        build_main([
            'HAL=posix_host',
            'MAKE=scan-build -o {} make'.format(csa_dir),
-           'CFLAGS=-fprofile-arcs -ftest-coverage',
-           'CXXFLAGS=-fprofile-arcs -ftest-coverage',
-           'HAL_LINK=clang --coverage -pthread -o'
+           'CC=clang',
+           'HAL_LINK=clang -o'
         ])
 
         # collect coverages
+        plan('Testing with gcov')
+        test_main([
+           'HAL=posix_host',
+           'CFLAGS=-fprofile-arcs -ftest-coverage',
+           'CXXFLAGS=-fprofile-arcs -ftest-coverage',
+           'HAL_LINK=gcc -fprofile-arcs -ftest-coverage -o'
+        ])
+
         progress('Collecting coverages')
         coverage_info = os.path.join(tmp_dir, 'coverage.info')
         coverage_dir = os.path.join(tmp_dir, 'coverage')
-        subprocess.run(['lcov', '--capture', '--directory', '.',
+        subprocess.run(['lcov', '--capture', '--directory',
+            'build/test/' + yml['name'],
             '--quiet', '--output-file', coverage_info],
             check=True)
         subprocess.run(['genhtml', coverage_info, '--quiet',
