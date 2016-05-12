@@ -50,6 +50,7 @@ interface:
         type: id
   create_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
