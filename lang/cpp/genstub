@@ -15,7 +15,7 @@ class GeneratingError(Exception):
     pass
 
 
-def load_payload_defs(interface_name, msgid_name, msgid, name_prefix=None,
+def load_payload_defs(interface_name, msg_name, msgid, name_prefix=None,
                       with_type_args=False):
 
     if name_prefix is None:
@@ -23,7 +23,7 @@ def load_payload_defs(interface_name, msgid_name, msgid, name_prefix=None,
 
     defs = [{
         'type': '',
-        'name': 'MSGID({}, {})'.format(interface_name, msgid_name)
+        'name': 'MSGID({}, {})'.format(interface_name, msg_name)
     }]
 
     for p in msgid['payloads']:
@@ -68,7 +68,7 @@ def load_payload_defs(interface_name, msgid_name, msgid, name_prefix=None,
     return payloads
 
 
-def call_decl(interface_name, msgid_name, msgid):
+def call_decl(yml, msg_name, msg):
     send_tmpl = """
 {{ func }} {
     payload_t __payloads[{{ size }}];
@@ -100,19 +100,20 @@ def call_decl(interface_name, msgid_name, msgid):
 
 """
 
+    interface_name = yml['name']
     code = ''
     decls = ''
 
-    if msgid_name + '_reply' in msgids:
-        reply_msgid = msgids[msgid_name + '_reply']
-        arg_payloads = load_payload_defs(interface_name, msgid_name, msgid)
-        ret_payloads = load_payload_defs(interface_name, msgid_name, reply_msgid, '__r_')
+    if msg['type'] == 'request' and 'reply' in msg:
+        reply_msg = yml['interface'][msg['reply']]
+        arg_payloads = load_payload_defs(interface_name, msg_name, msg)
+        ret_payloads = load_payload_defs(interface_name, msg_name, reply_msg, '__r_')
         arg_size = len(arg_payloads)
         ret_size = len(ret_payloads)
 
         unmarshall = []
-        n = 2 # skip the first payload header and msgid
-        for i, p in enumerate(reply_msgid['payloads']):
+        n = 2 # skip the first payload header and msg
+        for i, p in enumerate(reply_msg['payloads']):
             if n % 9 == 0:
                 n += 1 # skip payload headers
 
@@ -128,13 +129,13 @@ def call_decl(interface_name, msgid_name, msgid):
         args += [ '{}* {}'.format(*ret) for ret in ret_payloads[1:] if ret[0] != '']
 
         func = "static inline void call_{}_{}({})".format(
-            interface_name, msgid_name, ", ".join(args))
+            interface_name, msg_name, ", ".join(args))
 
         decls += func + ";\n"
         code += jinja2.Template(call_tmpl).render(**locals())
 
         # callas
-        arg_payloads = load_payload_defs(interface_name, msgid_name, msgid,
+        arg_payloads = load_payload_defs(interface_name, msg_name, msg,
                            with_type_args=True)
 
         args = ['channel_t __ch']
@@ -148,32 +149,32 @@ def call_decl(interface_name, msgid_name, msgid):
         args += [ '{}* {}'.format(*ret) for ret in ret_payloads[1:] if ret[0] != '']
 
         func = "static inline void callas_{}_{}({})".format(
-            interface_name, msgid_name, ", ".join(args))
+            interface_name, msg_name, ", ".join(args))
 
         decls += func + ";\n"
         code += jinja2.Template(call_tmpl).render(**locals())
 
 
-    payloads = load_payload_defs(interface_name, msgid_name, msgid)
+    payloads = load_payload_defs(interface_name, msg_name, msg)
 
     for i, p in enumerate(payloads):
         if p[0] == '':
             continue
 
-        code += "typedef {} __ptype_{}_{}_{};\n".format(p[0], interface_name, msgid_name,
+        code += "typedef {} __ptype_{}_{}_{};\n".format(p[0], interface_name, msg_name,
                     p[1])
-        code += "static const int __pindex_{}_{}_{} = {};\n".format(interface_name, msgid_name,
+        code += "static const int __pindex_{}_{}_{} = {};\n".format(interface_name, msg_name,
                     p[1], i)
 
     size = len(payloads)
     args = ['channel_t __ch'] + [ '{} {}'.format(*p) for p in payloads[1:] if p[0] != '']
     func = "static inline void send_{}_{}({})".format(
-        interface_name, msgid_name, ", ".join(args))
+        interface_name, msg_name, ", ".join(args))
     decls += func + ";\n"
     code += jinja2.Template(send_tmpl).render(**locals())
  
     # sendas
-    payloads = load_payload_defs(interface_name, msgid_name, msgid,
+    payloads = load_payload_defs(interface_name, msg_name, msg,
                    with_type_args=True)
 
     args = ['channel_t __ch']
@@ -185,7 +186,7 @@ def call_decl(interface_name, msgid_name, msgid):
             i += 1
 
     func = "static inline void sendas_{}_{}({})".format(
-        interface_name, msgid_name, ", ".join(args))
+        interface_name, msg_name, ", ".join(args))
     decls += func + ";\n"
     code += jinja2.Template(send_tmpl).render(**locals())
 
@@ -219,20 +220,20 @@ def type_decl(interface_name, type_name, type_):
     return s
 
 
-def id_decl(interface_name, interface_id, name, msgid):
+def id_decl(yml, msg_name, msg):
     """Returns a declaration of `__msgid_`"""
     tmpl = """
-#define __msgid_{{ interface_name }}_{{ name }} \
-            (({{ interface_id }} << 16) | {{ msgid['id'] }})
+#define __msgid_{{ interface_name }}_{{ msg_name }} \
+            (({{ interface_id }} << 16) | {{ msg['id'] }})
 
 """
 
+    interface_name = yml['name']
+    interface_id = yml['id']
     return  jinja2.Template(tmpl).render(**locals())
 
 def main(args):
     """Generates stubs of arg.package_yml into args.output"""
-    global msgids
-
     package_yml = load_yaml(args.package_yml, validator=validate_package_yml)
 
     #
@@ -265,14 +266,13 @@ def main(args):
     #  send and recv
     #
     if "interface" in package_yml and package_yml["interface"] is not None:
-        msgids = package_yml["interface"]
         _s = ""
-        for name,msgid in msgids.items():
-            if msgid["payloads"] is None:
-                msgid["payloads"] = []
+        for name, msg in package_yml["interface"].items():
+            if msg["payloads"] is None:
+                msg["payloads"] = []
 
-            s += id_decl(package_yml["name"], package_yml["id"], name, msgid)
-            d, __s = call_decl(package_yml["name"], name, msgid)
+            s += id_decl(package_yml, name, msg)
+            d, __s = call_decl(package_yml, name, msg)
             s += d
             _s += __s
         s += _s
