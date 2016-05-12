@@ -35,10 +35,13 @@ interface:
   get_date:
     description: Returns the current date & time
     id: 1
+    type: request
+    reply: get_date_reply
     payloads:
 
   get_date_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
