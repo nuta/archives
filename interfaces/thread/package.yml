@@ -81,20 +81,6 @@ interface:
       - name: result
         type: result
 
-  block:
-    id: 7
-    type: request
-    payloads:
-      - name: thread
-        type: id
-
-  unblock:
-    id: 8
-    type: request
-    payloads:
-      - name: thread
-        type: id
-
   set:
     id: 9
     type: request
@@ -131,9 +117,3 @@ interface:
         type: id
       - name: group
         type: id
-
-# TODO:
-#
-#  .wait(addr, val)
-#  .wake(addr, wake_num_max)
-#
