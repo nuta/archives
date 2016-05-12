@@ -77,3 +77,7 @@ structures of messages.
 - 100: net_device
 - 101: storage_device
 - 102: datetime_device
+- 1001: elf
+- 1002: zeroed_pager
+- 1004: virtio
+- 1005: pci
