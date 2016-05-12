@@ -38,9 +38,13 @@ interface:
 #  Config
 #
 config:
-  SOURCES:
-    set:
-      - src/startup.cpp
-      - src/elf.cpp
-      - src/handler.cpp
-      - src/exec.create.cpp
+  - SOURCES:
+      set:
+        - src/startup.cpp
+        - src/elf.cpp
+        - src/handler.cpp
+        - src/exec.create.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      set:
+        - tests/test.cpp
