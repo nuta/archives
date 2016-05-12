@@ -19,8 +19,7 @@ void elf_handler(channel_t __ch, payload_t *payloads) {
             payload_t a2 = payloads[4];
             payload_t a3 = payloads[5];
             payload_t a4 = payloads[6];
-            payload_t a5 = payloads[7];
-            elf_exec_create(__ch, (uchar_t*) a0, (size_t) a1, (size_t) a2, (channel_t) a3, (ident_t) a4, (ident_t) a5);
+            elf_exec_create(__ch, (uchar_t*) a0, (size_t) a1, (channel_t) a2, (ident_t) a3, (ident_t) a4);
             return;
     }
     }

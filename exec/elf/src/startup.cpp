@@ -1,14 +1,16 @@
 #include <resea.h>
+#include <resea/channel.h>
 #include <resea/exec.h>
 
 handler_t elf_handler;
 
-void elf_startup(void) {
+extern "C" void elf_startup(void) {
     channel_t ch;
+    result_t r;
 
     INFO("starting");
-    create_channel(&ch);
-    register_channel(ch, INTERFACE(exec));
-    serve_channel(ch, &elf_handler);
-    INFO("started");
+    ch = create_channel();
+    call_channel_register(connect_to_local(1), ch,
+        INTERFACE(exec), &r);
+    serve_channel(ch, elf_handler);
 }

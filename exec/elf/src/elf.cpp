@@ -8,7 +8,7 @@
 result_t elf_validate(void *data, enum elf_archtype archtype) {
     Elf64_Ehdr *ehdr;
 
-    ehdr = data;
+    ehdr = (Elf64_Ehdr *) data;
 
     /* check out the magic number */
     if (ehdr->e_ident[0] != EI_MAG0 || ehdr->e_ident[1] != EI_MAG1 ||
@@ -56,7 +56,7 @@ result_t elf_load_executable(channel_t memory_ch, ident_t group,
         return E_INVALID;
     }
 
-    ehdr = data;
+    ehdr = (Elf64_Ehdr *) data;
     if (ehdr->e_phoff == 0) {
         WARN("tried to load a invalid file as an executable");
         return E_INVALID;
@@ -65,7 +65,7 @@ result_t elf_load_executable(channel_t memory_ch, ident_t group,
     /* load program headers */
     INFO("reading program headers");
     for (i=0; i < ehdr->e_phnum && i < PHDR_MAX; i++) {
-        phdr = data + ehdr->e_phoff + (ehdr->e_phentsize * i);
+        phdr = (Elf64_Phdr *) ((uintptr_t)  data + ehdr->e_phoff + (ehdr->e_phentsize * i));
 
         if (phdr->p_type == PT_LOAD) {
             uint8_t flags = 0;

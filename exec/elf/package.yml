@@ -13,8 +13,8 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Required packages
-depends: [thread, memory, cpp]
-lang: c
+depends: [thread, memory, cpp, channel, zeroed_pager]
+lang: cpp
 
 # Interfaces which this package uses
 uses: [fs, pager]
