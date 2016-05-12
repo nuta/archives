@@ -18,6 +18,7 @@ static void udp_server(channel_t ch, payload_t *m) {
         port   = EXTRACT(m, tcpip, received, port);
         data   = EXTRACT(m, tcpip, received, payload);
         DEBUG("udp_server: received '%s'", data);
+        TEST_EXPECT(strcmp((const char *) data, "HELO") == 0);
 
         call_tcpip_sendto(tcpip_ch, socket, TCPIP_PROTOCOL_IPV4,
           (void *) "", 0, port,
@@ -34,8 +35,8 @@ static void udp_client(channel_t ch, payload_t *m) {
     case MSGID(tcpip, received):
         data = EXTRACT(m, tcpip, received, payload);
         DEBUG("udp_client: received '%s'", data);
-        if (strcmp((const char *) data, "HOWDY") == 0)
-            TEST_END();
+        TEST_EXPECT(strcmp((const char *) data, "HOWDY") == 0);
+        TEST_END();
         break;
     }
 }
