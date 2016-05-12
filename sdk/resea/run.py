@@ -5,7 +5,7 @@ import datetime
 import subprocess
 import time
 from termcolor import cprint, colored
-from resea.helpers import info, error, progress
+from resea.helpers import info, error, progress, success, fail
 
 
 def lprint(s):
@@ -130,11 +130,9 @@ def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
             lprint(l)
             if test:
                 if failed == 0:
-                    cprint('ReseaSDK: All {} tests passed'.format(passed),
-                           'green')
+                    success('All {} tests passed'.format(passed))
                 else:
-                    cprint('ReseaSDK: {} tests failed'.format(failed),
-                           'red')
+                    fail('{} tests failed'.format(failed))
 
             if wait:
                progress('Waiting for termination')  

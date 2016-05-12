@@ -26,15 +26,31 @@ def info(msg):
     """Prints an informational message."""
     cprint(msg, 'blue')
 
+def _print_with_arrow(msg, color, colored_msg=False):
+    cprint('==> ', color, attrs=['bold'], end='')
+    if colored_msg:
+        cprint(msg, color, attrs=['bold'])
+    else:
+        cprint(msg, attrs=['bold'])
 
 def progress(msg):
     """Prints progress."""
-    cprint('==> ' + msg, 'blue', attrs=['bold'])
+    _print_with_arrow(msg, 'blue')
 
 
 def plan(msg):
     """Prints an execution plan."""
-    cprint('==> ' + msg, 'green', attrs=['bold'])
+    _print_with_arrow(msg, 'green')
+
+
+def success(msg):
+    """Notices that all went well."""
+    _print_with_arrow(msg, 'green', True)
+
+
+def fail(msg):
+    """Notices that something went wrong."""
+    _print_with_arrow(msg, 'red', True)
 
 
 def _generating(cmd, target):

@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import webbrowser
 from resea.package import load_packages
-from resea.helpers import info, error, notice, plan, progress, load_yaml, render
+from resea.helpers import info, error, success, notice, plan, progress, load_yaml, render
 from resea.validators import validate_package_yml
 import resea.commands.clean
 
@@ -45,7 +45,7 @@ def doctor():
     try:
         yml = load_yaml('package.yml', validator=validate_package_yml)
     except FileNotFoundError:
-        sys.exit("'package.yml' not found")
+        error("'package.yml' not found")
 
     if yml['category'] in ['application', 'library']:
         config, _ = load_packages([yml['name']] + yml['depends'])
@@ -88,5 +88,5 @@ def main(argv_):
         progress('Opening the results')
         webbrowser.open_new_tab('file://' + os.path.abspath(index_html_path))
 
-    plan('Done all diagnosis')
+    success('Done all diagnosis')
 
