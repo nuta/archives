@@ -34,9 +34,12 @@ types:
 interface:
   get_date:
     id: 1
+    type: request
+    reply: get_date_reply
     payloads:
   get_date_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
@@ -50,6 +53,8 @@ interface:
 
   set_oneshot_timer:
     id: 3
+    type: request
+    reply: set_oneshot_timer_reply
     payloads:
       - name: ch
         type: channel
@@ -57,12 +62,15 @@ interface:
         type: uintmax
   set_oneshot_timer_reply:
     id: 4
+    type: reply
     payloads:
       - name: result
         type: result
 
   set_interval_timer:
     id: 5
+    type: request
+    reply: set_interval_timer_reply
     payloads:
       - name: ch
         type: channel
@@ -70,18 +78,22 @@ interface:
         type: uintmax
   set_interval_timer_reply:
     id: 6
+    type: reply
     payloads:
       - name: result
         type: result
 
   delay:
     id: 7
+    type: request
+    reply: delay_reply
     description: Delays returning
     payloads:
       - name: msec
         type: uintmax
   delay_reply:
     id: 8
+    type: reply
     payloads:
       - name: result
         type: result

@@ -33,6 +33,8 @@ types:
 interface:
   create:
     id: 1
+    type: request
+    reply: create_reply
     payloads:
       - name: name
         type: Array<uchar>

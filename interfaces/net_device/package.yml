@@ -34,9 +34,12 @@ types:
 interface:
   receive:
     id: 1
+    type: request
+    reply: receive_reply
     payloads:
   receive_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
@@ -45,21 +48,27 @@ interface:
 
   transmit:
     id: 3
+    type: request
+    reply: transmit_reply
     payloads:
       - name: data
         type: data
         attrs: [readonly]
   transmit_reply:
     id: 4
+    type: reply
     payloads:
       - name: result
         type: result
 
   get_hardware_address:
     id: 5
+    type: request
+    reply: get_hardware_address_reply
     payloads:
   get_hardware_address_reply:
     id: 6
+    type: reply
     payloads:
       - name: result
         type: result

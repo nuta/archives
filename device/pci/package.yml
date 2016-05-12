@@ -39,6 +39,8 @@ types:
 interface:
   listen:
     id: 1
+    type: request
+    reply: listen_reply
     payloads:
       - name: ch
         type: channel
@@ -52,12 +54,14 @@ interface:
         type: uint32
   listen_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
 
   new_device:
     id: 3
+    type: push
     payloads:
       - name: header
         type: data

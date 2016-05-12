@@ -34,6 +34,8 @@ types:
 interface:
   read:
     id: 1
+    type: request
+    reply: read_reply
     payloads:
       - name: offset
         type: offset
@@ -41,6 +43,7 @@ interface:
         type: size
   read_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
@@ -49,6 +52,8 @@ interface:
 
   write:
     id: 3
+    type: request
+    reply: write_reply
     payloads:
       - name: offset
         type: offset
@@ -57,6 +62,7 @@ interface:
         attrs: [readonly]
   write_reply:
     id: 4
+    type: reply
     payloads:
       - name: result
         type: result

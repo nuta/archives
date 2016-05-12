@@ -34,6 +34,8 @@ types:
 interface:
   fill:
     id: 1
+    type: request
+    reply: fill_reply
     payloads:
       - name: id
         type: id
@@ -43,6 +45,7 @@ interface:
         type: size
   fill_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result

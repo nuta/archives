@@ -45,6 +45,8 @@ types:
 interface:
   open:
     id: 1
+    type: request
+    reply: open_reply
     payloads:
       - name: transport
         type: tcpip(protocol)
@@ -52,6 +54,7 @@ interface:
         type: channel
   open_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
@@ -60,17 +63,22 @@ interface:
 
   close:
     id: 3
+    type: request
+    reply: close_reply
     payloads:
       - name: socket
         type: id
   close_reply:
     id: 4
+    type: reply
     payloads:
       - name: result
         type: result
 
   bind:
     id: 5
+    type: request
+    reply: bind_reply
     payloads:
       - name: socket
         type: id
@@ -82,12 +90,15 @@ interface:
         type: uint16
   bind_reply:
     id: 6
+    type: reply
     payloads:
       - name: result
         type: result
 
   sendto:
     id: 7
+    type: request
+    reply: sendto_reply
     payloads:
       - name: socket
         type: id
@@ -101,12 +112,14 @@ interface:
         type: data
   sendto_reply:
     id: 8
+    type: reply
     payloads:
       - name: result
         type: result
 
   received:
     id: 9
+    type: push
     payloads:
       - name: socket
         type: id

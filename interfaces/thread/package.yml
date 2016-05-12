@@ -34,6 +34,8 @@ types:
 interface:
   create:
     id: 1
+    type: request
+    reply: create_reply
     payloads:
       - name: group
         type: id
@@ -42,6 +44,7 @@ interface:
         attrs: [readonly]
   create_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
@@ -52,40 +55,50 @@ interface:
 
   delete:
     id: 3
+    type: request
+    reply: delete_reply
     payloads:
       - name: thread
         type: id
   delete_reply:
     id: 4
+    type: reply
     payloads:
       - name: result
         type: result
 
   start:
     id: 5
+    type: request
+    reply: start_reply
     payloads:
       - name: thread
         type: id
   start_reply:
     id: 6
+    type: reply
     payloads:
       - name: result
         type: result
 
   block:
     id: 7
+    type: request
     payloads:
       - name: thread
         type: id
 
   unblock:
     id: 8
+    type: request
     payloads:
       - name: thread
         type: id
 
   set:
     id: 9
+    type: request
+    reply: set_reply
     payloads:
       - name: thread
         type: id
@@ -99,16 +112,20 @@ interface:
         type: size
   set_reply:
     id: 10
+    type: reply
     payloads:
       - name: result
         type: result
 
   get_current_thread:
     id: 11
+    type: request
+    reply: get_current_thread_reply
     payloads:
 
   get_current_thread_reply:
     id: 12
+    type: reply
     payloads:
       - name: thread
         type: id

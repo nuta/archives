@@ -47,6 +47,8 @@ types:
 interface:
   map:
     id: 1
+    type: request
+    reply: map_reply
     payloads:
       - name: group
         type: id
@@ -62,32 +64,41 @@ interface:
         type: offset
   map_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
 
   unmap:
     id: 3
+    type: request
+    reply: unmap_reply
     payloads:
       - name: addr
         type: addr
   unmap_reply:
     id: 4
+    type: reply
     payloads:
       - name: result
         type: result
 
   get_page_size:
     id: 5
+    type: request
+    reply: get_page_size_reply
     payloads:
   get_page_size_reply:
     id: 6
+    type: reply
     payloads:
       - name: size
         type: size
 
   allocate:
     id: 7
+    type: request
+    reply: allocate_reply
     payloads:
       - name: size
         type: size
@@ -95,6 +106,7 @@ interface:
         type: uint32
   allocate_reply:
     id: 8
+    type: reply
     payloads:
       - name: result
         type: result
@@ -103,12 +115,15 @@ interface:
 
   release:
     id: 9
+    type: request
     payloads:
       - name: addr
         type: addr
 
   allocate_physical:
     id: 10
+    type: request
+    reply: allocate_physical_reply
     payloads:
       - name: paddr
         type: paddr
@@ -118,6 +133,7 @@ interface:
         type: uint32
   allocate_physical_reply:
     id: 11
+    type: reply
     payloads:
       - name: result
         type: result

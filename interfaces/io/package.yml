@@ -39,6 +39,8 @@ types:
 interface:
   allocate:
     id: 1
+    type: request
+    reply: allocate_reply
     payloads:
       - name: iospace
         type: io(space)
@@ -48,6 +50,7 @@ interface:
         type: size
   allocate_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
@@ -56,6 +59,7 @@ interface:
 
   release:
     id: 3
+    type: request
     payloads:
       - name: iospace
         type: io(space)

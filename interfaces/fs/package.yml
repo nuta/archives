@@ -42,6 +42,8 @@ types:
 interface:
   open:
     id: 1
+    type: request
+    reply: open_reply
     payloads:
       - name: path
         type: Array<uchar>
@@ -50,6 +52,7 @@ interface:
         type: fs(filemode)
   open_reply:
     id: 2
+    type: reply
     payloads:
       - name: result
         type: result
@@ -58,17 +61,22 @@ interface:
 
   close:
     id: 3
+    type: request
+    reply: close_reply
     payloads:
       - name: file
         type: id
   close_reply:
     id: 4
+    type: reply
     payloads:
       - name: result
         type: result
 
   read:
     id: 5
+    type: request
+    reply: read_reply
     payloads:
       - name: file
         type: id
@@ -78,6 +86,7 @@ interface:
         type: size
   read_reply:
     id: 6
+    type: reply
     payloads:
       - name: result
         type: result
@@ -86,6 +95,8 @@ interface:
 
   write:
     id: 7
+    type: request
+    reply: write_reply
     payloads:
       - name: file
         type: id
@@ -96,6 +107,7 @@ interface:
         attrs: [readonly]
   write_reply:
     id: 8
+    type: reply
     payloads:
       - name: result
         type: result
