@@ -3,6 +3,8 @@
 #include <resea/channel.h>
 #include <resea/thread.h>
 #include <resea/datetime.h>
+#include <resea/pager.h>
+#include <resea/zeroed_pager.h>
 #include "kernel.h"
 
 static channel_t ch;
@@ -22,7 +24,8 @@ extern "C" void kernel_startup(void) {
     kernel_register_channel(ch, INTERFACE(thread));
     kernel_register_channel(ch, INTERFACE(memory));
     kernel_register_channel(ch, INTERFACE(datetime));
-    kernel_register_channel(ch, INTERFACE(channel));
+    kernel_register_channel(ch, INTERFACE(pager));
+    kernel_register_channel(ch, INTERFACE(zeroed_pager));
     INFO("created a kernel server at @%d", ch);
 }
 

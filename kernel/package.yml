@@ -27,6 +27,7 @@ implements:
   - io
   - datetime
   - pager
+  - zeroed_pager
 
 #
 #  Type definitions
