@@ -9,8 +9,9 @@ language: cpp
 env:
   matrix:
     - TARGET=kernel
-    - TARGET=fs/fat
     - TARGET=tcpip
+    - TARGET=fs/fat
+    - TARGET=exec/elf
     - TARGET=lang/cpp
     - TARGET=interfaces/channel
     - TARGET=interfaces/datetime
