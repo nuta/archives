@@ -39,9 +39,6 @@ interface:
       - name: name
         type: Array<uchar>
         attrs: [readonly]
-        size: name_size
-      - name: name_size
-        type: size
       - name: fs
         type: channel
       - name: file
