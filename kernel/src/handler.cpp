@@ -94,20 +94,6 @@ void kernel_handler(channel_t __ch, payload_t *payloads) {
             kernel_thread_start(__ch, (ident_t) a0);
             return;
     }
-    case MSGID(thread, block):
-    {
-        DEBUG("received thread.block");
-            payload_t a0 = payloads[2];
-            kernel_thread_block(__ch, (ident_t) a0);
-            return;
-    }
-    case MSGID(thread, unblock):
-    {
-        DEBUG("received thread.unblock");
-            payload_t a0 = payloads[2];
-            kernel_thread_unblock(__ch, (ident_t) a0);
-            return;
-    }
     case MSGID(thread, set):
     {
         DEBUG("received thread.set");

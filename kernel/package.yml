@@ -72,14 +72,12 @@ config:
         - src/pager.fill.cpp
         - src/startup.cpp
         - src/syscall.cpp
-        - src/thread.block.cpp
         - src/thread.cpp
         - src/thread.create.cpp
         - src/thread.delete.cpp
         - src/thread.get_current_thread.cpp
         - src/thread.set.cpp
         - src/thread.start.cpp
-        - src/thread.unblock.cpp
   - if: "ENV == 'test'"
     SOURCES:
       set:
