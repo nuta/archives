@@ -15,6 +15,10 @@ MAKEFILE_TEMPLATE = """\
 _default: default
 # keep blank not to delete intermediate file (especially stub files)
 .SECONDARY:
+
+# disable implicit rules
+.SUFFIXES:
+
 $(VERBOSE).SILENT:
 
 #
@@ -34,7 +38,7 @@ $(BUILD_DIR)/{{ config['CATEGORY'] }}: \\
     {% for obj in config['OBJS'] + config['LIBS'] %}
     {{ obj }} \\
     {% endfor %}
-
+    $(BUILD_DIR)/start.o
 {% if config['CATEGORY'] == 'application' %}
 \t$(CMDECHO) LINK $@
 \t$(HAL_LINK) $@ $^
@@ -76,6 +80,12 @@ $(BUILD_DIR)/%.o: packages/%.{{ lang['ext'] }} $(BUILD_DIR)/%.deps $(STUBS_{{ la
 \t$(CMDECHO) '{{ lang['abbrev'] }}' $@
 \tPACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['compile'] }} $@ $<'
 
+{% if config['START_SOURCE_EXT'] == lang['ext'] %}
+$(BUILD_DIR)/start.o: $(BUILD_DIR)/start.{{ config['START_SOURCE_EXT'] }}
+\t$(CMDECHO) '{{ lang['abbrev'] }}' $@
+\tPACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['compile'] }} $@ $<'
+{% endif %}
+
 $(BUILD_DIR)/%.deps: packages/%.{{ lang['ext'] }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
 \t$(MKDIR) -p $(@D)
 \t$(CMDECHO) 'MKDEPS' $@
@@ -105,7 +115,7 @@ $(BUILD_DIR)/{{ package_name }}/%: {{ k }} = {{ v }}
 def run_make(make, makefile, env, prettify=False):
     """Executes make(1)"""
     try:
-        p = subprocess.Popen(make.split(' ') + ['-f', makefile],
+        p = subprocess.Popen(make.split(' ') + ['-r', '-f', makefile],
                              stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT,
                              env=env)
