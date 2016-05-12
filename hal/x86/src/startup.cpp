@@ -78,6 +78,9 @@ extern "C" void x86_init(void *binfo) {
 
         // is available RAM and the address does not starts with 0?
         if ((m->type & 0xffffffff) == 1 && m->base > 0) {
+            DEBUG("found a available RAM space: addr=%p, size=%dMiB",
+                  m->base, m->length / 1024 / 1024);
+
             bsp_pmmap[i].addr = m->base;
             bsp_pmmap[i].size = m->length;
             i++;
@@ -88,13 +91,6 @@ extern "C" void x86_init(void *binfo) {
 
     bsp_pmmap[i].addr = 0;
     bsp_pmmap[i].size = 0;
-
-
-WARN("kludge: setting hal_pmmap to 0x2000000 forcibly");
-    bsp_pmmap[0].addr = 0x2000000;
-    bsp_pmmap[0].size = 0x1000000;
-    bsp_pmmap[1].addr = 0;
-    bsp_pmmap[1].size = 0;
 
     /* virtual memory map */
     bsp_vmmap[0].type = VMMAP_USER;
