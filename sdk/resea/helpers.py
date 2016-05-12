@@ -117,18 +117,21 @@ def render(tmpl, vars):
 
 def load_yaml(path, **kwargs):
     """Loads a yaml file."""
-    return loads_yaml(open(path).read(), **kwargs)
+    return loads_yaml(open(path).read(), path=path, **kwargs)
     return yml
 
 
-def loads_yaml(s, validator=None):
+def loads_yaml(s, validator=None, path=None):
     """Loads a yaml string."""
     yml = yaml.safe_load(s)
     if validator is not None:
         try:
             yml = validator(yml)
         except ValidationError as e:
-            error("validation error in '{}': {}".format(path, str(e)))
+            if path is None:
+                error("validation error: {}".format(str(e)))
+            else:
+                error("validation error in '{}': {}".format(path, str(e)))
     return yml
 
 
