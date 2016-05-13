@@ -17,6 +17,7 @@ struct chunk {
 // The allocation unit header
 struct alloc {
     uintmax_t flags;  // 0 on unused or 1 on used
+    uintptr_t callee; // the callee address TODO: disable it if TEST == true
 
     // memory block for callee follows this header
 };
@@ -116,6 +117,7 @@ void *allocate_memory (size_t size, memory_alloc_t flags) {
                     if (__sync_bool_compare_and_swap(&alloc->flags, 0, 1)) {
                         // OK
                         __sync_fetch_and_sub(&chunk->unused, 1);
+                        alloc->callee = RETURN_ADDRESS;
                         return (void *) ((uintptr_t) alloc + sizeof(*alloc));
                     }
                 }

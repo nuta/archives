@@ -14,6 +14,7 @@ extern "C" {
 #define NORETURN    __attribute__((noreturn))
 #define UNUSED      __attribute__((unused))
 #define DEPRECATED  __attribute__((deprecated))
+#define RETURN_ADDRESS  ((uintptr_t) __builtin_extract_return_addr(__builtin_return_address(0)))
 
 #ifndef __cplusplus
 
