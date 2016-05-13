@@ -3,3 +3,4 @@ global_config:
     CC: x86_64-elf-gcc
     CXX: x86_64-elf-g++
     LD: x86_64-elf-ld
+    ADDR2LINE: x86_64-elf-addr2line
