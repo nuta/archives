@@ -1,2 +1,3 @@
 global_config:
     HAL: posix_host
+    ATOS: atos
