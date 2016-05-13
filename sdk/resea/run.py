@@ -14,8 +14,8 @@ def lprint(s ,env):
 
     # try to get the column length of terminal
     try:
-        columns = int(subprocess.check_outptu('stty size', 'r').split()[1])
-    except:
+        columns = int(subprocess.check_output(['stty', 'size']).split()[1])
+    except FileNotFoundError:
         columns = 80
 
     try:
