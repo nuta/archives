@@ -137,3 +137,22 @@ void release_memory(void *p){
 
     /* TODO */
 }
+
+
+void report_unfreed_memory() {
+
+    for (struct chunk *chunk = chunks; chunk; chunk = chunk->next) {
+        struct alloc *alloc = (struct alloc *)
+            ((uintptr_t) chunk + sizeof(*chunk));
+
+        for(int i=0; i < chunk->total; i++) {
+
+            if (alloc->flags & 1) {
+                BUG("unfreed memory allocated at: %P", alloc->callee);
+            }
+
+            alloc = (struct alloc *)
+                ((uintptr_t) alloc + sizeof(*alloc) + chunk->size);
+        }
+    }
+}

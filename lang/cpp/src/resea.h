@@ -95,9 +95,11 @@ void hal_panic(void);
 /*
  *  Test
  */
+void report_unfreed_memory(void);
 #define TEST_EXPECT_DESC(desc, cond) printfmt("[" PACKAGE_NAME "] TEST: <%s> " desc,  (cond)? "pass":"fail")
 #define TEST_EXPECT(cond)            printfmt("[" PACKAGE_NAME "] TEST: <%s> " #cond, (cond)? "pass":"fail")
 #define TEST_END() do { \
+                report_unfreed_memory(); \
                 printfmt("[" PACKAGE_NAME "] TEST: end"); \
                 hal_panic(); \
             } while(0)
