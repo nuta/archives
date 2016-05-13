@@ -165,6 +165,7 @@ static void vprintfmt (const char *fmt, va_list vargs) {
         if (fmt[i] == '%') {
             bool alt = false;
             bool pad = false;
+            bool escaped = false;
             char specifier;
             uintmax_t len = sizeof(intmax_t); // 1: char, 2: short, 4: unsigned, ...
             long long arg;
@@ -215,6 +216,11 @@ static void vprintfmt (const char *fmt, va_list vargs) {
                 len = sizeof(uintmax_t);
                 specifier = 'V';
                 break;
+            case 'P':
+                escaped = true;
+                len = sizeof(uintmax_t);
+                specifier = 'p';
+                break;
             case 'z':
                 len = sizeof(size_t);
                 i++;
@@ -237,6 +243,12 @@ static void vprintfmt (const char *fmt, va_list vargs) {
                     arg = va_arg(vargs, int);
                     break;
                 }
+            }
+
+            if (escaped) {
+                hal_printchar('%');
+                hal_printchar('P');
+                hal_printchar('[');
             }
 
             switch(specifier) {
@@ -272,6 +284,10 @@ static void vprintfmt (const char *fmt, va_list vargs) {
                 break;
             default:
                 hal_printchar(fmt[i]);
+            }
+
+            if (escaped) {
+                hal_printchar(']');
             }
         } else {
             hal_printchar(fmt[i]);
