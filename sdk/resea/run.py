@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import atexit
 import datetime
@@ -8,7 +9,7 @@ from termcolor import cprint, colored
 from resea.helpers import info, error, progress, success, fail
 
 
-def lprint(s):
+def lprint(s ,env):
     """Prints a log message beautifully."""
 
     # try to get the column length of terminal
@@ -55,6 +56,20 @@ def lprint(s):
         package_name_str = colored(package_name, attrs=['bold'])
         type_str = colored(*t)
         print('{}{} {} '.format(pad_str, package_name_str, type_str), end='')
+
+        # parse escaped strings
+        for e in re.finditer('%([P])\[(.*?)\]', body):
+            specifier, content = e.groups()
+            if specifier == 'P':
+                if 'ADDR2LINE' in env:
+                    cmd = [env['ADDR2LINE'], '-e', env['EXECUTABLE_PATH'], content]
+                elif 'ATOS' in env:
+                    cmd = [env['ATOS'], '-o', env['EXECUTABLE_PATH'], content]
+                else:
+                    break
+
+                line = subprocess.check_output(cmd).decode('utf-8').strip()
+                body = body.replace(e.group(0), line)
 
         column = 17  # the length of a string printed above
         for word in body.split(' '):
@@ -127,7 +142,7 @@ def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
         result = try_parse(l)
         if result == 'end':
             f.write(l + '\n')
-            lprint(l)
+            lprint(l, env)
             if test:
                 if failed == 0:
                     success('All {} tests passed'.format(passed))
@@ -144,15 +159,15 @@ def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
         elif result == 'pass':
             passed += 1
             f.write(l + '\n')
-            lprint(l)
+            lprint(l, env)
         elif result == 'fail':
             failed += 1
             f.write(l + '\n')
-            lprint(l)
+            lprint(l, env)
         else:
             f.write(l + '\n')
             try:
-                lprint(l)
+                lprint(l, env)
             except SystemExit:
                 # kernel panic
                 p.terminate()

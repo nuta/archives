@@ -21,7 +21,7 @@ def run(args):
     env.update(config)
 
     plan('Generating a disk image')
-    cmd = [config['HAL_GENIMAGE'], config['BUILD_DIR'] + '/application',
+    cmd = [config['HAL_GENIMAGE'], config['EXECUTABLE_PATH'],
            config['BUILD_DIR'] + '/disk.img']
     progress(' '.join(cmd))
 

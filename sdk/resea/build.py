@@ -162,6 +162,7 @@ def build(args):
         'MAKE': 'make',
         'ENV': args.env,
         'BUILD_DIR': 'build/' + args.env,
+        'EXECUTABLE_PATH': 'build/' + args.env + '/application',
         'MAKEFLAGS': '-j' + str(multiprocessing.cpu_count()),
         'LD_R': '$(LD) -r -o',
         'MKDIR': 'mkdir',
