@@ -35,7 +35,7 @@ interface:
 #
 global_config:
   HAL_LINK:
-    default: $(CC) -pthread -o
+    default: $(CC) $(LINKFLAGS) -pthread -o
   HAL_RUN:
     default: packages/posix_host/run
   HAL_GENSTART:

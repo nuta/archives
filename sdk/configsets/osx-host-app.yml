@@ -1,3 +1,4 @@
 global_config:
     HAL: posix_host
     ATOS: atos
+    LINKFLAGS: -Wl,-no_pie
