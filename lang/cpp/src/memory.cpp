@@ -55,7 +55,7 @@ static void add_chunk(size_t size, size_t num) {
         chunks = new_chunk;
     } else {
         struct chunk *chunk = chunks;
-        while (chunk) {
+        while (chunk && chunk->next) {
             if (chunk->size <= size) {
                 break;
             }
