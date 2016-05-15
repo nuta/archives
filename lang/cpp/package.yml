@@ -21,11 +21,11 @@ os_requirements:
   osx:
     homebrew:
       packages:
-        - "./packages/cpp/osx/clang-static-analyzer.rb"
-        - "./packages/cpp/osx/x86_64-elf-gcc.rb"
-        - "./packages/cpp/osx/x86_64-elf-binutils.rb"
-        - "./packages/cpp/osx/arm-elf-eabi-gcc.rb"
-        - "./packages/cpp/osx/arm-elf-eabi-binutils.rb"
+        - "./osx/clang-static-analyzer.rb"
+        - "./osx/x86_64-elf-gcc.rb"
+        - "./osx/x86_64-elf-binutils.rb"
+        - "./osx/arm-elf-eabi-gcc.rb"
+        - "./osx/arm-elf-eabi-binutils.rb"
         - lcov
   ubuntu:
     apt:
@@ -50,10 +50,10 @@ global_config:
           prefix: resea/
           suffix: .h
         compile: '${CC} ${CFLAGS} -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
-        mkdeps:  ./packages/cpp/mkdeps "${CXX} ${CXXFLAGS}"
-        scaffold: ./packages/cpp/scaffold
-        genstub: ./packages/cpp/genstub
-        doctor: ./packages/cpp/doctor
+        mkdeps:   ./${CPP_DIR}/mkdeps "${CXX} ${CXXFLAGS}"
+        scaffold: ./${CPP_DIR}/scaffold
+        genstub:  ./${CPP_DIR}/genstub
+        doctor:   ./${CPP_DIR}/doctor
       asm:
         ext:  S
         abbrev: AS
@@ -66,20 +66,20 @@ global_config:
           prefix: resea/
           suffix: .h
         compile: '${CXX} ${CXXFLAGS} -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
-        mkdeps:  ./packages/cpp/mkdeps "${CXX} ${CXXFLAGS}"
-        scaffold: ./packages/cpp/scaffold
-        genstub: ./packages/cpp/genstub
-        doctor: ./packages/cpp/doctor
+        mkdeps:   ./${CPP_DIR}/mkdeps "${CXX} ${CXXFLAGS}"
+        scaffold: ./${CPP_DIR}/scaffold
+        genstub:  ./${CPP_DIR}/genstub
+        doctor:   ./${CPP_DIR}/doctor
   CFLAGS:
     append_words: >
       -Wall -ggdb3 -std=c99 -Wno-incompatible-library-redeclaration
-      -fdiagnostics-color     
-      -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/c
+      -fdiagnostics-color
+      -I${CPP_DIR}/src -I${BUILD_DIR}/stubs/c
   CXXFLAGS:
     append_words: >
       -Wall -ggdb3 -std=c++14 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color -fno-exceptions
-      -Ipackages/cpp/src -I$(BUILD_DIR)/stubs/cpp
+      -I${CPP_DIR}/src -I${BUILD_DIR}/stubs/cpp
 
 
 config:

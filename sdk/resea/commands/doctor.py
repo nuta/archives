@@ -7,7 +7,8 @@ import shutil
 import subprocess
 import webbrowser
 from resea.package import load_packages
-from resea.helpers import info, error, success, notice, plan, progress, load_yaml, render
+from resea.helpers import info, error, success, notice, plan, progress, \
+                          load_yaml, render, dict_to_strdict
 from resea.validators import validate_package_yml
 import resea.commands.clean
 
@@ -55,8 +56,12 @@ def doctor():
 
         # run lang's doctor
         lang_html_path = os.path.join(tmp_dir, 'lang.html')
-        subprocess.run([config['LANG'][lang]['doctor'], lang_html_path,
-            tmp_dir], check=True)
+        doctor = config['LANG'][lang]['doctor']
+        env = os.environ.copy()
+        del config['LANG'] # XXX
+        env.update(dict_to_strdict(config))
+        subprocess.Popen('{} {} {}'.format(doctor, lang_html_path,tmp_dir),
+            shell=True, env=env).wait()
 
         # generate index.html
         progress('Generating index.html')

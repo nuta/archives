@@ -87,6 +87,7 @@ def load_packages(builtin_packages, config=None, enable_if=False):
         package = packages.pop()
         all_packages.append(package)
         yml = load_package_yml(package)
+        config['{}_DIR'.format(package.upper())] = 'packages/{}'.format(package)
 
         install_os_requirements(yml['os_requirements'])
 
