@@ -3,7 +3,7 @@ exitcode=0
 
 cd test
 
-RAILS_ENV=test CODECLIMATE=true bundle exec rails server 3>&1 > log &
+RAILS_ENV=test CODECLIMATE=true bundle exec rails server 2>&1 > log &
 PID=$!
 
 sleep 5
