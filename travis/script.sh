@@ -3,7 +3,7 @@ exitcode=0
 
 cd test
 
-RAILS_ENV=test COVERALLS=true bundle exec rails server 3>&1 > log &
+RAILS_ENV=test bundle exec rails server 3>&1 > log &
 PID=$!
 
 sleep 5

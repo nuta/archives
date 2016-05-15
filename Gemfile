@@ -21,5 +21,4 @@ group :development do
   gem 'hirb'
   gem 'hirb-unicode'
   gem 'erd', require: false
-  gem 'coveralls', require: false
 end
