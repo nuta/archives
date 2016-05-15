@@ -16,6 +16,10 @@ extern "C" {
 #define DEPRECATED  __attribute__((deprecated))
 #define RETURN_ADDRESS  ((uintptr_t) __builtin_extract_return_addr(__builtin_return_address(0)))
 
+#define COMPARE_AND_SWAP  __sync_bool_compare_and_swap
+#define ATOMIC_ADD        __sync_fetch_and_add
+#define ATOMIC_SUB        __sync_fetch_and_sub
+
 #ifndef __cplusplus
 
 #ifndef NULL

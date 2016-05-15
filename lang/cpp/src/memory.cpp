@@ -114,9 +114,9 @@ void *allocate_memory (size_t size, memory_alloc_t flags) {
 
                 if (!(alloc->flags & 1)) {
                     // unused unit, try to lock
-                    if (__sync_bool_compare_and_swap(&alloc->flags, 0, 1)) {
+                    if (COMPARE_AND_SWAP(&alloc->flags, 0, 1)) {
                         // OK
-                        __sync_fetch_and_sub(&chunk->unused, 1);
+                        ATOMIC_SUB(&chunk->unused, 1);
                         alloc->callee = RETURN_ADDRESS;
                         return (void *) ((uintptr_t) alloc + sizeof(*alloc));
                     }

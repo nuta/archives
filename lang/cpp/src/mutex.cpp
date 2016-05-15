@@ -22,7 +22,7 @@ void init_mutex (mutex_t *m, int init) {
  */
 void lock_mutex (mutex_t *m) {
 
-    while(!__sync_bool_compare_and_swap(m, MUTEX_UNLOCKED, MUTEX_LOCKED));
+    while(!COMPARE_AND_SWAP(m, MUTEX_UNLOCKED, MUTEX_LOCKED));
 }
 
 
