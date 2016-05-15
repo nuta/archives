@@ -27,24 +27,29 @@ implements: []
 #  Type definitions
 #
 types:
+  type:
+    type: const
+    size: uint32
+    consts:
+      TYPE_ETHERNET: 0x0001
 
 #
 #  interface definitions
 #
 interface:
-  receive:
+  listen:
     id: 1
     type: request
     reply: receive_reply
     payloads:
+      - name: channel
+        type: channel
   receive_reply:
     id: 2
     type: reply
     payloads:
       - name: result
         type: result
-      - name: data
-        type: data
 
   transmit:
     id: 3
@@ -61,16 +66,25 @@ interface:
       - name: result
         type: result
 
-  get_hardware_address:
+  get_info:
     id: 5
     type: request
-    reply: get_hardware_address_reply
+    reply: get_info_reply
     payloads:
-  get_hardware_address_reply:
+  get_info_reply:
     id: 6
     type: reply
     payloads:
       - name: result
         type: result
-      - name: addr
+      - name: type
+        type: net_device(type)
+      - name: hwaddr
+        type: data
+
+  received:
+    id: 9
+    type: push
+    payloads:
+      - name: packet
         type: data
