@@ -321,8 +321,6 @@ static result_t run_thread(ident_t group, const char *name, uintptr_t entry, uin
     size_t stack_size;
 
     stack_size = 0x4000; // TODO
-    INFO("group=%p", group
-    );
     stack = (uintptr_t) kernel_allocate_memory(stack_size, MEMORY_ALLOC_NORMAL);
     kernel_create_thread(group, (const uchar_t *) name, strlen(name), &thread, &r_group);
     kernel_set_thread(thread, entry, arg, stack, stack_size);

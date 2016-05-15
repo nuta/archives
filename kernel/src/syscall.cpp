@@ -206,39 +206,30 @@ extern "C" result_t kernel_syscall(int type, uintmax_t r1, uintmax_t r2,
 
     switch (type) {
     case SYSCALL_OPEN:
-        DEBUG("syscall: open()");
         r = open((channel_t *) ret);
         break;
     case SYSCALL_CLOSE:
-        DEBUG("syscall: close(%d)", r1);
         r = close((channel_t) r1);
         break;
     case SYSCALL_SETOPTIONS:
-        DEBUG("syscall: setoptions(%d, %p, %p, %d)", r1, r2, r4, r4);
         r = setoptions((channel_t) r1, (handler_t *) r2, (void *) r3, (size_t) r4);
         break;
     case SYSCALL_SEND:
-        DEBUG("syscall: send(%p)", (void *) r1);
         r = send((channel_t) r1, (payload_t *) r2, (size_t) r3);
         break;
     case SYSCALL_RECV:
-        DEBUG("syscall: recv(%d)", r1);
         r = recv((channel_t) r1, (payload_t **) &ret);
         break;
     case SYSCALL_WAIT:
-        DEBUG("syscall: wait(%d)", r1);
         r = wait((channel_t) r1);
         break;
      case SYSCALL_CALL:
-        DEBUG("syscall: call(%p, %p)", (void *) r1, (void *) r2);
         r = call((channel_t) r1, (payload_t *) r2, (size_t) r3, (void *) r4, (size_t) r5);
         break;
     case SYSCALL_LINK:
-        DEBUG("syscall: link(%d, %d)", r1, r2);
         r = link((channel_t) r1, (channel_t) r2);
         break;
     case SYSCALL_TRANSFER:
-        DEBUG("syscall: transfer(%d, %d)", r1, r2);
         r = transfer((channel_t) r1, (channel_t) r2);
         break;
     default:
