@@ -21,9 +21,14 @@ def main():
 
     plan('Analysing with Clang Static Analyzer')
     csa_dir = os.path.join(tmp_dir, 'csa')
+    csa_options = [
+        '--keep-empty',
+        '-plist-html',
+        '-analyzer-config stable-report-filename=true'
+    ]
     resea.commands.build.main([
        'HAL=posix_host',
-       'MAKE=scan-build -o {} make'.format(csa_dir),
+       'MAKE=scan-build {} -o {} make'.format(' '.join(csa_options), csa_dir),
        'CC=clang',
        'HAL_LINK=clang -pthread -o'
     ])
