@@ -21,4 +21,5 @@ group :development do
   gem 'hirb'
   gem 'hirb-unicode'
   gem 'erd', require: false
+  gem "codeclimate-test-reporter", require: true
 end
