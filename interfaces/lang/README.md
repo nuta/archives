@@ -3,12 +3,12 @@ An interface implemented by langauge runtime libraries.
 
 ## Requirements
 ### Global config
-Append a map into `LANG`. Refer `cpp`'s `package.yml`.
+Append a map into `LANGS`. Refer `cpp`'s `package.yml`.
 
 **Example**
 ```
 global_config:
-  LANG:
+  LANGS:
     append:
       c:
         ext:  c

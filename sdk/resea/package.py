@@ -82,7 +82,7 @@ def load_packages(builtin_packages, config=None, enable_if=False):
     config['OBJS'] = []
     config['LIBS'] = []
     config['STUBS'] = []
-    config['LANG'] = {}
+    config['LANGS'] = {}
     while len(packages) > 0:
         package = packages.pop()
         all_packages.append(package)

@@ -56,9 +56,9 @@ def doctor():
 
         # run lang's doctor
         lang_html_path = os.path.join(tmp_dir, 'lang.html')
-        doctor = config['LANG'][lang]['doctor']
+        doctor = config['LANGS'][lang]['doctor']
         env = os.environ.copy()
-        del config['LANG'] # XXX
+        del config['LANGS'] # XXX
         env.update(dict_to_strdict(config))
         subprocess.Popen('{} {} {}'.format(doctor, lang_html_path,tmp_dir),
             shell=True, env=env).wait()

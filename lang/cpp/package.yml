@@ -41,7 +41,7 @@ uses: [memory, io]
 implements: [lang]
 
 global_config:
-  LANG:
+  LANGS:
     append:
       c:
         ext:  c

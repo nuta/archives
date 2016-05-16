@@ -24,7 +24,7 @@ def scaffold(args):
     if lang is None:
         error("lang is not speicified in package.yml")
 
-    bin = config['LANG'][lang].get('scaffold')
+    bin = config['LANGS'][lang].get('scaffold')
 
     if bin is None:
         error("'{}' lang does not support scaffolding".format(lang))

@@ -25,7 +25,7 @@ $(VERBOSE).SILENT:
 #  global config
 #
 {% for k,v in config.items() %}
-{% if k not in ['LANG', 'OBJS', 'DEPS', 'STUBS'] %}
+{% if k not in ['LANGS', 'OBJS', 'DEPS', 'STUBS'] %}
 export {{ k }} = {{ v }}
 {% endif %}
 {% endfor %}
@@ -58,7 +58,7 @@ $(BUILD_DIR)/start.{{ config['START_SOURCE_EXT'] }}:
 #
 #  lang
 #
-{% for lang in config['LANG'].values() %}
+{% for lang in config['LANGS'].values() %}
 #  *.{{ lang['ext'] }}
 
 {% if lang['stub'] %}
@@ -201,7 +201,7 @@ def build(args):
 
     # start.o
     config['OBJS'].append(os.path.join(config['BUILD_DIR'], 'start.o'))
-    config['START_SOURCE_EXT'] = config['LANG']['c']['ext'] # FIXME
+    config['START_SOURCE_EXT'] = config['LANGS']['c']['ext'] # FIXME
     
     apps = config['BUILTIN_APPS']
     if args.env != 'test' and 'kernel' in apps:
