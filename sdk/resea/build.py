@@ -53,7 +53,7 @@ $(BUILD_DIR)/{{ config['CATEGORY'] }}: \\
 #  start
 #
 $(BUILD_DIR)/start.{{ config['START_SOURCE_EXT'] }}:
-\t$(CMDECHO) GENSTARTC $@
+\t$(CMDECHO) GENSTART $@
 \tWITH_THREADING=yes {{ config['HAL_GENSTART'] }} {{ config['GENSTART_ARGS'] }} > $@
 # FIXME: WITH_THREADING is hard coded
 
