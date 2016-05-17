@@ -49,7 +49,7 @@ def doctor():
         error("'package.yml' not found")
 
     if yml['category'] in ['application', 'library']:
-        config, _ = load_packages([yml['name']] + yml['depends'])
+        config, _, _ = load_packages([yml['name']] + yml['depends'], {})
         lang = yml.get("lang")
         if lang is None:
             error("lang is not speicified in package.yml")
