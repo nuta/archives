@@ -9,7 +9,7 @@ from termcolor import cprint, colored
 from resea.helpers import info, error, progress, success, fail
 
 
-def lprint(s ,env):
+def lprint(s):
     """Prints a log message beautifully."""
 
     # try to get the column length of terminal
@@ -19,6 +19,8 @@ def lprint(s ,env):
         columns = 80
     except FileNotFoundError:
         columns = 80
+
+    env = os.environ
 
     try:
         # log message format is '[package_name] TYPE: a message from the package'
@@ -112,11 +114,9 @@ def atexit_handler(p):
         pass
 
 
-def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
+def run_emulator(cmd, test=False, save_log=None, wait=False):
     if save_log is None:
         save_log = '/dev/null'
-    if env is None:
-        env = {}
 
     # prepend a header to the log file
     f = open(save_log, 'a')
@@ -144,7 +144,7 @@ def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
         result = try_parse(l)
         if result == 'end':
             f.write(l + '\n')
-            lprint(l, env)
+            lprint(l)
             if test:
                 if failed == 0:
                     success('All {} tests passed'.format(passed))
@@ -161,15 +161,15 @@ def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
         elif result == 'pass':
             passed += 1
             f.write(l + '\n')
-            lprint(l, env)
+            lprint(l)
         elif result == 'fail':
             failed += 1
             f.write(l + '\n')
-            lprint(l, env)
+            lprint(l)
         else:
             f.write(l + '\n')
             try:
-                lprint(l, env)
+                lprint(l)
             except SystemExit:
                 # kernel panic
                 p.terminate()
