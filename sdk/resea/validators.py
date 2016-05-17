@@ -94,7 +94,9 @@ def validate_package_yml(d):
 
         # config
         for x in ['config', 'global_config']:
-            if isinstance(d.get(x), dict):
+            if d.get(x) is None:
+                d[x] ={}
+            elif isinstance(d.get(x), dict):
                 d[x] = [d[x]]
 
         return d

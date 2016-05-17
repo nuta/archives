@@ -3,6 +3,7 @@
 Useful functions
 
 """
+from copy import copy
 import os
 import shlex
 import subprocess
@@ -152,8 +153,12 @@ def loads_yaml(s, validator=None, path=None):
 
 
 def dict_to_strdict(d):
+    d = copy(d)
     for k, v in d.items():
         if isinstance(v, (list, tuple)):
+            if not isinstance(v, str):
+                d[k] = '' # FIXME
+                continue
             d[k] = " ".join(v)
         if isinstance(v, bool):
             d[k] = repr(v)

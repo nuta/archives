@@ -5,7 +5,7 @@ import shutil
 import subprocess
 import sys
 from termcolor import colored
-from resea.package import get_package, load_package_yml, load_packages
+from resea.package import load_packages, get_package_dir
 from resea.helpers import render, info, notice, error, generating, \
     load_yaml, loads_yaml, dict_to_strdict, plan, progress
 from resea.validators import validate_package_yml
@@ -24,10 +24,8 @@ $(VERBOSE).SILENT:
 #
 #  global config
 #
-{% for k,v in config.items() %}
-{% if k not in ['LANGS', 'OBJS', 'DEPS', 'STUBS'] %}
+{% for k,v in mk_config.items() %}
 export {{ k }} = {{ v }}
-{% endif %}
 {% endfor %}
 
 #
@@ -35,8 +33,11 @@ export {{ k }} = {{ v }}
 #
 default: $(BUILD_DIR)/{{ config['CATEGORY'] }}
 $(BUILD_DIR)/{{ config['CATEGORY'] }}: \\
-    {% for obj in config['OBJS'] + config['LIBS'] %}
+    {% for obj, _, _, _ in config['OBJS'] %}
     {{ obj }} \\
+    {% endfor %}
+    {% for lib in config['LIBS'] %}
+    {{ lib }} \\
     {% endfor %}
     $(BUILD_DIR)/start.o
 {% if config['CATEGORY'] == 'application' %}
@@ -51,7 +52,7 @@ $(BUILD_DIR)/{{ config['CATEGORY'] }}: \\
 #  start
 #
 $(BUILD_DIR)/start.{{ config['START_SOURCE_EXT'] }}:
-\t$(CMDECHO) GEN $@
+\t$(CMDECHO) GENSTARTC $@
 \tWITH_THREADING=yes {{ config['HAL_GENSTART'] }} {{ config['GENSTART_ARGS'] }} > $@
 # FIXME: WITH_THREADING is hard coded
 
@@ -63,42 +64,43 @@ $(BUILD_DIR)/start.{{ config['START_SOURCE_EXT'] }}:
 
 {% if lang['stub'] %}
 STUBS_{{ lang['ext'] }} = \\
-{% for stub in config['STUBS'] %}
+{% for stub, _ in config['STUBS'] %}
   $(BUILD_DIR)/stubs/{{ lang['ext'] }}/{{ lang['stub']['prefix'] }}{{ stub }}{{ lang['stub']['suffix'] }} \\
 {% endfor %}
 
-$(BUILD_DIR)/stubs/{{ lang['ext'] }}/{{ lang['stub']['prefix'] }}%\
-{{ lang['stub']['suffix'] }}: \
-packages/%/package.yml
+{% for stub, package_yml in config['STUBS'] %}
+$(BUILD_DIR)/stubs/{{ lang['ext'] }}/{{ lang['stub']['prefix'] }}{{stub }}{{ lang['stub']['suffix'] }}: \
+    {{ package_yml }}
 \t$(MKDIR) -p $(@D)
 \t$(CMDECHO) GENSTUB $@
 \tPACKAGE_NAME=$(PACKAGE_NAME) {{ lang['genstub'] }} $@ $<
+{% endfor %}
+
 {% endif %}
 
-$(BUILD_DIR)/%.o: packages/%.{{ lang['ext'] }} $(BUILD_DIR)/%.deps $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
+{% for obj, src, ext, deps in config['OBJS'] %}
+{% if ext == lang['ext'] %}
+{{ obj }}: {{ src }} {{ deps }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
 \t$(MKDIR) -p $(@D)
 \t$(CMDECHO) '{{ lang['abbrev'] }}' $@
 \tPACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['compile'] }} $@ $<'
 
-{% if config['START_SOURCE_EXT'] == lang['ext'] %}
-$(BUILD_DIR)/start.o: $(BUILD_DIR)/start.{{ config['START_SOURCE_EXT'] }}
-\t$(CMDECHO) '{{ lang['abbrev'] }}' $@
-\tPACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['compile'] }} $@ $<'
-{% endif %}
-
-$(BUILD_DIR)/%.deps: packages/%.{{ lang['ext'] }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
+{{ deps }}: {{ src }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
 \t$(MKDIR) -p $(@D)
 \t$(CMDECHO) 'MKDEPS' $@
 \techo "$(@:.deps=.o): `PACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['mkdeps'] }} $<'`" > $@
+{% endif %}
+{% endfor %}
+
 {% endfor %}
 
 #
 #  local config
 #
-{% for package_name,config in local_config.items() %}
+{% for package_name, mk_config in mk_local_config.items() %}
 # {{ package_name }}
 $(BUILD_DIR)/{{ package_name }}/%: PACKAGE_NAME = {{ package_name }}
-{% for k,v in config.items() %}
+{% for k,v in mk_config.items() %}
 $(BUILD_DIR)/{{ package_name }}/%: {{ k }} = {{ v }}
 {% endfor %}
 {% endfor %}
@@ -170,7 +172,6 @@ def build(args):
         'BUILTIN_APPS': [],
         'RESEAPATH': '',
         'PACKAGE': yml['name'],
-        'CATEGORY': yml['category']
     }
 
     configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
@@ -186,32 +187,44 @@ def build(args):
     if 'HAL' not in config:
         error('HAL is not speicified')
 
-    builtin_packages = [config['PACKAGE'], config['HAL']] + config['BUILTIN_APPS']
+    # resolve dependencies
+    _config, local_config = load_packages([config['PACKAGE'], config['HAL']],
+                                config, enable_if=True, update_env=True)
+    config.update(_config)
+
+    # TODO: install os requirements
 
     # add kernel to run tests
-    if args.env == 'test' and 'kernel' not in builtin_packages:
-        builtin_packages.append('kernel')
+    if args.env == 'test' and 'kernel' not in config['BUILTIN_APPS']:
+        config['BUILTIN_APPS'].append('kernel')
 
-    if config['CATEGORY'] == 'application' and config['PACKAGE'] not in config['BUILTIN_APPS']:
-        config['BUILTIN_APPS'] = config['BUILTIN_APPS'] + [config['PACKAGE']]
-
-    # resolve dependencies
-    config, local_config = load_packages(builtin_packages, config, enable_if=True)
     plan('as {CATEGORY} with {HAL} HAL in {BUILD_DIR}'.format(**config))
 
+    config['DEPS'] = []
+    config['OBJS'] = []
+    for package, _local_config in local_config.items():
+        for src in _local_config.get('SOURCES', []):
+            base = os.path.splitext(src)[0]
+            config['OBJS'].append((
+                os.path.join(config['BUILD_DIR'], package, base + '.o'),
+                os.path.join(get_package_dir(package), src),
+                os.path.splitext(src)[1].replace('.', ''),
+                os.path.join(config['BUILD_DIR'], package, base + '.deps')
+            ))
+            config['DEPS'].append(os.path.join(config['BUILD_DIR'], package, base, '.deps'))
+
     # start.o
-    config['OBJS'].append(os.path.join(config['BUILD_DIR'], 'start.o'))
+    config['GENSTART_ARGS'] = ' '.join(filter(lambda x: x != 'kernel', config['BUILTIN_APPS']))
     config['START_SOURCE_EXT'] = config['LANGS']['c']['ext'] # FIXME
-    
-    apps = config['BUILTIN_APPS']
-    if args.env != 'test' and 'kernel' in apps:
-        apps.remove('kernel')
+    config['OBJS'].append((
+        os.path.join(config['BUILD_DIR'], 'start.o'),
+        os.path.join(config['BUILD_DIR'], 'start.' + config['START_SOURCE_EXT']),
+        config['START_SOURCE_EXT'],
+        os.path.join(config['BUILD_DIR'], 'start.deps'),
+    ))
 
-    config['GENSTART_ARGS'] = ' '.join(apps)
+    config['DEPS'].append(os.path.join(config['BUILD_DIR'], 'start.deps'))
 
-    # deps
-    config['DEPS'] = list(map(lambda x: os.path.splitext(x)[0] + '.deps', config['OBJS']))
-   
     # clean up if build config have been changed
     try:
         prev_config = json.load(open(os.path.join(config['BUILD_DIR'], 'buildconfig.json')))
@@ -233,8 +246,10 @@ def build(args):
     # generate makefile if needed
     makefile = config['BUILD_DIR'] + '/Makefile'
     if args.r or not os.path.exists(makefile):
+        mk_config = dict_to_strdict(config)
+        mk_local_config = {}
         for package, c in local_config.items():
-            local_config[package] = dict_to_strdict(c)
+            mk_local_config[package] = dict_to_strdict(c)
 
         with open(config['BUILD_DIR'] + '/Makefile', 'w') as f:
             f.write(render(MAKEFILE_TEMPLATE, locals()))

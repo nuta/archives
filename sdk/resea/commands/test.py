@@ -96,7 +96,7 @@ def test(args):
     config = build(args)
     plan('Invoking tests')
     run_emulator([config['HAL_RUN'], config['BUILD_DIR'] + '/application'],
-        test=True, env=config, wait=args.wait)
+        test=True, wait=args.wait)
 
 
 def main(args_):

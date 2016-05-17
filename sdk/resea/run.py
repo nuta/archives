@@ -124,7 +124,7 @@ def run_emulator(cmd, test=False, env=None, save_log=None, wait=False):
             str(datetime.datetime.now())))
 
     # run test program speicified in HAL_RUN config
-    p = subprocess.Popen(cmd, env=env,
+    p = subprocess.Popen(' '.join(cmd), shell=True,
                          stderr=subprocess.STDOUT,
                          stdout=subprocess.PIPE)
 

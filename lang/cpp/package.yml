@@ -50,10 +50,10 @@ global_config:
           prefix: resea/
           suffix: .h
         compile: '${CC} ${CFLAGS} -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
-        mkdeps:   ./${CPP_DIR}/mkdeps "${CXX} ${CXXFLAGS}"
-        scaffold: ./${CPP_DIR}/scaffold
-        genstub:  ./${CPP_DIR}/genstub
-        doctor:   ./${CPP_DIR}/doctor
+        mkdeps:   ${CPP_DIR}/mkdeps "${CXX} ${CXXFLAGS}"
+        scaffold: ${CPP_DIR}/scaffold
+        genstub:  ${CPP_DIR}/genstub
+        doctor:   ${CPP_DIR}/doctor
       asm:
         ext:  S
         abbrev: AS
@@ -66,20 +66,20 @@ global_config:
           prefix: resea/
           suffix: .h
         compile: '${CXX} ${CXXFLAGS} -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
-        mkdeps:   ./${CPP_DIR}/mkdeps "${CXX} ${CXXFLAGS}"
-        scaffold: ./${CPP_DIR}/scaffold
-        genstub:  ./${CPP_DIR}/genstub
-        doctor:   ./${CPP_DIR}/doctor
+        mkdeps:   ${CPP_DIR}/mkdeps "${CXX} ${CXXFLAGS}"
+        scaffold: ${CPP_DIR}/scaffold
+        genstub:  ${CPP_DIR}/genstub
+        doctor:   ${CPP_DIR}/doctor
   CFLAGS:
     append_words: >
       -Wall -ggdb3 -std=c99 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color
-      -I${CPP_DIR}/src -I${BUILD_DIR}/stubs/c
+      -I$(CPP_DIR)/src -I$(BUILD_DIR)/stubs/c
   CXXFLAGS:
     append_words: >
       -Wall -ggdb3 -std=c++14 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color -fno-exceptions
-      -I${CPP_DIR}/src -I${BUILD_DIR}/stubs/cpp
+      -I$(CPP_DIR)/src -I$(BUILD_DIR)/stubs/cpp
 
 
 config:
@@ -96,15 +96,15 @@ config:
         - src/io.cpp
   - if: "ENV == 'test'"
     SOURCES:
-      set:
+      append:
         - tests/test.cpp
   - if: "HAL == 'x86'"
     SOURCES:
-      set:
+      append:
         - src/x86.cpp
   - if: "HAL == 'posix_host'"
     SOURCES:
-      set:
+      append:
         - src/posix_host.cpp
 
 #

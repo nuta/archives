@@ -37,13 +37,13 @@ global_config:
   HAL_LINK:
     default: $(CC) $(LINKFLAGS) -pthread -o
   HAL_RUN:
-    default: packages/posix_host/run
+    default: ${POSIX_HOST_DIR}/run
   HAL_GENSTART:
-    default: ./packages/genstartc/genstartc
+    default: ${GENSTARTC_DIR}/genstartc
   CFLAGS:
-   append_words: -Ipackages/posix_host/src -DPOSIX_HOST
+   append_words: -I${POSIX_HOST_DIR}/src -DPOSIX_HOST
   CXXFLAGS:
-   append_words: -Ipackages/posix_host/src -DPOSIX_HOST
+   append_words: -I${POSIX_HOST_DIR}/src -DPOSIX_HOST
 
 config:
   SOURCES:

@@ -81,5 +81,5 @@ config:
         - src/thread.start.cpp
   - if: "ENV == 'test'"
     SOURCES:
-      set:
+      append:
         - tests/test.cpp
