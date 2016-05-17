@@ -30,6 +30,7 @@ def main():
        'HAL=posix_host',
        'MAKE=scan-build {} -o {} make'.format(' '.join(csa_options), csa_dir),
        'CC=clang',
+       'CXX=clang',
        'HAL_LINK=clang -pthread -o'
     ])
 
@@ -37,6 +38,8 @@ def main():
     resea.commands.test.main([
        '--wait',
        'HAL=posix_host',
+       'CC=gcc',
+       'CXX=gcc',
        'CFLAGS=-fprofile-arcs -ftest-coverage',
        'CXXFLAGS=-fprofile-arcs -ftest-coverage',
        'HAL_LINK=gcc -fprofile-arcs -ftest-coverage -pthread -o'
