@@ -108,7 +108,7 @@ def load_local_config(package, config, global_config, enable_if):
     return local_config
 
 
-def load_packages(packages, config, enable_if=False, update_env=False):
+def load_packages(builtin_packages, config, enable_if=False, update_env=False):
     """Returns packages config"""
 
     config.update({
@@ -121,7 +121,7 @@ def load_packages(packages, config, enable_if=False, update_env=False):
 
     local_config = {}
     ymls = {}
-    builtin_packages = []
+    packages = builtin_packages.copy()
     loaded_packages = []
     categories = []
 
@@ -147,7 +147,7 @@ def load_packages(packages, config, enable_if=False, update_env=False):
             if depend not in loaded_packages:
                 packages.append(depend)
 
-        if yml['category'] == 'application':
+        if package in builtin_packages and yml['category'] == 'application':
             config['BUILTIN_APPS'].append(package)
 
         categories.append(yml['category'])
