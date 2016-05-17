@@ -95,9 +95,8 @@ def autotest(args):
 def test(args):
     config = build(args)
     plan('Invoking tests')
-    run_emulator([config['HAL_RUN'], config['BUILD_DIR'] + '/application'],
-        test=True, wait=args.wait)
-
+    cmd = [config['HAL_RUN'], config['BUILD_DIR'] + '/application']
+    sys.exit(run_emulator(cmd, test=True, wait=args.wait))
 
 def main(args_):
     parser = argparse.ArgumentParser(prog='resea test',

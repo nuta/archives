@@ -9,6 +9,10 @@ from termcolor import cprint, colored
 from resea.helpers import info, error, progress, success, fail
 
 
+class BugFoundError(Exception):
+    pass
+
+
 def lprint(s):
     """Prints a log message beautifully."""
 
@@ -34,61 +38,64 @@ def lprint(s):
     except ValueError:
         # invalid log message format: just print it
         print(s)
-    else:
-        # valid log message
-        if type_ == 'TEST':
-            # test results
-            if body in ['start', 'end']:
-                return
-            elif body.startswith("<pass>"):
-                type_ = 'PASS'
+        return ''
+
+    # valid log message
+    if type_ == 'TEST':
+        # test results
+        if body in ['start', 'end']:
+            return
+        elif body.startswith("<pass>"):
+            type_ = 'PASS'
+        else:
+            type_ = 'FAIL'
+
+    # pick a color
+    t = {
+        'INFO':  (' I ', 'white', 'on_blue'),
+        'BUG':   (' B ', 'white', 'on_red'),
+        'PANIC': (' P ', 'white', 'on_red'),
+        'WARN':  (' W ', 'white', 'on_yellow'),
+        'DEBUG': (' D ', 'grey',  'on_white'),
+        'PASS':  (' T ', 'white', 'on_green'),
+        'FAIL':  (' T ', 'white', 'on_red'),
+    }.get(type_, (' ',))
+
+    pad_str = ' ' * (12 - len(package_name))
+    package_name_str = colored(package_name, attrs=['bold'])
+    type_str = colored(*t)
+    print('{}{} {} '.format(pad_str, package_name_str, type_str), end='')
+
+    # parse escaped strings
+    for e in re.finditer('%([P])\[(.*?)\]', body):
+        specifier, content = e.groups()
+        if specifier == 'P':
+            if 'ADDR2LINE' in env:
+                cmd = [env['ADDR2LINE'], '-e', env['EXECUTABLE_PATH'], content]
+            elif 'ATOS' in env:
+                cmd = [env['ATOS'], '-o', env['EXECUTABLE_PATH'], content]
             else:
-                type_ = 'FAIL'
+                break
 
-        # pick a color
-        t = {
-            'INFO':  (' I ', 'white', 'on_blue'),
-            'BUG':   (' B ', 'white', 'on_red'),
-            'PANIC': (' P ', 'white', 'on_red'),
-            'WARN':  (' W ', 'white', 'on_yellow'),
-            'DEBUG': (' D ', 'grey',  'on_white'),
-            'PASS':  (' T ', 'white', 'on_green'),
-            'FAIL':  (' T ', 'white', 'on_red'),
-        }.get(type_, (' ',))
+            line = subprocess.check_output(cmd).decode('utf-8').strip()
+            body = body.replace(e.group(0), line)
 
-        pad_str = ' ' * (12 - len(package_name))
-        package_name_str = colored(package_name, attrs=['bold'])
-        type_str = colored(*t)
-        print('{}{} {} '.format(pad_str, package_name_str, type_str), end='')
+    column = 17  # the length of a string printed above
+    for word in body.split(' '):
+        if column + len(word) + 1 < columns:
+            print(word + ' ', end='')
+            column += len(word) + 1
+        else:
+            # line wrap
+            print('\n{}{} '.format(' ' * 17, word, ' '), end='')
+            column = 17 + len(word) + 1
+    print('')
 
-        # parse escaped strings
-        for e in re.finditer('%([P])\[(.*?)\]', body):
-            specifier, content = e.groups()
-            if specifier == 'P':
-                if 'ADDR2LINE' in env:
-                    cmd = [env['ADDR2LINE'], '-e', env['EXECUTABLE_PATH'], content]
-                elif 'ATOS' in env:
-                    cmd = [env['ATOS'], '-o', env['EXECUTABLE_PATH'], content]
-                else:
-                    break
+    if type_ == 'PANIC':
+        # kernel panic: raise SystemExit to abort the emulator
+        raise SystemExit
 
-                line = subprocess.check_output(cmd).decode('utf-8').strip()
-                body = body.replace(e.group(0), line)
-
-        column = 17  # the length of a string printed above
-        for word in body.split(' '):
-            if column + len(word) + 1 < columns:
-                print(word + ' ', end='')
-                column += len(word) + 1
-            else:
-                # line wrap
-                print('\n{}{} '.format(' ' * 17, word, ' '), end='')
-                column = 17 + len(word) + 1
-        print('')
-
-        if type_ == 'PANIC':
-            # kernel panic: raise SystemExit to abort the emulator
-            raise SystemExit
+    return type_
 
 
 def try_parse(l):
@@ -131,6 +138,7 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
     atexit.register(atexit_handler, p)
 
     # parse log messages
+    bugs = 0
     passed = 0
     failed = 0
     while True:
@@ -143,13 +151,21 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
 
         result = try_parse(l)
         if result == 'end':
+            exit_code = 0
+
             f.write(l + '\n')
             lprint(l)
+
+            if bugs > 0:
+                fail('{} bugs found'.format(bugs))
+                exit_code = 1
+
             if test:
                 if failed == 0:
                     success('All {} tests passed'.format(passed))
                 else:
                     fail('{} tests failed'.format(failed))
+                    exit_code = 2
 
             if wait:
                progress('Waiting for termination')  
@@ -157,7 +173,7 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
             else:
                 p.terminate()
                 p.kill()
-            return
+            return exit_code
         elif result == 'pass':
             passed += 1
             f.write(l + '\n')
@@ -169,9 +185,10 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
         else:
             f.write(l + '\n')
             try:
-                lprint(l)
+                if lprint(l) == 'BUG':
+                    bugs += 1
             except SystemExit:
                 # kernel panic
                 p.terminate()
                 p.kill()
-                return
+                return False
