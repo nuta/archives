@@ -92,11 +92,12 @@ def autotest(args):
     observer.stop()
     observer.join()
 
+
 def test(args):
     config = build(args)
     plan('Invoking tests')
     cmd = [config['HAL_RUN'], config['BUILD_DIR'] + '/application']
-    sys.exit(run_emulator(cmd, test=True, wait=args.wait))
+    return run_emulator(cmd, test=True, wait=args.wait)
 
 def main(args_):
     parser = argparse.ArgumentParser(prog='resea test',
@@ -109,5 +110,5 @@ def main(args_):
     if args.P:
         autotest(args)
     else:
-        test(args)
+        return test(args)
 

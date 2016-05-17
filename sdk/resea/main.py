@@ -1,3 +1,4 @@
+import sys
 from resea.helpers import import_module, error
 
 
@@ -12,4 +13,8 @@ def main(args):
     except ImportError:
         error('command not found: {}'.format(command))
 
-    m.main(args[1:])
+    exit_code = m.main(args[1:])
+    if exit_code is None:
+        exit_code = 0
+
+    sys.exit(exit_code)
