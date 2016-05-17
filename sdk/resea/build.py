@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import sys
 from termcolor import colored
+from resea.install import install_os_requirements
 from resea.package import load_packages, get_package_dir
 from resea.helpers import render, info, notice, error, generating, \
     load_yaml, loads_yaml, dict_to_strdict, plan, progress
@@ -188,11 +189,13 @@ def build(args):
         error('HAL is not speicified')
 
     # resolve dependencies
-    _config, local_config = load_packages([config['PACKAGE'], config['HAL']],
-                                config, enable_if=True, update_env=True)
+    _config, local_config, ymls = load_packages([config['PACKAGE'], config['HAL']],
+                                                config, enable_if=True, update_env=True)
     config.update(_config)
 
-    # TODO: install os requirements
+    # install os requirements
+    for yml in ymls.values():
+        install_os_requirements(yml['os_requirements'])
 
     # add kernel to run tests
     if args.env == 'test' and 'kernel' not in config['BUILTIN_APPS']:

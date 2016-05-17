@@ -1,7 +1,6 @@
 from copy import copy
 import os
 from resea.helpers import load_yaml, error, dict_to_strdict
-from resea.install import install_os_requirements
 from resea.validators import validate_package_yml, ValidationError
 
 paths = None # cache
@@ -121,6 +120,7 @@ def load_packages(packages, config, enable_if=False, update_env=False):
     })
 
     local_config = {}
+    ymls = {}
     builtin_packages = []
     loaded_packages = []
     categories = []
@@ -151,6 +151,7 @@ def load_packages(packages, config, enable_if=False, update_env=False):
             config['BUILTIN_APPS'].append(package)
 
         categories.append(yml['category'])
+        ymls[package] = yml
 
     # determine the build type
     if any(map(lambda cat: cat == 'application', set(categories))):
@@ -166,4 +167,4 @@ def load_packages(packages, config, enable_if=False, update_env=False):
     if update_env:
         os.environ.update(dict_to_strdict(config))
 
-    return config, local_config
+    return config, local_config, ymls
