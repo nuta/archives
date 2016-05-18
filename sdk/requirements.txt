@@ -4,4 +4,4 @@ jinja2
 markdown2
 watchdog
 pytest
-deppfdiff
+deepdiff
