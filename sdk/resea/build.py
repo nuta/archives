@@ -165,7 +165,7 @@ def is_object_equals_to_pickle(obj, pickle_path):
     return p is None or DeepDiff(obj, p) == {}
 
 
-def build(args):
+def build(args, config):
     """Builds an executable."""
 
     # load package.yml in the current directory
@@ -174,11 +174,12 @@ def build(args):
     except FileNotFoundError:
         error("'package.yml' not found (are you in a package directory?)")
 
-    config = {
+    config.setdefault('ENV', 'release')
+
+    default_config = {
         'MAKE': 'make',
-        'ENV': args.env,
-        'BUILD_DIR': 'build/' + args.env,
-        'EXECUTABLE_PATH': 'build/' + args.env + '/application',
+        'BUILD_DIR': 'build/' + config['ENV'],
+        'EXECUTABLE_PATH': 'build/' + config['ENV'] + '/application',
         'MAKEFLAGS': '-j' + str(multiprocessing.cpu_count()),
         'LD_R': '$(LD) -r -o',
         'MKDIR': 'mkdir',
@@ -187,6 +188,9 @@ def build(args):
         'RESEAPATH': '',
         'PACKAGE': yml['name'],
     }
+
+    for k, v in default_config.items():
+        config.setdefault(k, v)
 
     configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
     for configset in args.configset:
@@ -214,7 +218,7 @@ def build(args):
             install_os_requirements(x)
 
     # add kernel to run tests
-    if args.env == 'test' and 'kernel' not in config['BUILTIN_APPS']:
+    if config['ENV'] == 'test' and 'kernel' not in config['BUILTIN_APPS']:
         config['BUILTIN_APPS'].append('kernel')
 
     plan('as {CATEGORY} with {HAL} HAL in {BUILD_DIR}'.format(**config))
@@ -264,7 +268,7 @@ def build(args):
 
     # generate makefile if needed
     makefile = config['BUILD_DIR'] + '/Makefile'
-    if args.r or not os.path.exists(makefile):
+    if not os.path.exists(makefile):
         mk_config = dict_to_strdict(config)
         mk_local_config = {}
         for package, c in local_config.items():
@@ -285,11 +289,7 @@ def build(args):
 
 def add_build_arguments(parser):
     """Add argparse parser arguments used in building."""
-    parser.add_argument('-r', action='store_true', help='regenerate Makefile')
-    parser.add_argument('--env', default='release', help='environment')
     parser.add_argument('--prettify', action='store_false', help="prettify output")
-    parser.add_argument('--single-app', action='store_true', help='no threading')
     parser.add_argument('--configset', nargs="*", default=[], help='config sets')
     parser.add_argument('config', nargs='*', help='config variables (FOO=bar)')
     return parser
-

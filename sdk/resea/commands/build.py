@@ -10,4 +10,4 @@ def main(args):
     parser = argparse.ArgumentParser(prog='resea build',
                                      description='build an executable')
     parser = add_build_arguments(parser)
-    build(parser.parse_args(args))
+    build(parser.parse_args(args), {})

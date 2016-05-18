@@ -94,7 +94,7 @@ def autotest(args):
 
 
 def test(args):
-    config = build(args)
+    config = build(args, {'TEST': 'yes', 'ENV': 'test'})
     plan('Invoking tests')
     cmd = [config['HAL_RUN'], config['BUILD_DIR'] + '/application']
     return run_emulator(cmd, test=True, wait=args.wait)
@@ -105,7 +105,7 @@ def main(args_):
     parser = add_build_arguments(parser)
     parser.add_argument('-P', action='store_true', help='Poll file changes and run tests automatically')
     parser.add_argument('--wait', action='store_true', help='wait for termination')
-    args = parser.parse_args(['--env=test'] + args_ + ['--', 'TEST=yes'])
+    args = parser.parse_args(args_)
 
     if args.P:
         autotest(args)
