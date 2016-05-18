@@ -206,7 +206,7 @@ def build(args, config):
         error('HAL is not speicified')
 
     # resolve dependencies
-    _config, local_config, ymls = load_packages([config['PACKAGE'], config['HAL']],
+    _config, local_config, ymls = load_packages([yml['name'], config['HAL']] + config.get('BUILTIN_APPS', []),
                                                 config, enable_if=True, update_env=True)
     config.update(_config)
 
