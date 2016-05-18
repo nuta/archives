@@ -46,5 +46,5 @@ config:
         - src/exec.create.cpp
   - if: "ENV == 'test'"
     SOURCES:
-      set:
+      append:
         - tests/test.cpp
