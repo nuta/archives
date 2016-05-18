@@ -154,19 +154,15 @@ def get_cmdline_config(args):
     return cmdline_config
 
 
-def is_build_config_changed(config):
-    path = os.path.join(config['BUILD_DIR'], 'buildconfig.pickle')
+def is_object_equals_to_pickle(obj, pickle_path):
     try:
-        prev_config = pickle.load(open(path, 'rb'))
+        p = pickle.load(open(pickle_path, 'rb'))
     except EOFError:
-        prev_config = None
+        p = None
     except FileNotFoundError:
-        prev_config = None
+        p = None
 
-    if prev_config is None or DeepDiff(prev_config, config) == {}:
-        return False
-    else:
-        return True
+    return pickle is None or DeepDiff(obj, p) == {}
 
 
 def build(args):
@@ -211,8 +207,11 @@ def build(args):
     config.update(_config)
 
     # install os requirements
-    for yml in ymls.values():
-        install_os_requirements(yml['os_requirements'])
+    os_requirements_pickle = os.path.join(config['BUILD_DIR'], 'os_requirements.pickle')
+    os_requirements = list(map(lambda y: y['os_requirements'], ymls.values()))
+    if is_object_equals_to_pickle(os_requirements, os_requirements_pickle):
+        for x in os_requirements:
+            install_os_requirements(x)
 
     # add kernel to run tests
     if args.env == 'test' and 'kernel' not in config['BUILTIN_APPS']:
@@ -246,7 +245,8 @@ def build(args):
     config['DEPS'].append(os.path.join(config['BUILD_DIR'], 'start.deps'))
 
     # clean up if build config have been changed
-    if is_build_config_changed(config):
+    buildconfig_pickle = os.path.join(config['BUILD_DIR'], 'buildconfig.pickle')
+    if is_object_equals_to_pickle(config, buildconfig_pickle):
         plan('detected build config changes; cleaning the build directory')
         progress('deleting {}'.format(config['BUILD_DIR'])) 
         shutil.rmtree(config['BUILD_DIR'])
@@ -255,8 +255,9 @@ def build(args):
     if not os.path.exists(config['BUILD_DIR']):
         os.makedirs(config['BUILD_DIR'], exist_ok=True)
 
-    # save the build config to detect its changes
-    pickle.dump(config, open(os.path.join(config['BUILD_DIR'], 'buildconfig.pickle'), 'wb'))
+    # save the build config and the os requirements to detect changes
+    pickle.dump(config, open(buildconfig_pickle, 'wb'))
+    pickle.dump(config, open(os_requirements_pickle, 'wb'))
 
     # generate makefile if needed
     makefile = config['BUILD_DIR'] + '/Makefile'
