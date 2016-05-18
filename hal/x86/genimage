@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-cp -r packages/x86/isofiles $BUILD_DIR
+cp -r $X86_DIR/isofiles $BUILD_DIR
 cp $1 $BUILD_DIR/isofiles/boot/executable
 
 # many grep(1) are for suppressing messages we do not care

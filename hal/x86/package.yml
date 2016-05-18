@@ -27,7 +27,7 @@ os_requirements:
         - grub --HEAD
 
 # Interfaces which this package uses
-uses: [posix_host] # we use genstart in posix_host
+uses: []
 
 # Interfaces which this package implements
 implements: [hal]
@@ -48,25 +48,25 @@ interface:
 #
 global_config:
   HAL_LINK:
-    default: "${LD} -Map ${BUILD_DIR}/executable.map -nostdlib -nodefaultlibs -Tpackages/x86/src/executable.lds -o"
+    default: "${LD} -Map ${BUILD_DIR}/executable.map -nostdlib -nodefaultlibs -T${X86_DIR}/src/executable.lds -o"
   HAL_RUN:
-    default: packages/x86/run
+    default: ${X86_DIR}/run
   HAL_GENSTART:
-    default: ./packages/genstartc/genstartc
+    default: ${GENSTARTC_DIR}/genstartc
   HAL_GENIMAGE:
-    default: ./packages/x86/genimage
+    default: ${X86_DIR}/genimage
   CFLAGS:
     append_words: >
       -m64 -ffreestanding -mno-sse -mno-mmx
       -fno-stack-protector -mno-red-zone
       -mcmodel=large 
-      -Ipackages/x86/src
+      -I${X86_DIR}/src
   CXXFLAGS:
     append_words: >
       -m64 -ffreestanding -mno-sse -mno-mmx
       -fno-stack-protector -mno-red-zone
       -mcmodel=large 
-      -Ipackages/x86/src
+      -I${X86_DIR}/src
   QEMU:
     default: qemu-system-x86_64
 
