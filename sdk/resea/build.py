@@ -162,7 +162,7 @@ def is_object_equals_to_pickle(obj, pickle_path):
     except FileNotFoundError:
         p = None
 
-    return p is None or DeepDiff(obj, p) == {}
+    return DeepDiff(obj, p) == {}
 
 
 def build(args, config):
