@@ -4,6 +4,8 @@ import os
 import shutil
 import subprocess
 import sys
+import pickle
+from deepdiff import DeepDiff
 from termcolor import colored
 from resea.install import install_os_requirements
 from resea.package import load_packages, get_package_dir
@@ -146,10 +148,25 @@ def get_cmdline_config(args):
     cmdline_config = {}
     for arg in args:
         if '=' not in arg:
-            error('invalid default variable (should be "VAR_NAME=yaml" form): {}'.format(c))
+            error('invalid default variable (should be "VAR_NAME=yaml" form): {}'.format(arg))
         k, v = map(lambda x: x.strip(), arg.split('=', 1))
         cmdline_config[k] = loads_yaml(v)
     return cmdline_config
+
+
+def is_build_config_changed(config):
+    path = os.path.join(config['BUILD_DIR'], 'buildconfig.pickle')
+    try:
+        prev_config = pickle.load(open(path, 'rb'))
+    except EOFError:
+        prev_config = None
+    except FileNotFoundError:
+        prev_config = None
+
+    if prev_config is None or DeepDiff(prev_config, config) == {}:
+        return False
+    else:
+        return True
 
 
 def build(args):
@@ -205,8 +222,8 @@ def build(args):
 
     config['DEPS'] = []
     config['OBJS'] = []
-    for package, _local_config in local_config.items():
-        for src in _local_config.get('SOURCES', []):
+    for package in sorted(local_config):
+        for src in local_config[package].get('SOURCES', []):
             base = os.path.splitext(src)[0]
             config['OBJS'].append((
                 os.path.join(config['BUILD_DIR'], package, base + '.o'),
@@ -214,7 +231,7 @@ def build(args):
                 os.path.splitext(src)[1].replace('.', ''),
                 os.path.join(config['BUILD_DIR'], package, base + '.deps')
             ))
-            config['DEPS'].append(os.path.join(config['BUILD_DIR'], package, base, '.deps'))
+            config['DEPS'].append(os.path.join(config['BUILD_DIR'], package, base + '.deps'))
 
     # start.o
     config['GENSTART_ARGS'] = ' '.join(filter(lambda x: x != 'kernel', config['BUILTIN_APPS']))
@@ -229,12 +246,7 @@ def build(args):
     config['DEPS'].append(os.path.join(config['BUILD_DIR'], 'start.deps'))
 
     # clean up if build config have been changed
-    try:
-        prev_config = json.load(open(os.path.join(config['BUILD_DIR'], 'buildconfig.json')))
-    except FileNotFoundError:
-        prev_config = None
-
-    if prev_config and prev_config != config:
+    if is_build_config_changed(config):
         plan('detected build config changes; cleaning the build directory')
         progress('deleting {}'.format(config['BUILD_DIR'])) 
         shutil.rmtree(config['BUILD_DIR'])
@@ -244,7 +256,7 @@ def build(args):
         os.makedirs(config['BUILD_DIR'], exist_ok=True)
 
     # save the build config to detect its changes
-    json.dump(config, open(os.path.join(config['BUILD_DIR'], 'buildconfig.json'), 'w'))
+    pickle.dump(config, open(os.path.join(config['BUILD_DIR'], 'buildconfig.pickle'), 'wb'))
 
     # generate makefile if needed
     makefile = config['BUILD_DIR'] + '/Makefile'
