@@ -162,7 +162,7 @@ def is_object_equals_to_pickle(obj, pickle_path):
     except FileNotFoundError:
         p = None
 
-    return pickle is None or DeepDiff(obj, p) == {}
+    return p is None or DeepDiff(obj, p) == {}
 
 
 def build(args):
@@ -246,7 +246,7 @@ def build(args):
 
     # clean up if build config have been changed
     buildconfig_pickle = os.path.join(config['BUILD_DIR'], 'buildconfig.pickle')
-    if is_object_equals_to_pickle(config, buildconfig_pickle):
+    if os.path.exists(config['BUILD_DIR']) and not is_object_equals_to_pickle(config, buildconfig_pickle):
         plan('detected build config changes; cleaning the build directory')
         progress('deleting {}'.format(config['BUILD_DIR'])) 
         shutil.rmtree(config['BUILD_DIR'])
@@ -257,7 +257,7 @@ def build(args):
 
     # save the build config and the os requirements to detect changes
     pickle.dump(config, open(buildconfig_pickle, 'wb'))
-    pickle.dump(config, open(os_requirements_pickle, 'wb'))
+    pickle.dump(os_requirements, open(os_requirements_pickle, 'wb'))
 
     # generate makefile if needed
     makefile = config['BUILD_DIR'] + '/Makefile'
