@@ -17,4 +17,4 @@ def main(args):
     if exit_code is None:
         exit_code = 0
 
-    sys.exit(exit_code)
+    return exit_code

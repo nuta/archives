@@ -12,5 +12,5 @@ sys.path.insert(0, os.path.join(os.getcwd(), "../../../../sdk"))
 import resea
 
 if __name__ == '__main__':
-    resea.main(sys.argv[1:])
+    sys.exit(resea.main(sys.argv[1:]))
 
