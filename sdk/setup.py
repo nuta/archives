@@ -10,7 +10,7 @@ setup_args = {
     'author_email': 'nuta@seiya.me',
     'description': 'A Resea developer kit',
     'license': 'Public Domain',
-    'packages': ['resea', 'resea.commands'],
+    'packages': find_packages(),
     'scripts': ['bin/resea'],
     'install_requires': open('requirements.txt').read().strip().splitlines(),
     'classifiers': [
