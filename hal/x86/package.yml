@@ -19,10 +19,12 @@ lang: c
 os_requirements:
   osx:
     homebrew:
+      taps:
+        - resea/resea
       packages:
         - qemu
         - xorriso
-        - "./packages/x86/osx/grub.rb --HEAD"
+        - grub --HEAD
 
 # Interfaces which this package uses
 uses: [posix_host] # we use genstart in posix_host

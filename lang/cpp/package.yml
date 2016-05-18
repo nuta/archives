@@ -20,12 +20,14 @@ lang: cpp
 os_requirements:
   osx:
     homebrew:
+      taps:
+        - resea/resea
       packages:
-        - "./osx/clang-static-analyzer.rb"
-        - "./osx/x86_64-elf-gcc.rb"
-        - "./osx/x86_64-elf-binutils.rb"
-        - "./osx/arm-elf-eabi-gcc.rb"
-        - "./osx/arm-elf-eabi-binutils.rb"
+        - clang-static-analyzer.rb
+        - x86_64-elf-gcc.rb
+        - x86_64-elf-binutils.rb
+        - arm-elf-eabi-gcc.rb
+        - arm-elf-eabi-binutils.rb
         - lcov
   ubuntu:
     apt:
