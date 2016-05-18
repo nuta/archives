@@ -2,7 +2,7 @@ import os
 import sys
 import argparse
 import subprocess
-from resea.package import load_package_yml, load_packages
+from resea.package import load_packages
 from resea.validators import validate_package_yml
 from resea.helpers import load_yaml, error
 
