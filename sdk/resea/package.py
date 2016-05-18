@@ -63,7 +63,7 @@ def _load_include(package, include, config, enable_if):
 
 def load_global_config(package, config, global_config, enable_if):
     for cs in config:
-        if enable_if and cs.get('if') and not eval(cs['if'], global_config):
+        if enable_if and cs.get('if') and not eval(cs['if'], copy(global_config)):
             continue
 
         for k,v in cs.items():
@@ -89,7 +89,7 @@ def load_global_config(package, config, global_config, enable_if):
 def load_local_config(package, config, global_config, enable_if):
     local_config = {}
     for cs in config:
-        if enable_if and cs.get('if') and not eval(cs['if'], global_config):
+        if enable_if and cs.get('if') and not eval(cs['if'], copy(global_config)):
             continue
 
         for k,v in cs.items():
@@ -159,9 +159,6 @@ def load_packages(builtin_packages, config, enable_if=False, update_env=False):
         config['CATEGORY'] = 'library'
     else:
         config['CATEGORY'] = 'unknown'
-
-    if '__builtins__' in config:
-        del config['__builtins__'] # FIXME
 
     if update_env:
         os.environ.update(dict_to_strdict(config))
