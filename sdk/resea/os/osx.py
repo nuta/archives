@@ -1,5 +1,5 @@
 import subprocess
-from resea.helpers import error
+from resea.helpers import error, plan
 
 
 def update():
