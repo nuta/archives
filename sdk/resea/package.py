@@ -120,21 +120,23 @@ def load_packages(builtin_packages, config, enable_if=False, update_env=False):
 
     local_config = {}
     ymls = {}
-    packages = builtin_packages.copy()
     loaded_packages = []
-    categories = []
+    packages = builtin_packages.copy()
 
     # load dependent packages
     while len(packages) > 0:
         package = packages.pop()
-
         loaded_packages.append(package)
+
         package_yml_path = os.path.join(get_package_dir(package), 'package.yml')
         yml = load_yaml(package_yml_path, validator=validate_package_yml)
+        ymls[package] = yml
 
+        # include
         for include in yml.get('includes', []):
             yml.update(load_include(package, include, config, enable_if))
 
+        # update config
         config.update(load_global_config(package, yml.get('global_config', {}),
                                          config, enable_if))
         local_config[package] = load_local_config(package, yml.get('config', {}),
@@ -142,17 +144,16 @@ def load_packages(builtin_packages, config, enable_if=False, update_env=False):
         config[package.upper() + '_DIR'] = get_package_dir(package)
         config['STUBS'].append((package, package_yml_path))
 
+        if package in builtin_packages and yml['category'] == 'application':
+            config['BUILTIN_APPS'].append(package)
+
+        # follow dependencies
         for depend in yml['uses'] + yml['implements'] + yml['depends']:
             if depend not in loaded_packages:
                 packages.append(depend)
 
-        if package in builtin_packages and yml['category'] == 'application':
-            config['BUILTIN_APPS'].append(package)
-
-        categories.append(yml['category'])
-        ymls[package] = yml
-
     # determine the build type
+    categories = map(lambda yml: yml['category'], ymls.values())
     if any(map(lambda cat: cat == 'application', set(categories))):
         config['CATEGORY'] = 'application'
     elif any(map(lambda cat: cat == 'library', set(categories))):
