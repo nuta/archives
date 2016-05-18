@@ -113,7 +113,6 @@ def load_packages(builtin_packages, config, enable_if=False, update_env=False):
 
     config.update({
         'SOURCES':  [],
-        'LIBS':     [],
         'STUBS':    [],
         'LANGS':    {},
         'BUILTIN_APPS': []

@@ -221,7 +221,10 @@ def build(args):
 
     config['DEPS'] = []
     config['OBJS'] = []
+    config['LIBS'] = []
     for package in sorted(local_config):
+        config['LIBS'] += local_config[package].get('LIBS', [])
+
         for src in local_config[package].get('SOURCES', []):
             base = os.path.splitext(src)[0]
             config['OBJS'].append((
