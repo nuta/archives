@@ -1,7 +1,7 @@
 import shutil
 
 
-SHORT_HELP = "remove generated files during builds"
+SHORT_HELP = "remove generated files"
 LONG_HELP = """
 Usage: resea clean
 """

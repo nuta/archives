@@ -12,6 +12,10 @@ from resea.helpers import info, error, success, notice, plan, progress, \
 from resea.validators import validate_package_yml
 import resea.commands.clean
 
+SHORT_HELP = "diagnosis the package"
+LONG_HELP = """
+Usage: resea doctor
+"""
 
 INDEX_HTML = """\
 <!DOCTYPE html>

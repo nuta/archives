@@ -10,10 +10,13 @@ import resea.support
 
 command_list = [
     'build',
+    'run',
     'test',
     'clean',
     'new',
     'scaffold',
+    'doctor',
     'alldocs',
-    'version'
+    'version',
+    'help'
 ]

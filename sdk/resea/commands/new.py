@@ -7,7 +7,7 @@ import resea
 from resea.helpers import error, generating, exec_cmd
 
 
-SHORT_HELP = "generate a porject boilterplate files"
+SHORT_HELP = "create a new package"
 LONG_HELP = """
 Usage: resea new package_name
 """

@@ -2,6 +2,11 @@ from resea.helpers import import_module
 from resea import command_list
 
 
+SHORT_HELP = "print this message"
+LONG_HELP = """
+Usage: resea help
+"""
+
 def main(args):
     try:
         cmd = args[0]
