@@ -4,15 +4,13 @@ from resea.helpers import plan, error, import_module
 
 
 def install_os_requirements(os_requirements):
-    os = {
-        'Darwin': 'osx',
-        'Linux':  'ubuntu'
-    }.get(platform.system(), 'unknown')
+    if platform.system() == 'Darwin':
+        os = 'osx'
+    elif platform.linux_distribution()[0] == 'Ubuntu':
+        os = 'ubuntu'
+    else:
+        notice('unsupported platform -- use OS X or Ubuntu')
 
-    try:
-        m = import_module('resea.os.{}'.format(os))
-    except ImportError:
-        return
-
+    m = import_module('resea.os.{}'.format(os))
     m.install(os_requirements.get(os, {}))
 
