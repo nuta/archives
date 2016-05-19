@@ -14,19 +14,142 @@ from helpers import ctype
 class GeneratingError(Exception):
     pass
 
+HEADER_TEMPLATE = """
+#ifndef __RESEA_{{ name | upper }}__H__
+#define __RESEA_{{ name | upper }}__H__
+#include <resea.h>
 
-def load_payload_defs(interface_name, msg_name, msgid, name_prefix=None,
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+{% if id %}
+static const uint32_t __interface_{{ name }} = {{ id }} << 12;
+{% endif %}
+"""
+
+FOOTER_TEMPLATE = """
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+"""
+
+SEND_TEMPLATE = """
+static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
+    channel_t __ch
+{%- for type, name in payloads -%}
+    {% if type != '' -%}
+    , {{ type }} {{ name }}
+    {%- endif %}
+{%- endfor %}
+    ) {
+
+    payload_t __payloads[{{ payloads | length }}];
+
+{% set i = 0 %}
+{% for type, name in payloads %}
+    {% if type != 'payloadtype_t' %}
+    __payloads[{{ i }}] = (payload_t) {{ name }};
+    {% set i = i + 1 %}
+    {% endif %}
+{%- endfor %}
+
+    sys_send(__ch, (payload_t *) &__payloads, sizeof(__payloads));
+}
+
+"""
+
+CALL_TEMPLATE = """
+static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
+    channel_t __ch
+{%- for type, name in args -%}
+    {% if type != '' -%}
+    , {{ type }} {{ name }}
+    {%- endif %}
+{%- endfor %}
+{%- for type, name in rets -%}
+    {% if type != '' -%}
+    , {{ type }}* {{ name }}
+    {%- endif %}
+{%- endfor %}
+    ) {
+
+    payload_t __arg[{{ args | length }}];
+    payload_t __ret[{{ rets | length }}];
+
+{% set i = 0 %}
+{% for type, val in args %}
+    {% if type != 'payloadtype_t' %}
+    __arg[{{ loop.index0 }}] = (payload_t) {{ val }};
+    {% set i = i + 1 %}
+    {% endif %}
+{%- endfor %}
+
+    sys_call(__ch, (payload_t *) &__arg, sizeof(__arg), (payload_t *) &__ret, sizeof(__ret));
+
+{% for type, name in rets %}
+    {% if type != '' -%}
+    *{{ name }} = ({{ type }}) __ret[{{ loop.index0 }}];
+    {% endif %}
+{%- endfor %}
+}
+
+"""
+
+MSGID_TEMPLATE = """
+static const uint32_t __msgid_{{ interface_name }}_{{ msg_name }} = ({{ interface_id }} << 12) | {{ msg_id }};
+
+"""
+
+PMACROS_TEMPLATE = """
+{% for type, name in payloads %}
+    {% if type != '' %}
+    typedef {{ type }} __ptype_{{interface_name}}_{{ msg_name }}_{{ name }};
+    static const int __pindex_{{ interface_name }}_{{ msg_name }}_{{ name }} = {{ loop.index0 }};
+    {% endif %}
+{% endfor %}
+"""
+
+STRUCT_TEMPLATE = """
+typedef struct {
+{% for type, name in members.items() %}
+    {{ type }} {{ name }};
+{% endfor %}
+} {[ interface_name }}_{{ type_name }}_t;
+
+"""
+
+CONST_TEMPLATE = """
+typedef {{ ctype }} {{ interface_name }}_{{ type_name }}_t;
+{% for name, val in consts.items() %}
+#define {{ interface_name | upper }}_{{ name }} ({{ val }})
+{% endfor %}
+
+"""
+
+ALIAS_TEMPLATE = """
+typedef {{ ctype }} {{ interface_name }}_{{ type_name }}_t;
+
+"""
+
+
+def load_payload_defs(interface_name, msg_name, msg, name_prefix=None,
                       with_type_args=False):
 
     if name_prefix is None:
         name_prefix = ''
+
+    if msg['payloads'] is None:
+        msg['payloads'] = []
 
     defs = [{
         'type': '',
         'name': 'MSGID({}, {})'.format(interface_name, msg_name)
     }]
 
-    for p in msgid['payloads']:
+    for p in msg['payloads']:
         defs.append(p)
 
         if is_ool_type(p['type']):
@@ -37,255 +160,135 @@ def load_payload_defs(interface_name, msg_name, msgid, name_prefix=None,
             })
 
     payloads = []
-    j = 1
-    for i, p in enumerate(defs):
+    for i, p in enumerate(defs, start=0):
         if i % 8 == 0:
             # inject a payload header
             header = '0'
             size_payload = False
-            for i, q in enumerate(defs[i:i+8]):
+            for j, q in enumerate(defs[i:i+8]):
                 if size_payload:
-                    header += ' | (0x0f << {})'.format(i * 4)
+                    header += ' | (0x0f << {})'.format(j * 4)
                     size_payload = False
                     continue
 
                 if isinstance(q, dict):
                     if with_type_args and q['type'] != '':
-                        header += '| ({} << {})'.format("type" + str(j), i * 4)
+                        header += '| ({} << {})'.format("type" + str(j), j * 4)
                         j += 1
                     else:
                         if q['type'] == 'channel':
-                            header += '| (0x02 << {})'.format(i * 4)
+                            header += '| (0x02 << {})'.format(j * 4)
                         elif is_ool_type(q['type']):
-                            header += '| (0x03 << {})'.format(i * 4)
+                            header += '| (0x03 << {})'.format(j * 4)
                             size_payload = True
                         else:
-                            header += '| (0x01 << {})'.format(i * 4)
+                            header += '| (0x01 << {})'.format(j * 4)
 
             payloads.append(('', header))
         payloads.append((ctype(p['type']), name_prefix + p['name'])) # payload
+        if i > 0 and with_type_args:
+            payloads.append(('payloadtype_t', 'type' + str(i)))
 
     return payloads
 
 
-def call_decl(yml, msg_name, msg):
-    send_tmpl = """
-{{ func }} {
-    payload_t __payloads[{{ size }}];
+def write(template, args):
+    global output
+    output.write(jinja2.Template(template).render(**args))
 
-{% for type, name in payloads %}
-    __payloads[{{ loop.index0 }}] = (payload_t) {{ name }};
-{%- endfor %}
 
-    sys_send(__ch, (payload_t *) &__payloads, sizeof(__payloads));
-}
-
-"""
-
-    call_tmpl = """
-{{ func }} {
-    payload_t __arg[{{ arg_size }}];
-    payload_t __ret[{{ ret_size }}];
-
-{% for type, name in arg_payloads %}
-    __arg[{{ loop.index0 }}] = (payload_t) {{ name }};
-{%- endfor %}
-
-    sys_call(__ch, (payload_t *) &__arg, sizeof(__arg), (payload_t *) &__ret, sizeof(__ret));
-
-{% for n, type, name in unmarshall %}
-    *{{ name }} = ({{ type }}) __ret[{{ n }}];
-{%- endfor %}
-}
-
-"""
-
+def process_message(yml, msg_name, msg):
     interface_name = yml['name']
-    code = ''
-    decls = ''
+    payloads = load_payload_defs(interface_name, msg_name, msg)
+    payloads_with_type = load_payload_defs(interface_name, msg_name, msg,
+                                           with_type_args=True)
+
+    write(PMACROS_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'payloads': payloads
+    })
+    write(MSGID_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'interface_id': yml['id'],
+        'msg_id': msg['id']
+    })
+    write(SEND_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'func_name': 'send',
+        'payloads': payloads
+    })
+    write(SEND_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'func_name': 'sendas',
+        'payloads': payloads_with_type
+    })
 
     if msg['type'] == 'request' and 'reply' in msg:
-        reply_msg = yml['interface'][msg['reply']]
-        arg_payloads = load_payload_defs(interface_name, msg_name, msg)
-        ret_payloads = load_payload_defs(interface_name, msg_name, reply_msg, '__r_')
-        arg_size = len(arg_payloads)
-        ret_size = len(ret_payloads)
-
-        unmarshall = []
-        n = 2 # skip the first payload header and msg
-        for i, p in enumerate(reply_msg['payloads']):
-            if n % 9 == 0:
-                n += 1 # skip payload headers
-
-            unmarshall.append((n, ctype(p['type']), '__r_' + p['name']))
-            n += 1
-
-            if is_ool_type(p['type']):
-                unmarshall.append((n, ctype('size'), '__r_' + p['name'] + '_size'))
-                n += 1
-
-        args = ['channel_t __ch']
-        args += [ '{} {}'.format(*arg)  for arg in arg_payloads[1:] if arg[0] != '']
-        args += [ '{}* {}'.format(*ret) for ret in ret_payloads[1:] if ret[0] != '']
-
-        func = "static inline void call_{}_{}({})".format(
-            interface_name, msg_name, ", ".join(args))
-
-        decls += func + ";\n"
-        code += jinja2.Template(call_tmpl).render(**locals())
-
-        # callas
-        arg_payloads = load_payload_defs(interface_name, msg_name, msg,
-                           with_type_args=True)
-
-        args = ['channel_t __ch']
-        i = 1
-        for arg in arg_payloads[1:]:
-            if arg[0] != '':
-                args.append('{} {}'.format(*arg))
-                args.append('payloadtype_t type{}'.format(i))
-                i += 1
-
-        args += [ '{}* {}'.format(*ret) for ret in ret_payloads[1:] if ret[0] != '']
-
-        func = "static inline void callas_{}_{}({})".format(
-            interface_name, msg_name, ", ".join(args))
-
-        decls += func + ";\n"
-        code += jinja2.Template(call_tmpl).render(**locals())
+        rets = load_payload_defs(interface_name, msg_name,
+                                 yml['interface'][msg['reply']], '__r_')
+        write(CALL_TEMPLATE, {
+            'interface_name': interface_name,
+            'msg_name': msg_name,
+            'func_name': 'call',
+            'args': payloads,
+            'rets': rets
+        })
+        write(CALL_TEMPLATE, {
+            'interface_name': interface_name,
+            'msg_name': msg_name,
+            'func_name': 'callas',
+            'args': payloads_with_type,
+            'rets': rets
+        })
 
 
-    payloads = load_payload_defs(interface_name, msg_name, msg)
-
-    for i, p in enumerate(payloads):
-        if p[0] == '':
-            continue
-
-        code += "typedef {} __ptype_{}_{}_{};\n".format(p[0], interface_name, msg_name,
-                    p[1])
-        code += "static const int __pindex_{}_{}_{} = {};\n".format(interface_name, msg_name,
-                    p[1], i)
-
-    size = len(payloads)
-    args = ['channel_t __ch'] + [ '{} {}'.format(*p) for p in payloads[1:] if p[0] != '']
-    func = "static inline void send_{}_{}({})".format(
-        interface_name, msg_name, ", ".join(args))
-    decls += func + ";\n"
-    code += jinja2.Template(send_tmpl).render(**locals())
- 
-    # sendas
-    payloads = load_payload_defs(interface_name, msg_name, msg,
-                   with_type_args=True)
-
-    args = ['channel_t __ch']
-    i = 1
-    for p in payloads[1:]:
-        if p[0] != '':
-            args.append('{} {}'.format(*p))
-            args.append('payloadtype_t type{}'.format(i))
-            i += 1
-
-    func = "static inline void sendas_{}_{}({})".format(
-        interface_name, msg_name, ", ".join(args))
-    decls += func + ";\n"
-    code += jinja2.Template(send_tmpl).render(**locals())
-
-    return decls, code
-
-
-def type_decl(interface_name, type_name, type_):
+def process_types(interface_name, type_name, type_):
     """Returns the declaration of a type."""
-    s = ""
     if type_["type"] == "struct":
-        s += "typedef struct{\n"
-        for member in type_["members"]:
-            s += "{type} {name};\n".format(**member)
-        s += "}} {}_{}_t;\n".format(interface_name, type_name)
-
+        write(STRUCT_TEMPLATE, {
+            'interface_name': interface_name,
+            'type_name': type_name,
+            'members': type_['members']
+        })
     elif type_["type"] == "const":
-        size = type_["size"]
-        s += "typedef {} {}_{}_t;\n".format(ctype(size), interface_name, type_name)
-        for name,val in type_["consts"].items():
-            interface_name_ = interface_name.upper()
-            s += "#define {interface_name_}_{name} ({val})\n".format(**locals())
-
+        write(CONST_TEMPLATE, {
+            'interface_name': interface_name,
+            'type_name': type_name,
+            'consts': type_['consts'],
+            'ctype': ctype(type_['size'])
+        })
     elif type_["type"] == "alias":
-        s += "typedef {} {}_{}_t;\n".format(ctype(type_["alias_of"]),
-                                          interface_name, type_name)
-
+        write(CONST_TEMPLATE, {
+            'interface_name': interface_name,
+            'type_name': type_name,
+            'ctype': ctype(type_['alias_of'])
+        })
     else:
         raise GeneratingError("unknown type: '{}' in the type definition " +
                               "of '{}'".format(type_["type"], type_name))
 
-    return s
-
-
-def id_decl(yml, msg_name, msg):
-    """Returns a declaration of `__msgid_`"""
-    tmpl = """
-#define __msgid_{{ interface_name }}_{{ msg_name }} \
-            (({{ interface_id }} << 16) | {{ msg['id'] }})
-
-"""
-
-    interface_name = yml['name']
-    interface_id = yml['id']
-    return  jinja2.Template(tmpl).render(**locals())
 
 def main(args):
     """Generates stubs of arg.package_yml into args.output"""
+    global output
+
     package_yml = load_yaml(args.package_yml, validator=validate_package_yml)
+    output = open(args.output, "w")
 
-    #
-    #  Header
-    #
-    s = ""
-    s += "#ifndef __RESEA_{}__H__\n".format(package_yml["name"])
-    s += "#define __RESEA_{}__H__\n".format(package_yml["name"])
-    s += "#include <resea.h>\n"
-    s += "#ifdef __cplusplus\n"
-    s += "extern \"C\" {\n"
-    s += "#endif\n"
+    write(HEADER_TEMPLATE, package_yml)
 
-    #
-    #  Types (typedef and struct)
-    #
-    if isinstance(package_yml["types"], dict):
-        for name,type_ in package_yml["types"].items():
-            s += type_decl(package_yml["name"], name, type_)
-        s += "\n"
+    for name, type_ in package_yml["types"].items():
+        process_types(package_yml["name"], name, type_)
 
-    #
-    #  Inteface IDs
-    #
-    if "id" in package_yml:
-        s += "#define __interface_{} ({} << 12)\n".format(
-            package_yml["name"], package_yml["id"])
+    for name, msg in package_yml["interface"].items():
+        process_message(package_yml, name, msg)
 
-    #
-    #  send and recv
-    #
-    if "interface" in package_yml and package_yml["interface"] is not None:
-        _s = ""
-        for name, msg in package_yml["interface"].items():
-            if msg["payloads"] is None:
-                msg["payloads"] = []
-
-            s += id_decl(package_yml, name, msg)
-            d, __s = call_decl(package_yml, name, msg)
-            s += d
-            _s += __s
-        s += _s
-
-    #
-    #  Footer
-    #
-    s += "#ifdef __cplusplus\n"
-    s += "}\n"
-    s += "#endif\n"
-    s += "#endif\n"
-    with open(args.output, "w") as f:
-        f.write(s)
+    write(FOOTER_TEMPLATE, package_yml)
+    output.close()
 
 
 if __name__ == "__main__":
