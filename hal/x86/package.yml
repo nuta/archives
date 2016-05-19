@@ -53,6 +53,8 @@ global_config:
     default: ${X86_DIR}/run
   HAL_GENSTART:
     default: ${GENSTARTCPP_DIR}/genstartcpp
+  HAL_START_LANG:
+    default: cpp
   HAL_GENIMAGE:
     default: ${X86_DIR}/genimage
   CFLAGS:

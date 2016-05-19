@@ -1,6 +1,5 @@
 #include <hal.h>
 
-
 handler_t x86_handler;
 static channel_t ch;
 static struct hal_pmmap bsp_pmmap[16];

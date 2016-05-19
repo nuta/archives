@@ -4,9 +4,6 @@
 #include <resea.h>
 #include "common.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 struct x86_thread_regs{
   uint64_t  rax;
@@ -37,6 +34,7 @@ struct x86_thread_regs{
  * asm
  */
 
+extern "C" {
 uint8_t x86_asm_in8(uint16_t port);
 void x86_asm_out8(uint16_t port, uint8_t data);
 uint16_t x86_asm_in16(uint16_t port);
@@ -61,6 +59,7 @@ void x86_unblocked_thread_entry(uint64_t rsp);
 void x86_asm_set_cr3(uint64_t cr3);
 void x86_asm_fxsave(void *xsave_area);
 void x86_asm_fxrstor(void *xsave_area);
+}
 
 /*
  * TSS
@@ -188,6 +187,7 @@ struct grub_mmap_entry {
 /*
  *  Exceptions
  */
+extern "C" {
 void x86_exp_handler0 (uint64_t rip);
 void x86_exp_handler1 (uint64_t rip);
 void x86_exp_handler2 (uint64_t rip);
@@ -209,13 +209,14 @@ void x86_exp_handler17 (uint64_t rip, uint64_t errcode);
 void x86_exp_handler18 (uint64_t rip);
 void x86_exp_handler19 (uint64_t rip);
 void x86_exp_handler20 (uint64_t rip);
+}
 
 /*
  * handler
  */
 
 /* declared in handler.S */
-
+extern "C" {
 void x86_asm_exp_handler0(void);
 void x86_asm_exp_handler1(void);
 void x86_asm_exp_handler2(void);
@@ -244,6 +245,7 @@ void x86_asm_int_handler34(void);
 
 void x86_asm_int_handler_unregistered(void);
 void x86_asm_syscall_handler(void);
+}
 
 
 /*
@@ -302,7 +304,7 @@ void x86_ioapic_enable_irq(uint8_t vector, uint8_t irq);
 #define IPI_DEST_ALL_EXSELF 3 // send to all processors excluding itself
 
 void x86_init_localapic(void);
-void x86_ack_interrupt(void);
+extern "C" void x86_ack_interrupt(void);
 
 extern uint8_t x86_timer_vector;
 
@@ -437,9 +439,5 @@ void x86_init_vm(void);
  *  init
  */
 void x86_init (void *binfo);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

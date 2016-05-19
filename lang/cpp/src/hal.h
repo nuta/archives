@@ -4,10 +4,6 @@
 #include <resea.h>
 #include <_hal.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // HAL handler_t
 enum hal_callback_type {
   HAL_CALLBACK_INTERRUPT       = 0,
@@ -114,16 +110,15 @@ paddr_t hal_vaddr_to_paddr(struct vm_space *vms, uintptr_t v);
 void hal_set_thread(struct hal_thread *t, bool is_kernel, uintptr_t entry,
                     uintptr_t arg, uintptr_t stack, uintptr_t stack_size);
 NORETURN void hal_resume_thread(ident_t id, struct hal_thread *t, struct hal_vm_space *vms);
-void hal_switch_thread(struct hal_thread *t);
 void hal_save_thread(struct hal_thread *t);
 ident_t hal_get_current_thread_id(void);
 void hal_set_current_thread_id(ident_t thread);
 
+// prepend extern "C" because this is implemented in assembly on some HALs
+extern "C" void hal_switch_thread(struct hal_thread *t);
+
 // misc.
 void hal_printchar(char c);
 
-#ifdef __cplusplus
-}
-#endif
 #endif
 

@@ -6,10 +6,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define PACKED      __attribute__((packed))
 #define NORETURN    __attribute__((noreturn))
 #define UNUSED      __attribute__((unused))
@@ -19,14 +15,6 @@ extern "C" {
 #define COMPARE_AND_SWAP  __sync_bool_compare_and_swap
 #define ATOMIC_ADD        __sync_fetch_and_add
 #define ATOMIC_SUB        __sync_fetch_and_sub
-
-#ifndef __cplusplus
-
-#ifndef NULL
-#define NULL  ((void *) 0)
-#endif
-
-#endif
 
 typedef uintmax_t payload_t;
 typedef uint8_t payloadtype_t;
@@ -168,8 +156,4 @@ enum {
   PAYLOAD_MOVE_OOL = 4,
 };
 
-
-#ifdef __cplusplus
-}
-#endif
 #endif
