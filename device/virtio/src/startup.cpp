@@ -10,7 +10,7 @@
 handler_t virtio_handler;
 channel_t virtio_server;
 
-extern "C" void virtio_startup(void) {
+void virtio_startup(void) {
 
     virtio_server = create_channel();
     virtio_blk_init();

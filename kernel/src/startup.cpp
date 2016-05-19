@@ -10,7 +10,7 @@
 static channel_t ch;
 
 // this startup() should be return
-extern "C" void kernel_startup(void) {
+void kernel_startup(void) {
     INFO("starting Resea");
     INFO("built on " __DATE__);
 

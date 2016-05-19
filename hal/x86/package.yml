@@ -13,7 +13,7 @@ homepage: http://resea.net
 
 # Required packages
 depends: [cpp, genstartcpp]
-lang: c
+lang: cpp
 
 # OS requirements
 os_requirements:

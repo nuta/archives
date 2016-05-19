@@ -40,7 +40,7 @@ email: {{ email }}
 homepage:    # e.g. http://example.com/foo/bar
 
 # Prefered language
-# lang: c
+# lang: cpp
 
 # Required packages
 depends: []

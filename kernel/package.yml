@@ -13,7 +13,7 @@ homepage: http://resea.net
 
 # Required packages
 depends: [cpp]
-lang: c
+lang: cpp
 
 # Interfaces which this package uses
 uses:

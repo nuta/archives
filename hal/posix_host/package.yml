@@ -40,6 +40,8 @@ global_config:
     default: ${POSIX_HOST_DIR}/run
   HAL_GENSTART:
     default: ${GENSTARTCPP_DIR}/genstartcpp
+  HAL_START_LANG:
+    default: cpp
   CFLAGS:
    append_words: -I${POSIX_HOST_DIR}/src -DPOSIX_HOST
   CXXFLAGS:

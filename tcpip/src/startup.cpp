@@ -6,7 +6,7 @@
 
 handler_t tcpip_handler;
 
-extern "C" void tcpip_startup(void) {
+void tcpip_startup() {
     result_t r;
     channel_t ch;
 

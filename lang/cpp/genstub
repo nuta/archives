@@ -19,20 +19,12 @@ HEADER_TEMPLATE = """
 #define __RESEA_{{ name | upper }}__H__
 #include <resea.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 {% if id %}
 static const uint32_t __interface_{{ name }} = {{ id }} << 12;
 {% endif %}
 """
 
 FOOTER_TEMPLATE = """
-#ifdef __cplusplus
-}
-#endif
-
 #endif
 """
 

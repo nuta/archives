@@ -42,7 +42,7 @@ static void udp_client(channel_t ch, payload_t *m) {
 }
 
 
-extern "C" void tcpip_test(void) {
+void tcpip_test() {
     result_t r;
 
     tcpip_ch = create_channel();

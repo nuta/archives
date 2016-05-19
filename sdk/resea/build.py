@@ -241,7 +241,7 @@ def build(args, config):
 
     # start.o
     config['GENSTART_ARGS'] = ' '.join(filter(lambda x: x != 'kernel', config['BUILTIN_APPS']))
-    config['START_SOURCE_EXT'] = config['LANGS']['c']['ext'] # FIXME
+    config['START_SOURCE_EXT'] = config['LANGS'][config['HAL_START_LANG']]['ext']
     config['OBJS'].append((
         os.path.join(config['BUILD_DIR'], 'start.o'),
         os.path.join(config['BUILD_DIR'], 'start.' + config['START_SOURCE_EXT']),

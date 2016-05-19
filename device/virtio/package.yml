@@ -14,7 +14,7 @@ homepage:    # e.g. http://example.com/foo/bar
 
 # Required packages
 depends: [io, cpp, pci, libpci]
-lang: c
+lang: cpp
 
 # Interfaces which this package uses
 uses: []

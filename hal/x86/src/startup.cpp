@@ -5,8 +5,8 @@ handler_t x86_handler;
 static channel_t ch;
 static struct hal_pmmap bsp_pmmap[16];
 static struct hal_vmmap bsp_vmmap[16];
-extern "C" void start_apps(void);
-extern "C" void kernel_startup(void);
+void start_apps(void);
+void kernel_startup(void);
 void x86_init_localapic_timer(void);
 
 
@@ -33,7 +33,7 @@ struct  hal_vmmap *hal_get_vmmaps(void) {
  *  This function MUST be called only from BSP, only once.
  *
  */
-extern "C" void x86_init(void *binfo) {
+void x86_init(void *binfo) {
     uint32_t *p;
     uint32_t type, size;
     uint64_t q;

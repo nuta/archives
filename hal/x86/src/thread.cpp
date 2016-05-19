@@ -43,7 +43,7 @@ NORETURN void hal_resume_thread(ident_t id, struct hal_thread *t, struct hal_vm_
 }
 
 
-extern "C" void x86_soft_save_thread (struct hal_thread *t,
+void x86_soft_save_thread (struct hal_thread *t,
                                       uint64_t rsp, uint64_t rdi, uint64_t rsi,
                                       uint64_t rbx, uint64_t rbp, uint64_t r12,
                                       uint64_t r13, uint64_t r14, uint64_t r15) {

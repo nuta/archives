@@ -4,7 +4,7 @@
 
 handler_t elf_handler;
 
-extern "C" void elf_startup(void) {
+void elf_startup(void) {
     channel_t ch;
     result_t r;
 

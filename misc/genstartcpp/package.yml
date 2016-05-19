@@ -12,7 +12,7 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Prefered language
-# lang: c
+# lang: cpp
 
 # Required packages
 depends: []
