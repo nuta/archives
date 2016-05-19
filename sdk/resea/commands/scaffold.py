@@ -14,11 +14,12 @@ Usage: resea scaffold
 
 
 def scaffold(args):
-    if not os.path.exists('package.yml'):
+    try:
+        yml = load_yaml('package.yml', validator=validate_package_yml)
+    except FileNotFoundError:
         error("'package.yml' not found (are you in a package directory?)")
-    yml = load_yaml('package.yml', validator=validate_package_yml)
 
-    config, _ = load_packages(yml['depends'])
+    config, _, _ = load_packages([yml['name']] + yml['depends'], {}, update_env=True)
 
     lang = yml.get("lang")
     if lang is None:
@@ -29,7 +30,7 @@ def scaffold(args):
     if bin is None:
         error("'{}' lang does not support scaffolding".format(lang))
 
-    subprocess.Popen([bin, ".", "package.yml"]).wait()
+    subprocess.Popen(' '.join([bin, ".", "package.yml"]), shell=True).wait()
 
 
 def main(args_):
