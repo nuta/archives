@@ -7,15 +7,16 @@ import sys
 import traceback
 import yaml
 from resea.defines import PAYLOAD_NUM
-from resea.package import load_package_yml
+from resea.package import get_package_dir
 from resea.support import is_ool_type
-from resea.helpers import render, error, generating
+from resea.helpers import render, error, generating, load_yaml
+from resea.validators import validate_package_yml
 from helpers import ctype
 
 
-STARTUP_C_TEMPLATE = """\
+STARTUP_CPP_TEMPLATE = """\
 #include <resea.h>
-{% for implement in all_implements %}
+{% for implement in implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
 
@@ -26,35 +27,35 @@ result_t {{ name }}_startup(void) {
 
 """
 
-HANDLER_C_TEMPLATE = """\
+HANDLER_CPP_TEMPLATE = """\
 #include <resea.h>
-{% for implement in all_implements %}
+{% for implement in implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
 #include "handler.h"
 
 
-void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
-    if ((payloads[0] & 1) != 1) {
+void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
+    if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 
-    switch (payloads[1]) {
-{% for interface, msgid, args, _, unmarshall in msgids %}
-    case MSGID({{ interface }}, {{ msgid }}):
-    {
-        DEBUG("received {{ interface }}.{{ msgid }}");
-        {% for i, arg in unmarshall %}
-            payload_t {{ arg }} = payloads[{{ i }}];
+    switch (EXTRACT_MSGID(m)) {
+{% for interface_name, msg_name, payloads in messages %}
+    case MSGID({{ interface_name }}, {{ msg_name }}):
+        DEBUG("received {{ interface_name }}.{{ msg_name }}");
+        {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
+            __ch
+        {% for type, name in payloads %}
+            , ({{ type }}) EXTRACT(m, {{ interface_name }}, {{ msg_name }}, {{ name }})
         {% endfor %}
-            {{ name }}_{{ interface }}_{{ msgid }}({{ args | join(", ") }});
-            return;
-    }
+        );
+        return;
 {% endfor %}
     }
 
-    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
 
 """
@@ -62,20 +63,30 @@ void {{ name }}_handler(channel_t __ch, payload_t *payloads) {
 HANDLER_H_TEMPLATE = """\
 #include <resea.h>
 
-{% for interface, msgid, _, args, _ in msgids %}
-void {{ name }}_{{ interface }}_{{ msgid }}({{ args | join(", ") }});
+{% for interface_name, msg_name, payloads in messages %}
+void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
+    channel_t __ch
+{% for type, name in payloads %}
+    , {{ type }} {{ name }}
+{% endfor %}
+);
 {% endfor %}
 
 """
 
-HANDLE_C_TEMPLATE = """\
+HANDLE_CPP_TEMPLATE = """\
 #include <resea.h>
-{% for implement in all_implements %}
+{% for implement in implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
 
-/** handles {{ interface_name }}.{{ msgid_name }} */
-void {{name}}_{{interface_name}}_{{msgid_name}}({{ msgid_args | join(", ") }}) {
+/** handles {{ interface_name }}.{{ msg_name }} */
+void {{ name }}_{{ interface_name }}_{{ msg_name }}(
+    channel_t __ch
+{% for type, name in payloads %}
+    , {{ type }} {{ name }}
+{% endfor %}
+) {
 
 }
 
@@ -92,72 +103,49 @@ def create_file(path, data, overwrite=False):
 
 
 def main(args):
-    package_yml = yaml.safe_load(open(args.package_yml))
-    name = package_yml["name"]
-    implements = [name]
-    all_implements = [name]
-    msgids = []
+    package_name = load_yaml(args.package_yml, validator=validate_package_yml)['name']
 
-    while len(implements) > 0:
-        implement = implements.pop()
-        yml = load_package_yml(implement)
+    ymls = []
+    implements = []
+    packages = [package_name]
+    while len(packages) > 0:
+        package = packages.pop()
+        yml = load_yaml(os.path.join(get_package_dir(package), 'package.yml'),
+                        validator=validate_package_yml)
+        ymls.append(yml)
+        implements.append(package)
         for x in yml["implements"]:
-            if x not in all_implements:
-                all_implements.append(x)
-                implements.append(x)
+            if package in implements:
+                packages.append(x)
 
-        if "interface" in yml and yml["interface"] is not None:
-            interface_name = yml["name"]
-            msgids_ = OrderedDict(sorted(yml["interface"].items(),
-                                          key=lambda e: e[1]["id"]))
-            for msgid_name, msgid in msgids_.items():
-                if msgid_name.endswith("_reply"):
-                    continue
-                msgid_args = ["channel_t __ch"]
-                handler_args = ["__ch"]
-                _handler_args = ["channel_t __ch"]
-                unmarshall = []
+    for yml in ymls:
+        interface_name = yml["name"]
+        messages = []
+        sorted_messages = OrderedDict(sorted(yml['interface'].items(), key=lambda e: e[1]["id"]))
+        for  msg_name, msg in sorted_messages.items():
+            if msg['type'] != 'request':
+                continue
+    
+            payloads = []
+            if msg['payloads'] is not None:
+                for payload in msg['payloads']:
+                    payloads.append((ctype(payload['type']), payload['name']))
+                    if is_ool_type(payload['type']):
+                        payloads.append((ctype('size'), payload['name'] + '_size'))
+    
+            messages.append((interface_name, msg_name, payloads))
+    
+            create_file("{}/src/{}.{}.cpp".format(args.output_dir, interface_name, msg_name),
+                        render(HANDLE_CPP_TEMPLATE, locals()))
 
-                payloads = msgid.get("payloads")
-                if payloads is None:
-                    payloads = []
-
-                defs = []
-                for p in payloads:
-                    defs.append(p)
-                    if is_ool_type(p['type']):
-                        # size of an OoL payload
-                        defs.append({
-                            'type': 'size',
-                            'name': p['name'] + '_size'
-                        })
-
-                n = 2 # skip the first payload header and msgid
-                for i, p in enumerate(defs):
-                    if n % 9 == 0:
-                        n += 1 # skip payload headers
-                    unmarshall.append((n, 'a' + str(i)))
-                    n += 1
-
-                for i, p in enumerate(defs):
-                    msgid_args.append("{} {}".format(ctype(p["type"]), p["name"]))
-                    handler_args.append("({}) a{}".format(ctype(p["type"]), i))
-                    _handler_args.append("{} a{}".format(ctype(p["type"]), i))
-
-                create_file("{}/src/{}.{}.c".format(args.output_dir,
-interface_name, msgid_name),
-                            render(HANDLE_C_TEMPLATE, locals()))
-                msgids.append((interface_name, msgid_name, handler_args, _handler_args,
-                    unmarshall))
-
-    create_file("{}/src/handler.c".format(args.output_dir),
-                render(HANDLER_C_TEMPLATE, locals()),
+    create_file("{}/src/handler.cpp".format(args.output_dir),
+                render(HANDLER_CPP_TEMPLATE, locals()),
                 overwrite=True)
     create_file("{}/src/handler.h".format(args.output_dir),
                 render(HANDLER_H_TEMPLATE, locals()),
                 overwrite=True)
-    create_file("{}/src/startup.c".format(args.output_dir),
-                render(STARTUP_C_TEMPLATE, locals()))
+    create_file("{}/src/startup.cpp".format(args.output_dir),
+                render(STARTUP_CPP_TEMPLATE, locals()))
 
 
 if __name__ == "__main__":
