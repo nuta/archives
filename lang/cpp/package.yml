@@ -49,23 +49,23 @@ global_config:
         ext:  S
         abbrev: AS
         mkdeps: touch
-        compile: "${CC} ${CFLAGS} -c -o"
+        compile: '{{ CXX }} {{ CXXFLAGS }} -c -o'
       cpp:
         ext:  cpp
         abbrev: CXX
         stub:
           prefix: resea/
           suffix: .h
-        compile: '${CXX} ${CXXFLAGS} -DPACKAGE_NAME=\"${PACKAGE_NAME}\" -c -o'
-        mkdeps:   ${CPP_DIR}/mkdeps "${CXX} ${CXXFLAGS}"
-        scaffold: ${CPP_DIR}/scaffold
-        genstub:  ${CPP_DIR}/genstub
-        doctor:   ${CPP_DIR}/doctor
+        compile:  '{{ CXX }} {{ CXXFLAGS }} -c -o'
+        mkdeps:   '{{ CPP_DIR }}/mkdeps "{{ CXX }} {{ CXXFLAGS }}"'
+        scaffold: '{{ CPP_DIR }}/scaffold'
+        genstub:  '{{ CPP_DIR }}/genstub'
+        doctor:   '{{ CPP_DIR }}/doctor'
   CXXFLAGS:
     append_words: >
       -Wall -ggdb3 -std=c++14 -Wno-incompatible-library-redeclaration
       -fdiagnostics-color -fno-exceptions
-      -I$(CPP_DIR)/src -I$(BUILD_DIR)/stubs/cpp
+      -I{{ CPP_DIR }}/src -I{{ BUILD_DIR }}/stubs/cpp
 
 config:
   - SOURCES:

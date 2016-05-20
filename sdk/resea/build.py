@@ -7,15 +7,16 @@ import sys
 import pickle
 from deepdiff import DeepDiff
 from termcolor import colored
+from resea.var import global_config, local_config, get_var, expand_var, UndefinedVarError
 from resea.install import install_os_requirements
 from resea.package import load_packages, get_package_dir
 from resea.helpers import render, info, notice, error, generating, \
-    load_yaml, loads_yaml, dict_to_strdict, plan, progress
+    load_yaml, loads_yaml, plan, progress
 from resea.validators import validate_package_yml
 
 MAKEFILE_TEMPLATE = """\
-.PHONY: _default
-_default: default
+default: {{ target }}
+
 # keep blank not to delete intermediate file (especially stub files)
 .SECONDARY:
 
@@ -24,106 +25,59 @@ _default: default
 
 $(VERBOSE).SILENT:
 
-#
-#  global config
-#
-{% for k,v in mk_config.items() %}
-export {{ k }} = {{ v }}
+MKDIR = mkdir
+CMDECHO = echo "-->"
+
+# link
+{{ target }}: {{ target_deps | join(' ') }}
+	$(CMDECHO) LINK $@
+	{{ hal_link }} $@ $^
+
+# start
+{{ start_file }}:
+	$(CMDECHO) GENSTART $@
+	{{ genstart }} > $@
+
+# stubs
+{% for stub, package_yml, genstub in stubs %}
+{{ stub }}: {{ package_yml }}
+	$(MKDIR) -p $(@D)
+	$(CMDECHO) GENSTUB $@
+	{{ genstub }} $@ $<
 {% endfor %}
 
-#
-#  link
-#
-default: $(BUILD_DIR)/{{ config['CATEGORY'] }}
-$(BUILD_DIR)/{{ config['CATEGORY'] }}: \\
-    {% for obj, _, _, _ in config['OBJS'] %}
-    {{ obj }} \\
+# compile / mkdep
+{% for files, abbrev, compile, mkdeps in sources %}
+    {% for src, out, deps in files %}
+{{ out }}: {{ src }} {{ stub_files | join(' ') }}
+	$(MKDIR) -p $(@D)
+	$(CMDECHO) '{{ abbrev }}' $@
+	{{ compile }} $@ $<
+
+{{ deps }}: {{ src }} {{ stub_files | join(' ') }}
+	$(MKDIR) -p $(@D)
+	$(CMDECHO) 'MKDEPS' $@
+	echo "$(@:.deps=.o): $(shell {{ mkdeps }} $<)" > $@
     {% endfor %}
-    {% for lib in config['LIBS'] %}
-    {{ lib }} \\
-    {% endfor %}
-    $(BUILD_DIR)/start.o
-{% if config['CATEGORY'] == 'application' %}
-\t$(CMDECHO) LINK $@
-\t$(HAL_LINK) $@ $^
-{% else %}
-\t$(CMDECHO) LD_R $@
-\t$(LD_R) $@ $^
-{% endif %}
-
-#
-#  start
-#
-$(BUILD_DIR)/start.{{ config['START_SOURCE_EXT'] }}:
-\t$(CMDECHO) GENSTART $@
-\tWITH_THREADING=yes {{ config['HAL_GENSTART'] }} {{ config['GENSTART_ARGS'] }} > $@
-# FIXME: WITH_THREADING is hard coded
-
-#
-#  lang
-#
-{% for lang in config['LANGS'].values() %}
-#  *.{{ lang['ext'] }}
-
-{% if lang['stub'] %}
-STUBS_{{ lang['ext'] }} = \\
-{% for stub, _ in config['STUBS'] %}
-  $(BUILD_DIR)/stubs/{{ lang['ext'] }}/{{ lang['stub']['prefix'] }}{{ stub }}{{ lang['stub']['suffix'] }} \\
-{% endfor %}
-
-{% for stub, package_yml in config['STUBS'] %}
-$(BUILD_DIR)/stubs/{{ lang['ext'] }}/{{ lang['stub']['prefix'] }}{{stub }}{{ lang['stub']['suffix'] }}: \
-    {{ package_yml }}
-\t$(MKDIR) -p $(@D)
-\t$(CMDECHO) GENSTUB $@
-\tPACKAGE_NAME=$(PACKAGE_NAME) {{ lang['genstub'] }} $@ $<
-{% endfor %}
-
-{% endif %}
-
-{% for obj, src, ext, deps in config['OBJS'] %}
-{% if ext == lang['ext'] %}
-{{ obj }}: {{ src }} {{ deps }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
-\t$(MKDIR) -p $(@D)
-\t$(CMDECHO) '{{ lang['abbrev'] }}' $@
-\tPACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['compile'] }} $@ $<'
-
-{{ deps }}: {{ src }} $(STUBS_{{ lang['ext'] }}) $(BUILD_DIR)/Makefile
-\t$(MKDIR) -p $(@D)
-\t$(CMDECHO) 'MKDEPS' $@
-\techo "$(@:.deps=.o): `PACKAGE_NAME=$(PACKAGE_NAME) sh -c '{{ lang['mkdeps'] }} $<'`" > $@
-{% endif %}
-{% endfor %}
-
-{% endfor %}
-
-#
-#  local config
-#
-{% for package_name, mk_config in mk_local_config.items() %}
-# {{ package_name }}
-$(BUILD_DIR)/{{ package_name }}/%: PACKAGE_NAME = {{ package_name }}
-{% for k,v in mk_config.items() %}
-$(BUILD_DIR)/{{ package_name }}/%: {{ k }} = {{ v }}
-{% endfor %}
 {% endfor %}
 
 #
 #  deps
 #
-{% for path in config['DEPS'] %}
+{% for path in deps_files %}
 -include {{ path }}
 {% endfor %}
 """
 
 
-def run_make(make, makefile, env, prettify=False):
+def run_make(make, makefile, prettify=False):
     """Executes make(1)"""
+    makeflags = ['-j' + str(multiprocessing.cpu_count())]
     try:
-        p = subprocess.Popen(make.split(' ') + ['-r', '-f', makefile],
+        p = subprocess.Popen(make.split(' ') + ['-r', '-f', makefile] +
+                             makeflags,
                              stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT,
-                             env=env)
+                             stderr=subprocess.STDOUT)
     except Exception as e:
         error('failed to execute make: ' + str(e))
 
@@ -144,14 +98,28 @@ def run_make(make, makefile, env, prettify=False):
     return p.wait()
 
 
-def get_cmdline_config(args):
-    cmdline_config = {}
+def load_configsets(configsets):
+    configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
+    for configset in configsets:
+        path = os.path.join(configsets_dir, configset + '.yml')
+        for k, v in load_yaml(path)['global_config'].items():
+            global_config.set(k, v)
+
+def load_cmdline_config(args):
     for arg in args:
-        if '=' not in arg:
+        for op, func in [('+=', global_config.append_words), ('=', global_config.set)]:
+            if op in arg:
+                break
+        else:
             error('invalid default variable (should be "VAR_NAME=yaml" form): {}'.format(arg))
-        k, v = map(lambda x: x.strip(), arg.split('=', 1))
-        cmdline_config[k] = loads_yaml(v)
-    return cmdline_config
+
+        k, v = map(lambda x: x.strip(), arg.split(op, 1))
+
+        val = loads_yaml(v)
+        if val is None:
+            val = ''
+
+        func(k, val)
 
 
 def is_object_equals_to_pickle(obj, pickle_path):
@@ -165,7 +133,7 @@ def is_object_equals_to_pickle(obj, pickle_path):
     return DeepDiff(obj, p) == {}
 
 
-def build(args, config):
+def build(args):
     """Builds an executable."""
 
     # load package.yml in the current directory
@@ -174,117 +142,133 @@ def build(args, config):
     except FileNotFoundError:
         error("'package.yml' not found (are you in a package directory?)")
 
-    config.setdefault('ENV', 'release')
+    global_config.setdefault('ENV', 'release')
+    global_config.setdefault('MAKE', 'make')
+    global_config.setdefault('TEST', False)
+    global_config.set('BUILD_DIR', 'build/' + get_var('ENV'))
+    global_config.set('EXECUTABLE_PATH', expand_var('{{ BUILD_DIR }}/application'))
 
-    default_config = {
-        'MAKE': 'make',
-        'BUILD_DIR': 'build/' + config['ENV'],
-        'EXECUTABLE_PATH': 'build/' + config['ENV'] + '/application',
-        'MAKEFLAGS': '-j' + str(multiprocessing.cpu_count()),
-        'LD_R': '$(LD) -r -o',
-        'MKDIR': 'mkdir',
-        'CMDECHO': 'echo "-->"',
-        'BUILTIN_APPS': [],
-        'RESEAPATH': '',
-        'PACKAGE': yml['name'],
-    }
+    load_configsets(args.configset)
+    load_cmdline_config(args.config)
 
-    for k, v in default_config.items():
-        config.setdefault(k, v)
-
-    configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
-    for configset in args.configset:
-        path = os.path.join(configsets_dir, configset + '.yml')
-        config.update(load_yaml(path)['global_config'])
-
-    cmdline_config = get_cmdline_config(args.config)
-    config.update(cmdline_config)
-
-    plan('Building {PACKAGE} ({ENV})'.format(**config))
-
-    if 'HAL' not in config:
+    if get_var('HAL', default=None) is None:
         error('HAL is not speicified')
 
     # resolve dependencies
-    _config, local_config, ymls = load_packages([yml['name'], config['HAL']] + config.get('BUILTIN_APPS', []),
-                                                config, enable_if=True, update_env=True)
-    config.update(_config)
+    progress('Loading packages')
+    packages = [yml['name'], get_var('HAL')] + get_var('BUILTIN_APPS', default=[])
+    if get_var('TEST') and 'kernel' not in packages:
+        packages.append('kernel')
+    ymls = load_packages(packages, enable_if=True, update_env=True)
 
+    build_dir = get_var('BUILD_DIR')
+
+    plan('Building {CATEGORY} with {HAL} HAL in {BUILD_DIR} ({ENV})'.format(**global_config.getdict()))
     # install os requirements
-    os_requirements_pickle = os.path.join(config['BUILD_DIR'], 'os_requirements.pickle')
+    os_requirements_pickle = os.path.join(build_dir, 'os_requirements.pickle')
     os_requirements = list(map(lambda y: y['os_requirements'], ymls.values()))
     if not is_object_equals_to_pickle(os_requirements, os_requirements_pickle):
+        plan('Installing OS requirements')
         for x in os_requirements:
             install_os_requirements(x)
 
-    # add kernel to run tests
-    if config['ENV'] == 'test' and 'kernel' not in config['BUILTIN_APPS']:
-        config['BUILTIN_APPS'].append('kernel')
+    sources = []
+    libs = []
+    stubs = []
+    deps_files = []
+    stub_files = []
+    for package in ymls.keys():
+        package_dir = get_package_dir(package)
+        libs += get_var('LIBS', package, default=[])
 
-    plan('as {CATEGORY} with {HAL} HAL in {BUILD_DIR}'.format(**config))
+        ext_lang = {}
+        for lang_name, lang in get_var('LANGS').items():
+            if 'stub' not in lang:
+                continue
 
-    config['DEPS'] = []
-    config['OBJS'] = []
-    config['LIBS'] = []
-    for package in sorted(local_config):
-        config['LIBS'] += local_config[package].get('LIBS', [])
-
-        for src in local_config[package].get('SOURCES', []):
-            base = os.path.splitext(src)[0]
-            config['OBJS'].append((
-                os.path.join(config['BUILD_DIR'], package, base + '.o'),
-                os.path.join(get_package_dir(package), src),
-                os.path.splitext(src)[1].replace('.', ''),
-                os.path.join(config['BUILD_DIR'], package, base + '.deps')
+            ext_lang[lang['ext']] = lang
+            stub_file = os.path.join(build_dir, 'stubs', lang_name,
+                            lang['stub']['prefix'] + package + lang['stub']['suffix'])
+            stubs.append((
+                stub_file,
+                os.path.join(package_dir, 'package.yml'),
+                expand_var(get_var('LANGS', package)['cpp']['genstub'], package)
             ))
-            config['DEPS'].append(os.path.join(config['BUILD_DIR'], package, base + '.deps'))
+            stub_files.append(stub_file)
 
-    # start.o
-    config['GENSTART_ARGS'] = ' '.join(filter(lambda x: x != 'kernel', config['BUILTIN_APPS']))
-    config['START_SOURCE_EXT'] = config['LANGS'][config['HAL_START_LANG']]['ext']
-    config['OBJS'].append((
-        os.path.join(config['BUILD_DIR'], 'start.o'),
-        os.path.join(config['BUILD_DIR'], 'start.' + config['START_SOURCE_EXT']),
-        config['START_SOURCE_EXT'],
-        os.path.join(config['BUILD_DIR'], 'start.deps'),
+        source_files = []
+        for src in get_var('SOURCES', package, default=[]):
+            base, ext = os.path.splitext(src)
+            deps_file = os.path.join(build_dir, package, base + '.deps')
+            deps_files.append(deps_file)
+            sources.append((
+                [(os.path.join(get_package_dir(package), src),
+                  os.path.join(build_dir, package, base + '.o'),
+                  deps_file)],
+                expand_var(ext_lang[ext.lstrip('.')]['abbrev'], package),
+                expand_var(ext_lang[ext.lstrip('.')]['compile'], package),
+                expand_var(ext_lang[ext.lstrip('.')]['mkdeps'], package)
+            ))
+
+    # start
+    if get_var('TEST'):
+        genstart = ' '.join([get_var('HAL_GENSTART'),
+                            '--with-threading',
+                             '--test',
+                             '--test-target', yml['name'],
+                             ' '.join(get_var('BUILTIN_APPS'))])
+    else:    
+        genstart = ' '.join([get_var('HAL_GENSTART'), ' '.join(get_var('BUILTIN_APPS'))])
+
+    start_file = os.path.join(build_dir, 'start.' + get_var('LANGS')['cpp']['ext'])
+    start_deps_file = os.path.join(build_dir, 'start.deps')
+    start_obj_file = os.path.join(build_dir, 'start.o')
+    lang = get_var('HAL_START_LANG')
+    sources.append((
+        [(start_file, start_obj_file, start_deps_file)],
+        expand_var(get_var('LANGS', package)[lang]['abbrev'], package),
+        expand_var(get_var('LANGS', package)[lang]['compile'], package),
+        expand_var(get_var('LANGS', package)[lang]['mkdeps'], package)
     ))
 
-    config['DEPS'].append(os.path.join(config['BUILD_DIR'], 'start.deps'))
+    # target
+    if get_var('TEST'):
+        global_config.set('CATEGORY', 'application')
+
+    category = get_var('CATEGORY')
+    hal_link = get_var('HAL_LINK') # TODO support ld -r
+    target = os.path.join(build_dir, category)
+    target_deps = libs
+    for files, _, _, _ in sources:
+        for _, obj, _ in files:
+            target_deps.append(obj)
 
     # clean up if build config have been changed
-    buildconfig_pickle = os.path.join(config['BUILD_DIR'], 'buildconfig.pickle')
-    if os.path.exists(config['BUILD_DIR']) and not is_object_equals_to_pickle(config, buildconfig_pickle):
-        plan('detected build config changes; cleaning the build directory')
-        progress('deleting {}'.format(config['BUILD_DIR'])) 
-        shutil.rmtree(config['BUILD_DIR'])
+    buildconfig = (global_config.getdict(), [c.getdict() for c in local_config.values()])
+    buildconfig_pickle = os.path.join(build_dir, 'buildconfig.pickle')
+    if os.path.exists(build_dir) and not is_object_equals_to_pickle(buildconfig, buildconfig_pickle):
+         plan('detected build config changes; cleaning the build directory')
+         progress('deleting {}'.format(build_dir)) 
+         shutil.rmtree(build_dir)
 
     # generate the build directory
-    if not os.path.exists(config['BUILD_DIR']):
-        os.makedirs(config['BUILD_DIR'], exist_ok=True)
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir, exist_ok=True)
 
     # save the build config and the os requirements to detect changes
-    pickle.dump(config, open(buildconfig_pickle, 'wb'))
+    pickle.dump(buildconfig, open(buildconfig_pickle, 'wb'))
     pickle.dump(os_requirements, open(os_requirements_pickle, 'wb'))
 
     # generate makefile if needed
-    makefile = config['BUILD_DIR'] + '/Makefile'
+    makefile = build_dir + '/Makefile'
     if not os.path.exists(makefile):
-        mk_config = dict_to_strdict(config)
-        mk_local_config = {}
-        for package, c in local_config.items():
-            mk_local_config[package] = dict_to_strdict(c)
-
-        with open(config['BUILD_DIR'] + '/Makefile', 'w') as f:
+        with open(makefile, 'w') as f:
             f.write(render(MAKEFILE_TEMPLATE, locals()))
 
     # Everything is ready now. Let's start building!
     progress('executing make')
-    if run_make(config['MAKE'], makefile,
-            os.environ.copy().update(dict_to_strdict(config)),
-            args.prettify) != 0:
+    if run_make(get_var('MAKE'), makefile, args.prettify) != 0:
         error('something went wrong in make(1)')
-
-    return config
 
 
 def add_build_arguments(parser):

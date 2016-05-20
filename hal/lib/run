@@ -1,2 +1,2 @@
-#!/bin/sh
+#!ybin/sh
 echo "run is not supported in lib HAL"

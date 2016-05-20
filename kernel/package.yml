@@ -1,5 +1,5 @@
 name: kernel
-category: application
+category: library
 license: Public Domain
 summary: The kernel.
 description: # longer explanation
@@ -44,8 +44,6 @@ interface:
 #  Config
 #
 global_config:
-  CFLAGS:
-    append_words: -DKERNEL
   CXXFLAGS:
     append_words: -DKERNEL
 

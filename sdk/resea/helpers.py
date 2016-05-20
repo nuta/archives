@@ -151,17 +151,3 @@ def loads_yaml(s, validator=None, path=None):
                 error("validation error in '{}': {}".format(path, str(e)))
     return yml
 
-
-def dict_to_strdict(d):
-    d = copy(d)
-    for k, v in d.items():
-        if isinstance(v, (list, tuple)):
-            if not isinstance(v, str):
-                d[k] = '' # FIXME
-                continue
-            d[k] = " ".join(v)
-        if isinstance(v, bool):
-            d[k] = repr(v)
-        elif isinstance(v, dict):
-            d[k] = "dict_to_strdict: error: '{}' is dict".format(k)  # FIXME
-    return d

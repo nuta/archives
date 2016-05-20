@@ -7,6 +7,7 @@ import subprocess
 import time
 from termcolor import cprint, colored
 from resea.helpers import info, error, progress, success, fail
+from resea.var import get_var, UndefinedVarError
 
 
 class BugFoundError(Exception):
@@ -26,8 +27,6 @@ def lprint(s):
         columns = 80
     except FileNotFoundError:
         columns = 80
-
-    env = os.environ
 
     try:
         # log message format is '[package_name] TYPE: a message from the package'
@@ -73,12 +72,13 @@ def lprint(s):
     for e in re.finditer('%([P])\[(.*?)\]', body):
         specifier, content = e.groups()
         if specifier == 'P':
-            if 'ADDR2LINE' in env:
-                cmd = [env['ADDR2LINE'], '-e', env['EXECUTABLE_PATH'], content]
-            elif 'ATOS' in env:
-                cmd = [env['ATOS'], '-o', env['EXECUTABLE_PATH'], content]
-            else:
-                break
+            try:
+                cmd = [get_var('ADDR2LINE'), '-e', get_var('EXECUTABLE_PATH'), content]
+            except UndefinedVarError:
+                try:
+                    cmd = [get_var('ATOS'), '-o', get_var('EXECUTABLE_PATH'), content]
+                except UndefinedVarError:
+                    continue
 
             line = subprocess.check_output(cmd).decode('utf-8').strip()
             body = body.replace(e.group(0), line)

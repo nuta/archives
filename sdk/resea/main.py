@@ -1,6 +1,6 @@
 import sys
+import resea
 from resea.helpers import import_module, error
-
 
 def main(args):
     try:
@@ -8,10 +8,10 @@ def main(args):
     except IndexError:
         command = 'help'
 
-    try:
-        m = import_module('resea.commands.{}'.format(command))
-    except ImportError:
+    if command not in resea.command_list:
         error('command not found: {}'.format(command))
+
+    m = import_module('resea.commands.{}'.format(command))
 
     exit_code = m.main(args[1:])
     if exit_code is None:

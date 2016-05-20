@@ -35,17 +35,18 @@ interface:
 #
 global_config:
   HAL_LINK:
-    default: $(CC) $(LINKFLAGS) -pthread -o
+    default: '{{ CXX }} {{ LINKFLAGS }} -pthread -o'
   HAL_RUN:
-    default: ${POSIX_HOST_DIR}/run
+    default: '{{ POSIX_HOST_DIR }}/run'
+  HAL_GENIMAGE:
+    default: cp
   HAL_GENSTART:
-    default: ${GENSTARTCPP_DIR}/genstartcpp
+    default: '{{ GENSTARTCPP_DIR }}/genstartcpp'
   HAL_START_LANG:
     default: cpp
-  CFLAGS:
-   append_words: -I${POSIX_HOST_DIR}/src -DPOSIX_HOST
   CXXFLAGS:
-   append_words: -I${POSIX_HOST_DIR}/src -DPOSIX_HOST
+    append_words: >
+      -I{{ POSIX_HOST_DIR }}/src -DPOSIX_HOST
 
 config:
   SOURCES:

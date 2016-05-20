@@ -56,11 +56,13 @@ void start_apps(void){
 """
 
 def main():
-    print(jinja2.Template(TEMPLATE).render(
-        apps=sys.argv[1:],
-        test=os.environ.get('TEST'),
-        test_target=os.environ.get('PACKAGE'),
-        with_threading=os.environ.get('WITH_THREADING')))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('apps', nargs='*')
+    parser.add_argument('--with-threading', action='store_true')
+    parser.add_argument('--test', action='store_true')
+    parser.add_argument('--test-target')
+    args = parser.parse_args()
+    print(jinja2.Template(TEMPLATE).render(vars(args)))
 
 if __name__ == "__main__":
    main()

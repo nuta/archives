@@ -1,11 +1,11 @@
 import argparse
 import hashlib
-import os
 import subprocess
 import sys
 from resea.run import run_emulator
-from resea.helpers import info, notice, error, plan, progress, dict_to_strdict
+from resea.helpers import info, notice, error, plan, progress
 from resea.commands.build import build, add_build_arguments
+from resea.var import get_var
 
 
 SHORT_HELP = "build and run"
@@ -15,22 +15,19 @@ Usage: resea run
 
 
 def run(args):
-    config = build(args, {})
-
-    env = os.environ.copy()
-    env.update(dict_to_strdict(config))
+    build(args)
 
     plan('Generating a disk image')
-    cmd = [config['HAL_GENIMAGE'], config['EXECUTABLE_PATH'],
-           config['BUILD_DIR'] + '/disk.img']
+    cmd = [get_var('HAL_GENIMAGE'), get_var('EXECUTABLE_PATH'),
+           get_var('BUILD_DIR') + '/disk.img']
     progress(' '.join(cmd))
 
     subprocess.Popen(' '.join(cmd), shell=True).wait()
 
     plan('Launching an emulator')
-    cmd = [config['HAL_RUN'], config['BUILD_DIR'] + '/disk.img']
+    cmd = [get_var('HAL_RUN'), get_var('BUILD_DIR') + '/disk.img']
     progress(' '.join(cmd))
-    run_emulator(cmd, env)
+    run_emulator(cmd)
 
 def main(args):
     parser = argparse.ArgumentParser(prog='resea run',

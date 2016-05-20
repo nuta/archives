@@ -11,7 +11,7 @@ import watchdog.observers
 from resea.run import run_emulator
 from resea.helpers import info, notice, error, plan
 from resea.build import build, add_build_arguments
-
+from resea.var import global_config, get_var
 
 SHORT_HELP = "build and run tests"
 LONG_HELP = """
@@ -94,9 +94,12 @@ def autotest(args):
 
 
 def test(args):
-    config = build(args, {'TEST': 'yes', 'ENV': 'test'})
+    global_config.set('TEST', True)
+    global_config.set('ENV', 'test')
+    build(args)
+
     plan('Invoking tests')
-    cmd = [config['HAL_RUN'], config['BUILD_DIR'] + '/application']
+    cmd = [get_var('HAL_RUN'), get_var('BUILD_DIR') + '/application']
     return run_emulator(cmd, test=True, wait=args.wait)
 
 def main(args_):

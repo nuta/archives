@@ -1,7 +1,9 @@
 from copy import copy
 import os
-from resea.helpers import load_yaml, error, dict_to_strdict
+from resea.var import local_config, global_config, Config, get_var
+from resea.helpers import load_yaml, error
 from resea.validators import validate_package_yml, ValidationError
+
 
 paths = None # cache
 def load_reseapath():
@@ -61,64 +63,49 @@ def _load_include(package, include, config, enable_if):
         return yml
 
 
-def load_global_config(package, config, global_config, enable_if):
+def load_global_config(config, enable_if):
     for cs in config:
-        if enable_if and cs.get('if') and not eval(cs['if'], copy(global_config)):
+        if enable_if and cs.get('if') and not eval(cs['if'], copy(global_config.getdict())):
             continue
 
         for k,v in cs.items():
             if k == 'if':
                 continue
 
-            if v.get('append'):
-                val = v['append']
-                if isinstance(val, dict):
-                    global_config[k].update(val)
-                else:
-                    error("unexpected global_config type: '{}'".format(type(val)))
-            elif v.get('append_words'):
-                global_config[k] = global_config.get(k, '').strip() + ' ' + v['append_words'].strip()
-            elif v.get('default'):
-                global_config.setdefault(k, v['default'])
+            for mode in ['append', 'append_words', 'default']:
+                if v.get(mode):
+                    global_config._set(mode, k, v[mode])
+                    break
             else:
-                error("unsupported global_config: '{}'".format(repr(v)))
-
-    return global_config
+                error("unsupported global config: '{}'".format(repr(v)))
 
 
-def load_local_config(package, config, global_config, enable_if):
-    local_config = {}
+def load_local_config(package, config, enable_if):
+    local_config[package] = Config()
     for cs in config:
-        if enable_if and cs.get('if') and not eval(cs['if'], copy(global_config)):
+        if enable_if and cs.get('if') and not eval(cs['if'], copy(global_config.getdict())):
             continue
 
         for k,v in cs.items():
             if k == 'if':
                 continue
 
-            if v.get('append'):
-                if k not in local_config:
-                    local_config[k] = global_config[k] + v['append']
-                local_config[k] += v['append']
-            elif v.get('set'):
-                local_config[k] = v['set']
+            for mode in ['append', 'append_words', 'set']:
+                if v.get(mode):
+                    local_config[package]._set(mode, k, v[mode])
+                    break
             else:
-                error("invalid local config: '{}' (expected set or append)".format(k))
-
-    return local_config
+                error("unsupported local config: '{}'".format(repr(v)))
 
 
-def load_packages(builtin_packages, config, enable_if=False, update_env=False):
+def load_packages(builtin_packages, enable_if=False, update_env=False):
     """Returns packages config"""
 
-    config.update({
-        'SOURCES':  [],
-        'STUBS':    [],
-        'LANGS':    {},
-        'BUILTIN_APPS': []
-    })
+    global_config.set('SOURCES', [])
+    global_config.set('STUBS', [])
+    global_config.set('LANGS', {})
+    global_config.set('BUILTIN_APPS', [])
 
-    local_config = {}
     ymls = {}
     loaded_packages = []
     packages = builtin_packages.copy()
@@ -134,18 +121,16 @@ def load_packages(builtin_packages, config, enable_if=False, update_env=False):
 
         # include
         for include in yml.get('includes', []):
-            yml.update(load_include(package, include, config, enable_if))
+            yml.update(load_include(package, include, enable_if))
 
         # update config
-        config.update(load_global_config(package, yml.get('global_config', {}),
-                                         config, enable_if))
-        local_config[package] = load_local_config(package, yml.get('config', {}),
-                                                  config, enable_if)
-        config[package.upper() + '_DIR'] = get_package_dir(package)
-        config['STUBS'].append((package, package_yml_path))
+        load_global_config(yml.get('global_config', {}), enable_if)
+        load_local_config(package, yml.get('config', {}), enable_if)
+        global_config.set(package.upper() + '_DIR', get_package_dir(package))
+        global_config.append('STUBS', (package, package_yml_path))
 
         if package in builtin_packages and yml['category'] == 'application':
-            config['BUILTIN_APPS'].append(package)
+            global_config.append('BUILTIN_APPS', [package])
 
         # follow dependencies
         for depend in yml['uses'] + yml['implements'] + yml['depends']:
@@ -153,15 +138,10 @@ def load_packages(builtin_packages, config, enable_if=False, update_env=False):
                 packages.append(depend)
 
     # determine the build type
-    categories = map(lambda yml: yml['category'], ymls.values())
-    if any(map(lambda cat: cat == 'application', set(categories))):
-        config['CATEGORY'] = 'application'
-    elif any(map(lambda cat: cat == 'library', set(categories))):
-        config['CATEGORY'] = 'library'
+    categories = set(map(lambda yml: yml['category'], ymls.values()))
+    if all(map(lambda cat: cat != 'application', categories)):
+        global_config.set('CATEGORY', 'library')
     else:
-        config['CATEGORY'] = 'unknown'
+        global_config.set('CATEGORY', 'application')
 
-    if update_env:
-        os.environ.update(dict_to_strdict(config))
-
-    return config, local_config, ymls
+    return ymls

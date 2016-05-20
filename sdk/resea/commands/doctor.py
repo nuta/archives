@@ -8,8 +8,9 @@ import subprocess
 import webbrowser
 from resea.package import load_packages
 from resea.helpers import info, error, success, notice, plan, progress, \
-                          load_yaml, render, dict_to_strdict
+                          load_yaml, render
 from resea.validators import validate_package_yml
+from resea.var import get_var, expand_var
 import resea.commands.clean
 
 SHORT_HELP = "diagnosis the package"
@@ -53,19 +54,16 @@ def doctor():
         error("'package.yml' not found")
 
     if yml['category'] in ['application', 'library']:
-        config, _, _ = load_packages([yml['name']] + yml['depends'], {})
+        load_packages([yml['name']] + yml['depends'], {})
         lang = yml.get("lang")
         if lang is None:
             error("lang is not speicified in package.yml")
 
         # run lang's doctor
         lang_html_path = os.path.join(tmp_dir, 'lang.html')
-        doctor = config['LANGS'][lang]['doctor']
-        env = os.environ.copy()
-        del config['LANGS'] # XXX
-        env.update(dict_to_strdict(config))
+        doctor = expand_var(get_var('LANGS')[lang]['doctor'])
         subprocess.Popen('{} {} {}'.format(doctor, lang_html_path,tmp_dir),
-            shell=True, env=env).wait()
+            shell=True).wait()
 
         # generate index.html
         progress('Generating index.html')

@@ -7,7 +7,7 @@ static struct hal_pmmap pmmap[16];
 static struct hal_vmmap vmmap[16];
 
 struct hal_pmmap *hal_get_pmmaps(void) {
-    size_t size = 64 * 1024 * 1024;
+    size_t size = 128 * 1024 * 1024;
 
     pmmap[0].addr = (paddr_t) malloc(size);
     pmmap[0].size = size;

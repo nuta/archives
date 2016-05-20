@@ -17,12 +17,12 @@ def package(request):
     package_yml = yaml.load(open('package.yml'))
     package_yml['name'] = 'hello'
     package_yml['category'] = 'application'
-    package_yml['lang'] = 'c'
+    package_yml['lang'] = 'cpp'
     package_yml['depends'] = ['cpp']
-    package_yml['config'] = {'SOURCES': {'set': ['src/startup.c', 'src/test.c']}}
+    package_yml['config'] = {'SOURCES': {'set': ['src/startup.cpp', 'src/test.cpp']}}
     yaml.dump(package_yml, open('package.yml', 'w'))
 
-    open('src/startup.c', 'w').write("""\
+    open('src/startup.cpp', 'w').write("""\
 #include <resea.h>
 
 void hello_startup(void){
@@ -33,7 +33,7 @@ void hello_startup(void){
 }
 """)
 
-    open('src/test.c', 'w').write("""\
+    open('src/test.cpp', 'w').write("""\
 #include <resea.h>
 
 void hello_test(void) {
