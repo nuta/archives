@@ -35,7 +35,7 @@ void hal_save_thread(struct hal_thread *t) {
 }
 
 
-void hal_switch_thread(struct hal_thread *t) {
+extern "C" void hal_switch_thread(struct hal_thread *t) {
 
     WARN("hal_switch_thread() is not implemented");
 }
