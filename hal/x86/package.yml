@@ -48,27 +48,21 @@ interface:
 #
 global_config:
   HAL_LINK:
-    default: "${LD} -Map ${BUILD_DIR}/executable.map -nostdlib -nodefaultlibs -T${X86_DIR}/src/executable.lds -o"
+    default: "{{ LD }} -Map {{ BUILD_DIR }}/executable.map -nostdlib -nodefaultlibs -T{{ X86_DIR }}/src/executable.lds -o"
   HAL_RUN:
-    default: ${X86_DIR}/run
+    default: "{{ X86_DIR }}/run"
   HAL_GENSTART:
-    default: ${GENSTARTCPP_DIR}/genstartcpp
+    default: "{{ GENSTARTCPP_DIR }}/genstartcpp"
   HAL_START_LANG:
     default: cpp
   HAL_GENIMAGE:
-    default: ${X86_DIR}/genimage
-  CFLAGS:
-    append_words: >
-      -m64 -ffreestanding -mno-sse -mno-mmx
-      -fno-stack-protector -mno-red-zone
-      -mcmodel=large 
-      -I${X86_DIR}/src
+    default: "{{ X86_DIR }}/genimage"
   CXXFLAGS:
     append_words: >
       -m64 -ffreestanding -mno-sse -mno-mmx
       -fno-stack-protector -mno-red-zone
       -mcmodel=large 
-      -I${X86_DIR}/src
+      -I{{ X86_DIR }}/src
   QEMU:
     default: qemu-system-x86_64
 
