@@ -183,10 +183,11 @@ def build(args):
 
         ext_lang = {}
         for lang_name, lang in get_var('LANGS').items():
+            ext_lang[lang['ext']] = lang
+
             if 'stub' not in lang:
                 continue
 
-            ext_lang[lang['ext']] = lang
             stub_file = os.path.join(build_dir, 'stubs', lang_name,
                             lang['stub']['prefix'] + package + lang['stub']['suffix'])
             stubs.append((
