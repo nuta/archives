@@ -33,6 +33,14 @@ CMDECHO = echo "-->"
 	$(CMDECHO) LINK $@
 	{{ hal_link }} $@ $^
 
+# auto-generated files
+{% for path, cmd in autogen_files %}
+{{ path }}:
+	$(MKDIR) -p $(@D)
+	$(CMDECHO) GEN $@
+	{{ cmd }} $@
+{% endfor %}
+
 # start
 {{ start_file }}:
 	$(CMDECHO) GENSTART $@
@@ -173,6 +181,7 @@ def build(args):
             install_os_requirements(x)
 
     sources = []
+    autogen_files = []
     libs = []
     stubs = []
     deps_files = []
@@ -210,6 +219,11 @@ def build(args):
                 expand_var(ext_lang[ext.lstrip('.')]['compile'], package),
                 expand_var(ext_lang[ext.lstrip('.')]['mkdeps'], package)
             ))
+
+        for f in get_var('FILES', package, default=[]):
+            path = os.path.join(package_dir, f['path'])
+            cmd = expand_var(f['cmd'], package)
+            autogen_files.append((path, cmd))
 
     # start
     if get_var('TEST'):
