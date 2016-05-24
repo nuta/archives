@@ -4,6 +4,7 @@
 *.iso
 *.pcap
 .coverage*
+*.tmp
 
 GPATH
 GRTAGS
