@@ -6,7 +6,7 @@ import datetime
 import subprocess
 import time
 from termcolor import cprint, colored
-from resea.helpers import info, error, progress, success, fail
+from resea.helpers import info, error, progress, success, fail, notice
 from resea.var import get_var, UndefinedVarError
 
 
@@ -145,7 +145,11 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
     passed = 0
     failed = 0
     while True:
-        l = p.stdout.readline().decode('utf-8').strip()
+        b = p.stdout.readline()
+        try:
+            l = b.decode('utf-8').strip()
+        except UnicodeDecodeError:
+            notice('cannot decode utf-8 string [{}]'.format(b))
 
         if l == "" and p.poll() is not None:
             if test:
