@@ -1,0 +1,16 @@
+#!/bin/sh
+CPP_DIR=$1 # XXX
+out=$2
+
+echo hello > hello.tmp # TODO: use temporary directory
+
+mformat -C -i disk.tmp -h 1 -t 1 -s 8800 -c 8 ::
+mmd   -i disk.tmp ::/DOCS
+mcopy -i disk.tmp hello.tmp ::/DOCS/HELLO.TXT
+
+# truncate the disk image to make the build time faster
+gtruncate -s 16384 disk.tmp # XXX: coreutils prefix
+
+cat disk.tmp | $CPP_DIR/file2cpp 'unsigned char fat_test_disk_img[] = {' '};' > $out
+
+rm disk.tmp hello.tmp

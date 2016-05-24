@@ -1,3 +1,4 @@
 /tmp
 /build
 /packages
+/tests/test_img.cpp

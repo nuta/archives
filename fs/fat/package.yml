@@ -51,6 +51,11 @@ config:
         - src/fs.write.cpp
         - src/pager.fill.cpp
   - if: "ENV == 'test'"
+    FILES:
+      set:
+        - path: tests/test_img.cpp
+          cmd: "{{ FAT_DIR }}/gen_testimg {{ CPP_DIR }}"
     SOURCES:
       append:
+        - tests/test_img.cpp
         - tests/test.cpp
