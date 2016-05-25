@@ -1,3 +1,4 @@
+#include "pci.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <resea/pci.h>

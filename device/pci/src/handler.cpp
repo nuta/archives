@@ -1,3 +1,4 @@
+#include "pci.h"
 #include <resea.h>
 #include <resea/pci.h>
 #include "handler.h"
