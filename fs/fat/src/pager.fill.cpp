@@ -1,3 +1,4 @@
+#include "fat.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <resea/fat.h>
