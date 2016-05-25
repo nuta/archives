@@ -1,4 +1,5 @@
 #include <hal.h>
+#include "arm.h"
 #include <resea.h>
 
 void hal_set_current_thread_id(ident_t id) {

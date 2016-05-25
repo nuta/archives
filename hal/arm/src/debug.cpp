@@ -1,3 +1,4 @@
+#include "arm.h"
 #include <resea.h>
 #include <arm/machine.h>
 
