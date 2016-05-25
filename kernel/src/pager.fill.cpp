@@ -1,3 +1,4 @@
+#include "kernel.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <resea/pager.h>

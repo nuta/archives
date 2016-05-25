@@ -1,3 +1,4 @@
+#include "kernel.h"
 #include <resea.h>
 #include <resea/kernel.h>
 #include <resea/channel.h>

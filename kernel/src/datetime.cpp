@@ -1,3 +1,4 @@
+#include "kernel.h"
 #include <resea.h>
 #include <resea/channel.h>
 #include <resea/datetime_device.h>

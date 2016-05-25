@@ -1,3 +1,4 @@
+#include "kernel.h"
 #include <hal.h>
 #include <resea.h>
 #include <resea/cpp/memory.h>

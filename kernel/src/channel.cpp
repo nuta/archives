@@ -1,3 +1,4 @@
+#include "kernel.h"
 #include <resea.h>
 #include "kernel.h"
 
