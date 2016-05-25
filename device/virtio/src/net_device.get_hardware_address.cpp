@@ -1,3 +1,4 @@
+#include "virtio.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <resea/virtio.h>

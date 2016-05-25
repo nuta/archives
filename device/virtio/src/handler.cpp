@@ -1,3 +1,4 @@
+#include "virtio.h"
 #include <resea.h>
 #include <resea/virtio.h>
 #include <resea/net_device.h>

@@ -1,3 +1,4 @@
+#include "virtio.h"
 #include <resea.h>
 #include <resea/channel.h>
 #include <resea/pci.h>

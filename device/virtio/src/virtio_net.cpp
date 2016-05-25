@@ -1,4 +1,5 @@
 #include <string.h>
+#include "virtio.h"
 #include <resea.h>
 #include <resea/channel.h>
 #include <resea/net_device.h>
