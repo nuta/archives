@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "posix_host.h"
 #include <resea.h>
 
 void start_apps(void);

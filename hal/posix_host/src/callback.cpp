@@ -1,3 +1,4 @@
+#include "posix_host.h"
 #include <hal.h>
 #include <resea.h>
 #include <stdarg.h>
