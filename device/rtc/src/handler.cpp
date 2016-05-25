@@ -1,3 +1,4 @@
+#include "rtc.h"
 #include <resea.h>
 #include <resea/rtc.h>
 #include <resea/datetime_device.h>

@@ -1,3 +1,4 @@
+#include "rtc.h"
 #include <resea.h>
 #include <resea/channel.h>
 #include <resea/rtc.h>

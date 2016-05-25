@@ -1,3 +1,4 @@
+#include "rtc.h"
 #include <resea.h>
 #include <resea/cpp/io.h>
 #include <resea/io.h>
