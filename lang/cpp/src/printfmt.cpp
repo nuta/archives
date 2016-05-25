@@ -1,3 +1,4 @@
+#include "cpp.h"
 #include <resea.h>
 #include <hal.h>
 
