@@ -1,3 +1,4 @@
+#include "tcpip.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include "malloc.h"

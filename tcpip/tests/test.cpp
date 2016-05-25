@@ -1,3 +1,4 @@
+#include "../src/tcpip.h"
 #include <resea.h>
 #include <resea/channel.h>
 #include <resea/tcpip.h>

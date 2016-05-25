@@ -1,3 +1,4 @@
+#include "tcpip.h"
 #include <resea.h>
 #include <string.h>
 #include "socket.h"
