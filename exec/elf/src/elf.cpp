@@ -1,3 +1,4 @@
+#include "elf.h"
 #include <resea.h>
 #include <resea/fs.h>
 #include <resea/memory.h>

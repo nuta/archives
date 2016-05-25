@@ -1,3 +1,4 @@
+#include "../src/elf.h"
 #include <resea.h>
 
 
