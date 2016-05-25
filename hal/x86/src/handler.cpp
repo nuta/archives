@@ -1,3 +1,4 @@
+#include "x86.h"
 #include <resea.h>
 #include <resea/x86.h>
 #include <resea/hal.h>

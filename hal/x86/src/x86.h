@@ -1,9 +1,10 @@
 #ifndef __X86_H__
 #define __X86_H__
 
+#define PACKAGE_NAME "x86"
+
 #include <resea.h>
 #include "common.h"
-
 
 struct x86_thread_regs{
   uint64_t  rax;
