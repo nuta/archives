@@ -15,6 +15,17 @@ homepage: http://resea.net
 depends: [cpp]
 lang: cpp
 
+# OS requirements
+os_requirements:
+  osx:
+    homebrew:
+      packages:
+        - mtools
+  ubuntu:
+    apt:
+      packages:
+        - mtools
+
 # Interfaces which this package uses
 uses:
   - storage_device
