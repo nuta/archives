@@ -196,13 +196,10 @@ result_t fat_opendisk(struct fat_disk *disk, channel_t ch,
     data_clusters = (sectors - (reserved + (fat_num * fat_size) + root_size)) /
                     sectors_per_cluster;
 
-    // verify the disk is FAT32
     if (data_clusters < 4085) {
-        WARN("FAT12 is not supported");
-        return E_NOTSUPPORTED;
+        disk->type = 12;
     } else if (data_clusters < 65525) {
-        WARN("FAT16 is not supported");
-        return E_NOTSUPPORTED;
+        disk->type = 16;
     } else {
         disk->type = 32;
     }

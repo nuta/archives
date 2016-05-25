@@ -1,6 +1,7 @@
 #ifndef __FAT_FAT_H__
 #define __FAT_FAT_H__
 
+#define PACKAGE_NAME "fat"
 #include <resea.h>
 
 /* we assume LP64 */
