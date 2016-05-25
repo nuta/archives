@@ -10,4 +10,5 @@
 /** handles datetime.delay */
 void kernel_datetime_delay(channel_t __ch, uintmax_t msec) {
 
+    send_datetime_delay_reply(__ch, OK);
 }
