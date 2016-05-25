@@ -5,7 +5,7 @@ import subprocess
 from resea.package import load_packages
 from resea.validators import validate_package_yml
 from resea.helpers import load_yaml, error
-
+from resea.var import get_var, expand_var
 
 SHORT_HELP = "generate boilterplate files"
 LONG_HELP = """
@@ -19,13 +19,13 @@ def scaffold(args):
     except FileNotFoundError:
         error("'package.yml' not found (are you in a package directory?)")
 
-    config, _, _ = load_packages([yml['name']] + yml['depends'], {}, update_env=True)
+    load_packages([yml['name']] + yml['depends'], {})
 
-    lang = yml.get("lang")
+    lang = yml.get('lang')
     if lang is None:
         error("lang is not speicified in package.yml")
 
-    bin = config['LANGS'][lang].get('scaffold')
+    bin = expand_var(get_var('LANGS')[lang]['scaffold'])
 
     if bin is None:
         error("'{}' lang does not support scaffolding".format(lang))
