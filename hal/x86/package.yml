@@ -25,6 +25,12 @@ os_requirements:
         - qemu
         - xorriso
         - grub --HEAD
+  ubuntu:
+    apt:
+      packages:
+        - qemu
+        - xorriso
+        - grub
 
 # Interfaces which this package uses
 uses: []
