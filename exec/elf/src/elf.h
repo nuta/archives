@@ -1,6 +1,10 @@
 #ifndef __ELF_H__
 #define __ELF_H__
 
+#define PACKAGE_NAME "elf"
+
+#include <resea.h>
+
 #define STACK_SIZE 0x2000
 #define STACK_START_ADDRESS 0x90000000
 
