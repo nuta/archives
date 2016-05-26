@@ -4,6 +4,8 @@
 extern bool pci_initialized;
 #define PACKAGE_NAME "pci"
 
+#include <resea.h>
+
 /* PCI */
 #define PCI_CONFIG_VENDOR     0x00
 #define PCI_CONFIG_DEVICEID   0x02

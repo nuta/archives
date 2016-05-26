@@ -15,6 +15,6 @@ result_t pci_startup(void) {
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(pci), &r);
 
-    pci_inialized = true;
+    pci_initialized = true;
     serve_channel(ch, &pci_handler);
 }
