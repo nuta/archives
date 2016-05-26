@@ -150,7 +150,7 @@ void report_unfreed_memory() {
         struct alloc *alloc = (struct alloc *)
             ((uintptr_t) chunk + sizeof(*chunk));
 
-        for(int i=0; i < chunk->total; i++) {
+        for(size_t i=0; i < chunk->total; i++) {
 
             if (alloc->flags & 1) {
                 BUG("unfreed memory allocated at: %P", alloc->callee);
