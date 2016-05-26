@@ -25,7 +25,7 @@ struct alloc {
 
 
 static struct chunk *chunks = nullptr;
-
+static mutex_t lock = MUTEX_UNLOCKED;
 
 static void add_chunk(size_t size, size_t num) {
     result_t r;
@@ -95,6 +95,8 @@ channel_t get_memory_ch(void) {
  */
 void *allocate_memory (size_t size, memory_alloc_t flags) {
 
+    lock_mutex(&lock);
+
     if (!chunks) {
         // TODO: add chunk dynamically
         add_chunk(8,    4098);
@@ -119,6 +121,7 @@ void *allocate_memory (size_t size, memory_alloc_t flags) {
                         // OK
                         ATOMIC_SUB(&chunk->unused, 1);
                         alloc->callee = RETURN_ADDRESS;
+                        unlock_mutex(&lock);
                         return (void *) ((uintptr_t) alloc + sizeof(*alloc));
                     }
                 }
@@ -129,6 +132,7 @@ void *allocate_memory (size_t size, memory_alloc_t flags) {
         }
     }
 
+    unlock_mutex(&lock);
     WARN("failed to allocate memory: size=%d", size);
     return nullptr;
 }
