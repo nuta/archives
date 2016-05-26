@@ -1,6 +1,9 @@
 #ifndef __PCI_H__
 #define __PCI_H__
 
+extern bool pci_initialized;
+#define PACKAGE_NAME "pci"
+
 /* PCI */
 #define PCI_CONFIG_VENDOR     0x00
 #define PCI_CONFIG_DEVICEID   0x02
