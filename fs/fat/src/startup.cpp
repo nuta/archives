@@ -8,6 +8,7 @@
 
 channel_t storage_device_ch;
 struct fat_disk fat_the_disk; // XXX
+bool fat_initialized = false;
 
 static result_t read_disk(struct fat_disk *disk, fat_lba_t lba, fat_size_t num,
                         void **data) {
@@ -51,5 +52,6 @@ void fat_startup(void) {
     ch = create_channel();
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(fs), &r);
+    fat_initialized = true;
     serve_channel(ch, fat_handler);
 }

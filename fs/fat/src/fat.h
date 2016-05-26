@@ -2,6 +2,7 @@
 #define __FAT_FAT_H__
 
 #define PACKAGE_NAME "fat"
+extern bool fat_initialized;
 #include <resea.h>
 
 /* we assume LP64 */
