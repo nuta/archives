@@ -38,7 +38,7 @@ static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
 {%- endfor %}
     ) {
 
-    payload_t __payloads[{{ payloads | length }}];
+    payload_t __payloads[{{ payloads_length }}];
 
 {% set i = 0 %}
 {% for type, name in payloads %}
@@ -68,16 +68,16 @@ static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
 {%- endfor %}
     ) {
 
-    payload_t __arg[{{ args | length }}];
-    payload_t __ret[{{ rets | length }}];
+    payload_t __arg[{{ args_length }}];
+    payload_t __ret[{{ rets_length }}];
 
 {% set i = 0 %}
 {% for type, val in args %}
-    {% if type != 'payloadtype_t' %}
-    __arg[{{ loop.index0 }}] = (payload_t) {{ val }};
+    {%- if type != 'payloadtype_t' %}
+    __arg[{{ i }}] = (payload_t) {{ val }};
     {% set i = i + 1 %}
     {% endif %}
-{%- endfor %}
+{% endfor %}
 
     sys_call(__ch, (payload_t *) &__arg, sizeof(__arg), (payload_t *) &__ret, sizeof(__ret));
 
@@ -151,6 +151,7 @@ def load_payload_defs(interface_name, msg_name, msg, name_prefix=None,
                 'name': p['name'] + '_size'
             })
 
+    length = 0
     payloads = []
     for i, p in enumerate(defs, start=0):
         if i % 8 == 0:
@@ -177,11 +178,15 @@ def load_payload_defs(interface_name, msg_name, msg, name_prefix=None,
                             header += '| (0x01 << {})'.format(j * 4)
 
             payloads.append(('', header))
+            length += 1
+
         payloads.append((ctype(p['type']), name_prefix + p['name'])) # payload
+        length += 1
+
         if i > 0 and with_type_args:
             payloads.append(('payloadtype_t', 'type' + str(i)))
 
-    return payloads
+    return payloads, length
 
 
 def write(template, args):
@@ -191,14 +196,15 @@ def write(template, args):
 
 def process_message(yml, msg_name, msg):
     interface_name = yml['name']
-    payloads = load_payload_defs(interface_name, msg_name, msg)
-    payloads_with_type = load_payload_defs(interface_name, msg_name, msg,
-                                           with_type_args=True)
+    payloads, payloads_length = load_payload_defs(interface_name, msg_name, msg)
+    payloads_with_type, payloads_with_type_length = \
+        load_payload_defs(interface_name, msg_name, msg, with_type_args=True)
 
     write(PMACROS_TEMPLATE, {
         'interface_name': interface_name,
         'msg_name': msg_name,
-        'payloads': payloads
+        'payloads': payloads,
+        'payloads_length': payloads_length
     })
     write(MSGID_TEMPLATE, {
         'interface_name': interface_name,
@@ -210,31 +216,37 @@ def process_message(yml, msg_name, msg):
         'interface_name': interface_name,
         'msg_name': msg_name,
         'func_name': 'send',
-        'payloads': payloads
+        'payloads': payloads,
+        'payloads_length': payloads_length
     })
     write(SEND_TEMPLATE, {
         'interface_name': interface_name,
         'msg_name': msg_name,
         'func_name': 'sendas',
-        'payloads': payloads_with_type
+        'payloads': payloads_with_type,
+        'payloads_length': payloads_with_type_length
     })
 
     if msg['type'] == 'request' and 'reply' in msg:
-        rets = load_payload_defs(interface_name, msg_name,
-                                 yml['interface'][msg['reply']], '__r_')
+        rets, rets_length = load_payload_defs(interface_name, msg_name,
+                                yml['interface'][msg['reply']], '__r_')
         write(CALL_TEMPLATE, {
             'interface_name': interface_name,
             'msg_name': msg_name,
             'func_name': 'call',
             'args': payloads,
-            'rets': rets
+            'args_length': payloads_length,
+            'rets': rets,
+            'rets_length': rets_length
         })
         write(CALL_TEMPLATE, {
             'interface_name': interface_name,
             'msg_name': msg_name,
             'func_name': 'callas',
             'args': payloads_with_type,
-            'rets': rets
+            'args_length': payloads_with_type_length,
+            'rets': rets,
+            'rets_length': rets_length
         })
 
 
