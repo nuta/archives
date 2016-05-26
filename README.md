@@ -34,6 +34,8 @@ Busybook is a CalDAV server out of the box powered by Ruby on Rails.
 Public domain
 
 ## Changelog
+- **v1.0.0**
+  - the first stable version
 - **v0.6.1**
   - support calendar subscriptions
   - fix MOVE method
