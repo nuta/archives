@@ -4,53 +4,55 @@
 #include "handler.h"
 
 
-void tcpip_handler(channel_t __ch, payload_t *payloads) {
-    if ((payloads[0] & 1) != 1) {
+void tcpip_handler(channel_t __ch, payload_t *m) {
+    if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 
-    switch (payloads[1]) {
+    while(!tcpip_initialized);
+
+    switch (EXTRACT_MSGID(m)) {
     case MSGID(tcpip, open):
-    {
         DEBUG("received tcpip.open");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            tcpip_tcpip_open(__ch, (tcpip_protocol_t) a0, (channel_t) a1);
-            return;
-    }
+        tcpip_tcpip_open(
+            __ch
+            , (tcpip_protocol_t) EXTRACT(m, tcpip, open, transport)
+            , (channel_t) EXTRACT(m, tcpip, open, handler)
+        );
+        return;
     case MSGID(tcpip, close):
-    {
         DEBUG("received tcpip.close");
-            payload_t a0 = payloads[2];
-            tcpip_tcpip_close(__ch, (ident_t) a0);
-            return;
-    }
+        tcpip_tcpip_close(
+            __ch
+            , (ident_t) EXTRACT(m, tcpip, close, socket)
+        );
+        return;
     case MSGID(tcpip, bind):
-    {
         DEBUG("received tcpip.bind");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            payload_t a3 = payloads[5];
-            payload_t a4 = payloads[6];
-            tcpip_tcpip_bind(__ch, (ident_t) a0, (tcpip_protocol_t) a1, (void *) a2, (size_t) a3, (uint16_t) a4);
-            return;
-    }
+        tcpip_tcpip_bind(
+            __ch
+            , (ident_t) EXTRACT(m, tcpip, bind, socket)
+            , (tcpip_protocol_t) EXTRACT(m, tcpip, bind, network)
+            , (void *) EXTRACT(m, tcpip, bind, address)
+            , (size_t) EXTRACT(m, tcpip, bind, address_size)
+            , (uint16_t) EXTRACT(m, tcpip, bind, port)
+        );
+        return;
     case MSGID(tcpip, sendto):
-    {
         DEBUG("received tcpip.sendto");
-            payload_t a0 = payloads[2];
-            payload_t a1 = payloads[3];
-            payload_t a2 = payloads[4];
-            payload_t a3 = payloads[5];
-            payload_t a4 = payloads[6];
-            payload_t a5 = payloads[7];
-            payload_t a6 = payloads[8];
-            tcpip_tcpip_sendto(__ch, (ident_t) a0, (tcpip_protocol_t) a1, (void *) a2, (size_t) a3, (uint16_t) a4, (void *) a5, (size_t) a6);
-            return;
-    }
+        tcpip_tcpip_sendto(
+            __ch
+            , (ident_t) EXTRACT(m, tcpip, sendto, socket)
+            , (tcpip_protocol_t) EXTRACT(m, tcpip, sendto, network)
+            , (void *) EXTRACT(m, tcpip, sendto, address)
+            , (size_t) EXTRACT(m, tcpip, sendto, address_size)
+            , (uint16_t) EXTRACT(m, tcpip, sendto, port)
+            , (void *) EXTRACT(m, tcpip, sendto, payload)
+            , (size_t) EXTRACT(m, tcpip, sendto, payload_size)
+        );
+        return;
     }
 
-    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
