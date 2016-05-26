@@ -42,7 +42,9 @@ includes:
 #
 global_config:
   HAL_GENSTART:
-    default: ./packages/genstartcpp/genstartcpp
+    default: '{{ GENSTARTCPP_DIR }}/genstartcpp'
+  HAL_START_LANG:
+    default: cpp
 
 config:
   SOURCES:
