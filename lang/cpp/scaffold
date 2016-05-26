@@ -135,9 +135,9 @@ def main(args):
             if package in implements:
                 packages.append(x)
 
+    messages = []
     for yml in ymls:
         interface_name = yml["name"]
-        messages = []
         sorted_messages = OrderedDict(sorted(yml['interface'].items(), key=lambda e: e[1]["id"]))
         for  msg_name, msg in sorted_messages.items():
             if msg['type'] != 'request':
