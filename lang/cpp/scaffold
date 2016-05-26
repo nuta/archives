@@ -15,19 +15,23 @@ from helpers import ctype
 
 
 STARTUP_CPP_TEMPLATE = """\
+#include "{{ package_name }}.h"
 #include <resea.h>
 {% for implement in implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
 
-result_t {{ name }}_startup(void) {
+bool {{ package_name }}_initialized = false;
 
-    return OK;
+void {{ package_name }}_startup(void) {
+
+    {{ package_name }}_initialized = true;
 }
 
 """
 
 HANDLER_CPP_TEMPLATE = """\
+#include "{{ package_name }}.h"
 #include <resea.h>
 {% for implement in implements %}
 #include <resea/{{ implement }}.h>
@@ -40,6 +44,8 @@ void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
+
+    while(!{{ package_name }}_initialized);
 
     switch (EXTRACT_MSGID(m)) {
 {% for interface_name, msg_name, payloads in messages %}
@@ -61,6 +67,7 @@ void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
 """
 
 HANDLER_H_TEMPLATE = """\
+#include "{{ package_name }}.h"
 #include <resea.h>
 
 {% for interface_name, msg_name, payloads in messages %}
@@ -75,6 +82,7 @@ void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
 """
 
 HANDLE_CPP_TEMPLATE = """\
+#include "{{ package_name }}.h"
 #include <resea.h>
 {% for implement in implements %}
 #include <resea/{{ implement }}.h>
@@ -92,6 +100,15 @@ void {{ name }}_{{ interface_name }}_{{ msg_name }}(
 
 """
 
+PACKAGE_H_TEMPLATE = """\
+#ifndef __{{ package_name | upper }}_{{ package_name | upper }}_H__
+#define __{{ package_name | upper }}_{{ package_name | upper }}_H__
+
+#define PACKAGE_NAME "{{ package_name }}"
+extern bool {{ package_name }}_initialized;
+
+#endif
+"""
 
 def create_file(path, data, overwrite=False):
     if overwrite or not os.path.exists(path):
@@ -146,7 +163,8 @@ def main(args):
                 overwrite=True)
     create_file("{}/src/startup.cpp".format(args.output_dir),
                 render(STARTUP_CPP_TEMPLATE, locals()))
-
+    create_file("{}/src/{}.h".format(args.output_dir, package_name),
+                render(PACKAGE_H_TEMPLATE, locals()))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate boilerplates for C")
