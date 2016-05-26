@@ -1,6 +1,7 @@
 #ifndef __VIRTIO_H__
 #define __VIRTIO_H__
 
+extern bool virtio_initialized;
 #include <resea.h>
 
 #define VIRTIO_PCI_VENDOR       0x1af4
