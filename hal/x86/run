@@ -1,5 +1,5 @@
 #!/bin/sh
-exec $QEMU \
+exec qemu-system-x86_64 \
     -m 256 -localtime -nographic \
     -no-reboot -boot d \
     -cpu SandyBridge \

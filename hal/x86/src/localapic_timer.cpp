@@ -1,7 +1,7 @@
+#include "_x86.h"
 #include "x86.h"
 #include <resea.h>
 #include <hal.h>
-#include "x86.h"
 
 
 void x86_init_localapic_timer(void) {

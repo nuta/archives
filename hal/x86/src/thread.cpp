@@ -1,3 +1,4 @@
+#include "_x86.h"
 #include <hal.h>
 #include <resea/cpp/memory.h>
 #include <string.h>

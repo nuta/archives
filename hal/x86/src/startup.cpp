@@ -1,3 +1,4 @@
+#include "_x86.h"
 #include <hal.h>
 
 handler_t x86_handler;

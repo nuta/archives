@@ -1,8 +1,6 @@
 #ifndef __X86_H__
 #define __X86_H__
 
-#define PACKAGE_NAME "x86"
-
 #include <resea.h>
 #include "common.h"
 
@@ -439,6 +437,6 @@ void x86_init_vm(void);
 /*
  *  init
  */
-void x86_init (void *binfo);
+void x86_init(void *binfo);
 
 #endif

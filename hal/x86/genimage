@@ -1,5 +1,7 @@
 #!/bin/sh
 set -e
+X86_DIR=$(dirname "$0")
+BUILD_DIR=$(dirname "$1")
 
 cp -r $X86_DIR/isofiles $BUILD_DIR
 cp $1 $BUILD_DIR/isofiles/boot/executable

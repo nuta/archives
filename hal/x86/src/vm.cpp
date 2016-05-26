@@ -1,5 +1,6 @@
-#include <hal.h>
+#include "_x86.h"
 #include "x86.h"
+#include <hal.h>
 #include <resea.h>
 #include <resea/cpp/memory.h>
 
