@@ -3,21 +3,24 @@ An interface implemented by langauge runtime libraries.
 
 ## Requirements
 ### Global config
-Append a map into `LANGS`. Refer `cpp`'s `package.yml`.
+Append a dict into `LANGS`.
 
-**Example**
+**Example (C++)**
 ```
 global_config:
   LANGS:
     append:
-      c:
-        ext:  c
-        abbrev: CC
+      cpp:
+        ext:  cpp
+        abbrev: CXX
         stub:
           prefix: resea/
           suffix: .h
-        compile: '$(CC) $(CFLAGS) -c -o'
-        scaffold: ./packages/cpp/scaffold
-        genstub:  ./packages/cpp/genstub 
+        compile:  '{{ CXX }} {{ CXXFLAGS }} -c -o'
+        mkdeps:   '{{ CPP_DIR }}/mkdeps "{{ CXX }} {{ CXXFLAGS }}"'
+        scaffold: '{{ CPP_DIR }}/scaffold'
+        genstub:  '{{ CPP_DIR }}/genstub'
+        doctor:   '{{ CPP_DIR }}/doctor'
+  CXXFLAGS:
+    append_words: -Wall -ggdb3 -std=c++14
 ```
-

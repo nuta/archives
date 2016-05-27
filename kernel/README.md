@@ -1,5 +1,5 @@
 # kernel
-The `kernel` package consists of five components:
+The `kernel` package consists of these components:
 
 - system call handler
 - channel server

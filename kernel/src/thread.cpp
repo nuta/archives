@@ -12,13 +12,7 @@ static mutex_t lock = MUTEX_UNLOCKED;
 static bool started_threading = false;
 
 
-/**
- *  Returns a human-friendly description of a thread status
- *
- *  @param[in] status  The thread status.
- *  @return  A thread status string.
- *
- */
+// Returns a human-friendly description of a thread status
 static const char *get_thread_status_str(int status) {
 
     switch (status) {
@@ -32,15 +26,13 @@ static const char *get_thread_status_str(int status) {
 }
 
 
-/**
- *  Picks a next thread to run
- *
- *  This searches the thread list for a runnable thread. The
- *  scheduling algorithm is roundrobin. If no thread is runnable, It
- *  halts CPU and waits for an hardware interrupt.
- *
- *  @return  The thread ID of the next thread.
- */
+//
+//  Picks a next thread to run
+//
+//  This searches the thread list for a runnable thread. The
+//  scheduling algorithm is roundrobin. If no thread is runnable, It
+//  halts CPU and waits for an hardware interrupt.
+//
 static ident_t get_next_thread(void) {
     static ident_t next = 1;
     ident_t i;
@@ -68,11 +60,7 @@ success:
 }
 
 
-/**
- *  Allocates a thread ID
- *
- *  @return  A thread ID on success or 0 on failure.
- */
+// Allocates a thread ID
 static ident_t alloc_thread_id(void) {
     ident_t i;
 
@@ -94,11 +82,8 @@ static ident_t alloc_thread_id(void) {
 }
 
 
-/**
- *  Allocates a thread group ID
- *
- *  @return  A thread group ID on success or 0 on failure.
- */
+// Allocates a thread group ID. Returns a thread group ID on success or 0 on
+// failure.
 static ident_t alloc_thread_group_id(void) {
     ident_t i;
 
@@ -120,11 +105,8 @@ static ident_t alloc_thread_group_id(void) {
 }
 
 
-/**
- *  Creates a new thread group
- *
- *  @return  A thread group ID on success or 0 on failure.
- */
+// Creates a new thread group Returns a thread group ID on success or 0 on
+// failure.
 static ident_t create_thread_group(void) {
     ident_t id;
     struct thread_group *g;
@@ -148,58 +130,35 @@ static ident_t create_thread_group(void) {
 }
 
 
-/**
- *  Get the thread struct of the current thread
- *
- *  @return  The thread struct of the current thread.
- */
+// Get the thread struct of the current thread
 struct thread *kernel_get_current_thread(void) {
 
     return &threads[hal_get_current_thread_id()];
 }
 
 
-/**
- *  Get the thread_group struct by a thread group ID
- *
- *  @return  The thread_group struct of the ID.
- */
+// Get the thread_group struct by a thread group ID
 struct thread_group *kernel_get_thread_group(ident_t group) {
 
     return &thread_groups[group];
 }
 
 
-/**
- *  Get the thread_group struct by a thread ID
- *
- *  @return  The thread_group struct of a thread group the thread belongs to.
- */
+// Get the thread_group struct by a thread ID
 struct thread_group *kernel_get_thread_group_of(ident_t thread) {
 
     return threads[thread].group;
 }
 
 
-/**
- *  Get the current thread_group struct
- *
- *  @return  The current thread_group struct.
- */
+// Get the current thread_group struct
 struct thread_group *kernel_get_current_thread_group(void) {
 
     return kernel_get_thread_group_of(hal_get_current_thread_id());
 }
 
 
-/**
- *  Updates the status of a thread
- *
- *  @param[in] thread  The thread.
- *  @param[in] status  The new status.
- *  @return  A result code.
- *
- */
+// Updates the status of a thread
 result_t kernel_set_thread_status(ident_t thread, enum thread_status status) {
 
     INFO("thread #%d status changed to %s", thread, get_thread_status_str(status));
@@ -208,16 +167,7 @@ result_t kernel_set_thread_status(ident_t thread, enum thread_status status) {
 }
 
 
-/**
- *  Set thread registers states
- *
- *  @param[in] thread      The thread to be manipulated.
- *  @param[in] entry       The entry point.
- *  @param[in] arg         The first argument.
- *  @param[in] stack       The beginning of stack.
- *  @param[in] stack_size  The size of stack.
- *  @return  A result code.
- */
+// Set thread registers states. Be aware that `stack` is the *beginning* of stack.
 result_t kernel_set_thread(ident_t thread, uintptr_t entry, uintptr_t arg,
                        uintptr_t stack, size_t stack_size) {
 
@@ -232,17 +182,10 @@ result_t kernel_set_thread(ident_t thread, uintptr_t entry, uintptr_t arg,
 }
 
 
-/**
- *  Creates a new thread
- *
- *  @param[in] group       The thread group the new thread will belongs to. If it's 0,
-                           new thread group will be created.
- *  @param[in] name        The name.
- *  @param[in] name_size   The size of name.
- *  @param[out] r_thread   The allocated thread ident_t.
- *  @param[out] r_group    The group ident_t that the thread belongs to.
- *  @return  A result code.
- */
+// Creates a new thread. It set the allocated thread ID to r_thread and the
+// thread group ID which the created thread belongs to to r_group.
+//
+// If `group` is 0, new thread group will be created.
 result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_size,
                           ident_t *r_thread, ident_t *r_group) {
     ident_t thread;
@@ -266,9 +209,7 @@ result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_si
 }
 
 
-/**
- *  Resumes the next thread
- */
+// Resumes the next thread
 extern "C" NORETURN void kernel_resume_next_thread(void) {
     struct thread *t;
     struct thread_group *g;
@@ -282,10 +223,8 @@ extern "C" NORETURN void kernel_resume_next_thread(void) {
 }
 
 
-/**
- *  Do a soft context switch
- *
- */
+// Do a soft context switch. It's called from the kernel
+// when the thread should release the time slice (e.g. sleep)
 void kernel_switch_thread(void) {
     struct thread *t;
 
@@ -296,11 +235,7 @@ void kernel_switch_thread(void) {
 }
 
 
-
-/**
- *  Do a hard context switch
- *
- */
+// Do a hard context switch (exhausted a time slice)
 void kernel_hard_switch_thread(void) {
     struct thread *t;
 
@@ -315,6 +250,7 @@ void kernel_hard_switch_thread(void) {
 }
 
 
+// Creates a thread and make it runnable. It's for HAL.
 static result_t run_thread(ident_t group, const char *name, uintptr_t entry, uintptr_t arg) {
     ident_t thread;
     UNUSED ident_t r_group;
@@ -337,9 +273,7 @@ NORETURN static void start_threading(void) {
 }
 
 
-/**
- *  Initializes the threading system
- */
+// Initializes the threading system
 void kernel_thread_startup(void) {
     ident_t group, thread;
 
