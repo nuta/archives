@@ -2,7 +2,6 @@
 #define __KERNEL_H__
 
 #define PACKAGE_NAME "kernel"
-extern bool kernel_initialized;
 #include <hal.h>
 
 /*

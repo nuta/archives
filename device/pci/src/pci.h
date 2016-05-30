@@ -1,7 +1,6 @@
 #ifndef __PCI_H__
 #define __PCI_H__
 
-extern bool pci_initialized;
 #define PACKAGE_NAME "pci"
 
 #include <resea.h>

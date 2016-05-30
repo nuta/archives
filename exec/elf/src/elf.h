@@ -2,7 +2,6 @@
 #define __ELF_H__
 
 #define PACKAGE_NAME "elf"
-extern bool elf_initialized;
 
 #include <resea.h>
 

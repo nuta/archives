@@ -8,7 +8,6 @@
 #include <resea/zeroed_pager.h>
 #include "kernel.h"
 
-bool kernel_initialized = false;
 static channel_t ch;
 
 // this startup() should be return
@@ -29,7 +28,6 @@ void kernel_startup(void) {
     kernel_register_channel(ch, INTERFACE(pager));
     kernel_register_channel(ch, INTERFACE(zeroed_pager));
 
-    kernel_initialized = true;
     INFO("created a kernel server at @%d", ch);
 }
 
