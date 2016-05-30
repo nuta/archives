@@ -113,7 +113,7 @@ void *allocate_memory (size_t size, memory_alloc_t flags) {
             struct alloc *alloc = (struct alloc *)
                 ((uintptr_t) chunk + sizeof(*chunk));
 
-            for(int i=0; i < chunk->total; i++) {
+            for(size_t i=0; i < chunk->total; i++) {
 
                 if (!(alloc->flags & 1)) {
                     // unused unit, try to lock
