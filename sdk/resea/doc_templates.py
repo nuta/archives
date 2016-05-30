@@ -175,7 +175,7 @@ INDEX_DOC_CSS = COMMON_CSS + """
 
 INDEX_DOC = HEADER + """
 <h2>Tutorial</h2>
-<p><a href="http://resea.net/resea-by-example">Resea by Example</a>: Learn Resea by Examples</p>
+<p><a href="/examples">Resea by Example</a>: Learn Resea by Examples</p>
 
 <h2>References</h2>
 <p><a href="packages">Package References</a>: Documentaion for Resea packages.</p>
@@ -184,6 +184,9 @@ INDEX_DOC = HEADER + """
 <p><a href="thread.html">Thread and Thread Group</a>: A execution unit and set of threads.</p>
 <p><a href="messaging.html">Messaging</a>: A inter-thread communication.</p>
 <p><a href="package.html">Package and Executable</a>: A isolated component.</p>
+
+<h2>CI</h2>
+<p><a href="/ci">CI</a>: Official packages diagnosises</p>
 
 <h2>SDK</h2>
 <p><a href="commands.html">Commands</a>: How to use SDK.</p>
