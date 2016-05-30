@@ -27,11 +27,17 @@ implements: []
 #  Type definitions
 #
 types:
-  type:
+  packet_type:
     type: const
     size: uint32
     consts:
-      TYPE_ETHERNET: 0x0001
+      TYPE_IPV4: 0x0001
+      TYPE_ARP:  0x0002
+  hw_type:
+    type: const
+    size: uint32
+    consts:
+      HW_ETHERNET: 0x0001
 
 #
 #  interface definitions
@@ -56,7 +62,13 @@ interface:
     type: request
     reply: transmit_reply
     payloads:
-      - name: data
+      - name: dest_hwaddr
+        type: data
+      - name: src_hwaddr
+        type: data
+      - name: type
+        type: net_device(packet_type)
+      - name: packet
         type: data
         attrs: [readonly]
   transmit_reply:
@@ -78,13 +90,25 @@ interface:
       - name: result
         type: result
       - name: type
-        type: net_device(type)
+        type: net_device(hw_type)
       - name: hwaddr
         type: data
+      - name: device_header_size
+        type: size
+      - name: device_footer_size
+        type: size
+      - name: max_data_size
+        type: size
 
   received:
     id: 9
     type: push
     payloads:
+      - name: dest_hwaddr
+        type: data
+      - name: src_hwaddr
+        type: data
+      - name: type
+        type: net_device(packet_type)
       - name: packet
         type: data
