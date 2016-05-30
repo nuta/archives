@@ -8,6 +8,9 @@ from resea.validators import validate_package_yml
 from resea.helpers import load_yaml, plan, notice, render
 
 SHORT_HELP = "generate all packages documentaion"
+LONG_HELP = """
+Usage: resea doctor-all
+"""
 
 INDEX_HTML = """\
 <!DOCTYPE html>
