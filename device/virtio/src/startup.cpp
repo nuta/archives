@@ -10,13 +10,11 @@
 
 handler_t virtio_handler;
 channel_t virtio_server;
-bool virtio_initialized = false;
 
 void virtio_startup(void) {
 
     virtio_server = create_channel();
     virtio_blk_init();
     virtio_net_init();
-    virtio_inialized = true;
     serve_channel(virtio_server, &virtio_handler);
 }
