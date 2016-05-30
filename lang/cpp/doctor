@@ -11,13 +11,14 @@ import resea.commands.build
 import resea.commands.test
 
 LANG_HTML = """
-<li><a href="file:///{{ csa_dir }}/index.html">Static code analysis</a></li>
-<li><a href="file:///{{ coverage_dir }}/index.html">Test coverage</a></li>
+<li><a href="/ci/{{ package_name }}/csa/index.html">Static code analysis</a></li>
+<li><a href="/ci/{{ package_name }}/coverage/index.html">Test coverage</a></li>
 """
 
 def main():
     _, lang_html_path, tmp_dir = sys.argv # TODO
     yml = load_yaml('package.yml', validator=validate_package_yml)
+    package_name = yml['name']
 
     plan('Analysing with Clang Static Analyzer')
     csa_dir = os.path.join(tmp_dir, 'csa')
