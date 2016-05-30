@@ -19,8 +19,8 @@ def main(args):
         print("Commands:")
 
         for c in command_list:
-            m = import_module("resea.commands.{}".format(c))
-            print("  {:<10}{}".format(c, m.SHORT_HELP))
+            m = import_module("resea.commands.{}".format(c.replace('-', '_')))
+            print("  {:<14}{}".format(c, m.SHORT_HELP))
     else:
-        m = import_module("resea.commands.{}".format(cmd))
+        m = import_module("resea.commands.{}".format(cmd.replace('-', '_')))
         print(m.LONG_HELP.strip() + "\n")
