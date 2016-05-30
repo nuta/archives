@@ -21,11 +21,9 @@ STARTUP_CPP_TEMPLATE = """\
 #include <resea/{{ implement }}.h>
 {% endfor %}
 
-bool {{ package_name }}_initialized = false;
 
 void {{ package_name }}_startup(void) {
 
-    {{ package_name }}_initialized = true;
 }
 
 """
@@ -44,8 +42,6 @@ void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
-
-    while(!{{ package_name }}_initialized);
 
     switch (EXTRACT_MSGID(m)) {
 {% for interface_name, msg_name, payloads in messages %}
@@ -105,7 +101,6 @@ PACKAGE_H_TEMPLATE = """\
 #define __{{ package_name | upper }}_{{ package_name | upper }}_H__
 
 #define PACKAGE_NAME "{{ package_name }}"
-extern bool {{ package_name }}_initialized;
 
 #endif
 """

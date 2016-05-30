@@ -17,8 +17,6 @@ void kernel_handler(channel_t __ch, payload_t *m) {
         return;
     }
 
-    while(!kernel_initialized);
-
     switch (EXTRACT_MSGID(m)) {
     case MSGID(pager, fill):
         DEBUG("received pager.fill");

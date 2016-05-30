@@ -11,8 +11,6 @@ void elf_handler(channel_t __ch, payload_t *m) {
         return;
     }
 
-    while(!elf_initialized);
-
     switch (EXTRACT_MSGID(m)) {
     case MSGID(exec, create):
         DEBUG("received exec.create");

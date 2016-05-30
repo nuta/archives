@@ -10,8 +10,6 @@ void pci_handler(channel_t __ch, payload_t *m) {
         return;
     }
 
-    while(!pci_initialized);
-
     switch (EXTRACT_MSGID(m)) {
     case MSGID(pci, listen):
         DEBUG("received pci.listen");

@@ -10,8 +10,6 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
         return;
     }
 
-    while(!tcpip_initialized);
-
     switch (EXTRACT_MSGID(m)) {
     case MSGID(tcpip, open):
         DEBUG("received tcpip.open");

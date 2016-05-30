@@ -12,8 +12,6 @@ void fat_handler(channel_t __ch, payload_t *m) {
         return;
     }
 
-    while(!fat_initialized);
-
     switch (EXTRACT_MSGID(m)) {
     case MSGID(fs, open):
         DEBUG("received fs.open");

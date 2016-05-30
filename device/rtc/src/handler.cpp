@@ -5,20 +5,20 @@
 #include "handler.h"
 
 
-void rtc_handler(channel_t __ch, payload_t *payloads) {
-    if ((payloads[0] & 1) != 1) {
+void rtc_handler(channel_t __ch, payload_t *m) {
+    if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
     }
 
-    switch (payloads[1]) {
+    switch (EXTRACT_MSGID(m)) {
     case MSGID(datetime_device, get_date):
-    {
         DEBUG("received datetime_device.get_date");
-            rtc_datetime_device_get_date(__ch);
-            return;
-    }
+        rtc_datetime_device_get_date(
+            __ch
+        );
+        return;
     }
 
-    WARN("unsupported message: interface=%d, type=%d", payloads[2] >> 16, payloads[1] & 0xffff);
+    WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
