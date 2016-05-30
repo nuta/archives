@@ -5,7 +5,7 @@
 #include <resea/net_device.h>
 
 /** handles net_device.listen */
-void _net_device_listen(
+void virtio_net_device_listen(
     channel_t __ch
     , channel_t channel
 ) {

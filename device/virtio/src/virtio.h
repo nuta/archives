@@ -1,8 +1,17 @@
 #ifndef __VIRTIO_H__
 #define __VIRTIO_H__
 
-extern bool virtio_initialized;
+#define PACKAGE_NAME "virtio"
 #include <resea.h>
+
+struct ethernet_header {
+    uint8_t   dest[6];
+    uint8_t   src[6];
+    uint16_t  type;
+} PACKED;
+
+#define ETHERNET_HEADER_SIZE  sizeof(struct ethernet_header)
+#define MAX_DATA_SIZE         1500
 
 #define VIRTIO_PCI_VENDOR       0x1af4
 #define VIRTIO_PCI_DEVICEID     0x1000
