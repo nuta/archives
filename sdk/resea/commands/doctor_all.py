@@ -7,6 +7,7 @@ from resea.commands.doctor import main as doctor_main
 from resea.validators import validate_package_yml
 from resea.helpers import load_yaml, plan, notice, render
 
+SHORT_HELP = "generate all packages documentaion"
 
 INDEX_HTML = """\
 <!DOCTYPE html>
