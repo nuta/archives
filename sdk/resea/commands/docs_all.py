@@ -45,6 +45,6 @@ def alldocs(args):
 def main(args):
     parser = argparse.ArgumentParser(prog='resea docs',
                                      description='Generate HTML docs')
-    parser.add_argument('--outdir', default="html_docs")
+    parser.add_argument('outdir')
     parser.add_argument('--revision', default="unknown_revision")
     alldocs(parser.parse_args(args))
