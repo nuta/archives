@@ -6,7 +6,6 @@
 
 
 handler_t rtc_handler;
-bool rtc_initialized = false;
 
 void rtc_startup(void) {
     channel_t ch;
@@ -16,6 +15,5 @@ void rtc_startup(void) {
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(datetime_device), &r);
 
-    rtc_inialized = true;
     serve_channel(ch, &rtc_handler);
 }
