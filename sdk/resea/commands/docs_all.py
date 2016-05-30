@@ -20,7 +20,8 @@ def alldocs(args):
     kwargs = {
         'revision': args.revision
     }
-    
+
+    os.makedirs(args.outdir)
     generate_documentation_dir('Documentation', os.path.join(args.outdir), **kwargs)
 
     for f in files:
