@@ -63,21 +63,3 @@ The kernel does not care about semantics of a message. Thread have to determine 
 type of a message and know the its structure. *Interface* is a set of message definitions just
 like [Protocol Buffers](https://developers.google.com/protocol-buffers/) which defines
 structures of messages.
-
-### Interface IDs used in official packages
-- 1: channel
-- 2: memory
-- 3: pager
-- 4: io
-- 5: thread
-- 6: datetime
-- 7: exec
-- 8: fs
-- 9: tcpip
-- 100: net_device
-- 101: storage_device
-- 102: datetime_device
-- 1001: elf
-- 1002: zeroed_pager
-- 1004: virtio
-- 1005: pci
