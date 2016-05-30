@@ -26,7 +26,6 @@ env:
     - TARGET=interfaces/storage_device
     - TARGET=interfaces/net_device
     - TARGET=interfaces/datetime_device
-    - TARGET=resea.net
     - TARGET=SDK
 
 services:
