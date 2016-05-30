@@ -85,7 +85,7 @@ HANDLE_CPP_TEMPLATE = """\
 {% endfor %}
 
 /** handles {{ interface_name }}.{{ msg_name }} */
-void {{ name }}_{{ interface_name }}_{{ msg_name }}(
+void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
     channel_t __ch
 {% for type, name in payloads %}
     , {{ type }} {{ name }}
