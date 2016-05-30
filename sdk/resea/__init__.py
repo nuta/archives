@@ -16,6 +16,7 @@ command_list = [
     'new',
     'scaffold',
     'doctor',
+    'doctor-all',
     'alldocs',
     'version',
     'help'

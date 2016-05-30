@@ -11,7 +11,7 @@ def main(args):
     if command not in resea.command_list:
         error('command not found: {}'.format(command))
 
-    m = import_module('resea.commands.{}'.format(command))
+    m = import_module('resea.commands.{}'.format(command.replace('-', '_')))
 
     exit_code = m.main(args[1:])
     if exit_code is None:
