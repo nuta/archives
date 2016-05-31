@@ -1,12 +1,18 @@
 from copy import copy
+import glob
 import os
+import sqlite3
+import subprocess
+import urllib.request
 from resea.var import local_config, global_config, Config, get_var
-from resea.helpers import load_yaml, error
+from resea.helpers import load_yaml, error, progress
 from resea.validators import validate_package_yml, ValidationError
+
+REGISTRY_DB_URL = 'http://resea.net/registry.db'
 
 
 paths = None # cache
-def load_reseapath():
+def load_reseapath(base):
     """Looks up for .reseapath in parent directories."""
     global paths
 
@@ -15,6 +21,7 @@ def load_reseapath():
 
     paths = []
     wd = os.getcwd()
+    os.chdir(base)
     while True:
         cwd = os.getcwd()
 
@@ -34,13 +41,49 @@ def load_reseapath():
     return paths
 
 
-def get_package_dir(package):
+def get_package_from_registry(package):
+    for d in ['tmp', 'vendor']:
+        try:
+            os.makedirs(d)
+        except FileExistsError:
+            pass
+
+    db_path = os.path.join('tmp', 'registry.db')
+
+    # download the registry database
+    if not os.path.exists(db_path):
+        urllib.request.urlretrieve(REGISTRY_DB_URL, db_path)
+
+    # look for the package
+    db = sqlite3.connect(db_path)
+    c = db.execute('SELECT type, uri FROM packages WHERE name = ?',(package,))
+    type_, uri = c.fetchone()
+
+    # download it
+    if type_ == 'github':
+        name = 'github-{}'.format(uri.replace('/', '-'))
+        repo_path = os.path.join('vendor', name)
+        if not os.path.exists(repo_path):
+            repo_url = 'git://github.com/{}'.format(uri)
+            progress('cloning ' + repo_url)
+            subprocess.run(['git', 'clone', repo_url, repo_path]) # TODO: use pure python
+
+
+def get_package_dir(package, search_registry=True):
     """Returns a path to the package."""
 
-    for path in [os.path.abspath('..')] + load_reseapath():
+    paths = [os.path.abspath('..')]
+    for base in ['.'] + glob.glob('vendor/*'):
+        paths += load_reseapath(base)
+
+    for path in paths:
         d = os.path.join(path, package)
         if os.path.exists(os.path.join(d, 'package.yml')):
             return d
+
+    if search_registry:
+        get_package_from_registry(package)
+        return get_package_dir(package, search_registry=False)
 
     error("package not found: '{}'".format(package))
 
