@@ -1,4 +1,5 @@
 import re
+from collections import OrderedDict
 
 
 class UndefinedVarError(Exception):
@@ -11,7 +12,7 @@ class UndefinedVarError(Exception):
 
 class Config:
     def __init__(self):
-        self.d = {}
+        self.d = OrderedDict()
 
     def getdict(self):
         return self.d
@@ -52,7 +53,7 @@ class Config:
 
 
 global_config = Config()
-local_config = {}
+local_config = OrderedDict()
 
 
 def expand_var(val, package=None):

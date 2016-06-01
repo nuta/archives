@@ -1,4 +1,5 @@
 from copy import copy
+from collections import OrderedDict
 import glob
 import os
 import sqlite3
@@ -149,7 +150,7 @@ def load_packages(builtin_packages, enable_if=False, update_env=False):
     global_config.set('LANGS', {})
     global_config.set('BUILTIN_APPS', [])
 
-    ymls = {}
+    ymls = OrderedDict()
     loaded_packages = []
     packages = builtin_packages.copy()
 
