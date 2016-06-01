@@ -76,11 +76,11 @@ config:
   SOURCES:
     set:
       - src/startup.cpp
+      - src/handler.cpp
       - src/asm.S
       - src/exception.cpp
       - src/gdt.cpp
       - src/global.cpp
-      - src/handler.cpp
       - src/idt.cpp
       - src/init.S
       - src/init2.cpp
@@ -91,11 +91,9 @@ config:
       - src/pic.cpp
       - src/print.cpp
       - src/smp.cpp
-      - src/startup.cpp
       - src/thread.cpp
       - src/tss.cpp
       - src/vm.cpp
       - src/cpu.cpp
-      - src/handler.cpp
       - src/callback.cpp
 
