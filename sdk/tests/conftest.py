@@ -23,6 +23,7 @@ def package(request):
     yaml.dump(package_yml, open('package.yml', 'w'))
 
     open('src/startup.cpp', 'w').write("""\
+#include "hello.h"
 #include <resea.h>
 
 void hello_startup(void){
@@ -33,7 +34,17 @@ void hello_startup(void){
 }
 """)
 
+    open('src/hello.h', 'w').write("""\
+#ifndef __HELLO_HELLO_H__
+#define __HELLO_HELLO_H__
+
+#define PACKAGE_NAME "hello"
+
+#endif
+""")
+
     open('src/test.cpp', 'w').write("""\
+#include "hello.h"
 #include <resea.h>
 
 void hello_test(void) {
