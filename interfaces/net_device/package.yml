@@ -46,11 +46,11 @@ interface:
   listen:
     id: 1
     type: request
-    reply: receive_reply
+    reply: listen_reply
     payloads:
       - name: channel
         type: channel
-  receive_reply:
+  listen_reply:
     id: 2
     type: reply
     payloads:
@@ -68,7 +68,7 @@ interface:
         type: data
       - name: type
         type: net_device(packet_type)
-      - name: packet
+      - name: data
         type: data
         attrs: [readonly]
   transmit_reply:
@@ -110,5 +110,5 @@ interface:
         type: data
       - name: type
         type: net_device(packet_type)
-      - name: packet
+      - name: data
         type: data
