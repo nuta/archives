@@ -36,8 +36,12 @@ interface:
 #  Config
 #
 config:
-  SOURCES:
-    set:
-      - src/startup.cpp
-      - src/handler.cpp
-      - src/datetime_device.get_date.cpp
+  - SOURCES:
+      set:
+        - src/startup.cpp
+        - src/handler.cpp
+        - src/datetime_device.get_date.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      append:
+        - tests/test.cpp
