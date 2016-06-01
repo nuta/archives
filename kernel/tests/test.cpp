@@ -5,7 +5,7 @@
 
 
 void kernel_test(void) {
-    channel_t client, server;
+    channel_t client;
     result_t r;
 
     //
