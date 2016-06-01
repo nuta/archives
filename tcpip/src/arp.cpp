@@ -1,4 +1,5 @@
 #include <string.h>
+#include "tcpip.h"
 #include "arp.h"
 #include "endian.h"
 #include "printf.h"
