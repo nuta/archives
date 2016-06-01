@@ -63,7 +63,7 @@ global_config:
         doctor:   '{{ CPP_DIR }}/doctor'
   CXXFLAGS:
     append_words: >
-      -Wall -ggdb3 -std=c++14 -Wno-incompatible-library-redeclaration
+      -Wall -ggdb3 -std=c++14
       -fdiagnostics-color -fno-exceptions -fno-rtti
       -I{{ CPP_DIR }}/src -I{{ BUILD_DIR }}/stubs/cpp
 
