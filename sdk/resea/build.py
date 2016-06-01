@@ -170,8 +170,8 @@ def build(args):
     ymls = load_packages(packages, enable_if=True, update_env=True)
 
     build_dir = get_var('BUILD_DIR')
-
     plan('Building {CATEGORY} with {HAL} HAL in {BUILD_DIR} ({ENV})'.format(**global_config.getdict()))
+
     # install os requirements
     os_requirements_pickle = os.path.join(build_dir, 'os_requirements.pickle')
     os_requirements = list(map(lambda y: y['os_requirements'], ymls.values()))
@@ -258,25 +258,28 @@ def build(args):
         for _, obj, _ in files:
             target_deps.append(obj)
 
-    # clean up if build config have been changed
     buildconfig = (global_config.getdict(), [c.getdict() for c in local_config.values()])
     buildconfig_pickle = os.path.join(build_dir, 'buildconfig.pickle')
-    if os.path.exists(build_dir) and not is_object_equals_to_pickle(buildconfig, buildconfig_pickle):
-         plan('detected build config changes; cleaning the build directory')
-         progress('deleting {}'.format(build_dir)) 
-         shutil.rmtree(build_dir)
+    generate_makefile = True
+    if os.path.exists(build_dir):
+        # clean up if build config have been changed
+        if is_object_equals_to_pickle(buildconfig, buildconfig_pickle):
+            generate_makefile = False
+        else:
+            plan('detected build config changes; cleaning the build directory')
+            progress('deleting {}'.format(build_dir))
+            shutil.rmtree(build_dir)
 
-    # generate the build directory
-    if not os.path.exists(build_dir):
-        os.makedirs(build_dir, exist_ok=True)
+    os.makedirs(build_dir, exist_ok=True)
 
     # save the build config and the os requirements to detect changes
     pickle.dump(buildconfig, open(buildconfig_pickle, 'wb'))
     pickle.dump(os_requirements, open(os_requirements_pickle, 'wb'))
 
-    # generate makefile if needed
     makefile = build_dir + '/Makefile'
-    if not os.path.exists(makefile):
+
+    # generate makefile if needed
+    if generate_makefile:
         with open(makefile, 'w') as f:
             f.write(render(MAKEFILE_TEMPLATE, locals()))
 
