@@ -55,10 +55,6 @@ enum {
  */
 void printfmt (const char *format, ...);
 
-#ifndef PACKAGE_NAME
-#define PACKAGE_NAME  "somewhere"
-#endif
-
 #undef BUG
 #define BUG(fmt, ...)    printfmt("[" PACKAGE_NAME "] BUG: "   fmt, ##__VA_ARGS__)
 #undef INFO
