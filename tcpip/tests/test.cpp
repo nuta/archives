@@ -32,7 +32,7 @@ static void udp_server(channel_t ch, payload_t *m) {
 static void udp_client(channel_t ch, payload_t *m) {
     void *data;
 
-    switch (m[1]) {
+    switch (EXTRACT_MSGID(m)) {
     case MSGID(tcpip, received):
         data = EXTRACT(m, tcpip, received, payload);
         DEBUG("udp_client: received '%s'", data);
