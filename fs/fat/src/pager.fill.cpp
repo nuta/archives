@@ -19,7 +19,7 @@ void fat_pager_fill(
     size_t r_size;
 
     data   = allocate_memory(size, MEMORY_ALLOC_NORMAL); // TODO: free on failure
-    result = fat_read(&fat_the_disk, fat_get_file_by_id(id),
+    result = fat_read(&fat_instance, fat_get_file_by_id(id),
                       offset, data, size, &r_size);
 
     sendas_pager_fill_reply(__ch,

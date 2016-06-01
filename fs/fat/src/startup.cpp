@@ -7,7 +7,7 @@
 
 
 channel_t storage_device_ch;
-struct fat_disk fat_the_disk; // XXX
+struct fat_disk fat_instance; // XXX
 
 
 static result_t read_disk(struct fat_disk *disk, fat_lba_t lba, fat_size_t num,
@@ -47,7 +47,7 @@ void fat_startup(void) {
     call_channel_connect(connect_to_local(1), storage_device_ch,
         INTERFACE(storage_device), &r);
 
-    fat_opendisk(&fat_the_disk, storage_device_ch, read_disk, write_disk);
+    fat_opendisk(&fat_instance, storage_device_ch, read_disk, write_disk);
 
     ch = create_channel();
     call_channel_register(connect_to_local(1), ch,

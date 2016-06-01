@@ -109,7 +109,7 @@ struct fat_dir {
     fat_offset_t index;
 };
 
-extern struct fat_disk fat_the_disk;
+extern struct fat_disk fat_instance;
 
 result_t fat_opendisk(struct fat_disk *disk, channel_t ch,
                     fat_os_read_disk *read_disk,
