@@ -62,12 +62,6 @@ interface:
     type: request
     reply: transmit_reply
     payloads:
-      - name: dest_hwaddr
-        type: data
-      - name: src_hwaddr
-        type: data
-      - name: type
-        type: net_device(packet_type)
       - name: data
         type: data
         attrs: [readonly]
@@ -93,10 +87,6 @@ interface:
         type: net_device(hw_type)
       - name: hwaddr
         type: data
-      - name: device_header_size
-        type: size
-      - name: device_footer_size
-        type: size
       - name: max_data_size
         type: size
 
@@ -104,11 +94,5 @@ interface:
     id: 9
     type: push
     payloads:
-      - name: dest_hwaddr
-        type: data
-      - name: src_hwaddr
-        type: data
-      - name: type
-        type: net_device(packet_type)
       - name: data
         type: data
