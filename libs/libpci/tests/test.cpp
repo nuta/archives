@@ -1,4 +1,4 @@
-#include "../src/libpci.h"
+#define PACKAGE_NAME "libpci"
 #include <resea.h>
 
 
