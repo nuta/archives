@@ -8,25 +8,37 @@ language: cpp
 
 env:
   matrix:
-    - TARGET=kernel
-    - TARGET=tcpip
-    - TARGET=fs/fat
+    - TARGET=device/pci
+    - TARGET=device/rtc
+    - TARGET=device/virtio
     - TARGET=exec/elf
-    - TARGET=lang/cpp
+    - TARGET=fs/fat
     - TARGET=interfaces/channel
     - TARGET=interfaces/datetime
+    - TARGET=interfaces/datetime_device
     - TARGET=interfaces/exec
     - TARGET=interfaces/fs
     - TARGET=interfaces/hal
     - TARGET=interfaces/io
     - TARGET=interfaces/lang
     - TARGET=interfaces/memory
-    - TARGET=interfaces/pager
-    - TARGET=interfaces/thread
-    - TARGET=interfaces/storage_device
     - TARGET=interfaces/net_device
-    - TARGET=interfaces/datetime_device
+    - TARGET=interfaces/pager
+    - TARGET=interfaces/storage_device
+    - TARGET=interfaces/thread
+    - TARGET=interfaces/zeroed_pager
+    - TARGET=kernel
+    - TARGET=lang/cpp
+    - TARGET=libs/libpci
+    - TARGET=misc/genstartcpp
+    - TARGET=tcpip
     - TARGET=SDK
+
+# TODO
+#    - TARGET=hal/arm
+#    - TARGET=hal/lib
+#    - TARGET=hal/posix_host
+#    - TARGET=hal/x86
 
 services:
   - docker
