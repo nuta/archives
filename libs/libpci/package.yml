@@ -42,3 +42,8 @@ global_config:
   CXXFLAGS:
     append_words: -I{{ LIBPCI_DIR }}/include
 
+config:
+  - if: "ENV == 'test'"
+    SOURCES:
+      set:
+        - tests/test.cpp
