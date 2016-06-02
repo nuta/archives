@@ -87,6 +87,10 @@ config:
     SOURCES:
       append:
         - src/x86.cpp
+  - if: "HAL == 'arm'"
+    SOURCES:
+      append:
+        - src/arm.cpp
   - if: "HAL == 'posix_host'"
     SOURCES:
       append:
