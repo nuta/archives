@@ -282,7 +282,7 @@ void kernel_thread_startup(void) {
     // create the kernel's thread group and a temporary thread
     kernel_create_thread(0, nullptr, 0, &thread, &group);
     hal_set_current_thread_id(thread);
-    DEBUG("set current thread:#%d.%d", group, thread);
+    DEBUG("set current thread to #%d.%d", group, thread);
 
     hal_set_callback(HAL_CALLBACK_RUN_THREAD,      (void *) run_thread);
     hal_set_callback(HAL_CALLBACK_TIMER_TICK,      (void *) kernel_hard_switch_thread);
