@@ -1,7 +1,0 @@
-#!/bin/sh
-[ -z $QEMU ] && QEMU=qemu-system-arm
-
-exec $QEMU \
-    -m 256 -localtime -nographic -no-reboot \
-    -M versatileab -cpu arm1176 \
-    -kernel $1
