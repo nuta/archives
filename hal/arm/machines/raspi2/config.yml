@@ -1,0 +1,19 @@
+include_if: "MACHINE == 'raspi2'"
+
+global_config:
+  CXXFLAGS:
+    append_words: >
+      -ffreestanding
+      -I{{ ARM_DIR }}/src
+      -I{{ ARM_DIR }}/machines/raspi2/include
+      -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
+  HAL_RUN:
+    default: "{{ ARM_DIR }}/machines/raspi2/run"
+  HAL_GENIMAGE:
+    default: "{{ ARM_DIR }}/machines/raspi2/genimage"
+  HAL_LINK:
+    default: >
+      {{ LD }} -Map {{ BUILD_DIR }}/executable.map
+      -nostdlib -nodefaultlibs
+      -T{{ ARM_DIR }}/machines/raspi2/executable.lds
+      -o

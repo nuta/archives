@@ -34,8 +34,7 @@ interface:
 #  Machines
 #
 includes:
-  - machines/raspi/config.yml
-  - machines/versatileab/config.yml
+  - machines/raspi2/config.yml
 
 #
 #  Config

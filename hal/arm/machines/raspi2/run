@@ -1,0 +1,7 @@
+#!/bin/sh
+exec qemu-system-arm \
+    -m 256 -localtime -nographic \
+    -no-reboot -boot d \
+    -M raspi2 \
+    -kernel $1
+

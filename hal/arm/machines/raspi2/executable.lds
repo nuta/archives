@@ -1,6 +1,6 @@
 OUTPUT_FORMAT("elf32-littlearm");
 ENTRY(arm_init);
- 
+
 SECTIONS
 {
     . = 0x00008000;
@@ -10,7 +10,7 @@ SECTIONS
         *(.text);
     }
     . = ALIGN(0x1000);
- 
+
     .rodata :{
         *(.rodata)
     }

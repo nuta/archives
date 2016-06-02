@@ -1,3 +1,0 @@
-#!/bin/sh
-echo "raspi: run is not supported"
-exit 1
