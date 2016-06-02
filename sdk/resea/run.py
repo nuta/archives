@@ -4,6 +4,7 @@ import sys
 import atexit
 import datetime
 import subprocess
+import shutil
 import time
 from termcolor import cprint, colored
 from resea.helpers import info, error, progress, success, fail, notice
@@ -17,16 +18,7 @@ class BugFoundError(Exception):
 def lprint(s):
     """Prints a log message beautifully."""
 
-    # try to get the column length of terminal
-    try:
-        columns = int(subprocess.check_output(['stty', 'size'],
-                          stderr=subprocess.PIPE).split()[1])
-    except ValueError:
-        columns = 80
-    except subprocess.CalledProcessError:
-        columns = 80
-    except FileNotFoundError:
-        columns = 80
+    columns = shutil.get_terminal_size()[0]
 
     try:
         # log message format is '[package_name] TYPE: a message from the package'
