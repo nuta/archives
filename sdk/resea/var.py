@@ -65,7 +65,10 @@ def expand_var(val, package=None):
 
             val = val.replace(m.group(0), get_var(m.group(1), package))
 
-    return val
+    if isinstance(val, str):
+        return val.strip()
+    else:
+        return val
 
 
 def get_var(k, package=None, default=None):

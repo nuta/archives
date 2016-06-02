@@ -93,7 +93,8 @@ def _load_include(package, include, config, enable_if):
         include_yml = load_yaml(os.path.join(get_package_dir(package), include))
         try:
             # FIXME
-            include_if = not enable_if or eval(include_yml['include_if'], config)
+            include_if = not enable_if or eval(include_yml['include_if'],
+                                               copy(config.getdict()))
         except Exception as e:
             error("eval(include_if) in {}: {}".format(
                 package, str(e)))
@@ -161,15 +162,28 @@ def load_packages(builtin_packages, enable_if=False, update_env=False):
 
         package_yml_path = os.path.join(get_package_dir(package), 'package.yml')
         yml = load_yaml(package_yml_path, validator=validate_package_yml)
-        ymls[package] = yml
 
         # include
         for include in yml.get('includes', []):
-            yml.update(load_include(package, include, enable_if))
+            for k, v in _load_include(package, include, global_config, enable_if).items():
+                # XXX: it looks ugly
+                if k in ['config', 'global_config'] and isinstance(v, dict):
+                    v = [v]
+
+                if k in yml:
+                    if isinstance(v, dict):
+                        yml[k].update(v)
+                    else:
+                        yml[k] += v
+                else:
+                    yml[k] = v
+
+        yml = validate_package_yml(yml) # yml is modified by include; re-validate it
+        ymls[package] = yml
 
         # update config
-        load_global_config(yml.get('global_config', {}), enable_if)
-        load_local_config(package, yml.get('config', {}), enable_if)
+        load_global_config(yml.get('global_config', []), enable_if)
+        load_local_config(package, yml.get('config', []), enable_if)
         global_config.set(package.upper() + '_DIR', get_package_dir(package))
         global_config.append('STUBS', (package, package_yml_path))
 
