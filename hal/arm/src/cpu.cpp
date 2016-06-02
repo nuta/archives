@@ -1,5 +1,8 @@
 #include <hal.h>
-void exit(int);
+#include "arm.h"
+
+
+struct arm_cpuvar arm_cpuvars[CPU_MAX_NUM];
 
 void hal_panic(void) {
 

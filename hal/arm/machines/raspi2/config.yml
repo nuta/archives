@@ -17,3 +17,8 @@ global_config:
       -nostdlib -nodefaultlibs
       -T{{ ARM_DIR }}/machines/raspi2/executable.lds
       -o
+
+config:
+  SOURCES:
+    append:
+      - machines/raspi2/cpu.cpp
