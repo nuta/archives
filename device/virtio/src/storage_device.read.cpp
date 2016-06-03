@@ -25,8 +25,8 @@ void virtio_storage_device_read(channel_t __ch, offset_t offset, size_t size){
                                  &data);
 
         sendas_storage_device_read_reply(__ch,
-	    result, PAYLOAD_INLINE,
-	    data,   PAYLOAD_MOVE_OOL,
-	    size,   PAYLOAD_INLINE);
+            result, PAYLOAD_INLINE,
+            data,   PAYLOAD_MOVE_OOL,
+            size,   PAYLOAD_INLINE);
     }
 }

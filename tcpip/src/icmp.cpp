@@ -17,7 +17,7 @@ void tcpip_receive_icmp(struct addr *src_addr, struct addr *dest_addr,
     code = header->code;
     checksum = tcpip_to_host_endian16(header->checksum);
     data     = tcpip_to_host_endian32(header->data);
-    
+
     switch (type) {
     case TCPIP_ICMPTYPE_ECHO_REPLY:   type_str = "ECHO REPLY "; break;
     case TCPIP_ICMPTYPE_ECHO_REQUEST: type_str = "ECHO REQUEST "; break;

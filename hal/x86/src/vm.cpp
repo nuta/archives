@@ -37,10 +37,10 @@ static paddr_t lookup_page_entry (struct vm_space *vms, uintptr_t v, bool alloca
         if (!t[idx]) {
             /* the PDPT, PD or PT is not allocated so allocate it */
             if (allocate) {
-	        uintptr_t addr;
+                uintptr_t addr;
                 paddr_t paddr;
 
-                call_hal_callback(HAL_CALLBACK_ALLOCATE_MEMORY, 
+                call_hal_callback(HAL_CALLBACK_ALLOCATE_MEMORY,
                     0, sizeof(uint64_t) * PAGE_ENTRY_NUM,
                     MEMORY_ALLOC_PAGE_ALIGNED | MEMORY_ALLOC_CONTINUOUS,
                     &addr, &paddr);

@@ -33,7 +33,7 @@ struct mbuf *tcpip_append_mbuf(struct mbuf *head,
                                struct mbuf *tail,
                                bool is_packet) {
 
-    if (!head) 
+    if (!head)
         return tail;
 
     if (is_packet) {

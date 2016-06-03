@@ -62,7 +62,7 @@ static void add_chunk(size_t size, size_t num) {
             }
 
             chunk = chunk->next;
-        } 
+        }
 
         new_chunk->next = chunk->next;
         chunk->next     = new_chunk;

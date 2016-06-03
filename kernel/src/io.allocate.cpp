@@ -17,13 +17,13 @@ void kernel_io_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size
     switch (iospace) {
     case IO_SPACE_PORT: // TODO: permit
         vaddr = addr;
-	break;
+        break;
     case IO_SPACE_MEM:
-	vaddr = kernel_vmalloc(size);
+        vaddr = kernel_vmalloc(size);
         hal_link_page(&kernel_get_current_thread_group()->vm, vaddr,
-	              size / PAGE_SIZE, addr, PAGE_PRESENT | PAGE_WRITABLE);
+                      size / PAGE_SIZE, addr, PAGE_PRESENT | PAGE_WRITABLE);
         DEBUG("allocated memory-mapped IO (v=%p, p=%p)", vaddr, addr);
-	break;
+        break;
     }
 
     send_io_allocate_reply(__ch, OK, vaddr);

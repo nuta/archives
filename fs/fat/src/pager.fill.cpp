@@ -24,6 +24,6 @@ void fat_pager_fill(
 
     sendas_pager_fill_reply(__ch,
         result,  PAYLOAD_INLINE,
-	data,    PAYLOAD_MOVE_OOL,
-	r_size,  PAYLOAD_INLINE);
+        data,    PAYLOAD_MOVE_OOL,
+        r_size,  PAYLOAD_INLINE);
 }

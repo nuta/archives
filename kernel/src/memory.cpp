@@ -8,32 +8,26 @@
 #include "kernel.h"
 
 
-/*
- *  Physical memory space
- */
+// Physical memory space
 struct pm_space {
     mutex_t    lock;
-    size_t     num;    /* the number of pages */
-    paddr_t    paddr;   /* the beginning address of the space */
-    uint8_t    *pages; /* reference counts */
-    struct pm_space *next; /* the next physical memory space if it is not nullptr */
+    size_t     num;        // the number of pages
+    paddr_t    paddr;      // the beginning address of the space
+    uint8_t    *pages;     // reference counts
+    struct pm_space *next; // the next physical memory space if it is not nullptr
 };
 
 
-/* a singly linked list of physical memory spaces */
+// a singly linked list of physical memory spaces
 static struct pm_space *memory_spaces = nullptr;
 static size_t memory_space_num = 0;
 static uintptr_t dynamic_vpages_start = 0;
 static size_t dynamic_vpages_num = 0;
 
 
-/**
- *
- *  Initlaizes memory management
- *
- *  @param[in] mmap  a memory map
- *
- */
+
+
+// Initlaizes memory management
 static void init_memory(void) {
     struct hal_pmmap *pmmap = hal_get_pmmaps();
     struct hal_vmmap *vmmap = hal_get_vmmaps();
@@ -41,9 +35,7 @@ static void init_memory(void) {
 
     memory_spaces = (struct pm_space *) hal_paddr_to_vaddr(pmmap[0].addr);
 
-    /*
-     *  add memory maps from HAL into this CPU's `memory_spaces`
-     */
+    // add memory maps from HAL into `memory_spaces`
     for (i=0; pmmap[i].size > 0; i++) {
         struct pm_space *m;
 
@@ -67,12 +59,10 @@ static void init_memory(void) {
         memory_space_num++;
     }
 
-    //
     //  XXX: look for dynamic vpages area
-    //
     for (i=0; vmmap[i].size > 0; i++) {
         if (vmmap[i].type == VMMAP_DYNAMIC) {
-           dynamic_vpages_start = vmmap[i].addr; 
+           dynamic_vpages_start = vmmap[i].addr;
            dynamic_vpages_num   = vmmap[i].size / PAGE_SIZE;
            break;
         }
@@ -90,13 +80,13 @@ size_t kernel_get_dynamic_vpages_num(void) {
 }
 
 
-/**
- *  Allocates virtual memory pages
- *
- *  @param[in] size  The number of bytes.
- *  @return  The beginning virtual address of the allocated virtual pages.
- *
- */
+//
+// Allocates virtual memory pages
+//
+// `size` is the number of bytes. It returns the beginning of the allocated
+// virtual memory pages. Note that it allocates only virtual memory pages.
+//
+//
 uintptr_t kernel_vmalloc(size_t size) {
     void *p;
     size_t num = size / PAGE_SIZE + ((size % PAGE_SIZE == 0)? 0:1);
@@ -108,7 +98,7 @@ uintptr_t kernel_vmalloc(size_t size) {
     p = memchrseq(vpages, sizeof(*vpages) * dynamic_vpages_num, 0x00, num);
 
     if (p) {
-        /* allocation succeeded */
+        // allocation succeeded
         uintmax_t st = (PTR2ADDR(p) - PTR2ADDR(vpages));
 
         // mark as used
@@ -125,26 +115,23 @@ uintptr_t kernel_vmalloc(size_t size) {
 }
 
 
-/**
- *  Allocates physical memory pages
- *
- *  @param[in] num   The number of memory pages to be allocated.
- *  @return  The address to the allocated memory pages.
- *
- */
+//
+// Allocates physical memory pages
+//
+// `num` is the number of memory pages to be allocated.
+// It returns the physical memory address to the allocated memory pages.
+//
+//
 static paddr_t pmalloc(size_t num) {
     struct pm_space *m = memory_spaces;
 
     for (size_t i=0; i < memory_space_num; m = m->next, i++) {
-        /*
-         *  look for enough continuous pages
-         */
-
+        // look for enough continuous pages
         lock_mutex(&m->lock);
         void *p = memchrseq(m->pages, sizeof(*m->pages) * m->num, 0x00, num);
 
         if (p) {
-            /* allocation succeeded */
+            // allocation succeeded
             uintmax_t st = (PTR2ADDR(p) - PTR2ADDR(m->pages));
 
             // increment the reference counts
@@ -163,60 +150,12 @@ static paddr_t pmalloc(size_t num) {
 }
 
 
-/**
- *  Frees physical memory pages
- *
- *  @param[in] p    The addreess to a memory space to be freed.
- *  @param[in] num  The number of physical pages to be freed.
- *
- */
-UNUSED static void pfree(paddr_t p, size_t num) {
-    struct pm_space *m;
-    paddr_t st, end;
-    uintmax_t i;
-
-    BUG_IF(num == 0, "pfree() with n=0");
-
-    /*
-     *  look for the space where `p` belongs to
-     */
-    for (m=memory_spaces; m != nullptr; m = m->next) {
-        st  = m->paddr;
-        end = m->paddr + (m->num * PAGE_SIZE);
-        if (st <= p && p <= end)
-            break;
-    }
-
-    if (m == nullptr || p < st || p >= end) {
-        DEBUG("pfree(): freeing an invalid pointer");
-        return;
-    }
-
-    /*
-     *  decrement reference count
-     */
-    i = (p - st) / PAGE_SIZE;
-    while(num > 0) {
-        m->pages[i]--;
-        i++;
-        num--;
-    }
-}
-
-
 void kernel_release_memory(void *p) {
   /* TODO */
 }
 
 
-/**
- *  Allocates memory block
- *
- *  @param[in] size   The size of memory pages to be allocated.
- *  @param[in] flags  Attribute of pages
- *  @return  The pointer to the allocated memory block.
- *
- */
+// Allocates memory block
 void *kernel_allocate_memory(size_t size, uint32_t flags) {
     uintptr_t addr;
     paddr_t paddr;
@@ -226,6 +165,7 @@ void *kernel_allocate_memory(size_t size, uint32_t flags) {
 }
 
 
+// Allocates a physical memory block and maps it to a virtual addres.
 result_t kernel_allocate_memory_at(paddr_t at, size_t size, uint32_t flags,
                                    uintptr_t *addr, paddr_t *paddr) {
     size_t required;
@@ -239,7 +179,7 @@ result_t kernel_allocate_memory_at(paddr_t at, size_t size, uint32_t flags,
             PANIC("pmalloc: failed to allocate memory");
     } else {
         WARN("at != 0 in %s()", __func__); // TODO
-	*paddr = at;
+        *paddr = at;
     }
 
     *addr = hal_paddr_to_vaddr(*paddr);
@@ -265,7 +205,7 @@ void kernel_page_fault_handler(uintptr_t addr, uint32_t reason) {
         struct vm_area *area = &g->vm.areas[i];
 
         if (area->addr <= addr && addr < area->addr + area->size) {
-            /* found the vm_area */
+            // found the vm_area
             offset_t offset; // offset from the area
             result_t result;
             uintptr_t aligned_addr, filled_addr;

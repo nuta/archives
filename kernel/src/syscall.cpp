@@ -47,7 +47,7 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
             header = m[i];
         } else {
             int type = (header >> (4 * ((i - 1) % 8))) & 0x0f;
-         
+
             switch (type) {
             case PAYLOAD_INLINE:
                 break;

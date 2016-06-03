@@ -22,7 +22,7 @@ result_t virtio_net_transmit(void *data, size_t size) {
     uintptr_t addr;
     paddr_t paddr;
     result_t r;
-  
+
     header.gso_type    = 0;
     header.hdr_len     = 0;
     header.gso_size    = 0;
@@ -103,7 +103,7 @@ static void new_device_handler(channel_t ch, payload_t *m) {
 
         DEBUG("virtio-net device found (%x:%x)",
             config->vendor, config->device);
-  
+
         // setup the device
         virtio_setup_device(&device, bar0);
         feats = virtio_get_features(&device);
@@ -113,7 +113,7 @@ static void new_device_handler(channel_t ch, payload_t *m) {
         virtio_init_queue(&device, VIRTIO_NET_CTRL_QUEUE);
         virtio_activate_device(&device);
 
-        for(int i=0; i < 6; i++) 
+        for(int i=0; i < 6; i++)
           mac_addr[i] = io_read8(device.iospace, device.iobase, VIRTIO_IO_NET_MAC_ADDR + i);
 
         INFO("virtio-net: MAC address is %x:%x:%x:%x:%x:%x",

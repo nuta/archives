@@ -66,8 +66,8 @@ void tcpip_receive_ipv4(struct mbuf *mbuf) {
     header_size = sizeof(struct tcpip_ipv4_header); // TODO: care about IHL
 
     if (version != 4) {
-	WARN("version is not 4 (version=%d)", version);
-	return;
+        WARN("version is not 4 (version=%d)", version);
+        return;
     }
 
     DEBUG("received IPv4: " FMT_IPV4ADDR " -> " FMT_IPV4ADDR,
@@ -86,11 +86,11 @@ void tcpip_receive_ipv4(struct mbuf *mbuf) {
 
     switch (proto) {
     case IPTYPE_ICMP:
-	tcpip_receive_icmp(&src, &dest, mbuf);
-	break;
+        tcpip_receive_icmp(&src, &dest, mbuf);
+        break;
     case IPTYPE_UDP:
-	tcpip_receive_udp(&src, &dest, mbuf);
-	break;
+        tcpip_receive_udp(&src, &dest, mbuf);
+        break;
     default: WARN("unknown proto type (proto=%04x)", proto);
     }
 }

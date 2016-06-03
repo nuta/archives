@@ -8,7 +8,7 @@
 
 
 /** handles fs.open */
-void fat_fs_open(channel_t __ch, 
+void fat_fs_open(channel_t __ch,
        uchar_t* path,
        size_t path_size,
        fs_filemode_t mode) {

@@ -5,8 +5,8 @@
 #define SERVERS_MAX  256
 
 struct server {
-    bool       used;
-    ident_t         group_id;
+    bool         used;
+    ident_t      group_id;
     channel_t    ch;
     interface_t  interface;
 };
@@ -14,6 +14,8 @@ struct server {
 static struct server servers[SERVERS_MAX];
 static mutex_t servers_lock;
 
+
+// Allocates a channel ID in the thread group.
 ident_t kernel_alloc_channel_id(struct thread_group *group) {
     ident_t i;
 
@@ -36,6 +38,7 @@ ident_t kernel_alloc_channel_id(struct thread_group *group) {
 }
 
 
+// Returns the pointer to the channel struct of the channel ID.
 struct channel *kernel_get_channel(struct thread_group *group, channel_t ch) {
 
     return &group->channels[ch];
@@ -44,7 +47,7 @@ struct channel *kernel_get_channel(struct thread_group *group, channel_t ch) {
 
 result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t dst) {
 
-    group->channels[src].used    = true;
+    group->channels[src].used        = true;
     group->channels[src].transfer_to = dst;
 
     DEBUG("transfer @%d:%d => @%d", group->id, src, dst);
@@ -53,7 +56,7 @@ result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t
 
 
 result_t kernel_link_channels(struct thread_group *group1, channel_t ch1,
-                                 struct thread_group *group2, channel_t ch2) {
+                              struct thread_group *group2, channel_t ch2) {
 
     group1->channels[ch1].used         = true;
     group1->channels[ch1].linked_group = group2->id;
@@ -67,6 +70,7 @@ result_t kernel_link_channels(struct thread_group *group1, channel_t ch1,
 }
 
 
+// Registers the channel as a server in `interface`.
 result_t kernel_register_channel(channel_t ch, interface_t interface) {
 
     lock_mutex(&servers_lock);
@@ -95,6 +99,7 @@ result_t kernel_register_channel(channel_t ch, interface_t interface) {
 }
 
 
+// Connects the channel `ch` to a server specified in `interface`.
 result_t kernel_connect_channel(channel_t ch, interface_t interface) {
     struct thread_group *current_group, *server_group;
     bool retried = false;
@@ -103,6 +108,7 @@ result_t kernel_connect_channel(channel_t ch, interface_t interface) {
 retry:
     lock_mutex(&servers_lock);
 
+    // search `servers` for an appreciate server
     int i;
     for (i=0; i < SERVERS_MAX; i++) {
         if (servers[i].used && servers[i].interface == interface) {

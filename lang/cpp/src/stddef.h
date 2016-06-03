@@ -8,7 +8,7 @@
 #else
 
 #include <stdint.h>
-typedef uintmax_t size_t; 
+typedef uintmax_t size_t;
 
 #endif
 

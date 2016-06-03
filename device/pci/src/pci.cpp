@@ -26,13 +26,13 @@ static uint16_t read_config16(uint16_t bus, uint16_t dev, offset_t offset){
 static uint32_t read_config32(uint16_t bus, uint16_t dev, offset_t offset){
     uint32_t addr;
     uint32_t data;
-  
+
     /* NOTE: offset must be multiple of 4 */
     addr = (uint32_t) ((1 << 31) | (bus << 16) | (dev << 11) | (offset & 0xfc));
-  
+
     io_write32(IO_SPACE_PORT, 0, PCI_IO_ADDR, addr);
     data = io_read32(IO_SPACE_PORT,  0, PCI_IO_DATA);
-  
+
     return (uint32_t) data;
 }
 

@@ -1,2 +1,2 @@
 # x86
-The HAL for AMD64/Intel64 processors.
+The HAL for x86_64 processors. 32-bit processors is not supported.

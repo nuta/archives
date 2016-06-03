@@ -1,5 +1,5 @@
 # kernel
-The `kernel` package consists of these components:
+The `kernel` is a set of essential components for almost all Resea applications:
 
 - system call handler
 - channel server

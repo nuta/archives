@@ -48,7 +48,7 @@ result_t sys_setoptions(channel_t ch, handler_t handler, void *buffer,
                         size_t size) {
     uintmax_t r;
     return do_syscall(SYSCALL_SETOPTIONS, ch, (uintmax_t) handler,
-	    (uintmax_t) buffer, (uintmax_t) size, 0, &r);
+            (uintmax_t) buffer, (uintmax_t) size, 0, &r);
 }
 
 

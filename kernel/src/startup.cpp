@@ -18,7 +18,7 @@ void kernel_startup(void) {
     kernel_channel_startup();
     kernel_memory_startup();
     kernel_thread_startup();
-    kernel_datetime_startup(); 
+    kernel_datetime_startup();
 
     ch = create_channel();
     set_channel_handler(ch, &kernel_handler);

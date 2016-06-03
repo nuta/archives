@@ -10,7 +10,7 @@
 
 
 /** handles memory.map */
-void kernel_memory_map(channel_t __ch, 
+void kernel_memory_map(channel_t __ch,
        ident_t group,
        uintptr_t addr,
        size_t size,
@@ -50,7 +50,7 @@ void kernel_memory_map(channel_t __ch,
     area->flags     = flags;
     area->pager     = pager;
     vm_space->areas_num++;
- 
+
     unlock_mutex(&current->lock);
 
    send_memory_map_reply(__ch, OK);

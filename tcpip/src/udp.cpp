@@ -58,8 +58,8 @@ void tcpip_receive_udp(struct addr *src_addr, struct addr *dest_addr,
     socket = tcpip_get_socket_by_addr(src_addr, dest_addr);
 
     if (!socket) {
-	WARN("socket not found, ignoring");
-	return;
+        WARN("socket not found, ignoring");
+        return;
     }
 
     void *payload = allocate_memory(length, MEMORY_ALLOC_NORMAL);

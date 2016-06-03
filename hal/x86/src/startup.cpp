@@ -139,7 +139,7 @@ void x86_init(void *binfo) {
     /* start the kernel */
     kernel_startup();
 
-    hal_startup(); 
+    hal_startup();
     x86_init_localapic_timer();
 
     /* start applications */

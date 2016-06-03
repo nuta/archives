@@ -25,7 +25,7 @@ static void new_device_handler(channel_t ch, payload_t *m) {
 
         DEBUG("virtio-blk device found (%x:%x)",
             config->vendor, config->device);
-  
+
         // setup the device
         virtio_setup_device(&device, bar0);
         feats = virtio_get_features(&device);
@@ -66,11 +66,11 @@ result_t virtio_blk_write(uintmax_t sector, size_t n, const void *data) {
     uintptr_t status_addr, buf_addr;
     paddr_t buf_paddr, header_paddr, status_paddr;
     result_t r;
-  
+
     data_size = n * VIRTIO_BLK_SECTOR_SIZE;
 
     DEBUG("write: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
-  
+
     call_memory_allocate_physical(get_memory_ch(),
         0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
         &r, (uintptr_t *) &header, &header_paddr);
@@ -88,17 +88,17 @@ result_t virtio_blk_write(uintmax_t sector, size_t n, const void *data) {
     rs[0].data  = (uint64_t) header_paddr;
     rs[0].size  = sizeof(*header);
     rs[0].flags = 0; // READONLY
-  
+
     memcpy((void *) buf_addr, data, data_size);
     INFO("buf=%p, data=%p, size=%d (%s)", buf_addr, data, data_size, data);
     rs[1].data  = (uint64_t) buf_paddr;
     rs[1].size  = data_size;
     rs[1].flags = 0; // READONLY
-  
+
     rs[2].data  = (uint64_t) status_paddr;
     rs[2].size  = sizeof(*status);
     rs[2].flags = VIRTIO_DESC_F_WRITE;
-  
+
     virtio_send_request(&device, VIRTIO_BLK_RQUEUE, (struct virtio_request *) &rs, 3);
     return OK;
 }
@@ -112,9 +112,9 @@ result_t virtio_blk_read(uintmax_t sector, size_t n, void **data) {
     paddr_t paddr, header_paddr, status_paddr;
     uintptr_t buf_addr, status_addr;
     result_t r;
-  
+
     data_size = n * VIRTIO_BLK_SECTOR_SIZE;
- 
+
     DEBUG("read: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
 
     call_memory_allocate_physical(get_memory_ch(),
@@ -134,17 +134,17 @@ result_t virtio_blk_read(uintmax_t sector, size_t n, void **data) {
     rs[0].data  = (uint64_t) header_paddr;
     rs[0].size  = sizeof(*header);
     rs[0].flags = 0; // READONLY
-  
+
     rs[1].data  = (uint64_t) paddr;
     rs[1].size  = data_size;
     rs[1].flags = VIRTIO_DESC_F_WRITE;
-  
+
     rs[2].data  = (uint64_t) status_paddr;
     rs[2].size  = sizeof(*status);
     rs[2].flags = VIRTIO_DESC_F_WRITE;
-  
+
     virtio_send_request(&device, VIRTIO_BLK_RQUEUE, (struct virtio_request *) &rs, 3);
-  
+
     *data = (void *) buf_addr;
     return OK;
 }

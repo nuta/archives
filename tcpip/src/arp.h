@@ -4,7 +4,7 @@
 #include "types.h"
 #include "mbuf.h"
 
-#define TCPIP_ARP_REQUEST  1 
+#define TCPIP_ARP_REQUEST  1
 #define TCPIP_ARP_REPLY    2
 
 struct tcpip_arp_header {

@@ -40,12 +40,12 @@ void arm_set_pin_mode(int pin, int mode) {
 
     switch (mode) {
     case ARM_PINMODE_PULLDOWN_INPUT:
-	pulldown(pin);
-	*gpfsel &= ~(7 << shift);
-	break;
+        pulldown(pin);
+        *gpfsel &= ~(7 << shift);
+        break;
     case ARM_PINMODE_ALT0:
-	*gpfsel |= 4 << shift;
-	break;
+        *gpfsel |= 4 << shift;
+        break;
     }
 }
 
@@ -53,13 +53,13 @@ void hal_printchar(const char ch) {
     static bool inited = false;
 
     if (!inited) {
-	inited = true;
+        inited = true;
 
         *ARM_UART0_CR = 0;
-	arm_set_pin_mode(14, ARM_PINMODE_PULLDOWN_INPUT);
-	arm_set_pin_mode(15, ARM_PINMODE_PULLDOWN_INPUT);
-	arm_set_pin_mode(14, ARM_PINMODE_ALT0);
-	arm_set_pin_mode(15, ARM_PINMODE_ALT0);
+        arm_set_pin_mode(14, ARM_PINMODE_PULLDOWN_INPUT);
+        arm_set_pin_mode(15, ARM_PINMODE_PULLDOWN_INPUT);
+        arm_set_pin_mode(14, ARM_PINMODE_ALT0);
+        arm_set_pin_mode(15, ARM_PINMODE_ALT0);
         *ARM_UART0_IBRD = 1;
         *ARM_UART0_FBRD = 40;
         *ARM_UART0_LCRH = 0x70;

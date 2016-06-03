@@ -44,7 +44,7 @@ retry:
             goto success;
     }
 
-    /* from the beginning */
+    // from the beginning
     for (i=1; i < THREAD_NUM_MAX; i++) {
         if (threads[i].status == THREAD_RUNNABLE)
             goto success;
@@ -194,7 +194,7 @@ result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_si
         group = create_thread_group();
     } else {
         BUG_IF(group >= THREAD_NUM_MAX, "invalid group ID");
-	BUG_IF(!thread_groups[group].used, "tried to join uncreated group");
+        BUG_IF(!thread_groups[group].used, "tried to join uncreated group");
     }
 
     thread = alloc_thread_id();

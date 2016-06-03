@@ -12,8 +12,8 @@ void tcpip_receive_arp(struct mbuf *mbuf) {
     uint32_t sender_proto_addr, target_proto_addr;
 
     if (mbuf->length - mbuf->begin < sizeof(struct tcpip_arp_header)) {
-	WARN("too short ARP packet (size=%zu)", mbuf->length - mbuf->begin);
-	return;
+        WARN("too short ARP packet (size=%zu)", mbuf->length - mbuf->begin);
+        return;
     }
 
     memcpy(sender_hw_addr, header->sender_hw_addr, sizeof(sender_hw_addr));
@@ -24,17 +24,17 @@ void tcpip_receive_arp(struct mbuf *mbuf) {
     target_proto_addr = tcpip_to_host_endian32(header->target_proto_addr);
 
     if (proto_type != 0x0800) {
-	WARN("non-ipv4 ARP packet (proto_type=%04x)", proto_type);
-	return;
+        WARN("non-ipv4 ARP packet (proto_type=%04x)", proto_type);
+        return;
     }
 
     DEBUG("%s " FMT_MACADDR " (" FMT_IPV4ADDR ") -> "
       FMT_MACADDR " (" FMT_IPV4ADDR ")",
         (op == TCPIP_ARP_REQUEST)? "REQUEST" : "REPLY",
-	FMTARG_MACADDR(sender_hw_addr),
-	FMTARG_IPV4ADDR(sender_proto_addr),
-	FMTARG_MACADDR(target_hw_addr),
-	FMTARG_IPV4ADDR(target_proto_addr)
+        FMTARG_MACADDR(sender_hw_addr),
+        FMTARG_IPV4ADDR(sender_proto_addr),
+        FMTARG_MACADDR(target_hw_addr),
+        FMTARG_IPV4ADDR(target_proto_addr)
     );
 }
 

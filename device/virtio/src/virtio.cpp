@@ -20,7 +20,7 @@ static int alloc_desc(struct virtio_queue *queue) {
             return i; // TODO: add lock into the virtio_desc
         }
     }
-  
+
     WARN("cannot allocate a virtio_desc");
     return -1;
 }
@@ -86,15 +86,15 @@ int virtio_send_request(struct virtio_device *device, int queue_index,
     int desc_index, next_desc_index, first_desc_index, used_index;
     struct virtio_queue *queue = &device->queues[queue_index];
     uint16_t *avail_ring = &queue->avail->ring;
-  
+
     if (rs_num < 0)
         return 1;
-  
+
     desc_index = alloc_desc(queue);
     first_desc_index = desc_index;
-  
+
     for (int i=0; i < rs_num; i++) {
-  
+
         /* does the next desc exist? */
         if (i < rs_num - 1) {
           next_desc_index = alloc_desc(queue);
@@ -104,20 +104,20 @@ int virtio_send_request(struct virtio_device *device, int queue_index,
           next_desc_index = 0;
           queue->desc[desc_index].flags = rs[i].flags;
         }
-    
+
         queue->desc[desc_index].addr = rs[i].data;
         queue->desc[desc_index].len  = rs[i].size;
         queue->desc[desc_index].next = next_desc_index;
         desc_index = next_desc_index;
     }
-  
+
     /* append the index of the first queue_desc to avail ring */
     avail_ring[queue->avail->index % queue->queue_num] = first_desc_index;
-  
+
     /* increment the index in avail_ring */
     MEMORY_BARRIER();
     queue->avail->index++;
-  
+
     used_index = queue->used->index;
     /* notify the device */
     io_write16(device->iospace, device->iobase,
@@ -148,19 +148,19 @@ int virtio_send_request(struct virtio_device *device, int queue_index,
  *  @returns  0 on success or 1 on fail
  */
 int virtio_setup_device(struct virtio_device *device, uint32_t bar0) {
-  
+
     /* get iospace and iobase from BAR0 in the PCI config space */
     device->iobase  = bar0 & 0xfffffffc;
     device->iospace = (bar0 & 1)? IO_SPACE_PORT : IO_SPACE_MEM;
-  
+
     /* reset */
     io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, 0x00);
     io_read8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS);
-  
+
     /* tell to the device that we know how to use */
     io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
              VIRTIO_STATUS_ACK | VIRTIO_STATUS_DRIVER);
-  
+
     return 0;
 }
 
@@ -172,7 +172,7 @@ int virtio_setup_device(struct virtio_device *device, uint32_t bar0) {
  *  @return  The features supported by the device.
  */
 uint32_t virtio_get_features(struct virtio_device *device) {
-  
+
     return io_read32(device->iospace, device->iobase, VIRTIO_IO_DEVICE_FEATS);
 }
 
@@ -185,9 +185,9 @@ uint32_t virtio_get_features(struct virtio_device *device) {
  */
 void virtio_set_features(struct virtio_device *device, uint32_t features) {
     uint8_t old;
-  
+
     io_write32(device->iospace, device->iobase, VIRTIO_IO_GUEST_FEATS, features);
-  
+
     /* feature negotiation finished */
     old = io_read8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS);
     io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
@@ -202,7 +202,7 @@ void virtio_set_features(struct virtio_device *device, uint32_t features) {
  */
 void virtio_activate_device(struct virtio_device *device) {
     uint8_t old;
-  
+
     old = io_read8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS);
     io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS,
              VIRTIO_STATUS_DRIVER_OK | old);
@@ -222,42 +222,42 @@ int virtio_init_queue(struct virtio_device *device, int queue_index) {
     paddr_t paddr;
     uintptr_t addr;
     result_t r;
-  
+
     /* get the number of queue */
     io_write16(device->iospace, device->iobase, VIRTIO_IO_QUEUE_SELECT, queue_index);
     queue->queue_num = io_read16(device->iospace, device->iobase, VIRTIO_IO_QUEUE_SIZE);
-  
+
     if (queue->queue_num == 0) {
         WARN("the number of queue #%d is 0", queue_index);
         return 1;
     }
-  
+
     queue_size = sizeof(struct virtio_queue) + sizeof(uint16_t)*2 +
                  sizeof(uint16_t)*queue->queue_num*2 +
                  sizeof(struct virtio_desc)*queue->queue_num;
-  
+
     call_memory_allocate_physical(get_memory_ch(),
         0, queue_size, MEMORY_ALLOC_PAGE_ALIGNED | MEMORY_ALLOC_CONTINUOUS,
-	&r, &addr, &paddr);
-  
+        &r, &addr, &paddr);
+
     queue->number = queue_index;
-  
+
     /* virtio_desc */
     queue->desc = (struct virtio_desc *) addr;
-  
+
     /* avail_ring */
     addr += sizeof(struct virtio_desc) * queue->queue_num;
     queue->avail = (struct virtio_avail *) addr;
     queue->avail->index = 0;
     queue->avail->flags = 0;
-  
+
     /* used_ring */
     addr = ALIGN(addr + sizeof(uint16_t) * (3 + queue->queue_num), 0x1000);
     queue->used = (struct virtio_used *) addr;
     queue->used->index = 0;
     queue->used->flags = 0;
     queue->last_used_index = 0;
-  
+
     /* tell the device the physical address of the queue */
     io_write32(device->iospace, device->iobase, VIRTIO_IO_QUEUE_ADDR, paddr >> 12);
     return 0;

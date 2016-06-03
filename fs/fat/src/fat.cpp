@@ -47,26 +47,26 @@ static fat_cluster_t get_next_cluster(struct fat_disk *disk, fat_cluster_t from)
         uint32_t *entries;
         lba_offset = (from * sizeof(uint32_t)) / disk->bpb->sector_size;
         index      = (from * sizeof(uint32_t)) % disk->bpb->sector_size;
-    
+
         if ((r = disk->read_disk(disk,
                                  cluster_to_lba(disk, disk->fat_entries_cluster) +
                                  lba_offset,
                                  1, (void **) &entries)) != OK)
             return r;
-    
+
         next = entries[index] & 0x0fffffff;
         return ((next < 0xffffff8)? next : FAT_CLUSTER_END);
     } else if (disk->type == 16) {
         uint16_t *entries;
         lba_offset = (from * sizeof(uint16_t)) / disk->bpb->sector_size;
         index      = (from * sizeof(uint16_t)) % disk->bpb->sector_size;
-    
+
         if ((r = disk->read_disk(disk,
                                  cluster_to_lba(disk, disk->fat_entries_cluster) +
                                  lba_offset,
                                  1, (void **) &entries)) != OK)
             return r;
-    
+
         next = entries[index] & 0x0ffff;
         return ((next < 0xfff8)? next : FAT_CLUSTER_END);
     } else {
@@ -116,7 +116,7 @@ static size_t get_next_filename(char **path, size_t path_size, char *name, char 
         *path += 1;
         path_size--;
     }
-    
+
     ext[i] = '\0';
     return path_size;
 }

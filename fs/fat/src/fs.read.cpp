@@ -24,6 +24,6 @@ void fat_fs_read(channel_t __ch,
 
     sendas_fs_read_reply(__ch,
         result, PAYLOAD_INLINE,
-	data,   PAYLOAD_MOVE_OOL,
-	size,   PAYLOAD_INLINE);
+        data,   PAYLOAD_MOVE_OOL,
+        size,   PAYLOAD_INLINE);
 }
