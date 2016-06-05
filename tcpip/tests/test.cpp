@@ -1,11 +1,22 @@
 #include "../src/tcpip.h"
+#include "../src/endian.h"
 #include <resea.h>
 #include <resea/channel.h>
 #include <resea/tcpip.h>
+#include <resea/net_device.h>
 #include <string.h>
-#include "../src/endian.h"
 
 static channel_t tcpip_ch;
+
+
+static void net_device_mock_server(channel_t ch, payload_t *m) {
+
+    switch (EXTRACT_MSGID(m)) {
+    default:
+        BUG("net_device_mock: unsupported msg");
+    }
+}
+
 
 static void udp_server(channel_t ch, payload_t *m) {
     ident_t socket;
@@ -44,8 +55,16 @@ static void udp_client(channel_t ch, payload_t *m) {
 
 
 void tcpip_test() {
+    channel_t mock_ch;
     result_t r;
 
+    // launch a mock
+    mock_ch = create_channel();
+    call_channel_register(connect_to_local(1), mock_ch,
+        INTERFACE(net_device), &r);
+    set_channel_handler(mock_ch, net_device_mock_server);
+
+    // connect to tcpip
     tcpip_ch = create_channel();
     call_channel_connect(connect_to_local(1), tcpip_ch, INTERFACE(tcpip), &r);
 

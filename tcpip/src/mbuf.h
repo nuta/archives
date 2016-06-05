@@ -30,11 +30,6 @@ struct mbuf *tcpip_append_mbuf(struct mbuf *head,
 struct mbuf *tcpip_pack_mbuf(const void *buf, size_t size);
 struct mbuf *tcpip_allocate_mbuf();
 void tcpip_free_mbuf(struct mbuf *mbuf);
-void tcpip_append_mbuf(struct tcpip_mqueue *mqueue, struct addr *addr,
-                       const void *buf, size_t size, int flags);
-size_t tcpip_pop_mbuf(struct tcpip_mqueue *mqueue,
-                      void *buf, size_t size, int flags,
-                      struct addr *addr);
 result_t tcpip_copy_from_mbuf(void *buf, struct mbuf *mbuf, size_t size);
 
 #endif

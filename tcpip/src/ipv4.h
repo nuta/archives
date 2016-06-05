@@ -19,7 +19,11 @@ struct tcpip_ipv4_header {
 #define IPTYPE_ICMP  0x01
 #define IPTYPE_UDP   0x11
 
+// a.b.c.d
+#define IPV4_ADDR(a, b, c, d)  ((a) << 24 | (b) << 16 | (c) << 8 | (d))
+
 #define IPV4_ADDR_ANY  0
+#define IPV4_ADDR_LOOPBACK  IPV4_ADDR(127, 0, 0, 1)
 
 void tcpip_receive_ipv4(struct mbuf *mbuf);
 result_t tcpip_send_ipv4(struct socket *socket,

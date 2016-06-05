@@ -5,12 +5,13 @@
 #include "endian.h"
 
 
+// TODO
 void tcpip_parse_ip_addr(struct addr *addr, tcpip_protocol_t protocol,
                          void *address, size_t address_size) {
 
     // NOTE: address is *not* null-terminated
 
-    addr->ipv4_addr = IPV4_ADDR_ANY;
+    addr->ipv4_addr = IPV4_ADDR_LOOPBACK;
 }
 
 result_t tcpip_send_ip(struct socket *socket,

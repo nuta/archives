@@ -1,10 +1,12 @@
-#include <string.h>
+#include "tcpip.h"
 #include "mbuf.h"
-#include "malloc.h"
 #include "printf.h"
+#include <string.h>
+#include <resea/cpp/memory.h>
 
 
 result_t tcpip_copy_from_mbuf(void *buf, struct mbuf *mbuf, size_t size) {
+    struct mbuf *head = mbuf;
     uint8_t *p = (uint8_t *) buf;
     size_t copy_size;
 
@@ -14,6 +16,7 @@ result_t tcpip_copy_from_mbuf(void *buf, struct mbuf *mbuf, size_t size) {
         memcpy(p, &mbuf->data[mbuf->begin], copy_size);
         p    += copy_size;
         size -= copy_size;
+        head->total_length -= copy_size;
 
         if (size > 0) {
             struct mbuf *next = mbuf->next;
@@ -84,7 +87,7 @@ struct mbuf *tcpip_pack_mbuf(const void *buf, size_t size) {
 struct mbuf *tcpip_allocate_mbuf(void) {
     struct mbuf *mbuf;
 
-    mbuf = (struct mbuf *) tcpip_malloc(MBUF_SIZE);
+    mbuf = (struct mbuf *) allocate_memory(MBUF_SIZE, MEMORY_ALLOC_NORMAL);
     mbuf->next        = nullptr;
     mbuf->next_packet = nullptr;
     mbuf->begin  = 0;
@@ -96,5 +99,5 @@ struct mbuf *tcpip_allocate_mbuf(void) {
 
 void tcpip_free_mbuf(struct mbuf *mbuf) {
 
-     tcpip_free(mbuf);
+     WARN("tcpip_free_mbuf is not implemented");
 }

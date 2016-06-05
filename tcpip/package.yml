@@ -16,7 +16,7 @@ homepage: http://resea.net
 lang: cpp
 
 # Required packages
-depends: [cpp, channel]
+depends: [cpp, channel, net_device]
 
 # Interfaces which this package uses
 uses: []
@@ -37,6 +37,7 @@ types:
       PROTOCOL_IPV6: 0x0004
       PROTOCOL_UDP:  0x0008
       PROTOCOL_TCP:  0x0010
+      PROTOCOL_ARP:  0x0020
 
 
 #
@@ -140,15 +141,17 @@ config:
   - SOURCES:
       set:
         - src/arp.cpp
+        - src/ethernet.cpp
         - src/endian.cpp
         - src/icmp.cpp
         - src/ip.cpp
         - src/ipv4.cpp
-        - src/malloc.cpp
         - src/mbuf.cpp
         - src/receive.cpp
         - src/udp.cpp
         - src/socket.cpp
+        - src/device.cpp
+        - src/route.cpp
         - src/startup.cpp
         - src/handler.cpp
         - src/tcpip.open.cpp

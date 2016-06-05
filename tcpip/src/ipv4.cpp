@@ -6,12 +6,22 @@
 #include "icmp.h"
 #include "udp.h"
 #include "printf.h"
+#include "arp.h"
+#include "route.h"
+#include "device.h"
 
 
 static uint16_t compute_checksum(struct mbuf *mbuf) {
 
     return 0; // XXX
 }
+
+
+static bool is_loopback_address(uint32_t addr) {
+
+    return addr == IPV4_ADDR_LOOPBACK;
+}
+
 
 result_t tcpip_send_ipv4(struct socket *socket,
                          struct mbuf *mbuf,
@@ -40,8 +50,21 @@ result_t tcpip_send_ipv4(struct socket *socket,
 
     tcpip_append_mbuf(header_mbuf, mbuf, false);
 
-    // XXX: for test
-    tcpip_receive_ipv4(header_mbuf);
+    if (is_loopback_address(addr->ipv4_addr)) {
+        // loopback
+        tcpip_receive_ipv4(header_mbuf);
+    } else {
+        struct net_device *device = tcpip_route(addr);
+
+        if (header_mbuf->total_length > device->max_data_size) {
+            WARN("too long packet; aborting transmission");
+            return E_INVALID;
+        }
+
+        device->transmit(device, addr, TCPIP_PROTOCOL_IPV4 | TCPIP_PROTOCOL_UDP /*XXX*/, header_mbuf);
+    }
+
+    return OK;
 }
 
 

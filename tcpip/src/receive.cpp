@@ -16,15 +16,6 @@ static tcpip_receiver_t receivers[LINKTYPE_MAX] = {
 
 void tcpip_receive_packet(tcpip_link_type_t type, const void *payload, size_t size) {
 
-    struct mbuf *mbuf;
-    size_t len;
-
-    // XXX
-    mbuf = tcpip_allocate_mbuf();
-    len = (size > MBUF_DATA_SIZE) ? MBUF_DATA_SIZE : size;
-    memcpy(&mbuf->data, payload, len);
-    mbuf->length = len;
-
-    receivers[type](mbuf);
+    receivers[type](tcpip_pack_mbuf(payload, size));
 }
 

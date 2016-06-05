@@ -1,10 +1,11 @@
 #include "tcpip.h"
-#include <resea.h>
-#include <string.h>
 #include "socket.h"
-#include "malloc.h"
 #include "ipv4.h"
 #include "printf.h"
+#include <resea.h>
+#include <resea/cpp/memory.h>
+#include <resea/tcpip.h>
+#include <string.h>
 
 static struct socket *sockets;
 static size_t sockets_max;
@@ -101,6 +102,7 @@ result_t tcpip_bind_socket(struct socket *socket, struct addr *addr) {
 
 void tcpip_init_socket() {
 
-    sockets     = (struct socket *) tcpip_malloc(sizeof(struct socket) * 256);
+    sockets     = (struct socket *) allocate_memory(sizeof(struct socket) * 256,
+                                                    MEMORY_ALLOC_NORMAL);
     sockets_max = 256;
 }
