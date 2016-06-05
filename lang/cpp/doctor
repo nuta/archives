@@ -49,7 +49,7 @@ def main():
     coverage_info = os.path.join(tmp_dir, 'coverage.info')
     coverage_dir = os.path.join(tmp_dir, 'coverage')
     subprocess.run(['lcov', '--capture', '--directory',
-        'build/test/' + yml['name'],
+        'build/test/objs/' + yml['name'],
         '--quiet', '--output-file', coverage_info],
         check=True)
     subprocess.run(['genhtml', coverage_info, '--quiet',
