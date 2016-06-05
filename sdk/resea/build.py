@@ -214,7 +214,7 @@ def build(args):
             deps_files.append(deps_file)
             sources.append((
                 [(os.path.join(get_package_dir(package), src),
-                  os.path.join(build_dir, package, base + '.o'),
+                  os.path.join(build_dir, 'objs', package, base + '.o'),
                   deps_file)],
                 expand_var(ext_lang[ext.lstrip('.')]['abbrev'], package),
                 expand_var(ext_lang[ext.lstrip('.')]['compile'], package),
