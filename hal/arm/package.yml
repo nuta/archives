@@ -1,5 +1,5 @@
 name: arm
-category: library
+category: hal
 license: Public Domain
 summary: The HAL library for ARM processors
 description: # longer explanation

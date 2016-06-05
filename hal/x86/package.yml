@@ -1,5 +1,5 @@
 name: x86
-category: library
+category: hal
 license: Public Domain
 summary: The HAL library for x86
 description: # longer explanation

@@ -1,5 +1,5 @@
 name: lib
-category: library
+category: hal
 license: Public Domain
 summary: The HAL library for libraries including Resea packages
 description: # longer explanation
