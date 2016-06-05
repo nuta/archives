@@ -133,7 +133,6 @@ static void new_device_handler(channel_t ch, payload_t *m) {
         paddr_t paddr = dma_paddr;
         for (int i=0; i < fill_num; i++) {
           struct virtio_request rs;
-
           rs.data  = (uint64_t) paddr;
           rs.size  = 0x800; // FIXME
           rs.flags = VIRTIO_DESC_F_WRITE;
@@ -151,7 +150,7 @@ static void new_device_handler(channel_t ch, payload_t *m) {
 }
 
 
-void virtio_net_init(void){
+void virtio_net_init(void) {
     channel_t pci_server, pci_client;
     result_t r;
 

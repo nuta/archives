@@ -6,6 +6,7 @@
 #include <resea/net_device.h>
 #include <resea/cpp/memory.h>
 
+
 /** handles net_device.get_info */
 void virtio_net_device_get_info(
     channel_t __ch
