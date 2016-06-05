@@ -228,13 +228,12 @@ def build(args):
 
     # start
     if get_var('TEST'):
-        genstart = ' '.join([get_var('HAL_GENSTART'),
-                            '--with-threading',
-                             '--test',
-                             '--test-target', yml['name'],
-                             ' '.join(get_var('BUILTIN_APPS'))])
-    else:    
-        genstart = ' '.join([get_var('HAL_GENSTART'), ' '.join(get_var('BUILTIN_APPS'))])
+        genstart_args = ['--test', '--test-target', yml['name']]
+    else:
+        genstart_args = []
+
+    genstart = ' '.join([get_var('HAL_GENSTART'), '--with-threading'] + genstart_args +
+                         list(set(get_var('BUILTIN_APPS'))))
 
     start_file = os.path.join(build_dir, 'start.' + get_var('LANGS')['cpp']['ext'])
     start_deps_file = os.path.join(build_dir, 'start.deps')
