@@ -53,7 +53,7 @@ def doctor():
     except FileNotFoundError:
         error("'package.yml' not found")
 
-    if yml['category'] in ['application', 'library']:
+    if yml['category'] in ['application', 'library', 'lang', 'hal']:
         load_packages([yml['name']] + yml['depends'], {})
         lang = yml.get("lang")
         if lang is None:
