@@ -37,7 +37,7 @@ def validate_package_yml(d):
             assert isinstance(d[x], dict)
 
         # category
-        cats = ['application', 'library', 'interface', 'group', 'misc']
+        cats = ['application', 'library', 'interface', 'hal', 'lang', 'misc']
         desc = 'category must be one of the following: {}'.format(
             ', '.join(cats))
         assert d['category'] in cats
