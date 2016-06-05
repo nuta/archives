@@ -164,7 +164,8 @@ def build(args):
 
     # resolve dependencies
     progress('Loading packages')
-    packages = [yml['name'], get_var('HAL')] + get_var('BUILTIN_APPS', default=[])
+    packages = list(set([yml['name'], get_var('HAL')] + get_var('BUILTIN_APPS', default=[])))
+
     if get_var('TEST') and 'kernel' not in packages:
         packages.append('kernel')
     ymls = load_packages(packages, enable_if=True, update_env=True)
