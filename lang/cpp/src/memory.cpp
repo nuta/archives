@@ -132,9 +132,21 @@ void *allocate_memory (size_t size, memory_alloc_t flags) {
         }
     }
 
-    unlock_mutex(&lock);
-    WARN("failed to allocate memory: size=%d", size);
-    return nullptr;
+    // failed to allocate from chunks; try allocating from the memory server
+    result_t r;
+    uintptr_t p;
+
+    call_memory_allocate(get_memory_ch(), size, flags, &r, &p);
+    if (r != OK) {
+        WARN("failed to allocate memory (size=%d)", size);
+        return nullptr;
+    }
+
+    if (!p) {
+        WARN("memory.allocate returned nullptr (size=%d)", size);
+    }
+
+    return (void *) p;
 }
 
 
