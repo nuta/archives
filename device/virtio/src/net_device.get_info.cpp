@@ -20,8 +20,6 @@ void virtio_net_device_get_info(
         NET_DEVICE_HW_ETHERNET, PAYLOAD_INLINE,
         hwaddr, PAYLOAD_MOVE_OOL,             // hwaddr
         6, PAYLOAD_INLINE,
-        ETHERNET_HEADER_SIZE, PAYLOAD_INLINE, // device_header_size
-        0 , PAYLOAD_INLINE,                   // device_footer_size
         MAX_DATA_SIZE, PAYLOAD_INLINE         // max_data_size
         );
 }

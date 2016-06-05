@@ -8,16 +8,11 @@
 /** handles net_device.transmit */
 void virtio_net_device_transmit(
     channel_t __ch
-    , void * dest_hwaddr
-    , size_t dest_hwaddr_size
-    , void * src_hwaddr
-    , size_t src_hwaddr_size
-    , net_device_packet_type_t type
-    , void * packet
-    , size_t packet_size
+    , void * data
+    , size_t data_size
 ) {
     result_t result;
 
-    result = virtio_net_transmit(packet, packet_size); // TODO: add header
+    result = virtio_net_transmit(data, data_size);
     send_net_device_transmit_reply(__ch, result);
 }

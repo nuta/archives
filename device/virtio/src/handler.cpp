@@ -41,13 +41,8 @@ void virtio_handler(channel_t __ch, payload_t *m) {
         DEBUG("received net_device.transmit");
         virtio_net_device_transmit(
             __ch
-            , (void *) EXTRACT(m, net_device, transmit, dest_hwaddr)
-            , (size_t) EXTRACT(m, net_device, transmit, dest_hwaddr_size)
-            , (void *) EXTRACT(m, net_device, transmit, src_hwaddr)
-            , (size_t) EXTRACT(m, net_device, transmit, src_hwaddr_size)
-            , (net_device_packet_type_t) EXTRACT(m, net_device, transmit, type)
-            , (void *) EXTRACT(m, net_device, transmit, packet)
-            , (size_t) EXTRACT(m, net_device, transmit, packet_size)
+            , (void *) EXTRACT(m, net_device, transmit, data)
+            , (size_t) EXTRACT(m, net_device, transmit, data_size)
         );
         return;
     case MSGID(net_device, get_info):
