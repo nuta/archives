@@ -10,6 +10,8 @@
 #include "virtio.h"
 #include "virtio_net.h"
 
+channel_t virtio_net_listener = 0;
+
 static uintptr_t dma_addr;
 static paddr_t dma_paddr;
 static uint8_t mac_addr[6];

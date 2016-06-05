@@ -1,4 +1,5 @@
 #include "virtio.h"
+#include "virtio_net.h"
 #include <resea.h>
 #include <resea/virtio.h>
 #include <resea/storage_device.h>
@@ -10,4 +11,6 @@ void virtio_net_device_listen(
     , channel_t channel
 ) {
 
+    virtio_net_listener = channel;
+    send_net_device_listen_reply(__ch, OK);
 }

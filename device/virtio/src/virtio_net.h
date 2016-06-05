@@ -18,6 +18,7 @@ struct virtio_net_request_header {
   uint16_t  csum_offset;
 } PACKED;
 
+extern channel_t virtio_net_listener;
 
 void virtio_net_init(void);
 result_t virtio_net_transmit(void *data, size_t size);
