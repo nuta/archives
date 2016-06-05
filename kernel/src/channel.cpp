@@ -93,7 +93,7 @@ result_t kernel_register_channel(channel_t ch, interface_t interface) {
     servers[i].ch        = ch;
     servers[i].interface = interface;
 
-    INFO("registered server (%d)", interface >> 24);
+    INFO("registered server (%d)", interface >> 12);
     unlock_mutex(&servers_lock);
     return OK;
 }
@@ -121,20 +121,22 @@ retry:
     if (i == SERVERS_MAX) {
         // TODO: block current thread
         if (!retried) {
-            WARN("server (%d) not found, retrying", interface >> 24);
+            WARN("server (%d) not found, retrying", interface >> 12);
             retried = true;
         }
 
         goto retry;
     }
 
-    INFO("found server (%d)", interface >> 24);
+    INFO("found server (%d)", interface >> 12);
     current_group = kernel_get_current_thread_group();
     server_group  = kernel_get_thread_group(servers[i].group_id);
 
     server_new_ch = kernel_alloc_channel_id(server_group);
     kernel_transfer_to(server_group, server_new_ch, servers[i].ch);
     kernel_link_channels(current_group, ch, server_group, server_new_ch);
+
+    INFO("connected (%d)", interface >> 12);
     return OK;
 }
 
