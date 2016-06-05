@@ -210,7 +210,7 @@ def build(args):
         source_files = []
         for src in get_var('SOURCES', package, default=[]):
             base, ext = os.path.splitext(src)
-            deps_file = os.path.join(build_dir, package, base + '.deps')
+            deps_file = os.path.join(build_dir, 'deps', package, base + '.deps')
             deps_files.append(deps_file)
             sources.append((
                 [(os.path.join(get_package_dir(package), src),
