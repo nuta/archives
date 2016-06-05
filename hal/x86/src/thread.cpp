@@ -35,6 +35,12 @@ void hal_set_thread(struct hal_thread *t, bool is_kernel,
 }
 
 
+extern "C" NORETURN void x86_resume_next_thread() {
+
+    call_hal_callback(HAL_CALLBACK_RESUME_NEXT_THREAD);
+}
+
+
 NORETURN void hal_resume_thread(ident_t id, struct hal_thread *t, struct hal_vm_space *vm) {
 
     hal_set_current_thread_id(id);

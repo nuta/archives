@@ -228,7 +228,7 @@ C_SYMBOL(hal_switch_thread):
   push r15       // R15
 
   call x86_soft_save_thread
-  call kernel_resume_next_thread // this does not return
+  call x86_resume_next_thread // this does not return
 
 
 .global C_SYMBOL(x86_unblocked_thread_entry)

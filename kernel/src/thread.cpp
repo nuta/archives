@@ -210,7 +210,7 @@ result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_si
 
 
 // Resumes the next thread
-extern "C" NORETURN void kernel_resume_next_thread(void) {
+static NORETURN void resume_next_thread(void) {
     struct thread *t;
     struct thread_group *g;
     ident_t next;
@@ -246,7 +246,7 @@ void kernel_hard_switch_thread(void) {
     hal_save_thread(&t->hal);
     t->status = THREAD_RUNNABLE;
 
-    kernel_resume_next_thread();
+    resume_next_thread();
 }
 
 
@@ -269,7 +269,7 @@ static result_t run_thread(ident_t group, const char *name, uintptr_t entry, uin
 NORETURN static void start_threading(void) {
 
     started_threading = true;
-    kernel_resume_next_thread();
+    resume_next_thread();
 }
 
 
@@ -285,6 +285,7 @@ void kernel_thread_startup(void) {
     DEBUG("set current thread to #%d.%d", group, thread);
 
     hal_set_callback(HAL_CALLBACK_RUN_THREAD,      (void *) run_thread);
+    hal_set_callback(HAL_CALLBACK_RESUME_NEXT_THREAD, (void *) resume_next_thread);
     hal_set_callback(HAL_CALLBACK_TIMER_TICK,      (void *) kernel_hard_switch_thread);
     hal_set_callback(HAL_CALLBACK_START_THREADING, (void *) start_threading);
 }
