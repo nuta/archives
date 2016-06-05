@@ -35,12 +35,18 @@ void hal_enable_irq(uintmax_t irq) {
 
 // Handles interrupts. Caller MUST disable interrupts
 extern "C" void x86_interrupt_handler (uint8_t vector) {
+    static uint32_t ticks = 0;
 
     x86_ack_interrupt();
 
-    if (vector == x86_timer_vector)
-        call_hal_callback(HAL_CALLBACK_TIMER_TICK);
-    else
+    if (vector == x86_timer_vector) {
+        if (ticks % 1000 == 0) {
+            call_hal_callback(HAL_CALLBACK_TIMER_TICK);
+        }
+
+        ticks++;
+    } else {
         call_hal_callback(HAL_CALLBACK_INTERRUPT, vector);
+    }
 }
 
