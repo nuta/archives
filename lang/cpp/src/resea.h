@@ -75,7 +75,7 @@ void hal_panic(void);
   } while (0)
 
 #define PANIC(fmt, ...) do{ \
-      printfmt("[%s:%s:%d] PANIC: " fmt, __FILE__, __func__, __LINE__, \
+      printfmt("[%s:%d] PANIC: " fmt, __func__, __LINE__, \
                 ##__VA_ARGS__); \
       hal_panic(); \
   }while(0)
