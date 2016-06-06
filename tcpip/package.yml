@@ -37,7 +37,6 @@ types:
       PROTOCOL_IPV6: 0x0004
       PROTOCOL_UDP:  0x0008
       PROTOCOL_TCP:  0x0010
-      PROTOCOL_ARP:  0x0020
 
 
 #

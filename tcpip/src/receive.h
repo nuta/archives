@@ -3,7 +3,6 @@
 
 #include "types.h"
 
-void tcpip_receive_packet(tcpip_link_type_t type,
-    const void *payload, size_t size);
+void tcpip_receive_packet(net_type_t type, const void *payload, size_t size);
 
 #endif

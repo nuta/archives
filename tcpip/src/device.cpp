@@ -13,6 +13,12 @@ static size_t devices_max = 0;
 
 
 // XXX
+static struct net_device *get_device_by_channel(channel_t ch) {
+
+    return &devices[0];
+}
+
+// XXX
 struct net_device *tcpip_route(struct addr *addr) {
 
     return devices;
@@ -22,11 +28,14 @@ struct net_device *tcpip_route(struct addr *addr) {
 static void net_device_client_handler(channel_t ch, payload_t *m) {
     void *data;
     size_t data_size;
+    struct net_device *device;
 
     switch (EXTRACT_MSGID(m)) {
-    case MSGID(tcpip, received):
+    case MSGID(net_device, received):
         data        = EXTRACT(m, net_device, received, data);
         data_size   = EXTRACT(m, net_device, received, data_size);
+        device = get_device_by_channel(ch);
+        device->receive(device, data, data_size);
         break;
     }
 }
@@ -50,6 +59,7 @@ void tcpip_add_device(channel_t ch) {
     devices[0].hwaddr_len    = 6;
     devices[0].max_data_size = 1500;
     devices[0].transmit      = tcpip_ethernet_transmit;
+    devices[0].receive       = tcpip_ethernet_receive;
 }
 
 

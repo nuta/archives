@@ -10,8 +10,9 @@ struct net_device {
     void *hwaddr;
     size_t hwaddr_len;
     size_t max_data_size;
+    void (*receive)(struct net_device *device, void *payload, size_t length);
     void (*transmit)(struct net_device *device, struct addr* addr,
-                     tcpip_protocol_t protocol, struct mbuf *m);
+                     net_type_t protocol, struct mbuf *m);
 };
 
 void tcpip_add_device(channel_t ch);

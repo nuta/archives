@@ -69,12 +69,9 @@ result_t tcpip_send_ipv4(struct socket *socket,
 
 
 void tcpip_receive_ipv4(struct mbuf *mbuf) {
-
     struct tcpip_ipv4_header header;
     uint8_t version, proto;
-    uint16_t length;
     uint32_t src_addr, dest_addr;
-    size_t header_size;
 
     if (tcpip_copy_from_mbuf(&header, mbuf, sizeof(header)) != OK) {
         DEBUG("too short packet");

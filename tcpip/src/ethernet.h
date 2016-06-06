@@ -9,7 +9,8 @@ struct ethernet_header {
     uint16_t  type;
 } PACKED;
 
+void tcpip_ethernet_receive(struct net_device *device, void *payload, size_t length);
 void tcpip_ethernet_transmit(struct net_device *device, struct addr* addr,
-                             tcpip_protocol_t protocol, struct mbuf *m);
+                             net_type_t protocol, struct mbuf *m);
 
 #endif
