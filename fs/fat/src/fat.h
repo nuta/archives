@@ -4,18 +4,19 @@
 #define PACKAGE_NAME "fat"
 #include <resea.h>
 
+namespace fat {
+
 /* we assume LP64 */
-typedef uintmax_t  fat_uintmax_t;
-typedef uintmax_t  fat_lba_t;
-typedef uintmax_t  fat_size_t;
-typedef uintmax_t  fat_offset_t;
-typedef uint32_t   fat_cluster_t;
+typedef uintmax_t  lba_t;
+typedef uintmax_t  size_t;
+typedef uintmax_t  offset_t;
+typedef uint32_t   cluster_t;
 
-struct fat_disk;
+struct disk;
 
-typedef result_t fat_os_read_disk(struct fat_disk *disk, fat_lba_t lba, fat_size_t num,
+typedef result_t fat_os_read_disk(struct disk *disk, lba_t lba, size_t num,
                                 void **data);
-typedef result_t fat_os_write_disk(struct fat_disk *disk, fat_lba_t lba, fat_size_t num,
+typedef result_t fat_os_write_disk(struct disk *disk, lba_t lba, size_t num,
                                  const void *data);
 
 #define FAT_SECTOR_SIZE 512 /* TODO don't change -- code assumes that it is 512 */
@@ -25,7 +26,7 @@ typedef result_t fat_os_write_disk(struct fat_disk *disk, fat_lba_t lba, fat_siz
 #define FAT_ATTR_SYSTEM(attr)   ((attr) & (1 << 2))
 #define FAT_ATTR_DIR(attr)      ((attr) & (1 << 4))
 
-struct fat_bpb {
+struct bpb {
     uint8_t   jmp[3];
     uint8_t   oem_name[8];
     uint16_t  sector_size;
@@ -57,7 +58,7 @@ struct fat_bpb {
     uint8_t   magic[2]; /* 0x55, 0xaa */
 } PACKED;
 
-struct fat_entry {
+struct entry {
     /*
      *  name[0]
      *
@@ -80,55 +81,57 @@ struct fat_entry {
     uint32_t  size;
 } PACKED;
 
-struct fat_disk {
+struct disk {
     channel_t ch; /* storage_device */
     fat_os_read_disk  *read_disk;
     fat_os_write_disk *write_disk;
-    struct fat_bpb *bpb;
-    fat_cluster_t fat_entries_cluster;
-    fat_lba_t root_dir_lba;
-    fat_lba_t data_lba;
+    struct bpb *bpb;
+    cluster_t fat_entries_cluster;
+    lba_t root_dir_lba;
+    lba_t data_lba;
     int type; /* 16 or 32 */
 };
 
-struct fat_file {
+struct file {
     char name[13]; /* name(8) + dot(3) + ext(1) + NULL(1) == 13 */
-    fat_size_t size;
-    fat_cluster_t cluster;
-    fat_lba_t     lba_offset;
-    fat_cluster_t cluster_begin;
-    fat_offset_t  offset;
+    size_t size;
+    cluster_t cluster;
+    lba_t     lba_offset;
+    cluster_t cluster_begin;
+    offset_t  offset;
     bool used;
 };
 
 
-struct fat_dir {
-    struct fat_entry *entries;
-    fat_cluster_t cluster;
-    fat_lba_t    lba_offset;
-    fat_offset_t index;
+struct dir {
+    struct entry *entries;
+    cluster_t cluster;
+    lba_t    lba_offset;
+    offset_t index;
 };
 
-extern struct fat_disk fat_instance;
+extern struct disk instance;
 
-result_t fat_opendisk(struct fat_disk *disk, channel_t ch,
-                    fat_os_read_disk *read_disk,
-                    fat_os_write_disk *write_disk);
-result_t fat_closedisk(struct fat_disk *disk);
+result_t opendisk(struct disk *disk, channel_t ch,
+                  fat_os_read_disk *read_disk,
+                  fat_os_write_disk *write_disk);
+result_t closedisk(struct disk *disk);
 
-result_t fat_open(struct fat_disk *disk, struct fat_file *file, const char *path,
+result_t open(struct disk *disk, struct file *file, const char *path,
                 size_t path_size);
-result_t fat_close(struct fat_disk *disk, struct fat_file *file);
-result_t fat_read(struct fat_disk *disk, struct fat_file *file,
-                fat_offset_t offset, void *buf, fat_size_t size,
+result_t close(struct disk *disk, struct file *file);
+result_t read(struct disk *disk, struct file *file,
+              offset_t offset, void *buf, size_t size,
                 size_t *r_size);
-result_t fat_write(struct fat_disk *disk, struct fat_file *file, const void *buf, fat_size_t size);
+result_t write(struct disk *disk, struct file *file, const void *buf, size_t size);
 
-result_t fat_opendir(struct fat_disk *disk, struct fat_dir *dir, const char *path,
-                   size_t path_size);
-result_t fat_closedir(struct fat_disk *disk, struct fat_dir *dir);
-result_t fat_readdir(struct fat_disk *disk, struct fat_dir *dir, struct fat_entry *entry);
-result_t fat_mkdir(struct fat_disk *disk, const char *path);
+result_t opendir(struct disk *disk, struct dir *dir, const char *path,
+                 size_t path_size);
+result_t closedir(struct disk *disk, struct dir *dir);
+result_t readdir(struct disk *disk, struct dir *dir, struct entry *entry);
+result_t mkdir(struct disk *disk, const char *path);
+
+} // namespace fat
 
 #endif
 

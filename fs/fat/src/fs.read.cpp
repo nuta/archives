@@ -19,8 +19,8 @@ void fat_fs_read(channel_t __ch,
     size_t r_size;
 
     data   = allocate_memory(size, MEMORY_ALLOC_NORMAL); // TODO: free on failure
-    result = fat_read(&fat_instance, fat_get_file_by_id(file),
-                      offset, data, size, &r_size);
+    result = fat::read(&fat::instance, fat_get_file_by_id(file),
+                       offset, data, size, &r_size);
 
     sendas_fs_read_reply(__ch,
         result, PAYLOAD_INLINE,

@@ -1,8 +1,9 @@
 #include "fat.h"
 #include "file.h"
+using namespace fat;
 
 #define FILES_MAX 128
-struct fat_file files[FILES_MAX];
+struct file files[FILES_MAX];
 
 ident_t fat_alloc_file_id(void) {
     ident_t i;
@@ -19,7 +20,7 @@ ident_t fat_alloc_file_id(void) {
 }
 
 
-struct fat_file *fat_get_file_by_id(ident_t id) {
+struct file *fat_get_file_by_id(ident_t id) {
 
     return &files[id];
 }

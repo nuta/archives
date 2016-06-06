@@ -4,13 +4,12 @@
 #include <resea/fs.h>
 #include <resea/storage_device.h>
 #include "fat.h"
-
+using namespace fat;
 
 channel_t storage_device_ch;
-struct fat_disk fat_instance; // XXX
+struct disk fat::instance;
 
-
-static result_t read_disk(struct fat_disk *disk, fat_lba_t lba, fat_size_t num,
+static result_t read_disk(struct disk *disk, lba_t lba, size_t num,
                         void **data) {
     result_t result;
     size_t size;
@@ -23,7 +22,7 @@ static result_t read_disk(struct fat_disk *disk, fat_lba_t lba, fat_size_t num,
 }
 
 
-static result_t write_disk(struct fat_disk *disk, fat_lba_t lba, fat_size_t num,
+static result_t write_disk(struct disk *disk, lba_t lba, size_t num,
                          const void *data) {
     result_t result;
 
@@ -47,7 +46,7 @@ void fat_startup(void) {
     call_channel_connect(connect_to_local(1), storage_device_ch,
         INTERFACE(storage_device), &r);
 
-    fat_opendisk(&fat_instance, storage_device_ch, read_disk, write_disk);
+    opendisk(&instance, storage_device_ch, read_disk, write_disk);
 
     ch = create_channel();
     call_channel_register(connect_to_local(1), ch,

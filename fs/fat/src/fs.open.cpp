@@ -21,8 +21,8 @@ void fat_fs_open(channel_t __ch,
         result = E_NOSPACE;
     }
 
-    result = fat_open(&fat_instance, fat_get_file_by_id(file),
-                      (const char *) path, path_size);
+    result = fat::open(&fat::instance, fat_get_file_by_id(file),
+                       (const char *) path, path_size);
 
     send_fs_open_reply(__ch, result, file);
 }

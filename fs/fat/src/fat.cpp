@@ -1,24 +1,26 @@
 #include <string.h>
 #include <ctype.h>
 #include "fat.h"
+using namespace fat;
 
 #define ROOT_DIR_CLUSTER 0
 
+namespace fat {
 
-static int compare_filename(struct fat_entry *e, const char *name, const char *ext) {
+static int compare_filename(struct entry *e, const char *name, const char *ext) {
 
     return (!strncmp((char *) e->name, (char *) name, strlen(name)) &&
             !strncmp((char *) e->ext,  (char *) ext,  strlen(ext)));
 }
 
 
-static fat_cluster_t get_cluster_from_entry(struct fat_entry *e) {
+static cluster_t get_cluster_from_entry(struct entry *e) {
 
     return ((e->cluster_begin_high << 16) | e->cluster_begin_low);
 }
 
 
-static fat_lba_t cluster_to_lba(struct fat_disk *disk, fat_cluster_t cluster) {
+static lba_t cluster_to_lba(struct disk *disk, cluster_t cluster) {
 
     if (cluster == ROOT_DIR_CLUSTER) {
         // in FAT16, root directory entries is stored in front of data clusters
@@ -32,9 +34,9 @@ static fat_lba_t cluster_to_lba(struct fat_disk *disk, fat_cluster_t cluster) {
 
 
 /* Returns the next cluster if it exists or FAT_CLUSTER_END if it does not exist. */
-static fat_cluster_t get_next_cluster(struct fat_disk *disk, fat_cluster_t from) {
-    fat_cluster_t next;
-    fat_lba_t lba_offset; /* offset from the beginning of FAT entries */
+static cluster_t get_next_cluster(struct disk *disk, cluster_t from) {
+    cluster_t next;
+    lba_t lba_offset; /* offset from the beginning of FAT entries */
     int index; /* index in a sector */
     int r;
 
@@ -76,7 +78,7 @@ static fat_cluster_t get_next_cluster(struct fat_disk *disk, fat_cluster_t from)
 }
 
 
-void fat_opendir_by_entry(struct fat_disk *disk, struct fat_dir *dir, struct fat_entry *e) {
+void fat_opendir_by_entry(struct disk *disk, struct dir *dir, struct entry *e) {
 
     dir->cluster    = get_cluster_from_entry(e);
     dir->index      = 0;
@@ -121,14 +123,14 @@ static size_t get_next_filename(char **path, size_t path_size, char *name, char 
     return path_size;
 }
 
-static result_t lookup(struct fat_disk *disk, const char *_path, size_t path_size,
-                     struct fat_entry *entry) {
+static result_t lookup(struct disk *disk, const char *_path, size_t path_size,
+                     struct entry *entry) {
     char name[9];
     char ext[4];
-    struct fat_dir dir;
+    struct dir dir;
     char *path = (char *) _path;
 
-    fat_opendir(disk, &dir, "/", 1);
+    opendir(disk, &dir, "/", 1);
 
     /* for each directory level */
     while(1) {
@@ -137,7 +139,7 @@ static result_t lookup(struct fat_disk *disk, const char *_path, size_t path_siz
 
         /* check each file */
         while (1) {
-            if (fat_readdir(disk, &dir, entry) != OK) {
+            if (readdir(disk, &dir, entry) != OK) {
                 DEBUG("lookup: file not found");
                 return E_UNEXPECTED;
             }
@@ -157,9 +159,9 @@ static result_t lookup(struct fat_disk *disk, const char *_path, size_t path_siz
 }
 
 
-result_t fat_opendisk(struct fat_disk *disk, channel_t ch,
-                    fat_os_read_disk *read_disk,
-                    fat_os_write_disk *write_disk){
+result_t opendisk(struct disk *disk, channel_t ch,
+                  fat_os_read_disk *read_disk,
+                  fat_os_write_disk *write_disk){
     int r;
 
     disk->ch          = ch;
@@ -209,8 +211,8 @@ result_t fat_opendisk(struct fat_disk *disk, channel_t ch,
     disk->data_lba             = disk->root_dir_lba + root_size;
 
     DEBUG("FAT type:               %d", disk->type);
-    DEBUG("sizeof(fat_entry):      %u", sizeof(struct fat_entry));
-    DEBUG("sizeof(fat_bpb):        %u", sizeof(struct fat_bpb));
+    DEBUG("sizeof(entry):      %u", sizeof(struct entry));
+    DEBUG("sizeof(bpb):        %u", sizeof(struct bpb));
     DEBUG("bpb->oem_name:          %s", (char *) &disk->bpb->oem_name);
     DEBUG("# of reserved sectors:  %d",  reserved);
     DEBUG("# of FAT:               %d",  fat_num);
@@ -227,17 +229,17 @@ result_t fat_opendisk(struct fat_disk *disk, channel_t ch,
 }
 
 
-result_t fat_closedisk(struct fat_disk *disk) {
+result_t closedisk(struct disk *disk) {
 
     // nothing to do
     return OK;
 }
 
 
-result_t fat_open(struct fat_disk *disk, struct fat_file *file, const char *path,
-                size_t path_size) {
+result_t open(struct disk *disk, struct file *file, const char *path,
+              size_t path_size) {
     int r;
-    struct fat_entry e;
+    struct entry e;
 
     if ((r = lookup(disk, path, path_size, &e)) != OK) {
         return r;
@@ -250,14 +252,14 @@ result_t fat_open(struct fat_disk *disk, struct fat_file *file, const char *path
 }
 
 
-result_t fat_close(struct fat_disk *disk, struct fat_file *file) {
+result_t close(struct disk *disk, struct file *file) {
 
     // nothing to do
     return OK;
 }
 
 
-result_t fat_seek(struct fat_disk *disk, struct fat_file *file, fat_offset_t offset) {
+result_t seek(struct disk *disk, struct file *file, offset_t offset) {
     size_t nth_cluster = offset / (disk->bpb->sectors_per_cluster * FAT_SECTOR_SIZE);
 
     for (size_t i=0; i < nth_cluster; i++) {
@@ -271,15 +273,15 @@ result_t fat_seek(struct fat_disk *disk, struct fat_file *file, fat_offset_t off
 }
 
 
-result_t fat_read(struct fat_disk *disk, struct fat_file *file,
-                fat_offset_t offset, void *buf, fat_size_t size,
-                size_t *r_size) {
+result_t read(struct disk *disk, struct file *file,
+              offset_t offset, void *buf, size_t size,
+              size_t *r_size) {
     int r;
     uint8_t *_buf;
-    fat_lba_t lba;
-    fat_size_t remain = size;
+    lba_t lba;
+    size_t remain = size;
 
-    fat_seek(disk, file, offset);
+    seek(disk, file, offset);
 
     while(remain > 0) {
         lba = cluster_to_lba(disk, file->cluster) + file->lba_offset;
@@ -311,17 +313,17 @@ result_t fat_read(struct fat_disk *disk, struct fat_file *file,
 }
 
 
-result_t fat_write(struct fat_disk *disk, struct fat_file *file, const void *buf, fat_size_t size) {
+result_t write(struct disk *disk, struct file *file, const void *buf, size_t size) {
 
     // TODO
     return E_UNEXPECTED;
 }
 
 
-result_t fat_opendir(struct fat_disk *disk, struct fat_dir *dir, const char *path,
-                   size_t path_size) {
+result_t opendir(struct disk *disk, struct dir *dir, const char *path,
+                 size_t path_size) {
     int r;
-    struct fat_entry e;
+    struct entry e;
 
 
     if (!strcmp(path, "/")) {
@@ -340,16 +342,16 @@ result_t fat_opendir(struct fat_disk *disk, struct fat_dir *dir, const char *pat
 }
 
 
-result_t fat_closedir(struct fat_disk *disk, struct fat_dir *dir) {
+result_t closedir(struct disk *disk, struct dir *dir) {
 
     /* nothing to do */
     return OK;
 }
 
 
-result_t fat_readdir(struct fat_disk *disk, struct fat_dir *dir, struct fat_entry *entry) {
+result_t readdir(struct disk *disk, struct dir *dir, struct entry *entry) {
     /* TODO: cache entries */
-    struct fat_entry *entries;
+    struct entry *entries;
     int r;
 
     if (dir->cluster == FAT_CLUSTER_END) {
@@ -366,11 +368,11 @@ result_t fat_readdir(struct fat_disk *disk, struct fat_dir *dir, struct fat_entr
         dir->lba_offset = 0;
     }
 
-    if (disk->bpb->sector_size / sizeof(struct fat_entry) <= dir->index) {
+    if (disk->bpb->sector_size / sizeof(struct entry) <= dir->index) {
         dir->lba_offset++;
     }
 
-    memcpy(entry, &entries[dir->index], sizeof(struct fat_entry));
+    memcpy(entry, &entries[dir->index], sizeof(struct entry));
 
     if (entry->name[0] == 0x00) {
         return E_UNEXPECTED;
@@ -385,7 +387,9 @@ result_t fat_readdir(struct fat_disk *disk, struct fat_dir *dir, struct fat_entr
 }
 
 
-result_t fat_mkdir(struct fat_disk *disk, const char *path) {
+result_t mkdir(struct disk *disk, const char *path) {
 
     return E_UNEXPECTED; // TODO
 }
+
+} // namespace fat
