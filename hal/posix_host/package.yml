@@ -38,8 +38,6 @@ global_config:
     default: '{{ CXX }} {{ LINKFLAGS }} -pthread -o'
   HAL_RUN:
     default: '{{ POSIX_HOST_DIR }}/run'
-  HAL_GENIMAGE:
-    default: cp
   HAL_GENSTART:
     default: '{{ GENSTARTCPP_DIR }}/genstartcpp'
   HAL_START_LANG:

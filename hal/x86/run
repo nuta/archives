@@ -1,8 +1,18 @@
 #!/bin/sh
-exec qemu-system-x86_64 \
+set -eu
+X86_DIR=$(dirname "$0")
+BUILD_DIR=$(dirname "$1")
+EXECUTABLE_FILE=$1
+ISO_FILE=$BUILD_DIR/bootable.iso
+
+cp -r $X86_DIR/isofiles $BUILD_DIR
+cp $EXECUTABLE_FILE $BUILD_DIR/isofiles/boot/executable
+
+grub-mkrescue -o $ISO_FILE $BUILD_DIR/isofiles
+qemu-system-x86_64 \
     -m 256 -localtime -nographic \
     -no-reboot -boot d \
     -cpu SandyBridge \
     -net user -net nic,model=virtio \
     -net dump,file=qemu.pcap \
-    -cdrom $1
+    -cdrom $ISO_FILE

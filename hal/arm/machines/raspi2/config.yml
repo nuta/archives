@@ -9,8 +9,6 @@ global_config:
       -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
   HAL_RUN:
     default: "{{ ARM_DIR }}/machines/raspi2/run"
-  HAL_GENIMAGE:
-    default: "{{ ARM_DIR }}/machines/raspi2/genimage"
   HAL_LINK:
     default: >
       {{ LD }} -Map {{ BUILD_DIR }}/executable.map

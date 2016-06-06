@@ -61,8 +61,6 @@ global_config:
     default: "{{ GENSTARTCPP_DIR }}/genstartcpp"
   HAL_START_LANG:
     default: cpp
-  HAL_GENIMAGE:
-    default: "{{ X86_DIR }}/genimage"
   CXXFLAGS:
     append_words: >
       -m64 -ffreestanding -mno-sse -mno-mmx
