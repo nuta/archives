@@ -167,7 +167,7 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
                     exit_code = 2
 
             if wait:
-               progress('Waiting for termination')  
+               progress('Waiting for termination')
                p.wait()
             else:
                 p.terminate()

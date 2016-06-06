@@ -30,13 +30,13 @@ def brew_tap(tap):
         subprocess.run(['brew', 'tap', tap], check=True)
     except subprocess.CalledProcessError:
         error('failed to tap {}'.format(args))
- 
+
 def install(requirements):
     for tap in requirements.get('homebrew', {}).get('taps', []):
         if not is_tapped(tap):
             brew_tap(tap)
 
-    missing = [] 
+    missing = []
     for package in requirements.get('homebrew', {}).get('packages', []):
         args = package.split(' ')
         package = list(filter(lambda x: not x.startswith('-'), args))[0]

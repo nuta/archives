@@ -13,7 +13,7 @@ def md2html(path):
 
 def generate_documentation_dir(indir, outdir, revision):
     for path in glob(os.path.join(indir, '*.md')):
-        with open(os.path.join(outdir, 
+        with open(os.path.join(outdir,
             os.path.splitext(os.path.basename(path))[0] + '.html'), 'w') as f:
              f.write(render(DOC, {
                  'title': 'Resea Documentation',

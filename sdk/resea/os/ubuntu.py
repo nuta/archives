@@ -19,9 +19,9 @@ def apt_install(args):
         subprocess.run(['sudo', 'apt-get', 'install', '-y'] + args, check=True)
     except subprocess.CalledProcessError:
         error('failed to install {}'.format(args))
-       
+
 def install(requirements):
-    missing = [] 
+    missing = []
     for package in requirements.get('apt', {}).get('packages', []):
         args = package.split(' ')
         package = list(filter(lambda x: not x.startswith('-'), args))[0]

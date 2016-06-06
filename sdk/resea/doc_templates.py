@@ -219,7 +219,7 @@ PACKAGE_DOC = HEADER + """
     <li>{{ license }}</li>
     <li><a href="{{ homepage }}">{{ homepage or '' }}</a></li>
   </ul>
-  
+
   <h3>Implements</h3>
   <ul>
   {% for i in implements %}
