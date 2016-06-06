@@ -10,7 +10,10 @@ struct net_device {
     void *hwaddr;
     size_t hwaddr_len;
     size_t max_data_size;
+    struct addr addr;
     void (*receive)(struct net_device *device, void *payload, size_t length);
+
+    // Sends a packet. If `addr` is nullptr, it sends a broadcast packet.
     void (*transmit)(struct net_device *device, struct addr* addr,
                      net_type_t protocol, struct mbuf *m);
 };

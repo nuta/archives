@@ -58,6 +58,7 @@ void tcpip_add_device(channel_t ch) {
     devices[0].hwaddr        = (void *) "\x00\x11\x22\x33\x44\x55";
     devices[0].hwaddr_len    = 6;
     devices[0].max_data_size = 1500;
+    devices[0].addr.ipv4_addr = (10 << 24) | 15;
     devices[0].transmit      = tcpip_ethernet_transmit;
     devices[0].receive       = tcpip_ethernet_receive;
 }

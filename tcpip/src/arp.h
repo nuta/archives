@@ -20,9 +20,22 @@ struct tcpip_arp_header {
     uint32_t  target_proto_addr;
 } PACKED;
 
+
+// packets waiting for ARP resolution
+struct arp_pending {
+    struct arp_pending *next;
+    struct net_device *device;
+    uint32_t ipaddr;
+    void *hwaddr;
+    void *packet;
+    size_t length;
+};
+
+// entries of the arp cache table
 struct arp_entry {
     uint32_t ipaddr;
     uint8_t hwaddr[6];
+    struct arp_pending *pendings;
 };
 
 void tcpip_receive_arp(struct mbuf *mbuf);
