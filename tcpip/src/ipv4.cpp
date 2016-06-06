@@ -80,10 +80,10 @@ void tcpip_receive_ipv4(struct mbuf *mbuf) {
 
     version   = header.version >> 4;
     proto     = header.proto;
-    length    = tcpip_to_host_endian16(header.length);
     src_addr  = tcpip_to_host_endian32(header.src_addr);
     dest_addr = tcpip_to_host_endian32(header.dest_addr);
-    header_size = sizeof(struct tcpip_ipv4_header); // TODO: care about IHL
+
+    // TODO: check IHL
 
     if (version != 4) {
         WARN("version is not 4 (version=%d)", version);
