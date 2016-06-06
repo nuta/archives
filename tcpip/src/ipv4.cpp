@@ -61,7 +61,7 @@ result_t tcpip_send_ipv4(struct socket *socket,
             return E_INVALID;
         }
 
-        device->transmit(device, addr, TCPIP_PROTOCOL_IPV4 | TCPIP_PROTOCOL_UDP /*XXX*/, header_mbuf);
+        device->transmit(device, addr, NET_TYPE_IPV4, header_mbuf);
     }
 
     return OK;
