@@ -67,7 +67,7 @@ void printfmt (const char *format, ...);
 #define WARN(fmt, ...)   printfmt("[" PACKAGE_NAME "] WARN: "  fmt, ##__VA_ARGS__)
 
 
-void hal_panic(void);
+extern "C" void hal_panic(void);
 
 #define BUG_IF(cond, fmt, ...)  do { \
   if (cond) \

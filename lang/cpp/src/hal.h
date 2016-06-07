@@ -4,6 +4,8 @@
 #include <resea.h>
 #include <_hal.h>
 
+extern "C" {
+
 // HAL handler_t
 enum hal_callback_type {
   HAL_CALLBACK_INTERRUPT          = 0,
@@ -114,11 +116,12 @@ void hal_save_thread(struct hal_thread *t);
 ident_t hal_get_current_thread_id(void);
 void hal_set_current_thread_id(ident_t thread);
 
-// prepend extern "C" because this is implemented in assembly on some HALs
-extern "C" void hal_switch_thread(struct hal_thread *t);
+void hal_switch_thread(struct hal_thread *t);
 
 // misc.
 void hal_printchar(char c);
+
+} // extern "C"
 
 #endif
 
