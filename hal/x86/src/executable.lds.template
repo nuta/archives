@@ -6,9 +6,8 @@ SECTIONS {
   . = 0x00100000;
 
   .bootstrap :{
-    /* XXX: create lds in build time */
-    build/release/objs/x86/src/init.o(.text);
-    build/release/objs/x86/src/init2.o(.text);
+    {{ BUILD_DIR }}/objs/x86/src/init.o(.text);
+    {{ BUILD_DIR }}/objs/x86/src/init2.o(.text);
  }
 
  . += 0xffff800000000000;

@@ -71,6 +71,12 @@ global_config:
     default: qemu-system-x86_64
 
 config:
+  FILES:
+    set:
+      - path: src/executable.lds
+        cmd: "{{ X86_DIR }}/gen-lds {{ BUILD_DIR }} {{ X86_DIR }}/src/executable.lds.template"
+        required_on: link
+        rebuild_on: always
   SOURCES:
     set:
       - src/startup.cpp
