@@ -78,8 +78,13 @@ void x86_init_vm(void) {
 void hal_create_vm_space(struct vm_space *vms) {
 
     init_mutex(&vms->hal.lock, MUTEX_UNLOCKED);
-    vms->hal.pml4 = (uint64_t *) kernel_allocate_memory(
-                        sizeof(uint64_t) * PAGE_ENTRY_NUM, 0);
+
+    paddr_t paddr;
+    call_hal_callback(HAL_CALLBACK_ALLOCATE_MEMORY,
+        0, // paddr
+        sizeof(uint64_t) * PAGE_ENTRY_NUM, // size
+        MEMORY_ALLOC_PAGE_ALIGNED,
+        &vms->hal.pml4, &paddr);
 
     /*
      *  Add page entries for the kernel space: reuse PDPT and PT which
