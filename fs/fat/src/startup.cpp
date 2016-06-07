@@ -36,7 +36,7 @@ static result_t write_disk(struct disk *disk, lba_t lba, size_t num,
 
 handler_t fat_handler;
 
-void fat_startup(void) {
+extern "C" extern "C" void fat_startup(void) {
     channel_t ch;
     result_t r;
 

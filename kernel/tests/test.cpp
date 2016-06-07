@@ -4,7 +4,7 @@
 #include <resea/datetime.h>
 
 
-void kernel_test(void) {
+extern "C" void kernel_test(void) {
     channel_t client;
     result_t r;
 

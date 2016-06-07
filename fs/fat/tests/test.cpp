@@ -26,7 +26,7 @@ static void storage_device_mock_handler(channel_t ch, payload_t *m) {
 }
 
 
-void fat_test(void) {
+extern "C" extern "C" void fat_test(void) {
     channel_t mock_ch, fat_ch;
     result_t r;
 

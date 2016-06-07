@@ -2,7 +2,7 @@
 #include <resea.h>
 
 
-void virtio_test(void) {
+extern "C" void virtio_test(void) {
 
     TEST_END();
 }

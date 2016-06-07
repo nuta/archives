@@ -9,7 +9,7 @@
 
 handler_t tcpip_handler;
 
-void tcpip_startup() {
+extern "C" void tcpip_startup() {
     result_t r;
     channel_t ch, net_device_ch;
 

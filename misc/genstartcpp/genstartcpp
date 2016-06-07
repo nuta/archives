@@ -12,11 +12,11 @@ TEMPLATE = """
 #define PACKAGE_NAME "start_apps"
 
 {% for app in apps %}
-void {{ app }}_startup();
+extern "C" void {{ app }}_startup();
 {% endfor %}
 
 {% if test %}
-void {{ test_target }}_test();
+extern "C" void {{ test_target }}_test();
 {% endif %}
 
 static void app_entrypoint (void (*startup)()) {

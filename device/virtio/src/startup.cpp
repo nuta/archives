@@ -11,7 +11,7 @@
 handler_t virtio_handler;
 channel_t virtio_server;
 
-void virtio_startup(void) {
+extern "C" void virtio_startup(void) {
 
     INFO("starting");
 

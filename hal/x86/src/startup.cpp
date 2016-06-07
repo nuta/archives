@@ -6,7 +6,7 @@ static channel_t ch;
 static struct hal_pmmap bsp_pmmap[16];
 static struct hal_vmmap bsp_vmmap[16];
 void start_apps(void);
-void kernel_startup(void);
+extern "C" void kernel_startup(void);
 void x86_init_localapic_timer(void);
 
 

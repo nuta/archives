@@ -2,7 +2,7 @@
 #include <resea.h>
 
 
-void rtc_test(void) {
+extern "C" void rtc_test(void) {
 
     TEST_END();
 }

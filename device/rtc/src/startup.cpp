@@ -7,7 +7,7 @@
 
 handler_t rtc_handler;
 
-void rtc_startup(void) {
+extern "C" void rtc_startup(void) {
     channel_t ch;
     result_t r;
 

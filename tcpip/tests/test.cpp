@@ -54,7 +54,7 @@ static void udp_client(channel_t ch, payload_t *m) {
 }
 
 
-void tcpip_test() {
+extern "C" void tcpip_test() {
     channel_t mock_ch;
     result_t r;
 

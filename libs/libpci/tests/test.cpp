@@ -2,7 +2,7 @@
 #include <resea.h>
 
 
-void libpci_test(void) {
+extern "C" void libpci_test(void) {
 
     TEST_END();
 }
