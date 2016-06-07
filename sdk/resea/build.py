@@ -187,6 +187,7 @@ def build(args):
     stubs = []
     deps_files = []
     stub_files = []
+    target_deps = []
     for package in ymls.keys():
         package_dir = get_package_dir(package)
         libs += get_var('LIBS', package, default=[])
@@ -226,6 +227,17 @@ def build(args):
             cmd = expand_var(f['cmd'], package)
             autogen_files.append((path, cmd))
 
+            if f.get('rebuild_on') == 'always':
+                try:
+                    os.remove(path)
+                except FileNotFoundError:
+                    pass
+
+            if f.get('required_on') == 'link':
+                target_deps += [path]
+
+    target_deps += libs
+
     # start
     if get_var('TEST'):
         genstart_args = ['--test', '--test-target', yml['name']]
@@ -253,7 +265,6 @@ def build(args):
     category = get_var('CATEGORY')
     hal_link = get_var('HAL_LINK') # TODO support ld -r
     target = os.path.join(build_dir, category)
-    target_deps = libs
     for files, _, _, _ in sources:
         for _, obj, _ in files:
             target_deps.append(obj)
