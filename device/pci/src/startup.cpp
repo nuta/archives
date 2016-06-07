@@ -6,7 +6,7 @@
 
 handler_t pci_handler;
 
-result_t pci_startup(void) {
+extern "C" result_t pci_startup(void) {
     channel_t ch;
     result_t r;
 

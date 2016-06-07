@@ -26,11 +26,10 @@ def package(request):
 #include "hello.h"
 #include <resea.h>
 
-void hello_startup(void){
+extern "C" void hello_startup(void){
 
   INFO("Hello, World!");
   for (;;);
-  // TODO: terminate itself
 }
 """)
 
@@ -47,7 +46,7 @@ void hello_startup(void){
 #include "hello.h"
 #include <resea.h>
 
-void hello_test(void) {
+extern "C" void hello_test(void) {
 
   TEST_EXPECT(123 == 124-1);
   TEST_END();
