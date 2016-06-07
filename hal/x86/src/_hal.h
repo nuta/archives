@@ -4,10 +4,7 @@
 #include <resea.h>
 #include "x86.h"
 
-
-/*
- *  Memory
- */
+// memory
 #define PAGE_SIZE  4096
 
 struct hal_vm_space{
@@ -16,9 +13,7 @@ struct hal_vm_space{
 };
 
 
-/*
- *  Threading
- */
+// threading
 struct hal_thread{
   bool is_kernel;
   struct x86_thread_regs regs;
@@ -26,9 +21,7 @@ struct hal_thread{
 };
 
 
-/*
- *  CPU
- */
+// CPU
 typedef uintmax_t cpuid_t;
 
 struct x86_cpuvar{
@@ -44,7 +37,5 @@ struct x86_cpuvar{
 #define CPU_MAX_NUM 32
 extern struct x86_cpuvar x86_cpuvars[CPU_MAX_NUM];
 #define CPUVAR ((struct x86_cpuvar *) &x86_cpuvars[hal_get_cpuid()])
-
-void *kernel_allocate_memory(size_t size, uint32_t flags); // TODO: remove
 
 #endif
