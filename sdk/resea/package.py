@@ -153,7 +153,7 @@ def load_packages(builtin_packages, enable_if=False, update_env=False):
 
     ymls = OrderedDict()
     loaded_packages = []
-    packages = builtin_packages.copy()
+    packages = sorted(builtin_packages.copy())
 
     # load dependent packages
     while len(packages) > 0:
