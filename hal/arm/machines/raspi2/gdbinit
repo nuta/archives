@@ -1,0 +1,8 @@
+# gdbinit for connecting GDB stub of QEMU
+#
+#   $ qemu-system-arm -M raspi2 -s -S -kernel build/release/application
+#   $ gdb -x path/to/raspi2/gdbinit
+#
+set gnutarget elf32-littlearm
+file build/release/application
+target remote localhost:1234
