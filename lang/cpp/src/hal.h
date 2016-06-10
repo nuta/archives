@@ -42,6 +42,7 @@ void hal_disable_interrupt(void);
 void hal_enable_irq(uintmax_t irq);
 
 // CPU
+typedef uintmax_t cpuid_t;
 cpuid_t hal_get_cpuid(void);
 void hal_panic(void);
 
