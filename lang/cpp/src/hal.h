@@ -21,7 +21,10 @@ enum hal_callback_type {
 
 void * hal_get_callback(enum hal_callback_type type);
 void hal_set_callback(enum hal_callback_type type, void *handler);
-result_t call_hal_callback(enum hal_callback_type type, ...); // implemented in cpp
+
+// implemented in cpp
+bool is_hal_callback_set(enum hal_callback_type type);
+result_t call_hal_callback(enum hal_callback_type type, ...);
 
 enum exception_type {
   EXCEPTION_DIVIDE_BY_ZERO,

@@ -4,6 +4,12 @@
 #include <stdarg.h>
 
 
+bool is_hal_callback_set(enum hal_callback_type type) {
+
+    return (hal_get_callback(type) != nullptr)? true : false;
+}
+
+
 result_t call_hal_callback(enum hal_callback_type type, ...) {
     void *handler;
     va_list vargs;
