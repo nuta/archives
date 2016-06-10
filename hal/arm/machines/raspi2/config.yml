@@ -19,4 +19,10 @@ global_config:
 config:
   SOURCES:
     append:
+      - machines/raspi2/init.S
+      - machines/raspi2/asm.S
       - machines/raspi2/cpu.cpp
+      - machines/raspi2/interrupt.cpp
+      - machines/raspi2/timer.cpp
+      - machines/raspi2/startup.cpp
+      - machines/raspi2/thread.cpp

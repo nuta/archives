@@ -5,5 +5,6 @@ arm_init:
     msr    cpsr, r0
     ldr    sp, =0x02000000
 
+    bl arm_machine_startup
     bl arm_startup
     b .

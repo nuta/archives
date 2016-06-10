@@ -1,5 +1,5 @@
 OUTPUT_FORMAT("elf32-littlearm");
-ENTRY(arm_init);
+ENTRY(vectors);
 
 SECTIONS
 {
@@ -15,14 +15,23 @@ SECTIONS
         *(.rodata)
     }
 
-    . = ALIGN(0x1000);
 
+    . = ALIGN(0x1000);
     .data :{
         *(.data)
     }
 
     .bss :{
         *(.bss)
+
+        /* stack */
+        . = . + 0x4000;
+        . = ALIGN(8);
+        boot_stack = .;
+
+        . = . + 0x4000;
+        . = ALIGN(8);
+        irq_stack = .;
     }
 }
 

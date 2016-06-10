@@ -12,9 +12,15 @@
 
 struct arm_cpuvar {
   ident_t current_thread;
+  struct hal_thread_regs *irq_thread_state;
 };
 
 
 extern struct arm_cpuvar arm_cpuvars[CPU_MAX_NUM];
+
+
+extern "C" {
+    void arm_accept_irq(void);
+};
 
 #endif

@@ -55,5 +55,4 @@ config:
       - src/hw.cpp
       - src/vm.cpp
       - src/cpu.cpp
-      - src/init.S
       - src/callback.cpp
