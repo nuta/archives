@@ -22,8 +22,6 @@ struct hal_thread{
 
 
 // CPU
-typedef uintmax_t cpuid_t;
-
 struct x86_cpuvar{
   struct seg_desc gdt[GDT_DESC_NUM];
   struct int_desc idt[IDT_DESC_NUM];
