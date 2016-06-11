@@ -3,9 +3,9 @@ Messaging
 
 Channel
 -------
-A *channel* is an endpoint of inter-thread (including ones in other thread
+A *channel* is a bidirectional endpoint of inter-thread (including ones in other thread
 groups) communciation. In other OS kernel, TCP/UDP port or socket is a
-almost same concept.
+almost same concept. It can be used asynchronously and synchronously.
 
 Threads sends messages from a chanel to another channel. This is the only
 way to communicate with threads in another thread group.
@@ -16,6 +16,27 @@ A *message* is a variable-length continuous memory block. Payload Headers contai
 the types of next 8 payloads. A payload is an arbitrary integers (inline), a pointer
 to a memory buffer (out-of-line), or a channel. Size of a payload and a payload header
 is equal and it depends on the environment. Generally it is `sizeof(uintmax_t)`.
+
+The first payload shall be a message ID.
+
+
+### OoL Payload
+Like *Move Semantics* in C++, there are some OoL payload transfer strategies for efficiency:
+
+- **copy:** The memory block is copied. Both sender and receiver have ownerships. This is the default.
+- **move:** The memory block is not copied. Sender loses the ownership.
+- **readonly:** The memory block is not copied. Receiver can read the block only until it sends a reply message; this type is usable in handling reuqest message in request-response (client-server) messaging.
+
+Note that these strategies are only effective in kernel-space. In user-space, stubs
+provide same semantics but all OoL messages are copied internally.
+
+### Channel Payload
+The behavior depends on the channel. If channel is:
+
+- **linked:** A channel linked to the source channel linked to shall be created.
+- **not linked:** A channel linked to the source channel shall be created.
+
+## Message structure
 
 ```
 +----------------------+
@@ -43,19 +64,53 @@ is equal and it depends on the environment. Generally it is `sizeof(uintmax_t)`.
 
 System call
 -----------
-TODO
-
 ```
 open() -> ch
-close(ch)
-wait(ch)
-setoptions(id, handler, buffer)
-send(ch, m, size)
-recv(channel) -> m
-call(ch, m, size, buffer)
-link(ch1, ch2)
-transfer(ch1, ch2)
 ```
+Create a new channel.
+
+```
+close(ch)
+```
+Destroy a channel.
+
+```
+wait(ch)
+```
+Wait for a new message.
+
+```
+setoptions(id, handler, buffer)
+```
+Set channel options.
+
+```
+send(ch, m, size)
+```
+Send a message.
+
+```
+recv(ch) -> m
+```
+Receive a message.
+
+```
+call(ch, m, size, buffer)
+```
+Send a message and then receive a message.
+
+```
+link(ch1, ch2)
+```
+Connect ch1 and ch2 each other. Messages to `ch1` arrives to `ch2` and
+vice versa.
+
+```
+transfer(src, dest)
+```
+Transfer messages to `src` to `dest`. Messages arrived to `src` is not
+saved `src`, instead, they are saved to `dest`. Their Channel ID are
+not modified to `dest` (retain `src`).
 
 Interfaces
 -----------
