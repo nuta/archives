@@ -1,7 +1,7 @@
 Resea
 ======
 
-Resea [rìːséə] is a whole new operating system kernel that you can toy around with.
+Resea [rìːséə] is a whole new operating system kernel that you can toy around with. Have fun!
 
 Resea is:
 
@@ -17,7 +17,6 @@ TODO
 
 Contributing
 ------------
-OS kernel, hypervisor development and physical computing. Have fun!
 We warmly welcome your contribution. [Join us on GitHub](https://github.com/resea/resea)!
 
 License
