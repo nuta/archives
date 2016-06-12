@@ -148,7 +148,7 @@ def main(args):
         for  msg_name, msg in sorted_messages.items():
             if msg['type'] != 'request':
                 continue
-    
+
             payloads = []
             if msg['payloads'] is not None:
                 for payload in msg['payloads']:
@@ -162,9 +162,9 @@ def main(args):
                             ctype('size'),
                             payload['name'] + '_size',
                             payload.get('attrs', [])))
-    
+
             messages.append((interface_name, msg_name, payloads))
-    
+
             create_file("{}/src/{}.{}.cpp".format(args.output_dir, interface_name, msg_name),
                         render(HANDLE_CPP_TEMPLATE, locals()))
 
