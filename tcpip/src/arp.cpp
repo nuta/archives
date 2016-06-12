@@ -167,7 +167,7 @@ void tcpip_receive_arp(struct mbuf *mbuf) {
     // add to the ARP cache table
     lock_mutex(&arp_table_lock);
 
-    struct arp_pending *pending;
+    struct arp_pending *pending = nullptr;
     for (size_t i=0; i < arp_entry_max; i++) {
         if (arp_table[i].ipaddr == sender_proto_addr) {
             pending = arp_table[i].pendings;
