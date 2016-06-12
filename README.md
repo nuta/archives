@@ -1,7 +1,7 @@
 Resea
 ======
 
-Resea [rìːséə] is a whole new operating system kernel that you can toy around with. Have fun!
+Resea [rìːséə] is a modern, whole new operating system kernel that you can toy around with. Have fun!
 
 Resea is:
 
@@ -9,7 +9,7 @@ Resea is:
 - **consitent:** the only one IPC is the unfied, structured, simple message passing
 - **seamless:** all applications can be run in both kernel-space and user-space seamlessly
 - **adaptable:** environment-neutral, language-neutral, and absolutes are only few
-- **user friendly:** easy-to-understand specifications and sane SDK
+- **friendly:** easy-to-understand specifications and sane SDK
 
 Getting Started
 ---------------
