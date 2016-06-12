@@ -144,6 +144,10 @@ NORETURN void serve_channel(channel_t ch, handler_t handler);
 #define EXTRACT(m, i, t, p)  ((__PTYPE(i, t, p)) (((payload_t *) (m))[__PINDEX(i, t, p)]))
 #define EXTRACT_MSGID(m)     ((m)[1])
 
+// `header` must be the payload header that includes type of `i`
+#define GET_PAYLOAD_TYPE(header, i) (((header) >> (4 * ((i - 1) % 8))) & 0x0f)
+#define IS_PAYLOAD_HEADER_INDEX(i) ((i) % 8 == 0)
+
 enum {
   PAYLOAD_NULL     = 0,
   PAYLOAD_INLINE   = 1,
