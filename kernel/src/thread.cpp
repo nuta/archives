@@ -216,6 +216,7 @@ static NORETURN void resume_next_thread(void) {
     ident_t next;
 
     next = get_next_thread();
+
     t = &threads[next];
     g = t->group;
     hal_resume_thread(next, &t->hal, &g->vm.hal);
@@ -280,7 +281,6 @@ void kernel_thread_startup(void) {
 
     // create the kernel's thread group and a temporary thread
     kernel_create_thread(0, nullptr, 0, &thread, &group);
-    kernel_set_thread_status(thread, THREAD_BLOCKED);
     hal_set_current_thread_id(thread);
     DEBUG("set current thread to #%d.%d", group, thread);
 
