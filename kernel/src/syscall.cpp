@@ -43,10 +43,10 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
     size_t payloads_num = size / sizeof(payload_t);
 
     for (size_t i = 0; i < payloads_num; i++) {
-        if (i % 8 == 0) {
+        if (IS_PAYLOAD_HEADER_INDEX(i)) {
             header = m[i];
         } else {
-            int type = (header >> (4 * ((i - 1) % 8))) & 0x0f;
+            int type = GET_PAYLOAD_TYPE(header, i);
 
             switch (type) {
             case PAYLOAD_INLINE:
