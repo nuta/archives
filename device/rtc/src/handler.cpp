@@ -1,5 +1,6 @@
 #include "rtc.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/rtc.h>
 #include <resea/datetime_device.h>
 #include "handler.h"
@@ -18,6 +19,11 @@ void rtc_handler(channel_t __ch, payload_t *m) {
             __ch
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     }
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));

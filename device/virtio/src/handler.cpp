@@ -1,5 +1,6 @@
 #include "virtio.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/virtio.h>
 #include <resea/storage_device.h>
 #include <resea/net_device.h>
@@ -21,6 +22,11 @@ void virtio_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, storage_device, read, size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(storage_device, write):
         DEBUG("received storage_device.write");
         virtio_storage_device_write(
@@ -30,6 +36,13 @@ void virtio_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, storage_device, write, data_size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+        release_memory((void * ) m[__PINDEX(m, storage_device, write, data)]);
+        release_memory((void * ) m[__PINDEX(m, storage_device, write, data_size)]);
+#endif
+
     case MSGID(net_device, listen):
         DEBUG("received net_device.listen");
         virtio_net_device_listen(
@@ -37,6 +50,11 @@ void virtio_handler(channel_t __ch, payload_t *m) {
             , (channel_t) EXTRACT(m, net_device, listen, channel)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(net_device, transmit):
         DEBUG("received net_device.transmit");
         virtio_net_device_transmit(
@@ -45,12 +63,24 @@ void virtio_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, net_device, transmit, data_size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+        release_memory((void * ) m[__PINDEX(m, net_device, transmit, data)]);
+        release_memory((void * ) m[__PINDEX(m, net_device, transmit, data_size)]);
+#endif
+
     case MSGID(net_device, get_info):
         DEBUG("received net_device.get_info");
         virtio_net_device_get_info(
             __ch
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     }
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));

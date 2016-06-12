@@ -1,5 +1,6 @@
 #include "pci.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/pci.h>
 #include "handler.h"
 
@@ -22,6 +23,11 @@ void pci_handler(channel_t __ch, payload_t *m) {
             , (uint32_t) EXTRACT(m, pci, listen, subdevice)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     }
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));

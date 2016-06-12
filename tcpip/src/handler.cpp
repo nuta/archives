@@ -1,5 +1,6 @@
 #include "tcpip.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/tcpip.h>
 #include "handler.h"
 
@@ -19,6 +20,11 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
             , (channel_t) EXTRACT(m, tcpip, open, handler)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(tcpip, close):
         DEBUG("received tcpip.close");
         tcpip_tcpip_close(
@@ -26,6 +32,11 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
             , (ident_t) EXTRACT(m, tcpip, close, socket)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(tcpip, bind):
         DEBUG("received tcpip.bind");
         tcpip_tcpip_bind(
@@ -37,6 +48,11 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
             , (uint16_t) EXTRACT(m, tcpip, bind, port)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(tcpip, sendto):
         DEBUG("received tcpip.sendto");
         tcpip_tcpip_sendto(
@@ -50,6 +66,11 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, tcpip, sendto, payload_size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     }
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));

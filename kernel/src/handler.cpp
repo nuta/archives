@@ -1,5 +1,6 @@
 #include "kernel.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/kernel.h>
 #include <resea/zeroed_pager.h>
 #include <resea/pager.h>
@@ -27,12 +28,22 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, pager, fill, size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(datetime, get_date):
         DEBUG("received datetime.get_date");
         kernel_datetime_get_date(
             __ch
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(datetime, set_oneshot_timer):
         DEBUG("received datetime.set_oneshot_timer");
         kernel_datetime_set_oneshot_timer(
@@ -41,6 +52,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uintmax_t) EXTRACT(m, datetime, set_oneshot_timer, msec)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(datetime, set_interval_timer):
         DEBUG("received datetime.set_interval_timer");
         kernel_datetime_set_interval_timer(
@@ -49,6 +65,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uintmax_t) EXTRACT(m, datetime, set_interval_timer, msec)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(datetime, delay):
         DEBUG("received datetime.delay");
         kernel_datetime_delay(
@@ -56,6 +77,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uintmax_t) EXTRACT(m, datetime, delay, msec)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(io, allocate):
         DEBUG("received io.allocate");
         kernel_io_allocate(
@@ -65,6 +91,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, io, allocate, size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(io, release):
         DEBUG("received io.release");
         kernel_io_release(
@@ -73,6 +104,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uintptr_t) EXTRACT(m, io, release, addr)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(thread, create):
         DEBUG("received thread.create");
         kernel_thread_create(
@@ -82,6 +118,13 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, thread, create, name_size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+        release_memory((void * ) m[__PINDEX(m, thread, create, name)]);
+        release_memory((void * ) m[__PINDEX(m, thread, create, name_size)]);
+#endif
+
     case MSGID(thread, delete):
         DEBUG("received thread.delete");
         kernel_thread_delete(
@@ -89,6 +132,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (ident_t) EXTRACT(m, thread, delete, thread)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(thread, start):
         DEBUG("received thread.start");
         kernel_thread_start(
@@ -96,6 +144,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (ident_t) EXTRACT(m, thread, start, thread)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(thread, set):
         DEBUG("received thread.set");
         kernel_thread_set(
@@ -107,12 +160,22 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, thread, set, stack_size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(thread, get_current_thread):
         DEBUG("received thread.get_current_thread");
         kernel_thread_get_current_thread(
             __ch
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(memory, map):
         DEBUG("received memory.map");
         kernel_memory_map(
@@ -125,6 +188,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (offset_t) EXTRACT(m, memory, map, offset)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(memory, unmap):
         DEBUG("received memory.unmap");
         kernel_memory_unmap(
@@ -132,12 +200,22 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uintptr_t) EXTRACT(m, memory, unmap, addr)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(memory, get_page_size):
         DEBUG("received memory.get_page_size");
         kernel_memory_get_page_size(
             __ch
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(memory, allocate):
         DEBUG("received memory.allocate");
         kernel_memory_allocate(
@@ -146,6 +224,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uint32_t) EXTRACT(m, memory, allocate, flags)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(memory, release):
         DEBUG("received memory.release");
         kernel_memory_release(
@@ -153,6 +236,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uintptr_t) EXTRACT(m, memory, release, addr)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(memory, allocate_physical):
         DEBUG("received memory.allocate_physical");
         kernel_memory_allocate_physical(
@@ -162,6 +250,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (uint32_t) EXTRACT(m, memory, allocate_physical, flags)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(channel, connect):
         DEBUG("received channel.connect");
         kernel_channel_connect(
@@ -170,6 +263,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (interface_t) EXTRACT(m, channel, connect, interface)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(channel, register):
         DEBUG("received channel.register");
         kernel_channel_register(
@@ -178,6 +276,11 @@ void kernel_handler(channel_t __ch, payload_t *m) {
             , (interface_t) EXTRACT(m, channel, register, interface)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     }
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));

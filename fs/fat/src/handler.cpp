@@ -1,5 +1,6 @@
 #include "fat.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/fat.h>
 #include <resea/fs.h>
 #include <resea/pager.h>
@@ -22,6 +23,13 @@ void fat_handler(channel_t __ch, payload_t *m) {
             , (fs_filemode_t) EXTRACT(m, fs, open, mode)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+        release_memory((void * ) m[__PINDEX(m, fs, open, path)]);
+        release_memory((void * ) m[__PINDEX(m, fs, open, path_size)]);
+#endif
+
     case MSGID(fs, close):
         DEBUG("received fs.close");
         fat_fs_close(
@@ -29,6 +37,11 @@ void fat_handler(channel_t __ch, payload_t *m) {
             , (ident_t) EXTRACT(m, fs, close, file)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(fs, read):
         DEBUG("received fs.read");
         fat_fs_read(
@@ -38,6 +51,11 @@ void fat_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, fs, read, size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     case MSGID(fs, write):
         DEBUG("received fs.write");
         fat_fs_write(
@@ -48,6 +66,13 @@ void fat_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, fs, write, data_size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+        release_memory((void * ) m[__PINDEX(m, fs, write, data)]);
+        release_memory((void * ) m[__PINDEX(m, fs, write, data_size)]);
+#endif
+
     case MSGID(pager, fill):
         DEBUG("received pager.fill");
         fat_pager_fill(
@@ -57,6 +82,11 @@ void fat_handler(channel_t __ch, payload_t *m) {
             , (size_t) EXTRACT(m, pager, fill, size)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+#endif
+
     }
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));

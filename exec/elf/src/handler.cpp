@@ -1,5 +1,6 @@
 #include "elf.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/elf.h>
 #include <resea/exec.h>
 #include "handler.h"
@@ -23,6 +24,13 @@ void elf_handler(channel_t __ch, payload_t *m) {
             , (ident_t) EXTRACT(m, exec, create, group)
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+        release_memory((void * ) m[__PINDEX(m, exec, create, name)]);
+        release_memory((void * ) m[__PINDEX(m, exec, create, name_size)]);
+#endif
+
     }
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));

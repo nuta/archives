@@ -1,6 +1,6 @@
-#include "_x86.h"
 #include "x86.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <resea/x86.h>
 #include <resea/hal.h>
 #include "handler.h"
