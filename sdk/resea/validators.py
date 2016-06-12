@@ -53,6 +53,15 @@ def validate_package_yml(d):
                        name, ', '.join(msg_types))
             assert i['type'] in msg_types
 
+            if 'attrs' in i:
+                # TODO: set default value
+                desc = '.{}: readonly payloads are effective only in request' \
+                       'messages'.format(name)
+                assert 'readonly' not in i['attrs'] or i['type'] == 'request'
+
+                desc = '.{}: only readonly attribute is supported'.format(name)
+                assert list(filter(lambda x: x != 'readonly', i['attrs'])) == []
+
             desc = '.{}: message name must matches ' \
                    '/^[a-z][a-z0-9_]*$/'.format(name)
             assert re.match('^[a-z][a-z0-9_]*$', name)
