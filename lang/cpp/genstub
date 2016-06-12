@@ -49,6 +49,20 @@ static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
 {%- endfor %}
 
     sys_send(__ch, (payload_t *) &__payloads, sizeof(__payloads));
+
+#ifndef KERNEL
+    // free move payloads in user-space
+    payload __header;
+    for (size_t i = 0; i < {{ payloads | length }}; i++) {
+        if (IS_PAYLOAD_HEADER_INDEX(i)) {
+            header = __payloads[i];
+        } else {
+            if (GET_PAYLOAD_TYPE(header, i) == PAYLOAD_MOVE_OOL) {
+                release_memory(__payloads[i]);
+            }
+        }
+    }
+#endif
 }
 
 """

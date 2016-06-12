@@ -1,7 +1,7 @@
 #include "kernel.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 #include <string.h>
-#include "kernel.h"
 
 
 static result_t send(channel_t ch, payload_t *m, size_t size) {
@@ -41,6 +41,7 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
     // foreach payload
     payload_t header;
     size_t payloads_num = size / sizeof(payload_t);
+    bool to_kernel = dest_group->id == 1;
 
     for (size_t i = 0; i < payloads_num; i++) {
         if (IS_PAYLOAD_HEADER_INDEX(i)) {
@@ -52,10 +53,23 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
             case PAYLOAD_INLINE:
                 break;
             case PAYLOAD_OOL:
-                WARN("OoL payload is not supported yet, handling as an inline");
+                if (to_kernel) {
+                    if (i + 1 >= payloads_num) {
+                        WARN("size payload does not exists for %d th OoL payload", i);
+                        continue;
+                    }
+
+                    size_t size = m[i + 1];
+                    void *p = allocate_memory(size, MEMORY_ALLOC_NORMAL);
+                    memcpy(p, (void *) m[i], size);
+                } else {
+                    WARN("OoL payload is not supported yet, handling as an inline");
+                }
                 break;
             case PAYLOAD_MOVE_OOL:
-                WARN("move OoL payload is not supported yet, handling as an inline");
+                if (!to_kernel) {
+                    WARN("move OoL payload is not supported yet, handling as an inline");
+                }
                 break;
             case PAYLOAD_CHANNEL: {
                 if (kernel_get_channel(src_group, m[i])->linked_to) {
@@ -77,7 +91,7 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
         }
     }
 
-    if (dest_group->id == 1) {
+    if (to_kernel) {
         // destination thread group is in the kernel space
         handler_t *handler = (handler_t *) dest->handler;
 

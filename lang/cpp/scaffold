@@ -31,6 +31,7 @@ void {{ package_name }}_startup(void) {
 HANDLER_CPP_TEMPLATE = """\
 #include "{{ package_name }}.h"
 #include <resea.h>
+#include <resea/cpp/memory.h>
 {% for implement in implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
@@ -49,11 +50,21 @@ void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
         DEBUG("received {{ interface_name }}.{{ msg_name }}");
         {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
             __ch
-        {% for type, name in payloads %}
+        {% for type, name, _ in payloads %}
             , ({{ type }}) EXTRACT(m, {{ interface_name }}, {{ msg_name }}, {{ name }})
         {% endfor %}
         );
         return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+    {% for _, name, attrs in payloads %}
+        {% if 'readonly' in attrs %}
+        release_memory((void * ) m[__PINDEX(m, {{ interface_name }}, {{ msg_name }}, {{ name }})]);
+        {% endif %}
+    {% endfor %}
+#endif
+
 {% endfor %}
     }
 
@@ -69,7 +80,7 @@ HANDLER_H_TEMPLATE = """\
 {% for interface_name, msg_name, payloads in messages %}
 void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
     channel_t __ch
-{% for type, name in payloads %}
+{% for type, name, _ in payloads %}
     , {{ type }} {{ name }}
 {% endfor %}
 );
@@ -87,7 +98,7 @@ HANDLE_CPP_TEMPLATE = """\
 /** handles {{ interface_name }}.{{ msg_name }} */
 void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
     channel_t __ch
-{% for type, name in payloads %}
+{% for type, name, _ in payloads %}
     , {{ type }} {{ name }}
 {% endfor %}
 ) {
@@ -141,9 +152,16 @@ def main(args):
             payloads = []
             if msg['payloads'] is not None:
                 for payload in msg['payloads']:
-                    payloads.append((ctype(payload['type']), payload['name']))
+                    payloads.append((
+                        ctype(payload['type']),
+                        payload['name'],
+                        payload.get('attrs', [])
+                    ))
                     if is_ool_type(payload['type']):
-                        payloads.append((ctype('size'), payload['name'] + '_size'))
+                        payloads.append((
+                            ctype('size'),
+                            payload['name'] + '_size',
+                            payload.get('attrs', [])))
     
             messages.append((interface_name, msg_name, payloads))
     
