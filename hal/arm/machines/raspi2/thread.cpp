@@ -30,8 +30,6 @@ void hal_set_thread(struct hal_thread *t, bool is_kernel,
 
 void hal_resume_thread(ident_t id, struct hal_thread *t, struct hal_vm_space *vms) {
 
-    hal_set_current_thread_id(id);
-
     // copy registers except sp and spsr into the thread's stack
     size_t length = sizeof(t->regs) - 8;
     t->regs.sp -= length;

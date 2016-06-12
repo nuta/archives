@@ -48,7 +48,6 @@ extern "C" void x86_resume_next_thread() {
 
 NORETURN void hal_resume_thread(ident_t id, struct hal_thread *t, struct hal_vm_space *vm) {
 
-    hal_set_current_thread_id(id);
     hal_switch_vm_space(vm);
     x86_asm_fxrstor(t->fregs);
     x86_asm_resume_thread(t->is_kernel, &t->regs);

@@ -219,6 +219,7 @@ static NORETURN void resume_next_thread(void) {
 
     t = &threads[next];
     g = t->group;
+    hal_set_current_thread_id(next);
     hal_resume_thread(next, &t->hal, &g->vm.hal);
 }
 
