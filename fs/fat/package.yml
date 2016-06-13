@@ -17,7 +17,7 @@ lang: cpp
 
 # OS requirements
 os_requirements:
-  osx:
+  macos:
     homebrew:
       packages:
         - mtools

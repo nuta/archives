@@ -18,7 +18,7 @@ lang: cpp
 
 # OS requirements
 os_requirements:
-  osx:
+  macos:
     homebrew:
       taps:
         - resea/resea

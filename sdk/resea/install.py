@@ -5,7 +5,7 @@ from resea.helpers import plan, error, import_module
 
 def install_os_requirements(os_requirements):
     if platform.system() == 'Darwin':
-        os = 'osx'
+        os = 'macos'
     elif platform.linux_distribution()[0] == 'Ubuntu':
         os = 'ubuntu'
     else:
