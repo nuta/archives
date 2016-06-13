@@ -8,8 +8,10 @@ Resea is:
 - **modular:** all components are isolated as *packages*
 - **consitent:** the only one IPC is the unfied, structured, simple message passing
 - **seamless:** all applications can be run in both kernel-space and user-space seamlessly
-- **adaptable:** environment-neutral, language-neutral, and absolutes are only few
+- **adaptable:** environment-neutral, language-neutral, only few absolutes
 - **friendly:** easy-to-understand specifications and sane SDK
+
+Packages in this respository are the essential, fundamental, and general-purpose ones.
 
 Getting Started
 ---------------
