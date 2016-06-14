@@ -8,16 +8,24 @@ def update():
     except subprocess.CalledProcessError:
         error('failed to update the list of packages'.format(args))
 
+
 def is_tapped(tap):
     taps = subprocess.check_output(['brew', 'tap']) \
            .decode('utf-8') \
            .split('\n')
     return tap in taps
 
+
+installed_packages = None
 def is_installed(package):
-    p = subprocess.run(['brew', 'list', package],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return p.returncode == 0
+    global installed_packages
+    if installed_packages is None:
+        out =  subprocess.run(['brew', 'list'],
+                   stdout=subprocess.PIPE).stdout.decode('utf-8')
+        installed_packages = out.strip().split('\n')
+
+    return package.replace('.rb', '') in installed_packages
+
 
 def brew_install(args):
     try:
@@ -25,11 +33,13 @@ def brew_install(args):
     except subprocess.CalledProcessError:
         error('failed to install {}'.format(args))
 
+
 def brew_tap(tap):
     try:
         subprocess.run(['brew', 'tap', tap], check=True)
     except subprocess.CalledProcessError:
         error('failed to tap {}'.format(args))
+
 
 def install(requirements):
     for tap in requirements.get('homebrew', {}).get('taps', []):
