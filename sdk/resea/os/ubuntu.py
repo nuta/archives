@@ -29,7 +29,7 @@ def install(requirements):
             missing.append(args)
 
     if missing != []:
-        plan('Install requirements')
+        plan('Install OS requirements')
         update()
         for package in missing:
             apt_install(package)

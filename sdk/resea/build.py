@@ -177,7 +177,7 @@ def build(args):
     os_requirements_pickle = os.path.join(build_dir, 'os_requirements.pickle')
     os_requirements = list(map(lambda y: y['os_requirements'], ymls.values()))
     if not is_object_equals_to_pickle(os_requirements, os_requirements_pickle):
-        plan('Installing OS requirements')
+        plan('Checking OS requirements')
         for x in os_requirements:
             install_os_requirements(x)
 
