@@ -43,8 +43,6 @@ matrix:
   include:
     - os: osx
       osx_image: xcode8
-      language: python
-      python: 3.5
       env: TARGET=SDK
 
 before_install:
@@ -52,7 +50,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull ubuntu:16.04; fi
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then cd sdk && python3 setup.py install; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew install python3 && cd sdk && python3 setup.py install; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker build -t ci-image -f .travis.dockerfile .; fi
 
 script:
