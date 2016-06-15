@@ -94,9 +94,9 @@ struct vm_space {
 
 
 enum{
-    PGFAULT_PRESENT = (1 << 1), // 1: present, 0: not present
-    PGFAULT_WRITE   = (1 << 2), // 1: caused by write, 0: caused by read
-    PGFAULT_EXEC    = (1 << 3), // 1: caused by execute, 0: caused by r/w
+    PGFAULT_PRESENT = (1 << 1), // 1: present,            0: not present
+    PGFAULT_WRITE   = (1 << 2), // 1: caused by write,    0: caused by read
+    PGFAULT_EXEC    = (1 << 3), // 1: caused by execute,  0: caused by r/w
     PGFAULT_USER    = (1 << 4)  // 1: caused in usermode, 0: in kernelmode
 };
 
