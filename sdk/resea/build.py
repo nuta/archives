@@ -65,7 +65,7 @@ CMDECHO = echo "-->"
 {{ deps }}: {{ src }} {{ stub_files | join(' ') }}
 	$(MKDIR) -p $(@D)
 	$(CMDECHO) 'MKDEPS' $@
-	echo "$(@:.deps=.o): $(shell {{ mkdeps }} $<)" > $@
+	echo "{{ out }}: $(shell {{ mkdeps }} $<)" > $@
     {% endfor %}
 {% endfor %}
 
