@@ -1,53 +1,58 @@
 notifications:
   email:
-    on_success: changed
-    on_failure: never
+    on_failure: changed
 
-sudo: required
-language: cpp
+language: generic
 
-env:
-  matrix:
-    - TARGET=device/pci
-    - TARGET=device/rtc
-    - TARGET=device/virtio
-    - TARGET=exec/elf
-    - TARGET=fs/fat
-    - TARGET=interfaces/channel
-    - TARGET=interfaces/datetime
-    - TARGET=interfaces/datetime_device
-    - TARGET=interfaces/exec
-    - TARGET=interfaces/fs
-    - TARGET=interfaces/hal
-    - TARGET=interfaces/io
-    - TARGET=interfaces/lang
-    - TARGET=interfaces/memory
-    - TARGET=interfaces/net_device
-    - TARGET=interfaces/pager
-    - TARGET=interfaces/storage_device
-    - TARGET=interfaces/thread
-    - TARGET=interfaces/zeroed_pager
-    - TARGET=kernel
-    - TARGET=lang/cpp
-    - TARGET=libs/libpci
-    - TARGET=misc/genstartcpp
-    - TARGET=tcpip
-    - TARGET=SDK
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      services:
+        - docker
+      env:
+        matrix:
+          - TARGET=device/pci
+          - TARGET=device/rtc
+          - TARGET=device/virtio
+          - TARGET=exec/elf
+          - TARGET=fs/fat
+          - TARGET=interfaces/channel
+          - TARGET=interfaces/datetime
+          - TARGET=interfaces/datetime_device
+          - TARGET=interfaces/exec
+          - TARGET=interfaces/fs
+          - TARGET=interfaces/hal
+          - TARGET=interfaces/io
+          - TARGET=interfaces/lang
+          - TARGET=interfaces/memory
+          - TARGET=interfaces/net_device
+          - TARGET=interfaces/pager
+          - TARGET=interfaces/storage_device
+          - TARGET=interfaces/thread
+          - TARGET=interfaces/zeroed_pager
+          - TARGET=kernel
+          - TARGET=lang/cpp
+          - TARGET=libs/libpci
+          - TARGET=misc/genstartcpp
+          - TARGET=tcpip
+          - TARGET=SDK
+    - os: osx
+      osx_image: xcode8
+      env:
+        matrix:
+          - TARGET=SDK
 
-# TODO
-#    - TARGET=hal/arm
-#    - TARGET=hal/lib
-#    - TARGET=hal/posix_host
-#    - TARGET=hal/x86
-
-services:
-  - docker
-
+# TODO: test HALs
+#
 before_instrall:
-  - docker pull ubuntu:16.04
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew update ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull ubuntu:16.04; fi
 
 install:
-  - docker build -t ci-image -f .travis.dockerfile .
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew install python3 git; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker build -t ci-image -f .travis.dockerfile .; fi
 
 script:
-  - docker run -e TARGET -e GH_TOKEN ci-image
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then ./.travis.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker run -e TARGET -e GH_TOKEN ci-image; fi
