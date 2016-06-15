@@ -4,8 +4,11 @@
 #include <string.h>
 #include <resea/cpp/memory.h>
 
+using namespace tcpip;
 
-result_t tcpip_copy_from_mbuf(void *buf, struct mbuf *mbuf, size_t size) {
+namespace tcpip {
+
+result_t copy_from_mbuf(void *buf, struct mbuf *mbuf, size_t size) {
     struct mbuf *head = mbuf;
     uint8_t *p = (uint8_t *) buf;
     size_t copy_size;
@@ -20,7 +23,7 @@ result_t tcpip_copy_from_mbuf(void *buf, struct mbuf *mbuf, size_t size) {
 
         if (size > 0) {
             struct mbuf *next = mbuf->next;
-            tcpip_free_mbuf(mbuf);
+            free_mbuf(mbuf);
             mbuf = next;
         } else {
             mbuf->begin += copy_size;
@@ -32,9 +35,9 @@ result_t tcpip_copy_from_mbuf(void *buf, struct mbuf *mbuf, size_t size) {
 }
 
 
-struct mbuf *tcpip_append_mbuf(struct mbuf *head,
-                               struct mbuf *tail,
-                               bool is_packet) {
+struct mbuf *append_mbuf(struct mbuf *head,
+                         struct mbuf *tail,
+                         bool is_packet) {
 
     if (!head)
         return tail;
@@ -50,15 +53,15 @@ struct mbuf *tcpip_append_mbuf(struct mbuf *head,
 }
 
 
-struct mbuf *tcpip_pack_mbuf(const void *buf, size_t size) {
+struct mbuf *pack_mbuf(const void *buf, size_t size) {
     uint8_t *p;
     struct mbuf *first, *next, *m;
 
     p = (uint8_t *) buf;
 
-    first = tcpip_allocate_mbuf();
+    first = allocate_mbuf();
     if (size > 0) {
-        m = tcpip_allocate_mbuf();
+        m = allocate_mbuf();
         first->next = m;
 
         while (size > 0) {
@@ -71,7 +74,7 @@ struct mbuf *tcpip_pack_mbuf(const void *buf, size_t size) {
             first->total_length += copy_size;
 
             if (size > 0) {
-                next = tcpip_allocate_mbuf();
+                next = allocate_mbuf();
                 m->next = next;
                 m = next;
             } else {
@@ -84,7 +87,7 @@ struct mbuf *tcpip_pack_mbuf(const void *buf, size_t size) {
     return first;
 }
 
-struct mbuf *tcpip_allocate_mbuf(void) {
+struct mbuf *allocate_mbuf(void) {
     struct mbuf *mbuf;
 
     mbuf = (struct mbuf *) allocate_memory(MBUF_SIZE, MEMORY_ALLOC_NORMAL);
@@ -97,7 +100,9 @@ struct mbuf *tcpip_allocate_mbuf(void) {
 }
 
 
-void tcpip_free_mbuf(struct mbuf *mbuf) {
+void free_mbuf(struct mbuf *mbuf) {
 
-     WARN("tcpip_free_mbuf is not implemented");
+     WARN("free_mbuf is not implemented");
 }
+
+} // namespace tcpip

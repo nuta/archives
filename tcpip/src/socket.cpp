@@ -7,6 +7,10 @@
 #include <resea/tcpip.h>
 #include <string.h>
 
+using namespace tcpip;
+
+namespace tcpip {
+
 static struct socket *sockets;
 static size_t sockets_max;
 
@@ -34,13 +38,13 @@ static bool compare_addr(struct addr *addr1, struct addr *addr2) {
 }
 
 
-struct socket *tcpip_get_socket_by_id(ident_t id) {
+struct socket *get_socket_by_id(ident_t id) {
 
     return &sockets[id];
 }
 
 
-struct socket *tcpip_get_socket_by_addr(struct addr *remote_addr,
+struct socket *get_socket_by_addr(struct addr *remote_addr,
                                         struct addr *local_addr) {
 
     for (size_t i = 0; i < sockets_max; i++) {
@@ -57,13 +61,13 @@ struct socket *tcpip_get_socket_by_addr(struct addr *remote_addr,
 }
 
 
-void tcpip_destroy_socket(struct socket *socket) {
+void destroy_socket(struct socket *socket) {
     // TODO
 }
 
 
 // TODO: return result_t
-ident_t tcpip_create_socket() {
+ident_t create_socket() {
 
     for (ident_t i = 1; i < sockets_max; i++) {
         struct socket *s = &sockets[i];
@@ -83,7 +87,7 @@ ident_t tcpip_create_socket() {
 }
 
 
-result_t tcpip_bind_socket(struct socket *socket, struct addr *addr) {
+result_t bind_socket(struct socket *socket, struct addr *addr) {
     struct addr default_remote_addr;
 
     default_remote_addr.protocol  = addr->protocol;
@@ -100,9 +104,11 @@ result_t tcpip_bind_socket(struct socket *socket, struct addr *addr) {
 }
 
 
-void tcpip_init_socket() {
+void init_socket() {
 
     sockets     = (struct socket *) allocate_memory(sizeof(struct socket) * 256,
                                                     MEMORY_ALLOC_NORMAL);
     sockets_max = 256;
 }
+
+} // namespace tcpip

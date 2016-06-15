@@ -11,6 +11,10 @@
 #include "device.h"
 
 
+using namespace tcpip;
+
+namespace tcpip {
+
 static uint16_t compute_checksum(struct mbuf *mbuf) {
 
     return 0; // XXX
@@ -23,38 +27,38 @@ static bool is_loopback_address(uint32_t addr) {
 }
 
 
-result_t tcpip_send_ipv4(struct socket *socket,
-                         struct mbuf *mbuf,
-                         uint8_t proto,
-                         int flags, struct addr *addr) {
+result_t send_ipv4(struct socket *socket,
+                   struct mbuf *mbuf,
+                   uint8_t proto,
+                   int flags, struct addr *addr) {
 
     struct mbuf *header_mbuf;
-    struct tcpip_ipv4_header *header;
+    struct ipv4_header *header;
 
-    assert(MBUF_DATA_SIZE >= sizeof(struct tcpip_ipv4_header));
+    assert(MBUF_DATA_SIZE >= sizeof(struct ipv4_header));
 
-    header_mbuf = tcpip_allocate_mbuf();
-    header_mbuf->length = sizeof(struct tcpip_ipv4_header);
+    header_mbuf = allocate_mbuf();
+    header_mbuf->length = sizeof(struct ipv4_header);
 
-    header = (struct tcpip_ipv4_header *) &header_mbuf->data;
+    header = (struct ipv4_header *) &header_mbuf->data;
     header->version     = 0x45;
     header->tos         = 0x00;
-    header->length      = tcpip_to_net_endian16(mbuf->total_length);
+    header->length      = to_net_endian16(mbuf->total_length);
     header->id          = 0;
     header->frag_offset = 0;
     header->ttl         = 64;
     header->proto       = proto;
-    header->checksum    = tcpip_to_net_endian16(compute_checksum(mbuf));
-    header->src_addr    = tcpip_to_net_endian32(socket->local_addr.ipv4_addr);
-    header->dest_addr   = tcpip_to_net_endian32(addr->ipv4_addr);
+    header->checksum    = to_net_endian16(compute_checksum(mbuf));
+    header->src_addr    = to_net_endian32(socket->local_addr.ipv4_addr);
+    header->dest_addr   = to_net_endian32(addr->ipv4_addr);
 
-    tcpip_append_mbuf(header_mbuf, mbuf, false);
+    append_mbuf(header_mbuf, mbuf, false);
 
     if (is_loopback_address(addr->ipv4_addr)) {
         // loopback
-        tcpip_receive_ipv4(header_mbuf);
+        receive_ipv4(header_mbuf);
     } else {
-        struct net_device *device = tcpip_route(addr);
+        struct net_device *device = route(addr);
 
         if (header_mbuf->total_length > device->max_data_size) {
             WARN("too long packet; aborting transmission");
@@ -68,20 +72,20 @@ result_t tcpip_send_ipv4(struct socket *socket,
 }
 
 
-void tcpip_receive_ipv4(struct mbuf *mbuf) {
-    struct tcpip_ipv4_header header;
+void receive_ipv4(struct mbuf *mbuf) {
+    struct ipv4_header header;
     uint8_t version, proto;
     uint32_t src_addr, dest_addr;
 
-    if (tcpip_copy_from_mbuf(&header, mbuf, sizeof(header)) != OK) {
+    if (copy_from_mbuf(&header, mbuf, sizeof(header)) != OK) {
         DEBUG("too short packet");
         return;
     }
 
     version   = header.version >> 4;
     proto     = header.proto;
-    src_addr  = tcpip_to_host_endian32(header.src_addr);
-    dest_addr = tcpip_to_host_endian32(header.dest_addr);
+    src_addr  = to_host_endian32(header.src_addr);
+    dest_addr = to_host_endian32(header.dest_addr);
 
     // TODO: check IHL
 
@@ -106,11 +110,13 @@ void tcpip_receive_ipv4(struct mbuf *mbuf) {
 
     switch (proto) {
     case IPTYPE_ICMP:
-        tcpip_receive_icmp(&src, &dest, mbuf);
+        receive_icmp(&src, &dest, mbuf);
         break;
     case IPTYPE_UDP:
-        tcpip_receive_udp(&src, &dest, mbuf);
+        receive_udp(&src, &dest, mbuf);
         break;
     default: WARN("unknown proto type (proto=%04x)", proto);
     }
 }
+
+} // namespace tcpip

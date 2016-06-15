@@ -5,15 +5,19 @@
 #include "ipv4.h"
 #include "printf.h"
 
+using namespace tcpip;
 
-void tcpip_receive_packet(net_type_t type, const void *payload, size_t size) {
+namespace tcpip {
+
+void receive_packet(net_type_t type, const void *payload, size_t size) {
     struct mbuf *m;
 
-    m = tcpip_pack_mbuf(payload, size);
+    m = pack_mbuf(payload, size);
 
     switch (type) {
-    case NET_TYPE_ARP:  tcpip_receive_arp(m);  break;
-    case NET_TYPE_IPV4: tcpip_receive_ipv4(m); break;
+    case NET_TYPE_ARP:  receive_arp(m);  break;
+    case NET_TYPE_IPV4: receive_ipv4(m); break;
     }
 }
 
+} // namespace tcpip

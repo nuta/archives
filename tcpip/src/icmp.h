@@ -4,18 +4,22 @@
 #include "types.h"
 #include "mbuf.h"
 
-struct tcpip_icmp_header {
+namespace tcpip {
+
+struct icmp_header {
     uint8_t   type;
     uint8_t   code;
     uint16_t  checksum;
     uint32_t  data;
 } PACKED;
 
-#define TCPIP_ICMPTYPE_ECHO_REPLY    0
-#define TCPIP_ICMPTYPE_ECHO_REQUEST  8
+const uint8_t ICMPTYPE_ECHO_REPLY   = 0;
+const uint8_t ICMPTYPE_ECHO_REQUEST = 8;
 
-void tcpip_receive_icmp(struct addr *src_addr, struct addr *dest_addr,
-                        struct mbuf *mbuf);
+void receive_icmp(struct addr *src_addr, struct addr *dest_addr,
+                  struct mbuf *mbuf);
+
+} // namespace tcpip
 
 #endif
 

@@ -5,10 +5,12 @@
 #include "mbuf.h"
 #include "device.h"
 
+namespace tcpip {
+
 #define TCPIP_ARP_REQUEST  1
 #define TCPIP_ARP_REPLY    2
 
-struct tcpip_arp_header {
+struct arp_header {
     uint16_t  hw_type;
     uint16_t  proto_type;
     uint8_t   hw_len;
@@ -38,12 +40,14 @@ struct arp_entry {
     struct arp_pending *pendings;
 };
 
-void tcpip_receive_arp(struct mbuf *mbuf);
-void tcpip_arp_resolve_and_send(struct net_device *device,
+void receive_arp(struct mbuf *mbuf);
+void arp_resolve_and_send(struct net_device *device,
                                 struct addr *addr,
                                 void *hwaddr,
                                 void *packet,
                                 size_t packet_length);
-void tcpip_init_arp();
+void init_arp();
+
+} // namespace tcpip
 
 #endif

@@ -6,6 +6,9 @@
 #include <resea/tcpip.h>
 #include <resea/net_device.h>
 
+using namespace tcpip;
+
+namespace tcpip {
 
 // TODO: isolate ethernet-dependent stuff
 static struct net_device *devices = nullptr;
@@ -19,7 +22,7 @@ static struct net_device *get_device_by_channel(channel_t ch) {
 }
 
 // XXX
-struct net_device *tcpip_route(struct addr *addr) {
+struct net_device *route(struct addr *addr) {
 
     return devices;
 }
@@ -41,7 +44,7 @@ static void net_device_client_handler(channel_t ch, payload_t *m) {
 }
 
 
-void tcpip_add_device(channel_t ch) {
+void add_device(channel_t ch) {
     result_t r;
     channel_t client_ch;
 
@@ -59,15 +62,17 @@ void tcpip_add_device(channel_t ch) {
     devices[0].hwaddr_len    = 6;
     devices[0].max_data_size = 1500;
     devices[0].addr.ipv4_addr = (10 << 24) | 15;
-    devices[0].transmit      = tcpip_ethernet_transmit;
-    devices[0].receive       = tcpip_ethernet_receive;
+    devices[0].transmit      = ethernet_transmit;
+    devices[0].receive       = ethernet_receive;
 }
 
 
-void tcpip_init_devices() {
+void init_devices() {
 
     devices_max = 8;
     devices = (struct net_device *) allocate_memory(
                   sizeof(struct net_device) * devices_max,
                   MEMORY_ALLOC_ZEROED);
 }
+
+} // namespace tcpip

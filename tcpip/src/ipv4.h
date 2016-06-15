@@ -3,7 +3,9 @@
 
 #include "types.h"
 
-struct tcpip_ipv4_header {
+namespace tcpip {
+
+struct ipv4_header {
     uint8_t   version;
     uint8_t   tos;
     uint16_t  length;
@@ -25,11 +27,13 @@ struct tcpip_ipv4_header {
 #define IPV4_ADDR_ANY  0
 #define IPV4_ADDR_LOOPBACK  IPV4_ADDR(127, 0, 0, 1)
 
-void tcpip_receive_ipv4(struct mbuf *mbuf);
-result_t tcpip_send_ipv4(struct socket *socket,
-                         struct mbuf *mbuf,
-                         uint8_t proto,
-                         int flags, struct addr *addr);
+void receive_ipv4(struct mbuf *mbuf);
+result_t send_ipv4(struct socket *socket,
+                   struct mbuf *mbuf,
+                   uint8_t proto,
+                   int flags, struct addr *addr);
+
+} // namespace tcpip
 
 #endif
 

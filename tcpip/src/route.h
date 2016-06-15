@@ -3,6 +3,10 @@
 
 #include "device.h"
 
-struct net_device *tcpip_route(struct addr *addr);
+namespace tcpip {
+
+struct net_device *route(struct addr *addr);
+
+} // namespace tcpip
 
 #endif

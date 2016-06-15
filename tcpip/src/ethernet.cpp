@@ -9,19 +9,22 @@
 #include <resea/tcpip.h>
 #include <resea/net_device.h>
 
+using namespace tcpip;
 
-void tcpip_ethernet_receive(struct net_device *device, void *payload, size_t length) {
+namespace tcpip {
+
+void ethernet_receive(struct net_device *device, void *payload, size_t length) {
     struct ethernet_header *header;
     net_type_t protocol;
 
     header = (struct ethernet_header *) payload;
     protocol = header->type;
-    tcpip_receive_packet(protocol, (void *) ((uintptr_t) payload + sizeof(*header)),
-                         length - sizeof(*header));
+    receive_packet(protocol, (void *) ((uintptr_t) payload + sizeof(*header)),
+                   length - sizeof(*header));
 }
 
 
-void tcpip_ethernet_transmit(struct net_device *device, struct addr* addr,
+void ethernet_transmit(struct net_device *device, struct addr* addr,
                              net_type_t protocol, struct mbuf *m) {
 
     size_t data_len;
@@ -37,7 +40,9 @@ void tcpip_ethernet_transmit(struct net_device *device, struct addr* addr,
     // set the packet header
     header->type = protocol;
     memcpy(&header->src, device->hwaddr, device->hwaddr_len);
-    tcpip_copy_from_mbuf(payload, m, data_len);
+    copy_from_mbuf(payload, m, data_len);
 
-    tcpip_arp_resolve_and_send(device, addr, &header->dest, data, data_len);
+    arp_resolve_and_send(device, addr, &header->dest, data, data_len);
 }
+
+} // namespace tcpip

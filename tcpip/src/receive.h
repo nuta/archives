@@ -3,6 +3,10 @@
 
 #include "types.h"
 
-void tcpip_receive_packet(net_type_t type, const void *payload, size_t size);
+namespace tcpip {
+
+void receive_packet(net_type_t type, const void *payload, size_t size);
+
+} // namespace tcpip
 
 #endif

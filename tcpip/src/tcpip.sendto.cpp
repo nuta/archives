@@ -5,6 +5,7 @@
 #include "ip.h"
 #include "udp.h"
 
+using namespace tcpip;
 
 /** handles tcpip.sendto */
 void tcpip_tcpip_sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network,
@@ -15,12 +16,12 @@ void tcpip_tcpip_sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network
     struct socket *sock;
     result_t r;
 
-    sock = tcpip_get_socket_by_id(socket);
+    sock = get_socket_by_id(socket);
 
-    tcpip_parse_ip_addr(&addr, network, (void *) address, address_size);
+    parse_ip_addr(&addr, network, (void *) address, address_size);
     addr.port      = port;
     addr.protocol  = network | sock->protocol;
 
-    r = tcpip_send_udp(sock, tcpip_pack_mbuf(payload, payload_size), 0, &addr);
+    r = send_udp(sock, pack_mbuf(payload, payload_size), 0, &addr);
     send_tcpip_sendto_reply(__ch, r);
 }

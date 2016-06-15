@@ -4,6 +4,9 @@
 #include "route.h"
 #include "device.h"
 
+using namespace tcpip;
+
+namespace tcpip {
 
 // Looks up the appropriate net device in the routing table. It Returns
 // a channel connected to the net device.
@@ -14,3 +17,5 @@ struct net_device *tcpip_route(struct addr *addr) {
     return ;
 }
 */
+
+} // namespace tcpip

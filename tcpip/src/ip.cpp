@@ -4,20 +4,25 @@
 #include "mbuf.h"
 #include "endian.h"
 
+using namespace tcpip;
+
+namespace tcpip {
 
 // TODO
-void tcpip_parse_ip_addr(struct addr *addr, tcpip_protocol_t protocol,
-                         void *address, size_t address_size) {
+void parse_ip_addr(struct addr *addr, tcpip_protocol_t protocol,
+                   void *address, size_t address_size) {
 
     // NOTE: address is *not* null-terminated
 
     addr->ipv4_addr = IPV4_ADDR_LOOPBACK;
 }
 
-result_t tcpip_send_ip(struct socket *socket,
-                       struct mbuf *mbuf,
-                       uint8_t proto,
-                       int flags, struct addr *addr) {
+result_t send_ip(struct socket *socket,
+                 struct mbuf *mbuf,
+                 uint8_t proto,
+                 int flags, struct addr *addr) {
 
-    return tcpip_send_ipv4(socket, mbuf, proto, flags, addr);
+    return send_ipv4(socket, mbuf, proto, flags, addr);
 }
+
+} // namespace tcpip

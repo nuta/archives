@@ -5,6 +5,9 @@
 #include "mbuf.h"
 #include <resea/tcpip.h>
 
+
+namespace tcpip {
+
 struct socket {
     ident_t id;
     int used;
@@ -20,14 +23,16 @@ struct socket {
 };
 
 
-struct socket *tcpip_get_socket_by_id(ident_t id);
-struct socket *tcpip_get_socket_by_addr(struct addr *remote_addr,
-                                      struct addr *local_addr);
-result_t tcpip_bind_socket(struct socket *socket, struct addr *addr);
+struct socket *get_socket_by_id(ident_t id);
+struct socket *get_socket_by_addr(struct addr *remote_addr,
+                                  struct addr *local_addr);
+result_t bind_socket(struct socket *socket, struct addr *addr);
 
-ident_t tcpip_create_socket();
-void tcpip_destroy_socket(struct socket *socket);
+ident_t create_socket();
+void destroy_socket(struct socket *socket);
 
-void tcpip_init_socket();
+void init_socket();
+
+} // namespace tcpip
 
 #endif
