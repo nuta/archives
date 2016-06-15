@@ -109,8 +109,12 @@ void hal_link_page(struct vm_space *vms, uintptr_t v, paddr_t p, size_t n,
                    page_attrs_t attrs);
 void set_page_attribute(struct vm_space *vms, uintptr_t v, size_t n, page_attrs_t attrs);
 page_attrs_t get_page_attribute(struct vm_space *vms, uintptr_t v);
-uintptr_t hal_paddr_to_vaddr(paddr_t p);
+
+// Returns the physical page address pointered from `v`.
 paddr_t hal_vaddr_to_paddr(struct vm_space *vms, uintptr_t v);
+
+// Returns vaddr wired to `p`. Note that it does not supports physical unwired pages.
+uintptr_t hal_paddr_to_vaddr(paddr_t p);
 
 // Threading
 void hal_set_thread(struct hal_thread *t, bool is_kernel, uintptr_t entry,
