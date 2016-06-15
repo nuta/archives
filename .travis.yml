@@ -1,54 +1,58 @@
 notifications:
   email:
-    on_failure: changed
+    on_success: change
+    on_failure: change
 
 language: generic
 
-matrix:
-  include:
-    - os: linux
-      sudo: required
-      services:
-        - docker
-      env:
-        - TARGET=device/pci
-        - TARGET=device/rtc
-        - TARGET=device/virtio
-        - TARGET=exec/elf
-        - TARGET=fs/fat
-        - TARGET=interfaces/channel
-        - TARGET=interfaces/datetime
-        - TARGET=interfaces/datetime_device
-        - TARGET=interfaces/exec
-        - TARGET=interfaces/fs
-        - TARGET=interfaces/hal
-        - TARGET=interfaces/io
-        - TARGET=interfaces/lang
-        - TARGET=interfaces/memory
-        - TARGET=interfaces/net_device
-        - TARGET=interfaces/pager
-        - TARGET=interfaces/storage_device
-        - TARGET=interfaces/thread
-        - TARGET=interfaces/zeroed_pager
-        - TARGET=kernel
-        - TARGET=lang/cpp
-        - TARGET=libs/libpci
-        - TARGET=misc/genstartcpp
-        - TARGET=tcpip
-        - TARGET=SDK
-    - os: osx
-      osx_image: xcode8
-      env:
-        - TARGET=SDK
+env:
+  - TARGET=device/pci
+  - TARGET=device/rtc
+  - TARGET=device/virtio
+  - TARGET=exec/elf
+  - TARGET=fs/fat
+  - TARGET=interfaces/channel
+  - TARGET=interfaces/datetime
+  - TARGET=interfaces/datetime_device
+  - TARGET=interfaces/exec
+  - TARGET=interfaces/fs
+  - TARGET=interfaces/hal
+  - TARGET=interfaces/io
+  - TARGET=interfaces/lang
+  - TARGET=interfaces/memory
+  - TARGET=interfaces/net_device
+  - TARGET=interfaces/pager
+  - TARGET=interfaces/storage_device
+  - TARGET=interfaces/thread
+  - TARGET=interfaces/zeroed_pager
+  - TARGET=kernel
+  - TARGET=lang/cpp
+  - TARGET=libs/libpci
+  - TARGET=misc/genstartcpp
+  - TARGET=tcpip
+  - TARGET=SDK
 
 # TODO: test HALs
-#
-before_instrall:
+
+os: linux
+sudo: required
+services:
+  - docker
+
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode8
+      language: python
+      python: 3.5
+      env: TARGET=SDK
+
+before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew update ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker pull ubuntu:16.04; fi
 
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then brew install python3 git; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];   then cd sdk && python3 setup.py install; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then docker build -t ci-image -f .travis.dockerfile .; fi
 
 script:
