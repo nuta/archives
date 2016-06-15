@@ -11,37 +11,35 @@ matrix:
       services:
         - docker
       env:
-        matrix:
-          - TARGET=device/pci
-          - TARGET=device/rtc
-          - TARGET=device/virtio
-          - TARGET=exec/elf
-          - TARGET=fs/fat
-          - TARGET=interfaces/channel
-          - TARGET=interfaces/datetime
-          - TARGET=interfaces/datetime_device
-          - TARGET=interfaces/exec
-          - TARGET=interfaces/fs
-          - TARGET=interfaces/hal
-          - TARGET=interfaces/io
-          - TARGET=interfaces/lang
-          - TARGET=interfaces/memory
-          - TARGET=interfaces/net_device
-          - TARGET=interfaces/pager
-          - TARGET=interfaces/storage_device
-          - TARGET=interfaces/thread
-          - TARGET=interfaces/zeroed_pager
-          - TARGET=kernel
-          - TARGET=lang/cpp
-          - TARGET=libs/libpci
-          - TARGET=misc/genstartcpp
-          - TARGET=tcpip
-          - TARGET=SDK
+        - TARGET=device/pci
+        - TARGET=device/rtc
+        - TARGET=device/virtio
+        - TARGET=exec/elf
+        - TARGET=fs/fat
+        - TARGET=interfaces/channel
+        - TARGET=interfaces/datetime
+        - TARGET=interfaces/datetime_device
+        - TARGET=interfaces/exec
+        - TARGET=interfaces/fs
+        - TARGET=interfaces/hal
+        - TARGET=interfaces/io
+        - TARGET=interfaces/lang
+        - TARGET=interfaces/memory
+        - TARGET=interfaces/net_device
+        - TARGET=interfaces/pager
+        - TARGET=interfaces/storage_device
+        - TARGET=interfaces/thread
+        - TARGET=interfaces/zeroed_pager
+        - TARGET=kernel
+        - TARGET=lang/cpp
+        - TARGET=libs/libpci
+        - TARGET=misc/genstartcpp
+        - TARGET=tcpip
+        - TARGET=SDK
     - os: osx
       osx_image: xcode8
       env:
-        matrix:
-          - TARGET=SDK
+        - TARGET=SDK
 
 # TODO: test HALs
 #
