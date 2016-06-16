@@ -2,6 +2,7 @@
 #define __X86_H__
 
 #include <resea.h>
+#include "_x86.h"
 #include "common.h"
 
 struct x86_thread_regs{
