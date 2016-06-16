@@ -8,6 +8,7 @@ An interface implemented by Hardware Abstraction Layers.
 - `HAL_GENSTART`: a script to generate applications startup code
 - `HAL_START_LANG`: a language of the applications startup code
 - `HAL_LINK`: a linker command to link an executable file
+- `HAL_LIBLINK`: a linker command to link an library file (typically `ld -r -o`)
 
 ### C++ interfaces
 C++ API which HALs MUST implement is described in `hal.h`, a header file included in `cpp` package.
