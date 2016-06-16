@@ -1,2 +1,14 @@
-#!/bin/sh
-$1 -M $2 | sed -e 's/.*://' | tr -d '\n' | tr -d '\\'
+#!/usr/bin/env python3
+import subprocess
+import sys
+import shlex
+
+
+cc = sys.argv[1]
+src = sys.argv[2]
+
+p = subprocess.run(shlex.split('{cc} -M {src}'.format(**locals())),
+                   stdout=subprocess.PIPE)
+s = p.stdout.decode('utf-8')
+
+print(s.replace("\n", "").replace("\\", "").split(":", 2)[1])
