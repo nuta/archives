@@ -7,8 +7,11 @@
 #include "file.h"
 
 
+namespace fat {
+namespace fs_server {
+
 /** handles fs.open */
-void fat_fs_open(channel_t __ch,
+void handle_open(channel_t __ch,
        uchar_t* path,
        size_t path_size,
        fs_filemode_t mode) {
@@ -26,3 +29,6 @@ void fat_fs_open(channel_t __ch,
 
     send_fs_open_reply(__ch, result, file);
 }
+
+} // namespace fs_server
+} // namespace fat

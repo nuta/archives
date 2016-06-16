@@ -5,8 +5,11 @@
 #include <resea/pager.h>
 #include "fat.h"
 
+namespace fat {
+namespace fs_server {
+
 /** handles fs.write */
-void fat_fs_write(channel_t __ch,
+void handle_write(channel_t __ch,
        ident_t file,
        offset_t offset,
        void * data,
@@ -15,3 +18,6 @@ void fat_fs_write(channel_t __ch,
     /* TODO */
     send_fs_write_reply(__ch, E_NOTSUPPORTED);
 }
+
+} // namespace fs_server
+} // namespace fat

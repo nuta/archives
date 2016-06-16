@@ -8,8 +8,11 @@
 #include "file.h"
 
 
+namespace fat {
+namespace fs_server {
+
 /** handles fs.read */
-void fat_fs_read(channel_t __ch,
+void handle_read(channel_t __ch,
        ident_t file,
        offset_t offset,
        size_t size) {
@@ -27,3 +30,6 @@ void fat_fs_read(channel_t __ch,
         data,   PAYLOAD_MOVE_OOL,
         size,   PAYLOAD_INLINE);
 }
+
+} // namespace fs_server
+} // namespace fat

@@ -6,8 +6,9 @@
 #include <resea/pager.h>
 #include "handler.h"
 
+namespace fat {
 
-void fat_handler(channel_t __ch, payload_t *m) {
+void server_handler(channel_t __ch, payload_t *m) {
     if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
@@ -16,7 +17,7 @@ void fat_handler(channel_t __ch, payload_t *m) {
     switch (EXTRACT_MSGID(m)) {
     case MSGID(fs, open):
         DEBUG("received fs.open");
-        fat_fs_open(
+        fs_server::handle_open(
             __ch
             , (uchar_t*) EXTRACT(m, fs, open, path)
             , (size_t) EXTRACT(m, fs, open, path_size)
@@ -32,7 +33,7 @@ void fat_handler(channel_t __ch, payload_t *m) {
 
     case MSGID(fs, close):
         DEBUG("received fs.close");
-        fat_fs_close(
+        fs_server::handle_close(
             __ch
             , (ident_t) EXTRACT(m, fs, close, file)
         );
@@ -44,7 +45,7 @@ void fat_handler(channel_t __ch, payload_t *m) {
 
     case MSGID(fs, read):
         DEBUG("received fs.read");
-        fat_fs_read(
+        fs_server::handle_read(
             __ch
             , (ident_t) EXTRACT(m, fs, read, file)
             , (offset_t) EXTRACT(m, fs, read, offset)
@@ -58,7 +59,7 @@ void fat_handler(channel_t __ch, payload_t *m) {
 
     case MSGID(fs, write):
         DEBUG("received fs.write");
-        fat_fs_write(
+        fs_server::handle_write(
             __ch
             , (ident_t) EXTRACT(m, fs, write, file)
             , (offset_t) EXTRACT(m, fs, write, offset)
@@ -75,7 +76,7 @@ void fat_handler(channel_t __ch, payload_t *m) {
 
     case MSGID(pager, fill):
         DEBUG("received pager.fill");
-        fat_pager_fill(
+        pager_server::handle_fill(
             __ch
             , (ident_t) EXTRACT(m, pager, fill, id)
             , (offset_t) EXTRACT(m, pager, fill, offset)
@@ -91,3 +92,5 @@ void fat_handler(channel_t __ch, payload_t *m) {
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
+
+} // namespace fat

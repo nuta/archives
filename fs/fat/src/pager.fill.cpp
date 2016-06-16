@@ -7,8 +7,11 @@
 #include "fat.h"
 #include "file.h"
 
+namespace fat {
+namespace pager_server {
+
 /** handles pager.fill */
-void fat_pager_fill(
+void handle_fill(
          channel_t __ch,
          ident_t id,
          offset_t offset,
@@ -27,3 +30,6 @@ void fat_pager_fill(
         data,    PAYLOAD_MOVE_OOL,
         r_size,  PAYLOAD_INLINE);
 }
+
+} // namespace pager_server
+} // namespace fat

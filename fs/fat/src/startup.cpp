@@ -4,6 +4,7 @@
 #include <resea/fs.h>
 #include <resea/storage_device.h>
 #include "fat.h"
+#include "handler.h"
 using namespace fat;
 
 channel_t storage_device_ch;
@@ -34,9 +35,7 @@ static result_t write_disk(struct disk *disk, lba_t lba, size_t num,
 }
 
 
-handler_t fat_handler;
-
-extern "C" extern "C" void fat_startup(void) {
+extern "C" void fat_startup(void) {
     channel_t ch;
     result_t r;
 
@@ -51,5 +50,5 @@ extern "C" extern "C" void fat_startup(void) {
     ch = create_channel();
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(fs), &r);
-    serve_channel(ch, fat_handler);
+    serve_channel(ch, server_handler);
 }
