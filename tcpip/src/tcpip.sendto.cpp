@@ -6,11 +6,13 @@
 #include "udp.h"
 
 using namespace tcpip;
+namespace tcpip {
+namespace tcpip_server {
 
 /** handles tcpip.sendto */
-void tcpip_tcpip_sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network,
-                        void * address, size_t address_size, uint16_t port,
-                        void * payload, size_t payload_size) {
+void sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network,
+            void * address, size_t address_size, uint16_t port,
+            void * payload, size_t payload_size) {
 
     struct addr addr;
     struct socket *sock;
@@ -25,3 +27,6 @@ void tcpip_tcpip_sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network
     r = send_udp(sock, pack_mbuf(payload, payload_size), 0, &addr);
     send_tcpip_sendto_reply(__ch, r);
 }
+
+} // namespace tcpip_server
+} // namespace tcpip

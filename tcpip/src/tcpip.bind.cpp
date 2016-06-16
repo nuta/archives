@@ -5,9 +5,11 @@
 #include "socket.h"
 
 using namespace tcpip;
+namespace tcpip {
+namespace tcpip_server {
 
 /** handles tcpip.bind */
-void tcpip_tcpip_bind(channel_t __ch, ident_t socket, tcpip_protocol_t network, void * address, size_t address_size, uint16_t port) {
+void bind(channel_t __ch, ident_t socket, tcpip_protocol_t network, void * address, size_t address_size, uint16_t port) {
     struct addr addr;
     struct socket *sock;
 
@@ -19,3 +21,7 @@ void tcpip_tcpip_bind(channel_t __ch, ident_t socket, tcpip_protocol_t network, 
 
     send_tcpip_bind_reply(__ch, bind_socket(sock, &addr));
 }
+
+} // namespace tcpip_server
+} // namespace tcpip
+

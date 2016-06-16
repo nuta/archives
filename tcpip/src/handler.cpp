@@ -4,8 +4,9 @@
 #include <resea/tcpip.h>
 #include "handler.h"
 
+namespace tcpip {
 
-void tcpip_handler(channel_t __ch, payload_t *m) {
+void handler(channel_t __ch, payload_t *m) {
     if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
@@ -14,7 +15,7 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
     switch (EXTRACT_MSGID(m)) {
     case MSGID(tcpip, open):
         DEBUG("received tcpip.open");
-        tcpip_tcpip_open(
+        tcpip_server::open(
             __ch
             , (tcpip_protocol_t) EXTRACT(m, tcpip, open, transport)
             , (channel_t) EXTRACT(m, tcpip, open, handler)
@@ -27,7 +28,7 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
 
     case MSGID(tcpip, close):
         DEBUG("received tcpip.close");
-        tcpip_tcpip_close(
+        tcpip_server::close(
             __ch
             , (ident_t) EXTRACT(m, tcpip, close, socket)
         );
@@ -39,7 +40,7 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
 
     case MSGID(tcpip, bind):
         DEBUG("received tcpip.bind");
-        tcpip_tcpip_bind(
+        tcpip_server::bind(
             __ch
             , (ident_t) EXTRACT(m, tcpip, bind, socket)
             , (tcpip_protocol_t) EXTRACT(m, tcpip, bind, network)
@@ -55,7 +56,7 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
 
     case MSGID(tcpip, sendto):
         DEBUG("received tcpip.sendto");
-        tcpip_tcpip_sendto(
+        tcpip_server::sendto(
             __ch
             , (ident_t) EXTRACT(m, tcpip, sendto, socket)
             , (tcpip_protocol_t) EXTRACT(m, tcpip, sendto, network)
@@ -75,3 +76,5 @@ void tcpip_handler(channel_t __ch, payload_t *m) {
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
+
+} // namespace tcpip

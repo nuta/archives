@@ -3,13 +3,12 @@
 #include <resea/channel.h>
 #include <resea/tcpip.h>
 #include <resea/net_device.h>
+#include "handler.h"
 #include "socket.h"
 #include "device.h"
 #include "arp.h"
 
 using namespace tcpip;
-
-handler_t tcpip_handler;
 
 extern "C" void tcpip_startup() {
     result_t r;
@@ -32,5 +31,5 @@ extern "C" void tcpip_startup() {
         INTERFACE(tcpip), &r);
 
     INFO("ready");
-    serve_channel(ch, tcpip_handler);
+    serve_channel(ch, handler);
 }

@@ -2,7 +2,13 @@
 #include <resea.h>
 #include <resea/tcpip.h>
 
+namespace tcpip {
+namespace tcpip_server {
+
 /** handles tcpip.close */
-void tcpip_tcpip_close(channel_t __ch, ident_t socket) {
+void close(channel_t __ch, ident_t socket) {
 
 }
+
+} // namespace tcpip_server
+} // namespace tcpip
