@@ -15,7 +15,7 @@ void handler(channel_t __ch, payload_t *m) {
     switch (EXTRACT_MSGID(m)) {
     case MSGID(tcpip, open):
         DEBUG("received tcpip.open");
-        tcpip_server::open(
+        tcpip_server::handle_open(
             __ch
             , (tcpip_protocol_t) EXTRACT(m, tcpip, open, transport)
             , (channel_t) EXTRACT(m, tcpip, open, handler)
@@ -28,7 +28,7 @@ void handler(channel_t __ch, payload_t *m) {
 
     case MSGID(tcpip, close):
         DEBUG("received tcpip.close");
-        tcpip_server::close(
+        tcpip_server::handle_close(
             __ch
             , (ident_t) EXTRACT(m, tcpip, close, socket)
         );
@@ -40,7 +40,7 @@ void handler(channel_t __ch, payload_t *m) {
 
     case MSGID(tcpip, bind):
         DEBUG("received tcpip.bind");
-        tcpip_server::bind(
+        tcpip_server::handle_bind(
             __ch
             , (ident_t) EXTRACT(m, tcpip, bind, socket)
             , (tcpip_protocol_t) EXTRACT(m, tcpip, bind, network)
@@ -56,7 +56,7 @@ void handler(channel_t __ch, payload_t *m) {
 
     case MSGID(tcpip, sendto):
         DEBUG("received tcpip.sendto");
-        tcpip_server::sendto(
+        tcpip_server::handle_sendto(
             __ch
             , (ident_t) EXTRACT(m, tcpip, sendto, socket)
             , (tcpip_protocol_t) EXTRACT(m, tcpip, sendto, network)

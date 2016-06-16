@@ -6,7 +6,7 @@ namespace tcpip {
 namespace tcpip_server {
 
 /** handles tcpip.close */
-void close(channel_t __ch, ident_t socket) {
+void handle_close(channel_t __ch, ident_t socket) {
 
 }
 

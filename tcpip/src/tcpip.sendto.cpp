@@ -10,7 +10,7 @@ namespace tcpip {
 namespace tcpip_server {
 
 /** handles tcpip.sendto */
-void sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network,
+void handle_sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network,
             void * address, size_t address_size, uint16_t port,
             void * payload, size_t payload_size) {
 

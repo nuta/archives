@@ -8,7 +8,7 @@ namespace tcpip {
 namespace tcpip_server {
 
 /** handles tcpip.open */
-void open(channel_t __ch, tcpip_protocol_t transport, channel_t handler) {
+void handle_open(channel_t __ch, tcpip_protocol_t transport, channel_t handler) {
     ident_t id;
     struct socket *sock;
 
