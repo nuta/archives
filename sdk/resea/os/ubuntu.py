@@ -6,7 +6,7 @@ def update():
     try:
         subprocess.run(['sudo', 'apt-get', 'update', '-y'], check=True)
     except subprocess.CalledProcessError:
-        error('failed to update the list of packages'.format(args))
+        error('failed to update the list of packages')
 
 
 def is_installed(package):

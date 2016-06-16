@@ -1,5 +1,5 @@
 import platform
-from resea.helpers import import_module
+from resea.helpers import import_module, notice
 
 
 def install_os_requirements(os_requirements):

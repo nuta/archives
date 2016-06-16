@@ -1,10 +1,10 @@
 from glob import glob
 import os
 import markdown2
-from resea.doc_templates import *
+from resea.doc_templates import DOC, PACKAGE_DOC_CSS, PACKAGE_DOC, \
+    PACKAGE_INDEX_DOC, PACKAGE_INDEX_DOC_CSS, INDEX_DOC, INDEX_DOC_CSS
 from resea.helpers import generating, load_yaml, render, error
 from resea.validators import validate_package_yml
-
 
 def md2html(path):
     return markdown2.markdown(open(path).read(),

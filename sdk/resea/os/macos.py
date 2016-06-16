@@ -6,7 +6,7 @@ def update():
     try:
         subprocess.run(['brew', 'update'], check=True)
     except subprocess.CalledProcessError:
-        error('failed to update the list of packages'.format(args))
+        error('failed to update the list of packages')
 
 
 def is_tapped(tap):
@@ -38,7 +38,7 @@ def brew_tap(tap):
     try:
         subprocess.run(['brew', 'tap', tap], check=True)
     except subprocess.CalledProcessError:
-        error('failed to tap {}'.format(args))
+        error('failed to tap {}')
 
 
 def install(requirements):

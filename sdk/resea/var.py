@@ -7,7 +7,7 @@ class UndefinedVarError(Exception):
         self.key = k
         self.package = package
     def __str(self):
-        return 'undefined variable: {} (package={})'.format(k, repr(package))
+        return 'undefined variable: {} (package={})'.format(self.key, repr(self.package))
 
 
 class Config:

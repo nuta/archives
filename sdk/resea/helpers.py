@@ -134,7 +134,6 @@ def render(tmpl, vars):
 def load_yaml(path, **kwargs):
     """Loads a yaml file."""
     return loads_yaml(open(path).read(), path=path, **kwargs)
-    return yml
 
 
 def loads_yaml(s, validator=None, path=None):

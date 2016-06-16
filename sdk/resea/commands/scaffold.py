@@ -34,6 +34,4 @@ def scaffold(args):
 def main(args_):
     parser = argparse.ArgumentParser(prog='resea scaffold',
                                      description='Generate boilerplate files')
-    args = parser.parse_args(args_)
-
     scaffold(parser.parse_args(args_))
