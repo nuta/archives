@@ -12,6 +12,10 @@ void x86_init_localapic_timer(void);
 
 void hal_startup(void) {
 
+    /* TSS */
+    x86_init_tss(&CPUVAR->tss);
+    x86_asm_ltr(GDT_TSS_SEG);
+
     ch = create_channel();
     set_channel_handler(ch, x86::server_handler);
 }
@@ -120,10 +124,6 @@ void x86_init(void *binfo) {
     CPUVAR->idtr.length  = IDT_LENGTH;
     CPUVAR->idtr.address = (uint64_t) &CPUVAR->idt;
     x86_asm_lidt((uint64_t) &CPUVAR->idtr);
-
-    /* TSS */
-    x86_init_tss(&CPUVAR->tss);
-    x86_asm_ltr(GDT_TSS_SEG);
 
     /* I/O APIC, etc. */
     x86_init_smp();

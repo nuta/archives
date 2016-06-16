@@ -135,7 +135,7 @@ void x86_asm_syscall_handler(void);
 /*
  * Interrupt
  */
-
+#define INTERRUPT_STACK_SIZE    0x1000
 #define INT_HANDLER_STACK_SIZE  8192
 uint8_t alloc_intr_vector(void);
 
