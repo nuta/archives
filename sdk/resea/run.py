@@ -1,13 +1,11 @@
-import os
 import re
 import sys
 import atexit
 import datetime
 import subprocess
 import shutil
-import time
-from termcolor import cprint, colored
-from resea.helpers import info, error, progress, success, fail, notice
+from termcolor import colored
+from resea.helpers import error, progress, success, fail, notice
 from resea.var import get_var, UndefinedVarError
 
 

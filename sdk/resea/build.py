@@ -1,17 +1,14 @@
-import json
 import multiprocessing
 import os
 import shutil
 import subprocess
-import sys
 import pickle
 from deepdiff import DeepDiff
 from termcolor import colored
-from resea.var import global_config, local_config, get_var, expand_var, UndefinedVarError
+from resea.var import global_config, local_config, get_var, expand_var
 from resea.install import install_os_requirements
 from resea.package import load_packages, get_package_dir
-from resea.helpers import render, info, notice, error, generating, \
-    load_yaml, loads_yaml, plan, progress
+from resea.helpers import render, error, load_yaml, loads_yaml, plan, progress
 from resea.validators import validate_package_yml
 
 MAKEFILE_TEMPLATE = """\

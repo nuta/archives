@@ -1,9 +1,6 @@
 import argparse
-import hashlib
-import subprocess
-import sys
 from resea.run import run_emulator
-from resea.helpers import info, notice, error, plan, progress
+from resea.helpers import plan, progress
 from resea.commands.build import build, add_build_arguments
 from resea.var import get_var
 

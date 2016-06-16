@@ -1,9 +1,7 @@
 import argparse
 import os
 import re
-import sys
 import jinja2
-import resea
 from resea.helpers import error, generating, exec_cmd
 
 

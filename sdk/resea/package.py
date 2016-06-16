@@ -5,9 +5,9 @@ import os
 import sqlite3
 import subprocess
 import urllib.request
-from resea.var import local_config, global_config, Config, get_var
+from resea.var import local_config, global_config, Config
 from resea.helpers import load_yaml, error, progress
-from resea.validators import validate_package_yml, ValidationError
+from resea.validators import validate_package_yml
 
 REGISTRY_DB_URL = 'http://resea.net/registry.db'
 

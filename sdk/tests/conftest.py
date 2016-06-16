@@ -2,7 +2,6 @@ import os
 import yaml
 import pytest
 import resea
-import subprocess
 
 
 @pytest.fixture(scope='session')

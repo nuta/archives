@@ -3,7 +3,6 @@
 Useful functions
 
 """
-from copy import copy
 import os
 import shlex
 import subprocess

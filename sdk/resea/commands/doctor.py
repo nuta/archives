@@ -1,13 +1,11 @@
 import argparse
 import datetime
 import os
-import sys
-import glob
 import shutil
 import subprocess
 import webbrowser
 from resea.package import load_packages
-from resea.helpers import info, error, success, notice, plan, progress, \
+from resea.helpers import error, success, notice, plan, progress, \
                           load_yaml, render
 from resea.validators import validate_package_yml
 from resea.var import get_var, expand_var

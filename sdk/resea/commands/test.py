@@ -3,13 +3,12 @@ import hashlib
 import os
 import sys
 import subprocess
-import time
 import threading
 import watchdog
 import watchdog.events
 import watchdog.observers
 from resea.run import run_emulator
-from resea.helpers import info, notice, error, plan
+from resea.helpers import info, plan
 from resea.build import build, add_build_arguments
 from resea.var import global_config, get_var
 

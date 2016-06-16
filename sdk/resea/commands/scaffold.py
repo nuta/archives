@@ -1,5 +1,3 @@
-import os
-import sys
 import argparse
 import subprocess
 from resea.package import load_packages

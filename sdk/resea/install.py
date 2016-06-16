@@ -1,6 +1,5 @@
 import platform
-import subprocess
-from resea.helpers import plan, error, import_module
+from resea.helpers import import_module
 
 
 def install_os_requirements(os_requirements):

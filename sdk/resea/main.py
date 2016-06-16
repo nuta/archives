@@ -1,4 +1,3 @@
-import sys
 import resea
 from resea.helpers import import_module, error
 
