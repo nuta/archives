@@ -78,6 +78,9 @@ void handler(channel_t __ch, payload_t *m) {
 HANDLER_H_TEMPLATE = """\
 #include "{{ package_name }}.h"
 #include <resea.h>
+{% for implement in implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
 
 namespace {{ package_name }} {
 void handler(channel_t __ch, payload_t *m);
@@ -152,7 +155,10 @@ def main(args):
         implements.append(package)
         for x in yml["implements"]:
             if package in implements:
+                implements.append(x)
                 packages.append(x)
+
+    implements = list(set(implements))
 
     messages = []
     for yml in ymls:
