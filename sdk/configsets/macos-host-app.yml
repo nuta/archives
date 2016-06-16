@@ -3,3 +3,4 @@ global_config:
     ATOS: atos
     LINKFLAGS: -Wl,-no_pie
     CXX: clang++
+    LD: ld
