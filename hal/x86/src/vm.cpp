@@ -176,7 +176,7 @@ paddr_t hal_vaddr_to_paddr(struct vm_space *vms, uintptr_t v) {
 
 
 uintptr_t hal_paddr_to_vaddr(paddr_t p) {
-    vaddr_t v;
+    uintptr_t v;
 
     v =  p + KERNEL_BASE_ADDR;
     if (v < KERNEL_BASE_ADDR) {
