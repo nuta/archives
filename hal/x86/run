@@ -1,18 +1,26 @@
-#!/bin/sh
-set -eu
-X86_DIR=$(dirname "$0")
-BUILD_DIR=$(dirname "$1")
-EXECUTABLE_FILE=$1
-ISO_FILE=$BUILD_DIR/bootable.iso
+#!/usr/bin/env python3
+from os.path import *
+import sys
+import subprocess
+import shutil
+import shlex
 
-cp -r $X86_DIR/isofiles $BUILD_DIR
-cp $EXECUTABLE_FILE $BUILD_DIR/isofiles/boot/executable
 
-grub-mkrescue -o $ISO_FILE $BUILD_DIR/isofiles
-qemu-system-x86_64 \
-    -m 256 -localtime -nographic \
-    -no-reboot -boot d \
-    -cpu SandyBridge \
-    -net user -net nic,model=virtio \
-    -net dump,file=qemu.pcap \
-    -cdrom $ISO_FILE
+x86_dir = dirname(sys.argv[0])
+build_dir = dirname(sys.argv[1])
+executable_file = sys.argv[1]
+iso_file = join(build_dir, 'bootable.iso')
+
+grub_mkrescue = 'grub-mkrescue -o {iso_file} {build_dir}/isofiles'
+qemu = 'qemu-system-x86_64 -m 256 -localtime -nographic -no-reboot -boot d -cpu SandyBridge ' + \
+       '-net user -net nic,model=virtio -net dump,file=qemu.pcap -cdrom {iso_file}'
+
+if __name__ == '__main__':
+    try:
+        shutil.copytree(join(x86_dir, 'isofiles'), join(build_dir, 'isofiles'))
+    except FileExistsError:
+        pass
+
+    shutil.copy(executable_file, join(build_dir, 'isofiles', 'boot', 'executable'))
+    subprocess.run(shlex.split(grub_mkrescue.format(**locals())))
+    subprocess.run(shlex.split(qemu.format(**locals())))
