@@ -12,8 +12,11 @@ static channel_t thread_ch = 0;
 static channel_t memory_ch = 0;
 static channel_t zeroed_pager_ch = 0;
 
+namespace elf {
+namespace exec_server {
+
 /** handles exec.create */
-void elf_exec_create(channel_t __ch, uchar_t* name, size_t name_size,
+void handle_create(channel_t __ch, uchar_t* name, size_t name_size,
                      channel_t fs, ident_t file, ident_t group) {
     result_t result;
     uintptr_t entry, stack;
@@ -67,3 +70,6 @@ void elf_exec_create(channel_t __ch, uchar_t* name, size_t name_size,
     send_exec_create_reply(__ch, result, r_group, r_thread);
 }
 
+
+} // namespace exec_server
+} // namespace elf

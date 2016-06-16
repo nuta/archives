@@ -1,12 +1,13 @@
 #include "elf.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
-#include <resea/elf.h>
 #include <resea/exec.h>
+#include <resea/elf.h>
 #include "handler.h"
 
+namespace elf {
 
-void elf_handler(channel_t __ch, payload_t *m) {
+void server_handler(channel_t __ch, payload_t *m) {
     if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
@@ -15,7 +16,7 @@ void elf_handler(channel_t __ch, payload_t *m) {
     switch (EXTRACT_MSGID(m)) {
     case MSGID(exec, create):
         DEBUG("received exec.create");
-        elf_exec_create(
+        exec_server::handle_create(
             __ch
             , (uchar_t*) EXTRACT(m, exec, create, name)
             , (size_t) EXTRACT(m, exec, create, name_size)
@@ -35,3 +36,5 @@ void elf_handler(channel_t __ch, payload_t *m) {
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
+
+} // namespace elf
