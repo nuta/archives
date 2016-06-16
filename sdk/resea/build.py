@@ -5,7 +5,7 @@ import subprocess
 import pickle
 from deepdiff import DeepDiff
 from termcolor import colored
-from resea.var import global_config, local_config, get_var, expand_var
+from resea.var import global_config, local_config, get_var, expand_var, Config
 from resea.install import install_os_requirements
 from resea.package import load_packages, get_package_dir
 from resea.helpers import render, error, load_yaml, loads_yaml, plan, progress
@@ -107,8 +107,16 @@ def load_configsets(configsets):
     configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
     for configset in configsets:
         path = os.path.join(configsets_dir, configset + '.yml')
-        for k, v in load_yaml(path)['global_config'].items():
+        yml = load_yaml(path)
+
+        for k, v in yml.get('global_config', {}).items():
             global_config.set(k, v)
+
+        for package, vs in yml.get('local_config', {}).items():
+            if package not in local_config:
+                local_config[package] = Config()
+            for k, v in vs:
+                local_config[package].set(k, v)
 
 def load_cmdline_config(args):
     for arg in args:
