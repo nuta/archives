@@ -1,8 +1,8 @@
 #include "fat.h"
 #include <resea.h>
 #include <resea/fat.h>
-#include <resea/fs.h>
 #include <resea/pager.h>
+#include <resea/fs.h>
 
 namespace fat {
 void server_handler(channel_t __ch, payload_t *m);
@@ -12,7 +12,7 @@ void handle_open(
     channel_t __ch
     , uchar_t* path
     , size_t path_size
-    , fs_filemode_t mode
+    , resea::interfaces::fs::filemode_t mode
 );
 } // namespace fs
 namespace fs_server {

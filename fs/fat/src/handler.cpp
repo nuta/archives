@@ -2,8 +2,8 @@
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <resea/fat.h>
-#include <resea/fs.h>
 #include <resea/pager.h>
+#include <resea/fs.h>
 #include "handler.h"
 
 namespace fat {
@@ -21,7 +21,7 @@ void server_handler(channel_t __ch, payload_t *m) {
             __ch
             , (uchar_t*) EXTRACT(m, fs, open, path)
             , (size_t) EXTRACT(m, fs, open, path_size)
-            , (fs_filemode_t) EXTRACT(m, fs, open, mode)
+            , (resea::interfaces::fs::filemode_t) EXTRACT(m, fs, open, mode)
         );
         return;
 
