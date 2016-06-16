@@ -9,8 +9,11 @@
 #include "kernel.h"
 
 
+namespace kernel {
+namespace memory_server {
+
 /** handles memory.map */
-void kernel_memory_map(channel_t __ch,
+void handle_map(channel_t __ch,
        ident_t group,
        uintptr_t addr,
        size_t size,
@@ -55,3 +58,6 @@ void kernel_memory_map(channel_t __ch,
 
    send_memory_map_reply(__ch, OK);
 }
+
+} // namespace memory_server
+} // namespace kernel

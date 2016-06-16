@@ -8,8 +8,14 @@
 #include <resea/datetime.h>
 #include <resea/pager.h>
 
+namespace kernel {
+namespace io_server {
+
 /** handles io.release */
-void kernel_io_release(channel_t __ch, io_space_t iospace, uintptr_t addr) {
+void handle_release(channel_t __ch, io_space_t iospace, uintptr_t addr) {
 
     // TODO
 }
+
+} // namespace io_server
+} // namespace kernel

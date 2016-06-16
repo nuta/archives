@@ -10,9 +10,15 @@
 #include "kernel.h"
 
 
+namespace kernel {
+namespace channel_server {
+
 /** handles channel.connect */
-void kernel_channel_connect(channel_t __ch, uintmax_t channel, interface_t interface) {
+void handle_connect(channel_t __ch, uintmax_t channel, interface_t interface) {
 
     kernel_connect_channel(channel, interface);
     send_channel_connect_reply(__ch, OK);
 }
+
+} // namespace channel_server
+} // namespace kernel

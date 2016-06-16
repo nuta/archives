@@ -7,8 +7,11 @@
 #include "kernel.h"
 
 
+namespace kernel {
+namespace thread_server {
+
 /** handles thread.create */
-void kernel_thread_create(channel_t __ch, ident_t group, uchar_t* name, size_t name_size) {
+void handle_create(channel_t __ch, ident_t group, uchar_t* name, size_t name_size) {
     result_t r;
     ident_t thread, r_group;
 
@@ -17,3 +20,6 @@ void kernel_thread_create(channel_t __ch, ident_t group, uchar_t* name, size_t n
 
     send_thread_create_reply(__ch, r, thread, r_group);
 }
+
+} // namespace thread_server
+} // namespace kernel

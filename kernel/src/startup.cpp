@@ -6,7 +6,7 @@
 #include <resea/datetime.h>
 #include <resea/pager.h>
 #include <resea/zeroed_pager.h>
-#include "kernel.h"
+#include "handler.h"
 
 static channel_t ch;
 
@@ -21,7 +21,7 @@ extern "C" void kernel_startup(void) {
     kernel_datetime_startup();
 
     ch = create_channel();
-    set_channel_handler(ch, &kernel_handler);
+    set_channel_handler(ch, kernel::handler);
     kernel_register_channel(ch, INTERFACE(thread));
     kernel_register_channel(ch, INTERFACE(memory));
     kernel_register_channel(ch, INTERFACE(datetime));

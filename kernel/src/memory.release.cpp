@@ -8,7 +8,13 @@
 #include <resea/datetime.h>
 #include <resea/pager.h>
 
+namespace kernel {
+namespace memory_server {
+
 /** handles memory.release */
-void kernel_memory_release(channel_t __ch, uintptr_t addr) {
+void handle_release(channel_t __ch, uintptr_t addr) {
 
 }
+
+} // namespace memory_server
+} // namespace kernel

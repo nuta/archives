@@ -10,8 +10,11 @@
 #include <hal.h>
 #include "kernel.h"
 
+namespace kernel {
+namespace io_server {
+
 /** handles io.allocate */
-void kernel_io_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size_t size) {
+void handle_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size_t size) {
     uintptr_t vaddr;
 
     switch (iospace) {
@@ -28,3 +31,6 @@ void kernel_io_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size
 
     send_io_allocate_reply(__ch, OK, vaddr);
 }
+
+} // namespace io_server
+} // namespace kernel

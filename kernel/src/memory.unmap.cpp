@@ -5,9 +5,15 @@
 #include <resea/memory.h>
 #include <resea/thread.h>
 
+namespace kernel {
+namespace memory_server {
+
 /** handles memory.unmap */
-void kernel_memory_unmap(channel_t __ch, uintptr_t addr) {
+void handle_unmap(channel_t __ch, uintptr_t addr) {
 
     WARN("unimplemented");
     send_memory_map_reply(__ch, OK);
 }
+
+} // namespace memory_server
+} // namespace kernel

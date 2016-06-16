@@ -1,55 +1,87 @@
 #include "kernel.h"
 #include <resea.h>
+#include <resea/channel.h>
+#include <resea/thread.h>
+#include <resea/pager.h>
+#include <resea/memory.h>
+#include <resea/kernel.h>
+#include <resea/io.h>
+#include <resea/zeroed_pager.h>
+#include <resea/datetime.h>
 
-void kernel_pager_fill(
+namespace kernel {
+void handler(channel_t __ch, payload_t *m);
+
+namespace pager_server {
+void handle_fill(
     channel_t __ch
     , ident_t id
     , offset_t offset
     , size_t size
 );
-void kernel_datetime_get_date(
+} // namespace pager
+namespace datetime_server {
+void handle_get_date(
     channel_t __ch
 );
-void kernel_datetime_set_oneshot_timer(
+} // namespace datetime
+namespace datetime_server {
+void handle_set_oneshot_timer(
     channel_t __ch
     , channel_t ch
     , uintmax_t msec
 );
-void kernel_datetime_set_interval_timer(
+} // namespace datetime
+namespace datetime_server {
+void handle_set_interval_timer(
     channel_t __ch
     , channel_t ch
     , uintmax_t msec
 );
-void kernel_datetime_delay(
+} // namespace datetime
+namespace datetime_server {
+void handle_delay(
     channel_t __ch
     , uintmax_t msec
 );
-void kernel_io_allocate(
+} // namespace datetime
+namespace io_server {
+void handle_allocate(
     channel_t __ch
     , io_space_t iospace
     , uintptr_t addr
     , size_t size
 );
-void kernel_io_release(
+} // namespace io
+namespace io_server {
+void handle_release(
     channel_t __ch
     , io_space_t iospace
     , uintptr_t addr
 );
-void kernel_thread_create(
+} // namespace io
+namespace thread_server {
+void handle_create(
     channel_t __ch
     , ident_t group
     , uchar_t* name
     , size_t name_size
 );
-void kernel_thread_delete(
+} // namespace thread
+namespace thread_server {
+void handle_delete(
     channel_t __ch
     , ident_t thread
 );
-void kernel_thread_start(
+} // namespace thread
+namespace thread_server {
+void handle_start(
     channel_t __ch
     , ident_t thread
 );
-void kernel_thread_set(
+} // namespace thread
+namespace thread_server {
+void handle_set(
     channel_t __ch
     , ident_t thread
     , uintptr_t entry
@@ -57,10 +89,14 @@ void kernel_thread_set(
     , uintptr_t stack
     , size_t stack_size
 );
-void kernel_thread_get_current_thread(
+} // namespace thread
+namespace thread_server {
+void handle_get_current_thread(
     channel_t __ch
 );
-void kernel_memory_map(
+} // namespace thread
+namespace memory_server {
+void handle_map(
     channel_t __ch
     , ident_t group
     , uintptr_t addr
@@ -69,35 +105,52 @@ void kernel_memory_map(
     , ident_t pager_arg
     , offset_t offset
 );
-void kernel_memory_unmap(
+} // namespace memory
+namespace memory_server {
+void handle_unmap(
     channel_t __ch
     , uintptr_t addr
 );
-void kernel_memory_get_page_size(
+} // namespace memory
+namespace memory_server {
+void handle_get_page_size(
     channel_t __ch
 );
-void kernel_memory_allocate(
+} // namespace memory
+namespace memory_server {
+void handle_allocate(
     channel_t __ch
     , size_t size
     , uint32_t flags
 );
-void kernel_memory_release(
+} // namespace memory
+namespace memory_server {
+void handle_release(
     channel_t __ch
     , uintptr_t addr
 );
-void kernel_memory_allocate_physical(
+} // namespace memory
+namespace memory_server {
+void handle_allocate_physical(
     channel_t __ch
     , paddr_t paddr
     , size_t size
     , uint32_t flags
 );
-void kernel_channel_connect(
+} // namespace memory
+namespace channel_server {
+void handle_connect(
     channel_t __ch
     , uintmax_t channel
     , interface_t interface
 );
-void kernel_channel_register(
+} // namespace channel
+namespace channel_server {
+void handle_register(
     channel_t __ch
     , uintmax_t channel
     , interface_t interface
 );
+} // namespace channel
+
+} // namespace kernel

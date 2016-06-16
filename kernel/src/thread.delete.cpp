@@ -5,7 +5,13 @@
 #include <resea/memory.h>
 #include <resea/thread.h>
 
+namespace kernel {
+namespace thread_server {
+
 /** handles thread.delete */
-void kernel_thread_delete(channel_t __ch, ident_t thread) {
+void handle_delete(channel_t __ch, ident_t thread) {
 
 }
+
+} // namespace thread_server
+} // namespace kernel

@@ -7,8 +7,14 @@
 #include <resea/io.h>
 #include <resea/datetime.h>
 
+namespace kernel {
+namespace datetime_server {
+
 /** handles datetime.delay */
-void kernel_datetime_delay(channel_t __ch, uintmax_t msec) {
+void handle_delay(channel_t __ch, uintmax_t msec) {
 
     send_datetime_delay_reply(__ch, OK);
 }
+
+} // namespace datetime_server
+} // namespace kernel
