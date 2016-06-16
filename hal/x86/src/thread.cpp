@@ -1,7 +1,7 @@
-#include "_x86.h"
 #include <hal.h>
 #include <resea/cpp/memory.h>
 #include <string.h>
+#include "x86.h"
 
 
 void hal_set_current_thread_id(ident_t id) {
@@ -30,7 +30,7 @@ void hal_set_thread(struct hal_thread *t, bool is_kernel,
     paddr_t paddr;
     call_hal_callback(HAL_CALLBACK_ALLOCATE_MEMORY,
         0, // paddr
-        XSAVE_AREA_SIZE, MEMORY_ALLOC_PAGE_ALIGNED,
+        XSAVE_AREA_SIZE, resea::interfaces::memory::ALLOC_PAGE_ALIGNED,
         &t->fregs, &paddr);
 
     if (!is_kernel) {

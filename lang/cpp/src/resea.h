@@ -137,11 +137,13 @@ NORETURN void serve_channel(channel_t ch, handler_t handler);
 /*
  *  Message
  */
-#define INTERFACE(i)         __interface_##i
-#define MSGID(i, type)       __msgid_##i##_##type
-#define __PTYPE(i, t, p)     __ptype_##i##_##t##_##p
-#define __PINDEX(i, t, p)    __pindex_##i##_##t##_##p
-#define EXTRACT(m, i, t, p)  ((__PTYPE(i, t, p)) (((payload_t *) (m))[__PINDEX(i, t, p)]))
+#define INTERFACE(i)         resea::interfaces::i::interface_id
+#define MSGID(i, type)       resea::interfaces::i::type##_id
+#define __PTYPE(i, t, p)     t##_##p##_type
+#define __PINDEX(i, t, p)    t##_##p##_index
+#define _PTYPE(i, t, p)      resea::interfaces::i::__PTYPE(i, t, p)
+#define _PINDEX(i, t, p)     resea::interfaces::i::__PINDEX(i, t, p)
+#define EXTRACT(m, i, t, p)  ((_PTYPE(i, t, p)) (((payload_t *) (m))[_PINDEX(i, t, p)]))
 #define EXTRACT_MSGID(m)     ((m)[1])
 
 // `header` must be the payload header that includes type of `i`

@@ -17,7 +17,7 @@ void server_handler(channel_t __ch, payload_t *m) {
         DEBUG("received tcpip.open");
         tcpip_server::handle_open(
             __ch
-            , (tcpip_protocol_t) EXTRACT(m, tcpip, open, transport)
+            , (resea::interfaces::tcpip::protocol_t) EXTRACT(m, tcpip, open, transport)
             , (channel_t) EXTRACT(m, tcpip, open, handler)
         );
         return;
@@ -43,7 +43,7 @@ void server_handler(channel_t __ch, payload_t *m) {
         tcpip_server::handle_bind(
             __ch
             , (ident_t) EXTRACT(m, tcpip, bind, socket)
-            , (tcpip_protocol_t) EXTRACT(m, tcpip, bind, network)
+            , (resea::interfaces::tcpip::protocol_t) EXTRACT(m, tcpip, bind, network)
             , (void *) EXTRACT(m, tcpip, bind, address)
             , (size_t) EXTRACT(m, tcpip, bind, address_size)
             , (uint16_t) EXTRACT(m, tcpip, bind, port)
@@ -59,7 +59,7 @@ void server_handler(channel_t __ch, payload_t *m) {
         tcpip_server::handle_sendto(
             __ch
             , (ident_t) EXTRACT(m, tcpip, sendto, socket)
-            , (tcpip_protocol_t) EXTRACT(m, tcpip, sendto, network)
+            , (resea::interfaces::tcpip::protocol_t) EXTRACT(m, tcpip, sendto, network)
             , (void *) EXTRACT(m, tcpip, sendto, address)
             , (size_t) EXTRACT(m, tcpip, sendto, address_size)
             , (uint16_t) EXTRACT(m, tcpip, sendto, port)

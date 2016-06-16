@@ -12,7 +12,7 @@ namespace kernel {
 namespace io_server {
 
 /** handles io.release */
-void handle_release(channel_t __ch, io_space_t iospace, uintptr_t addr) {
+void handle_release(channel_t __ch, resea::interfaces::io::space_t iospace, uintptr_t addr) {
 
     // TODO
 }

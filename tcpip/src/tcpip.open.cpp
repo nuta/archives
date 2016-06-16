@@ -8,7 +8,7 @@ namespace tcpip {
 namespace tcpip_server {
 
 /** handles tcpip.open */
-void handle_open(channel_t __ch, tcpip_protocol_t transport, channel_t handler) {
+void handle_open(channel_t __ch, resea::interfaces::tcpip::protocol_t transport, channel_t handler) {
     ident_t id;
     struct socket *sock;
 
@@ -17,7 +17,7 @@ void handle_open(channel_t __ch, tcpip_protocol_t transport, channel_t handler) 
     sock->protocol = transport;
     sock->handler  = handler;
 
-    send_tcpip_open_reply(__ch, OK, id);
+    resea::interfaces::tcpip::send_open_reply(__ch, OK, id);
 }
 
 } // namespace tcpip_server

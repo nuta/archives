@@ -21,7 +21,7 @@ static bool compare_addr(struct addr *addr1, struct addr *addr2) {
             return false;
     }
 
-    if (addr1->protocol & TCPIP_PROTOCOL_IPV4 && addr2->protocol & TCPIP_PROTOCOL_IPV4) {
+    if (addr1->protocol & resea::interfaces::tcpip::PROTOCOL_IPV4 && addr2->protocol & resea::interfaces::tcpip::PROTOCOL_IPV4) {
         if (addr1->ipv4_addr != IPV4_ADDR_ANY &&
             addr2->ipv4_addr != IPV4_ADDR_ANY) {
             if (addr1->ipv4_addr != addr2->ipv4_addr) {
@@ -107,7 +107,7 @@ result_t bind_socket(struct socket *socket, struct addr *addr) {
 void init_socket() {
 
     sockets     = (struct socket *) allocate_memory(sizeof(struct socket) * 256,
-                                                    MEMORY_ALLOC_NORMAL);
+                                                    resea::interfaces::memory::ALLOC_NORMAL);
     sockets_max = 256;
 }
 

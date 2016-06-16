@@ -21,11 +21,11 @@ void handle_read(channel_t __ch,
     void* data;
     size_t r_size;
 
-    data   = allocate_memory(size, MEMORY_ALLOC_NORMAL); // TODO: free on failure
+    data   = allocate_memory(size, resea::interfaces::memory::ALLOC_NORMAL); // TODO: free on failure
     result = fat::read(&fat::instance, fat_get_file_by_id(file),
                        offset, data, size, &r_size);
 
-    sendas_fs_read_reply(__ch,
+    resea::interfaces::fs::sendas_read_reply(__ch,
         result, PAYLOAD_INLINE,
         data,   PAYLOAD_MOVE_OOL,
         size,   PAYLOAD_INLINE);

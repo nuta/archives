@@ -16,7 +16,7 @@ struct socket {
     struct addr remote_addr;
 
     channel_t handler;
-    tcpip_protocol_t protocol;
+    resea::interfaces::tcpip::protocol_t protocol;
 
     // Transmit (TX) and queues
     struct mbuf *tx;

@@ -20,14 +20,14 @@ extern "C" void tcpip_startup() {
     init_socket();
 
     net_device_ch = create_channel();
-    call_channel_connect(connect_to_local(1), net_device_ch,
+    resea::interfaces::channel::call_connect(connect_to_local(1), net_device_ch,
         INTERFACE(net_device), &r);
 
     INFO("connected to a net_device");
     add_device(net_device_ch);
 
     ch = create_channel();
-    call_channel_register(connect_to_local(1), ch,
+    resea::interfaces::channel::call_register(connect_to_local(1), ch,
         INTERFACE(tcpip), &r);
 
     INFO("ready");

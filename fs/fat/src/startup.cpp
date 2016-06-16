@@ -42,13 +42,13 @@ extern "C" void fat_startup(void) {
     INFO("starting");
 
     storage_device_ch = create_channel();
-    call_channel_connect(connect_to_local(1), storage_device_ch,
+    resea::interfaces::channel::call_connect(connect_to_local(1), storage_device_ch,
         INTERFACE(storage_device), &r);
 
     opendisk(&instance, storage_device_ch, read_disk, write_disk);
 
     ch = create_channel();
-    call_channel_register(connect_to_local(1), ch,
+    resea::interfaces::channel::call_register(connect_to_local(1), ch,
         INTERFACE(fs), &r);
     serve_channel(ch, server_handler);
 }

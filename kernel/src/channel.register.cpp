@@ -17,7 +17,7 @@ namespace channel_server {
 void handle_register(channel_t __ch, uintmax_t channel, interface_t interface) {
 
     kernel_register_channel(channel, interface);
-    send_channel_register_reply(__ch, OK);
+    resea::interfaces::channel::send_register_reply(__ch, OK);
 }
 
 } // namespace channel_server

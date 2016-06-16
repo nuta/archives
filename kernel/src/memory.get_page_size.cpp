@@ -13,7 +13,7 @@ namespace memory_server {
 /** handles memory.get_page_size */
 void handle_get_page_size(channel_t __ch) {
 
-    send_memory_get_page_size_reply(__ch, PAGE_SIZE);
+    resea::interfaces::memory::send_get_page_size_reply(__ch, PAGE_SIZE);
 }
 
 } // namespace memory_server

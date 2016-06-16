@@ -50,7 +50,7 @@ void add_device(channel_t ch) {
 
     client_ch = create_channel();
     set_channel_handler(client_ch, net_device_client_handler);
-    call_net_device_listen(ch, client_ch, &r);
+    resea::interfaces::net_device::call_listen(ch, client_ch, &r);
 
     if (r != OK) {
         WARN("failed to net_device.listen");
@@ -72,7 +72,7 @@ void init_devices() {
     devices_max = 8;
     devices = (struct net_device *) allocate_memory(
                   sizeof(struct net_device) * devices_max,
-                  MEMORY_ALLOC_ZEROED);
+                  resea::interfaces::memory::ALLOC_ZEROED);
 }
 
 } // namespace tcpip

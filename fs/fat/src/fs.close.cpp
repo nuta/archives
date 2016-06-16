@@ -14,7 +14,7 @@ namespace fs_server {
 void handle_close(channel_t __ch, ident_t file) {
 
     fat_free_file_by_id(file);
-    send_fs_close_reply(__ch, OK);
+    resea::interfaces::fs::send_close_reply(__ch, OK);
 }
 
 } // namespace fs_server

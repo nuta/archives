@@ -15,7 +15,7 @@ void handle_listen(
 ) {
 
     virtio_net_listener = channel;
-    send_net_device_listen_reply(__ch, OK);
+    resea::interfaces::net_device::send_listen_reply(__ch, OK);
 }
 
 } // namespace net_device_server

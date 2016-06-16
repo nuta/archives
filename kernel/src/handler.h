@@ -1,13 +1,13 @@
 #include "kernel.h"
 #include <resea.h>
+#include <resea/kernel.h>
 #include <resea/thread.h>
+#include <resea/memory.h>
+#include <resea/pager.h>
+#include <resea/zeroed_pager.h>
+#include <resea/channel.h>
 #include <resea/datetime.h>
 #include <resea/io.h>
-#include <resea/kernel.h>
-#include <resea/channel.h>
-#include <resea/memory.h>
-#include <resea/zeroed_pager.h>
-#include <resea/pager.h>
 
 namespace kernel {
 void server_handler(channel_t __ch, payload_t *m);
@@ -48,7 +48,7 @@ void handle_delay(
 namespace io_server {
 void handle_allocate(
     channel_t __ch
-    , io_space_t iospace
+    , resea::interfaces::io::space_t iospace
     , uintptr_t addr
     , size_t size
 );
@@ -56,7 +56,7 @@ void handle_allocate(
 namespace io_server {
 void handle_release(
     channel_t __ch
-    , io_space_t iospace
+    , resea::interfaces::io::space_t iospace
     , uintptr_t addr
 );
 } // namespace io

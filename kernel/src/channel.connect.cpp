@@ -17,7 +17,7 @@ namespace channel_server {
 void handle_connect(channel_t __ch, uintmax_t channel, interface_t interface) {
 
     kernel_connect_channel(channel, interface);
-    send_channel_connect_reply(__ch, OK);
+    resea::interfaces::channel::send_connect_reply(__ch, OK);
 }
 
 } // namespace channel_server

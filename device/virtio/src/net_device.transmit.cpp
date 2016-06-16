@@ -17,7 +17,7 @@ void handle_transmit(
     result_t result;
 
     result = virtio_net_transmit(data, data_size);
-    send_net_device_transmit_reply(__ch, result);
+    resea::interfaces::net_device::send_transmit_reply(__ch, result);
 }
 
 } // namespace net_device_server

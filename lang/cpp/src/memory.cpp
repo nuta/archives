@@ -31,9 +31,9 @@ static void add_chunk(size_t size, size_t num) {
     result_t r;
     uintptr_t p;
 
-    call_memory_allocate(get_memory_ch(),
+    resea::interfaces::memory::call_allocate(get_memory_ch(),
         sizeof(struct chunk) + (sizeof(struct alloc) + size) * num,
-        MEMORY_ALLOC_NORMAL,
+        resea::interfaces::memory::ALLOC_NORMAL,
         &r, &p);
 
     if (r != OK) {
@@ -76,7 +76,7 @@ channel_t get_memory_ch(void) {
 
     if (!ch) {
         ch = create_channel();
-        call_channel_connect(connect_to_local(1), ch,
+        resea::interfaces::channel::call_connect(connect_to_local(1), ch,
             INTERFACE(memory), &r);
     }
 
@@ -93,7 +93,7 @@ channel_t get_memory_ch(void) {
  *           nullptr on failure.
  *
  */
-void *allocate_memory (size_t size, memory_alloc_t flags) {
+void *allocate_memory (size_t size, resea::interfaces::memory::alloc_t flags) {
 
     lock_mutex(&lock);
 
@@ -136,7 +136,7 @@ void *allocate_memory (size_t size, memory_alloc_t flags) {
     result_t r;
     uintptr_t p;
 
-    call_memory_allocate(get_memory_ch(), size, flags, &r, &p);
+    resea::interfaces::memory::call_allocate(get_memory_ch(), size, flags, &r, &p);
     if (r != OK) {
         WARN("failed to allocate memory (size=%d)", size);
         return nullptr;

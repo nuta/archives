@@ -9,7 +9,7 @@ using namespace tcpip;
 namespace tcpip {
 
 // TODO
-void parse_ip_addr(struct addr *addr, tcpip_protocol_t protocol,
+void parse_ip_addr(struct addr *addr, resea::interfaces::tcpip::protocol_t protocol,
                    void *address, size_t address_size) {
 
     // NOTE: address is *not* null-terminated

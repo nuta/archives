@@ -33,7 +33,7 @@ void ethernet_transmit(struct net_device *device, struct addr* addr,
 
     data_len = m->total_length;
     data = allocate_memory(data_len + sizeof(struct ethernet_header),
-                           MEMORY_ALLOC_NORMAL);
+                           resea::interfaces::memory::ALLOC_NORMAL);
     header = (struct ethernet_header *) data;
     payload = (void *) ((uintptr_t) data + sizeof(struct ethernet_header));
 

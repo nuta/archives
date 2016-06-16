@@ -40,7 +40,7 @@ void handle_map(channel_t __ch,
 
     if (area->size > 0) {
         unlock_mutex(&current->lock);
-        send_memory_map_reply(__ch, OK);
+        resea::interfaces::memory::send_map_reply(__ch, OK);
         return;
     }
 
@@ -56,7 +56,7 @@ void handle_map(channel_t __ch,
 
     unlock_mutex(&current->lock);
 
-   send_memory_map_reply(__ch, OK);
+   resea::interfaces::memory::send_map_reply(__ch, OK);
 }
 
 } // namespace memory_server

@@ -35,8 +35,8 @@ result_t virtio_net_transmit(void *data, size_t size) {
     rs[0].size  = sizeof(header);
     rs[0].flags = 0; // READONLY
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, size, MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, size, resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, &addr, &paddr);
 
     memcpy((void *) addr, data, size);
@@ -72,7 +72,7 @@ retry:
 
     // addr is a physical address so we must convert it to a virtual address
     *size = desc->len;
-    *data = allocate_memory(*size, MEMORY_ALLOC_NORMAL);
+    *data = allocate_memory(*size, resea::interfaces::memory::ALLOC_NORMAL);
 
     /* the magic number '10' in 2nd arg. is the size of virtio-net's packet header */
     memcpy(*data,
@@ -126,8 +126,8 @@ static void new_device_handler(channel_t ch, payload_t *m) {
         if (fill_num > 128)
             fill_num = 128;
 
-        call_memory_allocate_physical(get_memory_ch(),
-            0, 0x800 * fill_num, MEMORY_ALLOC_CONTINUOUS,
+        resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+            0, 0x800 * fill_num, resea::interfaces::memory::ALLOC_CONTINUOUS,
             &r, &dma_addr, &dma_paddr);
 
         INFO("virtio-net: filling avail_ring to receive packets (num=%d)", fill_num);
@@ -145,7 +145,7 @@ static void new_device_handler(channel_t ch, payload_t *m) {
         }
 
         INFO("virtio-net: device ready");
-        call_channel_register(connect_to_local(1), virtio_server,
+        resea::interfaces::channel::call_register(connect_to_local(1), virtio_server,
             INTERFACE(net_device), &r);
         break;
     }
@@ -157,13 +157,13 @@ void virtio_net_init(void) {
     result_t r;
 
     pci_server = create_channel();
-    call_channel_connect(connect_to_local(1), pci_server, INTERFACE(pci), &r);
+    resea::interfaces::channel::call_connect(connect_to_local(1), pci_server, INTERFACE(pci), &r);
 
     pci_client = create_channel();
     set_channel_handler(pci_client, new_device_handler);
 
-    call_pci_listen(pci_server, pci_client,
-        VIRTIO_PCI_VENDOR, PCI_ID_ANY,
-        PCI_ID_ANY, VIRTIO_PCI_SUBSYS_NET,
+    resea::interfaces::pci::call_listen(pci_server, pci_client,
+        VIRTIO_PCI_VENDOR, resea::interfaces::pci::ID_ANY,
+        resea::interfaces::pci::ID_ANY, VIRTIO_PCI_SUBSYS_NET,
         &r);
 }

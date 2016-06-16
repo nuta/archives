@@ -64,12 +64,12 @@ void receive_udp(struct addr *src_addr, struct addr *dest_addr,
         return;
     }
 
-    void *payload = allocate_memory(length, MEMORY_ALLOC_NORMAL);
+    void *payload = allocate_memory(length, resea::interfaces::memory::ALLOC_NORMAL);
     copy_from_mbuf(payload, mbuf, length);
 
-    sendas_tcpip_received(socket->handler,
+    resea::interfaces::tcpip::sendas_received(socket->handler,
         socket->id,          PAYLOAD_INLINE,
-        TCPIP_PROTOCOL_IPV4, PAYLOAD_INLINE,
+        resea::interfaces::tcpip::PROTOCOL_IPV4, PAYLOAD_INLINE,
         (void *) "",         PAYLOAD_OOL,
         0,                   PAYLOAD_INLINE, // TODO
         src_port,            PAYLOAD_INLINE,

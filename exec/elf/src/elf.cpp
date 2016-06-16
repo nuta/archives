@@ -44,7 +44,7 @@ result_t elf_load_executable(channel_t memory_ch, ident_t group,
     int i;
 
     /* load and validate the header */
-    call_fs_read(fs,
+    resea::interfaces::fs::call_read(fs,
          file, 0, sizeof(Elf64_Ehdr) + (sizeof(Elf64_Phdr) * PHDR_MAX),
          &r, &data, &size);
 
@@ -70,9 +70,9 @@ result_t elf_load_executable(channel_t memory_ch, ident_t group,
 
         if (phdr->p_type == PT_LOAD) {
             uint8_t flags = 0;
-            flags |= (phdr->p_flags & PF_R)? MEMORY_MAP_READ  : 0;
-            flags |= (phdr->p_flags & PF_W)? MEMORY_MAP_WRITE : 0;
-            flags |= (phdr->p_flags & PF_X)? MEMORY_MAP_EXEC  : 0;
+            flags |= (phdr->p_flags & PF_R)? resea::interfaces::memory::MAP_READ  : 0;
+            flags |= (phdr->p_flags & PF_W)? resea::interfaces::memory::MAP_WRITE : 0;
+            flags |= (phdr->p_flags & PF_X)? resea::interfaces::memory::MAP_EXEC  : 0;
 
             /* map the area to the virtual memory space */
             INFO("mapping a pager: vaddr=%p, size=%d type=%c%c%c",
@@ -81,7 +81,7 @@ result_t elf_load_executable(channel_t memory_ch, ident_t group,
                  (phdr->p_flags & PF_W)? 'W' : '-',
                  (phdr->p_flags & PF_X)? 'X' : '-');
 
-            call_memory_map(memory_ch,
+            resea::interfaces::memory::call_map(memory_ch,
                  group, phdr->p_vaddr, phdr->p_filesz << 8 | flags,
                  fs, file, phdr->p_offset,
                  &r);
@@ -91,8 +91,8 @@ result_t elf_load_executable(channel_t memory_ch, ident_t group,
     /* stack */
    INFO("mapping the zeroed_pager for stack: vaddr=%p, size=%d",
         STACK_START_ADDRESS, STACK_SIZE);
-    call_memory_map(memory_ch,
-         group, STACK_START_ADDRESS, STACK_SIZE | MEMORY_MAP_READ | MEMORY_MAP_WRITE,
+    resea::interfaces::memory::call_map(memory_ch,
+         group, STACK_START_ADDRESS, STACK_SIZE | resea::interfaces::memory::MAP_READ | resea::interfaces::memory::MAP_WRITE,
          zeroed_pager, 0, 0,
          &r);
 

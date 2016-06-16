@@ -16,12 +16,12 @@ void handle_get_info(
 ) {
     uint8_t* hwaddr;
 
-    hwaddr = (uint8_t *) allocate_memory(6, MEMORY_ALLOC_NORMAL);
+    hwaddr = (uint8_t *) allocate_memory(6, resea::interfaces::memory::ALLOC_NORMAL);
     virtio_net_get_hwaddr(hwaddr);
 
-    sendas_net_device_get_info_reply(__ch,
+    resea::interfaces::net_device::sendas_get_info_reply(__ch,
         OK, PAYLOAD_INLINE,
-        NET_DEVICE_HW_ETHERNET, PAYLOAD_INLINE,
+        resea::interfaces::net_device::HW_ETHERNET, PAYLOAD_INLINE,
         hwaddr, PAYLOAD_MOVE_OOL,             // hwaddr
         6, PAYLOAD_INLINE,
         MAX_DATA_SIZE, PAYLOAD_INLINE         // max_data_size

@@ -17,8 +17,8 @@
 
 static uint8_t read_cmos(int reg) {
 
-    io_write8(IO_SPACE_PORT, 0, 0x70, reg);
-    return io_read8(IO_SPACE_PORT, 0, 0x71);
+    io_write8(resea::interfaces::io::SPACE_PORT, 0, 0x70, reg);
+    return io_read8(resea::interfaces::io::SPACE_PORT, 0, 0x71);
 }
 
 
@@ -65,7 +65,7 @@ void handle_get_date(channel_t __ch) {
     date = (month << 22) | (day << 17) | (hour << 12) | (min << 6) | sec;
 
     INFO("date: %d-%d-%dT%d:%d:%d", year, month, day, hour, min, sec);
-    send_datetime_device_get_date_reply(__ch, OK, year, date, 0);
+    resea::interfaces::datetime_device::send_get_date_reply(__ch, OK, year, date, 0);
 }
 
 } // namespace datetime_device_server

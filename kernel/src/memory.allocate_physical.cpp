@@ -19,7 +19,7 @@ void handle_allocate_physical(channel_t __ch, paddr_t paddr, size_t size, uint32
      paddr_t r_paddr;
 
      r = kernel_allocate_memory_at(paddr, size, flags, &addr, &r_paddr);
-     send_memory_allocate_physical_reply(__ch, r, addr, r_paddr);
+     resea::interfaces::memory::send_allocate_physical_reply(__ch, r, addr, r_paddr);
 }
 
 } // namespace memory_server

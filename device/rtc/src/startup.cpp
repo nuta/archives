@@ -11,7 +11,7 @@ extern "C" void rtc_startup(void) {
     result_t r;
 
     ch = create_channel();
-    call_channel_register(connect_to_local(1), ch,
+    resea::interfaces::channel::call_register(connect_to_local(1), ch,
         INTERFACE(datetime_device), &r);
 
     serve_channel(ch, rtc::server_handler);

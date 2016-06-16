@@ -10,7 +10,7 @@ namespace tcpip {
 namespace tcpip_server {
 
 /** handles tcpip.sendto */
-void handle_sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network,
+void handle_sendto(channel_t __ch, ident_t socket, resea::interfaces::tcpip::protocol_t network,
             void * address, size_t address_size, uint16_t port,
             void * payload, size_t payload_size) {
 
@@ -25,7 +25,7 @@ void handle_sendto(channel_t __ch, ident_t socket, tcpip_protocol_t network,
     addr.protocol  = network | sock->protocol;
 
     r = send_udp(sock, pack_mbuf(payload, payload_size), 0, &addr);
-    send_tcpip_sendto_reply(__ch, r);
+    resea::interfaces::tcpip::send_sendto_reply(__ch, r);
 }
 
 } // namespace tcpip_server

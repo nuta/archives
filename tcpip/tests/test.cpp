@@ -33,7 +33,7 @@ static void udp_server(channel_t ch, payload_t *m) {
         DEBUG("udp_server: received '%s'", data);
         TEST_EXPECT(strcmp((const char *) data, "HELO") == 0);
 
-        call_tcpip_sendto(tcpip_ch, socket, TCPIP_PROTOCOL_IPV4,
+        resea::interfaces::tcpip::call_sendto(tcpip_ch, socket, resea::interfaces::tcpip::PROTOCOL_IPV4,
           (void *) "", 0, port,
           (void *) "HOWDY", 6, &r);
         break;
@@ -61,13 +61,13 @@ extern "C" void tcpip_test() {
 
     // launch a mock
     mock_ch = create_channel();
-    call_channel_register(connect_to_local(1), mock_ch,
+    resea::interfaces::channel::call_register(connect_to_local(1), mock_ch,
         INTERFACE(net_device), &r);
     set_channel_handler(mock_ch, net_device_mock_server);
 
     // connect to tcpip
     tcpip_ch = create_channel();
-    call_channel_connect(connect_to_local(1), tcpip_ch, INTERFACE(tcpip), &r);
+    resea::interfaces::channel::call_connect(connect_to_local(1), tcpip_ch, INTERFACE(tcpip), &r);
 
     //
     //  Endian conversions
@@ -90,15 +90,15 @@ extern "C" void tcpip_test() {
     set_channel_handler(udp_server_ch, udp_server);
     set_channel_handler(udp_client_ch, udp_client);
 
-    call_tcpip_open(tcpip_ch, TCPIP_PROTOCOL_UDP, udp_server_ch, &r, &server_sock);
-    call_tcpip_open(tcpip_ch, TCPIP_PROTOCOL_UDP, udp_client_ch, &r, &client_sock);
+    resea::interfaces::tcpip::call_open(tcpip_ch, resea::interfaces::tcpip::PROTOCOL_UDP, udp_server_ch, &r, &server_sock);
+    resea::interfaces::tcpip::call_open(tcpip_ch, resea::interfaces::tcpip::PROTOCOL_UDP, udp_client_ch, &r, &client_sock);
 
-    call_tcpip_bind(tcpip_ch, server_sock, TCPIP_PROTOCOL_IPV4,
+    resea::interfaces::tcpip::call_bind(tcpip_ch, server_sock, resea::interfaces::tcpip::PROTOCOL_IPV4,
       &localhost, strlen(localhost), 10000, &r);
-    call_tcpip_bind(tcpip_ch, client_sock, TCPIP_PROTOCOL_IPV4,
+    resea::interfaces::tcpip::call_bind(tcpip_ch, client_sock, resea::interfaces::tcpip::PROTOCOL_IPV4,
       &localhost, strlen(localhost), 10001, &r);
 
-    call_tcpip_sendto(tcpip_ch, client_sock, TCPIP_PROTOCOL_IPV4,
+    resea::interfaces::tcpip::call_sendto(tcpip_ch, client_sock, resea::interfaces::tcpip::PROTOCOL_IPV4,
       &localhost, strlen(localhost), 10000,
       (void *) data, sizeof(data), &r);
 

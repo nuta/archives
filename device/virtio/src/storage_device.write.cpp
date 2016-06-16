@@ -28,7 +28,7 @@ void handle_write(channel_t __ch, offset_t offset, void * data, size_t size) {
                               size / VIRTIO_BLK_SECTOR_SIZE,
                               data);
 
-    send_storage_device_write_reply(__ch, result);
+    resea::interfaces::storage_device::send_write_reply(__ch, result);
 }
 
 } // namespace storage_device_server

@@ -60,7 +60,7 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
                     }
 
                     size_t size = m[i + 1];
-                    void *p = allocate_memory(size, MEMORY_ALLOC_NORMAL);
+                    void *p = allocate_memory(size, resea::interfaces::memory::ALLOC_NORMAL);
                     memcpy(p, (void *) m[i], size);
                 } else {
                     WARN("OoL payload is not supported yet, handling as an inline");

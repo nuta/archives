@@ -1,5 +1,5 @@
-#ifndef __TCPIP_PROTOCOL_IPV4_H__
-#define __TCPIP_PROTOCOL_IPV4_H__
+#ifndef __TCPIP_IPV4_H__
+#define __TCPIP_IPV4_H__
 
 #include "types.h"
 

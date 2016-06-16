@@ -1,8 +1,7 @@
-#include "_x86.h"
-#include "x86.h"
 #include <hal.h>
 #include <resea.h>
 #include <resea/cpp/memory.h>
+#include "x86.h"
 
 
 static void set_page_attrs (uint64_t *page, page_attrs_t attrs) {
@@ -42,7 +41,7 @@ static paddr_t lookup_page_entry (struct vm_space *vms, uintptr_t v, bool alloca
 
                 call_hal_callback(HAL_CALLBACK_ALLOCATE_MEMORY,
                     0, sizeof(uint64_t) * PAGE_ENTRY_NUM,
-                    MEMORY_ALLOC_PAGE_ALIGNED | MEMORY_ALLOC_CONTINUOUS,
+                    resea::interfaces::memory::ALLOC_PAGE_ALIGNED | resea::interfaces::memory::ALLOC_CONTINUOUS,
                     &addr, &paddr);
 
                 t[idx] = paddr;
@@ -83,7 +82,7 @@ void hal_create_vm_space(struct vm_space *vms) {
     call_hal_callback(HAL_CALLBACK_ALLOCATE_MEMORY,
         0, // paddr
         sizeof(uint64_t) * PAGE_ENTRY_NUM, // size
-        MEMORY_ALLOC_PAGE_ALIGNED,
+        resea::interfaces::memory::ALLOC_PAGE_ALIGNED,
         &vms->hal.pml4, &paddr);
 
     /*

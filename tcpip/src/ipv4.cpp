@@ -103,9 +103,9 @@ void receive_ipv4(struct mbuf *mbuf) {
     //
     struct addr src, dest;
 
-    src.protocol   = TCPIP_PROTOCOL_IPV4;
+    src.protocol   = resea::interfaces::tcpip::PROTOCOL_IPV4;
     src.ipv4_addr  = src_addr;
-    dest.protocol  = TCPIP_PROTOCOL_IPV4;
+    dest.protocol  = resea::interfaces::tcpip::PROTOCOL_IPV4;
     dest.ipv4_addr = dest_addr;
 
     switch (proto) {

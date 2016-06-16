@@ -34,7 +34,7 @@ static void new_device_handler(channel_t ch, payload_t *m) {
         virtio_activate_device(&device);
 
         DEBUG("virtio-blk: device ready");
-        call_channel_register(connect_to_local(1), virtio_server,
+        resea::interfaces::channel::call_register(connect_to_local(1), virtio_server,
             INTERFACE(storage_device), &r);
         break;
     }
@@ -46,14 +46,14 @@ void virtio_blk_init(void){
     result_t r;
 
     pci_server = create_channel();
-    call_channel_connect(connect_to_local(1), pci_server, INTERFACE(pci), &r);
+    resea::interfaces::channel::call_connect(connect_to_local(1), pci_server, INTERFACE(pci), &r);
 
     pci_client = create_channel();
     set_channel_handler(pci_client, new_device_handler);
 
-    call_pci_listen(pci_server, pci_client,
-        VIRTIO_PCI_VENDOR, PCI_ID_ANY,
-        PCI_ID_ANY, VIRTIO_PCI_SUBSYS_BLOCK,
+    resea::interfaces::pci::call_listen(pci_server, pci_client,
+        VIRTIO_PCI_VENDOR, resea::interfaces::pci::ID_ANY,
+        resea::interfaces::pci::ID_ANY, VIRTIO_PCI_SUBSYS_BLOCK,
         &r);
 }
 
@@ -71,16 +71,16 @@ result_t virtio_blk_write(uintmax_t sector, size_t n, const void *data) {
 
     DEBUG("write: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, sizeof(*header), resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, (uintptr_t *) &header, &header_paddr);
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, data_size, MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, data_size, resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, &buf_addr, &buf_paddr);
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, sizeof(*status), resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, &status_addr, &status_paddr);
 
     header->type   = VIRTIO_BLK_WRITE;
@@ -117,16 +117,16 @@ result_t virtio_blk_read(uintmax_t sector, size_t n, void **data) {
 
     DEBUG("read: offset=%#0x, size=%d", sector * VIRTIO_BLK_SECTOR_SIZE, data_size);
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, sizeof(*header), MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, sizeof(*header), resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, (uintptr_t *) &header, &header_paddr);
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, data_size, MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, data_size, resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, &buf_addr, &paddr);
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, sizeof(*status), MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, sizeof(*status), resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, &status_addr, &status_paddr);
 
     header->type   = VIRTIO_BLK_READ;

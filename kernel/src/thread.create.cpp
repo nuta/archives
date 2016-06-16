@@ -18,7 +18,7 @@ void handle_create(channel_t __ch, ident_t group, uchar_t* name, size_t name_siz
     r = kernel_create_thread(group, name, name_size,
                            &thread, &r_group);
 
-    send_thread_create_reply(__ch, r, thread, r_group);
+    resea::interfaces::thread::send_create_reply(__ch, r, thread, r_group);
 }
 
 } // namespace thread_server

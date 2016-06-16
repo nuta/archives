@@ -18,7 +18,7 @@ static void storage_device_mock_handler(channel_t ch, payload_t *m) {
         offset = EXTRACT(m, storage_device, read, offset);
         size   = EXTRACT(m, storage_device, read, size);
         data   = &fat_test_disk_img[offset];
-        send_storage_device_read_reply(ch, OK, data, size);
+        resea::interfaces::storage_device::send_read_reply(ch, OK, data, size);
         break;
     default:
         BUG("storage_mock: unsupported msg");
@@ -32,26 +32,26 @@ extern "C" void fat_test(void) {
 
     // launch a mock
     mock_ch = create_channel();
-    call_channel_register(connect_to_local(1), mock_ch,
+    resea::interfaces::channel::call_register(connect_to_local(1), mock_ch,
         INTERFACE(storage_device), &r);
     set_channel_handler(mock_ch, storage_device_mock_handler);
 
     // connect to the fat
     fat_ch = create_channel();
-    call_channel_connect(connect_to_local(1), fat_ch,
+    resea::interfaces::channel::call_connect(connect_to_local(1), fat_ch,
         INTERFACE(fs), &r);
 
     // open file
     ident_t file;
     char const *path = "docs/hello.txt";
-    call_fs_open(fat_ch, (uchar_t *) path, strlen(path), FS_FILEMODE_READ,
+    resea::interfaces::fs::call_open(fat_ch, (uchar_t *) path, strlen(path), FS_FILEMODE_READ,
         &r, &file);
 
     TEST_EXPECT_DESC("[docs/hello.txt] fs.open return OK", r == OK);
 
     char *data;
     size_t size;
-    call_fs_read(fat_ch, file, 0, 5,
+    resea::interfaces::fs::call_read(fat_ch, file, 0, 5,
         &r, (void **) &data, &size);
 
     TEST_EXPECT_DESC("[docs/hello.txt] fs.read returns OK", r == OK);

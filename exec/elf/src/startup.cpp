@@ -11,7 +11,7 @@ extern "C" void elf_startup(void) {
 
     INFO("starting");
     ch = create_channel();
-    call_channel_register(connect_to_local(1), ch,
+    resea::interfaces::channel::call_register(connect_to_local(1), ch,
         INTERFACE(exec), &r);
     serve_channel(ch, elf::server_handler);
 }

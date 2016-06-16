@@ -25,30 +25,30 @@ void handle_create(channel_t __ch, uchar_t* name, size_t name_size,
     /* connect to the servers if not connected */
     if (thread_ch == 0) {
         thread_ch = create_channel();
-        call_channel_connect(connect_to_local(1), thread_ch,
+        resea::interfaces::channel::call_connect(connect_to_local(1), thread_ch,
             INTERFACE(thread), &result);
     }
 
     if (memory_ch == 0) {
         memory_ch = create_channel();
-        call_channel_connect(connect_to_local(1), memory_ch,
+        resea::interfaces::channel::call_connect(connect_to_local(1), memory_ch,
             INTERFACE(memory), &result);
     }
 
     if (zeroed_pager_ch == 0) {
         zeroed_pager_ch = create_channel();
-        call_channel_connect(connect_to_local(1), zeroed_pager_ch,
+        resea::interfaces::channel::call_connect(connect_to_local(1), zeroed_pager_ch,
             INTERFACE(zeroed_pager), &result);
     }
 
     /* create a thread */
     INFO("creating a new thread");
-    call_thread_create(thread_ch,
+    resea::interfaces::thread::call_create(thread_ch,
          group, name, name_size,
          &result, &r_thread, &r_group);
 
     if (result != OK) {
-        send_exec_create_reply(__ch, result, r_group, r_thread);
+        resea::interfaces::exec::send_create_reply(__ch, result, r_group, r_thread);
         return;
     }
 
@@ -58,16 +58,16 @@ void handle_create(channel_t __ch, uchar_t* name, size_t name_size,
                                       fs, zeroed_pager_ch, file,
                                       &entry, &stack)) != OK) {
 
-        send_exec_create_reply(__ch, result, r_group, r_thread);
+        resea::interfaces::exec::send_create_reply(__ch, result, r_group, r_thread);
         return;
     }
 
     /* set registers states */
-    call_thread_set(thread_ch,
+    resea::interfaces::thread::call_set(thread_ch,
          r_thread, entry, (uintptr_t) nullptr, stack, STACK_SIZE,
          &result);
 
-    send_exec_create_reply(__ch, result, r_group, r_thread);
+    resea::interfaces::exec::send_create_reply(__ch, result, r_group, r_thread);
 }
 
 

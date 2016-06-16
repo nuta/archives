@@ -215,7 +215,7 @@ void kernel_page_fault_handler(uintptr_t addr, uint32_t reason) {
 
             aligned_addr = addr & ~(PAGE_SIZE - 1);
             offset = aligned_addr - area->addr;
-            call_pager_fill(area->pager,
+            resea::interfaces::pager::call_fill(area->pager,
                  area->pager_arg, area->offset + offset, PAGE_SIZE,
                  &result, (void **) &filled_addr, &filled_size);
 

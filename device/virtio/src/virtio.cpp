@@ -151,7 +151,7 @@ int virtio_setup_device(struct virtio_device *device, uint32_t bar0) {
 
     /* get iospace and iobase from BAR0 in the PCI config space */
     device->iobase  = bar0 & 0xfffffffc;
-    device->iospace = (bar0 & 1)? IO_SPACE_PORT : IO_SPACE_MEM;
+    device->iospace = (bar0 & 1)? resea::interfaces::io::SPACE_PORT : resea::interfaces::io::SPACE_MEM;
 
     /* reset */
     io_write8(device->iospace, device->iobase, VIRTIO_IO_DEVICE_STATUS, 0x00);
@@ -236,8 +236,8 @@ int virtio_init_queue(struct virtio_device *device, int queue_index) {
                  sizeof(uint16_t)*queue->queue_num*2 +
                  sizeof(struct virtio_desc)*queue->queue_num;
 
-    call_memory_allocate_physical(get_memory_ch(),
-        0, queue_size, MEMORY_ALLOC_PAGE_ALIGNED | MEMORY_ALLOC_CONTINUOUS,
+    resea::interfaces::memory::call_allocate_physical(get_memory_ch(),
+        0, queue_size, resea::interfaces::memory::ALLOC_PAGE_ALIGNED | resea::interfaces::memory::ALLOC_CONTINUOUS,
         &r, &addr, &paddr);
 
     queue->number = queue_index;

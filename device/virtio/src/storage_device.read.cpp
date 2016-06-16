@@ -16,18 +16,18 @@ void handle_read(channel_t __ch, offset_t offset, size_t size){
     void *data;
     if (offset % VIRTIO_BLK_SECTOR_SIZE != 0) {
         WARN("offset is not aligned to 0x%x", VIRTIO_BLK_SECTOR_SIZE);
-        send_storage_device_read_reply(__ch, E_INVALID, nullptr, 0);
+        resea::interfaces::storage_device::send_read_reply(__ch, E_INVALID, nullptr, 0);
 
     }else if (size % VIRTIO_BLK_SECTOR_SIZE != 0) {
         WARN("size is not aligned to 0x%x", VIRTIO_BLK_SECTOR_SIZE);
-        send_storage_device_read_reply(__ch, E_INVALID, nullptr, 0);
+        resea::interfaces::storage_device::send_read_reply(__ch, E_INVALID, nullptr, 0);
 
     } else {
         result = virtio_blk_read(offset / VIRTIO_BLK_SECTOR_SIZE,
                                  size / VIRTIO_BLK_SECTOR_SIZE,
                                  &data);
 
-        sendas_storage_device_read_reply(__ch,
+        resea::interfaces::storage_device::sendas_read_reply(__ch,
             result, PAYLOAD_INLINE,
             data,   PAYLOAD_MOVE_OOL,
             size,   PAYLOAD_INLINE);

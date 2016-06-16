@@ -12,7 +12,7 @@ namespace memory_server {
 void handle_unmap(channel_t __ch, uintptr_t addr) {
 
     WARN("unimplemented");
-    send_memory_map_reply(__ch, OK);
+    resea::interfaces::memory::send_map_reply(__ch, OK);
 }
 
 } // namespace memory_server

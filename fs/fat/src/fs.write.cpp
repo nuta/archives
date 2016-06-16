@@ -16,7 +16,7 @@ void handle_write(channel_t __ch,
        size_t size) {
 
     /* TODO */
-    send_fs_write_reply(__ch, E_NOTSUPPORTED);
+    resea::interfaces::fs::send_write_reply(__ch, E_NOTSUPPORTED);
 }
 
 } // namespace fs_server

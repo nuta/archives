@@ -13,7 +13,7 @@ namespace thread_server {
 /** handles thread.start */
 void handle_start(channel_t __ch, ident_t thread) {
 
-    send_thread_start_reply(__ch, kernel_set_thread_status(thread, THREAD_RUNNABLE));
+    resea::interfaces::thread::send_start_reply(__ch, kernel_set_thread_status(thread, THREAD_RUNNABLE));
 }
 
 } // namespace thread_server

@@ -117,7 +117,7 @@ static ident_t create_thread_group(void) {
     g = kernel_get_thread_group(id);
     g->id                = id;
     g->vm.dynamic_vpages = (uint8_t *) kernel_allocate_memory(kernel_get_dynamic_vpages_num(),
-                                                              MEMORY_ALLOC_NORMAL);
+                                                              resea::interfaces::memory::ALLOC_NORMAL);
     g->vm.areas_num      = 0;
     g->num               = 0;
 
@@ -259,7 +259,7 @@ static result_t run_thread(ident_t group, const char *name, uintptr_t entry, uin
     size_t stack_size;
 
     stack_size = 0x4000; // TODO
-    stack = (uintptr_t) kernel_allocate_memory(stack_size, MEMORY_ALLOC_NORMAL);
+    stack = (uintptr_t) kernel_allocate_memory(stack_size, resea::interfaces::memory::ALLOC_NORMAL);
     kernel_create_thread(group, (const uchar_t *) name, strlen(name), &thread, &r_group);
     kernel_set_thread(thread, entry, arg, stack, stack_size);
     kernel_set_thread_status(thread, THREAD_RUNNABLE);

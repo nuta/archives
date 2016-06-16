@@ -20,7 +20,7 @@ void handle_allocate(channel_t __ch, size_t size, uint32_t flags) {
      paddr_t paddr;
 
      r = kernel_allocate_memory_at(0, size, flags, &addr, &paddr);
-     send_memory_allocate_reply(__ch, r, addr);
+     resea::interfaces::memory::send_allocate_reply(__ch, r, addr);
 }
 
 } // namespace memory_server

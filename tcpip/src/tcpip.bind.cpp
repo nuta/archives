@@ -9,7 +9,7 @@ namespace tcpip {
 namespace tcpip_server {
 
 /** handles tcpip.bind */
-void handle_bind(channel_t __ch, ident_t socket, tcpip_protocol_t network, void * address, size_t address_size, uint16_t port) {
+void handle_bind(channel_t __ch, ident_t socket, resea::interfaces::tcpip::protocol_t network, void * address, size_t address_size, uint16_t port) {
     struct addr addr;
     struct socket *sock;
 
@@ -19,7 +19,7 @@ void handle_bind(channel_t __ch, ident_t socket, tcpip_protocol_t network, void 
     addr.port = port;
     addr.protocol = network | sock->protocol;
 
-    send_tcpip_bind_reply(__ch, bind_socket(sock, &addr));
+    resea::interfaces::tcpip::send_bind_reply(__ch, bind_socket(sock, &addr));
 }
 
 } // namespace tcpip_server

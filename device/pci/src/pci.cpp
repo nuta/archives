@@ -16,8 +16,8 @@ static uint16_t read_config16(uint16_t bus, uint16_t dev, offset_t offset){
     /* NOTE: offset must be multiple of 4 */
     addr = (uint32_t) ((1 << 31) | (bus << 16) | (dev << 11) | (offset & 0xfc));
 
-    io_write32(IO_SPACE_PORT, 0, PCI_IO_ADDR, addr);
-    data = io_read32(IO_SPACE_PORT,  0, PCI_IO_DATA);
+    io_write32(resea::interfaces::io::SPACE_PORT, 0, PCI_IO_ADDR, addr);
+    data = io_read32(resea::interfaces::io::SPACE_PORT,  0, PCI_IO_DATA);
 
     return (uint16_t) (data >> (offset & 3) * 8);
 }
@@ -30,8 +30,8 @@ static uint32_t read_config32(uint16_t bus, uint16_t dev, offset_t offset){
     /* NOTE: offset must be multiple of 4 */
     addr = (uint32_t) ((1 << 31) | (bus << 16) | (dev << 11) | (offset & 0xfc));
 
-    io_write32(IO_SPACE_PORT, 0, PCI_IO_ADDR, addr);
-    data = io_read32(IO_SPACE_PORT,  0, PCI_IO_DATA);
+    io_write32(resea::interfaces::io::SPACE_PORT, 0, PCI_IO_ADDR, addr);
+    data = io_read32(resea::interfaces::io::SPACE_PORT,  0, PCI_IO_DATA);
 
     return (uint32_t) data;
 }
@@ -45,16 +45,16 @@ result_t pci_lookup(void *config, uint32_t vendor, uint32_t device,
     for(bus=0; bus < 256; bus++){
       for(dev=0; dev < 32; dev++){
         // check vendor ID
-        if(vendor != PCI_ID_ANY && read_config16(bus, dev, PCI_CONFIG_VENDOR) != vendor)
+        if(vendor != resea::interfaces::pci::ID_ANY && read_config16(bus, dev, PCI_CONFIG_VENDOR) != vendor)
           continue;
         // check device ID
-        if(device != PCI_ID_ANY && read_config16(bus, dev, PCI_CONFIG_DEVICEID) != device)
+        if(device != resea::interfaces::pci::ID_ANY && read_config16(bus, dev, PCI_CONFIG_DEVICEID) != device)
           continue;
         // check subsystem vendor ID
-        if(subvendor != PCI_ID_ANY && read_config16(bus, dev, PCI_CONFIG_SUBVENDOR) != subvendor)
+        if(subvendor != resea::interfaces::pci::ID_ANY && read_config16(bus, dev, PCI_CONFIG_SUBVENDOR) != subvendor)
           continue;
         // check subsystem ID
-        if(subdevice != PCI_ID_ANY && read_config16(bus, dev, PCI_CONFIG_SUBDEVICE) != subdevice)
+        if(subdevice != resea::interfaces::pci::ID_ANY && read_config16(bus, dev, PCI_CONFIG_SUBDEVICE) != subdevice)
           continue;
 
         // found!

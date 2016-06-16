@@ -1,14 +1,14 @@
 #include "kernel.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
+#include <resea/kernel.h>
 #include <resea/thread.h>
+#include <resea/memory.h>
+#include <resea/pager.h>
+#include <resea/zeroed_pager.h>
+#include <resea/channel.h>
 #include <resea/datetime.h>
 #include <resea/io.h>
-#include <resea/kernel.h>
-#include <resea/channel.h>
-#include <resea/memory.h>
-#include <resea/zeroed_pager.h>
-#include <resea/pager.h>
 #include "handler.h"
 
 namespace kernel {
@@ -87,7 +87,7 @@ void server_handler(channel_t __ch, payload_t *m) {
         DEBUG("received io.allocate");
         io_server::handle_allocate(
             __ch
-            , (io_space_t) EXTRACT(m, io, allocate, iospace)
+            , (resea::interfaces::io::space_t) EXTRACT(m, io, allocate, iospace)
             , (uintptr_t) EXTRACT(m, io, allocate, addr)
             , (size_t) EXTRACT(m, io, allocate, size)
         );
@@ -101,7 +101,7 @@ void server_handler(channel_t __ch, payload_t *m) {
         DEBUG("received io.release");
         io_server::handle_release(
             __ch
-            , (io_space_t) EXTRACT(m, io, release, iospace)
+            , (resea::interfaces::io::space_t) EXTRACT(m, io, release, iospace)
             , (uintptr_t) EXTRACT(m, io, release, addr)
         );
         return;

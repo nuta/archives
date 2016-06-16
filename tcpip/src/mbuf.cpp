@@ -90,7 +90,7 @@ struct mbuf *pack_mbuf(const void *buf, size_t size) {
 struct mbuf *allocate_mbuf(void) {
     struct mbuf *mbuf;
 
-    mbuf = (struct mbuf *) allocate_memory(MBUF_SIZE, MEMORY_ALLOC_NORMAL);
+    mbuf = (struct mbuf *) allocate_memory(MBUF_SIZE, resea::interfaces::memory::ALLOC_NORMAL);
     mbuf->next        = nullptr;
     mbuf->next_packet = nullptr;
     mbuf->begin  = 0;

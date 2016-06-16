@@ -47,7 +47,7 @@ static void add_pending_packet(uint32_t ipaddr,
                                void *hwaddr) {
 
     struct arp_pending *pending = (struct arp_pending *)
-        allocate_memory(sizeof(*pending), MEMORY_ALLOC_NORMAL);
+        allocate_memory(sizeof(*pending), resea::interfaces::memory::ALLOC_NORMAL);
 
     pending->packet = packet;
     pending->length = length;
@@ -121,10 +121,10 @@ void arp_resolve_and_send(struct net_device *device,
         uint8_t broadcast[] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
         result_t r;
         memcpy(hwaddr, &broadcast, sizeof(broadcast));
-        call_net_device_transmit(device->ch, packet, packet_length, &r);
+        resea::interfaces::net_device::call_transmit(device->ch, packet, packet_length, &r);
     } else if (lookup(addr->ipv4_addr, hwaddr)) {
         result_t r;
-        call_net_device_transmit(device->ch, packet, packet_length, &r);
+        resea::interfaces::net_device::call_transmit(device->ch, packet, packet_length, &r);
     } else {
         // needs ARP hardware address resolution
         DEBUG("sending ARP request");
@@ -188,7 +188,7 @@ void receive_arp(struct mbuf *mbuf) {
         result_t r;
         memcpy(pending->hwaddr, sender_hw_addr, 6);
 
-        call_net_device_transmit(pending->device->ch, pending->packet,
+        resea::interfaces::net_device::call_transmit(pending->device->ch, pending->packet,
             pending->length, &r);
 
         release_memory(pending);
@@ -202,7 +202,7 @@ void init_arp() {
     arp_entry_max = 8;
     arp_table = (struct arp_entry *) allocate_memory(
                     sizeof(struct arp_entry) * arp_entry_max,
-                    MEMORY_ALLOC_ZEROED);
+                    resea::interfaces::memory::ALLOC_ZEROED);
 }
 
 } // namespace tcpip

@@ -14,14 +14,14 @@ namespace kernel {
 namespace io_server {
 
 /** handles io.allocate */
-void handle_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size_t size) {
+void handle_allocate(channel_t __ch, resea::interfaces::io::space_t iospace, uintptr_t addr, size_t size) {
     uintptr_t vaddr;
 
     switch (iospace) {
-    case IO_SPACE_PORT: // TODO: permit
+    case resea::interfaces::io::SPACE_PORT: // TODO: permit
         vaddr = addr;
         break;
-    case IO_SPACE_MEM:
+    case resea::interfaces::io::SPACE_MEM:
         vaddr = kernel_vmalloc(size);
         hal_link_page(&kernel_get_current_thread_group()->vm, vaddr,
                       size / PAGE_SIZE, addr, PAGE_PRESENT | PAGE_WRITABLE);
@@ -29,7 +29,7 @@ void handle_allocate(channel_t __ch, io_space_t iospace, uintptr_t addr, size_t 
         break;
     }
 
-    send_io_allocate_reply(__ch, OK, vaddr);
+    resea::interfaces::io::send_allocate_reply(__ch, OK, vaddr);
 }
 
 } // namespace io_server
