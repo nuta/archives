@@ -44,7 +44,8 @@ extern "C" void fat_test(void) {
     // open file
     ident_t file;
     char const *path = "docs/hello.txt";
-    resea::interfaces::fs::call_open(fat_ch, (uchar_t *) path, strlen(path), FS_FILEMODE_READ,
+    resea::interfaces::fs::call_open(fat_ch, (uchar_t *) path, strlen(path),
+        resea::interfaces::fs::FILEMODE_READ,
         &r, &file);
 
     TEST_EXPECT_DESC("[docs/hello.txt] fs.open return OK", r == OK);

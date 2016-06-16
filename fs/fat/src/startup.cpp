@@ -15,7 +15,7 @@ static result_t read_disk(struct disk *disk, lba_t lba, size_t num,
     result_t result;
     size_t size;
 
-    call_storage_device_read(disk->ch,
+    resea::interfaces::storage_device::call_read(disk->ch,
          lba * FAT_SECTOR_SIZE, num * FAT_SECTOR_SIZE,
          &result, data, &size);
 
@@ -27,7 +27,7 @@ static result_t write_disk(struct disk *disk, lba_t lba, size_t num,
                          const void *data) {
     result_t result;
 
-    call_storage_device_write(disk->ch,
+    resea::interfaces::storage_device::call_write(disk->ch,
          lba * FAT_SECTOR_SIZE, (void *) data, num * FAT_SECTOR_SIZE,
          &result);
 
