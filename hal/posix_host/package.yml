@@ -36,6 +36,8 @@ interface:
 global_config:
   HAL_LINK:
     default: '{{ CXX }} {{ LINKFLAGS }} -pthread -o'
+  HAL_LIBLINK:
+    default: '{{ LD }} -r -o'
   HAL_RUN:
     default: '{{ POSIX_HOST_DIR }}/run'
   HAL_GENSTART:
