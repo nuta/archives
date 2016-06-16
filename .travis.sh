@@ -7,8 +7,8 @@ SDK)
     make test
     ;;
 resea.net)
-    resea doctor-all
-    resea docs-all
+    resea doctor-all /tmp/health
+    resea docs-all   /tmp/docs
     ;;
 *)
     cd $TARGET
