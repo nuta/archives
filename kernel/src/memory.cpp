@@ -170,6 +170,8 @@ result_t kernel_allocate_memory_at(paddr_t at, size_t size, uint32_t flags,
                                    uintptr_t *addr, paddr_t *paddr) {
     size_t required;
 
+    // TODO: support flags
+
     // calculate the number of pages large enough for `size`
     required = (size / PAGE_SIZE) + 1;
 
