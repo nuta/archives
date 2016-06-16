@@ -38,8 +38,8 @@ types:
     type: const
     size: uint16
     consts:
-      ALLOC_NORMAL:       0x0000  # no requirements
-      ALLOC_PAGE_ALIGNED: 0x0001  # aligned to PAGE_SIZE */
+      ALLOC_NORMAL:       0x0000 # no requirements
+      ALLOC_PAGE_ALIGNED: 0x0001 # aligned to PAGE_SIZE
       ALLOC_CONTINUOUS:   0x0004 # straight in physical memory space
       ALLOC_ZEROED:       0x0008 # zero-filled
       ALLOC_USER:         0x0010 # map in user virtual memory, used by kernel
