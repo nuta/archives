@@ -23,11 +23,11 @@ os_requirements:
       taps:
         - resea/resea
       packages:
-        - clang-static-analyzer.rb
-        - x86_64-elf-gcc.rb
-        - x86_64-elf-binutils.rb
-        - arm-elf-eabi-gcc.rb
-        - arm-elf-eabi-binutils.rb
+        - clang-static-analyzer
+        - x86_64-elf-gcc
+        - x86_64-elf-binutils
+        - arm-elf-eabi-gcc
+        - arm-elf-eabi-binutils
         - lcov
   ubuntu:
     apt:
