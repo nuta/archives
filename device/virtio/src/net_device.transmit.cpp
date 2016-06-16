@@ -5,8 +5,11 @@
 #include <resea/storage_device.h>
 #include <resea/net_device.h>
 
+namespace virtio {
+namespace net_device_server {
+
 /** handles net_device.transmit */
-void virtio_net_device_transmit(
+void handle_transmit(
     channel_t __ch
     , void * data
     , size_t data_size
@@ -16,3 +19,6 @@ void virtio_net_device_transmit(
     result = virtio_net_transmit(data, data_size);
     send_net_device_transmit_reply(__ch, result);
 }
+
+} // namespace net_device_server
+} // namespace virtio

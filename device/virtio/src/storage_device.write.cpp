@@ -6,8 +6,11 @@
 #include "virtio_blk.h"
 
 
+namespace virtio {
+namespace storage_device_server {
+
 /** handles storage_device.write */
-void virtio_storage_device_write(channel_t __ch, offset_t offset, void * data, size_t size) {
+void handle_write(channel_t __ch, offset_t offset, void * data, size_t size) {
 
     result_t result;
 
@@ -27,3 +30,6 @@ void virtio_storage_device_write(channel_t __ch, offset_t offset, void * data, s
 
     send_storage_device_write_reply(__ch, result);
 }
+
+} // namespace storage_device_server
+} // namespace virtio

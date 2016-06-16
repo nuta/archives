@@ -1,26 +1,44 @@
 #include "virtio.h"
 #include <resea.h>
+#include <resea/storage_device.h>
+#include <resea/net_device.h>
+#include <resea/virtio.h>
 
-void virtio_storage_device_read(
+namespace virtio {
+void server_handler(channel_t __ch, payload_t *m);
+
+namespace storage_device_server {
+void handle_read(
     channel_t __ch
     , offset_t offset
     , size_t size
 );
-void virtio_storage_device_write(
+} // namespace storage_device
+namespace storage_device_server {
+void handle_write(
     channel_t __ch
     , offset_t offset
     , void * data
     , size_t data_size
 );
-void virtio_net_device_listen(
+} // namespace storage_device
+namespace net_device_server {
+void handle_listen(
     channel_t __ch
     , channel_t channel
 );
-void virtio_net_device_transmit(
+} // namespace net_device
+namespace net_device_server {
+void handle_transmit(
     channel_t __ch
     , void * data
     , size_t data_size
 );
-void virtio_net_device_get_info(
+} // namespace net_device
+namespace net_device_server {
+void handle_get_info(
     channel_t __ch
 );
+} // namespace net_device
+
+} // namespace virtio

@@ -7,8 +7,11 @@
 #include <resea/cpp/memory.h>
 
 
+namespace virtio {
+namespace net_device_server {
+
 /** handles net_device.get_info */
-void virtio_net_device_get_info(
+void handle_get_info(
     channel_t __ch
 ) {
     uint8_t* hwaddr;
@@ -24,3 +27,6 @@ void virtio_net_device_get_info(
         MAX_DATA_SIZE, PAYLOAD_INLINE         // max_data_size
         );
 }
+
+} // namespace net_device_server
+} // namespace virtio
