@@ -5,8 +5,11 @@
 #include "pci.h"
 
 
+namespace pci {
+namespace pci_server {
+
 /** handles pci.listen */
-void pci_pci_listen(channel_t __ch, channel_t ch, uint32_t vendor, uint32_t device,
+void handle_listen(channel_t __ch, channel_t ch, uint32_t vendor, uint32_t device,
                     uint32_t subvendor, uint32_t subdevice) {
 
     // TODO
@@ -20,3 +23,6 @@ void pci_pci_listen(channel_t __ch, channel_t ch, uint32_t vendor, uint32_t devi
         INFO("device not found");
     }
 }
+
+} // namespace pci_server
+} // namespace pci

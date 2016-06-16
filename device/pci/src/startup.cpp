@@ -1,4 +1,5 @@
 #include "pci.h"
+#include "handler.h"
 #include <resea.h>
 #include <resea/channel.h>
 #include <resea/pci.h>
@@ -14,5 +15,5 @@ extern "C" result_t pci_startup(void) {
     call_channel_register(connect_to_local(1), ch,
         INTERFACE(pci), &r);
 
-    serve_channel(ch, &pci_handler);
+    serve_channel(ch, pci::server_handler);
 }
