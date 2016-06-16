@@ -31,6 +31,7 @@ env:
   - TARGET=misc/genstartcpp
   - TARGET=tcpip
   - TARGET=SDK
+  - TARGET=resea.net
 
 # TODO: test HALs
 

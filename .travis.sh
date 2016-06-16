@@ -6,6 +6,10 @@ SDK)
     cd sdk
     make test
     ;;
+resea.net)
+    resea doctor-all
+    resea docs-all
+    ;;
 *)
     cd $TARGET
     resea doctor
