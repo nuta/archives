@@ -5,8 +5,9 @@
 #include <resea/hal.h>
 #include "handler.h"
 
+namespace x86 {
 
-void x86_handler(channel_t __ch, payload_t *m) {
+void server_handler(channel_t __ch, payload_t *m) {
     if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
@@ -17,3 +18,5 @@ void x86_handler(channel_t __ch, payload_t *m) {
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
+
+} // namespace x86

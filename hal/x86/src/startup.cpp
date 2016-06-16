@@ -1,7 +1,7 @@
 #include "_x86.h"
+#include "handler.h"
 #include <hal.h>
 
-handler_t x86_handler;
 static channel_t ch;
 static struct hal_pmmap bsp_pmmap[16];
 static struct hal_vmmap bsp_vmmap[16];
@@ -13,7 +13,7 @@ void x86_init_localapic_timer(void);
 void hal_startup(void) {
 
     ch = create_channel();
-    set_channel_handler(ch, &x86_handler);
+    set_channel_handler(ch, x86::server_handler);
 }
 
 
