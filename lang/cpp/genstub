@@ -19,17 +19,24 @@ HEADER_TEMPLATE = """
 #define __RESEA_{{ name | upper }}__H__
 #include <resea.h>
 
+namespace resea {
+namespace interfaces {
+namespace {{ name }} {
+
 {% if id %}
-static const uint32_t __interface_{{ name }} = {{ id }} << 12;
+static const uint32_t interface_id = {{ id }} << 12;
 {% endif %}
 """
 
 FOOTER_TEMPLATE = """
+} // namespace {{ name }}
+} // namespace interfaces
+} // namespace resea
 #endif
 """
 
 SEND_TEMPLATE = """
-static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
+static inline void {{ func_name }}_{{ msg_name }} (
     channel_t __ch
 {%- for type, name in payloads -%}
     {% if type != '' -%}
@@ -68,7 +75,7 @@ static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
 """
 
 CALL_TEMPLATE = """
-static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
+static inline void {{ func_name }}_{{ msg_name }} (
     channel_t __ch
 {%- for type, name in args -%}
     {% if type != '' -%}
@@ -105,15 +112,15 @@ static inline void {{ func_name }}_{{ interface_name }}_{{ msg_name }} (
 """
 
 MSGID_TEMPLATE = """
-static const uint32_t __msgid_{{ interface_name }}_{{ msg_name }} = ({{ interface_id }} << 12) | {{ msg_id }};
+const uint32_t {{ msg_name }}_id = ({{ interface_id }} << 12) | {{ msg_id }};
 
 """
 
 PMACROS_TEMPLATE = """
 {% for type, name in payloads %}
     {% if type != '' %}
-    typedef {{ type }} __ptype_{{interface_name}}_{{ msg_name }}_{{ name }};
-    static const int __pindex_{{ interface_name }}_{{ msg_name }}_{{ name }} = {{ loop.index0 }};
+    typedef {{ type }} {{ msg_name }}_{{ name }}_type;
+    const int {{ msg_name }}_{{ name }}_index = {{ loop.index0 }};
     {% endif %}
 {% endfor %}
 """
@@ -123,20 +130,20 @@ typedef struct {
 {% for type, name in members.items() %}
     {{ type }} {{ name }};
 {% endfor %}
-} {[ interface_name }}_{{ type_name }}_t;
+} {{ type_name }}_t;
 
 """
 
 CONST_TEMPLATE = """
-typedef {{ ctype }} {{ interface_name }}_{{ type_name }}_t;
+typedef {{ ctype }} {{ type_name }}_t;
 {% for name, val in consts.items() %}
-#define {{ interface_name | upper }}_{{ name }} ({{ val }})
+const {{ ctype }} {{ name }} = {{ val }};
 {% endfor %}
 
 """
 
 ALIAS_TEMPLATE = """
-typedef {{ ctype }} {{ interface_name }}_{{ type_name }}_t;
+typedef {{ ctype }} {{ type_name }}_t;
 
 """
 
@@ -152,7 +159,7 @@ def load_payload_defs(interface_name, msg_name, msg, name_prefix=None,
 
     defs = [{
         'type': '',
-        'name': 'MSGID({}, {})'.format(interface_name, msg_name)
+        'name': 'resea::interfaces::{}::{}_id'.format(interface_name, msg_name)
     }]
 
     for p in msg['payloads']:
@@ -280,7 +287,7 @@ def process_types(interface_name, type_name, type_):
             'ctype': ctype(type_['size'])
         })
     elif type_["type"] == "alias":
-        write(CONST_TEMPLATE, {
+        write(ALIAS_TEMPLATE, {
             'interface_name': interface_name,
             'type_name': type_name,
             'ctype': ctype(type_['alias_of'])
