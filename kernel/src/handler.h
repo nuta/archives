@@ -1,16 +1,16 @@
 #include "kernel.h"
 #include <resea.h>
-#include <resea/channel.h>
 #include <resea/thread.h>
-#include <resea/pager.h>
-#include <resea/memory.h>
-#include <resea/kernel.h>
-#include <resea/io.h>
-#include <resea/zeroed_pager.h>
 #include <resea/datetime.h>
+#include <resea/io.h>
+#include <resea/kernel.h>
+#include <resea/channel.h>
+#include <resea/memory.h>
+#include <resea/zeroed_pager.h>
+#include <resea/pager.h>
 
 namespace kernel {
-void handler(channel_t __ch, payload_t *m);
+void server_handler(channel_t __ch, payload_t *m);
 
 namespace pager_server {
 void handle_fill(

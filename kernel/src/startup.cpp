@@ -21,7 +21,7 @@ extern "C" void kernel_startup(void) {
     kernel_datetime_startup();
 
     ch = create_channel();
-    set_channel_handler(ch, kernel::handler);
+    set_channel_handler(ch, kernel::server_handler);
     kernel_register_channel(ch, INTERFACE(thread));
     kernel_register_channel(ch, INTERFACE(memory));
     kernel_register_channel(ch, INTERFACE(datetime));
