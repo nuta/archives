@@ -1,7 +1,11 @@
-#!/bin/sh
-exec qemu-system-arm \
-    -m 256 -localtime -nographic \
-    -no-reboot -boot d \
-    -M raspi2 \
-    -kernel $1
+#!/usr/bin/env python3
+import sys
+import subprocess
+import shlex
+
+
+cmd = 'qemu-system-arm -m 256 -localtime -nographic -no-reboot -boot d -M raspi2 -kernel {kernel}'
+
+if __name__ == '__main__':
+    subprocess.run(shlex.split(cmd.format(kernel=sys.argv[1])))
 
