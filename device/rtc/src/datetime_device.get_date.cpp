@@ -34,8 +34,11 @@ static uint32_t bcd_to_binary(uint32_t x) {
 }
 
 
+namespace rtc {
+namespace datetime_device_server {
+
 /** handles datetime_device.get_date */
-void rtc_datetime_device_get_date(channel_t __ch) {
+void handle_get_date(channel_t __ch) {
     uint8_t year90s, century, month, day, hour, min, sec;
     uint32_t year, date;
 
@@ -64,3 +67,6 @@ void rtc_datetime_device_get_date(channel_t __ch) {
     INFO("date: %d-%d-%dT%d:%d:%d", year, month, day, hour, min, sec);
     send_datetime_device_get_date_reply(__ch, OK, year, date, 0);
 }
+
+} // namespace datetime_device_server
+} // namespace rtc

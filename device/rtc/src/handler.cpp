@@ -1,12 +1,13 @@
 #include "rtc.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
-#include <resea/rtc.h>
 #include <resea/datetime_device.h>
+#include <resea/rtc.h>
 #include "handler.h"
 
+namespace rtc {
 
-void rtc_handler(channel_t __ch, payload_t *m) {
+void server_handler(channel_t __ch, payload_t *m) {
     if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
@@ -15,7 +16,7 @@ void rtc_handler(channel_t __ch, payload_t *m) {
     switch (EXTRACT_MSGID(m)) {
     case MSGID(datetime_device, get_date):
         DEBUG("received datetime_device.get_date");
-        rtc_datetime_device_get_date(
+        datetime_device_server::handle_get_date(
             __ch
         );
         return;
@@ -28,3 +29,5 @@ void rtc_handler(channel_t __ch, payload_t *m) {
 
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
+
+} // namespace rtc
