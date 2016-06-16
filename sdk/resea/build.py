@@ -263,7 +263,13 @@ def build(args):
         global_config.set('CATEGORY', 'application')
 
     category = get_var('CATEGORY')
-    hal_link = get_var('HAL_LINK') # TODO support ld -r
+    if category == 'application':
+        hal_link = get_var('HAL_LINK')
+    elif category == 'library':
+        hal_link = get_var('HAL_LIBLINK')
+    else:
+        error("unknown category '{}'".format(category))
+
     target = os.path.join(build_dir, category)
     for files, _, _, _ in sources:
         for _, obj, _ in files:
