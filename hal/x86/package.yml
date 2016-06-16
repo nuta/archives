@@ -55,6 +55,8 @@ interface:
 global_config:
   HAL_LINK:
     default: "{{ LD }} -Map {{ BUILD_DIR }}/executable.map -nostdlib -nodefaultlibs -T{{ X86_DIR }}/src/executable.lds -o"
+  HAL_LIBLINK:
+    default: '{{ LD }} -r -o'
   HAL_RUN:
     default: "{{ X86_DIR }}/run"
   HAL_GENSTART:
