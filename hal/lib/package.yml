@@ -12,7 +12,7 @@ email: nuta@seiya.me
 homepage: http://resea.net
 
 # Required packages
-depends: [cpp]
+depends: [cpp, genstartcpp]
 
 # Interfaces which this package uses
 uses: []
@@ -35,11 +35,18 @@ interface:
 #
 global_config:
   HAL_LINK:
-    set:  $(LD) -r -o
+    default: '{{ LD }} -r -o'
+  HAL_LIBLINK:
+    default: '{{ LD }} -r -o'
+  HAL_GENSTART:
+    default: '{{ GENSTARTCPP_DIR }}/genstartcpp'
+  HAL_START_LANG:
+    default: cpp
   HAL_RUN:
-      set: packages/lib/run
-  CFLAGS:
-    append_words: -Ipackages/lib/src
+    default: echo
+  CXXFLAGS:
+    append_words: >
+      -I{{ LIB_DIR }}/src
 
 #
 #  Config
