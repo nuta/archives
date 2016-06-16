@@ -6,7 +6,7 @@
 
 namespace tcpip {
 
-void handler(channel_t __ch, payload_t *m) {
+void server_handler(channel_t __ch, payload_t *m) {
     if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;

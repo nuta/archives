@@ -31,5 +31,5 @@ extern "C" void tcpip_startup() {
         INTERFACE(tcpip), &r);
 
     INFO("ready");
-    serve_channel(ch, handler);
+    serve_channel(ch, server_handler);
 }

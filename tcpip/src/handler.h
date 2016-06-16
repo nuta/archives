@@ -3,7 +3,7 @@
 #include <resea/tcpip.h>
 
 namespace tcpip {
-void handler(channel_t __ch, payload_t *m);
+void server_handler(channel_t __ch, payload_t *m);
 
 namespace tcpip_server {
 void handle_open(
