@@ -1,16 +1,37 @@
-#!/bin/sh
-CPP_DIR=$1 # XXX
-out=$2
+#!/usr/bin/env python3
+import os
+import sys
+import subprocess
+import shlex
+import tempfile
 
-echo hello > hello.tmp # TODO: use temporary directory
 
-mformat -C -i disk.tmp -h 1 -t 1 -s 8800 -c 8 ::
-mmd   -i disk.tmp ::/DOCS
-mcopy -i disk.tmp hello.tmp ::/DOCS/HELLO.TXT
+def file2cpp(header, footer, data):
+    src = header
+    for i, b in enumerate(data):
+        if i % 100 == 0:
+            print('')
+        src += hex(b) + ','
+    src += footer
 
-# truncate the disk image to make the build time faster
-gtruncate -s 16384 disk.tmp # XXX: coreutils prefix
+    return src
 
-cat disk.tmp | $CPP_DIR/file2cpp 'unsigned char fat_test_disk_img[] = {' '};' > $out
+if __name__ == '__main__':
+    cpp_dir = sys.argv[1] # FIXME: ugly
+    out = os.path.abspath(sys.argv[2])
 
-rm disk.tmp hello.tmp
+    with tempfile.TemporaryDirectory() as tmpdir:
+        os.chdir(tmpdir)
+
+        with open('hello.txt', 'w') as f:
+            f.write('hello')
+
+        subprocess.run(shlex.split('mformat -C -i disk.tmp -h 1 -t 1 -s 8800 -c 8 ::'))
+        subprocess.run(shlex.split('mmd -i disk.tmp ::/docs'))
+        subprocess.run(shlex.split('mcopy -i disk.tmp hello.txt ::/docs/hello.txt'))
+
+        # truncate the disk image to make the build time faster
+        img = open('disk.tmp', 'rb').read(0x4000)
+
+        with open(out, 'w') as f:
+            f.write(file2cpp('unsigned char fat_test_disk_img[] = {', '};', img))
