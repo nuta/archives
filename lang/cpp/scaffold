@@ -37,8 +37,9 @@ HANDLER_CPP_TEMPLATE = """\
 {% endfor %}
 #include "handler.h"
 
+namespace {{ package_name }} {
 
-void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
+void handler(channel_t __ch, payload_t *m) {
     if ((m[0] & 1) != 1) {
         WARN("the first payload is not inline one (expected inline msgid_t)");
         return;
@@ -48,7 +49,7 @@ void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
 {% for interface_name, msg_name, payloads in messages %}
     case MSGID({{ interface_name }}, {{ msg_name }}):
         DEBUG("received {{ interface_name }}.{{ msg_name }}");
-        {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
+        {{ interface_name }}_server::{{ msg_name }}(
             __ch
         {% for type, name, _ in payloads %}
             , ({{ type }}) EXTRACT(m, {{ interface_name }}, {{ msg_name }}, {{ name }})
@@ -71,20 +72,28 @@ void {{ package_name }}_handler(channel_t __ch, payload_t *m) {
     WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
 }
 
+} // namespace {{ package_name }}
 """
 
 HANDLER_H_TEMPLATE = """\
 #include "{{ package_name }}.h"
 #include <resea.h>
 
+namespace {{ package_name }} {
+void handler(channel_t __ch, payload_t *m);
+
 {% for interface_name, msg_name, payloads in messages %}
-void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
+namespace {{ interface_name }}_server {
+void {{ msg_name }}(
     channel_t __ch
 {% for type, name, _ in payloads %}
     , {{ type }} {{ name }}
 {% endfor %}
 );
+} // namespace {{ interface_name }}
 {% endfor %}
+
+} // namespace {{ package_name }}
 
 """
 
@@ -96,7 +105,9 @@ HANDLE_CPP_TEMPLATE = """\
 {% endfor %}
 
 /** handles {{ interface_name }}.{{ msg_name }} */
-void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
+namespace {{ package_name }} {
+namespace {{ interface_name }}_server {
+void {{ msg_name }}(
     channel_t __ch
 {% for type, name, _ in payloads %}
     , {{ type }} {{ name }}
@@ -105,6 +116,8 @@ void {{ package_name }}_{{ interface_name }}_{{ msg_name }}(
 
 }
 
+} // namespace {{ interface_name }}_server
+} // namespace {{ package_name }}
 """
 
 PACKAGE_H_TEMPLATE = """\
