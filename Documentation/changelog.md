@@ -1,6 +1,22 @@
 Changelog
 =========
 
+Version 0.4
+-----------
+### New features
+
+- arm/raspi2: threading support
+- hal: introduce HAL_LIBLINK
+
+### Changes
+
+- cpp: stubs are now written in C++
+
+### Bug fixes
+
+- A lot.
+
+
 Version 0.3
 -----------
 ### New features
