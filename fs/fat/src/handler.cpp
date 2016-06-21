@@ -1,10 +1,11 @@
 #include "fat.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
-#include <resea/fat.h>
 #include <resea/pager.h>
 #include <resea/fs.h>
-#include "handler.h"
+#include <resea/fat.h>
+#include "fs_server.h"
+#include "pager_server.h"
 
 namespace fat {
 

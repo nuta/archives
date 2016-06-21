@@ -56,11 +56,8 @@ config:
         - src/handler.cpp
         - src/fat.cpp
         - src/file.cpp
-        - src/fs.open.cpp
-        - src/fs.close.cpp
-        - src/fs.read.cpp
-        - src/fs.write.cpp
-        - src/pager.fill.cpp
+        - src/fs_server.cpp
+        - src/pager_server.cpp
   - if: "ENV == 'test'"
     FILES:
       set:
