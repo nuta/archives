@@ -75,7 +75,7 @@ config:
         - src/handler.cpp
         - src/startup.cpp
         - src/pci.cpp
-        - src/pci.listen.cpp
+        - src/pci_server.cpp
   - if: "ENV == 'test'"
     SOURCES:
       append:

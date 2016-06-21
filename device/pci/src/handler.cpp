@@ -2,7 +2,7 @@
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <resea/pci.h>
-#include "handler.h"
+#include "pci_server.h"
 
 namespace pci {
 
