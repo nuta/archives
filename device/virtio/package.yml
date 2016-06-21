@@ -40,11 +40,8 @@ interface:
 config:
   - SOURCES:
       set:
-        - src/net_device.transmit.cpp
-        - src/net_device.get_info.cpp
-        - src/net_device.listen.cpp
-        - src/storage_device.read.cpp
-        - src/storage_device.write.cpp
+        - src/net_device_server.cpp
+        - src/storage_device_server.cpp
         - src/handler.cpp
         - src/startup.cpp
         - src/virtio.cpp

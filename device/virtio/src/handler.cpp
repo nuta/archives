@@ -1,10 +1,11 @@
 #include "virtio.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
-#include <resea/storage_device.h>
 #include <resea/net_device.h>
+#include <resea/storage_device.h>
 #include <resea/virtio.h>
-#include "handler.h"
+#include "storage_device_server.h"
+#include "net_device_server.h"
 
 namespace virtio {
 
