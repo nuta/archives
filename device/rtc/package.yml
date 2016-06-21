@@ -40,7 +40,7 @@ config:
       set:
         - src/startup.cpp
         - src/handler.cpp
-        - src/datetime_device.get_date.cpp
+        - src/datetime_device_server.cpp
   - if: "ENV == 'test'"
     SOURCES:
       append:
