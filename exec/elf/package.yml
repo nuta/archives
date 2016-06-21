@@ -43,7 +43,7 @@ config:
         - src/startup.cpp
         - src/elf.cpp
         - src/handler.cpp
-        - src/exec.create.cpp
+        - src/exec_server.cpp
   - if: "ENV == 'test'"
     SOURCES:
       append:
