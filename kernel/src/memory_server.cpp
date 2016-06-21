@@ -1,16 +1,46 @@
 #include "kernel.h"
 #include <resea.h>
-#include <string.h>
 #include <resea/kernel.h>
 #include <resea/channel.h>
 #include <resea/memory.h>
 #include <resea/thread.h>
-#include <hal.h>
+#include <resea/io.h>
+#include <resea/datetime.h>
+#include <resea/pager.h>
 #include "kernel.h"
 
 
 namespace kernel {
 namespace memory_server {
+
+/** handles memory.allocate */
+void handle_allocate(channel_t __ch, size_t size, uint32_t flags) {
+     result_t r;
+     uintptr_t addr;
+     paddr_t paddr;
+
+     r = kernel_allocate_memory_at(0, size, flags, &addr, &paddr);
+     resea::interfaces::memory::send_allocate_reply(__ch, r, addr);
+}
+
+
+/** handles memory.allocate_physical */
+void handle_allocate_physical(channel_t __ch, paddr_t paddr, size_t size, uint32_t flags) {
+     result_t r;
+     uintptr_t addr;
+     paddr_t r_paddr;
+
+     r = kernel_allocate_memory_at(paddr, size, flags, &addr, &r_paddr);
+     resea::interfaces::memory::send_allocate_physical_reply(__ch, r, addr, r_paddr);
+}
+
+
+/** handles memory.get_page_size */
+void handle_get_page_size(channel_t __ch) {
+
+    resea::interfaces::memory::send_get_page_size_reply(__ch, PAGE_SIZE);
+}
+
 
 /** handles memory.map */
 void handle_map(channel_t __ch,
@@ -57,6 +87,20 @@ void handle_map(channel_t __ch,
     unlock_mutex(&current->lock);
 
    resea::interfaces::memory::send_map_reply(__ch, OK);
+}
+
+
+/** handles memory.release */
+void handle_release(channel_t __ch, uintptr_t addr) {
+
+}
+
+
+/** handles memory.unmap */
+void handle_unmap(channel_t __ch, uintptr_t addr) {
+
+    WARN("unimplemented");
+    resea::interfaces::memory::send_map_reply(__ch, OK);
 }
 
 } // namespace memory_server

@@ -32,5 +32,12 @@ void handle_allocate(channel_t __ch, resea::interfaces::io::space_t iospace, uin
     resea::interfaces::io::send_allocate_reply(__ch, OK, vaddr);
 }
 
+
+/** handles io.release */
+void handle_release(channel_t __ch, resea::interfaces::io::space_t iospace, uintptr_t addr) {
+
+    // TODO
+}
+
 } // namespace io_server
 } // namespace kernel

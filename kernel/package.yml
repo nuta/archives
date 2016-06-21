@@ -51,32 +51,18 @@ config:
   - SOURCES:
       set:
         - src/channel.cpp
-        - src/channel.connect.cpp
-        - src/channel.register.cpp
+        - src/channel_server.cpp
         - src/datetime.cpp
-        - src/datetime.delay.cpp
-        - src/datetime.get_date.cpp
-        - src/datetime.set_interval_timer.cpp
-        - src/datetime.set_oneshot_timer.cpp
+        - src/datetime_server.cpp
         - src/handler.cpp
-        - src/io.allocate.cpp
-        - src/io.release.cpp
+        - src/io_server.cpp
         - src/memory.cpp
-        - src/memory.allocate.cpp
-        - src/memory.allocate_physical.cpp
-        - src/memory.release.cpp
-        - src/memory.get_page_size.cpp
-        - src/memory.map.cpp
-        - src/memory.unmap.cpp
-        - src/pager.fill.cpp
+        - src/memory_server.cpp
+        - src/pager_server.cpp
         - src/startup.cpp
         - src/syscall.cpp
         - src/thread.cpp
-        - src/thread.create.cpp
-        - src/thread.delete.cpp
-        - src/thread.get_current_thread.cpp
-        - src/thread.set.cpp
-        - src/thread.start.cpp
+        - src/thread_server.cpp
   - if: "ENV == 'test'"
     SOURCES:
       append:

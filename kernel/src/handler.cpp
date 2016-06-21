@@ -1,15 +1,20 @@
 #include "kernel.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
-#include <resea/kernel.h>
-#include <resea/thread.h>
 #include <resea/memory.h>
-#include <resea/pager.h>
 #include <resea/zeroed_pager.h>
-#include <resea/channel.h>
-#include <resea/datetime.h>
 #include <resea/io.h>
-#include "handler.h"
+#include <resea/datetime.h>
+#include <resea/kernel.h>
+#include <resea/pager.h>
+#include <resea/channel.h>
+#include <resea/thread.h>
+#include "pager_server.h"
+#include "datetime_server.h"
+#include "io_server.h"
+#include "thread_server.h"
+#include "memory_server.h"
+#include "channel_server.h"
 
 namespace kernel {
 
