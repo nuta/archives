@@ -67,7 +67,7 @@ global_config:
     append_words: >
       -m64 -ffreestanding -mno-sse -mno-mmx
       -fno-stack-protector -mno-red-zone
-      -mcmodel=large 
+      -mcmodel=large
       -I{{ X86_DIR }}/src
   QEMU:
     default: qemu-system-x86_64
@@ -82,7 +82,6 @@ config:
   SOURCES:
     set:
       - src/startup.cpp
-      - src/handler.cpp
       - src/asm.S
       - src/exception.cpp
       - src/gdt.cpp

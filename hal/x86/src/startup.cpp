@@ -1,6 +1,6 @@
-
-#include "handler.h"
 #include <hal.h>
+#include "x86.h"
+
 
 static channel_t ch;
 static struct hal_pmmap bsp_pmmap[16];
@@ -15,9 +15,6 @@ void hal_startup(void) {
     /* TSS */
     x86_init_tss(&CPUVAR->tss);
     x86_asm_ltr(GDT_TSS_SEG);
-
-    ch = create_channel();
-    set_channel_handler(ch, x86::server_handler);
 }
 
 
