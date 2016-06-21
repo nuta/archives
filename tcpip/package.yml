@@ -153,10 +153,7 @@ config:
         - src/route.cpp
         - src/startup.cpp
         - src/handler.cpp
-        - src/tcpip.open.cpp
-        - src/tcpip.close.cpp
-        - src/tcpip.bind.cpp
-        - src/tcpip.sendto.cpp
+        - src/tcpip_server.cpp
   - if: "ENV == 'test'"
     SOURCES:
       append:
