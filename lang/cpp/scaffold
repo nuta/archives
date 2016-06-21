@@ -35,7 +35,9 @@ HANDLER_CPP_TEMPLATE = """\
 {% for implement in implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
-#include "handler.h"
+{% for server in servers %}
+#include "{{ server }}_server.h"
+{% endfor %}
 
 namespace {{ package_name }} {
 
@@ -46,7 +48,7 @@ void server_handler(channel_t __ch, payload_t *m) {
     }
 
     switch (EXTRACT_MSGID(m)) {
-{% for interface_name, msg_name, payloads in messages %}
+{% for interface_name, msg_name, payloads in all_messages %}
     case MSGID({{ interface_name }}, {{ msg_name }}):
         DEBUG("received {{ interface_name }}.{{ msg_name }}");
         {{ interface_name }}_server::handle_{{ msg_name }}(
@@ -78,46 +80,63 @@ void server_handler(channel_t __ch, payload_t *m) {
 HANDLER_H_TEMPLATE = """\
 #include "{{ package_name }}.h"
 #include <resea.h>
-{% for implement in implements %}
-#include <resea/{{ implement }}.h>
-{% endfor %}
 
 namespace {{ package_name }} {
-void server_handler(channel_t __ch, payload_t *m);
 
-{% for interface_name, msg_name, payloads in messages %}
-namespace {{ interface_name }}_server {
-void handle_{{ msg_name }}(
-    channel_t __ch
-{% for type, name, _ in payloads %}
-    , {{ type }} {{ name }}
-{% endfor %}
-);
-} // namespace {{ interface_name }}
-{% endfor %}
+void server_handler(channel_t __ch, payload_t *m);
 
 } // namespace {{ package_name }}
 
 """
 
-HANDLE_CPP_TEMPLATE = """\
+SERVER_H_TEMPLATE = """\
 #include "{{ package_name }}.h"
 #include <resea.h>
 {% for implement in implements %}
 #include <resea/{{ implement }}.h>
 {% endfor %}
 
-/** handles {{ interface_name }}.{{ msg_name }} */
 namespace {{ package_name }} {
 namespace {{ interface_name }}_server {
+
+{% for msg_name, payloads in messages %}
+void handle_{{ msg_name }}(
+    channel_t __ch
+{% for type, name, _ in payloads %}
+    , {{ type }} {{ name }}
+{% endfor %}
+);
+{% endfor %}
+
+} // namespace {{ interface_name }}
+} // namespace {{ package_name }}
+
+"""
+
+SERVER_CPP_TEMPLATE = """\
+#include "{{ package_name }}.h"
+#include <resea.h>
+{% for implement in implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+#include "{{ interface_name }}_server.h"
+
+
+namespace {{ package_name }} {
+namespace {{ interface_name }}_server {
+
+{% for msg_name, payloads in messages %}
+
 void handle_{{ msg_name }}(
     channel_t __ch
 {% for type, name, _ in payloads %}
     , {{ type }} {{ name }}
 {% endfor %}
 ) {
-
+    // TODO: add your code
 }
+
+{% endfor %}
 
 } // namespace {{ interface_name }}_server
 } // namespace {{ package_name }}
@@ -160,9 +179,11 @@ def main(args):
 
     implements = list(set(implements))
 
-    messages = []
+    servers = []
+    all_messages = []
     for yml in ymls:
         interface_name = yml["name"]
+        messages = []
         sorted_messages = OrderedDict(sorted(yml['interface'].items(), key=lambda e: e[1]["id"]))
         for  msg_name, msg in sorted_messages.items():
             if msg['type'] != 'request':
@@ -182,10 +203,16 @@ def main(args):
                             payload['name'] + '_size',
                             payload.get('attrs', [])))
 
-            messages.append((interface_name, msg_name, payloads))
+            messages.append((msg_name, payloads))
+            all_messages.append((interface_name, msg_name, payloads))
 
-            create_file("{}/src/{}.{}.cpp".format(args.output_dir, interface_name, msg_name),
-                        render(HANDLE_CPP_TEMPLATE, locals()))
+        if len(messages) > 0:
+            servers.append(interface_name)
+            create_file("{}/src/{}_server.cpp".format(args.output_dir, interface_name),
+                        render(SERVER_CPP_TEMPLATE, locals()))
+            create_file("{}/src/{}_server.h".format(args.output_dir, interface_name),
+                        render(SERVER_H_TEMPLATE, locals()),
+                        overwrite=True)
 
     create_file("{}/src/handler.cpp".format(args.output_dir),
                 render(HANDLER_CPP_TEMPLATE, locals()),
