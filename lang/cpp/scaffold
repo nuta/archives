@@ -22,7 +22,7 @@ STARTUP_CPP_TEMPLATE = """\
 {% endfor %}
 
 
-void {{ package_name }}_startup(void) {
+void {{ package_name }}_startup() {
 
 }
 
