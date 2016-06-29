@@ -59,7 +59,7 @@ static inline void {{ func_name }}_{{ msg_name }} (
 
 #ifndef KERNEL
     // free move payloads in user-space
-    payload __header;
+    payload_t __header;
     for (size_t i = 0; i < {{ payloads | length }}; i++) {
         if (IS_PAYLOAD_HEADER_INDEX(i)) {
             header = __payloads[i];
