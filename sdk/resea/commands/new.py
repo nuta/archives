@@ -20,6 +20,7 @@ GITIGNORE_TEMPLATE = """\
 /build
 /packages
 /tmp
+/vendor
 """
 
 PACKAGE_YML_TEMPLATE = """\
