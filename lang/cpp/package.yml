@@ -37,7 +37,7 @@ os_requirements:
         - lcov
 
 # Interfaces which this package uses
-uses: [memory, io]
+uses: [memory, io, channel]
 
 # Interfaces which this package implements
 implements: [lang]
