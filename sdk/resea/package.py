@@ -58,7 +58,12 @@ def get_package_from_registry(package):
     # look for the package
     db = sqlite3.connect(db_path)
     c = db.execute('SELECT type, uri FROM packages WHERE name = ?',(package,))
-    type_, uri = c.fetchone()
+
+    r = c.fetchone()
+    if r is None:
+        error("unknown package '{}' in registry".format(package))
+
+    type_, uri = r
 
     # download it
     if type_ == 'github':
