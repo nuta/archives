@@ -70,3 +70,18 @@ void hal_printchar(const char ch) {
     *ARM_UART0_DR = ch;
 }
 
+
+namespace arm {
+
+result_t console_read(uint8_t *data) {
+
+    while (*ARM_UART0_FR & (1 << 4)); // receive fifo
+    return *ARM_UART0_DR & 0xff;
+}
+
+result_t console_write(uint8_t data) {
+
+    WARN("console_device.write is not supported");
+}
+
+} // namespace arm

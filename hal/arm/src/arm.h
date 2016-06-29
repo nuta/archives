@@ -18,6 +18,10 @@ struct arm_cpuvar {
 
 extern struct arm_cpuvar arm_cpuvars[CPU_MAX_NUM];
 
+namespace arm {
+result_t console_read(uint8_t *data);
+result_t console_write(uint8_t data);
+} // namespace arm
 
 extern "C" {
     void arm_accept_irq(void);

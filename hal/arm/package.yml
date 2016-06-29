@@ -11,14 +11,10 @@ author: Seiya Nuta
 email: nuta@seiya.me
 homepage: http://resea.net
 
-# Required packages
+lang: cpp
 depends: [cpp, genstartcpp]
-
-# Interfaces which this package uses
 uses: []
-
-# Interfaces which this package implements
-implements: [hal]
+implements: [hal, console_device]
 
 #
 #  Type definitions
@@ -56,3 +52,5 @@ config:
       - src/vm.cpp
       - src/cpu.cpp
       - src/callback.cpp
+      - src/handler.cpp
+      - src/console_device_server.cpp
