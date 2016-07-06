@@ -82,8 +82,14 @@ void x86_init(void *binfo) {
             DEBUG("found a available RAM space: addr=%p, size=%dMiB",
                   m->base, m->length / 1024 / 1024);
 
-            bsp_pmmap[i].addr = m->base;
-            bsp_pmmap[i].size = m->length;
+            if (m->base < FREE_MEMORY_BASE_ADDR) {
+                bsp_pmmap[i].addr = FREE_MEMORY_BASE_ADDR;
+                bsp_pmmap[i].size = m->length - (FREE_MEMORY_BASE_ADDR - m->base);
+            } else {
+               bsp_pmmap[i].addr = m->base;
+               bsp_pmmap[i].size = m->length;
+            }
+
             i++;
         }
 

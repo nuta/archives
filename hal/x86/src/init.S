@@ -97,8 +97,8 @@ check_cpuid_end:
  */
   // PML4
   mov  edi, PGTABLE_BASE_ADDR
-  mov  eax, PGTABLE_BASE_ADDR + 0x1000 + 0b11
-  mov  [edi], eax
+  mov dword ptr [edi],     PGTABLE_BASE_ADDR + 0x1000 + 0b11
+  mov dword ptr [edi + 4], 0
 
   // PDPT
   mov  edi, PGTABLE_BASE_ADDR + 0x1000 // the beginning of PDPT
@@ -115,7 +115,7 @@ create_pdpt_entry:
   mov  edi, PGTABLE_BASE_ADDR + 0x2000 // the beginning of page directory
   mov  edx, 0          // upper 32-bit
   mov  eax, 0b10000011 // lower 32-bit: readable, writable, 2MB page
-  mov  ecx, 512 * 512 // create 64 pages (512GB)
+  mov  ecx, 16 * 512   // create 16 * 512 pages (16GB)
 
 create_pd_entry:
     mov  [edi],   eax
