@@ -57,6 +57,7 @@ config:
         - src/handler.cpp
         - src/io_server.cpp
         - src/memory.cpp
+        - src/page_fault.cpp
         - src/memory_server.cpp
         - src/pager_server.cpp
         - src/startup.cpp

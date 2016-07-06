@@ -1,15 +1,21 @@
 #include "kernel.h"
+#include "thread.h"
+#include "memory.h"
 #include <hal.h>
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <string.h>
-#include "kernel.h"
 
 
-static struct thread threads[THREAD_NUM_MAX];
-static struct thread_group thread_groups[THREAD_NUM_MAX];
-static mutex_t lock = MUTEX_UNLOCKED;
-static bool started_threading = false;
+namespace kernel {
+namespace thread {
+
+namespace {
+    struct thread threads[THREAD_NUM_MAX];
+    struct thread_group thread_groups[THREAD_NUM_MAX];
+    mutex_t lock = MUTEX_UNLOCKED;
+    bool started_threading = false;
+}
 
 
 // Returns a human-friendly description of a thread status
@@ -114,10 +120,10 @@ static ident_t create_thread_group(void) {
     if ((id = alloc_thread_group_id()) == 0)
         return 0;
 
-    g = kernel_get_thread_group(id);
+    g = get_thread_group(id);
     g->id                = id;
-    g->vm.dynamic_vpages = (uint8_t *) kernel_allocate_memory(kernel_get_dynamic_vpages_num(),
-                                                              resea::interfaces::memory::ALLOC_NORMAL);
+    g->vm.dynamic_vpages = (uint8_t *) memory::allocate(memory::get_dynamic_vpages_num(),
+                                                        resea::interfaces::memory::ALLOC_NORMAL);
     g->vm.areas_num      = 0;
     g->num               = 0;
 
@@ -131,35 +137,35 @@ static ident_t create_thread_group(void) {
 
 
 // Get the thread struct of the current thread
-struct thread *kernel_get_current_thread(void) {
+struct thread *get_current_thread(void) {
 
     return &threads[hal_get_current_thread_id()];
 }
 
 
 // Get the thread_group struct by a thread group ID
-struct thread_group *kernel_get_thread_group(ident_t group) {
+struct thread_group *get_thread_group(ident_t group) {
 
     return &thread_groups[group];
 }
 
 
 // Get the thread_group struct by a thread ID
-struct thread_group *kernel_get_thread_group_of(ident_t thread) {
+struct thread_group *get_thread_group_of(ident_t thread) {
 
     return threads[thread].group;
 }
 
 
 // Get the current thread_group struct
-struct thread_group *kernel_get_current_thread_group(void) {
+struct thread_group *get_current_thread_group(void) {
 
-    return kernel_get_thread_group_of(hal_get_current_thread_id());
+    return get_thread_group_of(hal_get_current_thread_id());
 }
 
 
 // Updates the status of a thread
-result_t kernel_set_thread_status(ident_t thread, enum thread_status status) {
+result_t set_status(ident_t thread, enum thread_status status) {
 
     INFO("thread #%d status changed to %s", thread, get_thread_status_str(status));
     threads[thread].status = status;
@@ -168,7 +174,7 @@ result_t kernel_set_thread_status(ident_t thread, enum thread_status status) {
 
 
 // Set thread registers states. Be aware that `stack` is the *beginning* of stack.
-result_t kernel_set_thread(ident_t thread, uintptr_t entry, uintptr_t arg,
+result_t set_reg_state(ident_t thread, uintptr_t entry, uintptr_t arg,
                        uintptr_t stack, size_t stack_size) {
 
     BUG_IF(THREAD_NUM_MAX < thread ||
@@ -186,8 +192,8 @@ result_t kernel_set_thread(ident_t thread, uintptr_t entry, uintptr_t arg,
 // thread group ID which the created thread belongs to to r_group.
 //
 // If `group` is 0, new thread group will be created.
-result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_size,
-                          ident_t *r_thread, ident_t *r_group) {
+result_t create_thread(ident_t group, const uchar_t *name, size_t name_size,
+                       ident_t *r_thread, ident_t *r_group) {
     ident_t thread;
 
     if (group == 0) {
@@ -210,7 +216,7 @@ result_t kernel_create_thread(ident_t group, const uchar_t *name, size_t name_si
 
 
 // Resumes the next thread
-static NORETURN void resume_next_thread(void) {
+static NORETURN void resume_next(void) {
     struct thread *t;
     struct thread_group *g;
     ident_t next;
@@ -226,7 +232,7 @@ static NORETURN void resume_next_thread(void) {
 
 // Do a soft context switch. It's called from the kernel
 // when the thread should release the time slice (e.g. sleep)
-void kernel_switch_thread(void) {
+void yield() {
     struct thread *t;
 
     t = &threads[hal_get_current_thread_id()];
@@ -237,7 +243,7 @@ void kernel_switch_thread(void) {
 
 
 // Do a hard context switch (exhausted a time slice)
-void kernel_hard_switch_thread(void) {
+void hard_switch(void) {
     struct thread *t;
 
     if (!started_threading)
@@ -247,7 +253,7 @@ void kernel_hard_switch_thread(void) {
     hal_save_thread(&t->hal);
     t->status = THREAD_RUNNABLE;
 
-    resume_next_thread();
+    resume_next();
 }
 
 
@@ -259,34 +265,37 @@ static result_t run_thread(ident_t group, const char *name, uintptr_t entry, uin
     size_t stack_size;
 
     stack_size = 0x4000; // TODO
-    stack = (uintptr_t) kernel_allocate_memory(stack_size, resea::interfaces::memory::ALLOC_NORMAL);
-    kernel_create_thread(group, (const uchar_t *) name, strlen(name), &thread, &r_group);
-    kernel_set_thread(thread, entry, arg, stack, stack_size);
-    kernel_set_thread_status(thread, THREAD_RUNNABLE);
+    stack = (uintptr_t) memory::allocate(stack_size, resea::interfaces::memory::ALLOC_NORMAL);
+    create_thread(group, (const uchar_t *) name, strlen(name), &thread, &r_group);
+    set_reg_state(thread, entry, arg, stack, stack_size);
+    set_status(thread, THREAD_RUNNABLE);
     return OK;
 }
 
 
-NORETURN static void start_threading(void) {
+NORETURN static void start_threading() {
 
     started_threading = true;
-    resume_next_thread();
+    resume_next();
 }
 
 
 // Initializes the threading system
-void kernel_thread_startup(void) {
+void init() {
     ident_t group, thread;
 
     INFO("initializing the thread system");
 
     // create the kernel's thread group and a temporary thread
-    kernel_create_thread(0, nullptr, 0, &thread, &group);
+    create_thread(0, nullptr, 0, &thread, &group);
     hal_set_current_thread_id(thread);
     DEBUG("set current thread to #%d.%d", group, thread);
 
     hal_set_callback(HAL_CALLBACK_RUN_THREAD,      (void *) run_thread);
-    hal_set_callback(HAL_CALLBACK_RESUME_NEXT_THREAD, (void *) resume_next_thread);
-    hal_set_callback(HAL_CALLBACK_TIMER_TICK,      (void *) kernel_hard_switch_thread);
+    hal_set_callback(HAL_CALLBACK_RESUME_NEXT_THREAD, (void *) resume_next);
+    hal_set_callback(HAL_CALLBACK_TIMER_TICK,      (void *) hard_switch);
     hal_set_callback(HAL_CALLBACK_START_THREADING, (void *) start_threading);
 }
+
+} // namespace thread
+} // namespace kernel

@@ -1,4 +1,6 @@
 #include "kernel.h"
+#include "memory.h"
+#include "thread.h"
 #include <resea.h>
 #include <resea/kernel.h>
 #include <resea/channel.h>
@@ -8,13 +10,14 @@
 #include <resea/datetime.h>
 #include <resea/pager.h>
 #include <hal.h>
-#include "kernel.h"
+
 
 namespace kernel {
 namespace io_server {
 
 /** handles io.allocate */
-void handle_allocate(channel_t __ch, resea::interfaces::io::space_t iospace, uintptr_t addr, size_t size) {
+void handle_allocate(channel_t __ch, resea::interfaces::io::space_t iospace,
+                     uintptr_t addr, size_t size) {
     uintptr_t vaddr;
 
     switch (iospace) {
@@ -22,8 +25,8 @@ void handle_allocate(channel_t __ch, resea::interfaces::io::space_t iospace, uin
         vaddr = addr;
         break;
     case resea::interfaces::io::SPACE_MEM:
-        vaddr = kernel_vmalloc(size);
-        hal_link_page(&kernel_get_current_thread_group()->vm, vaddr,
+        vaddr = memory::vmalloc(size);
+        hal_link_page(&thread::get_current_thread_group()->vm, vaddr,
                       size / PAGE_SIZE, addr, PAGE_PRESENT | PAGE_WRITABLE);
         DEBUG("allocated memory-mapped IO (v=%p, p=%p)", vaddr, addr);
         break;
@@ -34,7 +37,8 @@ void handle_allocate(channel_t __ch, resea::interfaces::io::space_t iospace, uin
 
 
 /** handles io.release */
-void handle_release(channel_t __ch, resea::interfaces::io::space_t iospace, uintptr_t addr) {
+void handle_release(channel_t __ch, resea::interfaces::io::space_t iospace,
+                    uintptr_t addr) {
 
     // TODO
 }

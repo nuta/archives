@@ -1,22 +1,19 @@
 #include "kernel.h"
+#include "thread.h"
+#include "channel.h"
 #include <resea.h>
-#include "kernel.h"
 
-#define SERVERS_MAX  256
 
-struct server {
-    bool         used;
-    ident_t      group_id;
-    channel_t    ch;
-    interface_t  interface;
-};
+namespace {
+    struct kernel::channel::server servers[SERVERS_MAX];
+    mutex_t servers_lock;
+}
 
-static struct server servers[SERVERS_MAX];
-static mutex_t servers_lock;
-
+namespace kernel {
+namespace channel {
 
 // Allocates a channel ID in the thread group.
-ident_t kernel_alloc_channel_id(struct thread_group *group) {
+ident_t alloc_id(struct thread::thread_group *group) {
     ident_t i;
 
     lock_mutex(&group->lock);
@@ -39,13 +36,13 @@ ident_t kernel_alloc_channel_id(struct thread_group *group) {
 
 
 // Returns the pointer to the channel struct of the channel ID.
-struct channel *kernel_get_channel(struct thread_group *group, channel_t ch) {
+struct thread::channel *get_channel(struct thread::thread_group *group, channel_t ch) {
 
     return &group->channels[ch];
 }
 
 
-result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t dst) {
+result_t transfer_to(struct thread::thread_group *group, channel_t src, channel_t dst) {
 
     group->channels[src].used        = true;
     group->channels[src].transfer_to = dst;
@@ -55,8 +52,8 @@ result_t kernel_transfer_to(struct thread_group *group, channel_t src, channel_t
 }
 
 
-result_t kernel_link_channels(struct thread_group *group1, channel_t ch1,
-                              struct thread_group *group2, channel_t ch2) {
+result_t link(struct thread::thread_group *group1, channel_t ch1,
+              struct thread::thread_group *group2, channel_t ch2) {
 
     group1->channels[ch1].used         = true;
     group1->channels[ch1].linked_group = group2->id;
@@ -71,7 +68,7 @@ result_t kernel_link_channels(struct thread_group *group1, channel_t ch1,
 
 
 // Registers the channel as a server in `interface`.
-result_t kernel_register_channel(channel_t ch, interface_t interface) {
+result_t register_server(channel_t ch, interface_t interface) {
 
     lock_mutex(&servers_lock);
 
@@ -89,7 +86,7 @@ result_t kernel_register_channel(channel_t ch, interface_t interface) {
     }
 
     servers[i].used      = true;
-    servers[i].group_id  = kernel_get_current_thread_group()->id;
+    servers[i].group_id  = thread::get_current_thread_group()->id;
     servers[i].ch        = ch;
     servers[i].interface = interface;
 
@@ -100,8 +97,8 @@ result_t kernel_register_channel(channel_t ch, interface_t interface) {
 
 
 // Connects the channel `ch` to a server specified in `interface`.
-result_t kernel_connect_channel(channel_t ch, interface_t interface) {
-    struct thread_group *current_group, *server_group;
+result_t connect(channel_t ch, interface_t interface) {
+    struct thread::thread_group *current_group, *server_group;
     bool retried = false;
     channel_t server_new_ch;
 
@@ -129,19 +126,19 @@ retry:
     }
 
     INFO("found server (%d)", interface >> 12);
-    current_group = kernel_get_current_thread_group();
-    server_group  = kernel_get_thread_group(servers[i].group_id);
+    current_group = thread::get_current_thread_group();
+    server_group  = thread::get_thread_group(servers[i].group_id);
 
-    server_new_ch = kernel_alloc_channel_id(server_group);
-    kernel_transfer_to(server_group, server_new_ch, servers[i].ch);
-    kernel_link_channels(current_group, ch, server_group, server_new_ch);
+    server_new_ch = alloc_id(server_group);
+    channel::transfer_to(server_group, server_new_ch, servers[i].ch);
+    channel::link(current_group, ch, server_group, server_new_ch);
 
     INFO("connected (%d)", interface >> 12);
     return OK;
 }
 
 
-void kernel_channel_startup(void) {
+void init() {
 
     INFO("initializing the channel system");
     init_mutex(&servers_lock, MUTEX_UNLOCKED);
@@ -150,3 +147,6 @@ void kernel_channel_startup(void) {
         servers[i].used = false;
     }
 }
+
+} // namespace channel
+} // namespace kernel

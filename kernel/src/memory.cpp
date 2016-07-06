@@ -1,80 +1,29 @@
 #include "kernel.h"
+#include "thread.h"
+#include "memory.h"
 #include <hal.h>
 #include <resea.h>
 #include <resea/cpp/io.h>
 #include <resea/cpp/memory.h>
 #include <resea/pager.h>
 #include <string.h>
-#include "kernel.h"
 
 
-// Physical memory space
-struct pm_space {
-    mutex_t    lock;
-    size_t     num;        // the number of pages
-    paddr_t    paddr;      // the beginning address of the space
-    uint8_t    *pages;     // reference counts
-    struct pm_space *next; // the next physical memory space if it is not nullptr
-};
+using namespace resea::interfaces;
 
+namespace kernel {
+namespace memory {
 
-// a singly linked list of physical memory spaces
-static struct pm_space *memory_spaces = nullptr;
-static size_t memory_space_num = 0;
-static uintptr_t dynamic_vpages_start = 0;
-static size_t dynamic_vpages_num = 0;
-
-
-
-
-// Initlaizes memory management
-static void init_memory(void) {
-    struct hal_pmmap *pmmap = hal_get_pmmaps();
-    struct hal_vmmap *vmmap = hal_get_vmmaps();
-    int i;
-
-    memory_spaces = (struct pm_space *) hal_paddr_to_vaddr(pmmap[0].addr);
-
-    // add memory maps from HAL into `memory_spaces`
-    for (i=0; pmmap[i].size > 0; i++) {
-        struct pm_space *m;
-
-        INFO("new physical memory space: addr=%p size=%lldMB",
-             pmmap[i].addr,
-             pmmap[i].size / 1024 / 1024);
-
-        m = (struct pm_space *) hal_paddr_to_vaddr(pmmap[i].addr);
-        init_mutex(&m->lock, MUTEX_UNLOCKED);
-        m->pages = (uint8_t *) hal_paddr_to_vaddr(pmmap[i].addr) + sizeof(struct pm_space);
-        m->num   = pmmap[i].size / PAGE_SIZE;
-        m->paddr = ((pmmap[i].addr + sizeof(struct pm_space) +
-                     sizeof(uintmax_t) * m->num) & (paddr_t) ~(PAGE_SIZE - 1)) +
-                     PAGE_SIZE;
-
-        if (pmmap[i+1].size > 0)
-            m->next = (struct pm_space *) hal_paddr_to_vaddr(pmmap[i+1].addr);
-        else
-            m->next = nullptr;
-
-        memory_space_num++;
-    }
-
-    //  XXX: look for dynamic vpages area
-    for (i=0; vmmap[i].size > 0; i++) {
-        if (vmmap[i].type == VMMAP_DYNAMIC) {
-           dynamic_vpages_start = vmmap[i].addr;
-           dynamic_vpages_num   = vmmap[i].size / PAGE_SIZE;
-           break;
-        }
-    }
-
-    if (vmmap[i].size == 0) {
-        WARN("dynamic vpages area not found");
-    }
+namespace {
+    // a singly linked list of physical memory spaces
+    struct pm_space *memory_spaces = nullptr;
+    size_t memory_space_num = 0;
+    uintptr_t dynamic_vpages_start = 0;
+    size_t dynamic_vpages_num = 0;
 }
 
 
-size_t kernel_get_dynamic_vpages_num(void) {
+size_t get_dynamic_vpages_num(void) {
 
     return dynamic_vpages_num;
 }
@@ -87,10 +36,10 @@ size_t kernel_get_dynamic_vpages_num(void) {
 // virtual memory pages. Note that it allocates only virtual memory pages.
 //
 //
-uintptr_t kernel_vmalloc(size_t size) {
+uintptr_t vmalloc(size_t size) {
     void *p;
     size_t num = size / PAGE_SIZE + ((size % PAGE_SIZE == 0)? 0:1);
-    struct thread_group *group = kernel_get_current_thread_group();
+    struct thread::thread_group *group = thread::get_current_thread_group();
     uint8_t *vpages = group->vm.dynamic_vpages;
     mutex_t *lock   = &group->vm.dynamic_vpages_lock;
 
@@ -150,24 +99,24 @@ static paddr_t pmalloc(size_t num) {
 }
 
 
-void kernel_release_memory(void *p) {
+void release(void *p) {
   /* TODO */
 }
 
 
 // Allocates memory block
-void *kernel_allocate_memory(size_t size, uint32_t flags) {
+void *allocate(size_t size, uint32_t flags) {
     uintptr_t addr;
     paddr_t paddr;
 
-    kernel_allocate_memory_at(0, size, flags, &addr, &paddr);
+    allocate_at(0, size, flags, &addr, &paddr);
     return (void *) addr;
 }
 
 
 // Allocates a physical memory block and maps it to a virtual addres.
-result_t kernel_allocate_memory_at(paddr_t at, size_t size, uint32_t flags,
-                                   uintptr_t *addr, paddr_t *paddr) {
+result_t allocate_at(paddr_t at, size_t size, uint32_t flags,
+                     uintptr_t *addr, paddr_t *paddr) {
     size_t required;
 
     // TODO: support flags
@@ -193,56 +142,56 @@ result_t kernel_allocate_memory_at(paddr_t at, size_t size, uint32_t flags,
 }
 
 
-void kernel_page_fault_handler(uintptr_t addr, uint32_t reason) {
-    struct thread_group *g;
+// Initlaizes memory management
+void init() {
+    struct hal_pmmap *pmmap = hal_get_pmmaps();
+    struct hal_vmmap *vmmap = hal_get_vmmaps();
+    int i;
 
-    if(!(reason & PGFAULT_USER)) {
-        PANIC("page fault in the kernel mode: addr=%p, reason=%#8x",
-              addr, reason);
+    INFO("initializing the memory system");
+    memory_spaces = (struct pm_space *) hal_paddr_to_vaddr(pmmap[0].addr);
+
+    // add memory maps from HAL into `memory_spaces`
+    for (i=0; pmmap[i].size > 0; i++) {
+        struct pm_space *m;
+
+        INFO("new physical memory space: addr=%p size=%lldMB",
+             pmmap[i].addr,
+             pmmap[i].size / 1024 / 1024);
+
+        m = (struct pm_space *) hal_paddr_to_vaddr(pmmap[i].addr);
+        init_mutex(&m->lock, MUTEX_UNLOCKED);
+        m->pages = (uint8_t *) hal_paddr_to_vaddr(pmmap[i].addr) + sizeof(struct pm_space);
+        m->num   = pmmap[i].size / PAGE_SIZE;
+        m->paddr = ((pmmap[i].addr + sizeof(struct pm_space) +
+                     sizeof(uintmax_t) * m->num) & (paddr_t) ~(PAGE_SIZE - 1)) +
+                     PAGE_SIZE;
+
+        if (pmmap[i+1].size > 0)
+            m->next = (struct pm_space *) hal_paddr_to_vaddr(pmmap[i+1].addr);
+        else
+            m->next = nullptr;
+
+        memory_space_num++;
     }
 
-    g = kernel_get_current_thread_group();
-
-    for (size_t i=0; i< g->vm.areas_num; i++) {
-        struct vm_area *area = &g->vm.areas[i];
-
-        if (area->addr <= addr && addr < area->addr + area->size) {
-            // found the vm_area
-            offset_t offset; // offset from the area
-            result_t result;
-            uintptr_t aligned_addr, filled_addr;
-            size_t filled_size;
-
-            INFO("page_fault_handler: found a vm_area, filling...");
-
-            aligned_addr = addr & ~(PAGE_SIZE - 1);
-            offset = aligned_addr - area->addr;
-            resea::interfaces::pager::call_fill(area->pager,
-                 area->pager_arg, area->offset + offset, PAGE_SIZE,
-                 &result, (void **) &filled_addr, &filled_size);
-
-            INFO("linking v=%p, p=%p, filled_addr=%p", aligned_addr,
-                 hal_vaddr_to_paddr(&g->vm, filled_addr), filled_addr);
-
-            hal_link_page(&g->vm, aligned_addr,
-                          hal_vaddr_to_paddr(&g->vm, filled_addr), 1,
-                          PAGE_PRESENT | PAGE_READABLE | PAGE_WRITABLE |
-                          PAGE_USER | PAGE_EXECUTABLE /* XXX: use area->flags and
-                                                  verify `reason` */);
-            INFO("page_fault_handler: filled, resuming");
-            return;
+    //  XXX: look for dynamic vpages area
+    for (i=0; vmmap[i].size > 0; i++) {
+        if (vmmap[i].type == VMMAP_DYNAMIC) {
+           dynamic_vpages_start = vmmap[i].addr;
+           dynamic_vpages_num   = vmmap[i].size / PAGE_SIZE;
+           break;
         }
     }
 
-    PANIC("page fault at an unmapped area: addr=%p, reason=%#8x",
-          addr, reason);
+    if (vmmap[i].size == 0) {
+        WARN("dynamic vpages area not found");
+    }
+
+
+    hal_set_callback(HAL_CALLBACK_ALLOCATE_MEMORY,
+                     (void *) allocate_at);
 }
 
-
-void kernel_memory_startup(void) {
-
-    INFO("initializing the memory system");
-
-    init_memory();
-    hal_set_callback(HAL_CALLBACK_ALLOCATE_MEMORY, (void *) kernel_allocate_memory_at);
-}
+} // namespace memory
+} // namespace kernel

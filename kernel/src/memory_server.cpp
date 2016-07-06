@@ -1,4 +1,6 @@
 #include "kernel.h"
+#include "memory.h"
+#include "thread.h"
 #include <resea.h>
 #include <resea/kernel.h>
 #include <resea/channel.h>
@@ -7,7 +9,6 @@
 #include <resea/io.h>
 #include <resea/datetime.h>
 #include <resea/pager.h>
-#include "kernel.h"
 
 
 namespace kernel {
@@ -19,7 +20,7 @@ void handle_allocate(channel_t __ch, size_t size, uint32_t flags) {
      uintptr_t addr;
      paddr_t paddr;
 
-     r = kernel_allocate_memory_at(0, size, flags, &addr, &paddr);
+     r = memory::allocate_at(0, size, flags, &addr, &paddr);
      resea::interfaces::memory::send_allocate_reply(__ch, r, addr);
 }
 
@@ -30,7 +31,7 @@ void handle_allocate_physical(channel_t __ch, paddr_t paddr, size_t size, uint32
      uintptr_t addr;
      paddr_t r_paddr;
 
-     r = kernel_allocate_memory_at(paddr, size, flags, &addr, &r_paddr);
+     r = memory::allocate_at(paddr, size, flags, &addr, &r_paddr);
      resea::interfaces::memory::send_allocate_physical_reply(__ch, r, addr, r_paddr);
 }
 
@@ -53,7 +54,7 @@ void handle_map(channel_t __ch,
 
     uint8_t flags;
     intmax_t i;
-    struct thread_group *current = kernel_get_thread_group(group);
+    struct thread::thread_group *current = thread::get_thread_group(group);
     struct vm_space *vm_space = &current->vm;
     struct vm_area *area;
 
@@ -93,6 +94,7 @@ void handle_map(channel_t __ch,
 /** handles memory.release */
 void handle_release(channel_t __ch, uintptr_t addr) {
 
+    WARN("unimplemented");
 }
 
 

@@ -102,7 +102,6 @@ void x86_exp_handler13 (uint64_t rip, uint64_t errcode) {
 }
 
 
-void kernel_page_fault_handler(uintptr_t addr, uint32_t reason);
 void x86_exp_handler14 (uint64_t rip, uint64_t errcode) {
     uint32_t reason;
 
@@ -119,8 +118,8 @@ void x86_exp_handler14 (uint64_t rip, uint64_t errcode) {
     reason |= (errcode & (1 << 2))? PGFAULT_USER    : 0;
     reason |= (errcode & (1 << 4))? PGFAULT_EXEC    : 0;
 
-    /* TODO: replace it with hook */
-    kernel_page_fault_handler(x86_asm_read_cr2(), reason);
+    call_hal_callback(HAL_CALLBACK_PAGE_FAULT,
+        x86_asm_read_cr2(), reason);
 }
 
 

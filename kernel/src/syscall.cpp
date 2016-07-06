@@ -1,14 +1,18 @@
 #include "kernel.h"
+#include "channel.h"
+#include "thread.h"
 #include <resea.h>
 #include <resea/cpp/memory.h>
 #include <string.h>
 
+namespace kernel {
+namespace syscall {
 
 static result_t send(channel_t ch, payload_t *m, size_t size) {
-    struct thread_group *src_group, *dest_group;
-    struct channel *src, *dest;
+    struct thread::thread_group *src_group, *dest_group;
+    struct thread::channel *src, *dest;
 
-    src_group = kernel_get_current_thread_group();
+    src_group = thread::get_current_thread_group();
     src = &src_group->channels[ch];
 
     if (!src->used || !src->linked_to) {
@@ -16,7 +20,7 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
        return E_UNCONNECTED;
     }
 
-    dest_group = kernel_get_thread_group(src->linked_group);
+    dest_group = thread::get_thread_group(src->linked_group);
     dest = &dest_group->channels[src->linked_to];
 
     if (dest->transfer_to) {
@@ -72,13 +76,13 @@ static result_t send(channel_t ch, payload_t *m, size_t size) {
                 }
                 break;
             case PAYLOAD_CHANNEL: {
-                if (kernel_get_channel(src_group, m[i])->linked_to) {
+                if (channel::get_channel(src_group, m[i])->linked_to) {
                     WARN("channel (%d th payload) is already linked", i);
                     return E_INVALID;
                 }
 
-                channel_t dest_ch = kernel_alloc_channel_id(dest_group);
-                kernel_link_channels(src_group, m[i], dest_group, dest_ch);
+                channel_t dest_ch = channel::alloc_id(dest_group);
+                channel::link(src_group, m[i], dest_group, dest_ch);
                 m[i] = dest_ch;
                 break;
             }
@@ -134,9 +138,9 @@ static result_t recv(channel_t ch, payload_t **m) {
 }
 
 static result_t setoptions(channel_t channel, handler_t *handler, void *buffer, size_t size) {
-    struct thread_group *g;
+    struct thread::thread_group *g;
 
-    g = kernel_get_current_thread_group();
+    g = thread::get_current_thread_group();
     if (channel > CHANNELS_MAX || !g->channels[channel].used) {
         WARN("invalid channel ID");
         return E_INVALID;
@@ -150,7 +154,8 @@ static result_t setoptions(channel_t channel, handler_t *handler, void *buffer, 
 
 
 
-static result_t call(channel_t ch, payload_t *m, size_t size, void *buffer, size_t buffer_size) {
+static result_t call(channel_t ch, payload_t *m, size_t size,
+                     void *buffer, size_t buffer_size) {
     result_t r;
 
     if ((r = setoptions(ch, nullptr, buffer, buffer_size)) != OK)
@@ -163,9 +168,9 @@ static result_t call(channel_t ch, payload_t *m, size_t size, void *buffer, size
 }
 
 static result_t link(channel_t ch1, channel_t ch2) {
-    struct thread_group *g;
+    struct thread::thread_group *g;
 
-    g = kernel_get_current_thread_group();
+    g = thread::get_current_thread_group();
     if (ch1 > CHANNELS_MAX || !g->channels[ch1].used) {
         WARN("invalid channel ID");
         return E_INVALID;
@@ -176,15 +181,15 @@ static result_t link(channel_t ch1, channel_t ch2) {
         return E_INVALID;
     }
 
-    kernel_link_channels(g, ch1, g, ch2);
+    channel::link(g, ch1, g, ch2);
     return OK;
 }
 
 
 static result_t transfer(channel_t ch1, channel_t ch2) {
-    struct thread_group *g;
+    struct thread::thread_group *g;
 
-    g = kernel_get_current_thread_group();
+    g = thread::get_current_thread_group();
     if (ch1 > CHANNELS_MAX || !g->channels[ch1].used) {
         WARN("invalid channel ID");
         return E_INVALID;
@@ -195,14 +200,14 @@ static result_t transfer(channel_t ch1, channel_t ch2) {
         return E_INVALID;
     }
 
-    kernel_transfer_to(g, ch1, ch2);
+    channel::transfer_to(g, ch1, ch2);
     return OK;
 }
 
 
 static result_t open(channel_t *ch) {
 
-    *ch = kernel_alloc_channel_id(kernel_get_current_thread_group());
+    *ch = channel::alloc_id(thread::get_current_thread_group());
     return OK;
 }
 
@@ -213,10 +218,12 @@ static result_t close(channel_t id) {
     return OK;
 }
 
+
 // NOTE: If you want to change this defition do care about
 //       system call wrappers in lang libraries.
 extern "C" result_t kernel_syscall(int type, uintmax_t r1, uintmax_t r2,
-                        uintmax_t r3, uintmax_t r4, uintmax_t r5, uintmax_t *ret) {
+                                   uintmax_t r3, uintmax_t r4, uintmax_t r5,
+                                   uintmax_t *ret) {
     result_t r;
 
     switch (type) {
@@ -255,4 +262,5 @@ extern "C" result_t kernel_syscall(int type, uintmax_t r1, uintmax_t r2,
     return r;
 }
 
-
+} // namespace syscall
+} // namespace kernel
