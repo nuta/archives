@@ -108,8 +108,8 @@ void hal_remove_vm_space(struct vm_space *vms);
 void hal_switch_vm_space(struct hal_vm_space *vms);
 void hal_link_page(struct vm_space *vms, uintptr_t v, paddr_t p, size_t n,
                    page_attrs_t attrs);
-void set_page_attribute(struct vm_space *vms, uintptr_t v, size_t n, page_attrs_t attrs);
-page_attrs_t get_page_attribute(struct vm_space *vms, uintptr_t v);
+void hal_set_page_attribute(struct vm_space *vms, uintptr_t v, size_t n, page_attrs_t attrs);
+page_attrs_t hal_get_page_attribute(struct vm_space *vms, uintptr_t v);
 
 // Returns the physical page address pointered from `v`.
 paddr_t hal_vaddr_to_paddr(struct vm_space *vms, uintptr_t v);
