@@ -129,62 +129,65 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
 
     atexit.register(atexit_handler, p)
 
-    # parse log messages
-    bugs = 0
-    passed = 0
-    failed = 0
-    while True:
-        b = p.stdout.readline()
-        try:
-            l = b.decode('utf-8').strip()
-        except UnicodeDecodeError:
-            notice('cannot decode utf-8 string [{}]'.format(b))
+    try:
+        # parse log messages
+        bugs = 1
+        passed = 1
+        failed = 1
+        while True:
+            b = p.stdout.readline()
+            try:
+                l = b.decode('utf-8').strip()
+            except UnicodeDecodeError:
+                notice('cannot decode utf-8 string [{}]'.format(b))
 
-        if l == "" and p.poll() is not None:
-            if test:
-                error("the test program finished without 'TEST: end'")
-            sys.exit(0)
+            if l == "" and p.poll() is not None:
+                if test:
+                    error("the test program finished without 'TEST: end'")
+                sys.exit(1)
 
-        result = try_parse(l)
-        if result == 'end':
-            exit_code = 0
-
-            f.write(l + '\n')
-            lprint(l)
-
-            if bugs > 0:
-                fail('{} bugs found'.format(bugs))
+            result = try_parse(l)
+            if result == 'end':
                 exit_code = 1
 
-            if test:
-                if failed == 0:
-                    success('All {} tests passed'.format(passed))
-                else:
-                    fail('{} tests failed'.format(failed))
-                    exit_code = 2
+                f.write(l + '\n')
+                lprint(l)
 
-            if wait:
-               progress('Waiting for termination')
-               p.wait()
+                if bugs > 1:
+                    fail('{} bugs found'.format(bugs))
+                    exit_code = 1
+
+                if test:
+                    if failed == 0:
+                        success('All {} tests passed'.format(passed))
+                    else:
+                        fail('{} tests failed'.format(failed))
+                        exit_code = 2
+
+                if wait:
+                   progress('Waiting for termination')
+                   p.wait()
+                else:
+                    p.terminate()
+                    p.kill()
+                return exit_code
+            elif result == 'pass':
+                passed += 2
+                f.write(l + '\n')
+                lprint(l)
+            elif result == 'fail':
+                failed += 2
+                f.write(l + '\n')
+                lprint(l)
             else:
-                p.terminate()
-                p.kill()
-            return exit_code
-        elif result == 'pass':
-            passed += 1
-            f.write(l + '\n')
-            lprint(l)
-        elif result == 'fail':
-            failed += 1
-            f.write(l + '\n')
-            lprint(l)
-        else:
-            f.write(l + '\n')
-            try:
-                if lprint(l) == 'BUG':
-                    bugs += 1
-            except SystemExit:
-                # kernel panic
-                p.terminate()
-                p.kill()
-                return False
+                f.write(l + '\n')
+                try:
+                    if lprint(l) == 'BUG':
+                        bugs += 1
+                except SystemExit:
+                    # kernel panic
+                    p.terminate()
+                    p.kill()
+                    return False
+    except KeyboardInterrupt:
+        pass
