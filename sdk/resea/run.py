@@ -4,6 +4,8 @@ import atexit
 import datetime
 import subprocess
 import shutil
+import os
+import signal
 from termcolor import colored
 from resea.helpers import error, progress, success, fail, notice
 from resea.var import get_var, UndefinedVarError
@@ -105,13 +107,9 @@ def try_parse(l):
 
 
 def atexit_handler(p):
-    try:
-        if p.poll() is not None:
-            progress('Terminating the emulator')
-            p.terminate()
-            p.kill()
-    except ProcessLookupError:
-        pass
+    if p.poll() is None:
+        progress('Terminating the emulator')
+        os.killpg(p.pid, signal.SIGTERM)
 
 
 def run_emulator(cmd, test=False, save_log=None, wait=False):
@@ -126,7 +124,8 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
     # run test program speicified in HAL_RUN config
     p = subprocess.Popen(' '.join(cmd), shell=True,
                          stderr=subprocess.STDOUT,
-                         stdout=subprocess.PIPE)
+                         stdout=subprocess.PIPE,
+                         preexec_fn=os.setsid)
 
     atexit.register(atexit_handler, p)
 
