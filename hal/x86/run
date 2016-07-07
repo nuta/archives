@@ -12,8 +12,10 @@ executable_file = sys.argv[1]
 iso_file = join(build_dir, 'bootable.iso')
 
 grub_mkrescue = 'grub-mkrescue -o {iso_file} {build_dir}/isofiles'
-qemu = 'qemu-system-x86_64 -m 256 -localtime -nographic -no-reboot -boot d -cpu SandyBridge ' + \
-       '-net user -net nic,model=virtio -net dump,file=qemu.pcap -cdrom {iso_file}'
+qemu = 'qemu-system-x86_64 -m 256 -localtime -no-reboot -boot d -cpu SandyBridge ' + \
+       '-net user -net nic,model=virtio -net dump,file=qemu.pcap -cdrom {iso_file} ' + \
+       '-chardev stdio,id=char0,mux=off -serial chardev:char0 -display none'
+
 
 if __name__ == '__main__':
     try:
