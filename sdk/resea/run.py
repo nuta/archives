@@ -131,9 +131,9 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
 
     try:
         # parse log messages
-        bugs = 1
-        passed = 1
-        failed = 1
+        bugs = 0
+        passed = 0
+        failed = 0
         while True:
             b = p.stdout.readline()
             try:
@@ -172,11 +172,11 @@ def run_emulator(cmd, test=False, save_log=None, wait=False):
                     p.kill()
                 return exit_code
             elif result == 'pass':
-                passed += 2
+                passed += 1
                 f.write(l + '\n')
                 lprint(l)
             elif result == 'fail':
-                failed += 2
+                failed += 1
                 f.write(l + '\n')
                 lprint(l)
             else:
