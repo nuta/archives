@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -19,10 +18,9 @@ ActiveRecord::Schema.define(version: 20160407084137) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string   "uri"
+    t.index ["uri"], name: "index_calendars_on_uri", unique: true
+    t.index ["user_id"], name: "index_calendars_on_user_id"
   end
-
-  add_index "calendars", ["uri"], name: "index_calendars_on_uri", unique: true
-  add_index "calendars", ["user_id"], name: "index_calendars_on_user_id"
 
   create_table "schedules", force: :cascade do |t|
     t.string   "component"
@@ -34,11 +32,10 @@ ActiveRecord::Schema.define(version: 20160407084137) do
     t.integer  "calendar_id"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.index ["calendar_id"], name: "index_schedules_on_calendar_id"
+    t.index ["updated_at"], name: "index_schedules_on_updated_at"
+    t.index ["uri"], name: "index_schedules_on_uri", unique: true
   end
-
-  add_index "schedules", ["calendar_id"], name: "index_schedules_on_calendar_id"
-  add_index "schedules", ["updated_at"], name: "index_schedules_on_updated_at"
-  add_index "schedules", ["uri"], name: "index_schedules_on_uri", unique: true
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
@@ -46,8 +43,7 @@ ActiveRecord::Schema.define(version: 20160407084137) do
     t.datetime "updated_at",    null: false
     t.string   "password_hash"
     t.string   "password_salt"
+    t.index ["name"], name: "index_users_on_name", unique: true
   end
-
-  add_index "users", ["name"], name: "index_users_on_name", unique: true
 
 end
