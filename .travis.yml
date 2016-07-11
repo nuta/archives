@@ -6,7 +6,6 @@ services:
 rvm:
   - 2.3.1
   - 2.2.5
-  - 2.1.9
 
 cache:
   directories:
