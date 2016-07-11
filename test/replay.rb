@@ -41,21 +41,20 @@ def request(method, path, headers, body, expected_status, expected_response)
     end
   end
 
+  s.close
+
   if not expected_response or response.force_encoding("UTF-8").include?(expected_response)
     puts "OK".colorize(:green)
+    return true
   else
     puts "FAIL (expected '#{expected_response}' in the response)".colorize(:red)
-    $error = true
+    return false
   end
-
-  s.close
 end
-  
 
-$error = false
-YAML.load(File.open(ARGV[0])).each do |r|
+results = YAML.load(File.open(ARGV[0])).map do |r|
   request(r['method'], r['path'], r['headers'], r['body'], r['status'], r['includes'])
 end
 
-exit ($error)? 1 : 0
+exit (results.all?)? 1 : 0
 
