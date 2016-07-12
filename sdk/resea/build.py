@@ -169,10 +169,20 @@ def build(args):
 
     # resolve dependencies
     progress('Loading packages')
-    packages = list(set([yml['name'], get_var('HAL')] + get_var('BUILTIN_APPS', default=[])))
+    if get_var('PACKAGES', default=[]) != []:
+        packages = get_var('PACKAGES', default=[])
+    else:
+        packages = [yml['name']]
 
-    if get_var('TEST') and 'kernel' not in packages:
-        packages.append('kernel')
+    packages = list(set([get_var('HAL')] + packages))
+
+    if get_var('TEST'):
+        if 'kernel' not in packages:
+            packages.append('kernel')
+        if yml['name'] not in packages:
+            error("test target '" + yml['name'] + "' is not included in builtin packages " +
+                  '(did you include it in PACKAGES?)')
+
     ymls = load_packages(packages, enable_if=True, update_env=True)
 
     build_dir = get_var('BUILD_DIR')
