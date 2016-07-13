@@ -31,11 +31,11 @@ class CalendarController < ApplicationController
     sched = Schedule.find_by_uri(uri)
     if request.headers.key?("If-Match")
        unless sched
-          return head :status => :precondition_failed
+          return head :precondition_failed
        end
 
        if getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
-          return head :status => :precondition_failed
+          return head :precondition_failed
        end
     end
 
@@ -44,7 +44,7 @@ class CalendarController < ApplicationController
     sched.set_ics(rawrequest)
     sched.save!
 
-    head :status => :created
+    head :created
   end
 
   def delete
@@ -56,17 +56,17 @@ class CalendarController < ApplicationController
       sched.destroy
     end
 
-    head :status => :no_content
+    head :no_content
   end
 
   def copy
     @src.copy_to(@dst[:calendar], @dst[:calendar_object])
-    head :status => :no_content
+    head :no_content
   end
 
   def move
     @src.move_to(@dst[:calendar])
-    head :status => :created
+    head :created
   end
 
   def mkcalendar
@@ -79,7 +79,7 @@ class CalendarController < ApplicationController
     end
 
     Calendar.create(props: props, uri: params[:calendar], user: @user)
-    head :status => :created
+    head :created
   end
 
   def report
@@ -93,7 +93,7 @@ class CalendarController < ApplicationController
           when 'calendar-query'
             report_query(xml)
           else
-            return head :status => :not_implemented
+            return head :not_implemented
           end
 
     render :xml => res, :status => :multi_status
@@ -102,7 +102,7 @@ class CalendarController < ApplicationController
   def proppatch
     if params[:calendar_object] != "" || params[:calendar] == ""
       logger.warn "PROPPATCH to a calendar object or / is not supported"
-      return head :status => :not_implemented
+      return head :not_implemented
     end
 
     xml = Nokogiri::XML(rawrequest)
@@ -151,7 +151,7 @@ class CalendarController < ApplicationController
       @dst = Rails.application.routes.recognize_path(request.headers[:destination])
     rescue
       logger.warn "unknown destination url: '#{dst}'"
-      return head :status => :bad_request
+      return head :bad_request
     end
   end
 end
