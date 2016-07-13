@@ -20,7 +20,7 @@ class CalendarController < ApplicationController
 
   def get
     entry = Schedule.find_by_uri!(params[:calendar_object])
-    render :text => entry.ics, :status => :ok
+    render text: entry.ics, status: :ok
   end
 
   def put
@@ -96,7 +96,7 @@ class CalendarController < ApplicationController
             return head :not_implemented
           end
 
-    render :xml => res, :status => :multi_status
+    render xml: res, status: :multi_status
   end
 
   def proppatch
@@ -127,7 +127,7 @@ class CalendarController < ApplicationController
       [["/calendar/#{params[:calendar]}/", results]]
     end
 
-    render :xml => res, :status => :multi_status
+    render xml: res, status: :multi_status
   end
 
   def propfind
@@ -139,7 +139,7 @@ class CalendarController < ApplicationController
       xml = propfind_collections
     end
 
-    render :xml => xml, :status => :multi_status
+    render xml: xml, status: :multi_status
   end
 
   private
