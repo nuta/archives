@@ -56,5 +56,5 @@ results = YAML.load(File.open(ARGV[0])).map do |r|
   request(r['method'], r['path'], r['headers'], r['body'], r['status'], r['includes'])
 end
 
-exit (results.all?)? 1 : 0
+exit (results.all?)? 0 : 1
 
