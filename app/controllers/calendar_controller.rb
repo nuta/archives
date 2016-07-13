@@ -113,7 +113,7 @@ class CalendarController < ApplicationController
     for prop in xml.xpath('/A:propertyupdate/A:set/A:prop/*', A: 'DAV:')
       cal_props[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
     end
-  
+
     # remove properties
     for prop in xml.xpath('/A:propertyupdate/A:remove/A:prop/*', A: 'DAV:')
       cal_props.delete(prop.name)
