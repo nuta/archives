@@ -16,6 +16,11 @@ namespace :test do
       end
     end
 
-    abort "ERROR: some tests failed" if error
+    puts ""
+    if error
+      abort "ERROR: some tests failed"
+    else
+      puts "Hooray! All tests are passed!"
+    end
   end
 end

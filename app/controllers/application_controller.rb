@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   private
 
   def handle_404
-    head status: :not_found
+    head :not_found
   end
 
   def authenticate
