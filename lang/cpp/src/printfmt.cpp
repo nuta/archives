@@ -34,7 +34,7 @@ static bool isalphabet (const char ch) {
  *  @param[in] s  the string to print
  *
  */
-void print_str (const char *s) {
+static void print_str (const char *s) {
 
     for (int i=0; s[i] != '\0'; i++)
         hal_printchar(s[i]);
