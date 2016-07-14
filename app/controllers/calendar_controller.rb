@@ -20,7 +20,7 @@ class CalendarController < ApplicationController
 
   def get
     entry = Schedule.find_by_uri!(params[:calendar_object])
-    render text: entry.ics, status: :ok
+    render status: :ok, body: entry.ics, content_type: 'text/calendar'
   end
 
   def put
