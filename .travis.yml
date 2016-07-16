@@ -16,6 +16,12 @@ env:
   - DB=postgresql
   - DB=mysql
 
+# http://blog.arkency.com/2015/05/how-to-store-emoji-in-a-rails-app-with-a-mysql-database
+before_install:
+  - mysql -u root -e 'set global innodb_file_format = Barracuda'
+  - mysql -u root -e 'set global innodb_large_prefix = 1'
+  - git apply travis/support-utf8mb4-in-mysql.patch
+
 install:
   - cp travis/database.yml config/database.yml
   - mysql -e 'create database busybook_test'
