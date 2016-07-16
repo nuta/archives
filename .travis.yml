@@ -20,7 +20,8 @@ env:
 before_install:
   - mysql -u root -e 'set global innodb_file_format = Barracuda'
   - mysql -u root -e 'set global innodb_large_prefix = 1'
-  - git apply travis/support-utf8mb4-in-mysql.patch
+  - sudo service mysql restart
+  - '[ "$DB" = "mysql" ] && git apply travis/support-utf8mb4-in-mysql.patch'
 
 install:
   - cp travis/database.yml config/database.yml
