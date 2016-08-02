@@ -51,7 +51,7 @@ def main(argv):
     os.makedirs(outdir)
 
     packages = []
-    for package_yml_path in glob.glob('**/package.yml', recursive=True):
+    for package_yml_path in glob.glob('**/package.yaml', recursive=True):
         yml = load_yaml(package_yml_path, validator=validate_package_yml)
         package_name = yml['name']
 

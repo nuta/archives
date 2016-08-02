@@ -17,7 +17,7 @@ LANG_HTML = """
 
 def main():
     _, lang_html_path, tmp_dir = sys.argv # TODO
-    yml = load_yaml('package.yml', validator=validate_package_yml)
+    yml = load_yaml('package.yaml', validator=validate_package_yml)
     package_name = yml['name']
 
     plan('Analysing with Clang Static Analyzer')

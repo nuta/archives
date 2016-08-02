@@ -13,13 +13,13 @@ def package(request):
 
     os.chdir('hello')
 
-    package_yml = yaml.load(open('package.yml'))
+    package_yml = yaml.load(open('package.yaml'))
     package_yml['name'] = 'hello'
     package_yml['category'] = 'application'
     package_yml['lang'] = 'cpp'
     package_yml['depends'] = ['cpp']
     package_yml['config'] = {'SOURCES': {'set': ['src/startup.cpp', 'src/test.cpp']}}
-    yaml.dump(package_yml, open('package.yml', 'w'))
+    yaml.dump(package_yml, open('package.yaml', 'w'))
 
     open('src/startup.cpp', 'w').write("""\
 #include "hello.h"

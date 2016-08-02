@@ -72,7 +72,7 @@ FILES = [
     # (filepath, template)
     ('README.md', README_TEMPLATE),
     ('.gitignore', GITIGNORE_TEMPLATE),
-    ('package.yml', PACKAGE_YML_TEMPLATE),
+    ('package.yaml', PACKAGE_YML_TEMPLATE),
     ('src/.gitkeep', ''),
     ('Documentation/.gitkeep', '')
 ]

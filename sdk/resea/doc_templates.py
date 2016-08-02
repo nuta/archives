@@ -190,7 +190,7 @@ INDEX_DOC = HEADER + """
 
 <h2>SDK</h2>
 <p><a href="commands.html">Commands</a>: How to use SDK.</p>
-<p><a href="package.yml.html">package.yml</a>: The essential file for a package.</p>
+<p><a href="package.yaml.html">package.yaml</a>: The essential file for a package.</p>
 """
 
 PACKAGE_INDEX_DOC = HEADER + """

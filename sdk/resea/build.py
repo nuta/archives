@@ -106,7 +106,7 @@ def run_make(make, makefile, prettify=False):
 def load_configsets(configsets):
     configsets_dir = os.path.join(os.path.dirname(__file__), '..', 'configsets')
     for configset in configsets:
-        path = os.path.join(configsets_dir, configset + '.yml')
+        path = os.path.join(configsets_dir, configset + '.yaml')
         yml = load_yaml(path)
 
         for k, v in yml.get('global_config', {}).items():
@@ -149,11 +149,11 @@ def is_object_equals_to_pickle(obj, pickle_path):
 def build(args):
     """Builds an executable."""
 
-    # load package.yml in the current directory
+    # load package.yaml in the current directory
     try:
-        yml = load_yaml('package.yml', validator=validate_package_yml)
+        yml = load_yaml('package.yaml', validator=validate_package_yml)
     except FileNotFoundError:
-        error("'package.yml' not found (are you in a package directory?)")
+        error("'package.yaml' not found (are you in a package directory?)")
 
     global_config.setdefault('ENV', 'release')
     global_config.setdefault('MAKE', 'make')
@@ -218,7 +218,7 @@ def build(args):
                             lang['stub']['prefix'] + package + lang['stub']['suffix'])
             stubs.append((
                 stub_file,
-                os.path.join(package_dir, 'package.yml'),
+                os.path.join(package_dir, 'package.yaml'),
                 expand_var(get_var('LANGS', package)['cpp']['genstub'], package)
             ))
             stub_files.append(stub_file)

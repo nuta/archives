@@ -30,7 +30,7 @@ interface:
 #  Machines
 #
 includes:
-  - machines/raspi2/config.yml
+  - machines/raspi2/config.yaml
 
 #
 #  Config

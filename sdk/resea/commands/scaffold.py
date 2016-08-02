@@ -13,22 +13,22 @@ Usage: resea scaffold
 
 def scaffold(args):
     try:
-        yml = load_yaml('package.yml', validator=validate_package_yml)
+        yml = load_yaml('package.yaml', validator=validate_package_yml)
     except FileNotFoundError:
-        error("'package.yml' not found (are you in a package directory?)")
+        error("'package.yaml' not found (are you in a package directory?)")
 
     load_packages([yml['name']] + yml['depends'], {})
 
     lang = yml.get('lang')
     if lang is None:
-        error("lang is not speicified in package.yml")
+        error("lang is not speicified in package.yaml")
 
     bin = expand_var(get_var('LANGS')[lang]['scaffold'])
 
     if bin is None:
         error("'{}' lang does not support scaffolding".format(lang))
 
-    subprocess.Popen(' '.join([bin, ".", "package.yml"]), shell=True).wait()
+    subprocess.Popen(' '.join([bin, ".", "package.yaml"]), shell=True).wait()
 
 
 def main(args_):

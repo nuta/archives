@@ -13,9 +13,9 @@ Usage: resea alldocs --revision REVISION --outdir DIR
 def alldocs(args):
     packages = []
     # FIXME
-    files = glob('package.yml') + glob('*/package.yml') + \
-            glob('*/*/package.yml') + glob('*/*/*/package.yml') + \
-            glob('*/*/*/*/package.yml') + glob('*/*/*/*/*/package.yml')
+    files = glob('package.yaml') + glob('*/package.yaml') + \
+            glob('*/*/package.yaml') + glob('*/*/*/package.yaml') + \
+            glob('*/*/*/*/package.yaml') + glob('*/*/*/*/*/package.yaml')
 
     kwargs = {
         'revision': args.revision

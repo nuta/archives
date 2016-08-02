@@ -168,7 +168,7 @@ def main(args):
     packages = [package_name]
     while len(packages) > 0:
         package = packages.pop()
-        yml = load_yaml(os.path.join(get_package_dir(package), 'package.yml'),
+        yml = load_yaml(os.path.join(get_package_dir(package), 'package.yaml'),
                         validator=validate_package_yml)
         ymls.append(yml)
         implements.append(package)

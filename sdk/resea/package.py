@@ -84,7 +84,7 @@ def get_package_dir(package, search_registry=True):
 
     for path in paths:
         d = os.path.join(path, package)
-        if os.path.exists(os.path.join(d, 'package.yml')):
+        if os.path.exists(os.path.join(d, 'package.yaml')):
             return d
 
     if search_registry:
@@ -165,7 +165,7 @@ def load_packages(builtin_packages, enable_if=False, update_env=False):
         package = packages.pop()
         loaded_packages.append(package)
 
-        package_yml_path = os.path.join(get_package_dir(package), 'package.yml')
+        package_yml_path = os.path.join(get_package_dir(package), 'package.yaml')
         yml = load_yaml(package_yml_path, validator=validate_package_yml)
 
         # include

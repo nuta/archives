@@ -27,10 +27,10 @@ def generate_package_doc(indir, outdir, revision):
     os.makedirs(outdir, exist_ok=True)
 
     try:
-        yml = load_yaml(os.path.join(indir, 'package.yml'),
+        yml = load_yaml(os.path.join(indir, 'package.yaml'),
                    validator=validate_package_yml)
     except FileNotFoundError:
-        error("'package.yml' not found")
+        error("'package.yaml' not found")
 
     yml.update({
        'title': 'Resea Documentation - {}'.format(yml['name']),

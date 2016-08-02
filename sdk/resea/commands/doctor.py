@@ -45,17 +45,17 @@ def doctor():
     if not os.path.exists('README.md'):
         notice('README.md not found')
 
-    progress('validate package.yml')
+    progress('validate package.yaml')
     try:
-        yml = load_yaml('package.yml', validator=validate_package_yml)
+        yml = load_yaml('package.yaml', validator=validate_package_yml)
     except FileNotFoundError:
-        error("'package.yml' not found")
+        error("'package.yaml' not found")
 
     if yml['category'] in ['application', 'library', 'lang', 'hal']:
         load_packages([yml['name']] + yml['depends'], {})
         lang = yml.get("lang")
         if lang is None:
-            error("lang is not speicified in package.yml")
+            error("lang is not speicified in package.yaml")
 
         # run lang's doctor
         lang_html_path = os.path.join(tmp_dir, 'lang.html')
