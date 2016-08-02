@@ -98,8 +98,8 @@ def _load_include(package, include, config, enable_if):
         include_yml = load_yaml(os.path.join(get_package_dir(package), include))
         try:
             # FIXME
-            include_if = not enable_if or ('include_if' in include_yml and \
-                eval(include_yml['include_if'], copy(config.getdict())))
+            include_if = not enable_if or 'include_if' not in include_yml or \
+                eval(include_yml['include_if'], copy(config.getdict()))
         except Exception as e:
             error("eval(include_if) in {}: {}".format(
                 package, str(e)))
