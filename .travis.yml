@@ -27,7 +27,6 @@ before_install:
 install:
   - cp travis/database.yml config/database.yml
   - mysql -e 'create database busybook_test'
-  - mysql -e 'ALTER DATABASE busybook_test CHARACTER SET utf8 COLLATE utf8_general_ci'
   - psql -c 'create database busybook_test' -U postgres
   - bundle install --jobs 4 --path vendor/bundle
   - bundle exec rake db:migrate
