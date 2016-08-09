@@ -14,5 +14,5 @@ fi
 bundle install --path vendor/bundle --jobs 4 --without mysql postgres
 
 cp config/database.yml.example config/database.yml
-bundle exec rake db:migrate
-bundle exec rake user:add username=guest password=123
+bundle exec rails db:migrate
+bundle exec rails user:add username=guest password=123

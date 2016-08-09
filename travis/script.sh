@@ -8,7 +8,7 @@ PID=$!
 
 sleep 5
 
-bundle exec rake test:run
+bundle exec rails test:run
 exitcode=$?
 
 kill -2 $PID

@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-  skip_before_action :verify_authenticity_token
   before_action :authenticate
 
   rescue_from ActiveRecord::RecordNotFound,  with: :handle_404
@@ -7,7 +6,7 @@ class ApplicationController < ActionController::Base
   private
 
   def handle_404
-    head status: :not_found
+    head :not_found
   end
 
   def authenticate
