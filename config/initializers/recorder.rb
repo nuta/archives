@@ -36,8 +36,6 @@ class Recorder
   end
 end
 
-if Rails.env.development?
-  if String(ENV['RECORD_NAME']) != ''
-    Rails.configuration.middleware.insert(0, Recorder)
-  end
+if String(ENV['RECORD_NAME']) != ''
+  Rails.configuration.middleware.insert(0, Recorder)
 end
