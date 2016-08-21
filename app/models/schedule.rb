@@ -1,3 +1,5 @@
+require './lib/ics'
+
 class Schedule < ActiveRecord::Base
   belongs_to :calendar
 
