@@ -8,7 +8,7 @@ Busybook
 A CalDAV server powered built on Ruby on Rails.
 
 ## Getting started
-```sh
+```
 $ gem install bundler
 $ bundle install --path vendor/bundle --jobs 4 --without postgres mysql
 $ bundle exec rails db:migrate
