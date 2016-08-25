@@ -5,7 +5,7 @@ Busybook
 [![Code Climate](https://codeclimate.com/github/seiyanuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/seiyanuta/busybook)
 [![Dependency Status](https://gemnasium.com/seiyanuta/busybook.svg)](https://gemnasium.com/seiyanuta/busybook)
 
-A CalDAV server powered built on Ruby on Rails.
+A CalDAV server built on Ruby on Rails.
 
 ## Getting started
 ```
@@ -17,8 +17,6 @@ $ bundle exec rails s
 ```
 
 ![Add a CalDAV account on macOS](https://raw.githubusercontent.com/seiyanuta/busybook/master/add-account-on-macos.png)
-
-Have fun!
 
 ## Supported clients
 - OS X 10.11 (El Capitan): Calendar and Reminder
