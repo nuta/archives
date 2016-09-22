@@ -1,0 +1,11 @@
+#!/bin/sh
+set -ue
+
+case $TARGET in
+analyze)
+    codeclimate analyze --dev
+    ;;
+kernel-test)
+    docker run ci-image
+    ;;
+esac

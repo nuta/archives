@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+import argparse
+import sys
+import os
+import resea
+
+
+APPS_MK_FMT = """\
+{% for path in objs %}
+objs += {{ path }}
+{% endfor %}
+
+{% for name in interfaces %}
+interfaces += {{ name }}
+{% endfor %}
+"""
+
+
+def main(args):
+    objs = []
+    interfaces = set()
+    for path in getattr(args, "app.mk"):
+        yaml = resea.load_yaml(path)
+        app_dir = os.path.dirname(path)
+        objs += map(lambda obj: os.path.join(app_dir, obj), yaml["objs"])
+        interfaces.update(yaml["requires"])
+        interfaces.update(yaml["implements"])
+
+    print(resea.fmt(APPS_MK_FMT, locals()))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="A apps.mk generator")
+    parser.add_argument("app.mk", nargs="+", help="app.mk")
+    main(parser.parse_args())

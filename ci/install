@@ -1,0 +1,31 @@
+#!/bin/sh
+set -ue
+
+case $TARGET in
+analyze)
+    case $TRAVIS_OS_NAME in
+    linux)
+        cd ..
+        # Install CodeClimate CLI
+        curl -L https://github.com/codeclimate/codeclimate/archive/master.tar.gz | tar xvz
+        cd codeclimate-* && sudo make install && cd ..
+
+        # Install cppcheck Engine
+        git clone https://github.com/seiyanuta/codeclimate-cppcheck
+        cd codeclimate-cppcheck
+        git checkout origin/fix-output-format
+        docker build -t codeclimate/codeclimate-cppcheck .
+        cd ../resea
+        ;;
+    esac
+    ;;
+
+kernel-test)
+    case $TRAVIS_OS_NAME in
+    linux)
+        docker pull ubuntu:16.04
+        docker build -t ci-image -f ci/Dockerfile .
+        ;;
+    esac
+    ;;
+esac

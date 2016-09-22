@@ -1,0 +1,35 @@
+---
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - python
+  fixme:
+    enabled: true
+    config:
+      strings:
+      - TODO
+      - FIXME
+      - XXX
+  gnu-complexity:
+    enabled: true
+    config:
+      threshold: 100
+  radon:
+    enabled: true
+  markdownlint:
+    enabled: true
+  pep8:
+    enabled: true
+  cppcheck:
+    enabled: true
+    config:
+      check: all
+
+ratings:
+  paths:
+  - "**.c"
+  - "**.py"
+  - tools/**
+exclude_paths: []

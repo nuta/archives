@@ -1,0 +1,8 @@
+name: kernel-test
+author: Seiya Nuta <nuta@seiya.me>
+implements:
+  - gpio
+requires:
+  - gpio
+objs:
+  - startup.o

@@ -1,0 +1,74 @@
+name: gpio
+id: 10
+
+consts:
+  LOW:
+    type: int
+    value: 0
+  HIGH:
+    type: int
+    value: 1
+  INPUT_PIN:
+    type: int
+    value: 0
+  OUTPUT_PIN:
+    type: int
+    value: 1
+
+messages:
+  set_pin_mode:
+    id: 1
+    desc: Writes a value to a digital pin.
+    reply: set_pin_mode_reply
+    payloads:
+      - name: pin
+        type: int
+        desc: The pin number.
+      - name: mode
+        type: int
+        desc: "`INPUT_PIN` or `OUTPUT_PIN`."
+  set_pin_mode_reply:
+    id: 2
+    desc: The reply message of `.set_pin_mode`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  write:
+    id: 3
+    desc: Writes a value to a digital pin.
+    reply: write_reply
+    payloads:
+      - name: pin
+        type: int
+        desc: The pin number.
+      - name: value
+        type: int
+        desc: "`HIGH` or `LOW`."
+  write_reply:
+    id: 4
+    desc: The reply message of `.write`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  read:
+    id: 5
+    desc: Reads a value from a digital pin.
+    reply: read_reply
+    payloads:
+      - name: pin
+        type: int
+        desc: The pin number.
+  read_reply:
+    id: 6
+    desc: The reply message of `.read`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+      - name: value
+        type: int
+        desc: "`HIGH` or `LOW`."
