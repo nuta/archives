@@ -115,7 +115,23 @@ void resume_thread(struct thread *thread) {
 void start_thread(struct thread *thread) {
 
     set_thread_state(thread, THREAD_RUNNABLE);
-    queue_put(&resources->run_queue, thread);
+
+    // Add the thread into runqueue.
+    mutex_lock(&resources->runqueue_lock);
+
+    int i;
+    struct thread **runqueue = (struct thread **) &resources->runqueue;
+    for (i = 0; i < resources->runqueue_num; i++) {
+        if (runqueue[i] == NULL) {
+            runqueue[i] = thread;
+            mutex_unlock(&resources->runqueue_lock);
+            return;
+        }
+    }
+
+    // TODO
+    WARN("runqueue is full");
+    mutex_unlock(&resources->runqueue_lock);
 }
 
 
@@ -123,9 +139,19 @@ void yield(void) {
     if (arch_yield(&get_current_thread()->arch)) {
         return;
     } else {
-        struct thread *next;
-        queue_put(&resources->run_queue, get_current_thread());
-        next = (struct thread *) queue_get(&resources->run_queue);
-        arch_switch_thread(next->tid, &next->arch);
+        // Look for the next thread to run.
+        mutex_lock(&resources->runqueue_lock);
+        int i;
+        struct thread **runqueue = (struct thread **) &resources->runqueue;
+        for (i = 0; runqueue[i]; i++) {
+            if (runqueue[i]->state == THREAD_RUNNABLE) {
+                mutex_unlock(&resources->runqueue_lock);
+                arch_switch_thread(runqueue[i]->tid,
+                                   &runqueue[i]->arch);
+            }
+        }
+
+        // No threads to run. Continue the current thread.
+        mutex_unlock(&resources->runqueue_lock);
     }
 }

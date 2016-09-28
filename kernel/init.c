@@ -16,7 +16,11 @@ void init_kernel(struct resources *_resources) {
     resources = _resources;
     resources->processes = NULL;
     mutex_init(&resources->processes_lock);
-    queue_init(&resources->run_queue);
+    mutex_init(&resources->runqueue_lock);
+    resources->runqueue_num = MAX_THREAD_NUM;
+    for (int i = 0; i < resources->runqueue_num; i++) {
+        resources->runqueue[i] = NULL;
+    }
 
     INFO("creating the kernel process");
     struct process *kproc = create_process();
@@ -27,7 +31,7 @@ void init_kernel(struct resources *_resources) {
     }
 
     // Start the first thread
-    struct thread *t = (struct thread *) queue_get(&resources->run_queue);
+    struct thread *t = resources->runqueue[0];
 
     INFO("starting the first thread");
     arch_switch_thread(t->tid, &t->arch);
