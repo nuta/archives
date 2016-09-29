@@ -1,14 +1,13 @@
-objs += \
-    $(arch_dir)/panic.o     \
-    $(arch_dir)/boot.o      \
-     $(arch_dir)/mutex.o    \
-    $(arch_dir)/printchar.o \
-    $(arch_dir)/interrupt.o \
-    $(arch_dir)/x86.o       \
-    $(arch_dir)/thread.o
+arch_objs += \
+    panic.o     \
+    boot.o      \
+    mutex.o     \
+    printchar.o \
+    interrupt.o \
+    x86.o       \
+    thread.o
 
 LD := ld
-
 CFLAGS += -DARCH_POSIX -ggdb3 -Os
 
 ifeq ($(shell uname -s), Linux)

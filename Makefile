@@ -10,7 +10,8 @@ TARGET_FILE ?= $(BUILD_DIR)/$(target).elf
 makefile_dir = $(PWD)
 apps_dir = $(addprefix apps/, $(APPS))
 arch_dir = arch/$(ARCH)
-objs = $(BUILD_DIR)/apps.o
+objs = apps.o
+stub_objs =
 
 ifneq ($(ARCH),)
     ifeq ($(TARGET), kernel)
@@ -24,6 +25,10 @@ ifneq ($(ARCH),)
 
     -include $(BUILD_DIR)/apps.mk
     include $(addsuffix /lang.mk, $(addprefix lang/, $(LANGS)))
+    _objs := $(objs)
+    objs = $(addprefix $(BUILD_DIR)/, $(_objs)) \
+           $(addprefix $(BUILD_DIR)/$(arch_dir)/, $(arch_objs)) \
+           $(stub_objs)
     include arch/$(ARCH)/arch.mk
 endif
 
@@ -45,6 +50,7 @@ $(BUILD_DIR)/apps.mk: $(addsuffix /app.yaml, $(apps_dir))
 	$(MKDIR) -p $(@D)
 	PYTHONPATH=$(makefile_dir) ./tools/gen-apps-mk $^ > $@
 
+$(BUILD_DIR)/apps.o: $(BUILD_DIR)/apps.c
 $(BUILD_DIR)/apps.c:
 	$(CMDECHO) GEN $@
 	$(MKDIR) -p $(@D)

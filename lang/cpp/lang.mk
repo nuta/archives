@@ -5,8 +5,9 @@ objs += \
     lang/cpp/logging.o \
     lang/cpp/string.o  \
     lang/cpp/queue.o   \
-    lang/cpp/channel.o \
-    $(c_stubs:.c=.o)
+    lang/cpp/channel.o
+
+stub_objs += $(c_stubs:.c=.o)
 
 CPP_GENSTUB = ./lang/cpp/genstub
 CFLAGS += -Wall -std=c11
@@ -24,17 +25,23 @@ $(BUILD_DIR)/stubs/cpp/resea/%.h: interfaces/%.yaml $(CPP_GENSTUB)
 	$(MKDIR) -p $(@D)
 	PYTHONPATH=$(makefile_dir) $(CPP_GENSTUB) $< h > $@
 
-%.o: %.c Makefile $(c_stubs) $(h_stubs)
+$(BUILD_DIR)/%.o: %.c Makefile $(c_stubs) $(h_stubs)
 	$(CMDECHO) CC $@
 	$(MKDIR) -p $(@D)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
-%.o: %.cpp Makefile $(c_stubs) $(h_stubs)
+$(BUILD_DIR)/%.o: %.cpp Makefile $(c_stubs) $(h_stubs)
 	$(CMDECHO) CXX $@
 	$(MKDIR) -p $(@D)
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
 
-%.o: %.S Makefile
+$(BUILD_DIR)/%.o: %.S Makefile
+	$(CMDECHO) CC $@
+	$(MKDIR) -p $(@D)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+
+# for C stubs
+%.o: %.c Makefile $(c_stubs) $(h_stubs)
 	$(CMDECHO) CC $@
 	$(MKDIR) -p $(@D)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<

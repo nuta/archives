@@ -1,12 +1,12 @@
-objs += \
-    $(arch_dir)/panic.o      \
-    $(arch_dir)/boot.o       \
-    $(arch_dir)/init.o       \
-    $(arch_dir)/mutex.o      \
-    $(arch_dir)/printchar.o  \
-    $(arch_dir)/interrupt.o  \
-    $(arch_dir)/asm_thread.o \
-    $(arch_dir)/thread.o
+arch_objs += \
+    panic.o      \
+    boot.o       \
+    init.o       \
+    mutex.o      \
+    printchar.o  \
+    interrupt.o  \
+    asm_thread.o \
+    thread.o
 
 CC := xtensa-lx106-elf-gcc
 CXX := xtensa-lx106-elf-g++
