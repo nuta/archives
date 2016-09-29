@@ -85,10 +85,10 @@ void kernel_test_startup(void) {
 
         switch (buf[1]) {
         case GPIO_SET_PIN_MODE:
-            send_gpio_set_pin_mode_reply(reply_to, OK, 0);
+            reply_gpio_set_pin_mode(reply_to, OK);
             break;
         case GPIO_WRITE:
-            send_gpio_write_reply(reply_to, OK, 0);
+            reply_gpio_write(reply_to, OK);
             break;
         }
     }

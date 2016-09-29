@@ -18,6 +18,9 @@ extern "C" {
 H_MSG_FMT = """
 #define {{ interface_name | upper }}_{{name | upper }} ({{ interface_name | upper }}_INTERFACE | {{ id }})
 
+{% if is_reply_msg %}
+result_t reply_{{ interface_name }}_{{ without_suffix_name }}(channel_t __ch {{ arg_defs }});
+{% endif %}
 result_t send_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}, int flags);
 result_t recv_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_ptr_defs }}, int flags, channel_t *__from);
 {% if reply_name %}
@@ -64,6 +67,14 @@ result_t send_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}, int
     marshall_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
     return send(__ch, (payload_t *) &__payloads, sizeof(__payloads), flags);
 }
+
+{% if is_reply_msg %}
+result_t reply_{{ interface_name }}_{{ without_suffix_name }}(channel_t __ch {{ arg_defs }}) {
+    payload_t __payloads[{{ payloads_length }}];
+    marshall_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
+    return send(__ch, (payload_t *) &__payloads, sizeof(__payloads), 0);
+}
+{% endif %}
 
 
 result_t recv_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_ptr_defs }}, int flags, channel_t *__from) {
@@ -210,6 +221,12 @@ def generate_msg(interface_name, messages, msg_fmt):
         arg_ptr_defs = generate_defs("{type}* {name}", msg["payloads"])
         args = generate_defs("{name}", msg["payloads"])
         payloads, payloads_length = load_payload_defs(interface_name, name, msg["payloads"])
+
+        if name.endswith("_reply"):
+            is_reply_msg = True
+            without_suffix_name = name[:-len("_reply")]
+        else:
+            is_reply_msg = False
 
         if "reply" in msg:
             reply_name = msg["reply"]
