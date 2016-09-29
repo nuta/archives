@@ -15,6 +15,7 @@ enum {
 #define UNUSED      __attribute__((unused))
 #define DEPRECATED  __attribute__((deprecated))
 
+#define ROUND_UP(x, len) (((x) + (len - 1)) & ~(len - 1))
 
 #ifdef ARCH_POSIX
 
