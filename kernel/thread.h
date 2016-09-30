@@ -4,7 +4,11 @@
 #include <types.h>
 #include <arch_types.h>
 
+#ifdef ARCH_POSIX // FIXME
+#define DEFAULT_THREAD_STACK_SIZE 8192
+#else
 #define DEFAULT_THREAD_STACK_SIZE 1024
+#endif
 
 enum {
     THREAD_RUNNABLE = 1,
