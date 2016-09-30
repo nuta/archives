@@ -25,6 +25,21 @@ $(BUILD_DIR)/stubs/cpp/resea/%.h: interfaces/%.yaml $(CPP_GENSTUB)
 	$(MKDIR) -p $(@D)
 	PYTHONPATH=$(makefile_dir) $(CPP_GENSTUB) $< h > $@
 
+$(BUILD_DIR)/%.deps: %.c Makefile
+	$(CMDECHO) GENDEPS $@
+	$(MKDIR) -p $(@D)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -MM -MT $(@:.deps=.o) -MF $@ $<
+
+$(BUILD_DIR)/%.deps: %.cpp Makefile
+	$(CMDECHO) GENDEPS $@
+	$(MKDIR) -p $(@D)
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -MM -MT $(@:.deps=.o) -MF $@ $<
+
+$(BUILD_DIR)/%.deps: %.S Makefile
+	$(CMDECHO) GENDEPS $@
+	$(MKDIR) -p $(@D)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -MM -MT $(@:.deps=.o) -MF $@ $<
+
 $(BUILD_DIR)/%.o: %.c Makefile $(c_stubs) $(h_stubs)
 	$(CMDECHO) CC $@
 	$(MKDIR) -p $(@D)

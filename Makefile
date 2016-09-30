@@ -30,6 +30,7 @@ ifneq ($(ARCH),)
            $(addprefix $(BUILD_DIR)/$(arch_dir)/, $(arch_objs)) \
            $(stub_objs)
     include arch/$(ARCH)/arch.mk
+    -include $(objs:.o=.deps)
 endif
 
 .SUFFIXES:
