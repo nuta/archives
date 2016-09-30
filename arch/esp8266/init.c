@@ -18,11 +18,8 @@ void esp8266_init(struct firmware_info *_finfo) {
 
     finfo = _finfo;
     add_kmalloc_chunk(&__kmalloc_static_chunk,
-                      8 /* XXX */, 128);
-    add_kmalloc_chunk((void *) ((uintptr_t) &__kmalloc_static_chunk + 1536 + 64),
-                      64 /* XXX */, 4);
-    add_kmalloc_chunk((void *) 0x3fff9000,
-                      2944 /* XXX */, 4);
+                      (uintptr_t) &__kmalloc_static_chunk_end - (uintptr_t) &__kmalloc_static_chunk);
+    add_kmalloc_chunk((void *) 0x3fff9000 /* used by firmware on updating */, 0x3000);
 
     init_kernel((struct resources *) &__resources);
 }

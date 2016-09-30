@@ -6,6 +6,7 @@
 
 int main(void) {
 
-    add_kmalloc_chunk(malloc(4096 * 2048), 4096, 1024);
+    size_t size = 64 * 1024;
+    add_kmalloc_chunk(malloc(size), size);
     init_kernel(malloc(sizeof(struct resources)));
 }

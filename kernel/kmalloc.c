@@ -6,51 +6,30 @@ static struct chunk *chunks = NULL;
 static mutex_t kmalloc_lock = MUTEX_INITIALIZER;
 
 
-void add_kmalloc_chunk(void *ptr, size_t size, size_t num) {
+void add_kmalloc_chunk(void *ptr, size_t size) {
+
+    DEBUG("add kmalloc chunk %p (%d bytes)", ptr, size);
 
     // Initialize the chunk
-    // FIXME
     struct chunk *new_chunk = (struct chunk *) ptr;
-    new_chunk->size   = size;
-    new_chunk->total  = num;
-    new_chunk->unused = num;
+    new_chunk->next = NULL;
+    new_chunk->size = size - sizeof(*new_chunk);
 
-    // Initialize flags
-    struct alloc *alloc = (struct alloc *)
-        ((uintptr_t) new_chunk + sizeof(*new_chunk));
+    // Insert it into the linked list `chunks`
+    mutex_lock(&kmalloc_lock);
 
-    for(size_t i=0; i < new_chunk->total; i++) {
-        alloc->flags = 0;
-
-        alloc = (struct alloc *)
-            ((uintptr_t) alloc + sizeof(*alloc) + new_chunk->size);
-    }
-
-    // insert it into the linked list `chunks`
-    // TODO: add lock
     if (!chunks) {
-        new_chunk->next = NULL;
         chunks = new_chunk;
     } else {
         struct chunk *chunk = chunks;
-        struct chunk *prev_chunk = chunks;
-        while (chunk) {
-            if (size <= chunk->size) {
-                break;
-            }
-
-            prev_chunk = chunk;
-            chunk = chunk->next;
+        while (chunk->next) {
+            chunk = GET_NEXT_CHUNK(chunk);
         }
 
-        if (chunk) {
-            new_chunk->next  = chunk;
-            prev_chunk->next = new_chunk;
-        } else {
-            new_chunk->next  = NULL;
-            prev_chunk->next = new_chunk;
-        }
+        chunk->next = new_chunk;
     }
+
+    mutex_unlock(&kmalloc_lock);
 }
 
 
@@ -65,27 +44,24 @@ void add_kmalloc_chunk(void *ptr, size_t size, size_t num) {
  */
 void *kmalloc(size_t size, int flags) {
 
+    size = ROUND_UP(size, 8);
     DEBUG("kmalloc: allocating %d bytes", size);
     mutex_lock(&kmalloc_lock);
 
-    for (struct chunk *chunk = chunks; chunk; chunk = chunk->next) {
-        if (size <= chunk->size) {
-            struct alloc *alloc = (struct alloc *)
-                ((uintptr_t) chunk + sizeof(*chunk));
+    for (struct chunk *chunk = chunks; chunk; chunk = GET_NEXT_CHUNK(chunk)) {
+        if (IS_AVAILABLE_CHUNK(chunk) && size + sizeof(*chunk) <= chunk->size) {
+            // We've found an unused chunk with enough space! Split the memory
+            // block, mark it as being used and return the pointer to the
+            // memory block.
+            struct chunk *next_chunk = (void *) ((uintptr_t) chunk +
+                                                 sizeof(*chunk) + size);
+            next_chunk->next = NULL;
+            next_chunk->size = chunk->size - sizeof(*chunk) - size;
+            chunk->next      = (void *) ((uintptr_t) next_chunk | 1);
+            chunk->size      = size;
 
-            for (size_t i=0; i < chunk->total; i++) {
-                if (alloc->flags == 0) {
-                    // We've found an alloc unit with enough space! Mark it
-                    // as being used and return the pointer to the alloc unit.
-                    alloc->flags = 1;
-                    mutex_unlock(&kmalloc_lock);
-                    return (void *) ((uintptr_t) alloc + sizeof(*alloc));
-                }
-
-                // try the next alloc
-                alloc = (struct alloc *)
-                    ((uintptr_t) alloc + sizeof(*alloc) + chunk->size);
-            }
+            mutex_unlock(&kmalloc_lock);
+            return (void *) ((uintptr_t) chunk + sizeof(*chunk));
         }
     }
 
@@ -97,6 +73,6 @@ void *kmalloc(size_t size, int flags) {
 
 void kfree(void *ptr) {
 
-    struct alloc *alloc = (struct alloc *) ((uintptr_t) ptr - sizeof(*alloc));
-    alloc->flags = 0;
+    struct chunk *chunk = (struct chunk *) ((uintptr_t) ptr - sizeof(*chunk));
+    chunk->next = (void *) ((uintptr_t) chunk->next & (~1));
 }
