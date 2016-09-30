@@ -16,8 +16,8 @@ struct thread {
     struct process *process;
     tid_t tid;
     int state;
-    struct arch_thread arch;
     struct thread *next;
+    struct arch_thread arch;
 };
 
 

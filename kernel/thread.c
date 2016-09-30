@@ -69,16 +69,22 @@ struct thread *create_thread(struct process *process, uintptr_t start,
         return NULL;
     }
 
+    // set other variables
+    thread->process = process;
+    thread->tid     = allocate_tid();
+    thread->state   = THREAD_BLOCKED;
+    thread->next    = NULL;
+    arch_create_thread(&thread->arch, start, arg, stack, stack_size);
+
     // append `thread` into the thread list in the process
     mutex_lock(&process->threads_lock);
-    thread->next = NULL;
+
     if (process->threads) {
-        struct thread *t = process->threads;
-        struct thread *last = t;
-        while (t != NULL) {
-            last = t;
-            t    = t->next;
+        struct thread *last = process->threads;
+        while (last->next) {
+            last = last->next;
         }
+
         last->next = thread;
     } else {
         process->threads = thread;
@@ -86,16 +92,14 @@ struct thread *create_thread(struct process *process, uintptr_t start,
 
     mutex_unlock(&process->threads_lock);
 
-    // set other variables
-    thread->tid     = allocate_tid();
-    thread->process = process;
-    arch_create_thread(&thread->arch, start, arg, stack, stack_size);
-
+    DEBUG("created a new thread #%d", thread->tid);
     return thread;
 }
 
 
 void destroy_thread(struct thread *thread) {
+
+    // TODO
 }
 
 

@@ -36,13 +36,13 @@ struct process *create_process(void) {
     process->threads       = NULL;
     process->channels      = channels;
     process->channels_max  = channels_max;
+    process->next          = NULL;
     mutex_init(&process->threads_lock);
     mutex_init(&process->channels_lock);
 
     // Update resources->processes
     mutex_lock(&resources->processes_lock);
 
-    process->next = NULL;
     if (resources->processes) {
         struct process *proc = resources->processes;
         while (proc) {
