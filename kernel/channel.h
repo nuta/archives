@@ -2,7 +2,6 @@
 #define __KERNEL_CHANNEL_H__
 
 #include <mutex.h>
-#include <queue.h>
 
 enum {
     CHANNEL_OPEN,      // created, but not linked

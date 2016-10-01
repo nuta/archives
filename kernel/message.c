@@ -1,6 +1,5 @@
 #include <arch.h>
 #include <mutex.h>
-#include <queue.h>
 #include <string.h>
 #include <logging.h>
 #include "message.h"

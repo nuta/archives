@@ -4,7 +4,6 @@ h_stubs = $(addprefix $(BUILD_DIR)/stubs/cpp/resea/, $(addsuffix .h, $(interface
 objs += \
     lang/cpp/logging.o \
     lang/cpp/string.o  \
-    lang/cpp/queue.o   \
     lang/cpp/channel.o
 
 stub_objs += $(c_stubs:.c=.o)

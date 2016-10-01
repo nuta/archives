@@ -1,5 +1,4 @@
 #include <arch.h>
-#include <queue.h>
 #include <logging.h>
 #include "init.h"
 #include "process.h"
