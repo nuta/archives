@@ -55,7 +55,7 @@ void *kmalloc(size_t size, int flags) {
             // memory block.
             struct chunk *next_chunk = (void *) ((uintptr_t) chunk +
                                                  sizeof(*chunk) + size);
-            next_chunk->next = NULL;
+            next_chunk->next = chunk->next;
             next_chunk->size = chunk->size - sizeof(*chunk) - size;
             chunk->next      = (void *) ((uintptr_t) next_chunk | 1);
             chunk->size      = size;
