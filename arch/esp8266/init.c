@@ -7,7 +7,8 @@ extern uint8_t __bss_start;
 extern uint8_t __bss_end;
 extern int __kmalloc_static_chunk;
 extern int __kmalloc_static_chunk_end;
-extern int __resources;
+
+struct resources __resources;
 struct firmware_info *finfo;
 
 void esp8266_init(struct firmware_info *_finfo) {

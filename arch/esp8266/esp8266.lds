@@ -20,10 +20,6 @@ SECTIONS {
     .data : ALIGN(4) {
         *(.data*)
         *(.rodata*)
-
-        __resources = ALIGN(4);
-        . = . + 128; /* XXX */
-        __resources_end = .;
     } > dram : dram_phdr
 
     .bss : ALIGN(4) {
