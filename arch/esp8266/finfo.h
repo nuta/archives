@@ -1,6 +1,8 @@
 #ifndef __FINFO_H__
 #define __FINFO_H__
 
+#include <types.h>
+
 typedef int ferr_t;
 enum {
     BERR_OK       = 1,
@@ -10,10 +12,11 @@ enum {
 };
 
 struct firmware_info {
-    void (*set_loop)(void (*func)());
+    void (*start_loop)(void);
+    void (*set_interval)(int ms, void (*callback)(void));
     void (*dprint)(const char *msg, unsigned x);
     void (*printchar)(const char ch);
-    int (*read_adc)();
+    int (*read_adc)(void);
     int (*gpio_read)(int pin);
     void (*gpio_write)(int pin, int data);
     void (*gpio_set_pin_mode)(int pin, int mode);
