@@ -35,7 +35,8 @@ class CalendarController < ApplicationController
        end
 
        if getetag(sched) != remove_etag_prefix(request.headers["If-Match"])
-          return head :precondition_failed
+          logger.warn "etag mismatch: '#{getetag(sched)}' '#{remove_etag_prefix(request.headers["If-Match"])}', ignoring"
+          # return head :precondition_failed
        end
     end
 
