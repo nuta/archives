@@ -27,7 +27,7 @@ result_t recv_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_ptr_defs }},
 result_t call_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}{{ reply_ptr_defs }});
 {% endif %}
 
-static inline void marshall_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_defs }}) {
+static inline void marshal_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_defs }}) {
 
 {% set i = 0 %}
 {% for type, name in payloads %}
@@ -36,7 +36,7 @@ static inline void marshall_{{ interface_name }}_{{ name }}(payload_t *__payload
 {%- endfor %}
 }
 
-static inline void unmarshall_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_ptr_defs }}) {
+static inline void unmarshal_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_ptr_defs }}) {
 
 {% set i = 0 %}
 {% for type, name in payloads %}
@@ -64,14 +64,14 @@ C_HEADER_FMT = """\
 C_MSG_FMT = """
 result_t send_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}, int flags) {
     payload_t __payloads[{{ payloads_length }}];
-    marshall_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
+    marshal_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
     return send(__ch, (payload_t *) &__payloads, sizeof(__payloads), flags);
 }
 
 {% if is_reply_msg %}
 result_t reply_{{ interface_name }}_{{ without_suffix_name }}(channel_t __ch {{ arg_defs }}) {
     payload_t __payloads[{{ payloads_length }}];
-    marshall_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
+    marshal_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
     return send(__ch, (payload_t *) &__payloads, sizeof(__payloads), 0);
 }
 {% endif %}
@@ -83,7 +83,7 @@ result_t recv_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_ptr_defs }},
     if (__r != OK)
         return __r;
 
-    unmarshall_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
+    unmarshal_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
     return __r;
 }
 
@@ -94,12 +94,12 @@ result_t call_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}
     payload_t __args[{{ args_length }}];
     payload_t __rets[{{ rets_length }}];
 
-    marshall_{{ interface_name }}_{{ name }}((payload_t *) &__args {{ args }});
+    marshal_{{ interface_name }}_{{ name }}((payload_t *) &__args {{ args }});
     result_t __r = call(__ch, (payload_t *) &__args, sizeof(__args), (payload_t *) &__rets, sizeof(__rets));
     if (__r != OK)
         return __r;
 
-    unmarshall_{{ interface_name }}_{{ reply_name }}((payload_t *) &__rets {{ reply_args }});
+    unmarshal_{{ interface_name }}_{{ reply_name }}((payload_t *) &__rets {{ reply_args }});
     return __r;
 }
 {% endif %}
