@@ -3,7 +3,7 @@
 VERBOSE     ?=
 BUILD_DIR   ?= .
 LANGS       ?= cpp
-CMDECHO     ?= printf "  \e[1;35m%7s    \e[0;33m%s\e[m\n"
+CMDECHO     ?= printf "  \033[1;35m%7s    \033[0;33m%s\033[m\n"
 MKDIR       ?= mkdir
 TARGET_FILE ?= $(BUILD_DIR)/$(target).elf
 
