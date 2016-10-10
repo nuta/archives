@@ -15,10 +15,10 @@ STRIP := xtensa-lx106-elf-strip
 
 COMMON += -ggdb3 -mlongcalls -mtext-section-literals -falign-functions=4
 COMMON += -ffunction-sections -fdata-sections -flto
-CFLAGS += $(COMMON)
-CXXFLAGS += $(COMMON)
-CPPFLAGS += -I$(arch_dir)
-LDFLAGS += -nostdlib -static -Wl,-T$(arch_dir)/esp8266.lds -Wl,-Map,$(BUILD_DIR)/$(target).map -flto
+override CFLAGS   += $(COMMON)
+override CXXFLAGS += $(COMMON)
+override CPPFLAGS += -I$(arch_dir)
+override LDFLAGS  += -nostdlib -static -Wl,-T$(arch_dir)/esp8266.lds -Wl,-Map,$(BUILD_DIR)/$(target).map -flto
 
 STRIPFLAGS += -s -R .comment -R .xtensa.info -R .xt.lit -R .xt.prop
 

@@ -9,10 +9,9 @@ objs += \
 stub_objs += $(c_stubs:.c=.o)
 
 CPP_GENSTUB = ./lang/cpp/genstub
-CFLAGS += -Wall -std=c11
-CFLAGS += -Wno-incompatible-library-redeclaration
-CXXFLAGS += -Wall -std=c++11 -fno-exceptions -fno-rtti
-CPPFLAGS += -Ilang/cpp -I$(BUILD_DIR)/stubs/cpp -I.
+override CFLAGS   += -Wall -std=c11 -Wno-incompatible-library-redeclaration
+override CXXFLAGS += -Wall -std=c++11 -fno-exceptions -fno-rtti
+override CPPFLAGS += -Ilang/cpp -I$(BUILD_DIR)/stubs/cpp -I.
 
 $(BUILD_DIR)/stubs/cpp/%.c: interfaces/%.yaml $(CPP_GENSTUB)
 	$(CMDECHO) GENSTUB $@

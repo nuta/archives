@@ -8,17 +8,17 @@ arch_objs += \
     thread.o
 
 LD := ld
-CFLAGS += -DARCH_POSIX -ggdb3 -Os
+override CFLAGS += -DARCH_POSIX -ggdb3 -Os
 
 ifeq ($(shell uname -s), Linux)
-CFLAGS += -pthread
+override CFLAGS += -pthread
 endif
 
 ifeq ($(shell uname -s), Darwin)
 CC := gcc-6
 endif
 
-CPPFLAGS += -I$(arch_dir)
+override CPPFLAGS += -I$(arch_dir)
 
 $(TARGET_FILE): $(objs)
 	$(CMDECHO) CC $@
