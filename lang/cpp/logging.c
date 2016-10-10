@@ -170,30 +170,11 @@ static void vprintfmt (const char *fmt, va_list vargs) {
             }
 
             // len
+            // TODO
             switch(fmt[i]) {
             case 'h':
-                if (fmt[i+1] == 'h') {
-                    len = 1;
-                    i += 2;
-                } else {
-                    len = 2;
-                    i++;
-                }
-                specifier = fmt[i];
-                break;
             case 'l':
-                if (fmt[i+1] == 'l') {
-                    len = 8;
-                    i += 2;
-                } else {
-                    len = 4;
-                    i++;
-                }
-                specifier = fmt[i];
-                break;
             case 'j':
-                len = sizeof(uintmax_t);
-                i++;
                 specifier = fmt[i];
                 break;
             }
