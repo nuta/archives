@@ -2,7 +2,7 @@ ENTRY(esp8266_boot)
 
 MEMORY {
     dram : org = 0x3fff7000, len = 0x2000
-    iram : org = 0x40105a00, len = 0x2600
+    iram : org = 0x4026b000, len = 0xc000
 }
 
 PHDRS {
