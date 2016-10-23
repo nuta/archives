@@ -151,7 +151,7 @@ static void vprintfmt (const char *fmt, va_list vargs) {
             bool pad = false;
             char specifier;
             uintmax_t len = sizeof(intmax_t); // 1: char, 2: short, 4: unsigned, ...
-            uintmax_t arg;
+            uintmax_t arg = 0; // initialize 0 to supress compiler warning
 
             for (;;) {
                 i++;
