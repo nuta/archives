@@ -142,7 +142,7 @@ static void print_int (intmax_t base, intmax_t v, uintmax_t len,
  *  @param[in] vargs  arguemnts
  *
  */
-static void vprintfmt (const char *fmt, va_list vargs) {
+void vprintfmt(const char *fmt, va_list vargs) {
 
     for (int i=0; fmt[i] != '\0'; i++) {
 

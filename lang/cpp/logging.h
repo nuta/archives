@@ -1,6 +1,11 @@
 #ifndef __LOGGING_H__
 #define __LOGGING_H__
 
+#include <types.h>
+
+__EXTERN_C__
+
+void vprintfmt(const char *format, va_list vargs);
 void printfmt(const char *format, ...);
 
 #define BUG(fmt, ...)    printfmt("B> " fmt, ##__VA_ARGS__)
@@ -9,5 +14,7 @@ void printfmt(const char *format, ...);
 #define WARN(fmt, ...)   printfmt("W> " fmt, ##__VA_ARGS__)
 
 #define NOT_YET_IMPLEMENTED() WARN("%s:%d: NYI", __FILE__, __LINE__)
+
+__EXTERN_C_END__
 
 #endif
