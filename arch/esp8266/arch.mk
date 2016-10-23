@@ -15,6 +15,7 @@ STRIP := xtensa-lx106-elf-strip
 
 COMMON += -ggdb3 -mlongcalls -mtext-section-literals -falign-functions=4
 COMMON += -ffunction-sections -fdata-sections -flto
+COMMON += -DARCH_ESP8266
 override CFLAGS   += $(COMMON)
 override CXXFLAGS += $(COMMON)
 override CPPFLAGS += -I$(arch_dir)
