@@ -2,7 +2,6 @@
 #define __KERNEL_THREAD_H__
 
 #include <types.h>
-#include <arch_types.h>
 
 #ifdef ARCH_POSIX // FIXME
 #define DEFAULT_THREAD_STACK_SIZE 8192

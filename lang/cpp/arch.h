@@ -2,7 +2,6 @@
 #define __CPP_ARCH_H__
 
 #include <types.h>
-#include <arch_types.h>
 
 tid_t arch_get_current_tid(void);
 NORETURN void arch_switch_thread(tid_t tid, struct arch_thread *thread);
