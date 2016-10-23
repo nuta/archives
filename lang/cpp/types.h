@@ -1,6 +1,8 @@
 #ifndef __CPP_TYPES_H__
 #define __CPP_TYPES_H__
 
+#include <stdarg.h>
+
 enum {
     OK               = 1,
     E_BAD_CID        = 2,
