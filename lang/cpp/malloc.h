@@ -1,6 +1,10 @@
 #ifndef __CPP_MALLOC_H__
 #define __CPP_MALLOC_H__
 
+#include <types.h>
+
+__EXTERN_C__
+
 #ifndef ARCH_POSIX
 #ifndef KERNEL
 
@@ -24,5 +28,7 @@ static inline void free(void *ptr) {
 
 #endif // KERNEL
 #endif // ARCH_POSIX
+
+__EXTERN_C_END__
 
 #endif
