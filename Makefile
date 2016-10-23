@@ -52,7 +52,7 @@ $(BUILD_DIR)/apps.mk: $(addsuffix /app.yaml, $(apps_dir))
 	PYTHONPATH=$(makefile_dir) ./tools/gen-apps-mk $^ > $@
 
 $(BUILD_DIR)/apps.o: $(BUILD_DIR)/apps.c
-$(BUILD_DIR)/apps.c:
+$(BUILD_DIR)/apps.c: $(BUILD_DIR)/apps.mk
 	$(CMDECHO) GEN $@
 	$(MKDIR) -p $(@D)
 	PYTHONPATH=$(makefile_dir) ./tools/gen-apps-c $(APPS) > $@
