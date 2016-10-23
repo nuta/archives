@@ -17,6 +17,14 @@ enum {
 
 #define ROUND_UP(x, len) (((x) + (len - 1)) & ~(len - 1))
 
+#ifdef __cplusplus
+#define __EXTERN_C__      extern "C" {
+#define __EXTERN_C_END__  }
+#else
+#define __EXTERN_C__
+#define __EXTERN_C_END__
+#endif
+
 #ifdef ARCH_POSIX
 
 #include "arch/posix/stdlibs.h"
