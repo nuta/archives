@@ -14,6 +14,8 @@ static void mainloop(channel_t server) {
        return;
     }
 
+    /* TODO: validate the pin number */
+
     int mode, data;
     int pin = buf[2];
     switch (buf[1]) {
@@ -26,6 +28,10 @@ static void mainloop(channel_t server) {
     case GPIO_READ:
         DEBUG("gpio.read");
         send_gpio_read_reply(reply_to, OK, finfo->gpio_read(pin), 0);
+        break;
+    case GPIO_READ_ANALOG:
+        DEBUG("gpio.read_analog");
+        send_gpio_read_analog_reply(reply_to, OK, finfo->read_adc(), 0);
         break;
     case GPIO_WRITE:
         DEBUG("gpio.write");
