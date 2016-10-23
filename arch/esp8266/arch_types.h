@@ -5,6 +5,7 @@
 
 #define MUTEX_INITIALIZER  0
 typedef tid_t mutex_t;
+typedef unsigned int size_t;
 
 struct arch_thread {
     uint32_t  pc;

@@ -51,7 +51,6 @@ typedef uint8_t bool;
 #define NULL ((void *) 0)
 
 typedef uintmax_t  uintptr_t;
-typedef uintmax_t  size_t;
 typedef uintmax_t  tid_t;
 typedef tid_t      pid_t;
 
@@ -60,5 +59,7 @@ typedef tid_t      pid_t;
 typedef uint8_t    result_t;
 typedef uintmax_t  payload_t;
 typedef uintmax_t  cid_t;
+
+#include <arch_types.h>
 
 #endif

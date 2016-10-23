@@ -5,6 +5,7 @@
 
 #define MUTEX_INITIALIZER  PTHREAD_MUTEX_INITIALIZER
 typedef pthread_mutex_t mutex_t;
+typedef unsigned long size_t;
 
 struct arch_thread {
     uint64_t  rip;
