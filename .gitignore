@@ -1,6 +1,2 @@
-*.elf
-*.map
-*.o
 *.pyc
-/ktest
 /build
