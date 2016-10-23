@@ -72,3 +72,22 @@ messages:
       - name: value
         type: int
         desc: "`HIGH` or `LOW`."
+
+  read_analog:
+    id: 7
+    desc: Reads a value from a analog input pin.
+    reply: read_analog_reply
+    payloads:
+      - name: pin
+        type: int
+        desc: The pin number.
+  read_analog_reply:
+    id: 8
+    desc: The reply message of `.read_analog`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+      - name: value
+        type: int
+        desc: The read value. The range depends on the AD converter.
