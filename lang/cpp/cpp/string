@@ -1,0 +1,22 @@
+#ifndef __CPP_STRING__
+#define __CPP_STRING__
+
+#include <types.h>
+
+class string {
+    // The maximum value of size_t. Note that
+    // size_t is *un*signed integer.
+    static const size_t npos = -1;
+
+    string(const char *s);
+    string& append(const char *s);
+    size_t find(const char *s, size_t pos) const;
+    size_t find(const char c, size_t pos) const;
+
+private:
+    char *buf;
+    size_t length, capacity;
+    void init();
+};
+
+#endif

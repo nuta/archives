@@ -3,7 +3,9 @@ h_stubs = $(addprefix $(BUILD_DIR)/stubs/cpp/resea/, $(addsuffix .h, $(interface
 
 objs += \
     lang/cpp/logging.o \
+    lang/cpp/cstring.o \
     lang/cpp/string.o  \
+    lang/cpp/new.o     \
     lang/cpp/channel.o
 
 stub_objs += $(c_stubs:.c=.o)
@@ -11,7 +13,7 @@ stub_objs += $(c_stubs:.c=.o)
 CPP_GENSTUB = ./lang/cpp/genstub
 override CFLAGS   += -Wall -std=c11 -Wno-incompatible-library-redeclaration
 override CXXFLAGS += -Wall -std=c++11 -fno-exceptions -fno-rtti
-override CPPFLAGS += -Ilang/cpp -I$(BUILD_DIR)/stubs/cpp -I.
+override CPPFLAGS += -Ilang/cpp -Ilang/cpp/cpp -I$(BUILD_DIR)/stubs/cpp -I.
 
 $(BUILD_DIR)/stubs/cpp/%.c: interfaces/%.yaml $(CPP_GENSTUB)
 	$(CMDECHO) GENSTUB $@
