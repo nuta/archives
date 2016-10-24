@@ -2,6 +2,12 @@
 #include <string>
 
 
+string::string() {
+
+    init();
+}
+
+
 string::string(const char *s) {
 
     init();
@@ -30,6 +36,13 @@ string& string::append(const char *s) {
 }
 
 
+string& string::append(char c) {
+
+    char s[2] = {c, '\0'};
+    return append((const char *) &s);
+}
+
+
 size_t string::find(const char *s, size_t pos = 0) const {
 
     while (pos <= length) {
@@ -53,6 +66,36 @@ size_t string::find(char c, size_t pos = 0) const {
     }
 
     return npos;
+}
+
+
+const char *string::c_str() const {
+
+    return buf;
+}
+
+
+bool string::startswith(const char *s) const {
+
+    for (size_t i = 0; *s; i++) {
+        if (buf[i] != *s)
+            return false;
+    }
+
+    return true;
+}
+
+
+int string::to_int() const {
+
+    // TODO: support hex
+
+    int x = 0;
+    for (size_t i = length, j = 0; i > 0; i--, j++) {
+        x += i * (10 * j);
+    }
+
+    return x;
 }
 
 
