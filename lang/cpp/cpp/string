@@ -4,6 +4,11 @@
 #include <types.h>
 
 class string {
+private:
+    size_t _length, _capacity;
+    char *_buffer;
+    void init();
+
 public:
     // The maximum value of size_t. Note that
     // size_t is *un*signed integer.
@@ -11,26 +16,42 @@ public:
 
     string();
     string(const char *s);
+    const char at(size_t pos) const;
+    void reserve(size_t n);
     string& append(const char *s);
     string& append(char c);
-    size_t find(const char *s, size_t pos) const;
-    size_t find(const char c, size_t pos) const;
-    const char *c_str() const;
+    size_t find(const char *s, size_t pos = 0) const;
+    size_t find(char c, size_t pos = 0) const;
 
     string& operator +=(char c) {
         append(c);
         return *this;
     }
 
+    string& operator +=(const char *s) {
+        append(s);
+        return *this;
+    }
+
+    size_t length() const {
+        return _length;
+    }
+
+    size_t capacity() const {
+        return _capacity;
+    }
+
+    const char *c_str() const {
+        return _buffer;
+    }
+
     // extensions
     bool startswith(const char *s) const;
     int to_int() const;
 
-    size_t length, capacity;
-
-private:
-    char *buf;
-    void init();
+    char *buffer() const {
+        return _buffer;
+    }
 };
 
 #endif

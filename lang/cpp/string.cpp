@@ -15,23 +15,35 @@ string::string(const char *s) {
 }
 
 
+const char string::at(size_t pos) const {
+
+    if (pos >= _length)
+        return 0;
+
+    return _buffer[pos];
+}
+
+void string::reserve(size_t n) {
+    char *old__buffer = _buffer;
+    _capacity = n;
+    _buffer = new char[_capacity];
+    memcpy_s(_buffer, _capacity, old__buffer, _length);
+    delete old__buffer;
+}
+
 string& string::append(const char *s) {
 
-    if (capacity - length < strlen(s)) {
-        char *old_buf = buf;
-        capacity = (length + strlen(s)) * 2;
-        buf = new char[capacity];
-        memcpy_s(buf, capacity, old_buf, length);
-        delete old_buf;
+    if (_capacity - _length < strlen(s)) {
+        reserve((_length + strlen(s)) * 2);
     }
 
     while (*s) {
-        buf[length] = *s;
-        length++;
+        _buffer[_length] = *s;
+        _length++;
         s++;
     }
 
-    buf[length] = '\0';
+    _buffer[_length] = '\0';
     return *this;
 }
 
@@ -43,10 +55,10 @@ string& string::append(char c) {
 }
 
 
-size_t string::find(const char *s, size_t pos = 0) const {
+size_t string::find(const char *s, size_t pos) const {
 
-    while (pos <= length) {
-        if(strcmp(&buf[pos], s) == 0)
+    while (pos <= _length) {
+        if(strcmp(&_buffer[pos], s) == 0)
             return pos;
 
         pos++;
@@ -56,29 +68,23 @@ size_t string::find(const char *s, size_t pos = 0) const {
 }
 
 
-size_t string::find(char c, size_t pos = 0) const {
+size_t string::find(char c, size_t pos) const {
 
-    while (pos <= length) {
-        if(buf[pos] == c)
+    while (pos <= _length) {
+        if(_buffer[pos] == c)
             return pos;
 
         pos++;
     }
 
     return npos;
-}
-
-
-const char *string::c_str() const {
-
-    return buf;
 }
 
 
 bool string::startswith(const char *s) const {
 
     for (size_t i = 0; *s; i++) {
-        if (buf[i] != *s)
+        if (_buffer[i] != *s)
             return false;
     }
 
@@ -91,7 +97,7 @@ int string::to_int() const {
     // TODO: support hex
 
     int x = 0;
-    for (size_t i = length, j = 0; i > 0; i--, j++) {
+    for (size_t i = _length, j = 0; i > 0; i--, j++) {
         x += i * (10 * j);
     }
 
@@ -101,7 +107,7 @@ int string::to_int() const {
 
 void string::init() {
 
-    buf      = nullptr;
-    length   = 0;
-    capacity = 0;
+    _buffer   = nullptr;
+    _length   = 0;
+    _capacity = 0;
 }
