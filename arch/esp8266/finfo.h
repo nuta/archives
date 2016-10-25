@@ -24,6 +24,8 @@ struct firmware_info {
     ferr_t (*http_request)(const char *host, int port, const char *method,
                            const char *path, const void *headers, const void *payload,
                            size_t payload_size, void *buf, size_t buf_size);
+    const char *(*get_device_secret)(void);
+    const char *(*get_server_url)(void);
 };
 
 extern struct firmware_info *finfo;
