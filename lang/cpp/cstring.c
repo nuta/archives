@@ -52,3 +52,16 @@ int strcmp(const char *s1, const char *s2) {
 
     return *s1 - *s2;
 }
+
+
+// I think this should be in string.h. Just because.
+long int atol(const char *s) {
+
+    long int x = 0;
+    while (*s && '0' <= *s && *s <= '9') {
+        x = (x * 10) + (*s - '0');
+        s++;
+    }
+
+    return x;
+}
