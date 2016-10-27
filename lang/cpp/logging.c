@@ -3,6 +3,21 @@
 #include <mutex.h>
 #include "logging.h"
 
+static char buffer[BUFFER_SIZE];
+static size_t buffer_start = 0, buffer_end = 0;
+
+
+static void printchar(const char ch) {
+
+    buffer[buffer_end] = ch;
+    buffer_end++;
+    if (buffer_end == BUFFER_SIZE - 1) {
+        buffer_end = 0;
+    }
+
+    arch_printchar(ch);
+}
+
 
 /**
  *  Returns absolute value
@@ -23,7 +38,7 @@
 static void print_str (const char *s) {
 
     for (int i=0; s[i] != '\0'; i++)
-        arch_printchar(s[i]);
+        printchar(s[i]);
 }
 
 
@@ -51,7 +66,7 @@ static void print_int (intmax_t base, intmax_t v, uintmax_t len,
      *  ^
      */
     if (sign && (int) v < 0) {
-        arch_printchar('-');
+        printchar('-');
         v = abs((int) v);
     }
 
@@ -71,9 +86,9 @@ static void print_int (intmax_t base, intmax_t v, uintmax_t len,
         uintmax_t order, _v;
         for (order=1, _v=(uintmax_t) v; _v /= (uintmax_t) base; order++);
         for (uintmax_t j=order; j < len*2; j++) {
-            arch_printchar('0');
+            printchar('0');
             if (sep && j == len+1)
-                arch_printchar('_');
+                printchar('_');
         }
     }
 
@@ -97,6 +112,27 @@ static void print_int (intmax_t base, intmax_t v, uintmax_t len,
     i = 0;
     for (int j=0; buf[i] == '\0' && j < (int) sizeof(buf); j++, i++);
     print_str(&buf[i]);
+}
+
+
+size_t get_buffered_log(char **s) {
+
+    if (buffer_start == buffer_end)
+        return 0;
+
+    size_t start = buffer_start;
+    size_t end;
+    if (buffer_start > buffer_end) {
+        // wrapped
+        end = BUFFER_SIZE - 1;
+        buffer_start = 0;
+    } else {
+        end = buffer_end;
+        buffer_start = buffer_end;
+    }
+
+    *s = &buffer[start];
+    return end - start;
 }
 
 
@@ -181,7 +217,7 @@ void vprintfmt(const char *fmt, va_list vargs) {
 
             switch(specifier) {
             case '%':
-                arch_printchar('%');
+                printchar('%');
                 break;
             case 'd':
                 print_int(10, arg, len, true,  alt, pad, false);
@@ -197,16 +233,16 @@ void vprintfmt(const char *fmt, va_list vargs) {
                 print_int(16, arg, len, false, alt, pad, false);
                 break;
             case 'c':
-                arch_printchar((char) arg);
+                printchar((char) arg);
                 break;
             case 's':
                 print_str((char *) arg);
                 break;
             default:
-                arch_printchar(fmt[i]);
+                printchar(fmt[i]);
             }
         } else {
-            arch_printchar(fmt[i]);
+            printchar(fmt[i]);
         }
     }
 }
@@ -223,7 +259,7 @@ void printfmt(const char *format, ...) {
     vprintfmt(format, vargs);
     va_end(vargs);
 
-    arch_printchar('\n');
+    printchar('\n');
 
     mutex_unlock(&printfmt_lock);
 }
