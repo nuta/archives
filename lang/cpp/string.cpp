@@ -2,17 +2,19 @@
 #include <string>
 
 
-string::string() {
-
-    init();
-}
-
-
 string::string(const char *s) {
 
     init();
     append(s);
 }
+
+
+string::~string() {
+
+    if (_buffer)
+        delete[] _buffer;
+}
+
 
 
 const char string::at(size_t pos) const {
