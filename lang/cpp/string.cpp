@@ -2,6 +2,12 @@
 #include <string>
 
 
+string::string() {
+
+    init();
+}
+
+
 string::string(const char *s) {
 
     init();
