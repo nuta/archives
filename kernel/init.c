@@ -1,6 +1,7 @@
 #include <arch.h>
 #include <logging.h>
 #include "init.h"
+#include "panic.h"
 #include "process.h"
 #include "thread.h"
 #include "resources.h"
@@ -23,6 +24,10 @@ void init_kernel(struct resources *_resources) {
 
     INFO("creating the kernel process");
     struct process *kproc = create_process();
+
+    if (!apps[0]) {
+        PANIC("no in-kernel threads found");
+    }
 
     INFO("creating in-kernel threads");
     for (int i=0; apps[i]; i++) {
