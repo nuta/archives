@@ -22,7 +22,6 @@ string::~string() {
 }
 
 
-
 const char string::at(size_t pos) const {
 
     if (pos >= _length)
@@ -31,18 +30,21 @@ const char string::at(size_t pos) const {
     return _buffer[pos];
 }
 
+
 void string::reserve(size_t n) {
-    char *old__buffer = _buffer;
+    char *old_buffer = _buffer;
     _capacity = n;
     _buffer = new char[_capacity];
-    memcpy_s(_buffer, _capacity, old__buffer, _length);
-    delete old__buffer;
+    memcpy_s(_buffer, _capacity, old_buffer, _length);
+    delete old_buffer;
 }
+
 
 string& string::append(const char *s) {
 
-    if (_capacity - _length < strlen(s)) {
-        reserve((_length + strlen(s)) * 2);
+    size_t s_len = strlen(s);
+    if (_capacity - _length < s_len || (_capacity == 0 && s_len == 0)) {
+        reserve((_length + s_len + 1) * 2);
     }
 
     while (*s) {
