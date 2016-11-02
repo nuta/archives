@@ -34,6 +34,7 @@ size_t strlen(const char *s) {
     int c = 0;
     while (*s) {
         s++;
+        c++;
     }
 
     return c;
