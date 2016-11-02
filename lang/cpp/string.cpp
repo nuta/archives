@@ -105,13 +105,7 @@ bool string::startswith(const char *s) const {
 int string::to_int() const {
 
     // TODO: support hex
-
-    int x = 0;
-    for (size_t i = _length, j = 0; i > 0; i--, j++) {
-        x += i * (10 * j);
-    }
-
-    return x;
+    return atol(c_str());
 }
 
 
