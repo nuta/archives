@@ -13,7 +13,7 @@ CXX := xtensa-lx106-elf-g++
 LD := xtensa-lx106-elf-gcc
 STRIP := xtensa-lx106-elf-strip
 
-COMMON += -ggdb3 -mlongcalls -mtext-section-literals -falign-functions=4
+COMMON += -g3 -ggdb3 -mlongcalls -mtext-section-literals -falign-functions=4
 COMMON += -ffunction-sections -fdata-sections -flto
 COMMON += -DARCH_ESP8266
 override CFLAGS   += $(COMMON)
