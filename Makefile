@@ -23,7 +23,7 @@ ifneq ($(ARCH),)
         $(error "TARGET must be 'kernel' or 'user'")
     endif
 
-    -include $(BUILD_DIR)/apps.mk
+    include $(BUILD_DIR)/apps.mk
     include $(addsuffix /lang.mk, $(addprefix lang/, $(LANGS)))
     _objs := $(objs)
     objs = $(addprefix $(BUILD_DIR)/, $(_objs)) \
