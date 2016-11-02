@@ -93,7 +93,7 @@ size_t string::find(char c, size_t pos) const {
 
 bool string::startswith(const char *s) const {
 
-    for (size_t i = 0; *s; i++) {
+    for (size_t i = 0; *s; i++, s++) {
         if (_buffer[i] != *s)
             return false;
     }
