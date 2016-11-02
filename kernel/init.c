@@ -26,11 +26,12 @@ void init_kernel(struct resources *_resources) {
     struct process *kproc = create_process();
 
     if (!apps[0]) {
-        PANIC("no in-kernel threads found");
+        PANIC("no in-kernel apps found");
     }
 
-    INFO("creating in-kernel threads");
+    INFO("creating in-kernel app");
     for (int i=0; apps[i]; i++) {
+        INFO("in-kernel app: addr=%p", apps[i]);
         start_thread(create_thread(kproc, apps[i], 0));
     }
 
