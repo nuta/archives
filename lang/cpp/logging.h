@@ -5,7 +5,7 @@
 
 __EXTERN_C__
 
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 256
 
 size_t get_buffered_log(char **s);
 void vprintfmt(const char *format, va_list vargs);
