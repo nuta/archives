@@ -2,8 +2,6 @@
 engines:
   brakeman:
     enabled: true
-  bundler-audit:
-    enabled: true
   duplication:
     enabled: true
     config:
@@ -13,13 +11,20 @@ engines:
     enabled: true
   rubocop:
     enabled: true
+  rubymotion:
+    enabled: true
+  bundler-audit:
+    enabled: true
+
 ratings:
   paths:
-  - Gemfile.lock
-  - "**.erb"
-  - "**.rb"
+    - Gemfile.lock
+    - "**.erb"
+    - "**.rb"
+    - "**.js"
+    - "**.scss"
+
 exclude_paths:
-- config/
-- db/
-- test/
-- vendor/
+  - db/
+  - test/
+  - vendor/
