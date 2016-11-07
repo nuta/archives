@@ -36,9 +36,11 @@ endif
 .SUFFIXES:
 .SECONDARY:
 $(VERBOSE).SILENT:
-.PHONY: build test clean
+.PHONY: build config test clean
 
 build: $(TARGET_FILE)
+
+config: $(BUILD_DIR)/apps.mk
 
 test:
 	$(MAKE) ARCH=posix TARGET=kernel APPS=kernel-test \
