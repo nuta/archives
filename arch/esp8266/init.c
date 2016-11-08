@@ -20,6 +20,7 @@ void esp8266_init(struct firmware_info *_finfo) {
     finfo = _finfo;
     add_kmalloc_chunk(&__kmalloc_static_chunk,
                       (uintptr_t) &__kmalloc_static_chunk_end - (uintptr_t) &__kmalloc_static_chunk);
+    add_kmalloc_chunk((void *) 0x3fff7000 /* used by firmware on updating */, 0x2000);
 
     init_kernel((struct resources *) &__resources);
 }
