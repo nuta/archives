@@ -40,18 +40,26 @@ size_t strlen(const char *s) {
     return c;
 }
 
-int strcmp(const char *s1, const char *s2) {
 
-    while (*s1 && *s2) {
+int strncmp(const char *s1, const char *s2, size_t len) {
+
+    while (*s1 && *s2 && len > 0) {
         int diff = *s1 - *s2;
         if (diff != 0)
             return diff;
 
         s1++;
         s2++;
+        len--;
     }
 
-    return *s1 - *s2;
+    return (len > 0) ? *s1 - *s2 : 0;
+}
+
+
+int strcmp(const char *s1, const char *s2) {
+
+    return strncmp(s1, s2, strlen(s1));
 }
 
 
