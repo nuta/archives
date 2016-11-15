@@ -50,8 +50,6 @@ def main(args):
                 resea.notice('cannot decode utf-8 string [{}]'.format(b))
 
             if l == "":
-                if p.poll():
-                    return
                 continue
 
             m = re.match(LOG_LINE_REGEX, l)
