@@ -95,18 +95,29 @@ static void test_messaging() {
 }
 
 
-static void test_log_bufferring() {
+static void do_test_log_bufferring(char *str, char *expected_str) {
     char *buffer;
-    char *str = "Hello!\nNew\nWorld!";
-    char *expected_str = "Hello!\nNew";
     size_t buffered_size;
 
+    printfmt("");
     get_buffered_log(&buffer);
+    get_buffered_log(&buffer); // do twice for the wrapped case
     printfmt_nonl("%s", str);
     buffered_size = get_buffered_log(&buffer);
-    TEST_EXPECT(strlen(expected_str) == buffered_size, "get_buffered_log returns strlen(expected_str)");
-    INFO("%d, %d", buffered_size, buffer[buffered_size]);
-    TEST_EXPECT(strncmp(buffer, expected_str, buffered_size) == 0, "get_buffered_log returns only filled lines");
+    printfmt("");
+
+    TEST_EXPECT(strlen(expected_str) == buffered_size,
+                "get_buffered_log returns strlen(expected_str)");
+    TEST_EXPECT(strncmp(buffer, expected_str, buffered_size) == 0,
+                "get_buffered_log returns only filled lines");
+}
+
+
+static void test_log_bufferring() {
+    do_test_log_bufferring("ABC\nDEFG\n", "ABC\nDEFG");
+    do_test_log_bufferring("Hello!\nNew\nWorld!", "Hello!\nNew");
+    do_test_log_bufferring("", "");
+    do_test_log_bufferring("ABC", "");
 }
 
 

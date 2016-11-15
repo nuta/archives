@@ -120,22 +120,24 @@ static void print_int (intmax_t base, intmax_t v, uintmax_t len,
 
 size_t get_buffered_log(char **s) {
 
-    if (buffer_start == buffer_filled)
-        return 0;
-
-    size_t start = buffer_start;
-    size_t filled;
-    if (buffer_start > buffer_filled) {
-        // wrapped
-        filled = BUFFER_SIZE - 1;
-        buffer_start  = 0;
-    } else {
-        filled       = buffer_filled;
-        buffer_start = buffer_filled + 1;
+    if (buffer_filled < buffer_start) {
+        *s = &buffer[buffer_start];
+        if (buffer_end < buffer_start) {
+            // wraped
+            size_t start = buffer_start;
+            buffer_start = 0;
+            return BUFFER_SIZE - start + 1;
+        } else {
+            // nothing to return
+            return 0;
+        }
     }
 
+    size_t start = buffer_start;
+    buffer_start = buffer_filled + 1;
+
     *s = &buffer[start];
-    return filled - start;
+    return buffer_filled - start;
 }
 
 
