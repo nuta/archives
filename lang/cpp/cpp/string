@@ -5,11 +5,13 @@
 
 class string {
 private:
-    size_t _length, _capacity;
+    size_t _capacity;
     char *_buffer;
     void init();
 
 public:
+    size_t _length; // TODO: make this private
+
     // The maximum value of size_t. Note that
     // size_t is *un*signed integer.
     static const size_t npos = -1;
