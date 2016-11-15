@@ -10,6 +10,7 @@ __EXTERN_C__
 size_t get_buffered_log(char **s);
 void vprintfmt(const char *format, va_list vargs);
 void printfmt(const char *format, ...);
+void printfmt_nonl(const char *format, ...);
 
 #define BUG(fmt, ...)    printfmt("B> " fmt, ##__VA_ARGS__)
 #define INFO(fmt, ...)   printfmt("I> " fmt, ##__VA_ARGS__)

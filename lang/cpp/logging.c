@@ -263,3 +263,16 @@ void printfmt(const char *format, ...) {
 
     mutex_unlock(&printfmt_lock);
 }
+
+
+void printfmt_nonl(const char *format, ...) {
+    va_list vargs;
+
+    mutex_lock(&printfmt_lock);
+
+    va_start(vargs, format);
+    vprintfmt(format, vargs);
+    va_end(vargs);
+
+    mutex_unlock(&printfmt_lock);
+}
