@@ -67,11 +67,15 @@ string& string::append(char c) {
 
 size_t string::find(const char *s, size_t pos) const {
 
+    if (!_buffer)
+        return npos;
+
     while (pos <= _length) {
         if(strcmp(&_buffer[pos], s) == 0)
             return pos;
 
         pos++;
+        s++;
     }
 
     return npos;
@@ -79,6 +83,9 @@ size_t string::find(const char *s, size_t pos) const {
 
 
 size_t string::find(char c, size_t pos) const {
+
+    if (!_buffer)
+        return npos;
 
     while (pos <= _length) {
         if(_buffer[pos] == c)
