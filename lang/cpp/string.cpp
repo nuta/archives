@@ -70,12 +70,12 @@ size_t string::find(const char *s, size_t pos) const {
     if (!_buffer)
         return npos;
 
+    size_t s_len = strlen(s);
     while (pos <= _length) {
-        if(strcmp(&_buffer[pos], s) == 0)
+        if(strncmp(&_buffer[pos], s, s_len) == 0)
             return pos;
 
         pos++;
-        s++;
     }
 
     return npos;
