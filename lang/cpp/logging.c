@@ -4,16 +4,19 @@
 #include "logging.h"
 
 static char buffer[BUFFER_SIZE];
-static size_t buffer_start = 0, buffer_end = 0;
+static size_t buffer_start = 0, buffer_end = 0, buffer_filled = 0;
 
 
 static void printchar(const char ch) {
 
+    if (ch == '\n')
+        buffer_filled = buffer_end;
+
     buffer[buffer_end] = ch;
     buffer_end++;
-    if (buffer_end == BUFFER_SIZE - 1) {
+
+    if (buffer_end == BUFFER_SIZE - 1)
         buffer_end = 0;
-    }
 
     arch_printchar(ch);
 }
@@ -117,22 +120,22 @@ static void print_int (intmax_t base, intmax_t v, uintmax_t len,
 
 size_t get_buffered_log(char **s) {
 
-    if (buffer_start == buffer_end)
+    if (buffer_start == buffer_filled)
         return 0;
 
     size_t start = buffer_start;
-    size_t end;
-    if (buffer_start > buffer_end) {
+    size_t filled;
+    if (buffer_start > buffer_filled) {
         // wrapped
-        end = BUFFER_SIZE - 1;
-        buffer_start = 0;
+        filled = BUFFER_SIZE - 1;
+        buffer_start  = 0;
     } else {
-        end = buffer_end;
-        buffer_start = buffer_end;
+        filled       = buffer_filled;
+        buffer_start = buffer_filled + 1;
     }
 
     *s = &buffer[start];
-    return end - start;
+    return filled - start;
 }
 
 
