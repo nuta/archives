@@ -11,7 +11,9 @@ string::string() {
 string::string(const char *s) {
 
     init();
-    append(s);
+
+    if (s)
+        append(s);
 }
 
 
