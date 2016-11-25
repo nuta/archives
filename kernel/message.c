@@ -86,8 +86,10 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
 
     // Copy the message.
     // TODO: access right check
-    if (memcpy_s((void *) dst->buffer, dst->buffer_size, m, size) != OK)
+    if (memcpy_s((void *) dst->buffer, dst->buffer_size, m, size) != OK) {
+        WARN("failed to copy the message");
         return E_BAD_MEMCPY;
+    }
 
     dst->sent_from = sent_from;
     resume_thread(dst->receiver);
