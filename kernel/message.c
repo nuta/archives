@@ -74,6 +74,9 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
             case PAYLOAD_POINTER:
                 NOT_YET_IMPLEMENTED();
                 break;
+            case PAYLOAD_CHANNEL:
+                NOT_YET_IMPLEMENTED();
+                break;
             default:
                 // Handle an unknown payload as inline.
                 WARN("unknown payload type: %d", type);
