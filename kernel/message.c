@@ -3,6 +3,7 @@
 #include <string.h>
 #include <logging.h>
 #include "message.h"
+#include "kmalloc.h"
 #include "channel.h"
 #include "process.h"
 #include "thread.h"
@@ -58,6 +59,8 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
     payload_t *payloads = (payload_t *) m;
     size_t payloads_num = size / sizeof(payload_t);
     payload_t header = 0;
+    payload_t pointer = 0;
+    int prev_type = 0;
 
     for (int i=0; i < payloads_num; i++) {
         if (IS_PAYLOAD_HEADER_INDEX(i)) {
@@ -72,7 +75,24 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
                 // Nothing to do
                 break;
             case PAYLOAD_POINTER:
-                NOT_YET_IMPLEMENTED();
+                pointer = payloads[i];
+                break;
+            case PAYLOAD_POINTER_SIZE:
+                if (prev_type != PAYLOAD_POINTER) {
+                    WARN("unexpected pointer size payload");
+                    break;
+                }
+
+                size_t pointer_size = payloads[i];
+                if (current->process->pid == 1 && current->process == dst->process) {
+                    // in-kernel
+                    void *new_pointer = kmalloc(pointer_size, KMALLOC_NORMAL);
+                    memcpy_s(new_pointer, pointer_size, (const void *) pointer, pointer_size);
+                    payloads[i - 1] = (payload_t) new_pointer;
+                } else {
+                    NOT_YET_IMPLEMENTED();
+                }
+
                 break;
             case PAYLOAD_CHANNEL:
                 NOT_YET_IMPLEMENTED();
@@ -81,6 +101,8 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
                 // Handle an unknown payload as inline.
                 WARN("unknown payload type: %d", type);
             }
+
+            prev_type = type;
         }
     }
 

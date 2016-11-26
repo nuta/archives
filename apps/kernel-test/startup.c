@@ -5,16 +5,19 @@
 #include <string.h>
 
 
-static const payload_t msg1[] = {
+const char *POINTER_TEST_STRING = "ABC123";
+
+static payload_t msg1[] = {
     1,           // inline, null, null, null
     0x55aa55aa
 };
 
-static const payload_t msg2[] = {
-    1 | 1 >> 8,           // inline, null, inline, null
-    0xddddaaaa,
+static payload_t msg2[] = {
+    1 | (0x03 << 4) | (0x04 << 8), // inline, pointer, pointer size, null
+    0xabcd1234,
     0,
-    0x8
+    0,
+    0,
 };
 
 
@@ -28,12 +31,15 @@ void client_thread(uintmax_t arg) {
     r = send(client, &msg1, sizeof(msg1), 0);
     TEST_EXPECT(r == OK, "#1: send returns OK");
 
-    payload_t buf[4];
+    payload_t buf[8];
     channel_t from;
     r = recv(client, (void *) &buf, sizeof(buf), 0, &from);
     TEST_EXPECT(r == OK,            "#2: recv returns OK");
     TEST_EXPECT(from == client,     "#2: sent from the server");
-    TEST_EXPECT(buf[3] == msg2[3],  "#2: sent payloads correctly");
+    TEST_EXPECT(buf[1] == msg2[1],  "#2: sent an inline payload correctly");
+    TEST_EXPECT(!memcmp((const char *) buf[2], POINTER_TEST_STRING, buf[3]),
+                "#2: sent a pointer payload correctly");
+    TEST_EXPECT(buf[3] == msg2[3],  "#2: sent a pointer size payload correctly");
 
     // stub test
     INFO("client: entering stub tests");
@@ -74,6 +80,9 @@ static void test_messaging() {
     TEST_EXPECT(r == OK,            "server: recv returns OK");
     TEST_EXPECT(reply_to == server, "server: received from the client");
     TEST_EXPECT(buf[1] == msg1[1],  "server: received payloads correctly");
+
+    msg2[2] = (payload_t) POINTER_TEST_STRING;
+    msg2[3] = strlen(POINTER_TEST_STRING);
     send(reply_to, &msg2, sizeof(msg2), 0);
 
     INFO("server: I am now gpio server!");

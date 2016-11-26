@@ -8,7 +8,7 @@
 #define PAYLOAD_INLINE   1
 #define PAYLOAD_CHANNEL  2
 #define PAYLOAD_POINTER  3
-#define PAYLOAD_SIZE     4
+#define PAYLOAD_POINTER_SIZE  4
 
 #define GET_PAYLOAD_TYPE(header, i) (((header) >> (4 * ((i - 1) % 8))) & 0x0f)
 #define IS_PAYLOAD_HEADER_INDEX(i) ((i) % 8 == 0)

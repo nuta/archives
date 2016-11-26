@@ -110,7 +110,7 @@ C_FOOTER_FMT = """
 
 
 def is_ool_type(type_):
-    return False # TODO
+    return type_ == 'data'
 
 def ctype(type_):
     types = {
@@ -174,7 +174,7 @@ def load_payload_defs(interface_name, msg_name, payloads):
             size_payload = False
             for j, q in enumerate(defs[i:i+8]):
                 if size_payload:
-                    header += ' | (0x0f << {})'.format(j * 4)
+                    header += ' | (0x04 << {})'.format(j * 4)
                     size_payload = False
                     continue
 
