@@ -9,6 +9,24 @@ void *memcpy(void *dest, const void *src, size_t n) {
 }
 
 
+int memcmp(const void *s1, const void *s2, size_t len) {
+    unsigned char *p = (unsigned char *) s1;
+    unsigned char *q = (unsigned char *) s2;
+
+    while (len > 0) {
+        int diff = *p - *q;
+        if (diff != 0)
+            return diff;
+
+        p++;
+        q++;
+        len--;
+    }
+
+    return 0;
+}
+
+
 result_t memcpy_s(void *dest, size_t dest_size, const void *src, size_t size) {
 
     if (dest_size < size || dest == NULL || src == NULL) {
