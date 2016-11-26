@@ -49,27 +49,32 @@ static void mainloop(channel_t server) {
     case MAKESTACK_RESET:
         DEBUG("makestack.reset");
         finfo->update(-1); // never returns
+        break;
     case MAKESTACK_UPDATE: {
         DEBUG("makestack.update");
         int deployment_id = buf[2];
         finfo->update(deployment_id); // never returns
+        break;
     }
     case MAKESTACK_GET_DEVICE_SECRET: {
         DEBUG("makestack.get_device_secret");
         const char *device_secret = finfo->get_device_secret();
         size_t len = strlen(finfo->get_device_secret()) + 1;
         reply_makestack_get_device_secret(reply_to, (void *) device_secret, len);
+        break;
     }
     case MAKESTACK_GET_SERVER_URL: {
         DEBUG("makestack.get_serve_url");
         const char *server_url = finfo->get_server_url();
         size_t len = strlen(finfo->get_server_url()) + 1;
         reply_makestack_get_server_url(reply_to, (void *) server_url, len);
+        break;
     }
     case MAKESTACK_GET_DEPLOYMENT_ID: {
         DEBUG("makestack.get_deployment_id");
         int deployment_id = finfo->get_deployment_id();
         reply_makestack_get_deployment_id(reply_to, deployment_id);
+        break;
     }
     default:
         WARN("esp82660-driver: unknown message (%p)", buf[1]);
