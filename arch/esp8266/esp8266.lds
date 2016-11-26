@@ -28,7 +28,7 @@ SECTIONS {
         __bss_end = .;
 
         __kmalloc_static_chunk = ALIGN(4);
-        . = . + 0x2500; /* TODO: make this configurable */
+        . = . + 0x2400; /* TODO: make this configurable */
         __kmalloc_static_chunk_end = .;
 
         __stack_bottom = .;
