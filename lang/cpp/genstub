@@ -208,8 +208,11 @@ def generate_msg(interface_name, messages, msg_fmt):
     messages = OrderedDict(sorted(messages.items()))
     for name, msg in messages.items():
         def generate_defs(fmt, payloads):
-            args = map(lambda p: fmt.format(type=ctype(p['type']),
-                                            name=p['name']), payloads)
+            if payloads is None:
+                payloads = []
+
+            args = list(map(lambda p: fmt.format(type=ctype(p['type']),
+                                                 name=p['name']), payloads))
 
             if args == []:
                 return ""
