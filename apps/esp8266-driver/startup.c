@@ -84,7 +84,9 @@ void esp8266_driver_startup(void) {
 
     channel_t channel_server = connect_to_local(1);
     result_t r;
+
     call_channel_register(channel_server, server, GPIO_INTERFACE, &r);
+    call_channel_register(channel_server, server, MAKESTACK_INTERFACE, &r);
 
     INFO("esp8266-driver: ready");
     for (;;)
