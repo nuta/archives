@@ -26,7 +26,7 @@ struct firmware_info {
                            size_t payload_size, void *buf, size_t buf_size, bool tls);
     const char *(*get_device_secret)(void);
     const char *(*get_server_url)(void);
-    unsigned long (*get_deployment_id_on_boot)(void);
+    unsigned long (*get_deployment_id)(void);
 };
 
 extern struct firmware_info *finfo;
