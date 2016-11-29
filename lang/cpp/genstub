@@ -14,7 +14,7 @@ H_HEADER_FMT = """\
 extern "C" {
 #endif
 
-#define {{ interface_name | upper }}_INTERFACE ({{ interface_id }} << 16)
+#define {{ interface_name | upper }}_INTERFACE ({{ interface_id }} << 12)
 """
 
 H_MSG_FMT = """
