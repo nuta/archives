@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+if [ ! -d build/ktest ]; then
+    ./genconfig ARCH=posix TARGET=kernel APPS=kernel-test \
+        BUILD_DIR=build/ktest TARGET_FILE=build/ktest/ktest
+fi
+
+make run -j4 BUILD_DIR=build/ktest

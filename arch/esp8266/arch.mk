@@ -1,12 +1,12 @@
-arch_objs += \
-    panic.o      \
-    boot.o       \
-    init.o       \
-    mutex.o      \
-    printchar.o  \
-    interrupt.o  \
-    asm_thread.o \
-    thread.o
+objs += \
+    $(BUILD_DIR)/$(arch_dir)/panic.o      \
+    $(BUILD_DIR)/$(arch_dir)/boot.o       \
+    $(BUILD_DIR)/$(arch_dir)/init.o       \
+    $(BUILD_DIR)/$(arch_dir)/mutex.o      \
+    $(BUILD_DIR)/$(arch_dir)/printchar.o  \
+    $(BUILD_DIR)/$(arch_dir)/interrupt.o  \
+    $(BUILD_DIR)/$(arch_dir)/asm_thread.o \
+    $(BUILD_DIR)/$(arch_dir)/thread.o
 
 CC := xtensa-lx106-elf-gcc
 CXX := xtensa-lx106-elf-g++
@@ -19,7 +19,7 @@ COMMON += -DARCH_ESP8266
 override CFLAGS   += $(COMMON)
 override CXXFLAGS += $(COMMON)
 override CPPFLAGS += -I$(arch_dir)
-override LDFLAGS  += -nostdlib -static -Wl,-T$(arch_dir)/esp8266.lds -Wl,-Map,$(BUILD_DIR)/$(target).map -flto
+override LDFLAGS  += -nostdlib -static -Wl,-T$(arch_dir)/esp8266.lds -Wl,-Map,$(BUILD_DIR)/$(TARGET).map -flto
 
 STRIPFLAGS += -s -R .comment -R .xtensa.info -R .xt.lit -R .xt.prop
 

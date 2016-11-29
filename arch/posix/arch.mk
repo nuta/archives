@@ -1,11 +1,11 @@
-arch_objs += \
-    panic.o     \
-    boot.o      \
-    mutex.o     \
-    printchar.o \
-    interrupt.o \
-    x86.o       \
-    thread.o
+objs += \
+    $(BUILD_DIR)/$(arch_dir)/panic.o     \
+    $(BUILD_DIR)/$(arch_dir)/boot.o      \
+    $(BUILD_DIR)/$(arch_dir)/mutex.o     \
+    $(BUILD_DIR)/$(arch_dir)/printchar.o \
+    $(BUILD_DIR)/$(arch_dir)/interrupt.o \
+    $(BUILD_DIR)/$(arch_dir)/x86.o       \
+    $(BUILD_DIR)/$(arch_dir)/thread.o
 
 LD := ld
 override CFLAGS += -DARCH_POSIX -ggdb3 -Os
@@ -27,5 +27,5 @@ $(TARGET_FILE): $(objs)
 	$(CC) $(CFLAGS) -o $@ $(objs)
 
 .PHONY: run
-run:
+run: $(TARGET_FILE)
 	PYTHONPATH=$(makefile_dir) ./tools/run ./$(TARGET_FILE)
