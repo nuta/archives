@@ -8,6 +8,8 @@ H_HEADER_FMT = """\
 #ifndef __RESEA_CSTUB_{{ interface_name | upper }}_H__
 #define __RESEA_CSTUB_{{ interface_name | upper }}_H__
 
+#include <resea.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
