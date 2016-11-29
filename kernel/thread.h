@@ -16,10 +16,10 @@ enum {
 
 struct process;
 struct thread {
+    struct thread *next;
     struct process *process;
     tid_t tid;
     int state;
-    struct thread *next;
     struct arch_thread arch;
 };
 
