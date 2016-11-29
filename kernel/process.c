@@ -29,7 +29,7 @@ struct process *create_process(void) {
 
     // initialize channels
     for (cid_t cid = 1; cid <= channels_max; cid++) {
-        channels[cid - 1].state = CHANNEL_CLOSED;
+        channels[cid - 1].flags = CHANNEL_CLOSED;
     }
 
     process->pid           = allocate_tid();

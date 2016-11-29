@@ -4,5 +4,6 @@ implements:
   - gpio
 requires:
   - gpio
+  - interrupt
 objs:
   - startup.o

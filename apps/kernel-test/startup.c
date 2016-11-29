@@ -1,7 +1,10 @@
 #include <resea.h>
 #include <resea/gpio.h>
+#include <resea/interrupt.h>
 #include <logging.h>
 #include <kernel/thread.h>
+#include <kernel/message.h>
+#include <kernel/event.h>
 #include <string.h>
 
 
@@ -40,6 +43,12 @@ void client_thread(uintmax_t arg) {
     TEST_EXPECT(!memcmp((const char *) buf[2], POINTER_TEST_STRING, buf[3]),
                 "#2: sent a pointer payload correctly");
     TEST_EXPECT(buf[3] == msg2[3],  "#2: sent a pointer size payload correctly");
+
+    listen_event(get_channel_by_cid(client), INTERRUPT_INTERRUPT0, 0);
+    fire_event(INTERRUPT_INTERRUPT0);
+    recv(client, (void *) &buf, sizeof(buf), 0, &from);
+    TEST_EXPECT(from == 1, "sent a message from kernel");
+    TEST_EXPECT(buf[0] == INTERRUPT_INTERRUPT0, "receive an event");
 
     // stub test
     INFO("client: entering stub tests");

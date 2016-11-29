@@ -2,6 +2,7 @@
 #include <mutex.h>
 #include <string.h>
 #include <logging.h>
+#include "event.h"
 #include "message.h"
 #include "kmalloc.h"
 #include "channel.h"
@@ -26,7 +27,7 @@ struct channel *get_channel_by_cid(cid_t cid) {
 
 static result_t _send(struct channel *ch, const void *m, size_t size, int flags) {
 
-    if (ch->state != CHANNEL_LINKED) {
+    if (CHANNEL_STATE(ch) != CHANNEL_LINKED) {
         WARN("bad channel (@%d)", ch->cid);
         return E_BAD_CID;
     }
@@ -131,6 +132,30 @@ static result_t _recv(struct channel *ch, void *buffer, size_t size, int flags,
     ch->buffer      = (uintptr_t) buffer;
     ch->buffer_size = size;
 
+    if (ch->flags & CHANNEL_EVENT) {
+        // look for a fired event
+        struct event *e = ch->events;
+        while (e) {
+            if (e->flags & EVENT_FIRED) {
+                // found fired event
+                e->flags &= ~EVENT_FIRED;
+
+                payload_t m[2];
+                m[0] = e->type;
+                m[1] = e->arg;
+                if (memcpy_s((void *) ch->buffer, ch->buffer_size, &m, sizeof(m)) != OK) {
+                    WARN("failed to fill an event message");
+                    return E_BAD_MEMCPY;
+                }
+
+                ch->sent_from = 1;
+                goto received;
+            }
+
+            e = e->next;
+        }
+    }
+
     // Resume a sender thread if it exists.
     struct thread *sender = ch->sender;
     if (sender) {
@@ -144,6 +169,7 @@ static result_t _recv(struct channel *ch, void *buffer, size_t size, int flags,
     }
 
     // Sending is done and the sent message is filled in `buffer`.
+received:
     *from = ch->sent_from;
     ch->sent_from = 0;
     ch->receiver = NULL;
@@ -160,8 +186,8 @@ cid_t _open(struct process *proc) {
 
     // Look for closed (unused) channels
     for (cid = 1; cid <= proc->channels_max; cid++) {
-        if (channels[cid - 1].state == CHANNEL_CLOSED) {
-            channels[cid - 1].state = CHANNEL_OPEN;
+        if (CHANNEL_STATE(&channels[cid - 1]) == CHANNEL_CLOSED) {
+            channels[cid - 1].flags = CHANNEL_OPEN;
             mutex_unlock(&proc->channels_lock);
 
             // Initialize the allocated channel
@@ -246,10 +272,10 @@ result_t call(cid_t cid, const void *m, size_t m_size,
 result_t _link(struct channel *ch1, struct channel *ch2) {
     // TODO: add a assertion
 
-    ch1->state     = CHANNEL_LINKED;
-    ch1->linked_to = ch2;
-    ch2->state     = CHANNEL_LINKED;
-    ch2->linked_to = ch1;
+    ch1->flags      = (ch1->flags & (~3)) | CHANNEL_LINKED;
+    ch1->linked_to  = ch2;
+    ch2->flags      = (ch2->flags & (~3)) | CHANNEL_LINKED;
+    ch2->linked_to  = ch1;
 
     return OK;
 }
