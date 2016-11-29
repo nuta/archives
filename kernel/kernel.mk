@@ -6,4 +6,5 @@ objs += \
     kernel/thread.o     \
     kernel/message.o    \
     kernel/resources.o  \
+    kernel/timer.o      \
     kernel/kmalloc.o
