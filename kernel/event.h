@@ -20,5 +20,6 @@ struct event {
 
 void listen_event(struct channel *ch, msgid_t type, uintmax_t arg);
 void fire_event(msgid_t type);
+bool fire_event_to(struct channel *ch, msgid_t type);
 
 #endif

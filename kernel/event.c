@@ -24,16 +24,25 @@ void listen_event(struct channel *ch, msgid_t type, uintmax_t arg) {
 }
 
 
+bool fire_event_to(struct channel *ch, msgid_t type) {
+
+   for (struct event *e = ch->events; e; e = e->next) {
+       if (e->type == type) {
+            e->flags |= EVENT_FIRED;
+            DEBUG("fired the event 0x%x", type);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
 void fire_event(msgid_t type) {
 
     for (struct channel * ch = listeners; ch; ch = ch->next) {
-        for (struct event *e = ch->events; e; e = e->next) {
-            if (e->type == type) {
-                e->flags |= EVENT_FIRED;
-                DEBUG("fired the event 0x%x", type);
-                return;
-            }
-        }
+        if (fire_event_to(ch, type))
+            return;
     }
 
     DEBUG("no event listener of the event 0x%x", type);
