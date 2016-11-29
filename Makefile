@@ -31,6 +31,7 @@ ifneq ($(ARCH),)
            $(stub_objs)
     include arch/$(ARCH)/arch.mk
     -include $(objs:.o=.deps)
+    interfaces := $(sort $(interfaces))
 endif
 
 .SUFFIXES:
