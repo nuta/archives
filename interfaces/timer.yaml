@@ -1,0 +1,13 @@
+name: timer
+id: 4
+
+messages:
+  timeout:
+    id: 1000
+    payloads:
+  interval:
+    id: 1001
+    payloads:
+  oneshot:
+    id: 1002
+    payloads:
