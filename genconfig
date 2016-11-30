@@ -6,14 +6,11 @@ import resea
 
 
 CONFIG_MK_FMT = """\
-APPS        = {{ APPS | join(" ") }}
-ARCH        = {{ ARCH }}
-TARGET      = {{ TARGET }}
-BUILD_DIR   = {{ BUILD_DIR }}
-LANGS       = cpp
-TARGET_FILE = {{ TARGET_FILE }}
+{% for k, v in values.items() %}
+{{ k }} = {{ v }}
+{% endfor %}
 
-{% if TARGET == "kernel" %}
+{% if values["TARGET"] == "kernel" %}
 include kernel/kernel.mk
 {% endif %}
 
@@ -31,31 +28,28 @@ def main(args):
     values = {}
     for value in args.values:
         k, v = value.split("=", 2)
-        if k in ["APPS"]:
-            values[k] = v.split(" ")
-        else:
-            values[k] = v
+        values[k] = v
 
     objs = []
     interfaces = set()
-    for app in values.get("APPS", []):
+    for app in values["APPS"].split(" "):
         app_dir = os.path.join("apps", app)
         yaml = resea.load_yaml(os.path.join(app_dir, "app.yaml"))
         objs += map(lambda obj: os.path.join(app_dir, obj), yaml["objs"])
         interfaces.update(yaml["requires"])
         interfaces.update(yaml["implements"])
 
-    values.update({
-        "interfaces": interfaces,
-        "objs": objs
-    })
-
+    values.setdefault("LANGS", "cpp")
     values.setdefault("BUILD_DIR", "build")
     values.setdefault("TARGET_FILE", os.path.join(values["BUILD_DIR"], values["TARGET"] + ".elf"))
 
     os.makedirs(values["BUILD_DIR"], exist_ok=True)
     with open(os.path.join(values["BUILD_DIR"], "config.mk"), "w") as f:
-        f.write(resea.fmt(CONFIG_MK_FMT, values))
+        f.write(resea.fmt(CONFIG_MK_FMT, {
+            "interfaces": interfaces,
+            "objs": objs,
+            "values": values,
+        }))
 
 
 if __name__ == "__main__":
