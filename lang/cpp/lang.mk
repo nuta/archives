@@ -12,7 +12,8 @@ objs += \
 stub_objs += $(c_stubs:.c=.o)
 
 CPP_GENSTUB = ./lang/cpp/genstub
-override CFLAGS   += -Wall -std=c11 -Wno-incompatible-library-redeclaration
+override CFLAGS   += -Wall -std=c11 -Wno-incompatible-library-redeclaration \
+                     -Werror=implicit-function-declaration
 override CXXFLAGS += -Wall -std=c++11 -fno-exceptions -fno-rtti
 override CPPFLAGS += -Ilang/cpp -Ilang/cpp/cpp -I$(BUILD_DIR)/stubs/cpp -I.
 
