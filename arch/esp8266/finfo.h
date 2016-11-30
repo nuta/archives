@@ -12,9 +12,8 @@ enum {
 };
 
 struct firmware_info {
-    void (*start_loop)(void);
     NORETURN void (*update)(unsigned long deployment_id);
-    void (*set_interval)(int ms, void (*callback)(void));
+    void (*delay)(unsigned long ms);
     void (*dprint)(const char *msg, unsigned x);
     void (*printchar)(const char ch);
     int (*read_adc)(void);
