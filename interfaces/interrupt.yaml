@@ -3,70 +3,70 @@ id: 3
 
 messages:
   interrupt0:
-      desc: "Interrupt #0"
-      id: 1000
-      payloads:
+    desc: "Interrupt #0"
+    id: 1000
+    payloads:
   interrupt1:
-      desc: "Interrupt #1"
-      id: 1001
-      payloads:
+    desc: "Interrupt #1"
+    id: 1001
+    payloads:
   interrupt2:
-      desc: "Interrupt #2"
-      id: 1002
-      payloads:
+    desc: "Interrupt #2"
+    id: 1002
+    payloads:
   interrupt3:
-      desc: "Interrupt #3"
-      id: 1003
-      payloads:
+    desc: "Interrupt #3"
+    id: 1003
+    payloads:
   interrupt4:
-      desc: "Interrupt #4"
-      id: 1004
-      payloads:
+    desc: "Interrupt #4"
+    id: 1004
+    payloads:
   interrupt5:
-      desc: "Interrupt #5"
-      id: 1005
-      payloads:
+    desc: "Interrupt #5"
+    id: 1005
+    payloads:
   interrupt6:
-      desc: "Interrupt #6"
-      id: 1006
-      payloads:
+    desc: "Interrupt #6"
+    id: 1006
+    payloads:
   interrupt7:
-      desc: "Interrupt #7"
-      id: 1007
-      payloads:
+    desc: "Interrupt #7"
+    id: 1007
+    payloads:
   interrupt8:
-      desc: "Interrupt #8"
-      id: 1008
-      payloads:
+    desc: "Interrupt #8"
+    id: 1008
+    payloads:
   interrupt9:
-      desc: "Interrupt #9"
-      id: 1009
-      payloads:
+    desc: "Interrupt #9"
+    id: 1009
+    payloads:
   interrupt10:
-      desc: "Interrupt #10"
-      id: 1010
-      payloads:
+    desc: "Interrupt #10"
+    id: 1010
+    payloads:
   interrupt11:
-      desc: "Interrupt #11"
-      id: 1011
-      payloads:
+    desc: "Interrupt #11"
+    id: 1011
+    payloads:
   interrupt12:
-      desc: "Interrupt #12"
-      id: 1012
-      payloads:
+    desc: "Interrupt #12"
+    id: 1012
+    payloads:
   interrupt13:
-      desc: "Interrupt #13"
-      id: 1013
-      payloads:
+    desc: "Interrupt #13"
+    id: 1013
+    payloads:
   interrupt14:
-      desc: "Interrupt #14"
-      id: 1014
-      payloads:
+    desc: "Interrupt #14"
+    id: 1014
+    payloads:
   interrupt15:
-      desc: "Interrupt #15"
-      id: 1015
-      payloads:
+    desc: "Interrupt #15"
+    id: 1015
+    payloads:
   interrupt16:
-      desc: "Interrupt #16"
-      id: 1016
-      payloads:
+    desc: "Interrupt #16"
+    id: 1016
+    payloads:
