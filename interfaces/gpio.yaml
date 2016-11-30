@@ -73,8 +73,27 @@ messages:
         type: int
         desc: "`HIGH` or `LOW`."
 
-  read_analog:
+  write_analog:
     id: 7
+    desc: Writes a value to an analog pin (PWM).
+    reply: write_analog_reply
+    payloads:
+      - name: pin
+        type: int
+        desc: The pin number.
+      - name: value
+        type: int
+        desc: The value. The range depends on the board.
+  write_analog_reply:
+    id: 8
+    desc: The reply message of `.write_analog`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  read_analog:
+    id: 9
     desc: Reads a value from a analog input pin.
     reply: read_analog_reply
     payloads:
@@ -82,7 +101,7 @@ messages:
         type: int
         desc: The pin number.
   read_analog_reply:
-    id: 8
+    id: 10
     desc: The reply message of `.read_analog`.
     payloads:
       - name: result
