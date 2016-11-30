@@ -95,9 +95,21 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
                 }
 
                 break;
-            case PAYLOAD_CHANNEL:
-                NOT_YET_IMPLEMENTED();
+            case PAYLOAD_CHANNEL: {
+                cid_t cid = _open(dst->process);
+                struct channel *receiver_ch = _get_channel_by_cid(dst->process, cid);
+                struct channel *sender_ch = get_channel_by_cid(payloads[i]);
+
+                if (sender_ch->flags & CHANNEL_LINKED) {
+                    NOT_YET_IMPLEMENTED();
+                    payloads[i] = 0;
+                    break;
+                }
+
+                _link(sender_ch, receiver_ch);
+                payloads[i] = receiver_ch->cid;
                 break;
+            }
             default:
                 // Handle an unknown payload as inline.
                 WARN("unknown payload type: %d", type);
