@@ -1,8 +1,10 @@
 #include <resea.h>
 #include <logging.h>
 #include <string.h>
+#include <malloc.h>
 #include <resea/channel.h>
 #include <resea/gpio.h>
+#include <resea/i2c.h>
 #include <resea/interrupt.h>
 #include <resea/makestack.h>
 #include "kernel/event.h"
@@ -104,6 +106,24 @@ static void mainloop(channel_t server) {
         reply_interrupt_listen(reply_to, OK);
         break;
     }
+    case I2C_SEND: {
+        int addr    = buf[2];
+        char *data  = (char *) buf[3];
+        size_t size = buf[4];
+        finfo->i2c_send(addr, data, size);
+        reply_i2c_send(reply_to, OK);
+        break;
+    }
+    case I2C_RECEIVE: {
+        int addr    = buf[2];
+        size_t size = buf[3];
+        char *data  = (char *) malloc(size);
+        finfo->i2c_receive(addr, data, size);
+        reply_i2c_receive(reply_to, OK, data, size);
+
+        free(data);
+        break;
+    }
     default:
         WARN("esp82660-driver: unknown message (%p)", buf[1]);
     }
@@ -119,6 +139,7 @@ void esp8266_driver_startup(void) {
     result_t r;
 
     call_channel_register(channel_server, server, GPIO_INTERFACE, &r);
+    call_channel_register(channel_server, server, I2C_INTERFACE, &r);
     call_channel_register(channel_server, server, MAKESTACK_INTERFACE, &r);
 
     INFO("esp8266-driver: ready");

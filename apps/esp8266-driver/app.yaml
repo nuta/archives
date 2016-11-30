@@ -2,6 +2,7 @@ name: esp8266-driver
 author: Seiya Nuta <nuta@seiya.me>
 implements:
   - gpio
+  - i2c
   - interrupt
   - makestack
 requires:

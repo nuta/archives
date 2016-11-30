@@ -29,6 +29,8 @@ struct firmware_info {
     const char *(*get_server_url)(void);
     unsigned long (*get_deployment_id)(void);
     void (*accept_interrupt)(int pin, void (*cb)(int));
+    void (*i2c_send)(int addr, const void *buf, size_t size);
+    void (*i2c_receive)(int addr, void *buf, size_t size);
 };
 
 extern struct firmware_info *finfo;
