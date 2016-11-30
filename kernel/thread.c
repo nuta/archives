@@ -6,6 +6,7 @@
 #include "process.h"
 #include "kmalloc.h"
 #include "panic.h"
+#include "timer.h"
 
 
 static tid_t last_tid = 0;
@@ -155,7 +156,8 @@ void yield(void) {
             }
         }
 
-        // No threads to run. Continue the current thread.
+        // No threads to run.
         mutex_unlock(&resources->runqueue_lock);
+        arch_halt_until(get_next_timeout());
     }
 }
