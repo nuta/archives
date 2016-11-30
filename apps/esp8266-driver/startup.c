@@ -140,6 +140,7 @@ void esp8266_driver_startup(void) {
 
     call_channel_register(channel_server, server, GPIO_INTERFACE, &r);
     call_channel_register(channel_server, server, I2C_INTERFACE, &r);
+    call_channel_register(channel_server, server, INTERRUPT_INTERFACE, &r);
     call_channel_register(channel_server, server, MAKESTACK_INTERFACE, &r);
 
     INFO("esp8266-driver: ready");
