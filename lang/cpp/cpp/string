@@ -51,6 +51,7 @@ public:
     // extensions
     bool startswith(const char *s) const;
     int to_int() const;
+    void fmt(const char *format, ...);
 
     char *buffer() const {
         return _buffer;

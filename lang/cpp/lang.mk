@@ -6,6 +6,7 @@ objs += \
     lang/cpp/cstring.o \
     lang/cpp/string.o  \
     lang/cpp/new.o     \
+    lang/cpp/strfmt.o  \
     lang/cpp/channel.o
 
 stub_objs += $(c_stubs:.c=.o)

@@ -1,3 +1,4 @@
+#include <strfmt.h>
 #include <string.h>
 #include <string>
 
@@ -123,4 +124,18 @@ void string::init() {
     _buffer   = nullptr;
     _length   = 0;
     _capacity = 0;
+}
+
+
+void string::fmt(const char *format, ...) {
+    va_list vargs;
+
+    va_start(vargs, format);
+
+    vstrfmt(format, vargs, [](void *_s, char c) {
+        string *s = (string *) _s;
+        s->append(c);
+    }, this);
+
+    va_end(vargs);
 }
