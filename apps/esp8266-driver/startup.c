@@ -6,6 +6,7 @@
 #include <resea/interrupt.h>
 #include <resea/makestack.h>
 #include "kernel/event.h"
+#include "kernel/message.h"
 #include "arch/esp8266/finfo.h"
 
 
@@ -89,7 +90,8 @@ static void mainloop(channel_t server) {
         DEBUG("interrupt.accept");
         channel_t channel = buf[2];
         int pin           = buf[3];
-        listen_event(get_channel_by_cid(channel), INTERRUPT_INTERRUPT0 + pin, 0);
+        payload_t arg     = buf[4];
+        listen_event(get_channel_by_cid(channel), INTERRUPT_INTERRUPT0 + pin, arg);
         finfo->accept_interrupt(pin, interrupt_handler);
         reply_interrupt_listen(reply_to, OK);
         break;
