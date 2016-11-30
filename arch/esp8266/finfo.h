@@ -18,6 +18,7 @@ struct firmware_info {
     void (*dprint)(const char *msg, unsigned x);
     void (*printchar)(const char ch);
     int (*read_adc)(void);
+    void (*analog_write)(int pin, int value);
     int (*gpio_read)(int pin);
     void (*gpio_write)(int pin, int data);
     void (*gpio_set_pin_mode)(int pin, int mode);

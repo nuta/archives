@@ -47,6 +47,14 @@ static void mainloop(channel_t server) {
         send_gpio_read_analog_reply(reply_to, OK, finfo->read_adc(), 0);
         break;
     }
+    case GPIO_WRITE_ANALOG: {
+        DEBUG("gpio.write_analog");
+        int pin = buf[2];
+        int value = buf[3];
+        finfo->analog_write(pin, value);
+        send_gpio_write_analog_reply(reply_to, OK, 0);
+        break;
+    }
     case GPIO_WRITE: {
         DEBUG("gpio.write");
         int pin = buf[2];
