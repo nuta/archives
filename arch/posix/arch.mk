@@ -3,7 +3,7 @@ objs += \
     $(BUILD_DIR)/$(arch_dir)/boot.o      \
     $(BUILD_DIR)/$(arch_dir)/mutex.o     \
     $(BUILD_DIR)/$(arch_dir)/printchar.o \
-    $(BUILD_DIR)/$(arch_dir)/interrupt.o \
+    $(BUILD_DIR)/$(arch_dir)/halt.o      \
     $(BUILD_DIR)/$(arch_dir)/x86.o       \
     $(BUILD_DIR)/$(arch_dir)/thread.o
 
