@@ -2,6 +2,25 @@ name: interrupt
 id: 3
 
 messages:
+  listen:
+    desc: Receive interrupt event messages of the interrupt pin.
+    id: 1
+    reply: listen_reply
+    payloads:
+      - name: channel
+        type: channel
+        desc: The channel where events will be sent to.
+      - name: pin
+        type: int
+        desc: The interrupt vector. Depends on the environment.
+  listen_reply:
+    desc: The reply message of `.listen`.
+    id: 2
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
   interrupt0:
     desc: "Interrupt #0"
     id: 1000
