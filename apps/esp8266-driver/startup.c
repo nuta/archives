@@ -3,8 +3,16 @@
 #include <string.h>
 #include <resea/channel.h>
 #include <resea/gpio.h>
+#include <resea/interrupt.h>
 #include <resea/makestack.h>
+#include "kernel/event.h"
 #include "arch/esp8266/finfo.h"
+
+
+static void interrupt_handler(int pin) {
+
+    fire_event(INTERRUPT_INTERRUPT0 + pin);
+}
 
 
 static void mainloop(channel_t server) {
@@ -74,6 +82,16 @@ static void mainloop(channel_t server) {
         DEBUG("makestack.get_deployment_id");
         int deployment_id = finfo->get_deployment_id();
         reply_makestack_get_deployment_id(reply_to, deployment_id);
+        break;
+    }
+    // TODO: move this into the kernel
+    case INTERRUPT_LISTEN: {
+        DEBUG("interrupt.accept");
+        channel_t channel = buf[2];
+        int pin           = buf[3];
+        listen_event(get_channel_by_cid(channel), INTERRUPT_INTERRUPT0 + pin, 0);
+        finfo->accept_interrupt(pin, interrupt_handler);
+        reply_interrupt_listen(reply_to, OK);
         break;
     }
     default:

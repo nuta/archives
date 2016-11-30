@@ -27,6 +27,7 @@ struct firmware_info {
     const char *(*get_device_secret)(void);
     const char *(*get_server_url)(void);
     unsigned long (*get_deployment_id)(void);
+    void (*accept_interrupt)(int pin, void (*cb)(int));
 };
 
 extern struct firmware_info *finfo;
