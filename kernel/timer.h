@@ -10,5 +10,6 @@ struct timer {
 
 void add_timer(struct channel *ch, size_t ms);
 void advance_clock(size_t ms);
+size_t get_next_timeout(void);
 
 #endif

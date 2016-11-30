@@ -5,8 +5,10 @@
 #include "timer.h"
 
 
+static size_t next_timeout = SIZE_MAX;
 static struct timer *timers = NULL;
 static mutex_t timers_lock = MUTEX_INITIALIZER;
+
 
 void add_interval_timer(struct channel *ch, size_t interval_ms, uintmax_t arg) {
 
@@ -25,7 +27,10 @@ void add_interval_timer(struct channel *ch, size_t interval_ms, uintmax_t arg) {
 
 void advance_clock(size_t ms) {
 
+    size_t next = (timers)? timers->current : 1000;
+
     for (struct timer *t = timers; t; t = t->next) {
+
         if (t->current < ms) {
             fire_event_to(t->ch, TIMER_TIMEOUT);
 
@@ -35,6 +40,16 @@ void advance_clock(size_t ms) {
             t->current = t->reset;
         } else {
             t->current -= ms;
+            if (t->current < next)
+                next = t->current;
         }
     }
+
+    next_timeout = next;
+}
+
+
+size_t get_next_timeout(void) {
+
+    return (next_timeout == SIZE_MAX) ? 0 : next_timeout;
 }
