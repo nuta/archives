@@ -30,6 +30,7 @@ struct firmware_info {
     void (*accept_interrupt)(int pin, void (*cb)(int));
     void (*i2c_send)(int addr, const void *buf, size_t size);
     void (*i2c_receive)(int addr, void *buf, size_t size);
+    unsigned long (*millis)(void);
 };
 
 extern struct firmware_info *finfo;
