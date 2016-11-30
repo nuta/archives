@@ -6,7 +6,7 @@ import resea
 
 
 CONFIG_MK_FMT = """\
-APPS        = {{ APPS | join }}
+APPS        = {{ APPS | join(" ") }}
 ARCH        = {{ ARCH }}
 TARGET      = {{ TARGET }}
 BUILD_DIR   = {{ BUILD_DIR }}
