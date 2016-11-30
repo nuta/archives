@@ -10,6 +10,7 @@ void arch_create_thread(struct arch_thread *thread, uintptr_t start, uintmax_t a
 int  arch_yield(struct arch_thread *thread);
 void arch_panic(void);
 void arch_wait_interrupt(void);
+void arch_halt_until(size_t ms);
 void arch_printchar(const char ch);
 
 #endif
