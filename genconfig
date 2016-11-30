@@ -50,6 +50,7 @@ def main(args):
         "objs": objs
     })
 
+    values.setdefault("BUILD_DIR", "build")
     values.setdefault("TARGET_FILE", os.path.join(values["BUILD_DIR"], values["TARGET"] + ".elf"))
 
     os.makedirs(values["BUILD_DIR"], exist_ok=True)
