@@ -1,0 +1,69 @@
+name: http
+id: 12
+
+consts:
+  METHOD_GET:
+    type: int
+    value: 0
+  METHOD_POST:
+    type: int
+    value: 1
+  METHOD_DELETE:
+    type: int
+    value: 2
+  METHOD_PUT:
+    type: int
+    value: 3
+  METHOD_OPTIONS:
+    type: int
+    value: 4
+  METHOD_HEAD:
+    type: int
+    value: 5
+  OPTION_DISCARD_RESPONSE_PAYLOAD:
+    type: int
+    value: 0x0100
+
+messages:
+  request:
+    desc: Performs a HTTP request synchronously.
+    id: 1
+    reply: request_reply
+    payloads:
+      - name: options
+        type: int
+        desc: The options (`METHOD_*` and `OPTION_*`).
+      - name: url
+        type: data
+        desc: The URL.
+      - name: url_size
+        type: size
+        desc: The sizeof `url`.
+      - name: headers
+        type: data
+        desc: The headers.
+      - name: headers_size
+        type: size
+        desc: The sizeof `headers`.
+      - name: payload
+        type: data
+        desc: The request payload.
+      - name: payload_size
+        type: size
+        desc: The sizeof `payload`.
+  request_reply:
+    desc: The reply message of `.request`.
+    id: 2
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+      - name: status_code
+        type: int
+        desc: The HTTP status code.
+      - name: resp
+        type: data
+        desc: The response payload.
+      - name: resp_size
+        type: size
+        desc: The size of `resp`.
