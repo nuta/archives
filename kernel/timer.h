@@ -8,7 +8,9 @@ struct timer {
     size_t reset;  // 0 on oneshot timer
 };
 
-void add_timer(struct channel *ch, size_t ms);
+void add_oneshot_timer(struct channel *ch, size_t ms, uintmax_t arg);
+void add_interval_timer(struct channel *ch, size_t interval, uintmax_t arg);
+
 void advance_clock(size_t ms);
 size_t get_next_timeout(void);
 

@@ -10,18 +10,31 @@ static struct timer *timers = NULL;
 static mutex_t timers_lock = MUTEX_INITIALIZER;
 
 
-void add_interval_timer(struct channel *ch, size_t interval_ms, uintmax_t arg) {
+static void add_timer(struct channel *ch, size_t current, size_t reset,
+                      uintmax_t arg) {
 
-    listen_event(ch, TIMER_INTERVAL, arg);
+    listen_event(ch, TIMER_TIMEOUT, arg);
 
     struct timer *timer = kmalloc(sizeof(*timer), KMALLOC_NORMAL);
-    timer->ch = ch;
-    timer->current = interval_ms;
-    timer->reset   = interval_ms;
+    timer->ch      = ch;
+    timer->current = current;
+    timer->reset   = reset;
 
     mutex_lock(&timers_lock);
     insert_into_list((struct list **) &timers, timer);
     mutex_unlock(&timers_lock);
+}
+
+
+void add_interval_timer(struct channel *ch, size_t interval, uintmax_t arg) {
+
+    add_timer(ch, interval, interval, arg);
+}
+
+
+void add_oneshot_timer(struct channel *ch, size_t ms, uintmax_t arg) {
+
+    add_timer(ch, ms, 0, arg);
 }
 
 
