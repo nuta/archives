@@ -158,7 +158,7 @@ static void mainloop(channel_t server) {
         int options;
         int status_code;
         void *resp;
-        size_t resp_size;
+        size_t resp_size, received_size;
         static char *methods[] = { "GET", "POST", "DELETE", "PUT", "OPTIONS", "HEAD" };
 
         unmarshal_http_request((payload_t *) &buf, &options, &url, &url_size,
@@ -179,10 +179,10 @@ static void mainloop(channel_t server) {
             resp = malloc(resp_size);
         }
 
-        finfo->http_request(url, url_size, method, headers, headers_size,
-                            payload, payload_size, &status_code, resp, &resp_size);
+        status_code = finfo->http_request(method, url, url_size, headers, headers_size,
+                          payload, payload_size, resp, resp_size, &received_size);
 
-        reply_http_request(reply_to, OK, status_code, resp, resp_size);
+        reply_http_request(reply_to, OK, status_code, resp, received_size);
 
         free(resp);
         break;
