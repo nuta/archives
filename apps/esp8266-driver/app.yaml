@@ -5,6 +5,7 @@ implements:
   - i2c
   - interrupt
   - makestack
+  - timer
 requires:
   - channel
 objs:

@@ -5,9 +5,11 @@
 #include <resea/channel.h>
 #include <resea/gpio.h>
 #include <resea/i2c.h>
+#include <resea/timer.h>
 #include <resea/interrupt.h>
 #include <resea/makestack.h>
 #include "kernel/event.h"
+#include "kernel/timer.h"
 #include "kernel/message.h"
 #include "arch/esp8266/finfo.h"
 
@@ -124,6 +126,26 @@ static void mainloop(channel_t server) {
         free(data);
         break;
     }
+    case TIMER_SET_INTERVAL: {
+        channel_t channel;
+        uint32_t  ms;
+        uintmax_t arg;
+        unmarshal_timer_set_interval((payload_t *) &buf, &channel, &ms, &arg);
+
+        add_interval_timer(get_channel_by_cid(channel), ms, arg);
+        reply_timer_set_interval(reply_to, OK);
+        break;
+    }
+    case TIMER_SET_ONESHOT: {
+        channel_t channel;
+        uint32_t  ms;
+        uintmax_t arg;
+        unmarshal_timer_set_oneshot((payload_t *) &buf, &channel, &ms, &arg);
+
+        add_oneshot_timer(get_channel_by_cid(channel), ms, arg);
+        reply_timer_set_oneshot(reply_to, OK);
+        break;
+    }
     default:
         WARN("esp82660-driver: unknown message (%p)", buf[1]);
     }
@@ -140,6 +162,7 @@ void esp8266_driver_startup(void) {
 
     call_channel_register(channel_server, server, GPIO_INTERFACE, &r);
     call_channel_register(channel_server, server, I2C_INTERFACE, &r);
+    call_channel_register(channel_server, server, TIMER_INTERFACE, &r);
     call_channel_register(channel_server, server, INTERRUPT_INTERFACE, &r);
     call_channel_register(channel_server, server, MAKESTACK_INTERFACE, &r);
 
