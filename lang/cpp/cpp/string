@@ -6,11 +6,11 @@
 class string {
 private:
     size_t _capacity;
+    size_t _length;
     char *_buffer;
     void init();
 
 public:
-    size_t _length; // TODO: make this private
 
     // The maximum value of size_t. Note that
     // size_t is *un*signed integer.
@@ -22,6 +22,7 @@ public:
     const char at(size_t pos) const;
     void reserve(size_t n);
     string& append(const char *s);
+    string& append(const char *s, size_t n);
     string& append(char c);
     size_t find(const char *s, size_t pos = 0) const;
     size_t find(char c, size_t pos = 0) const;
@@ -52,10 +53,6 @@ public:
     bool startswith(const char *s) const;
     int to_int() const;
     void fmt(const char *format, ...);
-
-    char *buffer() const {
-        return _buffer;
-    }
 };
 
 #endif

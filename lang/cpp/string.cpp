@@ -45,15 +45,22 @@ void string::reserve(size_t n) {
 
 string& string::append(const char *s) {
 
+    return append(s, SIZE_MAX);
+}
+
+
+string& string::append(const char *s, size_t n) {
+
     size_t s_len = strlen(s);
     if (_capacity - _length < s_len || (_capacity == 0 && s_len == 0)) {
         reserve((_length + s_len + 1) * 2);
     }
 
-    while (*s) {
+    while (*s && n > 0) {
         _buffer[_length] = *s;
         _length++;
         s++;
+        n--;
     }
 
     _buffer[_length] = '\0';
