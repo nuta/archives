@@ -21,9 +21,10 @@ struct firmware_info {
     int (*gpio_read)(int pin);
     void (*gpio_write)(int pin, int data);
     void (*gpio_set_pin_mode)(int pin, int mode);
-    ferr_t (*http_request)(const char *host, int port, const char *method,
-                           const char *path, const void *headers, const void *payload,
-                           size_t payload_size, void *buf, size_t buf_size, bool tls);
+    ferr_t (*http_request)(const char *url, size_t url_size, const char *method,
+                           const void *headers, size_t headers_size,
+                           const void *payload, size_t payload_size,
+                           int *status_code, void *buf, size_t *buf_size);
     const char *(*get_device_secret)(void);
     const char *(*get_server_url)(void);
     unsigned long (*get_deployment_id)(void);

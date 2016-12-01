@@ -8,6 +8,7 @@
 #include <resea/timer.h>
 #include <resea/interrupt.h>
 #include <resea/makestack.h>
+#include <resea/http.h>
 #include "kernel/event.h"
 #include "kernel/timer.h"
 #include "kernel/message.h"
@@ -146,6 +147,46 @@ static void mainloop(channel_t server) {
         reply_timer_set_oneshot(reply_to, OK);
         break;
     }
+    case HTTP_REQUEST: {
+        void *url;
+        size_t url_size;
+        char *method;
+        void *headers;
+        size_t headers_size;
+        void *payload;
+        size_t payload_size;
+        int options;
+        int status_code;
+        void *resp;
+        size_t resp_size;
+        static char *methods[] = { "GET", "POST", "DELETE", "PUT", "OPTIONS", "HEAD" };
+
+        unmarshal_http_request((payload_t *) &buf, &options, &url, &url_size,
+                               &headers, &headers_size, &payload, &payload_size);
+
+        if ((options & 0xff) > 5) {
+            // Invalid HTTP method.
+            reply_http_request(reply_to, E_BAD_REQUEST, 0, NULL, 0);
+            break;
+        }
+
+        method = methods[options & 0xff];
+
+        if (options & HTTP_OPTION_DISCARD_RESPONSE_PAYLOAD) {
+            resp = NULL;
+        } else {
+            resp_size = 1024;
+            resp = malloc(resp_size);
+        }
+
+        finfo->http_request(url, url_size, method, headers, headers_size,
+                            payload, payload_size, &status_code, resp, &resp_size);
+
+        reply_http_request(reply_to, OK, status_code, resp, resp_size);
+
+        free(resp);
+        break;
+    }
     default:
         WARN("esp82660-driver: unknown message (%p)", buf[1]);
     }
@@ -165,6 +206,7 @@ void esp8266_driver_startup(void) {
     call_channel_register(channel_server, server, TIMER_INTERFACE, &r);
     call_channel_register(channel_server, server, INTERRUPT_INTERFACE, &r);
     call_channel_register(channel_server, server, MAKESTACK_INTERFACE, &r);
+    call_channel_register(channel_server, server, HTTP_INTERFACE, &r);
 
     INFO("esp8266-driver: ready");
     for (;;)

@@ -6,6 +6,7 @@ implements:
   - interrupt
   - makestack
   - timer
+  - http
 requires:
   - channel
 objs:
