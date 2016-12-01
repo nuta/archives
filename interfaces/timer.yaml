@@ -65,3 +65,6 @@ messages:
   timeout:
     id: 1000
     payloads:
+      - name: arg
+        type: uintmax
+        desc: The data set by `.set_*` messages.
