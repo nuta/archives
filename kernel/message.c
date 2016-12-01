@@ -84,6 +84,11 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
                     break;
                 }
 
+                if (!payloads[i] || !pointer) {
+                    payloads[i - 1] = 0;
+                    continue;
+                }
+
                 size_t pointer_size = payloads[i];
                 if (current->process->pid == 1 && current->process == dst->process) {
                     // in-kernel
