@@ -10,6 +10,7 @@ enum {
     E_NOT_LINKED     = 4,
     E_BAD_MEMCPY     = 5,
     E_NOMEM          = 6,
+    E_BAD_REQUEST    = 7
 };
 
 #define PACKED      __attribute__((packed))
