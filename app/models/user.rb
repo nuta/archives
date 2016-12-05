@@ -5,7 +5,8 @@ class User < ActiveRecord::Base
   has_many :calendars, dependent: :destroy
 
   def authenticate(password)
-    self.password_hash == hash(password + self.password_salt)
+    ActiveSupport::SecurityUtils.secure_compare(self.password_hash,
+                                                hash(password + self.password_salt))
   end
 
   def password=(password)
