@@ -206,58 +206,62 @@ def generate_consts(yaml):
                 value=const["value"]))
 
 
-def generate_msg(interface_name, messages, msg_fmt):
-    messages = OrderedDict(sorted(messages.items()))
-    for name, msg in messages.items():
-        def generate_defs(fmt, payloads):
-            if payloads is None:
-                payloads = []
+def generate_msg(interface_name, messages, name, msg_fmt):
+    msg = messages[name]
+    def generate_defs(fmt, payloads):
+        if payloads is None:
+            payloads = []
 
-            args = list(map(lambda p: fmt.format(type=ctype(p['type']),
-                                                 name=p['name']), payloads))
+        args = list(map(lambda p: fmt.format(type=ctype(p['type']),
+                                             name=p['name']), payloads))
 
-            if args == []:
-                return ""
-            else:
-                return ", " + ", ".join(args)
-
-        id = msg["id"]
-        arg_defs = generate_defs("{type} {name}", msg["payloads"])
-        arg_ptr_defs = generate_defs("{type}* {name}", msg["payloads"])
-        args = generate_defs("{name}", msg["payloads"])
-        payloads, payloads_length = load_payload_defs(interface_name, name, msg["payloads"])
-
-        if name.endswith("_reply"):
-            is_reply_msg = True
-            without_suffix_name = name[:-len("_reply")]
+        if args == []:
+            return ""
         else:
-            is_reply_msg = False
+            return ", " + ", ".join(args)
 
-        if "reply" in msg:
-            reply_name = msg["reply"]
-            reply_ptr_defs = generate_defs("{type}* {name}", messages[reply_name]["payloads"])
-            reply_args = generate_defs("{name}", messages[reply_name]["payloads"])
-            args_length = len(payloads)
-            _, rets_length = load_payload_defs(interface_name, name, messages[reply_name]["payloads"])
-        else:
-            reply_name = None
+    id = msg["id"]
+    arg_defs = generate_defs("{type} {name}", msg["payloads"])
+    arg_ptr_defs = generate_defs("{type}* {name}", msg["payloads"])
+    args = generate_defs("{name}", msg["payloads"])
+    payloads, payloads_length = load_payload_defs(interface_name, name, msg["payloads"])
 
-        print(resea.fmt(msg_fmt, locals()))
+    if name.endswith("_reply"):
+        is_reply_msg = True
+        without_suffix_name = name[:-len("_reply")]
+    else:
+        is_reply_msg = False
+
+    if "reply" in msg:
+        reply_name = msg["reply"]
+        reply_ptr_defs = generate_defs("{type}* {name}", messages[reply_name]["payloads"])
+        reply_args = generate_defs("{name}", messages[reply_name]["payloads"])
+        args_length = len(payloads)
+        _, rets_length = load_payload_defs(interface_name, name, messages[reply_name]["payloads"])
+    else:
+        reply_name = None
+
+    print(resea.fmt(msg_fmt, locals()))
 
 
 def main(args):
     yaml = resea.load_yaml(args.file)
     file_type = args.type
     interface_name = yaml["name"]
+    messages = OrderedDict(sorted(yaml["messages"].items()))
+
     if args.type == 'c':
         print(resea.fmt(C_HEADER_FMT, locals()))
-        generate_msg(interface_name, yaml["messages"], C_MSG_FMT)
+        for name, msg in messages.items():
+            if msg.get('stub', True):
+                generate_msg(interface_name, messages, name, C_MSG_FMT)
         print(resea.fmt(C_FOOTER_FMT, locals()))
     elif args.type == 'h':
         interface_id = yaml["id"]
         print(resea.fmt(H_HEADER_FMT, locals()))
         generate_consts(yaml)
-        generate_msg(interface_name, yaml["messages"], H_MSG_FMT)
+        for name, _ in messages.items():
+            generate_msg(interface_name, messages, name, H_MSG_FMT)
         print(resea.fmt(H_FOOTER_FMT, locals()))
     else:
         sys.exit("genstub: unknown file type")
