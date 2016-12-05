@@ -10,6 +10,7 @@ A CalDAV server built on Ruby on Rails.
 ```
 $ gem install bundler
 $ bundle install --path vendor/bundle --jobs 4 --without postgres mysql
+# cp config/database.yml.example config/database.yml
 $ bundle exec rails db:migrate
 $ bundle exec rails user:add username=chandler password=123
 $ bundle exec rails s
@@ -18,8 +19,8 @@ $ bundle exec rails s
 ![Add a CalDAV account on macOS](https://raw.githubusercontent.com/seiyanuta/busybook/master/add-account-on-macos.png)
 
 ## Supported clients
-- OS X 10.11 (El Capitan): Calendar and Reminder
-- iOS 9: Calendar and Reminder
+- OS X 10.12 (Sierra): Calendar and Reminder
+- iOS 10: Calendar and Reminder
 
 ## Compliance
 - [RFC4918: HTTP Extensions for Web Distributed Authoring and Versioning (WebDAV)](http://tools.ietf.org/html/rfc4918)
@@ -39,6 +40,17 @@ $ bundle exec rails s
   - supported
 - [RFC6638: Scheduling Extensions to CalDAV](http://tools.ietf.org/html/rfc6638)
   - *not* supported
+
+## Testing
+
+```
+$ bundle exec rails user:add username=guest password=123
+$ rails s
+```
+
+```
+$ bundle exec rails test:run
+```
 
 ## License
 Public domain
