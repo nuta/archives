@@ -39,15 +39,13 @@ void add_oneshot_timer(struct channel *ch, size_t ms, uintmax_t arg) {
 
 
 void advance_clock(size_t ms) {
-
     size_t next = (timers)? timers->current : 1000;
 
     for (struct timer *t = timers; t; t = t->next) {
-
         if (t->current < ms) {
             fire_event_to(t->ch, TIMER_TIMEOUT);
 
-            if (t->reset)
+            if (!t->reset)
                 remove_from_list((struct list **) &timers, t);
 
             t->current = t->reset;
