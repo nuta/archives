@@ -149,6 +149,8 @@ static result_t _recv(struct channel *ch, void *buffer, size_t size, int flags,
     ch->buffer      = (uintptr_t) buffer;
     ch->buffer_size = size;
 
+retry:
+
     if (ch->flags & CHANNEL_EVENT) {
         // look for a fired event
         struct event *e = ch->events;
@@ -180,9 +182,10 @@ static result_t _recv(struct channel *ch, void *buffer, size_t size, int flags,
     }
 
     // Yield so that the sender thread can send a message.
-    while (current->state == THREAD_BLOCKED) {
+    if (current->state == THREAD_BLOCKED) {
         // TODO: implement and use queue_delete(runqueue, current)
         yield();
+        goto retry;
     }
 
     // Sending is done and the sent message is filled in `buffer`.
