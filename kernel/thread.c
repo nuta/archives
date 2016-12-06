@@ -93,7 +93,7 @@ struct thread *create_thread(struct process *process, uintptr_t start,
 
     mutex_unlock(&process->threads_lock);
 
-    DEBUG("created a new thread #%d", thread->tid);
+    DEBUG("created a new thread #%d, stack_bttom: %p", thread->tid, stack);
     return thread;
 }
 
