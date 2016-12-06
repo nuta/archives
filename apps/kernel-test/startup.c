@@ -5,6 +5,7 @@
 #include <kernel/thread.h>
 #include <kernel/message.h>
 #include <kernel/event.h>
+#include <kernel/list.h>
 #include <string.h>
 
 
@@ -139,9 +140,53 @@ static void test_log_bufferring() {
 }
 
 
+struct int_list {
+    struct list *next;
+    int a;
+};
+
+static void test_list() {
+    struct int_list *l = NULL;
+
+    struct int_list *e1 = (struct int_list *) malloc(sizeof(*e1));
+    struct int_list *e2 = (struct int_list *) malloc(sizeof(*e2));
+    struct int_list *e3 = (struct int_list *) malloc(sizeof(*e3));
+
+    insert_into_list((struct list **) &l, e1);
+    TEST_EXPECT(l == e1,
+                "insert_into_list() appends an element to an emptry list");
+
+    insert_into_list((struct list **) &l, e2);
+    TEST_EXPECT(l->next == (struct list *) e2,
+                "insert_into_list() appends an element to an list (e2)");
+    TEST_EXPECT(l->next->next == NULL,
+                "insert_into_list() set the terminal `next' to NULL (e2)");
+
+    insert_into_list((struct list **) &l, e3);
+    TEST_EXPECT(l->next == (struct list *) e3,
+                "insert_into_list() appends an element to an list (e3)");
+    TEST_EXPECT(l->next->next->next == NULL,
+                "insert_into_list() set the terminal `next' to NULL (e3)");
+
+    remove_from_list((struct list **) &l, e2);
+    TEST_EXPECT(l == e1 && l->next == (struct list *) e3 && l->next->next == NULL,
+                "remove_from_list() can removes an element in middle");
+
+    remove_from_list((struct list **) &l, e3);
+    TEST_EXPECT(l == e1 && l->next == NULL,
+                "remove_from_list() can removes the temrinal element");
+
+    remove_from_list((struct list **) &l, e1);
+    TEST_EXPECT(l == NULL,
+                "remove_from_list() can removes the head element");
+}
+
+
 void kernel_test_startup(void) {
     INFO("started kernel test");
 
+    INFO("test_list -----------------------------------");
+    test_list();
     INFO("test_log_bufferring -------------------------");
     test_log_bufferring();
     INFO("test_messaging ------------------------------");
