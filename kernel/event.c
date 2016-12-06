@@ -17,7 +17,6 @@ void listen_event(struct channel *ch, msgid_t type, uintmax_t arg) {
 
     ch->flags |= CHANNEL_EVENT;
 
-
     mutex_lock(&ch->receiver_lock);
     insert_into_list((struct list **) &ch->events, new_e);
     insert_into_list((struct list **) &listeners, ch);
