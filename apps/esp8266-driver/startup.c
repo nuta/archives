@@ -23,7 +23,7 @@ static void interrupt_handler(int pin) {
 
 static void mainloop(channel_t server) {
 
-    payload_t buf[4];
+    payload_t buf[16];
     channel_t reply_to;
 
     if(recv(server, (void *) &buf, sizeof(buf), 0, &reply_to) != OK) {
