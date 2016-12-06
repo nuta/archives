@@ -1,4 +1,5 @@
 #include "kmalloc.h"
+#include "thread.h"
 #include "channel.h"
 #include "event.h"
 #include "list.h"
@@ -29,7 +30,10 @@ bool fire_event_to(struct channel *ch, msgid_t type) {
    for (struct event *e = ch->events; e; e = e->next) {
        if (e->type == type) {
             e->flags |= EVENT_FIRED;
-            DEBUG("fired the event 0x%x", type);
+            DEBUG("fired the event %d.%d", type >> 12, type & 0xfff);
+            struct thread *receiver = ch->receiver;
+            if (receiver)
+                resume_thread(receiver);
             return true;
         }
     }
