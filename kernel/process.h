@@ -5,7 +5,7 @@
 #include <mutex.h>
 #include "thread.h"
 
-#define DEFAULT_CHANNELS_MAX 16
+#define DEFAULT_CHANNELS_MAX 32
 
 struct process {
     struct process *next;
