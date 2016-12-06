@@ -33,6 +33,8 @@ extern "C" {
 #endif
 
 channel_t connect_to_local(channel_t to);
+channel_t transfer_to(channel_t to);
+
 #ifndef __KERNEL_MESSAGE_H__ // XXX
 channel_t open(void);
 result_t call(channel_t ch, const void *m, size_t m_size,
