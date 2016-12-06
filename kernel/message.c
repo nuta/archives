@@ -105,7 +105,7 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
                 struct channel *receiver_ch = _get_channel_by_cid(dst->process, cid);
                 struct channel *sender_ch = get_channel_by_cid(payloads[i]);
 
-                if (sender_ch->flags & CHANNEL_LINKED) {
+                if (CHANNEL_STATE(sender_ch) == CHANNEL_LINKED) {
                     NOT_YET_IMPLEMENTED();
                     payloads[i] = 0;
                     break;
