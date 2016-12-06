@@ -12,7 +12,7 @@ struct server_entry {
 };
 
 
-#define ENTRIES_NUM 4
+#define ENTRIES_NUM 8
 static struct server_entry entries [ENTRIES_NUM];
 static channel_t server;
 static mutex_t entries_lock = MUTEX_INITIALIZER;
