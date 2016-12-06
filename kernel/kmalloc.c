@@ -3,6 +3,8 @@
 #include "kmalloc.h"
 
 static struct chunk *chunks = NULL;
+static size_t total = 0;
+static size_t used  = 0;
 static mutex_t kmalloc_lock = MUTEX_INITIALIZER;
 
 
@@ -29,6 +31,7 @@ void add_kmalloc_chunk(void *ptr, size_t size) {
         chunk->next = new_chunk;
     }
 
+    total += size;
     mutex_unlock(&kmalloc_lock);
 }
 
@@ -45,7 +48,7 @@ void add_kmalloc_chunk(void *ptr, size_t size) {
 void *kmalloc(size_t size, int flags) {
 
     size = ROUND_UP(size, 8);
-    DEBUG("kmalloc: allocating %d bytes", size);
+    DEBUG("kmalloc: allocating %dB (remaining %dB)", size, total - used);
     mutex_lock(&kmalloc_lock);
 
     for (struct chunk *chunk = chunks; chunk; chunk = GET_NEXT_CHUNK(chunk)) {
@@ -59,6 +62,7 @@ void *kmalloc(size_t size, int flags) {
             next_chunk->size = chunk->size - sizeof(*chunk) - size;
             chunk->next      = (void *) ((uintptr_t) next_chunk | 1);
             chunk->size      = size;
+            used += size;
 
             mutex_unlock(&kmalloc_lock);
             return (void *) ((uintptr_t) chunk + sizeof(*chunk));
@@ -74,5 +78,10 @@ void *kmalloc(size_t size, int flags) {
 void kfree(void *ptr) {
 
     struct chunk *chunk = (struct chunk *) ((uintptr_t) ptr - sizeof(*chunk));
+
+    mutex_lock(&kmalloc_lock);
+    used -= chunk->size;
+    mutex_unlock(&kmalloc_lock);
+
     chunk->next = (void *) ((uintptr_t) chunk->next & (~1));
 }
