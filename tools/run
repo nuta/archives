@@ -4,6 +4,7 @@ import os
 import subprocess
 import re
 import resea
+import sys
 from termcolor import colored, cprint
 
 
@@ -66,9 +67,9 @@ def main(args):
                     p.wait()
 
                     if failed > 0:
-                        cprint("{} tests are failed.".format(failed), "red")
+                        sys.exit("\n{} tests are failed.".format(failed))
                     else:
-                        cprint("All {} tests are passed.".format(passed), "green")
+                        cprint("\nAll {} tests are passed.".format(passed), "green")
                     return
 
                 name = get_type_name(type_)
