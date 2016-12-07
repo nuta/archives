@@ -163,7 +163,7 @@ static void test_list() {
                 "insert_into_list() set the terminal `next' to NULL (e2)");
 
     insert_into_list((struct list **) &l, e3);
-    TEST_EXPECT(l->next == (struct list *) e3,
+    TEST_EXPECT(l->next->next == (struct list *) e3,
                 "insert_into_list() appends an element to an list (e3)");
     TEST_EXPECT(l->next->next->next == NULL,
                 "insert_into_list() set the terminal `next' to NULL (e3)");
@@ -179,6 +179,14 @@ static void test_list() {
     remove_from_list((struct list **) &l, e1);
     TEST_EXPECT(l == NULL,
                 "remove_from_list() can removes the head element");
+
+    remove_from_list((struct list **) &l, e1);
+    TEST_EXPECT(l == NULL,
+                "remove_from_list() do nothing if list is empty");
+
+    insert_into_list((struct list **) &l, e1);
+    TEST_EXPECT(l == e1 && l->next == NULL,
+                "insert_into_list() appends an element to an emptry list #1");
 }
 
 
