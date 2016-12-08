@@ -215,12 +215,13 @@ cid_t _open(struct process *proc) {
             mutex_unlock(&proc->channels_lock);
 
             // Initialize the allocated channel
-            channels[cid - 1].cid       = cid;
-            channels[cid - 1].process   = proc;
-            channels[cid - 1].sent_from = 0;
-            channels[cid - 1].sender    = NULL;
-            channels[cid - 1].receiver  = NULL;
-            channels[cid - 1].linked_to = NULL;
+            channels[cid - 1].cid         = cid;
+            channels[cid - 1].process     = proc;
+            channels[cid - 1].sent_from   = 0;
+            channels[cid - 1].events      = NULL;
+            channels[cid - 1].sender      = NULL;
+            channels[cid - 1].receiver    = NULL;
+            channels[cid - 1].linked_to   = NULL;
             channels[cid - 1].transfer_to = NULL;
             mutex_init(&channels[cid - 1].sender_lock);
             mutex_init(&channels[cid - 1].receiver_lock);
