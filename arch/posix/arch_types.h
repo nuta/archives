@@ -3,6 +3,7 @@
 
 #include "stdlibs.h"
 
+#define DEFAULT_THREAD_STACK_SIZE 8192
 #define MUTEX_INITIALIZER  PTHREAD_MUTEX_INITIALIZER
 typedef pthread_mutex_t mutex_t;
 typedef unsigned long size_t;

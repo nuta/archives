@@ -3,12 +3,6 @@
 
 #include <types.h>
 
-#ifdef ARCH_POSIX // FIXME
-#define DEFAULT_THREAD_STACK_SIZE 8192
-#else
-#define DEFAULT_THREAD_STACK_SIZE 2048
-#endif
-
 enum {
     THREAD_RUNNABLE = 1,
     THREAD_BLOCKED  = 2,
