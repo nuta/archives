@@ -13,10 +13,9 @@ static mutex_t timers_lock = MUTEX_INITIALIZER;
 static void add_timer(struct channel *ch, size_t current, size_t reset,
                       uintmax_t arg) {
 
-    listen_event(ch, TIMER_TIMEOUT, arg);
-
+    struct event *e = listen_event(ch, TIMER_TIMEOUT, arg);
     struct timer *timer = kmalloc(sizeof(*timer), KMALLOC_NORMAL);
-    timer->ch      = ch;
+    timer->event   = e;
     timer->current = current;
     timer->reset   = reset;
 
@@ -43,7 +42,7 @@ void advance_clock(size_t ms) {
 
     for (struct timer *t = timers; t; t = t->next) {
         if (t->current < ms) {
-            fire_event_to(t->ch, TIMER_TIMEOUT);
+            __fire_event(t->event);
 
             if (!t->reset)
                 remove_from_list((struct list **) &timers, t);

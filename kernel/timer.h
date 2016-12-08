@@ -1,9 +1,12 @@
 #ifndef __KERNEL_TIMER_H__
 #define __KERNEL_TIMER_H__
 
+#include "event.h"
+#include "channel.h"
+
 struct timer {
     struct timer *next;
-    struct channel *ch;
+    struct event *event;
     size_t current;
     size_t reset;  // 0 on oneshot timer
 };

@@ -7,13 +7,17 @@
 
 static struct channel *listeners = NULL;
 
-void listen_event(struct channel *ch, msgid_t type, uintmax_t arg) {
+struct event *listen_event(struct channel *ch, msgid_t type, uintmax_t arg) {
+
+    if (ch->transfer_to)
+        ch = ch->transfer_to;
 
     struct event *new_e = kmalloc(sizeof(*new_e), KMALLOC_NORMAL);
-    new_e->next  = NULL;
-    new_e->type  = type;
-    new_e->flags = 0;
-    new_e->arg   = arg;
+    new_e->next    = NULL;
+    new_e->channel = ch;
+    new_e->type    = type;
+    new_e->flags   = 0;
+    new_e->arg     = arg;
 
     ch->flags |= CHANNEL_EVENT;
 
@@ -21,30 +25,44 @@ void listen_event(struct channel *ch, msgid_t type, uintmax_t arg) {
     insert_into_list((struct list **) &ch->events, new_e);
     insert_into_list((struct list **) &listeners, ch);
     mutex_unlock(&ch->receiver_lock);
+
+    return new_e;
 }
 
 
-bool fire_event_to(struct channel *ch, msgid_t type) {
+bool __fire_event(struct event *e) {
+    e->flags |= EVENT_FIRED;
 
-   for (struct event *e = ch->events; e; e = e->next) {
-       if (e->type == type) {
-            e->flags |= EVENT_FIRED;
-            DEBUG("fired the event %d.%d", type >> 12, type & 0xfff);
-            struct thread *receiver = ch->receiver;
-            if (receiver)
-                resume_thread(receiver);
-            return true;
-        }
-    }
+    struct thread *receiver = e->channel->receiver;
+    if (receiver)
+        resume_thread(receiver);
 
-    return false;
+    DEBUG("fired the event %d.%d (#%d)", e->type >> 12, e->type & 0xfff,
+          (receiver) ? receiver->tid : 0);
+
+    return true;
+}
+
+
+bool _fire_event(struct channel *ch, msgid_t type) {
+
+    if (ch->transfer_to)
+        ch = ch->transfer_to;
+
+    for (struct event *e = ch->events; e; e = e->next) {
+         if (e->type == type) {
+             __fire_event(e);
+         }
+     }
+
+     return false;
 }
 
 
 void fire_event(msgid_t type) {
 
     for (struct channel * ch = listeners; ch; ch = ch->next) {
-        if (fire_event_to(ch, type))
+        if (_fire_event(ch, type))
             return;
     }
 

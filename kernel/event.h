@@ -12,14 +12,16 @@ enum {
 
 struct event {
     struct event *next;
+    struct channel *channel;
     msgid_t type;
     int flags;
     uintmax_t arg;
 };
 
 
-void listen_event(struct channel *ch, msgid_t type, uintmax_t arg);
+struct event *listen_event(struct channel *ch, msgid_t type, uintmax_t arg);
+bool __fire_event(struct event *e);
+bool _fire_event(struct channel *ch, msgid_t type);
 void fire_event(msgid_t type);
-bool fire_event_to(struct channel *ch, msgid_t type);
 
 #endif
