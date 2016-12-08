@@ -26,7 +26,7 @@ tid_t allocate_tid(void) {
 
 struct thread *get_current_thread(void) {
 
-    // TODO: The cost of this function is O(n). We need a more and more
+    // TODO: The cost of this function is O(n^2). We need a more and more
     //       faster algorithm.
 
     tid_t tid = arch_get_current_tid();
