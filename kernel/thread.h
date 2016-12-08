@@ -27,7 +27,7 @@ struct thread {
 tid_t allocate_tid(void);
 struct thread *get_current_thread(void);
 struct thread *create_thread(struct process *process, uintptr_t start,
-                             uintmax_t arg);
+                             uintmax_t arg, size_t stack_size);
 void resume_thread(struct thread *thread);
 void start_thread(struct thread *thread);
 void destroy_thread(struct thread *thread);

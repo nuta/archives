@@ -18,16 +18,27 @@ uintptr_t apps[] = {
 {% endfor %}
     (uintptr_t) NULL
 };
+
+size_t app_stacks[] = {
+{% for size in app_stacks %}
+    {{ size }}
+{% endfor %}
+};
 """
 
 
 def main(args):
-    print(resea.fmt(APPS_C_FMT, {
-        "apps": list(map(lambda app: resea.to_package_id(app), args.apps))
-    }))
+    apps = []
+    app_stacks = []
+    for app_yaml in args.app_yamls:
+        yml = resea.load_yaml(app_yaml)
+        apps.append(resea.to_package_id(yml["name"]))
+        app_stacks.append(yml.get("stack_size", 0))
+
+    print(resea.fmt(APPS_C_FMT, locals()))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A apps.c generator")
-    parser.add_argument("apps", nargs="+", help="Application names.")
+    parser.add_argument("app_yamls", nargs="+", help="app.yaml")
     main(parser.parse_args())

@@ -28,7 +28,7 @@ $(BUILD_DIR)/apps.o: $(BUILD_DIR)/apps.c
 $(BUILD_DIR)/apps.c: $(BUILD_DIR)/config.mk
 	$(CMDECHO) GEN $@
 	$(MKDIR) -p $(@D)
-	PYTHONPATH=$(makefile_dir) ./tools/gen-apps-c $(APPS) > $@
+	PYTHONPATH=$(makefile_dir) ./tools/gen-apps-c $(app_yamls) > $@
 
 
 -include $(objs:.o=.deps)

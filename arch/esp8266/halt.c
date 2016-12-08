@@ -1,3 +1,4 @@
+#include <resea.h>
 #include <arch.h>
 #include <kernel/timer.h>
 #include <kernel/thread.h>

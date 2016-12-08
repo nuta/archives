@@ -8,6 +8,7 @@
 
 
 extern uintptr_t apps[];
+extern size_t app_stacks[];
 
 void init_kernel(struct resources *_resources) {
 
@@ -32,7 +33,8 @@ void init_kernel(struct resources *_resources) {
     INFO("creating in-kernel app");
     for (int i=0; apps[i]; i++) {
         INFO("in-kernel app: addr=%p", apps[i]);
-        start_thread(create_thread(kproc, apps[i], 0));
+        size_t stack_size = (app_stacks[i])? app_stacks[i] : DEFAULT_THREAD_STACK_SIZE;
+        start_thread(create_thread(kproc, apps[i], 0, stack_size));
     }
 
     // Start the first thread

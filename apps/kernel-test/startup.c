@@ -78,7 +78,7 @@ static void test_messaging() {
     INFO("launching the client thread");
     struct thread *t;
     t = create_thread(get_current_thread()->process,
-                      (uintptr_t) client_thread, 0x55aa55aa);
+                      (uintptr_t) client_thread, 0x55aa55aa, 0);
     TEST_EXPECT(t != NULL, "create_thread() returns non-NULL value");
     start_thread(t);
 

@@ -10,6 +10,10 @@ CONFIG_MK_FMT = """\
 {{ k }} = {{ v }}
 {% endfor %}
 
+{% for app_yaml in app_yamls %}
+app_yamls += {{ app_yaml }}
+{% endfor %}
+
 {% if values["TARGET"] == "kernel" %}
 include kernel/kernel.mk
 {% endif %}
@@ -31,10 +35,13 @@ def main(args):
         values[k] = v
 
     objs = []
+    app_yamls = []
     interfaces = set()
     for app in values["APPS"].split(" "):
         app_dir = os.path.join("apps", app)
-        yaml = resea.load_yaml(os.path.join(app_dir, "app.yaml"))
+        yaml_path = os.path.join(app_dir, "app.yaml")
+        app_yamls.append(yaml_path)
+        yaml = resea.load_yaml(yaml_path)
         objs += map(lambda obj: os.path.join(app_dir, obj), yaml["objs"])
         interfaces.update(yaml["requires"])
         interfaces.update(yaml["implements"])
@@ -45,11 +52,7 @@ def main(args):
 
     os.makedirs(values["BUILD_DIR"], exist_ok=True)
     with open(os.path.join(values["BUILD_DIR"], "config.mk"), "w") as f:
-        f.write(resea.fmt(CONFIG_MK_FMT, {
-            "interfaces": interfaces,
-            "objs": objs,
-            "values": values,
-        }))
+        f.write(resea.fmt(CONFIG_MK_FMT, locals()))
 
 
 if __name__ == "__main__":

@@ -51,10 +51,9 @@ struct thread *get_current_thread(void) {
 
 
 struct thread *create_thread(struct process *process, uintptr_t start,
-                             uintmax_t arg) {
+                             uintmax_t arg, size_t stack_size) {
     struct thread *thread;
     uintptr_t stack;
-    const size_t stack_size = DEFAULT_THREAD_STACK_SIZE;
 
     // allocate memory for thread and stack
     thread = (struct thread *) kmalloc(sizeof(struct thread), KMALLOC_NORMAL);
