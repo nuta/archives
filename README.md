@@ -18,6 +18,14 @@ $ bundle exec rails s
 
 ![Add a CalDAV account on macOS](https://raw.githubusercontent.com/seiyanuta/busybook/master/add-account-on-macos.png)
 
+## Deploying to Heroku
+```
+$ heroku git:remote -a <your_app_name>
+$ git push heroku master
+$ heroku run rails db:migrate
+$ heroku run rails user:add username=<username password=<password>
+```
+
 ## Supported clients
 - OS X 10.12 (Sierra): Calendar and Reminder
 - iOS 10: Calendar and Reminder
