@@ -12,8 +12,10 @@
 
 struct channel *_get_channel_by_cid(struct process *proc, cid_t cid) {
 
-    if (cid > proc->channels_max)
+    if (cid == 0 || cid > proc->channels_max) {
+        WARN("bad cid");
         return NULL;
+    }
 
     return &proc->channels[cid - 1];
 }
@@ -144,47 +146,49 @@ static result_t _recv(struct channel *ch, void *buffer, size_t size, int flags,
 
     struct thread *current = get_current_thread();
 
+retry:
     set_thread_state(current, THREAD_BLOCKED);
     ch->receiver    = current;
     ch->buffer      = (uintptr_t) buffer;
     ch->buffer_size = size;
 
-retry:
-
-    if (ch->flags & CHANNEL_EVENT) {
-        // look for a fired event
-        struct event *e = ch->events;
-        while (e) {
+    if (ch->flags & CHANNEL_EVENT && mutex_try_lock(&ch->sender_lock)) {
+        // Look for a fired event.
+        for (struct event *e = ch->events; e; e = e->next) {
             if (e->flags & EVENT_FIRED) {
-                // found fired event
+                // Found a fired event.
                 e->flags &= ~EVENT_FIRED;
 
-                payload_t m[2];
-                m[0] = e->type;
-                m[1] = e->arg;
+                payload_t m[3];
+                m[0] = (1 << 4) | 1;
+                m[1] = e->type;
+                m[2] = e->arg;
+
                 if (memcpy_s((void *) ch->buffer, ch->buffer_size, &m, sizeof(m)) != OK) {
                     WARN("failed to fill an event message");
                     return E_BAD_MEMCPY;
                 }
 
-                ch->sent_from = 1;
+                ch->sent_from = -1;
+                mutex_unlock(&ch->sender_lock);
                 goto received;
             }
-
-            e = e->next;
         }
+
+        mutex_unlock(&ch->sender_lock);
     }
 
     // Resume a sender thread if it exists.
     struct thread *sender = ch->sender;
-    if (sender) {
+    if (sender)
         resume_thread(sender);
-    }
 
     // Yield so that the sender thread can send a message.
-    if (current->state == THREAD_BLOCKED) {
-        // TODO: implement and use queue_delete(runqueue, current)
+    if (current->state == THREAD_BLOCKED)
         yield();
+
+    if (!ch->sent_from) {
+        // Resumed by an event message.
         goto retry;
     }
 
@@ -193,7 +197,7 @@ received:
     *from = ch->sent_from;
     ch->sent_from = 0;
     ch->receiver = NULL;
-    mutex_unlock(&ch->receiver_lock);
+    mutex_unlock(&ch->receiver_lock); // locked in recv()
     return OK;
 }
 
