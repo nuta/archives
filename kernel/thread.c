@@ -141,9 +141,13 @@ void start_thread(struct thread *thread) {
 
 
 void yield(void) {
+
     if (arch_yield(&get_current_thread()->arch)) {
         return;
     } else {
+
+retry:
+
         // Look for the next thread to run.
         mutex_lock(&resources->runqueue_lock);
         int i;
@@ -159,5 +163,6 @@ void yield(void) {
         // No threads to run.
         mutex_unlock(&resources->runqueue_lock);
         arch_halt_until(get_next_timeout());
+        goto retry;
     }
 }
