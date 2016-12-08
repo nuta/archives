@@ -4,7 +4,6 @@ gem 'rails', '5.0.0.1'
 gem 'rake'
 
 gem 'puma'
-gem 'sqlite3', group: :sqlite3
 gem 'mysql2', group: :mysql
 gem 'pg', group: :postgres
 
@@ -12,6 +11,7 @@ gem 'highline', require: false
 gem 'colorize', require: false
 
 group :development do
+  gem 'sqlite3'
   gem 'byebug'
   gem 'pry-rails'
   gem 'pry-doc'
