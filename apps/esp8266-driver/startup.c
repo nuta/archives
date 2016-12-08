@@ -133,7 +133,7 @@ static void mainloop(channel_t server) {
         uintmax_t arg;
         unmarshal_timer_set_interval((payload_t *) &buf, &channel, &ms, &arg);
 
-        add_interval_timer(get_channel_by_cid(channel), ms, arg);
+        add_interval_timer(get_channel_by_cid(channel)->linked_to, ms, arg);
         reply_timer_set_interval(reply_to, OK);
         break;
     }
@@ -143,7 +143,7 @@ static void mainloop(channel_t server) {
         uintmax_t arg;
         unmarshal_timer_set_oneshot((payload_t *) &buf, &channel, &ms, &arg);
 
-        add_oneshot_timer(get_channel_by_cid(channel), ms, arg);
+        add_oneshot_timer(get_channel_by_cid(channel)->linked_to, ms, arg);
         reply_timer_set_oneshot(reply_to, OK);
         break;
     }
