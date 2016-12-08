@@ -24,5 +24,5 @@ void arch_halt_until(size_t ms) {
         }
     }
 
-    yield();
+    // return to yield()
 }
