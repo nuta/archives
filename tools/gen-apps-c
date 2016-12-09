@@ -21,7 +21,7 @@ uintptr_t apps[] = {
 
 size_t app_stacks[] = {
 {% for size in app_stacks %}
-    {{ size }}
+    {{ size }},
 {% endfor %}
 };
 """
