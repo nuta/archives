@@ -76,12 +76,29 @@ void *kmalloc(size_t size, int flags) {
 
 
 void kfree(void *ptr) {
-
-    struct chunk *chunk = (struct chunk *) ((uintptr_t) ptr - sizeof(*chunk));
+    struct chunk *free_chunk = (struct chunk *) ((uintptr_t) ptr - sizeof(*free_chunk));
 
     mutex_lock(&kmalloc_lock);
-    used -= chunk->size;
-    mutex_unlock(&kmalloc_lock);
+    free_chunk->next = (void *) ((uintptr_t) free_chunk->next & (~1));
+    used -= free_chunk->size;
 
-    chunk->next = (void *) ((uintptr_t) chunk->next & (~1));
+    // Merge continuous free chunks as much as possible.
+    for (struct chunk *c = chunks; c; c = GET_NEXT_CHUNK(c)) {
+        struct chunk *c_tmp = c;
+
+        if (IS_AVAILABLE_CHUNK(c)) {
+            struct chunk *next_chunk = GET_NEXT_CHUNK(c);
+            while (CHUNK_ADDR(next_chunk) && IS_AVAILABLE_CHUNK(next_chunk) &&
+                   (c + sizeof(*c) + c->size) == CHUNK_ADDR(next_chunk)) {
+
+                c->size = next_chunk->size + sizeof(*c);
+                c->next = next_chunk->next;
+                next_chunk = GET_NEXT_CHUNK(c);
+            }
+        }
+
+        c = c_tmp;
+    }
+
+    mutex_unlock(&kmalloc_lock);
 }

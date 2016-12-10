@@ -8,7 +8,8 @@ enum {
 };
 
 #define IS_AVAILABLE_CHUNK(chunk) (((uintptr_t) (chunk)->next & 1) == 0)
-#define GET_NEXT_CHUNK(chunk) ((struct chunk *) ((uintptr_t) chunk->next & (~1)))
+#define GET_NEXT_CHUNK(chunk_) ((struct chunk *) ((uintptr_t) (chunk_)->next & (~1)))
+#define CHUNK_ADDR(chunk_) ((struct chunk *) (((uintptr_t) chunk_) & (~1)))
 
 // The chunk header
 struct chunk {
