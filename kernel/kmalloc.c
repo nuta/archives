@@ -51,7 +51,7 @@ void *kmalloc(size_t size, int flags) {
     DEBUG("kmalloc: allocating %dB (remaining %dB)", size, total - used);
     mutex_lock(&kmalloc_lock);
 
-    for (struct chunk *chunk = chunks; chunk; chunk = GET_NEXT_CHUNK(chunk)) {
+    for (struct chunk *chunk = chunks; CHUNK_ADDR(chunk); chunk = GET_NEXT_CHUNK(chunk)) {
         if (IS_AVAILABLE_CHUNK(chunk) && size + sizeof(*chunk) <= chunk->size) {
             // We've found an unused chunk with enough space! Split the memory
             // block, mark it as being used and return the pointer to the
