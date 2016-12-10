@@ -2,6 +2,7 @@
 #include <resea/gpio.h>
 #include <resea/interrupt.h>
 #include <logging.h>
+#include <kernel/kmalloc.h>
 #include <kernel/thread.h>
 #include <kernel/message.h>
 #include <kernel/event.h>
@@ -190,6 +191,27 @@ static void test_list() {
 }
 
 
+void test_kmalloc(void) {
+    // Create a free'd chunk before ptr1.
+    kfree(kmalloc(5, KMALLOC_NORMAL));
+
+    size_t remaining = get_remaining_memory();
+    void *ptr1 = kmalloc(1024, KMALLOC_NORMAL);
+    void *ptr2 = kmalloc(1024, KMALLOC_NORMAL);
+    void *ptr3 = kmalloc(1024, KMALLOC_NORMAL);
+    kfree(ptr2);
+    kfree(ptr1);
+    void *ptr4 = kmalloc(1024, KMALLOC_NORMAL);
+    kfree(ptr4);
+    kfree(ptr3);
+
+    TEST_EXPECT(ptr1 && ptr2 && ptr3 && ptr4,
+                "kmalloc does not return NULL pointers");
+    TEST_EXPECT(get_remaining_memory() - remaining == 0,
+                "kmalloc free pointers without memory leaks");
+}
+
+
 void kernel_test_startup(void) {
     INFO("started kernel test");
 
@@ -197,6 +219,8 @@ void kernel_test_startup(void) {
     test_list();
     INFO("test_log_bufferring -------------------------");
     test_log_bufferring();
+    INFO("test_kmalloc --------------------------------");
+    test_kmalloc();
     INFO("test_messaging ------------------------------");
     test_messaging(); // MUST be last one
 }
