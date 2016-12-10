@@ -27,5 +27,6 @@ struct chunk {
 void add_kmalloc_chunk(void *ptr, size_t size);
 void *kmalloc(size_t size, int flags);
 void kfree(void *ptr);
+size_t get_remaining_memory(void);
 
 #endif

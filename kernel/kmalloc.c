@@ -102,3 +102,8 @@ void kfree(void *ptr) {
 
     mutex_unlock(&kmalloc_lock);
 }
+
+
+size_t get_remaining_memory(void) {
+    return total - used;
+}
