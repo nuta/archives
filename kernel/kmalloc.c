@@ -11,7 +11,7 @@ static mutex_t kmalloc_lock = MUTEX_INITIALIZER;
 
 void add_kmalloc_chunk(void *ptr, size_t size, bool large) {
 
-    INFO("kmalloc: add chunk %dB", ptr, size);
+    INFO("kmalloc: add chunk %dB", size);
 
     // Initialize the chunk
     struct chunk *new_chunk = (struct chunk *) ptr;
