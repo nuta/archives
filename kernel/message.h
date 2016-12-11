@@ -24,6 +24,7 @@ result_t recv(cid_t cid, void *buffer, size_t size, int flags, cid_t *from);
 cid_t open(void);
 result_t link(cid_t cid1, cid_t cid2);
 result_t transfer(cid_t from, cid_t to);
+result_t discard(void *buffer, size_t size);
 #endif
 
 cid_t _open(struct process *proc);

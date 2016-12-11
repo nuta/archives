@@ -43,6 +43,7 @@ result_t send(channel_t ch, const void *m, size_t size, int flags);
 result_t recv(channel_t ch, void *buffer, size_t size, int flags, channel_t *from);
 result_t link(channel_t ch1, channel_t ch2);
 result_t transfer(cid_t from, cid_t to);
+result_t discard(void *buffer, size_t size);
 #endif
 
 #ifdef __cplusplus
