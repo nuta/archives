@@ -22,10 +22,8 @@ engines:
     enabled: true
   pep8:
     enabled: true
-  cppcheck:
+  clang-static-analyzer:
     enabled: true
-    config:
-      check: all
 
 ratings:
   paths:

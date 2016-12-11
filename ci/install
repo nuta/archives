@@ -10,11 +10,9 @@ analyze)
         curl -L https://github.com/codeclimate/codeclimate/archive/master.tar.gz | tar xvz
         cd codeclimate-* && sudo make install && cd ..
 
-        # Install cppcheck Engine
-        git clone https://github.com/seiyanuta/codeclimate-cppcheck
-        cd codeclimate-cppcheck
-        git checkout origin/fix-output-format
-        docker build -t codeclimate/codeclimate-cppcheck .
+        # Install CodeClimate engine
+        docker pull seiyanuta/codeclimate-clang-static-analyzer
+        docker tag seiyanuta/codeclimate-clang-static-analyzer codeclimate/codeclimate-clang-static-analyzer
         cd ../resea
         ;;
     esac
