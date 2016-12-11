@@ -190,6 +190,8 @@ static void mainloop(channel_t server) {
     default:
         WARN("esp82660-driver: unknown message (%p)", buf[1]);
     }
+
+    discard(&buf, sizeof(buf));
 }
 
 
