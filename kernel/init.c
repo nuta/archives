@@ -33,8 +33,7 @@ void init_kernel(struct resources *_resources) {
     INFO("creating in-kernel app");
     for (int i=0; apps[i]; i++) {
         INFO("in-kernel app: addr=%p", apps[i]);
-        size_t stack_size = (app_stacks[i])? app_stacks[i] : DEFAULT_THREAD_STACK_SIZE;
-        start_thread(create_thread(kproc, apps[i], 0, stack_size));
+        start_thread(create_thread(kproc, apps[i], 0, app_stacks[i]));
     }
 
     // Start the first thread
