@@ -15,7 +15,6 @@ PHDRS {
 SECTIONS {
 
     .iram0.text : {
-        *kernel*.o(.literal* .text*)
         *lang*.o(.literal* .text*)
         *libgcc.a:_udivsi3.o(.literal* .text*)
         *libgcc.a:_umoddi3.o(.literal* .text*)
@@ -23,7 +22,7 @@ SECTIONS {
 
     .iram1.text : {
         *(.boot)
-        *(EXCLUDE_FILE(*kernel*.o *lang*.o *libgcc.a:_udivsi3.o *libgcc.a:_umoddi3.o) .literal* .text*)
+        *(EXCLUDE_FILE(*lang*.o *libgcc.a:_udivsi3.o *libgcc.a:_umoddi3.o) .literal* .text*)
     } > iram1 : iram1_phdr
 
     .data : ALIGN(4) {
@@ -37,7 +36,7 @@ SECTIONS {
         __bss_end = .;
 
         __kmalloc_static_chunk = ALIGN(4);
-        . = . + 0x2400; /* TODO: make this configurable */
+        . = . + 0x2400;
         __kmalloc_static_chunk_end = .;
 
         __stack_bottom = .;
