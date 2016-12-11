@@ -39,7 +39,7 @@ void string::reserve(size_t n) {
     _capacity = n;
     _buffer = new char[_capacity];
     memcpy_s(_buffer, _capacity, old_buffer, _length);
-    delete old_buffer;
+    delete[] old_buffer;
 }
 
 
