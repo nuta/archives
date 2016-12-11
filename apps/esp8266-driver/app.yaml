@@ -11,3 +11,4 @@ requires:
   - channel
 objs:
   - startup.o
+stack_size: 5000
