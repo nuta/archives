@@ -62,18 +62,7 @@ struct thread *create_thread(struct process *process, uintptr_t start,
 
     // append `thread` into the thread list in the process
     mutex_lock(&process->threads_lock);
-
-    if (process->threads) {
-        struct thread *last = process->threads;
-        while (last->next) {
-            last = last->next;
-        }
-
-        last->next = thread;
-    } else {
-        process->threads = thread;
-    }
-
+    insert_into_list((struct list **) &process->threads, thread);
     mutex_unlock(&process->threads_lock);
 
     DEBUG("created a new thread #%d, stack_bttom: %p", thread->tid, stack);

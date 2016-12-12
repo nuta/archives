@@ -4,6 +4,7 @@
 #include "thread.h"
 #include "channel.h"
 #include "kmalloc.h"
+#include "list.h"
 
 
 struct process *create_process(void) {
@@ -42,18 +43,7 @@ struct process *create_process(void) {
 
     // Update resources->processes
     mutex_lock(&resources->processes_lock);
-
-    if (resources->processes) {
-        struct process *proc = resources->processes;
-        while (proc) {
-            proc++;
-        }
-
-        proc->next = process;
-    } else {
-        resources->processes = process;
-    }
-
+    insert_into_list((struct list **) &resources->processes, process);
     mutex_unlock(&resources->processes_lock);
 
     return process;
