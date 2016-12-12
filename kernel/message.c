@@ -56,8 +56,6 @@ static result_t _send(struct channel *ch, const void *m, size_t size, int flags)
         yield();
     }
 
-    set_thread_state(current, THREAD_RUNNABLE);
-
     // Parse payload headers and transform payloads.
     payload_t *payloads = (payload_t *) m;
     size_t payloads_num = size / sizeof(payload_t);
