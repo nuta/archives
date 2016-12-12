@@ -7,6 +7,7 @@
 #define PANIC(fmt, ...)  do { \
         printfmt("P> "  fmt, ##__VA_ARGS__); \
         arch_panic();                        \
+        UNREACHABLE;                         \
     } while(0)
 
 #endif
