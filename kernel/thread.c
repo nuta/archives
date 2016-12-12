@@ -94,8 +94,13 @@ void start_thread(struct thread *thread) {
     set_thread_state(thread, THREAD_RUNNABLE);
 
     // Add the thread into runqueue.
+    // TODO: add kmalloc option to raise PANIC if it run out of memory
+    struct runqueue *runqueue = (struct runqueue *) kmalloc(sizeof(*runqueue),
+                                                            KMALLOC_NORMAL);
+
+    runqueue->thread =thread;
     mutex_lock(&resources->runqueue_lock);
-    insert_into_list((struct list **) &resources->runqueue, thread);
+    insert_into_list((struct list **) &resources->runqueue, runqueue);
     mutex_unlock(&resources->runqueue_lock);
 }
 
@@ -108,10 +113,10 @@ void yield(void) {
 retry:
         // Look for the next thread to run.
         mutex_lock(&resources->runqueue_lock);
-        for (struct thread *t = resources->runqueue; t; t = t->next) {
-            if (t->state == THREAD_RUNNABLE) {
+        for (struct runqueue *rq = resources->runqueue; rq; rq = rq->next) {
+            if (rq->thread->state == THREAD_RUNNABLE) {
                 mutex_unlock(&resources->runqueue_lock);
-                arch_switch_thread(t);
+                arch_switch_thread(rq->thread);
                 /* arch_switch_thread() won't return. */
             }
         }

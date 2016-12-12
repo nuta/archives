@@ -30,7 +30,7 @@ void init_kernel(struct resources *_resources) {
     }
 
     // Start the first thread
-    struct thread *t = resources->runqueue;
+    struct thread *t = resources->runqueue->thread;
     if (!t) {
         PANIC("no apps to run");
     }

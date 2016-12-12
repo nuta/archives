@@ -3,9 +3,14 @@
 
 #include "process.h"
 
+struct runqueue {
+    struct runqueue *next;
+    struct thread *thread;
+};
+
 struct resources {
     struct process *processes;
-    struct thread *runqueue;
+    struct runqueue *runqueue;
     mutex_t processes_lock;
     mutex_t runqueue_lock;
 };
