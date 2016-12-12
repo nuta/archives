@@ -17,6 +17,7 @@ enum {
 #define NORETURN    __attribute__((noreturn))
 #define UNUSED      __attribute__((unused))
 #define DEPRECATED  __attribute__((deprecated))
+#define UNREACHABLE __builtin_unreachable()
 
 #define ROUND_UP(x, len) (((x) + (len - 1)) & ~(len - 1))
 
