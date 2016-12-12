@@ -30,5 +30,8 @@ result_t discard(void *buffer, size_t size);
 cid_t _open(struct process *proc);
 result_t _link(struct channel *ch1, struct channel *ch2);
 result_t _transfer(struct channel *from, struct channel *to);
+result_t _send(struct channel *ch, const void *m, size_t size, int flags);
+result_t _recv(struct channel *ch, void *buffer, size_t size, int flags,
+               cid_t *from);
 
 #endif

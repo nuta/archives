@@ -33,4 +33,6 @@ struct channel {
     struct thread *receiver;    // Receiver thread
 };
 
+struct channel *get_channel_by_cid(cid_t cid);
+
 #endif
