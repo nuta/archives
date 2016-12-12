@@ -19,6 +19,12 @@ struct event {
 };
 
 
+struct listener {
+    struct listener *next;
+    struct channel *channel;
+};
+
+
 struct event *listen_event(struct channel *ch, msgid_t type, uintmax_t arg);
 bool __fire_event(struct event *e);
 bool _fire_event(struct channel *ch, msgid_t type);

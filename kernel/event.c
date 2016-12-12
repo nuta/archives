@@ -5,28 +5,31 @@
 #include "list.h"
 
 
-static struct channel *listeners = NULL;
+static struct listener *listeners = NULL;
 
 struct event *listen_event(struct channel *ch, msgid_t type, uintmax_t arg) {
 
     if (ch->transfer_to)
         ch = ch->transfer_to;
 
-    struct event *new_e = kmalloc(sizeof(*new_e), KMALLOC_NORMAL);
-    new_e->next    = NULL;
-    new_e->channel = ch;
-    new_e->type    = type;
-    new_e->flags   = 0;
-    new_e->arg     = arg;
+    struct event *event = kmalloc(sizeof(*event), KMALLOC_NORMAL);
+    event->next    = NULL;
+    event->channel = ch;
+    event->type    = type;
+    event->flags   = 0;
+    event->arg     = arg;
 
+    struct listener *listener = kmalloc(sizeof(*listener), KMALLOC_NORMAL);
+    listener->next    = NULL;
+    listener->channel = ch;
     ch->flags |= CHANNEL_EVENT;
 
     mutex_lock(&ch->receiver_lock);
-    insert_into_list((struct list **) &ch->events, new_e);
-    insert_into_list((struct list **) &listeners, ch);
+    insert_into_list((struct list **) &ch->events, event);
+    insert_into_list((struct list **) &listeners, listener);
     mutex_unlock(&ch->receiver_lock);
 
-    return new_e;
+    return event;
 }
 
 
@@ -61,8 +64,8 @@ bool _fire_event(struct channel *ch, msgid_t type) {
 
 void fire_event(msgid_t type) {
 
-    for (struct channel * ch = listeners; ch; ch = ch->next) {
-        if (_fire_event(ch, type))
+    for (struct listener* listener = listeners; listener; listener = listener->next) {
+        if (_fire_event(listener->channel, type))
             return;
     }
 

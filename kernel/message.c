@@ -8,16 +8,18 @@
 #include "channel.h"
 #include "process.h"
 #include "thread.h"
+#include "panic.h"
+#include "list.h"
 
 
 struct channel *_get_channel_by_cid(struct process *proc, cid_t cid) {
 
-    if (cid == 0 || cid > proc->channels_max) {
-        WARN("bad cid");
-        return NULL;
+    for (struct channel *ch = proc->channels; ch; ch = ch->next) {
+        if (ch->cid == cid)
+            return ch;
     }
 
-    return &proc->channels[cid - 1];
+    PANIC("bad cid %d",cid);
 }
 
 
@@ -200,37 +202,47 @@ received:
 }
 
 
-cid_t _open(struct process *proc) {
+static cid_t last_cid = 0;
+static mutex_t allocate_cid_lock = MUTEX_INITIALIZER;
+
+static cid_t allocate_cid(void) {
     cid_t cid;
-    struct channel *channels = proc->channels;
+
+    // TODO: handle overflow and duplication
+    mutex_lock(&allocate_cid_lock);
+    last_cid++;
+    cid = last_cid;
+    mutex_unlock(&allocate_cid_lock);
+
+    return cid;
+}
+
+
+cid_t _open(struct process *proc) {
 
     mutex_lock(&proc->channels_lock);
 
-    // Look for closed (unused) channels
-    for (cid = 1; cid <= proc->channels_max; cid++) {
-        if (CHANNEL_STATE(&channels[cid - 1]) == CHANNEL_CLOSED) {
-            channels[cid - 1].flags = CHANNEL_OPEN;
-            mutex_unlock(&proc->channels_lock);
+    // TODO: add kmalloc option to raise PANIC if it run out of memory
+    struct channel *ch = (struct channel *) kmalloc(sizeof(*ch),
+                                                    KMALLOC_NORMAL);
 
-            // Initialize the allocated channel
-            channels[cid - 1].cid         = cid;
-            channels[cid - 1].process     = proc;
-            channels[cid - 1].sent_from   = 0;
-            channels[cid - 1].events      = NULL;
-            channels[cid - 1].sender      = NULL;
-            channels[cid - 1].receiver    = NULL;
-            channels[cid - 1].linked_to   = NULL;
-            channels[cid - 1].transfer_to = NULL;
-            mutex_init(&channels[cid - 1].sender_lock);
-            mutex_init(&channels[cid - 1].receiver_lock);
-            return cid;
-        }
-    }
+    // Initialize the allocated channel
+    ch->flags       = CHANNEL_OPEN;
+    ch->cid         = allocate_cid();
+    ch->process     = proc;
+    ch->sent_from   = 0;
+    ch->events      = NULL;
+    ch->sender      = NULL;
+    ch->receiver    = NULL;
+    ch->linked_to   = NULL;
+    ch->transfer_to = NULL;
+    ch->next        = NULL;
+    mutex_init(&ch->sender_lock);
+    mutex_init(&ch->receiver_lock);
 
-    // No channels available.
-    WARN("too many channels");
+    insert_into_list((struct list **) &proc->channels, ch);
     mutex_unlock(&proc->channels_lock);
-    return 0;
+    return ch->cid;
 }
 
 

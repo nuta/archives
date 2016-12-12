@@ -9,8 +9,6 @@
 
 struct process *create_process(void) {
     struct process *process;
-    struct channel *channels;
-    const size_t channels_max = DEFAULT_CHANNELS_MAX;
 
     // allocate memory for process and channels
     process = (struct process *) kmalloc(sizeof(struct process),
@@ -20,24 +18,10 @@ struct process *create_process(void) {
         return NULL;
     }
 
-    channels = (struct channel *) kmalloc(sizeof(struct channel) *
-                                          channels_max, KMALLOC_NORMAL);
-    if (!channels) {
-        WARN("failed to kmalloc channels");
-        kfree(process);
-        return NULL;
-    }
-
-    // initialize channels
-    for (cid_t cid = 1; cid <= channels_max; cid++) {
-        channels[cid - 1].flags = CHANNEL_CLOSED;
-    }
-
-    process->pid           = allocate_tid();
-    process->threads       = NULL;
-    process->channels      = channels;
-    process->channels_max  = channels_max;
-    process->next          = NULL;
+    process->pid      = allocate_tid();
+    process->threads  = NULL;
+    process->channels = NULL;
+    process->next     = NULL;
     mutex_init(&process->threads_lock);
     mutex_init(&process->channels_lock);
 
