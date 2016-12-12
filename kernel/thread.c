@@ -7,6 +7,7 @@
 #include "kmalloc.h"
 #include "panic.h"
 #include "timer.h"
+#include "list.h"
 
 
 static tid_t last_tid = 0;
@@ -125,19 +126,7 @@ void start_thread(struct thread *thread) {
 
     // Add the thread into runqueue.
     mutex_lock(&resources->runqueue_lock);
-
-    int i;
-    struct thread **runqueue = (struct thread **) &resources->runqueue;
-    for (i = 0; i < resources->runqueue_num; i++) {
-        if (runqueue[i] == NULL) {
-            runqueue[i] = thread;
-            mutex_unlock(&resources->runqueue_lock);
-            return;
-        }
-    }
-
-    // TODO
-    WARN("runqueue is full");
+    insert_into_list((struct list **) &resources->runqueue, thread);
     mutex_unlock(&resources->runqueue_lock);
 }
 
@@ -147,18 +136,13 @@ void yield(void) {
     if (arch_yield(&get_current_thread()->arch)) {
         return;
     } else {
-
 retry:
-
         // Look for the next thread to run.
         mutex_lock(&resources->runqueue_lock);
-        int i;
-        struct thread **runqueue = (struct thread **) &resources->runqueue;
-        for (i = 0; runqueue[i]; i++) {
-            if (runqueue[i]->state == THREAD_RUNNABLE) {
+        for (struct thread *t = resources->runqueue; t; t = t->next) {
+            if (t->state == THREAD_RUNNABLE) {
                 mutex_unlock(&resources->runqueue_lock);
-                arch_switch_thread(runqueue[i]->tid,
-                                   &runqueue[i]->arch);
+                arch_switch_thread(t->tid, &t->arch);
             }
         }
 

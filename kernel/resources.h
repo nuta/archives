@@ -3,12 +3,9 @@
 
 #include "process.h"
 
-#define MAX_THREAD_NUM 32
-
 struct resources {
     struct process *processes;
-    struct thread *runqueue[MAX_THREAD_NUM];
-    size_t runqueue_num;
+    struct thread *runqueue;
     mutex_t processes_lock;
     mutex_t runqueue_lock;
 };

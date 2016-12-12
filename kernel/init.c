@@ -16,19 +16,12 @@ void init_kernel(struct resources *_resources) {
 
     resources = _resources;
     resources->processes = NULL;
+    resources->runqueue  = NULL;
     mutex_init(&resources->processes_lock);
     mutex_init(&resources->runqueue_lock);
-    resources->runqueue_num = MAX_THREAD_NUM;
-    for (int i = 0; i < resources->runqueue_num; i++) {
-        resources->runqueue[i] = NULL;
-    }
 
     INFO("creating the kernel process");
     struct process *kproc = create_process();
-
-    if (!apps[0]) {
-        PANIC("no in-kernel apps found");
-    }
 
     INFO("creating in-kernel app");
     for (int i=0; apps[i]; i++) {
@@ -37,7 +30,10 @@ void init_kernel(struct resources *_resources) {
     }
 
     // Start the first thread
-    struct thread *t = resources->runqueue[0];
+    struct thread *t = resources->runqueue;
+    if (!t) {
+        PANIC("no apps to run");
+    }
 
     INFO("starting the first thread");
     arch_switch_thread(t->tid, &t->arch);
