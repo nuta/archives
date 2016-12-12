@@ -27,27 +27,7 @@ tid_t allocate_tid(void) {
 
 struct thread *get_current_thread(void) {
 
-    // TODO: The cost of this function is O(n^2). We need a more and more
-    //       faster algorithm.
-
-    tid_t tid = arch_get_current_tid();
-
-    struct process *proc = resources->processes;
-
-    while (proc) {
-        struct thread *t = proc->threads;
-        while (t != NULL) {
-            if (t->tid == tid) {
-                return t;
-            }
-
-            t = t->next;
-        }
-        proc = proc->next;
-    }
-
-    PANIC("failed to get the current thread (TID: %d)", tid);
-    return NULL;
+    return arch_get_current_thread();
 }
 
 
@@ -78,7 +58,7 @@ struct thread *create_thread(struct process *process, uintptr_t start,
     thread->tid     = allocate_tid();
     thread->state   = THREAD_BLOCKED;
     thread->next    = NULL;
-    arch_create_thread(&thread->arch, start, arg, stack, stack_size);
+    arch_create_thread(thread, start, arg, stack, stack_size);
 
     // append `thread` into the thread list in the process
     mutex_lock(&process->threads_lock);
@@ -142,7 +122,8 @@ retry:
         for (struct thread *t = resources->runqueue; t; t = t->next) {
             if (t->state == THREAD_RUNNABLE) {
                 mutex_unlock(&resources->runqueue_lock);
-                arch_switch_thread(t->tid, &t->arch);
+                arch_switch_thread(t);
+                /* arch_switch_thread() won't return. */
             }
         }
 

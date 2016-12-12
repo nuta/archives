@@ -36,5 +36,5 @@ void init_kernel(struct resources *_resources) {
     }
 
     INFO("starting the first thread");
-    arch_switch_thread(t->tid, &t->arch);
+    arch_switch_thread(t);
 }
