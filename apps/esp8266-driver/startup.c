@@ -9,6 +9,7 @@
 #include <resea/interrupt.h>
 #include <resea/makestack.h>
 #include <resea/http.h>
+#include "kernel/kmalloc.h"
 #include "kernel/event.h"
 #include "kernel/timer.h"
 #include "kernel/message.h"
@@ -195,11 +196,18 @@ static void mainloop(channel_t server) {
 }
 
 
+extern int __stack;
+extern int __stack_bottom;
+
 void esp8266_driver_startup(void) {
     INFO("starting esp8266-driver");
 
-    channel_t server = open();
+    /* A stack area used in boot is no longer necessary. Reuse it. */
+    add_kmalloc_chunk((void *) &__stack_bottom,
+                      (uintptr_t) &__stack - (uintptr_t) &__stack_bottom,
+                      false);
 
+    channel_t server = open();
     channel_t channel_server = connect_to_local(1);
     result_t r;
 
