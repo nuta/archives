@@ -50,9 +50,10 @@ void advance_clock(size_t ms) {
             t->current = t->reset;
         } else {
             t->current -= ms;
-            if (t->current < next)
-                next = t->current;
         }
+
+        if (t->current < next)
+            next = t->current;
     }
 
     next_timeout = next;
