@@ -16,6 +16,7 @@ static mutex_t allocate_tid_lock = MUTEX_INITIALIZER;
 tid_t allocate_tid(void) {
     tid_t tid;
 
+    // TODO: handle overflow and duplication
     mutex_lock(&allocate_tid_lock);
     last_tid++;
     tid = last_tid;
