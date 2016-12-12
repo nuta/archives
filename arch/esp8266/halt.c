@@ -10,8 +10,6 @@ unsigned long prev_millis = 0;
 void arch_halt_until(size_t ms) {
     size_t from_prev_wait = finfo->millis() - prev_millis;
 
-    prev_millis = finfo->millis();
-
     if (prev_millis == 0) {
         finfo->delay(ms);
         advance_clock(ms);
@@ -24,5 +22,6 @@ void arch_halt_until(size_t ms) {
         }
     }
 
+    prev_millis = finfo->millis();
     // return to yield()
 }
