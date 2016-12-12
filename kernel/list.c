@@ -4,8 +4,14 @@
 
 void insert_into_list(struct list **list, void *e) {
 
-    while (*list)
+    while (*list) {
+        if (*list == (*list)->next) {
+            BUG("circular linked list %p", *list);
+            return;
+        }
+
         list = &((*list)->next);
+    }
 
     ((struct list *) e)->next = NULL;
     *list = e;
