@@ -9,6 +9,17 @@ static size_t used  = 0;
 static mutex_t kmalloc_lock = MUTEX_INITIALIZER;
 
 
+static inline void mark_as_used(struct chunk *chunk) {
+
+    chunk->next = (void *) ((uintptr_t) chunk->next | 1);
+}
+
+static inline void mark_as_unused(struct chunk *chunk) {
+
+    chunk->next = (void *) ((uintptr_t) chunk->next & (~1));
+}
+
+
 void add_kmalloc_chunk(void *ptr, size_t size, bool large) {
 
     INFO("kmalloc: add chunk %dB", size);
@@ -55,8 +66,7 @@ static void *_kmalloc(struct chunk *chunks, size_t size, int flags) {
                 chunk->next      = next_chunk;
             }
 
-            // Mark as being used.
-            chunk->next = (void *) ((uintptr_t) chunk->next | 1);
+            mark_as_used(chunk);
             chunk->size = size;
             used += size;
             INFO("kmalloc: allocate %dB", size);
@@ -114,7 +124,7 @@ void kfree(void *ptr) {
 
     mutex_lock(&kmalloc_lock);
 
-    free_chunk->next = (void *) ((uintptr_t) free_chunk->next & (~1));
+    mark_as_unused(free_chunk);
     used -= free_chunk->size;
     merge_cont_chunks(small_chunks);
     merge_cont_chunks(large_chunks);

@@ -292,13 +292,19 @@ result_t call(cid_t cid, const void *m, size_t m_size,
 }
 
 
+static inline void update_channel_state(struct channel *ch, int state) {
+
+    ch->flags = (ch->flags & (~3)) | state;
+}
+
+
 result_t _link(struct channel *ch1, struct channel *ch2) {
     // TODO: add a assertion
 
-    ch1->flags      = (ch1->flags & (~3)) | CHANNEL_LINKED;
-    ch1->linked_to  = ch2;
-    ch2->flags      = (ch2->flags & (~3)) | CHANNEL_LINKED;
-    ch2->linked_to  = ch1;
+    ch1->linked_to = ch2;
+    ch2->linked_to = ch1;
+    update_channel_state(ch1, CHANNEL_LINKED);
+    update_channel_state(ch2, CHANNEL_LINKED);
 
     return OK;
 }
