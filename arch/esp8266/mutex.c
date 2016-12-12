@@ -16,11 +16,11 @@ void mutex_init(mutex_t *lock) {
 void mutex_lock(mutex_t *lock) {
 
   retry:
-    while (*lock == 1);
+    while (*lock);
 
-    *lock = arch_get_current_tid();
+    *lock = arch_get_current_thread();
 
-    if (*lock != arch_get_current_tid())
+    if (*lock != arch_get_current_thread())
         goto retry;
 }
 
@@ -30,8 +30,8 @@ bool mutex_try_lock(mutex_t *lock) {
     if (*lock)
         return false;
 
-    *lock = arch_get_current_tid();
-    return (*lock == arch_get_current_tid());
+    *lock = arch_get_current_thread();
+    return (*lock == arch_get_current_thread());
 }
 
 

@@ -3,26 +3,26 @@
 #include "thread.h"
 
 
-static tid_t current_tid; // TODO: make it a cpu-local variable
-tid_t arch_get_current_tid(void) {
+static struct thread *current_thread; // TODO: make it a cpu-local variable
+struct thread *arch_get_current_thread(void) {
 
-    return current_tid;
+    return current_thread;
 }
 
 
-void arch_switch_thread(tid_t tid, struct arch_thread *thread) {
+void arch_switch_thread(struct thread *thread) {
 
-    current_tid = tid;
-    INFO("#%d [switch] pc: %p, a1: %p", tid, thread->pc, thread->a1);
-    esp8266_switch_thread(thread);
+    current_thread = thread;
+    INFO("#%d [switch] pc: %p, a1: %p", thread->tid, thread->arch.pc, thread->arch.a1);
+    esp8266_switch_thread(&thread->arch);
 }
 
 
-void arch_create_thread(struct arch_thread *thread, uintptr_t start, uintmax_t arg,
+void arch_create_thread(struct thread *thread, uintptr_t start, uintmax_t arg,
                         uintptr_t stack, size_t stack_size) {
 
-    thread->pc = start;
-    thread->a0 = 0x00000000; // return address
-    thread->a1 = (stack + stack_size) & ~0xf ;
-    thread->a2 = arg;
+    thread->arch.pc = start;
+    thread->arch.a0 = 0x00000000; // return address
+    thread->arch.a1 = (stack + stack_size) & ~0xf ;
+    thread->arch.a2 = arg;
 }

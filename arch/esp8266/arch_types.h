@@ -5,7 +5,7 @@
 
 #define DEFAULT_THREAD_STACK_SIZE 2048
 #define MUTEX_INITIALIZER  0
-typedef tid_t mutex_t;
+typedef void * mutex_t;
 typedef unsigned int size_t;
 #define SIZE_MAX 0xffffffff
 
