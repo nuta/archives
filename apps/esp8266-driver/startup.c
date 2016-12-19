@@ -101,11 +101,11 @@ static void mainloop(channel_t server) {
     }
     // TODO: move this into the kernel
     case INTERRUPT_LISTEN: {
-        DEBUG("interrupt.accept");
         channel_t channel = buf[2];
         int pin           = buf[3];
         payload_t arg     = buf[4];
-        listen_event(get_channel_by_cid(channel), INTERRUPT_INTERRUPT0 + pin, arg);
+        DEBUG("interrupt.listen %x", INTERRUPT_INTERRUPT0 + pin);
+        listen_event(get_channel_by_cid(channel)->linked_to, INTERRUPT_INTERRUPT0 + pin, arg);
         finfo->accept_interrupt(pin, interrupt_handler);
         reply_interrupt_listen(reply_to, OK);
         break;
