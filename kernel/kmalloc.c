@@ -76,6 +76,14 @@ static void *_kmalloc(struct chunk *chunks, size_t size, int flags) {
     }
 
     WARN("kmalloc: failed to allcoate %dB", size);
+
+    // Dump all memory chunks.
+    DEBUG("chunks:");
+    for (struct chunk *chunk = chunks; CHUNK_ADDR(chunk); chunk = GET_NEXT_CHUNK(chunk)) {
+        DEBUG("    addr: %p, size: %d [%s]", chunk, chunk->size,
+              (IS_AVAILABLE_CHUNK(chunk)) ? "free" : "used");
+    }
+
     mutex_unlock(&kmalloc_lock);
     return (void *) NULL;
 }
