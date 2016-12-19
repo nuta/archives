@@ -176,7 +176,7 @@ static void mainloop(channel_t server) {
         if (options & HTTP_OPTION_DISCARD_RESPONSE_PAYLOAD) {
             resp = NULL;
         } else {
-            resp_size = 1024;
+            resp_size = 256; // XXX
             resp = malloc(resp_size);
         }
 
