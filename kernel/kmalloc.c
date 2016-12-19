@@ -132,8 +132,9 @@ void kfree(void *ptr) {
 
     mutex_lock(&kmalloc_lock);
 
-    mark_as_unused(free_chunk);
     used -= free_chunk->size;
+
+    mark_as_unused(free_chunk);
     merge_cont_chunks(small_chunks);
     merge_cont_chunks(large_chunks);
 
