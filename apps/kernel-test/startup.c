@@ -46,11 +46,12 @@ void client_thread(uintmax_t arg) {
                 "#2: sent a pointer payload correctly");
     TEST_EXPECT(buf[3] == msg2[3],  "#2: sent a pointer size payload correctly");
 
+    INFO("invoking an event %d", client);
     listen_event(get_channel_by_cid(client), INTERRUPT_INTERRUPT0, 0);
     fire_event(INTERRUPT_INTERRUPT0);
     recv(client, (void *) &buf, sizeof(buf), 0, &from);
-    TEST_EXPECT(from == 1, "sent a message from kernel");
-    TEST_EXPECT(buf[0] == INTERRUPT_INTERRUPT0, "receive an event");
+    TEST_EXPECT(from == -1, "sent a message from kernel");
+    TEST_EXPECT(buf[1] == INTERRUPT_INTERRUPT0, "receive an event");
 
     // stub test
     INFO("client: entering stub tests");
