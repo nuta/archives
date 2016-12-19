@@ -54,7 +54,7 @@ bool _fire_event(struct channel *ch, msgid_t type) {
 
     for (struct event *e = ch->events; e; e = e->next) {
          if (e->type == type) {
-             __fire_event(e);
+             return __fire_event(e);
          }
      }
 
