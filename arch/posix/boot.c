@@ -1,4 +1,5 @@
 #include "stdlibs.h"
+#include "thread.h"
 #include <kernel/init.h>
 #include <kernel/kmalloc.h>
 #include <kernel/resources.h>
@@ -19,5 +20,7 @@ int main(void) {
 
     add_kmalloc_chunk(small_chunk, small_chunk_size, false);
     add_kmalloc_chunk(large_chunk, large_chunk_size, true);
+    posix_init_thread();
+
     init_kernel(malloc(sizeof(struct resources)));
 }

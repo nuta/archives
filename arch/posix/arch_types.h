@@ -9,16 +9,9 @@ typedef pthread_mutex_t mutex_t;
 typedef unsigned long size_t;
 
 struct arch_thread {
-    uint64_t  rip;
-    uint64_t  rbx;
-    uint64_t  rbp;
-    uint64_t  rdi;
-    uint64_t  rsi;
-    uint64_t  rsp;
-    uint64_t  r12;
-    uint64_t  r13;
-    uint64_t  r14;
-    uint64_t  r15;
+    pthread_t pthread;
+    void (*start)(void*);
+    void *arg;
 };
 
 #endif
