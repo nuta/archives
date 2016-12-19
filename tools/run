@@ -51,11 +51,7 @@ def main(args):
                 resea.notice('cannot decode utf-8 string [{}]'.format(b))
 
             if l == "":
-                exit_code = p.poll()
-                if exit_code:
-                    sys.exit("process exited with {}".format(exit_code))
-                else:
-                    continue
+                continue
 
             m = re.match(LOG_LINE_REGEX, l)
             if m is None:
@@ -71,9 +67,9 @@ def main(args):
                     p.wait()
 
                     if failed > 0:
-                        sys.exit("\n{} tests are failed.".format(failed))
+                        sys.exit(colored("\n{} tests are failed.".format(failed), "red", attrs=["bold"]))
                     else:
-                        cprint("\nAll {} tests are passed.".format(passed), "green")
+                        cprint("\nAll {} tests are passed.".format(passed), "green", attrs=["bold"])
                     return
 
                 name = get_type_name(type_)
