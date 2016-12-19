@@ -22,7 +22,7 @@ static inline void mark_as_unused(struct chunk *chunk) {
 
 void add_kmalloc_chunk(void *ptr, size_t size, bool large) {
 
-    INFO("kmalloc: add chunk %dB", size);
+    INFO("kmalloc: add chunk %dB at %p", size, ptr);
 
     // Initialize the chunk
     struct chunk *new_chunk = (struct chunk *) ptr;
