@@ -20,8 +20,10 @@ string::string(const char *s) {
 
 string::~string() {
 
-    if (_buffer)
+    if (_buffer) {
         delete[] _buffer;
+        _buffer = nullptr;
+    }
 }
 
 
