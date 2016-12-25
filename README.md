@@ -64,6 +64,9 @@ $ bundle exec rails test:run
 Public domain
 
 ## Changelog
+- **v1.1.2**
+  - Upgrade Rails to 5.0.1
+  - Support Ruby 2.4.0
 - **v1.1.1**
   - Security fix: use [ActiveSupport::SecurityUtils#secure_compare](http://api.rubyonrails.org/classes/ActiveSupport/SecurityUtils.html#method-c-secure_compare) in password comparsion
 - **v1.1.0**
