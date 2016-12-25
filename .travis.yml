@@ -27,3 +27,6 @@ install:
 
 script:
   - ./travis/script.sh
+
+after_script:
+  - bundle exec codeclimate-test-reporter
