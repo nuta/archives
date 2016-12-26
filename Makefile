@@ -5,6 +5,7 @@ include $(BUILD_DIR)/config.mk
 .SECONDARY:
 $(VERBOSE).SILENT:
 
+VERSION = $(shell cat VERSION)
 VERBOSE ?=
 CMDECHO ?= printf "  \033[1;35m%7s    \033[0;33m%s\033[m\n"
 MKDIR   ?= mkdir

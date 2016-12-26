@@ -12,7 +12,7 @@ extern size_t app_stacks[];
 
 void init_kernel(struct resources *_resources) {
 
-    INFO("Welcome to Resea");
+    INFO("Welcome to Resea version " VERSION);
 
     resources = _resources;
     resources->processes = NULL;
