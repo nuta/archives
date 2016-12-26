@@ -1,8 +1,8 @@
 #include <arch.h>
-#include "finfo.h"
+#include "hypercall_table.h"
 
 
 void arch_printchar(const char ch) {
 
-    finfo->printchar(ch);
+    hypercall_table->printchar(ch);
 }

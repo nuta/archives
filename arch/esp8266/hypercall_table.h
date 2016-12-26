@@ -1,5 +1,5 @@
-#ifndef __FINFO_H__
-#define __FINFO_H__
+#ifndef __HYPERCALL_TABLE_H__
+#define __HYPERCALL_TABLE_H__
 
 #include <types.h>
 
@@ -11,7 +11,7 @@ enum {
     BERR_EOF      = 4,
 };
 
-struct firmware_info {
+struct hypercall_table {
     NORETURN void (*update)(unsigned long deployment_id);
     void (*delay)(unsigned long ms);
     void (*dprint)(const char *msg, unsigned x);
@@ -34,6 +34,6 @@ struct firmware_info {
     unsigned long (*millis)(void);
 };
 
-extern struct firmware_info *finfo;
+extern struct hypercall_table *hypercall_table;
 
 #endif

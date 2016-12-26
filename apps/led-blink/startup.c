@@ -2,7 +2,7 @@
 #include <logging.h>
 #include <resea/channel.h>
 #include <resea/gpio.h>
-#include "arch/esp8266/finfo.h"
+#include "arch/esp8266/hypercall_table.h"
 
 
 channel_t gpio_server;
@@ -34,7 +34,7 @@ void led_blink_startup(void) {
     call_gpio_write(gpio_server, 4, GPIO_HIGH, &r);
 
     INFO("led-blink: turned a LED on!");
-    finfo->set_loop(my_loop);
+    hypercall_table->set_loop(my_loop);
     INFO("set loop");
     for (;;);
 }

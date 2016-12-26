@@ -1,6 +1,6 @@
 #include <kernel/init.h>
 #include <kernel/kmalloc.h>
-#include "finfo.h"
+#include "hypercall_table.h"
 
 
 extern uint8_t __bss_start;
@@ -9,15 +9,15 @@ extern int __kmalloc_static_chunk;
 extern int __kmalloc_static_chunk_end;
 
 struct resources __resources;
-struct firmware_info *finfo;
+struct hypercall_table *hypercall_table;
 
-void esp8266_init(struct firmware_info *_finfo) {
+void esp8266_init(struct hypercall_table *_hypercall_table) {
 
     for (uint8_t *p = &__bss_start; p <= &__bss_end; p++) {
         *p = 0;
     }
 
-    finfo = _finfo;
+    hypercall_table = _hypercall_table;
     add_kmalloc_chunk(&__kmalloc_static_chunk,
                       (uintptr_t) &__kmalloc_static_chunk_end - (uintptr_t) &__kmalloc_static_chunk,
                       true);
