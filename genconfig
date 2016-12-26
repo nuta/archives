@@ -31,7 +31,7 @@ interfaces += {{ name }}
 def main(args):
     values = {}
     for value in args.values:
-        k, v = value.split("=", 2)
+        k, v = value.split("=", 1)
         values[k] = v
 
     objs = []
