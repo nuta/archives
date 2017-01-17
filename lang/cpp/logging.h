@@ -5,12 +5,13 @@
 
 __EXTERN_C__
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 2048
 
 size_t get_buffered_log(char **s);
 void vprintfmt(const char *format, va_list vargs);
 void printfmt(const char *format, ...);
 void printfmt_nonl(const char *format, ...);
+void init_logging();
 
 #define BUG(fmt, ...)    printfmt("B> " fmt, ##__VA_ARGS__)
 #define INFO(fmt, ...)   printfmt("I> " fmt, ##__VA_ARGS__)

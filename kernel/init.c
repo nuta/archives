@@ -11,6 +11,7 @@ extern uintptr_t apps[];
 extern size_t app_stacks[];
 
 void init_kernel(struct resources *_resources) {
+    init_logging();
 
     INFO("Welcome to Resea version " VERSION);
 

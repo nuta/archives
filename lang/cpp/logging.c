@@ -2,13 +2,19 @@
 #include <arch.h>
 #include <mutex.h>
 #include <strfmt.h>
+#include <malloc.h>
 #include "logging.h"
 
-static char buffer[BUFFER_SIZE];
+static char *buffer = NULL;
 static size_t buffer_start = 0, buffer_end = 0, buffer_filled = 0;
 
 
 static void printchar(const char ch) {
+
+    arch_printchar(ch);
+
+    if (!buffer)
+        return;
 
     if (ch == '\n')
         buffer_filled = buffer_end;
@@ -18,8 +24,6 @@ static void printchar(const char ch) {
 
     if (buffer_end == BUFFER_SIZE - 1)
         buffer_end = 0;
-
-    arch_printchar(ch);
 }
 
 
@@ -86,4 +90,10 @@ void printfmt_nonl(const char *format, ...) {
     va_end(vargs);
 
     mutex_unlock(&printfmt_lock);
+}
+
+
+void init_logging() {
+
+    buffer = malloc(BUFFER_SIZE);
 }
