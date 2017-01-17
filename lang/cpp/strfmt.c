@@ -26,6 +26,24 @@ static void print_str (const char *s, void (*callback)(void *arg, char c),
 
 
 /**
+ *  Prints an escaped string
+ *
+ *  @param[in] s  The string to print.
+ *
+ */
+static void print_escaped_str(const char *s, void (*callback)(void *arg, char c),
+                              void *callback_arg) {
+
+    for (int i=0; s[i] != '\0'; i++) {
+        switch (s[i]) {
+        case '\n': print_str("\n", callback, callback_arg); break;
+        default:   callback(callback_arg, s[i]);
+        }
+    }
+}
+
+
+/**
  *  Prints a integer
  *
  *  @param[in] base          The radix (2-16).
@@ -185,7 +203,11 @@ void vstrfmt(const char *fmt, va_list vargs, void (*callback)(void *arg, char c)
             case 's':
                 print_str((char *) arg, callback, callback_arg);
                 break;
+            case 'q':
+                print_escaped_str((char *) arg, callback, callback_arg);
+                break;
             default:
+                callback(callback_arg, '%');
                 callback(callback_arg, fmt[i]);
             }
         } else {
