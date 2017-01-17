@@ -31,21 +31,17 @@ result_t call_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}{{ re
 
 static inline void marshal_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_defs }}) {
 
-{% set i = 0 %}
 {% for type, name in payloads %}
-    __payloads[{{ i }}] = (payload_t) {{ name }};
-    {% set i = i + 1 %}
-{%- endfor %}
+    __payloads[{{ loop.index0 }}] = (payload_t) {{ name }};
+{% endfor %}
 }
 
 static inline void unmarshal_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_ptr_defs }}) {
 
-{% set i = 0 %}
 {% for type, name in payloads %}
     {% if type != '' %}
-    *{{ name }} = ({{ type }}) __payloads[{{ i }}];
+    *{{ name }} = ({{ type }}) __payloads[{{ loop.index0 }}];
     {% endif %}
-    {% set i = i + 1 %}
 {%- endfor %}
 }
 """
