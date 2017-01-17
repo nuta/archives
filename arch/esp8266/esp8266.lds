@@ -36,7 +36,7 @@ SECTIONS {
         __bss_end = .;
 
         __kmalloc_static_chunk = ALIGN(4);
-        . = . + 0x2400;
+        . = . + 0x2500;
         __kmalloc_static_chunk_end = .;
 
         __stack_bottom = .;
