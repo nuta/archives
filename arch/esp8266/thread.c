@@ -13,7 +13,7 @@ struct thread *arch_get_current_thread(void) {
 void arch_switch_thread(struct thread *thread) {
 
     current_thread = thread;
-    INFO("#%d [switch] pc: %p, a1: %p", thread->tid, thread->arch.pc, thread->arch.a1);
+    DEBUG("#%d pc=%p", thread->tid, thread->arch.pc);
     esp8266_switch_thread(&thread->arch);
 }
 
