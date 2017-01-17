@@ -6,7 +6,7 @@
 #include "list.h"
 
 
-static cid_t last_cid = 0;
+static cid_t last_cid = 0; // FIXME: must be process-local
 static mutex_t allocate_cid_lock = MUTEX_INITIALIZER;
 
 static cid_t allocate_cid(void) {
