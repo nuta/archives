@@ -1,4 +1,4 @@
-name: esp8266-driver
+name: makestack-driver
 author: Seiya Nuta <nuta@seiya.me>
 implements:
   - gpio

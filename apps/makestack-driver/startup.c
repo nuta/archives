@@ -13,7 +13,10 @@
 #include "kernel/event.h"
 #include "kernel/timer.h"
 #include "kernel/message.h"
-#include "arch/esp8266/hypercall_table.h"
+#include "hypercall.h"
+
+
+extern struct hypercalls *hypercalls;
 
 
 static void interrupt_handler(int pin) {
@@ -38,26 +41,26 @@ static void mainloop(channel_t server) {
         DEBUG("gpio.set_pin_mode");
         int pin = buf[2];
         int mode = buf[3];
-        hypercall_table->gpio_set_pin_mode(pin, mode);
+        hypercalls->gpio_set_pin_mode(pin, mode);
         send_gpio_set_pin_mode_reply(reply_to, OK, 0);
         break;
     }
     case GPIO_READ: {
         DEBUG("gpio.read");
         int pin = buf[2];
-        send_gpio_read_reply(reply_to, OK, hypercall_table->gpio_read(pin), 0);
+        send_gpio_read_reply(reply_to, OK, hypercalls->gpio_read(pin), 0);
         break;
     }
     case GPIO_READ_ANALOG: {
         DEBUG("gpio.read_analog");
-        send_gpio_read_analog_reply(reply_to, OK, hypercall_table->read_adc(), 0);
+        send_gpio_read_analog_reply(reply_to, OK, hypercalls->read_adc(), 0);
         break;
     }
     case GPIO_WRITE_ANALOG: {
         DEBUG("gpio.write_analog");
         int pin = buf[2];
         int value = buf[3];
-        hypercall_table->analog_write(pin, value);
+        hypercalls->analog_write(pin, value);
         send_gpio_write_analog_reply(reply_to, OK, 0);
         break;
     }
@@ -65,37 +68,37 @@ static void mainloop(channel_t server) {
         DEBUG("gpio.write");
         int pin = buf[2];
         int data = buf[3];
-        hypercall_table->gpio_write(pin, data);
+        hypercalls->gpio_write(pin, data);
         send_gpio_write_reply(reply_to, OK, 0);
         break;
     }
     case MAKESTACK_RESET:
         DEBUG("makestack.reset");
-        hypercall_table->update(-1); // never returns
+        hypercalls->update(-1); // never returns
         break;
     case MAKESTACK_UPDATE: {
         DEBUG("makestack.update");
         int deployment_id = buf[2];
-        hypercall_table->update(deployment_id); // never returns
+        hypercalls->update(deployment_id); // never returns
         break;
     }
     case MAKESTACK_GET_DEVICE_SECRET: {
         DEBUG("makestack.get_device_secret");
-        const char *device_secret = hypercall_table->get_device_secret();
-        size_t len = strlen(hypercall_table->get_device_secret()) + 1;
+        const char *device_secret = hypercalls->get_device_secret();
+        size_t len = strlen(hypercalls->get_device_secret()) + 1;
         reply_makestack_get_device_secret(reply_to, (void *) device_secret, len);
         break;
     }
     case MAKESTACK_GET_SERVER_URL: {
         DEBUG("makestack.get_serve_url");
-        const char *server_url = hypercall_table->get_server_url();
-        size_t len = strlen(hypercall_table->get_server_url()) + 1;
+        const char *server_url = hypercalls->get_server_url();
+        size_t len = strlen(hypercalls->get_server_url()) + 1;
         reply_makestack_get_server_url(reply_to, (void *) server_url, len);
         break;
     }
     case MAKESTACK_GET_DEPLOYMENT_ID: {
         DEBUG("makestack.get_deployment_id");
-        int deployment_id = hypercall_table->get_deployment_id();
+        int deployment_id = hypercalls->get_deployment_id();
         reply_makestack_get_deployment_id(reply_to, deployment_id);
         break;
     }
@@ -106,7 +109,7 @@ static void mainloop(channel_t server) {
         payload_t arg     = buf[4];
         DEBUG("interrupt.listen %x", INTERRUPT_INTERRUPT0 + pin);
         listen_event(get_channel_by_cid(channel)->linked_to, INTERRUPT_INTERRUPT0 + pin, arg);
-        hypercall_table->accept_interrupt(pin, interrupt_handler);
+        hypercalls->accept_interrupt(pin, interrupt_handler);
         reply_interrupt_listen(reply_to, OK);
         break;
     }
@@ -114,7 +117,7 @@ static void mainloop(channel_t server) {
         int addr    = buf[2];
         char *data  = (char *) buf[3];
         size_t size = buf[4];
-        hypercall_table->i2c_send(addr, data, size);
+        hypercalls->i2c_send(addr, data, size);
         reply_i2c_send(reply_to, OK);
         break;
     }
@@ -122,7 +125,7 @@ static void mainloop(channel_t server) {
         int addr    = buf[2];
         size_t size = buf[3];
         char *data  = (char *) malloc(size);
-        hypercall_table->i2c_receive(addr, data, size);
+        hypercalls->i2c_receive(addr, data, size);
         reply_i2c_receive(reply_to, OK, data, size);
 
         free(data);
@@ -180,7 +183,7 @@ static void mainloop(channel_t server) {
             resp = malloc(resp_size);
         }
 
-        status_code = hypercall_table->http_request(method, url, url_size, headers, headers_size,
+        status_code = hypercalls->http_request(method, url, url_size, headers, headers_size,
                           payload, payload_size, resp, resp_size, &received_size);
 
         reply_http_request(reply_to, OK, status_code, resp, received_size);
@@ -189,7 +192,7 @@ static void mainloop(channel_t server) {
         break;
     }
     default:
-        WARN("esp82660-driver: unknown message (%p)", buf[1]);
+        WARN("makestack-driver: unknown message (%p)", buf[1]);
     }
 
     discard(&buf, sizeof(buf));
@@ -199,8 +202,8 @@ static void mainloop(channel_t server) {
 extern int __stack;
 extern int __stack_bottom;
 
-void esp8266_driver_startup(void) {
-    INFO("starting esp8266-driver");
+void makestack_driver_startup(void) {
+    INFO("starting makestack-driver");
 
     /* A stack area used in boot is no longer necessary. Reuse it. */
     add_kmalloc_chunk((void *) &__stack_bottom,
@@ -218,7 +221,7 @@ void esp8266_driver_startup(void) {
     call_channel_register(channel_server, server, MAKESTACK_INTERFACE, &r);
     call_channel_register(channel_server, server, HTTP_INTERFACE, &r);
 
-    INFO("esp8266-driver: ready");
+    INFO("makestack-driver: ready");
     for (;;)
         mainloop(server);
 }

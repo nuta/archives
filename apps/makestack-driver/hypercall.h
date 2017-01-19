@@ -1,22 +1,12 @@
-#ifndef __HYPERCALL_TABLE_H__
-#define __HYPERCALL_TABLE_H__
+#ifndef __HYPERCALL_H__
+#define __HYPERCALL_H__
 
-#include <types.h>
-
-typedef int ferr_t;
-enum {
-    BERR_OK       = 1,
-    BERR_CONNECT  = 2,
-    BERR_NOMEM    = 3,
-    BERR_EOF      = 4,
-};
-
-struct hypercall_table {
-    NORETURN void (*update)(unsigned long deployment_id);
+struct hypercalls {
+    void (*update)(unsigned long deployment_id);
     void (*delay)(unsigned long ms);
     void (*dprint)(const char *msg, unsigned x);
     void (*printchar)(const char ch);
-    int (*read_adc)(void);
+    int (*read_adc)();
     void (*analog_write)(int pin, int value);
     int (*gpio_read)(int pin);
     void (*gpio_write)(int pin, int data);
@@ -32,8 +22,8 @@ struct hypercall_table {
     void (*i2c_send)(int addr, const void *buf, size_t size);
     void (*i2c_receive)(int addr, void *buf, size_t size);
     unsigned long (*millis)(void);
+    void (*reboot_after)(int ms);
 };
 
-extern struct hypercall_table *hypercall_table;
 
 #endif

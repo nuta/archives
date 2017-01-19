@@ -19,7 +19,7 @@ Building
 
 **example:**
 ```
-$ ./genconfig ARCH=esp8266 TARGET=kernel APPS="channel-server esp8266-driver app"
+$ ./genconfig ARCH=esp8266 TARGET=kernel APPS="channel-server makestack-driver app"
 $ make -j2
 $ file build/image
 ```

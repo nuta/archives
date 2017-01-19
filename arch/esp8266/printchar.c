@@ -1,8 +1,8 @@
 #include <arch.h>
-#include "hypercall_table.h"
+#include "hypercall.h"
 
 
 void arch_printchar(const char ch) {
 
-    hypercall_table->printchar(ch);
+    hypercalls->printchar(ch);
 }
