@@ -68,3 +68,16 @@ messages:
       - name: deployment_id
         type: int
         desc: The deployment ID.
+
+  reboot_after:
+    id: 11
+    desc: Reboot after `ms`.
+    reply: reboot_after_reply
+    payloads:
+      - name: ms
+        type: int
+        desc: msec
+  reboot_after_reply:
+    id: 12
+    desc: The reply message of `.reboot_after`.
+    payloads:

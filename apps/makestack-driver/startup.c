@@ -191,6 +191,12 @@ static void mainloop(channel_t server) {
         free(resp);
         break;
     }
+    case MAKESTACK_REBOOT_AFTER: {
+        int ms;
+        unmarshal_makestack_reboot_after((payload_t *) &buf, &ms);
+        hypercalls->reboot_after(ms); // never returns
+        break;
+    }
     default:
         WARN("makestack-driver: unknown message (%p)", buf[1]);
     }
