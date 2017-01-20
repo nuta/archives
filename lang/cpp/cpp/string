@@ -9,6 +9,7 @@ private:
     size_t _length;
     char *_buffer;
     void init();
+    void free_buffer();
 
 public:
 
@@ -19,6 +20,7 @@ public:
     string();
     ~string();
     string(const char *s);
+    string& assign(const char *str);
     const char at(size_t pos) const;
     void reserve(size_t n);
     string& append(const char *s);

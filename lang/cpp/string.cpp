@@ -20,10 +20,27 @@ string::string(const char *s) {
 
 string::~string() {
 
+    free_buffer();
+}
+
+
+void string::free_buffer() {
+
     if (_buffer) {
         delete[] _buffer;
         _buffer = nullptr;
     }
+}
+
+
+string& string::assign(const char *str) {
+
+    if (_capacity > 0) {
+        _length = 0;
+        _buffer[0] = '\0';
+    }
+
+    append(str);
 }
 
 
