@@ -19,6 +19,9 @@ static inline void *malloc(size_t size) {
 
 static inline void free(void *ptr) {
 
+    if (!ptr)
+        return;
+
     kfree(ptr);
 }
 
