@@ -1,15 +1,15 @@
 #include <strfmt.h>
 #include <string.h>
-#include <string>
+#include <String.hpp>
 
 
-string::string() {
+String::String() {
 
     init();
 }
 
 
-string::string(const char *s) {
+String::String(const char *s) {
 
     init();
 
@@ -18,13 +18,13 @@ string::string(const char *s) {
 }
 
 
-string::~string() {
+String::~String() {
 
     free_buffer();
 }
 
 
-void string::free_buffer() {
+void String::free_buffer() {
 
     if (_buffer) {
         delete[] _buffer;
@@ -33,7 +33,7 @@ void string::free_buffer() {
 }
 
 
-string& string::assign(const char *str) {
+String& String::assign(const char *str) {
 
     if (_capacity > 0) {
         _length = 0;
@@ -45,7 +45,7 @@ string& string::assign(const char *str) {
 }
 
 
-const char string::at(size_t pos) const {
+const char String::at(size_t pos) const {
 
     if (pos >= _length)
         return 0;
@@ -54,7 +54,7 @@ const char string::at(size_t pos) const {
 }
 
 
-void string::reserve(size_t n) {
+void String::reserve(size_t n) {
     char *old_buffer = _buffer;
     _capacity = n;
     _buffer = new char[_capacity];
@@ -63,13 +63,13 @@ void string::reserve(size_t n) {
 }
 
 
-string& string::append(const char *s) {
+String& String::append(const char *s) {
 
     return append(s, SIZE_MAX);
 }
 
 
-string& string::append(const char *s, size_t n) {
+String& String::append(const char *s, size_t n) {
 
     size_t s_len = strlen(s);
     if (_capacity - _length < s_len || (_capacity == 0 && s_len == 0)) {
@@ -88,14 +88,14 @@ string& string::append(const char *s, size_t n) {
 }
 
 
-string& string::append(char c) {
+String& String::append(char c) {
 
     char s[2] = {c, '\0'};
     return append((const char *) &s);
 }
 
 
-size_t string::find(const char *s, size_t pos) const {
+size_t String::find(const char *s, size_t pos) const {
 
     if (!_buffer)
         return npos;
@@ -112,7 +112,7 @@ size_t string::find(const char *s, size_t pos) const {
 }
 
 
-size_t string::find(char c, size_t pos) const {
+size_t String::find(char c, size_t pos) const {
 
     if (!_buffer)
         return npos;
@@ -128,7 +128,7 @@ size_t string::find(char c, size_t pos) const {
 }
 
 
-bool string::startswith(const char *s) const {
+bool String::startswith(const char *s) const {
 
     for (size_t i = 0; *s; i++, s++) {
         if (_buffer[i] != *s)
@@ -139,14 +139,14 @@ bool string::startswith(const char *s) const {
 }
 
 
-int string::to_int() const {
+int String::to_int() const {
 
     // TODO: support hex
     return atol(c_str());
 }
 
 
-void string::init() {
+void String::init() {
 
     _buffer   = nullptr;
     _length   = 0;
@@ -154,13 +154,13 @@ void string::init() {
 }
 
 
-void string::fmt(const char *format, ...) {
+void String::fmt(const char *format, ...) {
     va_list vargs;
 
     va_start(vargs, format);
 
     vstrfmt(format, vargs, [](void *_s, char c) {
-        string *s = (string *) _s;
+        String *s = (String *) _s;
         s->append(c);
     }, this);
 

@@ -1,9 +1,9 @@
-#ifndef __CPP_STRING__
-#define __CPP_STRING__
+#ifndef __CPP_STRING_HPP__
+#define __CPP_STRING_HPP__
 
 #include <types.h>
 
-class string {
+class String {
 private:
     size_t _capacity;
     size_t _length;
@@ -17,24 +17,24 @@ public:
     // size_t is *un*signed integer.
     static const size_t npos = -1;
 
-    string();
-    ~string();
-    string(const char *s);
-    string& assign(const char *str);
+    String();
+    ~String();
+    String(const char *s);
+    String& assign(const char *str);
     const char at(size_t pos) const;
     void reserve(size_t n);
-    string& append(const char *s);
-    string& append(const char *s, size_t n);
-    string& append(char c);
+    String& append(const char *s);
+    String& append(const char *s, size_t n);
+    String& append(char c);
     size_t find(const char *s, size_t pos = 0) const;
     size_t find(char c, size_t pos = 0) const;
 
-    string& operator +=(char c) {
+    String& operator +=(char c) {
         append(c);
         return *this;
     }
 
-    string& operator +=(const char *s) {
+    String& operator +=(const char *s) {
         append(s);
         return *this;
     }

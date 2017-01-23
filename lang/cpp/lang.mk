@@ -4,7 +4,7 @@ h_stubs = $(addprefix $(BUILD_DIR)/stubs/cpp/resea/, $(addsuffix .h, $(interface
 objs += \
     lang/cpp/logging.o \
     lang/cpp/cstring.o \
-    lang/cpp/string.o  \
+    lang/cpp/String.o  \
     lang/cpp/new.o     \
     lang/cpp/strfmt.o  \
     lang/cpp/channel.o
@@ -16,7 +16,7 @@ DEFINES = -DVERSION='"$(VERSION)"'
 override CFLAGS   += -Wall -std=c11 -Wno-incompatible-library-redeclaration \
                      -Werror=implicit-function-declaration $(DEFINES)
 override CXXFLAGS += -Wall -std=c++11 -fno-exceptions -fno-rtti $(DEFINES)
-override CPPFLAGS += -Ilang/cpp -Ilang/cpp/cpp -I$(BUILD_DIR)/stubs/cpp -I.
+override CPPFLAGS += -Ilang/cpp -I$(BUILD_DIR)/stubs/cpp -I.
 
 $(BUILD_DIR)/stubs/cpp/%.c: interfaces/%.yaml $(CPP_GENSTUB)
 	$(CMDECHO) GENSTUB $@
