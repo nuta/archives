@@ -8,7 +8,7 @@ private:
     size_t _capacity;
     size_t _length;
     char *_buffer;
-    void init();
+    void init(const char *s);
     void free_buffer();
 
 public:
@@ -20,7 +20,7 @@ public:
     String();
     ~String();
     String(const char *s);
-    String& assign(const char *str);
+    String(const String& s);
     const char at(size_t pos) const;
     void reserve(size_t n);
     String& append(const char *s);

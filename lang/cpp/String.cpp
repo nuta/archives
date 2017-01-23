@@ -5,16 +5,19 @@
 
 String::String() {
 
-    init();
+    init(nullptr);
 }
 
 
 String::String(const char *s) {
 
-    init();
+    init(s);
+}
 
-    if (s)
-        append(s);
+
+String::String(const String& s) {
+
+    init(s.c_str());
 }
 
 
@@ -146,11 +149,14 @@ int String::to_int() const {
 }
 
 
-void String::init() {
+void String::init(const char *s) {
 
     _buffer   = nullptr;
     _length   = 0;
     _capacity = 0;
+
+    if (s)
+        append(s);
 }
 
 
