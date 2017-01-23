@@ -10,6 +10,7 @@ private:
 public:
     Buffer() : ptr(nullptr), len(0) {}
     Buffer(const Buffer &buffer) = delete;
+    void operator=(const Buffer &buffer) = delete;
 
     ~Buffer() {
         free(ptr);
