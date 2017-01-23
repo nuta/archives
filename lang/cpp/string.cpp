@@ -41,6 +41,7 @@ string& string::assign(const char *str) {
     }
 
     append(str);
+    return *this;
 }
 
 
