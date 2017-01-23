@@ -14,11 +14,11 @@ messages:
 
   update:
     id: 3
-    desc: Downloads and launches app to the speicified `deployment_id`. The
+    desc: Downloads and launches app to the speicified `deployment_version`. The
           current running app will be killed.
     reply: update_reply
     payloads:
-      - name: deployment_id
+      - name: deployment_version
         type: int
         desc: The deployment ID.
   update_reply:
@@ -56,16 +56,16 @@ messages:
       - name: server_url_size
         type: size
 
-  get_deployment_id:
+  get_deployment_version:
     id: 9
     desc: Returns the current deployment ID.
-    reply: get_deployment_id_reply
+    reply: get_deployment_version_reply
     payloads:
-  get_deployment_id_reply:
+  get_deployment_version_reply:
     id: 10
-    desc: The reply message of `.get_deployment_id`.
+    desc: The reply message of `.get_deployment_version`.
     payloads:
-      - name: deployment_id
+      - name: deployment_version
         type: int
         desc: The deployment ID.
 

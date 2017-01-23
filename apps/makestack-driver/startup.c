@@ -78,8 +78,8 @@ static void mainloop(channel_t server) {
         break;
     case MAKESTACK_UPDATE: {
         DEBUG("makestack.update");
-        int deployment_id = buf[2];
-        hypercalls->update(deployment_id); // never returns
+        int deployment_version = buf[2];
+        hypercalls->update(deployment_version); // never returns
         break;
     }
     case MAKESTACK_GET_DEVICE_SECRET: {
@@ -96,10 +96,10 @@ static void mainloop(channel_t server) {
         reply_makestack_get_server_url(reply_to, (void *) server_url, len);
         break;
     }
-    case MAKESTACK_GET_DEPLOYMENT_ID: {
-        DEBUG("makestack.get_deployment_id");
-        int deployment_id = hypercalls->get_deployment_id();
-        reply_makestack_get_deployment_id(reply_to, deployment_id);
+    case MAKESTACK_GET_DEPLOYMENT_VERSION: {
+        DEBUG("makestack.get_deployment_version");
+        int deployment_version = hypercalls->get_deployment_version();
+        reply_makestack_get_deployment_version(reply_to, deployment_version);
         break;
     }
     // TODO: move this into the kernel
