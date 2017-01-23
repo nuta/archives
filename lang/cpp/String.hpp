@@ -10,6 +10,7 @@ private:
     char *_buffer;
     void init(const char *s);
     void free_buffer();
+    void truncate_buffer();
 
 public:
 
@@ -21,6 +22,8 @@ public:
     ~String();
     String(const char *s);
     String(const String& s);
+    String& assign(const char *s);
+    String& assign(const char *s, size_t n);
     const char at(size_t pos) const;
     void reserve(size_t n);
     String& append(const char *s);

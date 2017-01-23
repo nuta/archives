@@ -36,14 +36,28 @@ void String::free_buffer() {
 }
 
 
-String& String::assign(const char *str) {
+void String::truncate_buffer() {
 
     if (_capacity > 0) {
         _length = 0;
         _buffer[0] = '\0';
     }
 
-    append(str);
+}
+
+
+String& String::assign(const char *s) {
+
+    truncate_buffer();
+    append(s);
+    return *this;
+}
+
+
+String& String::assign(const char *s, size_t n) {
+
+    truncate_buffer();
+    append(s, n);
     return *this;
 }
 
