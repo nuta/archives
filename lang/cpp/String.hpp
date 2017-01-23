@@ -42,6 +42,10 @@ public:
         return *this;
     }
 
+    bool operator ==(const char *s) {
+        return (_buffer && !strcmp(_buffer, s));
+    }
+
     size_t length() const {
         return _length;
     }
