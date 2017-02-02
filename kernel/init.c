@@ -1,5 +1,5 @@
 #include <arch.h>
-#include <logging.h>
+#include <runtime.h>
 #include "init.h"
 #include "panic.h"
 #include "process.h"
@@ -11,7 +11,7 @@ extern uintptr_t apps[];
 extern size_t app_stacks[];
 
 void init_kernel(struct resources *_resources) {
-    init_logging();
+    init_cpp_runtime();
 
     INFO("Welcome to Resea version " VERSION);
 

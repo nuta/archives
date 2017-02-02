@@ -1,6 +1,7 @@
 interfaces += timer interrupt
 objs += \
     kernel/init.o       \
+    kernel/halt.o       \
     kernel/event.o      \
     kernel/list.o       \
     kernel/interrupt.o  \

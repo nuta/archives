@@ -7,6 +7,7 @@ objs += \
     lang/cpp/String.o  \
     lang/cpp/new.o     \
     lang/cpp/strfmt.o  \
+    lang/cpp/runtime.o \
     lang/cpp/channel.o
 
 stub_objs += $(c_stubs:.c=.o)
