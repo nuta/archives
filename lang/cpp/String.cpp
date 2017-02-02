@@ -174,15 +174,19 @@ void String::init(const char *s) {
 }
 
 
-void String::fmt(const char *format, ...) {
-    va_list vargs;
-
-    va_start(vargs, format);
+void String::vfmt(const char *format, va_list vargs) {
 
     vstrfmt(format, vargs, [](void *_s, char c) {
         String *s = (String *) _s;
         s->append(c);
     }, this);
+}
 
+
+void String::fmt(const char *format, ...) {
+    va_list vargs;
+
+    va_start(vargs, format);
+    this->vfmt(format, vargs);
     va_end(vargs);
 }

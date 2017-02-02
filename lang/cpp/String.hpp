@@ -62,6 +62,7 @@ public:
     bool startswith(const char *s) const;
     int to_int() const;
     void fmt(const char *format, ...);
+    void vfmt(const char *format, va_list vargs);
 };
 
 #endif
