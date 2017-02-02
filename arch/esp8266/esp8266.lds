@@ -28,6 +28,14 @@ SECTIONS {
     .data : ALIGN(4) {
         *(.data*)
         *(.rodata*)
+
+        __ctors = .;
+        *(.ctors*)
+        __ctors_end = .;
+
+        __dtors = .;
+        *(.dtors*)
+        __dtors_end = .;
     } > dram : dram_phdr
 
     .bss : ALIGN(4) {
