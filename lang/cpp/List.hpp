@@ -3,6 +3,7 @@
 
 #include <resea.h>
 
+
 template <typename T>
 class ListElement {
 public:
