@@ -18,6 +18,7 @@ app_yamls += {{ app_yaml }}
 include kernel/kernel.mk
 {% endif %}
 
+objs += $(OBJS)
 {% for path in objs %}
 objs += {{ path }}
 {% endfor %}
