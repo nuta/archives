@@ -1,4 +1,5 @@
 #include <resea.h>
+#include <runtime.h>
 #include <logging.h>
 #include <string.h>
 #include <malloc.h>
@@ -9,6 +10,7 @@
 #include <resea/interrupt.h>
 #include <resea/makestack.h>
 #include <resea/http.h>
+#include "kernel/halt.h"
 #include "kernel/kmalloc.h"
 #include "kernel/event.h"
 #include "kernel/timer.h"
@@ -74,11 +76,15 @@ static void mainloop(channel_t server) {
     }
     case MAKESTACK_RESET:
         DEBUG("makestack.reset");
+
+        halt_kernel();
         hypercalls->update(-1); // never returns
         break;
     case MAKESTACK_UPDATE: {
         DEBUG("makestack.update");
         int deployment_version = buf[2];
+
+        halt_kernel();
         hypercalls->update(deployment_version); // never returns
         break;
     }
@@ -194,6 +200,8 @@ static void mainloop(channel_t server) {
     case MAKESTACK_REBOOT_AFTER: {
         int ms;
         unmarshal_makestack_reboot_after((payload_t *) &buf, &ms);
+
+        halt_kernel();
         hypercalls->reboot_after(ms); // never returns
         break;
     }
