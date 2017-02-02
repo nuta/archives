@@ -15,7 +15,7 @@ PHDRS {
 SECTIONS {
 
     .iram0.text : {
-        *lang*.o(.literal* .text*)
+        *arch*.o(.literal* .text*)
         *libgcc.a:_udivsi3.o(.literal* .text*)
         *libgcc.a:_umoddi3.o(.literal* .text*)
     } > iram0 : iram0_phdr
