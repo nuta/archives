@@ -1,3 +1,4 @@
+BUILD ?= release
 BUILD_DIR ?= build
 include $(BUILD_DIR)/config.mk
 

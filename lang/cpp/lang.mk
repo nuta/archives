@@ -13,7 +13,7 @@ objs += \
 stub_objs += $(c_stubs:.c=.o)
 
 CPP_GENSTUB = ./lang/cpp/genstub
-DEFINES = -DVERSION='"$(VERSION)"'
+DEFINES = -DVERSION='"$(VERSION)"' -DBUILD_$(shell echo $(BUILD) | tr a-z A-Z)
 override CFLAGS   += -Wall -std=c11 -Wno-incompatible-library-redeclaration \
                      -Werror=implicit-function-declaration $(DEFINES)
 override CXXFLAGS += -Wall -std=c++11 -fno-exceptions -fno-rtti $(DEFINES)
