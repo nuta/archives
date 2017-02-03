@@ -18,6 +18,8 @@
 #include "hypercall.h"
 
 
+#define HTTP_MAX_RESP_SIZE 512
+
 extern struct hypercalls *hypercalls;
 
 
@@ -185,7 +187,7 @@ static void mainloop(channel_t server) {
         if (options & HTTP_OPTION_DISCARD_RESPONSE_PAYLOAD) {
             resp = NULL;
         } else {
-            resp_size = 256; // XXX
+            resp_size = HTTP_MAX_RESP_SIZE;
             resp = malloc(resp_size);
         }
 
