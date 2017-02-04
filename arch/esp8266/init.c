@@ -22,7 +22,7 @@ void esp8266_init(struct hypercalls *_hypercalls) {
                       (uintptr_t) &__kmalloc_static_chunk_end - (uintptr_t) &__kmalloc_static_chunk,
                       true);
 
-    add_kmalloc_chunk((void *) 0x3fff7000 /* used by firmware on updating */, 0x1000, true);
+    add_kmalloc_chunk((void *) 0x3fff6000 /* used by firmware on updating */, 0x2000, true);
     add_kmalloc_chunk((void *) 0x3fff8000 /* used by firmware on updating */, 0x2000, false);
 
     init_kernel((struct resources *) &__resources);
