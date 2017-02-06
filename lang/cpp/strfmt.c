@@ -119,6 +119,56 @@ static void print_int (intmax_t base, intmax_t v, uintmax_t len,
 }
 
 
+static void print_double(double value, void (*callback)(void *arg, char c),
+                         void *callback_arg) {
+    int decimal_place = 4;
+    union {double d; uint64_t u;} u = {value};
+
+    int higher = u.u >> 48; // including sign bit
+    if (higher == 0x7ff0) {
+        strfmt("Inf", callback, callback_arg);
+        return;
+    }
+
+    if (higher == 0xfff0) {
+        strfmt("-Inf", callback, callback_arg);
+        return;
+    }
+
+    if (higher == 0xffff) {
+        strfmt("NaN", callback, callback_arg);
+        return;
+    }
+
+    if (value < 0) {
+        strfmt("-", callback, callback_arg);
+        value = -value;
+    }
+
+    // Rounded off to the (decimal_place - 1) decimal place.
+    double x = 0.5;
+    for (int i = 0; i < decimal_place; i++)
+        x *= 0.1;
+    value += x;
+
+    // Print the integer part.
+    long integer = (long) value;
+    value -= integer;
+    strfmt("%d", callback, callback_arg, integer);
+
+    // Print the decimal part.
+    if (decimal_place > 0) {
+        strfmt(".", callback, callback_arg);
+        for (int i = 0; i < decimal_place; i++) {
+            value *= 10.;
+            long integer = (long) value;
+            value -= integer;
+            strfmt("%d", callback, callback_arg, integer);
+        }
+    }
+}
+
+
 /**
  *  Parses a formatted string
  *
@@ -162,7 +212,6 @@ void vstrfmt(const char *fmt, va_list vargs, void (*callback)(void *arg, char c)
             bool pad = false;
             char specifier;
             uintmax_t len = sizeof(intmax_t); // 1: char, 2: short, 4: unsigned, ...
-            uintmax_t arg = 0; // initialize 0 to supress compiler warning
 
             for (;;) {
                 i++;
@@ -175,7 +224,6 @@ void vstrfmt(const char *fmt, va_list vargs, void (*callback)(void *arg, char c)
                     break;
                 } else {
                     specifier = fmt[i];
-                    arg = va_arg(vargs, uintmax_t);
                     break;
                 }
             }
@@ -184,27 +232,33 @@ void vstrfmt(const char *fmt, va_list vargs, void (*callback)(void *arg, char c)
             case '%':
                 callback(callback_arg, '%');
                 break;
+            case 'f':
+                print_double(va_arg(vargs, double), callback, callback_arg);
+                break;
             case 'd':
-                print_int(10, arg, len, true,  alt, pad, false, callback, callback_arg);
+                print_int(10, va_arg(vargs, uintmax_t), len, true,  alt, pad, false,
+                          callback, callback_arg);
                 break;
             case 'u':
-                print_int(10, arg, len, false, alt, pad, false, callback, callback_arg);
+                print_int(10, va_arg(vargs, uintmax_t), len, false, alt, pad, false,
+                          callback, callback_arg);
                 break;
             case 'p':
                 alt = true;
                 pad = true;
                 // fallthrough
             case 'x':
-                print_int(16, arg, len, false, alt, pad, false, callback, callback_arg);
+                print_int(16, va_arg(vargs, uintmax_t), len, false, alt, pad, false,
+                          callback, callback_arg);
                 break;
             case 'c':
-                callback(callback_arg, (char) arg);
+                callback(callback_arg, va_arg(vargs, int));
                 break;
             case 's':
-                print_str((char *) arg, callback, callback_arg);
+                print_str(va_arg(vargs, char *), callback, callback_arg);
                 break;
             case 'q':
-                print_escaped_str((char *) arg, callback, callback_arg);
+                print_escaped_str(va_arg(vargs, char *), callback, callback_arg);
                 break;
             default:
                 callback(callback_arg, '%');
@@ -214,4 +268,15 @@ void vstrfmt(const char *fmt, va_list vargs, void (*callback)(void *arg, char c)
             callback(callback_arg, fmt[i]);
         }
     }
+}
+
+
+void strfmt(const char *fmt, void (*callback)(void *arg, char c),
+            void *callback_arg, ...) {
+
+    va_list vargs;
+
+    va_start(vargs, callback_arg);
+    vstrfmt(fmt, vargs, callback, callback_arg);
+    va_end(vargs);
 }

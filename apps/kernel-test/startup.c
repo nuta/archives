@@ -213,11 +213,23 @@ void test_kmalloc(void) {
 }
 
 
+static void test_printfmt(void) {
+    union {uint32_t u; float f; }  f1 = {0x7f800000}; // Inf
+    union {uint32_t u; float f; }  f2 = {0xff800000}; // -Inf
+    union {uint64_t u; double f; } f3 = {0xffffffffffffffff}; // NaN
+
+    DEBUG("%s:%d %c %f %f %f %f %d %d\n", __func__, __LINE__, 'A', 12.456, 0., -0.33, 0.1, 123, -123);
+    DEBUG("%s:%d %f %f %f %f %f\n", __func__, __LINE__,  0.0001, 12345678.9, f1.f, f2.f, f3.f);
+}
+
+
 void kernel_test_startup(void) {
     INFO("started kernel test");
 
     INFO("test_list -----------------------------------");
     test_list();
+    INFO("test_printfmt -------------------------------");
+    test_printfmt();
     INFO("test_log_bufferring -------------------------");
     test_log_bufferring();
     INFO("test_kmalloc --------------------------------");
