@@ -6,6 +6,10 @@ Busybook
 
 A CalDAV server built on Ruby on Rails.
 
+## Securiy Notice
+**Authorization is not implemented.** That is, an authenticated user is able to
+get, update, and delete other users' calendars.
+
 ## Getting started
 ```
 $ gem install bundler
