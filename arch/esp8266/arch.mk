@@ -1,4 +1,5 @@
 objs += \
+    $(BUILD_DIR)/$(arch_dir)/ccount.o     \
     $(BUILD_DIR)/$(arch_dir)/panic.o      \
     $(BUILD_DIR)/$(arch_dir)/boot.o       \
     $(BUILD_DIR)/$(arch_dir)/init.o       \
