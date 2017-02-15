@@ -72,7 +72,7 @@ static void *_kmalloc(struct chunk *chunks, size_t size, int flags) {
             mutex_unlock(&kmalloc_lock);
 
             DEBUG("kmalloc: allocate %dB %p", size, (uintptr_t) chunk + sizeof(*chunk));
-            DEBUG("kmalloc: %d/%d used", used, total);
+            DEBUG("kmalloc: %d/%d free", total - used, total);
             return (void *) ((uintptr_t) chunk + sizeof(*chunk));
         }
     }
@@ -143,7 +143,7 @@ void kfree(void *ptr) {
 
     mutex_unlock(&kmalloc_lock);
 
-    DEBUG("kmalloc: %d/%d used", used, total);
+    DEBUG("kmalloc: %d/%d free", total - used, total);
 }
 
 
