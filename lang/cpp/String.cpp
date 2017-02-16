@@ -75,8 +75,11 @@ void String::reserve(size_t n) {
     char *old_buffer = _buffer;
     _capacity = n;
     _buffer = new char[_capacity];
-    memcpy_s(_buffer, _capacity, old_buffer, _length);
-    delete[] old_buffer;
+
+    if (old_buffer) {
+        memcpy_s(_buffer, _capacity, old_buffer, _length);
+        delete[] old_buffer;
+    }
 }
 
 
@@ -90,7 +93,7 @@ String& String::append(const char *s, size_t n) {
 
     size_t s_len = strlen(s);
     if (_capacity - _length < s_len || (_capacity == 0 && s_len == 0)) {
-        reserve((_length + s_len + 1) * 2);
+        reserve((_length + s_len + 1 + 16) * 2);
     }
 
     while (*s && n > 0) {
