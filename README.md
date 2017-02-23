@@ -3,6 +3,7 @@ Busybook
 [![Build Status](https://travis-ci.org/seiyanuta/busybook.svg?branch=master)](https://travis-ci.org/seiyanuta/busybook)
 [![Test Coverage](https://codeclimate.com/github/seiyanuta/busybook/badges/coverage.svg)](https://codeclimate.com/github/seiyanuta/busybook/coverage)
 [![Code Climate](https://codeclimate.com/github/seiyanuta/busybook/badges/gpa.svg)](https://codeclimate.com/github/seiyanuta/busybook)
+[![Docker Automated build](https://img.shields.io/docker/automated/seiyanuta/busybook.svg)](https://hub.docker.com/r/seiyanuta/busybook/)
 
 A CalDAV server built on Ruby on Rails.
 
