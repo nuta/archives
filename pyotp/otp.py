@@ -1,6 +1,9 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import base64
 import hashlib
 import hmac
+from .compat import str
 
 class OTP(object):
     def __init__(self, s, digits=6, digest=hashlib.sha1):
@@ -24,13 +27,8 @@ class OTP(object):
         Usually either the counter, or the computed integer
         based on the Unix timestamp
         """
-        hmac_hash = hmac.new(
-            self.byte_secret(),
-            self.int_to_bytestring(input),
-            self.digest,
-        ).digest()
-
-        hmac_hash = bytearray(hmac_hash)
+        hasher = hmac.new(self.byte_secret(), self.int_to_bytestring(input), self.digest)
+        hmac_hash = bytearray(hasher.digest())
         offset = hmac_hash[-1] & 0xf
         code = ((hmac_hash[offset] & 0x7f) << 24 |
                 (hmac_hash[offset + 1] & 0xff) << 16 |
@@ -59,6 +57,7 @@ class OTP(object):
         while i != 0:
             result.append(i & 0xFF)
             i >>= 8
-        # It's necessary to convert the final result from bytearray to bytes because
-        # the hmac functions in python 2.6 and 3.3 don't work with bytearray
+        # It's necessary to convert the final result from bytearray to bytes
+        # because the hmac functions in python 2.6 and 3.3 don't work with
+        # bytearray
         return bytes(bytearray(reversed(result)).rjust(padding, b'\0'))
