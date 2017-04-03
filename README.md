@@ -1,5 +1,9 @@
 # 2fa
-A command-line 2-factor authentication manager.
+A command-line 2-factor authentication manager. This includes
+[pyotp](https://github.com/pyotp/pyotp) and [pyqrcode](https://github.com/mnooner256/pyqrcode).
+
+
+## How to use
 
 Register an account:
 ```
@@ -17,5 +21,7 @@ Google              884966      (23)
 ```
 
 ## License
-MIT
+2fa is released under MIT license and includes third-party libraries:
+- `pyotp`: MIT License
+- `pyqrcode`: BSD 3-clause License
 
