@@ -11,6 +11,7 @@ import urllib.parse
 import pyotp
 import pyqrcode
 
+__version__ = '0.0.1'
 
 USAGE = """\
 Usage: 2fa                          Generate codes
@@ -79,13 +80,14 @@ def totp(secret):
 
 
 def main(argv):
-    load_config()
-    secrets = load_secrets()
-
     parser = argparse.ArgumentParser(description='2-factor auth token generator')
+    parser.add_argument('--version', action='version', version=__version__)
     parser.add_argument('--register', nargs=2, metavar=('name', 'secret'))
     parser.add_argument('--qrcode', metavar='name')
     args = parser.parse_args()
+
+    load_config()
+    secrets = load_secrets()
 
     if args.register:
         name, secret = args.register
