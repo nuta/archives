@@ -8,7 +8,14 @@ namespace :export do
     filepath = ENV['filepath'] || cli.ask('filepath: ')
     ics = ""
 
-    Schedule.where(calendar: Calendar.find_by_name(calendar)).find_each do |sched|
+
+    calendars = Calendar.all.find_each do |cal|
+      if name == cal.props['displayname']
+        return cal
+      end
+    end
+
+    Schedule.where(calendar: calendars).find_each do |sched|
       ics += sched.ics.strip + "\n"
     end
 

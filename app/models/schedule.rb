@@ -24,13 +24,12 @@ class Schedule < ActiveRecord::Base
 	args << range_end
     end
 
-    self.where(calendar: Calendar.find_by_uri!(calendar)).where(sql, *args)
+    self.where(calendar: calendar).where(sql, *args)
   end
 
   def copy_to(calendar, calendar_object)
     ActiveRecord::Base.transaction do
-      dst = Schedule.new(uri: calendar_object)
-      dst.calendar = Calendar.find_by_uri!(calendar)
+      dst = Schedule.new(calendar: calendar, uri: calendar_object)
       dst.attributes = self.attributes.except('id', 'uri', 'calendar')
 
       dst.save!
@@ -38,7 +37,7 @@ class Schedule < ActiveRecord::Base
   end
 
   def move_to(calendar)
-    self.calendar = Calendar.find_by_uri!(calendar)
+    self.calendar = calendar
     self.save!
   end
 

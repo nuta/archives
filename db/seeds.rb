@@ -6,7 +6,7 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-guest = User.create(name: 'guest', pass: 'password')
+guest = User.create(name: 'guest', password: 'password')
 
 Calendar.create(
   uri: '123-456-789',

@@ -9,6 +9,8 @@ class CalendarController < ApplicationController
   include HttpStatus
 
   skip_before_action :authenticate, only: [:options]
+  before_action :set_calendars, except: [:options]
+  before_action :set_schedules, except: [:options]
   before_action :set_src_and_dst, only: [:move, :copy]
 
   def options
@@ -19,7 +21,7 @@ class CalendarController < ApplicationController
   end
 
   def get
-    entry = Schedule.find_by_uri!(params[:calendar_object])
+    entry = @schedules.find_by_uri!(params[:calendar_object])
     render status: :ok, body: entry.ics, content_type: 'text/calendar'
   end
 
@@ -28,7 +30,7 @@ class CalendarController < ApplicationController
     calendar = params[:calendar]
 
     # handle If-Match
-    sched = Schedule.find_by_uri(uri)
+    sched = @schedules.find_by_uri(uri)
     if request.headers.key?("If-Match")
        unless sched
           return head :precondition_failed
@@ -40,8 +42,8 @@ class CalendarController < ApplicationController
        end
     end
 
-    sched = Schedule.new(uri: uri) unless sched
-    sched.calendar = Calendar.find_by_uri!(calendar)
+    sched = @schedules.new(uri: uri) unless sched
+    sched.calendar = @calendars.find_by_uri!(calendar)
     sched.set_ics(rawrequest)
     sched.save!
 
@@ -49,11 +51,11 @@ class CalendarController < ApplicationController
   end
 
   def delete
-    cal = Calendar.find_by_uri!(params[:calendar])
+    cal = @calendars.find_by_uri!(params[:calendar])
     if params[:calendar_object] == ""
       cal.destroy
     else
-      sched = Schedule.find_by_uri!(params[:calendar_object])
+      sched = @schedules.find_by_uri!(params[:calendar_object])
       sched.destroy
     end
 
@@ -61,12 +63,12 @@ class CalendarController < ApplicationController
   end
 
   def copy
-    @src.copy_to(@dst[:calendar], @dst[:calendar_object])
+    @src.copy_to(@calendars.find_by_uri!(@dst[:calendar]), @dst[:calendar_object])
     head :no_content
   end
 
   def move
-    @src.move_to(@dst[:calendar])
+    @src.move_to(@calendars.find_by_uri!(@dst[:calendar]))
     head :created
   end
 
@@ -79,7 +81,7 @@ class CalendarController < ApplicationController
       props[prop.name] = replace_xml_nsprefix(xml, prop.children.to_s)
     end
 
-    Calendar.create(props: props, uri: params[:calendar], user: @user)
+    @calendars.create(props: props, uri: params[:calendar], user: @user)
     head :created
   end
 
@@ -107,7 +109,7 @@ class CalendarController < ApplicationController
     end
 
     xml = Nokogiri::XML(rawrequest)
-    cal = Calendar.find_by_uri!(params[:calendar])
+    cal = @calendars.find_by_uri!(params[:calendar])
     cal_props = cal.props
 
     # set properties
@@ -145,8 +147,18 @@ class CalendarController < ApplicationController
 
   private
 
+  def set_calendars
+    authenticate
+    @calendars ||= Calendar.where(user: @user)
+  end
+
+  def set_schedules
+    set_calendars
+    @schedules ||= Schedule.where(calendar: @calendars)
+  end
+
   def set_src_and_dst
-    @src = Schedule.find_by_uri!(params[:calendar_object])
+    @src = @schedules.find_by_uri!(params[:calendar_object])
 
     begin
       @dst = Rails.application.routes.recognize_path(request.headers[:destination])

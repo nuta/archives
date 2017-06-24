@@ -11,7 +11,7 @@ module Report
           # TODO: support other comp-filters
           range_start = Time.zone.parse(filter.attr('start') || '')
           range_end   = Time.zone.parse(filter.attr('end')   || '')
-          scheds = Schedule.in_time_range(params[:calendar], range_start, range_end)
+          scheds = @schedules.in_time_range(params[:calendar], range_start, range_end)
           break
         end
       end
@@ -41,7 +41,7 @@ module Report
       responses = []
       for uri in uris
         # TODO: return 404 reponse if it does not exists
-        sched = Schedule.find_by_uri!(URI.decode(File.basename(uri)))
+        sched = @schedules.find_by_uri!(URI.decode(File.basename(uri)))
 
         results = handle_props(props) do |prop|
           case prop

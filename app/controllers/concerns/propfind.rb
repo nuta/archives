@@ -14,7 +14,7 @@ module Propfind
         when 'principal-URL'
           '<A:href>/calendar/</A:href>'
         when 'getctag'
-          s = Schedule.order('updated_at').last
+          s = @schedules.order('updated_at').last
           (s)? s.updated_at.to_i.to_s : ''
         when 'current-user-privilege-set'
           <<-EOS
@@ -48,12 +48,12 @@ EOS
 
       if params[:calendar] == ""
         if request.headers["Depth"] == "1"
-          cals = Calendar.all
+          cals = @calendars.all
         else
           cals = []
         end
       else
-        cals = [Calendar.find_by_uri!(params[:calendar])]
+        cals = [@calendars.find_by_uri!(params[:calendar])]
       end
      
       for cal in cals
@@ -64,7 +64,7 @@ EOS
           else
             case prop
             when 'getctag'
-              s = Schedule.where(calendar: cal).order('updated_at').last
+              s = @schedules.where(calendar: cal).order('updated_at').last
               (s)? s.updated_at.to_i.to_s : ''
             when 'current-user-privilege-set'
               <<-EOS
@@ -99,9 +99,9 @@ EOS
   def propfind_objects
     # get a list of calendar objects
     respond_xml_request('/A:propfind/A:prop/*') do |props|
-      calendar = Calendar.find_by_uri!(params[:calendar])
+      calendar = @calendars.find_by_uri!(params[:calendar])
       responses = []
-      Schedule.where(calendar_id: calendar).find_each do |sched|
+      @schedules.where(calendar: calendar).find_each do |sched|
         results = handle_props(props) do |prop|
           case prop
           when 'getcontenttype'
