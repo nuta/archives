@@ -1,6 +1,6 @@
 EFI.js (WIP)
 =============
-[![Build Status](https://travis-ci.org/seiyanuta/v8-uefi-test.svg?branch=master)](https://travis-ci.org/seiyanuta/EFI.js)
+[![Build Status](https://travis-ci.org/seiyanuta/EFI.js.svg?branch=master)](https://travis-ci.org/seiyanuta/EFI.js)
 
 EFI.js is a JavaScript runtime environment for [Unified Extensible Firmware Interface](http://www.uefi.org/) built on V8.
 
@@ -10,7 +10,7 @@ Progress
 - [x] Port GNU EFI
 - [x] Port musl
 - [x] Port C++ runtime libraries
-- [ ] Implement libc functions (in `src/libc.cpp`) **WIP**
+- [ ] Implement libc functions (in `src/libc.cpp`) **[WIP]**
 - [ ] Implement `v8::base::OS` (in `src/v8-platform.cpp`)
 - [ ] Run `console.log("Hello World!")`
 - [ ] REPL
