@@ -1,0 +1,10 @@
+*.efi
+*.so
+*.map
+*.o
+.*.deps
+/boot
+/.buildenv
+/node_modules
+/tmp/*
+!/tmp/.gitkeep

@@ -1,0 +1,29 @@
+dist: trusty
+sudo: false
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+matrix:
+  include:
+    - os: linux
+      env: CC=gcc-6 CXX=g++-6
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - gcc-6
+    - os: linux
+      env: CC=clang-3.8 CXX=clang-3.8
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-trusty
+          packages:
+            - clang-3.8
+
+script: make -j2
