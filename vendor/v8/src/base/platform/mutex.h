@@ -15,6 +15,10 @@
 #include <pthread.h>  // NOLINT
 #endif
 
+#if V8_OS_EFIJS
+#include <efijs/mutex.h>
+#endif
+
 namespace v8 {
 namespace base {
 
@@ -54,9 +58,11 @@ class Mutex final {
 
   // The implementation-defined native handle type.
 #if V8_OS_POSIX
-  typedef pthread_mutex_t NativeHandle;
+typedef pthread_mutex_t NativeHandle;
 #elif V8_OS_WIN
   typedef CRITICAL_SECTION NativeHandle;
+#elif V8_OS_EFIJS
+typedef efijs::mutex::Mutex NativeHandle;
 #endif
 
   NativeHandle& native_handle() {

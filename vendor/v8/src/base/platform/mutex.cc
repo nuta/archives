@@ -76,6 +76,41 @@ static V8_INLINE bool TryLockNativeHandle(pthread_mutex_t* mutex) {
   return true;
 }
 
+#elif V8_OS_EFIJS
+
+static V8_INLINE void InitializeNativeHandle(efijs::mutex::Mutex *mutex) {
+
+}
+
+
+static V8_INLINE void InitializeRecursiveNativeHandle(efijs::mutex::Mutex *mutex) {
+
+    mutex->mark_as_recursive();
+}
+
+
+static V8_INLINE void DestroyNativeHandle(efijs::mutex::Mutex *mutex) {
+
+}
+
+
+static V8_INLINE void LockNativeHandle(efijs::mutex::Mutex *mutex) {
+
+    mutex->lock();
+}
+
+
+static V8_INLINE void UnlockNativeHandle(efijs::mutex::Mutex *mutex) {
+
+    mutex->unlock();
+}
+
+
+static V8_INLINE bool TryLockNativeHandle(efijs::mutex::Mutex *mutex) {
+
+    return mutex->try_lock();
+}
+
 #elif V8_OS_WIN
 
 static V8_INLINE void InitializeNativeHandle(PCRITICAL_SECTION cs) {

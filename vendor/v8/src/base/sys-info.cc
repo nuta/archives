@@ -47,6 +47,8 @@ int SysInfo::NumberOfProcessors() {
   SYSTEM_INFO system_info = {};
   ::GetNativeSystemInfo(&system_info);
   return static_cast<int>(system_info.dwNumberOfProcessors);
+#elif V8_OS_EFIJS
+  return 1;
 #endif
 }
 
@@ -98,6 +100,8 @@ int64_t SysInfo::AmountOfPhysicalMemory() {
     return 0;
   }
   return static_cast<int64_t>(pages) * page_size;
+#elif V8_OS_EFIJS
+  return 128 * 1024 * 1024; /* EFIJS: FIXME */
 #endif
 }
 
@@ -113,6 +117,8 @@ int64_t SysInfo::AmountOfVirtualMemory() {
     return 0;
   }
   return (rlim.rlim_cur == RLIM_INFINITY) ? 0 : rlim.rlim_cur;
+#elif V8_OS_EFIJS
+  return 0;
 #endif
 }
 

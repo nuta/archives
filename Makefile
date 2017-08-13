@@ -79,11 +79,12 @@ $(V).SILENT:
 clean:
 	-rm -f bootx64.efi bootx64.so bootx64.map $(objs)
 
-run: tmp/OVMF.fd image/efi/boot/bootx64.efi
-	$(CMDECHO) RUN image
-	$(PYTHON) ./tools/run.py "qemu-system-x86_64 -bios tmp/OVMF.fd -drive file=fat:rw:image -nographic"
+run: tmp/OVMF.fd boot/efi/boot/bootx64.efi
+	$(CMDECHO) RUN boot/efi/boot/bootx64.efi
+	$(PYTHON) ./tools/run.py "qemu-system-x86_64 -bios tmp/OVMF.fd -drive file=fat:rw:boot -nographic"
 
-image/efi/boot/bootx64.efi: bootx64.efi
+boot/efi/boot/bootx64.efi: bootx64.efi
+	mkdir -p $(dir $@)
 	$(CMDECHO) CP $@
 	cp $< $@
 

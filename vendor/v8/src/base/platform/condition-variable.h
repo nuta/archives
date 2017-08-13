@@ -61,6 +61,8 @@ class ConditionVariable final {
   // The implementation-defined native handle type.
 #if V8_OS_POSIX
   typedef pthread_cond_t NativeHandle;
+#elif V8_OS_EFIJS
+  typedef int NativeHandle; // EFIJS: FIXME
 #elif V8_OS_WIN
   struct Event;
   class NativeHandle final {

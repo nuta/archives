@@ -1704,6 +1704,7 @@ void Logger::LogAccessorCallbacks() {
 
 static void AddIsolateIdIfNeeded(std::ostream& os,  // NOLINT
                                  Isolate* isolate) {
+
   if (FLAG_logfile_per_isolate) os << "isolate-" << isolate << "-";
 }
 
@@ -1758,8 +1759,14 @@ bool Logger::SetUp(Isolate* isolate) {
   is_initialized_ = true;
 
   std::ostringstream log_file_name;
+
+ // EFI.JS: XXX: PrepareLogFileName() raises a page-fault (invalid RIP). Ignore for now.
+#ifdef V8_OS_EFIJS
+  log_->Initialize("-");
+#else
   PrepareLogFileName(log_file_name, isolate, FLAG_logfile);
   log_->Initialize(log_file_name.str().c_str());
+#endif
 
   if (FLAG_perf_basic_prof) {
     perf_basic_logger_ = new PerfBasicLogger();

@@ -55,6 +55,8 @@ class Semaphore final {
   typedef sem_t NativeHandle;
 #elif V8_OS_WIN
   typedef HANDLE NativeHandle;
+#elif V8_OS_EFIJS
+  typedef int NativeHandle; // EFIJS: FIXME
 #endif
 
   NativeHandle& native_handle() {

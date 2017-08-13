@@ -633,6 +633,8 @@ bool ThreadTicks::IsSupported() {
 ThreadTicks ThreadTicks::Now() {
 #if V8_OS_MACOSX
   return ThreadTicks(ComputeThreadTicks());
+#elif V8_OS_EFIJS
+  return ThreadTicks(100);
 #elif(defined(_POSIX_THREAD_CPUTIME) && (_POSIX_THREAD_CPUTIME >= 0)) || \
   defined(V8_OS_ANDROID)
   return ThreadTicks(ClockNow(CLOCK_THREAD_CPUTIME_ID));
