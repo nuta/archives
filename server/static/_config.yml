@@ -1,0 +1,15 @@
+title: MakeStack Documentation
+email: nuta@seiya
+
+description:
+baseurl: ""
+url: ""
+github_username:  makestack
+
+source: ../../Documentation
+destination: ../public/documentation
+
+markdown: kramdown
+plugins:
+
+exclude:

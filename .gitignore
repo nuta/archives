@@ -1,0 +1,13 @@
+*.log
+*.jekyll-metadata
+node_modules
+
+/server/db/*.sqlite3
+/server/tmp/pids
+
+# Generated automatically by webpack.
+/server/public/index.html
+/server/public/app.*.js
+/server/public/vendor.*.js
+/server/public/documentation
+!/server/public/documentation/.gitkeep

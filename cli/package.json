@@ -1,0 +1,27 @@
+{
+  "name": "makestack",
+  "version": "0.0.1",
+  "description": "MakeStack CLI Developer Tools",
+  "bin": {
+    "makestack": "bin/makestack"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makestack/makestack.git"
+  },
+  "author": "Seiya Nuta <nuta@seiya.me>",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/makestack/makestack/issues"
+  },
+  "homepage": "http://makestack.org",
+  "dependencies": {
+    "linux-app": "file:../libs/linux-app",
+    "caporal": "^0.7.0",
+    "inquirer": "^3.2.3",
+    "node-fetch": "^1.7.3"
+  }
+}

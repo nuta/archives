@@ -1,0 +1,13 @@
+{
+  "name": "linux-app",
+  "version": "0.0.1",
+  "description": "MakeStack API for the Full Linux Environment",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node-fetch": "^1.7.3",
+    "vm2": "^3.5.0"
+  }
+}

@@ -1,0 +1,28 @@
+os: linux
+dist: trusty
+language: C++
+
+cache:
+  directories:
+    - server/vendor/bundle
+    - server/node_modules
+
+services:
+  - postgresql
+  - redis-server
+
+env:
+  - TARGET=server
+  - TARGET=ui
+
+cache:
+  directories:
+    - server/vendor/bundle
+    - server/node_modules
+
+install: ./travis/install.sh
+script: ./travis/script.sh
+
+notifications:
+  on_success: change
+  on_failure: change
