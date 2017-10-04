@@ -20,8 +20,6 @@ cat <<"EOF"
 
 EOF
 
-hostname makestack-linux
-
 for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
     [ "$interface" = "lo" ] && continue
     
@@ -29,9 +27,14 @@ for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
     udhcpc -i $interface -s /etc/udhcpc.script
 done
 
-echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
-
+mkdir /disk
+root=$(egrep -o "root=([^ ]+)" /proc/cmdline | awk -F= '{print $2}')
+mount $root /disk
+hostname makestack-linux
 grep debug /proc/cmdline > /dev/null && /bin/test-userland.js
+source /disk/config.sh
+
+echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
 echo "BUG: Something wrong with init, dropping to shell..."
 exec /bin/busybox sh
