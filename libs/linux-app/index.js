@@ -7,7 +7,7 @@ const EventAPI = require('./event');
 const GPIOAPI = require('./gpio');
 
 module.exports = class {
-  constructor(deviceId, deviceSecret, url) {
+  constructor(url, deviceId, deviceSecret) {
     this.deviceId = deviceId;
     this.deviceSecret = deviceSecret;
     this.appVersion = 0;

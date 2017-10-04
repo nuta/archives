@@ -16,7 +16,7 @@ function create(args, opts, logger) {
 
 function run(args, opts, logger) {
     let mock = config.mocks[args.name];
-  (new LinuxApp(mock.device_id, mock.device_secret, config.server.url)).run();
+    (new LinuxApp(config.server.url, mock.device_id, mock.device_secret).run();
 }
 
 module.exports = { create, run };
