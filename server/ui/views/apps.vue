@@ -46,13 +46,12 @@ export default {
   },
   filters: { describeAPI },
   beforeMount() {
-    api.getApps().then(r => {
-      this.apps = r.json;
-    }, error => { notify("error", error); });
+    api.getApps()
+      .then(r => this.apps = r.json)
+      .catch(error => notify("error", error));
   }
 };
 </script>
 
 <style lang="scss" scoped>
-
 </style>

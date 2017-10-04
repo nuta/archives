@@ -25,9 +25,9 @@ export default {
         api.getDeviceLog(this.deviceName, since).then(r => {
           since = Date.now();
           this.log.concat(r.json.lines);
-        });
+        }).catch(error => notify("error", error));
       }, 3000);
-    });
+    }).catch(error => notify("error", error));
   }
 };
 </script>

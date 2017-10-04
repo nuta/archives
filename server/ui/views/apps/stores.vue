@@ -58,19 +58,20 @@ export default {
   methods: {
     create() {
       api.createAppStore(this.appName, this.newStore.key, this.newStore.dataType,
-          this.new_store.value).then(() => {
-      }, error => { notify("error", error); });
+          this.new_store.value)
+        .catch(error => notify("error", error));
+
 
     },
     update(store) {
-      api.updateAppStore(this.appName, store.key, store.dataType, store.value).then(() => {
-      }, error => { notify("error", error); });
+      api.updateAppStore(this.appName, store.key, store.dataType, store.value)
+        .catch(error => notify("error", error));
     }
   },
   beforeMount() {
-    api.getAppStores(this.appName).then(r => {
-      this.stores = r.json;
-    }, error => { notify("error", error); });
+    api.getAppStores(this.appName)
+      .then(r => this.stores = r.json)
+      .catch(error => notify("error", error));
   }
 };
 </script>

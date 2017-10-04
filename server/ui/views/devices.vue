@@ -80,13 +80,13 @@ export default {
     }
   },
   beforeMount() {
-    api.getDevices().then(r => {
-      this.devices = r.json;
-    }, error => { notify("error", error); });
+    api.getDevices()
+      .then(r => this.devices = r.json)
+      .catch(error => notify("error", error));
 
-    api.getApps().then(r => {
-      this.apps = r.json;
-    }, error => { notify("error", error); });
+    api.getApps()
+      .then(r => this.apps = r.json)
+      .catch(error => notify("error", error));
   }
 };
 </script>

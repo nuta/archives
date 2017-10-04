@@ -23,12 +23,13 @@ export default {
     api.getAppLog(this.appName).then(r => {
       this.log = r.json.lines;
       this.timer = setInterval(() => {
-        api.getAppLog(this.appName, since).then(r => {
-          since = Date.now();
-          this.log.concat(r.json.lines);
-        }, error => { notify("error", error); });
+        api.getAppLog(this.appName, since)
+          .then(r => {
+            since = Date.now();
+            this.log.concat(r.json.lines);
+          }).catch(error => notify("error", error));
       }, 3000);
-    }, error => { notify("error", error); });
+    }).catch(error => notify("error", error));
   },
   beforeRouteLeave (to, from, next) {
     clearInterval(this.timer);

@@ -59,7 +59,7 @@ export default {
       api.deploy(this.appName, ace.edit("editor").getValue(), "", comment, null).then(r => {
         this.deployButton = "done";
         setTimeout(() => { this.deployButton = "waiting"; }, 1500);
-      }, error => { notify("error", error); });
+      }).catch(error => notify("error", error));
     },
     save() {
       let body = ace.edit("editor").getValue();
@@ -67,7 +67,7 @@ export default {
       api.saveFile(this.appName, this.fileName, body).then(r => {
         this.saveButton = "done";
         setTimeout(() => { this.saveButton = "waiting"; }, 1500);
-      }, error => { notify("error", error); });
+      }).catch(error => notify("error", error));
     }
   },
   beforeMount() {
@@ -93,7 +93,7 @@ export default {
       let editor = ace.edit("editor");
       editor.setValue(body);
       editor.selection.moveCursorFileStart();
-    }, error => { notify("error", error); });
+    }).catch(error => notify("error", error));
   },
   mounted() {
     let editor = ace.edit("editor");

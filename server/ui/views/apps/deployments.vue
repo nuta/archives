@@ -36,9 +36,9 @@ export default {
     };
   },
   beforeMount() {
-    api.getDeployments(this.appName).then(r => {
-      this.deployments = r.json;
-    }, error => { notify("error", error); });
+    api.getDeployments(this.appName)
+      .then(r => this.deployments = r.json)
+      .catch(error => notify("error", error));
   }
 };
 </script>

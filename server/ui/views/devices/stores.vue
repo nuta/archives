@@ -1,5 +1,5 @@
 <template>
-<dashboard-layout title="Applications">
+<dashboard-layout title="TODO">
   <div class="list">
     <div v-for="app in apps" class="element">
       <div class="title">
