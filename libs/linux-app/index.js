@@ -1,10 +1,20 @@
+const os = require('os');
 const fetch = require('node-fetch');
 const { NodeVM } = require('vm2');
 const LoggingAPI = require('./logging');
 const TimerAPI = require('./timer');
 const StoreAPI = require('./store');
 const EventAPI = require('./event');
-const GPIOAPI = require('./gpio');
+
+let GPIOAPI;
+switch(os.type()) {
+  case 'Linux':
+    GPIOAPI = require('./linux/gpio');
+    break;
+  default:
+    GPIOAPI = require('./mock/gpio');
+    break;
+}
 
 module.exports = class {
   constructor(url, deviceId, deviceSecret) {
