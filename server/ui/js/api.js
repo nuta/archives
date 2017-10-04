@@ -51,7 +51,7 @@ export default new class {
   }
 
   login(username, password) {
-    return this.invoke("POST", "/auth/signIn", {
+    return this.invoke("POST", "/auth/sign_in", {
       username: username,
       password: password
     }, false).then(r => {
