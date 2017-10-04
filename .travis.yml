@@ -37,10 +37,13 @@ matrix:
             - wget
             - qemu
             - zsh
+            - nodejs
       cache:
         apt: true
         directories:
           - linux/downloads
+      install:
+        - npm install -g yarn
       script:
         - cd linux
         - ./build.sh
