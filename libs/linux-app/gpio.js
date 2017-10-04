@@ -27,7 +27,6 @@ if (os.type() == 'Linux') {
       if (typeof pin !== 'number')
         throw "`pin' must be a number";
         
-      this.getSysfsPin(pin);
       fs.writeFileSync(`/sys/class/gpio/export`, `${pin}`);
       fs.writeFileSync(`/sys/class/gpio/gpio${pin}/direction`,
                        (mode == INPUT) ? "in" : "out");
