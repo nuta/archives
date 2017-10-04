@@ -1,27 +1,50 @@
 os: linux
 dist: trusty
-language: C++
+sudo: false
 
-cache:
-  directories:
-    - server/vendor/bundle
-    - server/node_modules
+matrix:
+  include:
+    - language: ruby
+      env: TARGET=server
+      services:
+        - postgresql
+        - redis-server
+      cache:
+        directories:
+          - server/vendor/bundle
+      install:
+        - cd server
+        - bundle install --jobs 2 --path vendor/bundle
+        - bundle exec rails db:migrate RAILS_ENV=test
+      script: bundle exec rspec
 
-services:
-  - postgresql
-  - redis-server
+    - language: node_js
+      node_js: "8"
+      env: TARGET=ui
+      cache: yarn
+      install:
+        - cd server
+        - yarn
+      script: npm run build
 
-env:
-  - TARGET=server
-  - TARGET=ui
-
-cache:
-  directories:
-    - server/vendor/bundle
-    - server/node_modules
-
-install: ./travis/install.sh
-script: ./travis/script.sh
+    - language: c
+      env: TARGET=linux
+      sudo: true # because of mknod and docker
+      addons:
+        apt:
+          packages:
+            - build-essential
+            - wget
+            - qemu
+            - zsh
+      cache:
+        apt: true
+        directories:
+          - linux/downloads
+      script:
+        - cd linux
+        - ./build.sh
+        - ./test.sh
 
 notifications:
   on_success: change

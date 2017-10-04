@@ -1,0 +1,15 @@
+#!/bin/sh
+case "$1" in
+deconfig)
+    ip addr flush dev $interface
+    ;;
+renew|bound)
+    ip addr flush dev $interface
+    ip route flush dev $interface
+    ip addr add $ip/$mask dev $interface
+    ip route add default via $router dev $interface
+    echo "nameserver $dns" > /etc/resolv.conf
+    echo "DHCP: updated network settings"
+    ip addr show
+    ;;
+esac
