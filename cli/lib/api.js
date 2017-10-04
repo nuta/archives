@@ -39,7 +39,6 @@ module.exports = new class {
       }).then(response => {
         return response.json();
       }).then(json => {
-        console.log(status);
         if (200 <= status && status <= 299)
           resolve({status, headers, json });
         else
