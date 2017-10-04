@@ -1,0 +1,9 @@
+{
+  "name": "app",
+  "version": "0.0.1",
+  "description": "A linux-app wrapper.",
+  "private": true,
+  "dependencies": {
+    "linux-app": "file:../../../libs/linux-app"
+  }
+}
