@@ -5,11 +5,10 @@ let config = require("./config");
 
 module.exports = new class {
   constructor() {
-    let dummyUser = { name: "", email: "" };
-    this.serverUrl = "http://localhost:3000";
     this.credentialsPath = path.join(config.configDir, "credentials.json");
     try {
       this.credentials = JSON.parse(fs.readFileSync(this.credentialsPath));
+      this.serverUrl = this.credentials.serverUrl;
     } catch (e) {
       try {
         fs.mkdirSync(path.dirname(this.credentialsPath));
@@ -53,20 +52,22 @@ module.exports = new class {
     fs.unlinkSync(this.credentialsPath);
   }
 
-  login(username, password) {
-    return this.invoke("POST", "/auth/signIn", {
+  login(serverUrl, username, password) {
+    this.serverUrl = serverUrl;
+    return this.invoke("POST", "/auth/sign_in", {
       username: username,
       password: password
     }, false).then(r => {
       this.credentials = {
+        serverUrl: serverUrl,
         username: username,
         email: r.json["data"]["email"],
-        uid:           r.headers.get("uid"),
-        "access-token":    r.headers.get("access-token"),
+        uid: r.headers.get("uid"),
+        "access-token": r.headers.get("access-token"),
         "access-token-secret": r.headers.get("access-token-secret")
       };
   
-      fs.writeFileSync(this.credentialsPath, JSON.stringify(this.credentials));   
+      fs.writeFileSync(this.credentialsPath, JSON.stringify(this.credentials));
     });
   }
 
