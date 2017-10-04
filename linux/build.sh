@@ -80,6 +80,10 @@ cp -n ../libstdc++*/usr/lib/*/libstdc++.so.*.* lib/libstdc++.so.6
 cp ../busybox-${BUSYBOX_VERSION}/busybox ../initramfs/bin
 [ -e dev/console ] || sudo mknod dev/console c 5 1
 
+cd app
+yarn
+cd ..
+
 find . | cpio -ov --format=newc > ../initramfs.cpio
 cd ..
 
