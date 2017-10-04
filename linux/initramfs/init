@@ -30,11 +30,18 @@ done
 mkdir /disk
 root=$(egrep -o "root=([^ ]+)" /proc/cmdline | awk -F= '{print $2}')
 mount $root /disk
+. /disk/config.sh
 hostname makestack-linux
-grep debug /proc/cmdline > /dev/null && /bin/test-userland.js
-source /disk/config.sh
 
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
-echo "BUG: Something wrong with init, dropping to shell..."
-exec /bin/busybox sh
+if [ "$DEBUG" = "" ]; then
+    /app/main.js
+else
+    /bin/test-userland.js
+    poweroff -f
+fi
+
+echo "*** something went wrong, rebooting..."
+reboot -f
+sleep 180
