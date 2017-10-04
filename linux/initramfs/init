@@ -6,7 +6,7 @@
 
 
 cd /
-mkdir -p dev sys proc tmp
+mkdir -p sys proc tmp
 mount -t sysfs    sysfs    /sys
 mount -t proc     proc     /proc
 mount -t devtmpfs devtmpfs /dev

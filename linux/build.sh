@@ -52,7 +52,7 @@ create_symlink() {
 download_and_extract https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${LINUX_VERSION}.tar.xz
 download_and_extract http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2
 download_and_extract https://nodejs.org/dist/v6.11.4/node-v6.11.4-linux-x64.tar.xz
-download_and_extract_deb http://http.us.debian.org/debian/pool/main/g/glibc/libc6_*-11+deb9u1_amd64.deb
+download_and_extract_deb http://http.us.debian.org/debian/pool/main/g/glibc/libc6_2.24-11+deb9u1_amd64.deb
 download_and_extract_deb http://http.us.debian.org/debian/pool/main/g/gcc-6/libgcc1_6.3.0-18_amd64.deb
 download_and_extract_deb http://http.us.debian.org/debian/pool/main/g/gcc-6/libstdc++6_6.3.0-18_amd64.deb
 
@@ -71,6 +71,7 @@ cd ..
 
 cd initramfs
 mkdir -p lib64
+cp -n ../node-*/bin/node bin/node
 cp -n ../libc*/lib/*/ld-*.so lib64/ld-linux-x86-64.so.2
 cp -n ../libc*/lib/*/lib*.so.* lib
 cp -n ../libgcc*/lib/*/libgcc_s.so.1 lib/libgcc_s.so.1

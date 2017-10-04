@@ -2,26 +2,27 @@
 let fs = require('fs');
 let https = require('https');
 
-function main() {
-  console.log('*** userland testing tool');
+console.log('*** userland testing tool');
 
-  console.log('==> file system');
-  console.log(fs.readFileSync('/etc/hosts', 'utf-8'));
-    
-  console.log('==> networking');
-  https.get('https://httpbin.org/ip', r => {
-    console.log('status:', r.statusCode);
-     
-    r.on('data', (json) => {
-      console.log('ip:', JSON.parse(json).origin);
-    });
+let fsTest = new Promise((resolve, reject) => {
+  fs.readFile('/etc/hosts', 'utf-8', (err, data) => {
+    return err ? reject(err) : resolve(data);
   });
-}
+});
 
-try {
-  main();
-  console.error('*** success!');
-} catch(e) {
-  console.error(e);
-  console.error('*** fail!');
-}
+let netTest = new Promise((resolve, reject) => {
+  https.get('https://httpbin.org/ip', r => {
+    r.on('data', (json) => {
+      resolve({ status: r.statusCode, ip: JSON.parse(json).origin });
+    });
+  }).on('error', e => reject(e));
+});
+
+  Promise.all([fsTest, netTest]).then(r => {
+    console.log(JSON.stringify(r, null, 4));
+    console.log('*** success!');
+  }).catch(e => {
+    console.error(e);
+    console.log('*** fail!');
+  });
+
