@@ -19,7 +19,7 @@
   },
   "homepage": "http://makestack.org",
   "dependencies": {
-    "linux-app": "file:../libs/linux-app",
+    "app-runtime": "link:../libs/app-runtime",
     "caporal": "^0.7.0",
     "inquirer": "^3.2.3",
     "node-fetch": "^1.7.3"

@@ -1,7 +1,7 @@
 let fs = require("fs");
 let path = require("path");
 let fetch = require("node-fetch");
-let LinuxApp = require("linux-app");
+let AppRuntime = require("app-runtime");
 let api = require("./api");
 let config = require("./config");
 
@@ -16,7 +16,7 @@ function create(args, opts, logger) {
 
 function run(args, opts, logger) {
     let mock = config.mocks[args.name];
-    (new LinuxApp(config.server.url, mock.device_id, mock.device_secret)).run();
+    (new AppRuntime(config.server.url, mock.device_id, mock.device_secret)).run();
 }
 
 module.exports = { create, run };

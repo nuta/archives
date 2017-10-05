@@ -1,9 +1,9 @@
 {
   "name": "app",
   "version": "0.0.1",
-  "description": "A linux-app wrapper.",
+  "description": "A MakeStack agent.",
   "private": true,
   "dependencies": {
-    "linux-app": "file:../../../libs/linux-app"
+    "app-runtime": "file:../../../libs/app-runtime"
   }
 }

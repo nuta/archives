@@ -32,6 +32,10 @@ ansi@^0.3.0, ansi@~0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/ansi/-/ansi-0.3.1.tgz#0c42d4fb17160d5a9af1e484bace1c66922c1b21"
 
+"app-runtime@link:../libs/app-runtime":
+  version "0.0.0"
+  uid ""
+
 are-we-there-yet@~1.1.2:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/are-we-there-yet/-/are-we-there-yet-1.1.4.tgz#bb5dca382bb94f05e15194373d16fd3ba1ca110d"
@@ -306,12 +310,6 @@ isstream@0.1.x:
 jschardet@^1.4.2:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/jschardet/-/jschardet-1.5.1.tgz#c519f629f86b3a5bedba58a88d311309eec097f9"
-
-"linux-app@file:../libs/linux-app":
-  version "0.0.1"
-  dependencies:
-    node-fetch "^1.7.3"
-    vm2 "^3.5.0"
 
 lodash.camelcase@^4.3.0:
   version "4.3.0"
