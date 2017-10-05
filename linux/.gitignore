@@ -8,6 +8,7 @@
 /libc*
 /libgcc*
 /libstdc++*
+/initramfs/etc/apparmor.policy
 /initramfs/dev
 !/initramfs/dev/.gitkeep
 /initramfs/bin

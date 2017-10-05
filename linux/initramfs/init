@@ -33,12 +33,15 @@ mount $root /disk
 . /disk/config.sh
 hostname makestack-linux
 
+# TODO: atomic write
+# cat /etc/apparmor.policy > /sys/kernel/security/apparmor/.replace
+
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
 if [ "$DEBUG" = "" ]; then
-    /app/main.js
+    node app/main.js
 else
-    /bin/test-userland.js
+    node bin/test-userland.js
     poweroff -f
 fi
 
