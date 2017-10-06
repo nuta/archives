@@ -5,7 +5,7 @@ sudo: false
 matrix:
   include:
     - language: ruby
-      env: TARGET=server
+      env: M=server
       services:
         - postgresql
         - redis-server
@@ -20,7 +20,7 @@ matrix:
 
     - language: node_js
       node_js: "8"
-      env: TARGET=ui
+      env: M=ui
       cache: yarn
       install:
         - cd server
@@ -28,7 +28,7 @@ matrix:
       script: npm run build
 
     - language: c
-      env: TARGET=linux
+      env: M=linux:x86_64
       sudo: true # because of mknod and docker
       addons:
         apt:
@@ -41,13 +41,34 @@ matrix:
       cache:
         apt: true
         directories:
-          - linux/downloads
-      install:
-        - npm install -g yarn
+          - linux/build/downloads
+      install: npm install -g yarn
       script:
         - cd linux
-        - ./build.sh
-        - ./test.sh
+        - ./builder --test x86_64
+
+
+    - language: c
+      env: M=linux:raspberrypi
+      sudo: true # because of mknod and docker
+      addons:
+        apt:
+          packages:
+            - binutils-arm-linux-gnueabihf
+            - gcc-arm-linux-gnueabihf
+            - build-essential
+            - wget
+            - qemu
+            - zsh
+            - nodejs
+      cache:
+        apt: true
+        directories:
+          - linux/build/downloads
+      install: npm install -g yarn
+      script:
+        - cd linux
+        - ./builder --test raspberrypi
 
 notifications:
   on_success: change

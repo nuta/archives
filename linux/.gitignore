@@ -1,13 +1,6 @@
 /kernel.img
+/test.log
 /build
-/downloads
-/musl-*
-/linux-*
-/busybox-*
-/node-*
-/libc*
-/libgcc*
-/libstdc++*
 /initramfs/etc/apparmor.policy
 /initramfs/dev
 !/initramfs/dev/.gitkeep
