@@ -79,6 +79,8 @@ cp -n ../libstdc++*/usr/lib/*/libstdc++.so.*.* lib/libstdc++.so.6
 
 cp ../busybox-${BUSYBOX_VERSION}/busybox ../initramfs/bin
 [ -e dev/console ] || sudo mknod dev/console c 5 1
+
+apparmor_parser --version | head -n1
 apparmor_parser -o etc/apparmor.policy ../node.apparmor
 
 cd app
