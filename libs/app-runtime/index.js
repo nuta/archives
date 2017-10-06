@@ -1,6 +1,5 @@
 const os = require('os');
-const fetch = require('node-fetch');
-const { NodeVM } = require('vm2');
+const { fetch, NodeVM } = require('hyperutils');
 const LoggingAPI = require('./logging');
 const TimerAPI = require('./timer');
 const StoreAPI = require('./store');

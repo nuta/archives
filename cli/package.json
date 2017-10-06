@@ -19,9 +19,9 @@
   },
   "homepage": "http://makestack.org",
   "dependencies": {
-    "app-runtime": "link:../libs/app-runtime",
+    "app-runtime": "file:../libs/app-runtime",
+    "hyperutils": "file:../libs/hyperutils",
     "caporal": "^0.7.0",
-    "inquirer": "^3.2.3",
-    "node-fetch": "^1.7.3"
+    "inquirer": "^3.2.3"
   }
 }

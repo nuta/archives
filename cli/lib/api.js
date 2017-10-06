@@ -1,6 +1,6 @@
 let fs = require("fs");
 let path = require("path");
-let fetch = require("node-fetch");
+let { fetch } = require("hyperutils");
 let config = require("./config");
 
 module.exports = new class {
