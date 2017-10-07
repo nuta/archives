@@ -1,8 +1,6 @@
 os: linux
 dist: trusty
 sudo: false
-language: node_js
-node_js: "8"
 
 env: M=dummy
 
@@ -77,7 +75,7 @@ matrix:
     - language: node_js
       env: M=installer:macos
       os: osx
-      osx_image: xcode8.3
+      osx_image: xcode9.1
       node_js: "8"
       cache:
         directories:
@@ -115,19 +113,35 @@ matrix:
     - language: node_js
       env: M=dependencies
       node_js: "8"
+      addons:
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - python3.6
+      cache:
+        apt: true
       install:
         - gem install --no-ri --no-rdoc hakiri
         - npm install -g nsp
       script:
-        - ./tools/check-dependencies.py
+        - python3.6 ./tools/check-dependencies.py
 
     - language: node_js
       env: M=coding-styles
       node_js: "8"
+      addons:
+        apt:
+          sources:
+            - deadsnakes
+          packages:
+            - python3.6
+      cache:
+        apt: true
       install:
-        -  npm i -g eslint eslint-config-standard eslint-plugin-standard   eslint-plugin-import eslint-plugin-node eslint-plugin-promise
+        -  npm i -g eslint eslint-config-standard eslint-plugin-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise
       script:
-        - ./tools/check-coding-styles.py
+        - python3.6 ./tools/check-coding-styles.py
 
   allow_failures:
     - env: M=coding-styles
