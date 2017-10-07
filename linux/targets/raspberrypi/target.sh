@@ -6,6 +6,7 @@ RPI_LINUX_VERSION=1.20170811-1
 LINUX_DIR=$BUILD_DIR/linux-raspberrypi-kernel_${RPI_LINUX_VERSION}
 LINUX_TARBALL=$DOWNLOADS_DIR/raspberrypi-kernel_${RPI_LINUX_VERSION}.tar.gz
 LINUX_MAKE_TARGET=zImage
+DYLINKER_PATH=lib/ld-2.24.so
 VMLINUZ=$LINUX_DIR/arch/arm/boot/zImage
 DOWNLOAD_URLS=(\
     https://github.com/raspberrypi/linux/archive/raspberrypi-kernel_${RPI_LINUX_VERSION}.tar.gz \

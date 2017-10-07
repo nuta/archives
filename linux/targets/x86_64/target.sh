@@ -6,6 +6,7 @@ LINUX_VERSION=4.9.53
 LINUX_TARBALL=$DOWNLOADS_DIR/linux-$LINUX_VERSION.tar.xz
 LINUX_DIR=$BUILD_DIR/linux-$LINUX_VERSION
 LINUX_MAKE_TARGET=bzImage
+DYLINKER_PATH=lib64/ld-linux-${LD_ARCH}.so.2
 VMLINUZ=$LINUX_DIR/arch/x86/boot/bzImage
 DOWNLOAD_URLS=(\
     https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${LINUX_VERSION}.tar.xz \

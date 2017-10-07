@@ -17,6 +17,7 @@ LIBSTDCPP_VERSION=6.3.0-18
 
 TARGET_DIR=$PWD/targets/$TARGET
 CONFIG_DIR=$PWD/config
+INITRAMFS_DIR=$PWD/initramfs
 BUILD_DIR=$PWD/build/$TARGET
 DOWNLOADS_DIR=$PWD/build/downloads
 
@@ -120,7 +121,7 @@ build_initramfs() {
 
     cp $BUSYBOX_DIR/busybox bin/busybox
     cp $NODE_DIR/bin/node   bin/node
-    cp $UBUNTU_DIR/lib/${TRIPLET}/ld-2.24.so         lib64/ld-linux-${LD_ARCH}.so.2
+    cp $UBUNTU_DIR/lib/${TRIPLET}/ld-2.24.so $INITRAMFS_DIR/$DYLINKER_PATH
 	cp $UBUNTU_DIR/usr/lib/${TRIPLET}/libstdc++.so.6 lib/libstdc++.so.6
 
     pushd app && yarn && popd
