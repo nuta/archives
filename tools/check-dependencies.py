@@ -27,8 +27,10 @@ def main():
         progress("Checking {}".format(gemfile_path))
         os.chdir(os.path.dirname(gemfile_path))
 
-        result = subprocess.run(['hakiri', 'gemfile:scan', '--quiet', '--force'],
-            stdout=subprocess.PIPE, encoding='utf-8').stdout
+        p = subprocess.Popen(['hakiri', 'gemfile:scan', '--quiet', '--force'],
+                stdout=subprocess.PIPE, encoding='utf-8')
+        p.wait()
+        result = p.stdout.read()
 
         if "!" in result:
             error(f"found issues in `{gemfile_path}'")
@@ -59,10 +61,11 @@ def main():
                 'dependencies': merged_dependencies
             }, open("package.json", 'w'))
 
-            p = subprocess.run(["nsp", "check", "--output", "json"], encoding='utf-8',
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = subprocess.Popen(["nsp", "check", "--output", "json"],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+            p.wait()
             
-            results = json.loads(p.stdout)
+            results = json.loads(p.stdout.read())
             for result in results:
                 scope = '(in dev_dependencies)' if result['module'] not in dependencies else ''
                 error("found a vulnerability in `{}' {}").format(result['module'], scope)

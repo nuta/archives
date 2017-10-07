@@ -13,7 +13,7 @@ JAVASCRIPT_DIRS = [
 def main():
     cwd = os.getcwd()
     for d in JAVASCRIPT_DIRS:
-        subprocess.run(['eslint', d])
+        subprocess.Popen(['eslint', d]).wait()
 
     # TODO: css, ruby, python, rust, shell, and C++
 
