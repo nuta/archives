@@ -61,16 +61,24 @@ matrix:
             - libc6-dev-armhf-cross
             - build-essential
             - wget
-            - qemu
             - zsh
             - nodejs
       cache:
         apt: true
         directories:
           - linux/build/downloads
-      install: npm install -g yarn
+      install:
+        - npm install -g yarn
+        - mkdir -p linux/build/downloads
+        - cd linux/build/downloads
+        - wget https://download.qemu.org/qemu-2.10.1.tar.xz
+        - tar xf qemu-2.10.1.tar.xz
+        - cd qemu-2.10.1
+        - ./configure
+        - make -j2
+        - sudo make install
+        - cd ../..
       script:
-        - cd linux
         - ./builder raspberrypi3
 
     - language: node_js

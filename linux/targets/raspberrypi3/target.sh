@@ -5,9 +5,10 @@ TRIPLET=arm-linux-gnueabihf
 RPI_LINUX_VERSION=1.20170811-1
 LINUX_DIR=$BUILD_DIR/linux-raspberrypi-kernel_${RPI_LINUX_VERSION}
 LINUX_TARBALL=$DOWNLOADS_DIR/raspberrypi-kernel_${RPI_LINUX_VERSION}.tar.gz
-LINUX_MAKE_TARGET=zImage
-DYLINKER_PATH=lib/ld-2.24.so
+LINUX_MAKE_TARGET=(zImage dtbs)
+DYLINKER_PATH=lib/ld-linux-armhf.so.3
 VMLINUZ=$LINUX_DIR/arch/arm/boot/zImage
+DTB_PATH=$LINUX_DIR/arch/arm/boot/dts/bcm2710-rpi-3-b.dtb
 DOWNLOAD_URLS=(\
     https://github.com/raspberrypi/linux/archive/raspberrypi-kernel_${RPI_LINUX_VERSION}.tar.gz \
     http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 \
@@ -49,11 +50,11 @@ export KERNEL=kernel
 
 test() {
     QEMU=(
-      qemu-system-arm -machine virt
-      -kernel $BUILD_DIR/kernel.img
-      -append '"console=ttyS0 root=/dev/vda1"'
-      -netdev user,id=net0 -device virtio-net,netdev=net0
-      -drive file=fat:rw:$DISK_DIR,if=virtio
+      qemu-system-arm
+      -machine raspi2
+      -kernel $BUILD_DIR/$KERNEL.img
+      -append '"console=ttyAMA0"'
+      -dtb $DTB_PATH
       -nographic
     )
 
