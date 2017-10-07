@@ -4,17 +4,7 @@ sudo: false
 language: node_js
 node_js: "8"
 
-env: M=build-env-info
-script:
-  - uname -a
-  - lsb_release
-  - getconf _NPROCESSORS_ONLN
-  - cat /proc/cpuinfo
-  - free -h
-  - gcc --version
-  - node --version
-  - python --version
-  - python3 --version
+env: M=dummy
 
 matrix:
   include:
