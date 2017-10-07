@@ -30,7 +30,7 @@ def main():
         result = subprocess.run(['hakiri', 'gemfile:scan', '--quiet', '--force'],
             stdout=subprocess.PIPE, encoding='utf-8').stdout
 
-        if "!" in result:
+        if "No vulnerabilities found" not in result:
             error(f"found issues in `{gemfile_path}'")
             print(result)
 
