@@ -10,12 +10,12 @@ from pprint import pprint
 exit_code = 0
 
 def progress(msg):
-    print(f"\x1b[1;34m==> {msg}\x1b[m")
+    print("\x1b[1;34m==> {}\x1b[m".format(msg))
 
 def error(msg):
     global exit_code
     exit_code = 1
-    print(f"\x1b[1;31m==> {msg}\x1b[m")
+    print("\x1b[1;31m==> {}\x1b[m".format(msg))
 
 def main():
     repo_dir = os.getcwd()
@@ -24,7 +24,7 @@ def main():
     #  Gemfile.lock
     #
     for gemfile_path in glob.glob("**/Gemfile.lock", recursive=True):
-        progress(f"Checking {gemfile_path}")
+        progress("Checking {}".format(gemfile_path))
         os.chdir(os.path.dirname(gemfile_path))
 
         result = subprocess.run(['hakiri', 'gemfile:scan', '--quiet', '--force'],
@@ -47,12 +47,12 @@ def main():
         os.chdir(tmpdir)
 
         for package_json_path in package_json_files:
-            progress(f"Checking {package_json_path}")
+            progress("Checking {}".format(package_json_path))
             package_json = json.load(open(package_json_path))
             dependencies = package_json.get('dependencies', {})
-            devDependencies = package_json.get('devDependencies', {})
+            dev_dependencies = package_json.get('devDependencies', {})
             merged_dependencies = dependencies
-            merged_dependencies.update(devDependencies)
+            merged_dependencies.update(dev_dependencies)
 
             json.dump({
                 'name': 'dummy',
@@ -64,8 +64,8 @@ def main():
             
             results = json.loads(p.stdout)
             for result in results:
-                scope = '(in devDependencies)' if result['module'] not in dependencies else ''
-                error(f"found a vulnerability in `{result['module']}' {scope}")
+                scope = '(in dev_dependencies)' if result['module'] not in dependencies else ''
+                error("found a vulnerability in `{}' {}").format(result['module'], scope)
                 pprint(result, indent=4)
 
 if __name__ == '__main__':
