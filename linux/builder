@@ -40,15 +40,15 @@ progress() {
 
 download() {
     if [ ! -f "$(basename $1)" ];then
-    	progress "Downloading $(basename $1)"
+        progress "Downloading $(basename $1)"
         curl -LO $1
     fi
 }
 
 
 download_files() {
-	progress "Downloading files"
-	pushd $DOWNLOADS_DIR
+    progress "Downloading files"
+    pushd $DOWNLOADS_DIR
 
     for url in $DOWNLOAD_URLS; do
         download $url
@@ -65,18 +65,18 @@ extract() {
 
 
 extract_files() {
-	progress "Extracting files"
+    progress "Extracting files"
 
-	pushd $BUILD_DIR
-	[ -d node-v${NODE_VERSION}-linux-${NODE_ARCH} ] || tar xf $DOWNLOADS_DIR/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz
+    pushd $BUILD_DIR
+    [ -d node-v${NODE_VERSION}-linux-${NODE_ARCH} ] || tar xf $DOWNLOADS_DIR/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz
     popd
 
-	pushd $UBUNTU_DIR
+    pushd $UBUNTU_DIR
 
     if [ ! -d lib ]; then
         for deb in \
-    	    $DOWNLOADS_DIR/libgcc1_${LIBGCC_VERSION}_${DEB_ARCH}.deb \
-    	    $DOWNLOADS_DIR/libstdc++6_${LIBSTDCPP_VERSION}_${DEB_ARCH}.deb \
+            $DOWNLOADS_DIR/libgcc1_${LIBGCC_VERSION}_${DEB_ARCH}.deb \
+            $DOWNLOADS_DIR/libstdc++6_${LIBSTDCPP_VERSION}_${DEB_ARCH}.deb \
             $DOWNLOADS_DIR/libc6_${GLIBC_VERSION}_${DEB_ARCH}.deb \
             $DOWNLOADS_DIR/apparmor_${APPARMOR_VERSION}_${DEB_ARCH}.deb
         do
@@ -85,26 +85,26 @@ extract_files() {
         done
     fi
 
-	popd
+    popd
 }
 
 
 build_busybox() {
-	progress "Building Busybox"
-	extract $DOWNLOADS_DIR/busybox-$BUSYBOX_VERSION.tar.bz2 $BUSYBOX_DIR
+    progress "Building Busybox"
+    extract $DOWNLOADS_DIR/busybox-$BUSYBOX_VERSION.tar.bz2 $BUSYBOX_DIR
 
-	pushd $BUSYBOX_DIR
-	[ -f .config ] || cp $CONFIG_DIR/busybox.config .config
+    pushd $BUSYBOX_DIR
+    [ -f .config ] || cp $CONFIG_DIR/busybox.config .config
     make busybox
-	popd
+    popd
 }
 
 
 build_linux() {
-	progress "Building Linux"
-	extract $LINUX_TARBALL $LINUX_DIR
+    progress "Building Linux"
+    extract $LINUX_TARBALL $LINUX_DIR
 
-	pushd $LINUX_DIR
+    pushd $LINUX_DIR
     if [ ! -f .config ]; then
         cp $TARGET_DIR/linux.config .config
         sed -i "s#__INITRAMFS_CPIO_PATH__#$INITRAMFS_CPIO_PATH#" .config 
@@ -118,14 +118,14 @@ build_linux() {
 build_initramfs() {
     pushd initramfs
 
-	for file in $LIB_FILES; do
+    for file in $LIB_FILES; do
         cp $UBUNTU_DIR/lib/${TRIPLET}/$file lib/$file
     done
 
     cp $BUSYBOX_DIR/busybox bin/busybox
     cp $NODE_DIR/bin/node   bin/node
     cp $UBUNTU_DIR/lib/${TRIPLET}/ld-2.24.so $INITRAMFS_DIR/$DYLINKER_PATH
-	cp $UBUNTU_DIR/usr/lib/${TRIPLET}/libstdc++.so.6 lib/libstdc++.so.6
+    cp $UBUNTU_DIR/usr/lib/${TRIPLET}/libstdc++.so.6 lib/libstdc++.so.6
     cp $UBUNTU_DIR/sbin/apparmor_parser bin/apparmor_parser
 
     pushd app
@@ -133,10 +133,10 @@ build_initramfs() {
     popd
 
     apparmor_parser -o etc/apparmor.policy $CONFIG_DIR/node.apparmor
-	[ -e dev/console ] || sudo mknod dev/console c 5 1
+    [ -e dev/console ] || sudo mknod dev/console c 5 1
 
-	find . | cpio -ov --format=newc > $INITRAMFS_CPIO_PATH
-	popd
+    find . | cpio -ov --format=newc > $INITRAMFS_CPIO_PATH
+    popd
 }
 
 
