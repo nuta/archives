@@ -35,7 +35,7 @@ mount $root /disk
 
 . /disk/config.sh
 hostname makestack-linux
-cat /etc/apparmor.policy > /sys/kernel/security/apparmor/.replace
+apparmor_parser -r -B /etc/apparmor.policy
 
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 

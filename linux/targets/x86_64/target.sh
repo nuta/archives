@@ -15,6 +15,7 @@ DOWNLOAD_URLS=(\
     http://http.us.debian.org/debian/pool/main/g/gcc-6/libgcc1_${LIBGCC_VERSION}_${DEB_ARCH}.deb \
     http://http.us.debian.org/debian/pool/main/g/gcc-6/libstdc++6_${LIBSTDCPP_VERSION}_${DEB_ARCH}.deb \
     http://http.us.debian.org/debian/pool/main/g/glibc/libc6_${GLIBC_VERSION}_${DEB_ARCH}.deb
+    http://us.archive.ubuntu.com/ubuntu/pool/main/a/apparmor/apparmor_${APPARMOR_VERSION}_${DEB_ARCH}.deb
 )
 
 LIB_FILES=(\

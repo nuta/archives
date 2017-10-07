@@ -14,6 +14,7 @@ NODE_VERSION=6.11.4
 GLIBC_VERSION=2.24-11+deb9u1
 LIBGCC_VERSION=6.3.0-18
 LIBSTDCPP_VERSION=6.3.0-18
+APPARMOR_VERSION=2.10.95-0ubuntu2
 
 TARGET_DIR=$PWD/targets/$TARGET
 CONFIG_DIR=$PWD/config
@@ -76,7 +77,8 @@ extract_files() {
         for deb in \
     	    $DOWNLOADS_DIR/libgcc1_${LIBGCC_VERSION}_${DEB_ARCH}.deb \
     	    $DOWNLOADS_DIR/libstdc++6_${LIBSTDCPP_VERSION}_${DEB_ARCH}.deb \
-            $DOWNLOADS_DIR/libc6_${GLIBC_VERSION}_${DEB_ARCH}.deb
+            $DOWNLOADS_DIR/libc6_${GLIBC_VERSION}_${DEB_ARCH}.deb \
+            $DOWNLOADS_DIR/apparmor_${APPARMOR_VERSION}_${DEB_ARCH}.deb
         do
             ar x $deb
             tar xf data.tar.xz
@@ -124,8 +126,12 @@ build_initramfs() {
     cp $NODE_DIR/bin/node   bin/node
     cp $UBUNTU_DIR/lib/${TRIPLET}/ld-2.24.so $INITRAMFS_DIR/$DYLINKER_PATH
 	cp $UBUNTU_DIR/usr/lib/${TRIPLET}/libstdc++.so.6 lib/libstdc++.so.6
+    cp $UBUNTU_DIR/sbin/apparmor_parser bin/apparmor_parser
 
-    pushd app && yarn && popd
+    pushd app
+    yarn
+    popd
+
     apparmor_parser -o etc/apparmor.policy $CONFIG_DIR/node.apparmor
 	[ -e dev/console ] || sudo mknod dev/console c 5 1
 
