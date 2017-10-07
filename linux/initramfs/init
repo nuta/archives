@@ -28,9 +28,11 @@ for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
     udhcpc -i $interface -s /etc/udhcpc.script
 done
 
-mkdir /disk
 root=$(egrep -o "root=([^ ]+)" /proc/cmdline | awk -F= '{print $2}')
+[ "$root" = "" ] || echo "Error: root is not speicifed in /proc/cmdline" > /dev/stderr
+mkdir /disk
 mount $root /disk
+
 . /disk/config.sh
 hostname makestack-linux
 cat /etc/apparmor.policy > /sys/kernel/security/apparmor/.replace
