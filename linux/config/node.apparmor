@@ -14,12 +14,13 @@
   /dev/i2c*    rw,
   /dev/spidev* rw,
 
-  /etc/hosts   r,
+  /etc/hosts       r,
+  /etc/resolv.conf r,
   network inet  stream,
   network inet6 stream,
   network inet  dgram,
   network inet6 dgram,
 
-  /app           r,
+  /app/**        r,
   /disk/data/*   rw,
 }
