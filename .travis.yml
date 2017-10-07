@@ -2,8 +2,6 @@ os: linux
 dist: trusty
 sudo: false
 
-env: M=dummy
-
 matrix:
   include:
     - language: ruby
@@ -58,6 +56,7 @@ matrix:
           packages:
             - binutils-arm-linux-gnueabihf
             - gcc-arm-linux-gnueabihf
+            - libc6-dev-armhf-cross
             - build-essential
             - wget
             - qemu
@@ -70,82 +69,8 @@ matrix:
       install: npm install -g yarn
       script:
         - cd linux
-        - ./builder --test raspberrypi
+        - ./builder raspberrypi3
 
-    - language: node_js
-      env: M=installer:macos
-      os: osx
-      osx_image: xcode9.1
-      node_js: "8"
-      cache:
-        directories:
-          - installer/node_modules
-          - "$HOME/.electron"
-          - "$HOME/.cache"
-      install:
-        - cd installer
-        - npm install -g yarn
-        - yarn
-      script:
-        - yarn run test
-
-    - language: node_js
-      node_js: "8"
-      env: M=installer:linux
-      addons:
-        apt:
-          packages:
-            - xvfb
-      cache:
-        directories:
-          - installer/node_modules
-          - "$HOME/.electron"
-          - "$HOME/.cache"
-      install:
-        - cd installer
-        - yarn
-      before_script:
-        - export DISPLAY=':99.0'
-        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-      script:
-        - yarn run test
-
-    - language: node_js
-      env: M=dependencies
-      node_js: "8"
-      addons:
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-      cache:
-        apt: true
-      install:
-        - gem install --no-ri --no-rdoc hakiri
-        - npm install -g nsp
-      script:
-        - python3.6 ./tools/check-dependencies.py
-
-    - language: node_js
-      env: M=coding-styles
-      node_js: "8"
-      addons:
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-      cache:
-        apt: true
-      install:
-        -  npm i -g eslint eslint-config-standard eslint-plugin-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise
-      script:
-        - python3.6 ./tools/check-coding-styles.py
-
-  allow_failures:
-    - env: M=coding-styles
- 
 notifications:
   on_success: change
   on_failure: change
