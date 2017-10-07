@@ -52,7 +52,7 @@ test() {
       -kernel $BUILD_DIR/kernel.img
       -append '"console=ttyS0 root=/dev/vda1"'
       -netdev user,id=net0 -device virtio-net,netdev=net0
-      -drive file=fat:rw:disk,if=virtio
+      -drive file=fat:rw:$DISK_DIR,if=virtio
       -nographic
 	)
 
