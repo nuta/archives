@@ -57,5 +57,6 @@ test() {
       -nographic
     )
 
-    zsh -c "(sleep 32 ; echo \"\\x1xq\") | $QEMU"
+    zsh -c "(sleep 32 ; echo \"\\x1xq\") | $QEMU" | tee test.log
+    grep "*** success" test.log
 }
