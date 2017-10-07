@@ -42,7 +42,8 @@ echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 if [ "$DEBUG" = "" ]; then
     node app/main.js
 else
-    node bin/test-userland.js
+    mv app/test.js app/main.js
+    node app/main.js
     poweroff -f
 fi
 
