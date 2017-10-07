@@ -2,6 +2,8 @@ os: linux
 dist: trusty
 sudo: false
 
+env:
+
 matrix:
   include:
     - language: ruby
@@ -117,7 +119,6 @@ matrix:
       script:
         - ./tools/check-dependencies.py
 
-  allow_failures:
     - language: node_js
       env: M=coding-styles
       node_js: "8"
@@ -125,7 +126,10 @@ matrix:
         -  npm i -g eslint eslint-config-standard eslint-plugin-standard   eslint-plugin-import eslint-plugin-node eslint-plugin-promise
       script:
         - ./tools/check-coding-styles.py
-  
+
+  allow_failures:
+    - env: M=coding-styles
+ 
 notifications:
   on_success: change
   on_failure: change
