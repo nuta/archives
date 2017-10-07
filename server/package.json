@@ -1,4 +1,5 @@
 {
+  "name": "makestack-server-ui",
   "private": true,
   "scripts": {
     "build": "webpack --config ui/webpack.config.js --progress",
