@@ -239,6 +239,7 @@ has-unicode@^2.0.0:
 "hyperutils@file:../libs/hyperutils":
   version "0.0.1"
   dependencies:
+    nan "^2.7.0"
     node-fetch "^1.7.3"
     vm2 "^3.5.0"
 
@@ -385,6 +386,10 @@ mute-stream@0.0.6:
 mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
+
+nan@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
 
 node-fetch@^1.7.3:
   version "1.7.3"

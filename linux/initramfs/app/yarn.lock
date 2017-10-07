@@ -5,19 +5,14 @@
 "app-runtime@file:../../../libs/app-runtime":
   version "0.0.1"
   dependencies:
-    hyperutils "file:../../../../.cache/yarn/v1/hyperutils"
+    node-fetch "^1.7.3"
+    vm2 "^3.5.0"
 
 encoding@^0.1.11:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/encoding/-/encoding-0.1.12.tgz#538b66f3ee62cd1ab51ec323829d1f9480c74beb"
   dependencies:
     iconv-lite "~0.4.13"
-
-"hyperutils@file:../../../libs/hyperutils":
-  version "0.0.1"
-  dependencies:
-    node-fetch "^1.7.3"
-    vm2 "^3.5.0"
 
 iconv-lite@~0.4.13:
   version "0.4.19"
