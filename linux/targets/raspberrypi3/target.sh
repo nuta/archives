@@ -41,23 +41,15 @@ LIB_FILES=(\
         libcrypt.so.1 \
         libnsl.so.1
 )
+QEMU=(
+    qemu-system-arm
+    -machine raspi2
+    -kernel $BUILD_DIR/kernel.img
+    -append '"console=ttyAMA0"'
+    -dtb $DTB_PATH
+    -nographic
+)
 
 # For Busybox and Linux.
 export ARCH=arm
-export CROSS_COMPILE=arm-linux-gnueabihf- 
-export KERNEL=kernel
-
-
-test() {
-    QEMU=(
-      qemu-system-arm
-      -machine raspi2
-      -kernel $BUILD_DIR/$KERNEL.img
-      -append '"console=ttyAMA0"'
-      -dtb $DTB_PATH
-      -nographic
-    )
-
-    zsh -c "(sleep 32 ; echo \"\\x1xq\") | $QEMU" | tee test.log
-    grep "*** success" test.log
-}
+export CROSS_COMPILE=arm-linux-gnueabihf-

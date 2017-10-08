@@ -41,18 +41,11 @@ LIB_FILES=(\
         libcrypt.so.1 \
         libnsl.so.1
 )
-
-
-test() {
-    QEMU=(
-      qemu-system-x86_64
-      -kernel $BUILD_DIR/kernel.img
-      -append '"console=ttyS0 root=/dev/vda1"'
-      -netdev user,id=net0 -device virtio-net,netdev=net0
-      -drive file=fat:rw:$DISK_DIR,if=virtio
-      -nographic
-    )
-
-    zsh -c "(sleep 32 ; echo \"\\x1xq\") | $QEMU" | tee test.log
-    grep "*** success" test.log
-}
+QEMU=(
+    qemu-system-x86_64
+    -kernel $BUILD_DIR/kernel.img
+    -append '"console=ttyS0 root=/dev/vda1"'
+    -netdev user,id=net0 -device virtio-net,netdev=net0
+    -drive file=fat:rw:$DISK_DIR,if=virtio
+    -nographic
+)

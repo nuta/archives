@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 set -ue
+
 if [ $1 = "--test" ]; then
   CMD="build && test"
   TARGET=$2
@@ -8,14 +9,12 @@ else
   TARGET=$1
 fi
 
-
 BUSYBOX_VERSION=1.27.2
 NODE_VERSION=6.11.4
 GLIBC_VERSION=2.24-11+deb9u1
 LIBGCC_VERSION=6.3.0-18
 LIBSTDCPP_VERSION=6.3.0-18
 APPARMOR_VERSION=2.10.95-0ubuntu2
-
 TARGET_DIR=$PWD/targets/$TARGET
 CONFIG_DIR=$PWD/config
 DISK_DIR=$PWD/disk
@@ -153,5 +152,13 @@ build() {
     sha256sum $KERNEL_IMG
 }
 
-# Start building the MakeStack Linux.
+test() {
+    zsh -c "(sleep 32 ; echo \"\\x1xq\") | $QEMU" | tee test.log
+    if ! fgrep "*** success" test.log > /dev/null; then
+      echo
+      echo "userland test failed :("
+      exit 1
+    fi
+}
+
 eval $CMD
