@@ -65,7 +65,7 @@ def main():
             results = json.loads(p.stdout)
             for result in results:
                 scope = '(in dev_dependencies)' if result['module'] not in dependencies else ''
-                error("found a vulnerability in `{}' {}").format(result['module'], scope)
+                error(f"found a vulnerability in {result['module']} {scope}")
                 pprint(result, indent=4)
 
 if __name__ == '__main__':
