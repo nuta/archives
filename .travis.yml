@@ -6,29 +6,6 @@ env: M=dummy
 
 matrix:
   include:
-    - language: ruby
-      env: M=server
-      services:
-        - postgresql
-        - redis-server
-      cache:
-        directories:
-          - server/vendor/bundle
-      install:
-        - cd server
-        - bundle install --jobs 2 --path vendor/bundle
-        - bundle exec rails db:migrate RAILS_ENV=test
-      script: bundle exec rspec
-
-    - language: node_js
-      node_js: "8"
-      env: M=ui
-      cache: yarn
-      install:
-        - cd server
-        - yarn
-      script: npm run build
-
     - language: c
       env: M=linux:x86_64
       sudo: true # because of mknod and docker
@@ -48,7 +25,6 @@ matrix:
       script:
         - cd linux
         - ./builder --test x86_64
-
 
     - language: c
       env: M=linux:raspberrypi3
@@ -80,6 +56,29 @@ matrix:
         - cd ../../..
       script:
         - ./builder raspberrypi3
+        
+    - language: ruby
+      env: M=server:backend
+      services:
+        - postgresql
+        - redis-server
+      cache:
+        directories:
+          - server/vendor/bundle
+      install:
+        - cd server
+        - bundle install --jobs 2 --path vendor/bundle
+        - bundle exec rails db:migrate RAILS_ENV=test
+      script: bundle exec rspec
+
+    - language: node_js
+      node_js: "8"
+      env: M=server:frontend
+      cache: yarn
+      install:
+        - cd server
+        - yarn
+      script: npm run build
 
     - language: node_js
       env: M=installer:macos
