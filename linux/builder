@@ -132,7 +132,6 @@ build_initramfs() {
     yarn
     popd
 
-    apparmor_parser -o etc/apparmor.policy $CONFIG_DIR/node.apparmor
     [ -e dev/console ] || sudo mknod dev/console c 5 1
 
     find . | cpio -ov --format=newc > $INITRAMFS_CPIO_PATH
