@@ -82,6 +82,35 @@ matrix:
         - ./builder raspberrypi3
 
     - language: node_js
+      env: M=installer:macos
+      os: osx
+      osx_image: xcode9.1
+      node_js: "8"
+      cache:
+        directories:
+          - installer/node_modules
+          - "$HOME/.electron"
+          - "$HOME/.cache"
+      install:
+        - cd installer
+        - npm install -g yarn
+        - yarn
+      script:
+        - yarn run build:macos
+
+    - language: node_js
+      node_js: "8"
+      env: M=installer:linux
+      cache:
+        directories:
+          - installer/node_modules
+      install:
+        - cd installer
+        - yarn
+      script:
+        - yarn run build:linux
+
+    - language: node_js
       env: M=dependencies
       node_js: "8"
       addons:
