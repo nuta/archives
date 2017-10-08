@@ -10,12 +10,15 @@ from pprint import pprint
 exit_code = 0
 
 def progress(msg):
-    print("\x1b[1;34m==> {}\x1b[m".format(msg))
+    print(f"\x1b[1;34m==> {msg}\x1b[m")
+
+def warn(msg):
+    print(f"\x1b[1;35m==> {msg}\x1b[m")
 
 def error(msg):
     global exit_code
     exit_code = 1
-    print("\x1b[1;31m==> {}\x1b[m".format(msg))
+    print(f"\x1b[1;31m==> {msg}\x1b[m")
 
 def main():
     repo_dir = os.getcwd()
@@ -64,8 +67,10 @@ def main():
             
             results = json.loads(p.stdout)
             for result in results:
-                scope = '(in dev_dependencies)' if result['module'] not in dependencies else ''
-                error(f"found a vulnerability in {result['module']} {scope}")
+                if result['module'] in dependencies:
+                    error(f"found a vulnerability in {result['module']}")
+                else:
+                    warn(f"found a vulnerability in {result['module']} (in devDependencies, ignoring)")
                 pprint(result, indent=4)
 
 if __name__ == '__main__':
