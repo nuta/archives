@@ -82,44 +82,6 @@ matrix:
         - ./builder raspberrypi3
 
     - language: node_js
-      env: M=installer:macos
-      os: osx
-      osx_image: xcode9.1
-      node_js: "8"
-      cache:
-        directories:
-          - installer/node_modules
-          - "$HOME/.electron"
-          - "$HOME/.cache"
-      install:
-        - cd installer
-        - npm install -g yarn
-        - yarn
-      script:
-        - yarn run test
-
-    - language: node_js
-      node_js: "8"
-      env: M=installer:linux
-      addons:
-        apt:
-          packages:
-            - xvfb
-      cache:
-        directories:
-          - installer/node_modules
-          - "$HOME/.electron"
-          - "$HOME/.cache"
-      install:
-        - cd installer
-        - yarn
-      before_script:
-        - export DISPLAY=':99.0'
-        - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-      script:
-        - yarn run test
-
-    - language: node_js
       env: M=dependencies
       node_js: "8"
       addons:
