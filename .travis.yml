@@ -77,7 +77,7 @@ matrix:
         - ./configure
         - make -j2
         - sudo make install
-        - cd ../..
+        - cd ../../..
       script:
         - ./builder raspberrypi3
 
