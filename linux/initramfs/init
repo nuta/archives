@@ -45,7 +45,6 @@ if [ "$DEBUG" = "" ]; then
 else
     mv app/test.js app/main.js
     node app/main.js
-    poweroff -f
 fi
 
 echo "*** something went wrong, rebooting in 10 seconds..."
