@@ -23,6 +23,7 @@ EOF
 
 for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
     [ "$interface" = "lo" ] && continue
+    [ "$interface" = "irlan0" ] && continue
     
     ip link set $interface up
     udhcpc -i $interface -s /etc/udhcpc.script
