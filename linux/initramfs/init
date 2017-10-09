@@ -38,6 +38,8 @@ mount $root /disk
 hostname makestack-linux
 apparmor_parser -r /etc/apparmor.d/*
 
+ntpd -p 1.pool.ntp.org
+
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
 if [ "$DEBUG" = "" ]; then
