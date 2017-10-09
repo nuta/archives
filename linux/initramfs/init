@@ -47,6 +47,6 @@ else
     poweroff -f
 fi
 
-echo "*** something went wrong, rebooting..."
+echo "*** something went wrong, rebooting in 10 seconds..."
+sleep 10
 reboot -f
-sleep 180
