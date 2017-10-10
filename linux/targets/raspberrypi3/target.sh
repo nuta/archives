@@ -73,7 +73,7 @@ build-image() {
     [ -d "firmware-$FIRMWARE_VERSION" ] || tar xf $DOWNLOADS_DIR/$FIRMWARE_VERSION.tar.gz
     mkdir -p disk
     dd if=/dev/zero of=$IMAGE_FILE bs=1M count=64
-    mkfs.fat $IMAGE_FILE
+    mkfs.fat -L MAKESTACK $IMAGE_FILE
     sudo mount $IMAGE_FILE disk -o uid=$(whoami) -o gid=$(whoami)
     cp -r firmware-$FIRMWARE_VERSION/boot/* disk
     rm disk/kernel.img disk/kernel7.img
