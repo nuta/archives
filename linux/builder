@@ -1,14 +1,22 @@
 #!/usr/bin/env zsh
 set -ue
 
-if [ $1 = "--test" ]; then
+case "$1" in
+--image)
+  CMD="build-image"
+  TARGET=$2
+  ;;
+--test)
   CMD="build && test"
   TARGET=$2
-else
+  ;;
+*)
   CMD="build"
   TARGET=$1
-fi
+  ;;
+esac
 
+MAKESTACK_LINUX_VERSION=dev
 BUSYBOX_VERSION=1.27.2
 NODE_VERSION=6.11.4
 GLIBC_VERSION=2.24-11+deb9u1

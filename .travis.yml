@@ -56,7 +56,7 @@ matrix:
         - sudo make install
         - cd ../../..
       script:
-        - ./builder raspberrypi3
+        - ./builder --image raspberrypi3
         
     - language: ruby
       env: M=server:backend

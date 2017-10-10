@@ -53,3 +53,8 @@ QEMU=(
 # FIXME: This assumes that x86_64 build machine.
 NODE_GYP_ARCH=
 NODE_GYP_ENV=()
+
+build-image() {
+    echo "build-image in x86_64 is not yet implemented!"
+    exit 1
+}

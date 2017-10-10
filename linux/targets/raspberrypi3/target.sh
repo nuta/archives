@@ -3,13 +3,16 @@ DEB_ARCH=armhf
 LD_ARCH=armhf
 TRIPLET=arm-linux-gnueabihf
 RPI_LINUX_VERSION=1.20170811-1
+FIRMWARE_VERSION=1.20170811
 LINUX_DIR=$BUILD_DIR/linux-raspberrypi-kernel_${RPI_LINUX_VERSION}
 LINUX_TARBALL=$DOWNLOADS_DIR/raspberrypi-kernel_${RPI_LINUX_VERSION}.tar.gz
 LINUX_MAKE_TARGET=(zImage dtbs)
 DYLINKER_PATH=lib/ld-linux-armhf.so.3
+IMAGE_FILE=$BUILD_DIR/makestack-linux-${MAKESTACK_LINUX_VERSION}-raspberrypi3.img
 VMLINUZ=$LINUX_DIR/arch/arm/boot/zImage
 DTB_PATH=$LINUX_DIR/arch/arm/boot/dts/bcm2710-rpi-3-b.dtb
 DOWNLOAD_URLS=(\
+    https://github.com/raspberrypi/firmware/archive/${FIRMWARE_VERSION}.tar.gz
     https://github.com/raspberrypi/linux/archive/raspberrypi-kernel_${RPI_LINUX_VERSION}.tar.gz \
     http://busybox.net/downloads/busybox-${BUSYBOX_VERSION}.tar.bz2 \
     https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz \
@@ -61,3 +64,32 @@ NODE_GYP_ENV=(
     CXX=arm-linux-gnueabihf-g++
     LINK=arm-linux-gnueabihf-g++
 )
+
+build-image() {
+    build
+
+    pushd $BUILD_DIR
+    
+    [ -d "firmware-$FIRMWARE_VERSION" ] || tar xf $DOWNLOAD_DIR/$FIRMWARE_VERSION.tar.gz
+    mkdir -p disk
+    dd if=/dev/zero of=$IMAGE_FILE bs=1M count=64
+    mkfs.fat $IMAGE_FILE
+    sudo mount $IMAGE_FILE disk -o uid=$(whoami) -o gid=$(whoami)
+    cp -r firmware-$FIRMWARE_VERSION/boot/* disk
+    rm disk/kernel.img disk/kernel7.img
+    cp $KERNEL_IMG disk/kernel7.img
+    cp -r $DISK_DIR/* disk
+    cp $TARGET_DIR/config.txt disk
+    cp $TARGET_DIR/cmdline.txt disk
+    sudo umount $IMAGE_FILE
+
+    rm -f $IMAGE_FILE.xz
+    xz --keep $IMAGE_FILE
+    du -h $IMAGE_FILE
+    sha256sum $IMAGE_FILE
+
+    du -h $IMAGE_FILE.xz
+    sha256sum $IMAGE_FILE.xz
+
+    popd
+}
