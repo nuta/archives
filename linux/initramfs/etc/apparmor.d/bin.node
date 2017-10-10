@@ -1,6 +1,7 @@
 /bin/node {
   /bin/node mr,
   
+  owner /proc/[0-9]*/auxv r,
   /dev/null rw,
   /dev/zero rw,
   /dev/random  r,
@@ -22,5 +23,6 @@
   network inet6 dgram,
 
   /app/**        r,
+  /app/**/*.node mr,
   /disk/data/*   rw,
 }
