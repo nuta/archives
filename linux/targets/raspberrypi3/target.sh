@@ -70,7 +70,7 @@ build-image() {
 
     pushd $BUILD_DIR
     
-    [ -d "firmware-$FIRMWARE_VERSION" ] || tar xf $DOWNLOAD_DIR/$FIRMWARE_VERSION.tar.gz
+    [ -d "firmware-$FIRMWARE_VERSION" ] || tar xf $DOWNLOADS_DIR/$FIRMWARE_VERSION.tar.gz
     mkdir -p disk
     dd if=/dev/zero of=$IMAGE_FILE bs=1M count=64
     mkfs.fat $IMAGE_FILE
