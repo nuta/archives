@@ -49,3 +49,7 @@ QEMU=(
     -drive file=fat:rw:$DISK_DIR,if=virtio
     -nographic
 )
+
+# FIXME: This assumes that x86_64 build machine.
+NODE_GYP_ARCH=
+NODE_GYP_ENV=()

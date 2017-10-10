@@ -34,6 +34,7 @@ matrix:
           packages:
             - binutils-arm-linux-gnueabihf
             - gcc-arm-linux-gnueabihf
+            - g++-arm-linux-gnueabihf
             - libc6-dev-armhf-cross
             - build-essential
             - wget

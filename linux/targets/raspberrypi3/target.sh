@@ -53,3 +53,11 @@ QEMU=(
 # For Busybox and Linux.
 export ARCH=arm
 export CROSS_COMPILE=arm-linux-gnueabihf-
+
+NODE_GYP_ARCH=arm
+NODE_GYP_ENV=(
+    AR=arm-linux-gnueabihf-ar
+    CC=arm-linux-gnueabihf-gcc
+    CXX=arm-linux-gnueabihf-g++
+    LINK=arm-linux-gnueabihf-g++
+)
