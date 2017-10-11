@@ -5,7 +5,7 @@ class Device < ApplicationRecord
 
   sorted_set :log
   
-  SUPPORTED_TYPES = %w(mock)
+  SUPPORTED_TYPES = %w(mock raspberrypi3)
   DEVICE_STATES = %w(new booting ready running relaunch reboot down)
   RESERVED_DEVICE_NAMES = %w(new)
   DEVICE_NAME_REGEX = /\A[a-zA-Z][a-zA-Z0-9\-\_]*\z/
