@@ -108,6 +108,9 @@ export default {
     }
   },
   beforeMount() {
+    if (!api.isLoggedIn())
+      this.$router.push({ name: 'login' })
+
     this.refreshAvailableDevFiles();
     this.deviceType = this.availableDeviceTypes[0] || "";
     this.devFile    = this.availableDevFiles[0] || "";
