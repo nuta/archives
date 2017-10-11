@@ -149,41 +149,6 @@ class Device < ApplicationRecord
     self.app.deployments.find_by_version!(version).image
   end
 
-  def app_image_url(deployment)
-    return "" unless self.app
-
-    # FIXME
-    version = deployment.version
-    Rails.application.config.host + "/api/v1/app_image?device_id=#{self.device_id}&version=#{version}"
-  end
-
-  def create_heartbeat_response(version)
-    # Header
-    body = [1, 0].pack("CC")
-
-    deployment = self.deployment
-    if deployment && version != deployment.version
-      # TODO: os_update_request
-
-      # app_update_request
-      body += [0x13 | 0x80, 0x00, 0x02, deployment.version].pack("CCnn")
-
-      # app_image_url
-      app_image_url = self.app_image_url(deployment)
-      body += [0x14 | 0x80, 0x00, app_image_url.length, app_image_url].pack("CCna*")
-    end
-
-    # store
-    self.stores.each do |key, store|
-      k = key
-      v = store[:value]
-      length = 1 + key.length + v.length
-      body += [0x10 | 0x80, 0x00, length, k.length, k, v].pack("CCnCa*a*")
-    end
-
-    body
-  end
-
   def self.authenticate(device_id)
     prefix = device_id[0, DEVICE_ID_PREFIX_LEN]
     device = Device.find_by_device_id_prefix(prefix)
