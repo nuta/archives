@@ -20,7 +20,11 @@ module.exports = class {
   }
 
   print(message) {
-    console.info("I " + message);
+    console.info(message);
     this.log += message + "\n";
+  }
+
+  error(message) {
+    this.print(`!${message}`)
   }
 }

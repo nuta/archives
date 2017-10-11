@@ -133,6 +133,11 @@ module.exports = class {
       timeout: 5000
     });
 
-    vm.run(script);
+    try {
+      vm.run(script);
+    } catch (e) {
+      let msg = e.stack.replace(/^/gm, '!');
+      this.apis.logging.print(msg);
+    }
   }
 }
