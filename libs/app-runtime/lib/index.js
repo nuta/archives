@@ -61,6 +61,7 @@ module.exports = class {
         console.log(`updating ${this.appVersion} -> ${appUpdateRequest}`)
         this.appVersion = appUpdateRequest
         this.adapter.getAppImage(appUpdateRequest).then((script) => {
+          this.resetAPIs();
           this.runScript(script)
         })
       }
