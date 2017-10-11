@@ -75,9 +75,9 @@ class HeartbeatController < ApplicationController
     payload = {}
     deployment = @device.deployment
 
-    if deployment && @messages[:version] != deployment.version
+    if deployment && @messages[:app_version] != deployment.version
       # TODO: os_update_request
-  
+
       payload[SMMS_APP_UPDATE_REQUEST] = deployment.version
     end
   
