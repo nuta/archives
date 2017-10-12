@@ -12,6 +12,7 @@ class IntegrationsController < ApplicationController
   def create
     @integration = Integration.new(integration_params)
     @integration.app = @app
+    @integration.reset_token
 
     if @integration.save
       render :show, status: :created, location: @integration
