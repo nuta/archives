@@ -2,7 +2,9 @@ class Device < ApplicationRecord
   belongs_to :user
   belongs_to :app, optional: true  
   has_many   :device_stores, dependent: :destroy
-
+  has_many   :device_mappings, dependent: :destroy
+  
+  value :current_app_version
   sorted_set :log
   
   SUPPORTED_TYPES = %w(mock raspberrypi3)

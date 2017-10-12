@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171012055726) do
+ActiveRecord::Schema.define(version: 20171012070754) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -46,6 +46,15 @@ ActiveRecord::Schema.define(version: 20171012055726) do
     t.binary "image", null: false
     t.index ["app_id", "version"], name: "index_deployments_on_app_id_and_version", unique: true
     t.index ["app_id"], name: "index_deployments_on_app_id"
+  end
+
+  create_table "device_mappings", force: :cascade do |t|
+    t.bigint "device_id"
+    t.string "token", null: false
+    t.string "type", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["device_id"], name: "index_device_mappings_on_device_id"
   end
 
   create_table "device_stores", id: :serial, force: :cascade do |t|
@@ -134,6 +143,7 @@ ActiveRecord::Schema.define(version: 20171012055726) do
   add_foreign_key "app_stores", "apps"
   add_foreign_key "apps", "users"
   add_foreign_key "deployments", "apps"
+  add_foreign_key "device_mappings", "devices"
   add_foreign_key "device_stores", "devices"
   add_foreign_key "devices", "apps"
   add_foreign_key "devices", "users"
