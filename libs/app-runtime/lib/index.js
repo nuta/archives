@@ -35,7 +35,7 @@ module.exports = class {
   }
 
   registerAPI(name, klass, ...args) {
-    let api = new klass(args);
+    let api = new klass(...args);
     Object.assign(this.globals, api.globals);
     this.apis[name] = api;
     return api;
