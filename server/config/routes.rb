@@ -30,6 +30,8 @@ Rails.application.routes.draw do
       post "heartbeat", to: "heartbeat#heartbeat"
       get "os_image",   to: "heartbeat#os_image"
       get "app_image",  to: "heartbeat#app_image"
+
+      get "webhooks/*token", to: "incoming_webhooks#invoke", constraints: { token: /.+/ }
   end
   end
 end

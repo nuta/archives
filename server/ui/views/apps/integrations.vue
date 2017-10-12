@@ -4,8 +4,13 @@
     <form v-for="integration in integrations" v-on:submit.prevent="update(integration)">
       <fieldset>
         <div v-if="integration.service == 'outgoing_webhook'">
-          <label>Webhook URL</label>
+          <label>Outgoing Webhook URL</label>
           <input type="url" v-model="integration.webhook_url" placeholder="Webhook URL" required>
+        </div>
+
+        <div v-if="integration.service == 'incoming_webhook'">
+          <label>Incoming Webhook Token</label>
+          <input type="text" v-model="integration.incoming_webhook_token" readonly>
         </div>
 
         <div v-if="integration.service == 'ifttt'">
@@ -51,8 +56,12 @@
         </select>
 
         <div v-if="newIntegration.service == 'outgoing_webhook'">
-          <label>Webhook URL</label>
+          <label>Outgoing Webhook URL</label>
           <input type="url" v-model="newIntegration.webhook_url" placeholder="Webhook URL" required>
+        </div>
+
+        <div v-if="newIntegration.service == 'incoming_webhook'">
+          Just click Create!
         </div>
 
         <div v-if="newIntegration.service == 'ifttt'">
@@ -107,12 +116,14 @@ export default {
         outgoing_webhook: "Outgoing Webhook",
         ifttt: "IFTTT",
         slack: "Slack",
-        datadog: "Datadog"
+        datadog: "Datadog",
+        incoming_webhook: "Incoming Webhook"
       },
       newIntegration: {
         service: "outgoing_webhook",
         comment: "",
         webhook_url: "",
+        incoming_webhook_token: "",
         slack_webhook_url: "",
         datadog_api_key: "",
         ifttt_key: "",
@@ -144,6 +155,9 @@ export default {
         case "datadog":
           config['api_key'] = form.datadog_api_key
           break
+
+        case "incoming_webhook":
+          break
       }
 
       return JSON.stringify(config);
@@ -173,6 +187,7 @@ export default {
           service: integration.service,
           comment: integration.comment,
           webhook_url: config.webhook_url || "",
+          incoming_webhook_token: integration.token || "",
           slack_webhook_url: config.webhook_url || "",
           ifttt_key: config.key || "",
           datadog_api_key: config.api_key || "",

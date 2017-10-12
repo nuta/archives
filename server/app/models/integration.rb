@@ -1,7 +1,7 @@
 class Integration < ApplicationRecord
   belongs_to :app
   
-  SUPPORTED_SERVICES = %w(outgoing_webhook ifttt slack datadog)
+  SUPPORTED_SERVICES = %w(incoming_webhook outgoing_webhook ifttt slack datadog)
   INTEGRATION_TOKEN_LEN = 40
   INTEGRATION_TOKEN_PREFIX_LEN = 20
   
