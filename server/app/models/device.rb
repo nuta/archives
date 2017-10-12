@@ -79,8 +79,8 @@ class Device < ApplicationRecord
   end
 
   def reset_credentials
-    device_id     = generate_random_string(DEVICE_ID_LEN)
-    device_secret = generate_random_string(DEVICE_SECRET_LEN)
+    device_id     = RandomIdGenerator::generate(DEVICE_ID_LEN)
+    device_secret = RandomIdGenerator::generate(DEVICE_SECRET_LEN)
 
     self.device_id = device_id
     self.device_id_prefix = device_id[0, DEVICE_ID_PREFIX_LEN]
@@ -160,18 +160,5 @@ class Device < ApplicationRecord
     else
       nil
     end
-  end
-
-  private
-
-  def generate_random_string(n)
-    urlsafe_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_~"
-
-    s = ""
-    while s.length < n
-      s << urlsafe_chars[SecureRandom.random_number(urlsafe_chars.length)]
-    end
-
-    s
   end
 end
