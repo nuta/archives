@@ -19,9 +19,8 @@ switch(os.type()) {
 }
 
 module.exports = class {
-  constructor(url, deviceId, deviceSecret) {
+  constructor(url, deviceId) {
     this.deviceId = deviceId;
-    this.deviceSecret = deviceSecret;
     this.appVersion = 0;
     this.context = {};
     this.apis = {};
