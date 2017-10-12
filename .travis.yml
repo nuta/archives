@@ -111,23 +111,6 @@ matrix:
         - yarn run build:linux
 
     - language: node_js
-      env: M=dependencies
-      node_js: "8"
-      addons:
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-      cache:
-        apt: true
-      install:
-        - gem install --no-ri --no-rdoc hakiri
-        - npm install -g nsp
-      script:
-        - python3.6 ./tools/check-dependencies.py
-
-    - language: node_js
       env: M=coding-styles
       node_js: "8"
       addons:
