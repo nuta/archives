@@ -100,25 +100,34 @@ class Device < ApplicationRecord
     lines
   end
 
-  def append_log_to(log, lines, time, max_lines, integrations)
+  def append_log_to(target, device, lines, time)
+    app = device.app
+    integrations = app ? app.integrations.all : []
+
+    if target == :app
+      unless app
+        # The device is not associated with any app. Aborting.
+        return
+      end
+
+      log = app.log
+      max_lines = App::APP_LOG_MAX_LINES
+    else
+      log = device.log
+      max_lines = DEVICE_LOG_MAX_LINES
+    end
+
     device_name = self.name
     lines.each_with_index do |line, index|
+      log["#{time}:#{index}:#{device_name}:#{line}"] = time
       m = /\A@(?<event>[^ ]+) (?<body>.*)\z/.match(line)
       if m
-        # Send an event to integration services.
-        integrations.each do |integration|
-          config = JSON.parse(integration.config)
-          
-          case integration.service
-          when "outgoing_webhook"
-            if config.key?("webhook_url")
-              CallOutgoingWebhookJob.perform_later(config["webhook_url"],
-                self.app.id, self.id, m["event"], m["body"])
-            end
-          end
-        end
+        # Detected a event published from the device.
+        HookService.new.invoke(integrations, :event_published, self, {
+          event: m['event'],
+          body: m['body']
+        })
       end
-      log["#{time}:#{index}:#{device_name}:#{line}"] = time
     end
 
     log.remrangebyrank(0, -max_lines)
@@ -131,11 +140,8 @@ class Device < ApplicationRecord
     time = Time.now.to_f
     lines = body.split("\n").reject(&:empty?)
 
-    append_log_to(self.log, lines, time, DEVICE_LOG_MAX_LINES, [])
-    if self.app
-      append_log_to(self.app.log, lines, time, App::APP_LOG_MAX_LINES, 
-                    self.app.integrations.all)
-    end
+    append_log_to(:device, self, lines, time)
+    append_log_to(:app, self, lines, time)
   end
 
   def deployment

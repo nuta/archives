@@ -16,6 +16,7 @@ gem 'pg', group: :postgres
 gem 'redis-objects'
 gem 'redis-namespace'
 gem 'msgpack'
+gem 'rest-client'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

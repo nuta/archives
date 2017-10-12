@@ -3,16 +3,16 @@
   <div class="integrations">
     <form v-for="integration in integrations" v-on:submit.prevent="update(integration)">
       <fieldset>
-        <div v-if="integration.service == 'outgoingWebhook'">
+        <div v-if="integration.service == 'outgoing_webhook'">
           <label>Webhook URL</label>
-          <input type="url" v-model="integration.webhookUrl" placeholder="Webhook URL" required>
+          <input type="url" v-model="integration.webhook_url" placeholder="Webhook URL" required>
           <label>Call webhook URL when:</label>
           <p>
-            <input type="checkbox" v-model="integration.onEvent">
+            <input type="checkbox" v-model="integration.on_event">
             a device sent events
           </p>
           <p>
-            <input type="checkbox" v-model="integration.onDeviceChange">
+            <input type="checkbox" v-model="integration.on_device_change">
             a device changes its state
           </p>
         </div>
@@ -31,16 +31,17 @@
             <option :value="value">{{ title }}</option>
           </template>
         </select>
-        <div v-if="newIntegration.service == 'outgoingWebhook'">
+
+        <div v-if="newIntegration.service == 'outgoing_webhook'">
           <label>Webhook URL</label>
-          <input type="url" v-model="newIntegration.webhookUrl" placeholder="Webhook URL" required>
+          <input type="url" v-model="newIntegration.webhook_url" placeholder="Webhook URL" required>
           <label>Call webhook URL when:</label>
           <p>
-            <input type="checkbox" v-model="newIntegration.onEvent">
+            <input type="checkbox" v-model="newIntegration.on_event">
             a device sent events
           </p>
           <p>
-            <input type="checkbox" v-model="newIntegration.onDeviceChange">
+            <input type="checkbox" v-model="newIntegration.on_device_change">
             a device changes its state
           </p>
         </div>
@@ -70,7 +71,7 @@ export default {
         outgoingWebhook: "Outgoing Webhook"
       },
       newIntegration: {
-        service: "outgoingWebhook",
+        service: "outgoing_webhook",
         comment: "",
         webhookUrl: "",
         onEvent: true,
@@ -79,16 +80,15 @@ export default {
     };
   },
   methods: {
-    createConfigFromForm(form) {
-      let config;
+    createConfigForServer(form) {
+      let config = {
+        on_event: form.on_event,
+        on_device_change: form.on_device_change
+      }
 
       switch (form.service) {
-        case "outgoingWebhook":
-          config = {
-            webhookUrl: form.webhookUrl,
-            onEvent: form.onEvent,
-            onDeviceChange: form.onDeviceChange
-          };
+        case "outgoing_webhook":
+          config['webhook_url'] = form.webhook_url
           break;
 
       }
@@ -100,7 +100,7 @@ export default {
       api.createIntegration(
         this.appName,
         this.newIntegration.service,
-        this.createConfigFromForm(this.newIntegration),
+        this.createConfigForServer(this.newIntegration),
         this.newIntegration.comment);
     },
     update(integration) {
@@ -108,7 +108,7 @@ export default {
       api.updateIntegration(
         this.appName,
         integration.service,
-        this.createConfigFromForm(integration),
+        this.createConfigForServer(integration),
         integration.comment);
     }
   },

@@ -122,8 +122,8 @@ export default new class {
   }
 
   createIntegration(appName, service, config, comment) {
-    return this.invoke("POST", `/apps/${appName}/integrations`,
-      { name, service, config, comment });
+    return this.invoke("POST", `/apps/${appName}/integrations/${service}`,
+      { name, config, comment });
   }
 
   updateIntegration(appName, service, config, comment) {

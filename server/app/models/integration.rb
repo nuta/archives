@@ -7,6 +7,8 @@ class Integration < ApplicationRecord
                         uniqueness: { scope: :app_id }
     validate :config_is_json
     
+    # TODO: validate contents in the config JSON
+
     def config_is_json
       JSON.parse(self.config)
     rescue
