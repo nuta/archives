@@ -1,4 +1,4 @@
-const { fetch } = require('hyperutils')
+const fetch = require('node-fetch')
 const AdapterBase = require('./base')
 
 class HTTPAdapter extends AdapterBase {

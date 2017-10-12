@@ -1,4 +1,4 @@
-const { msgpack } = require('hyperutils')
+const msgpack = require('msgpack')
 
 const SMMS_VERSION_MSG = 1;
 const SMMS_APP_UPDATE_REQUEST_MSG = 0x11
