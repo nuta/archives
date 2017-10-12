@@ -35,7 +35,7 @@ ansi@^0.3.0, ansi@~0.3.1:
 "app-runtime@file:../libs/app-runtime":
   version "0.0.1"
   dependencies:
-    hyperutils "file:../hyperutils"
+    vm2 "^3.5.2"
 
 are-we-there-yet@~1.1.2:
   version "1.1.4"
@@ -247,7 +247,6 @@ has-unicode@^2.0.0:
     msgpack "^1.0.2"
     nan "^2.7.0"
     node-fetch "^1.7.3"
-    vm2 "^3.5.0"
 
 iconv-lite@^0.4.17, iconv-lite@~0.4.13:
   version "0.4.19"
@@ -610,7 +609,7 @@ util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
 
-vm2@^3.5.0:
+vm2@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/vm2/-/vm2-3.5.2.tgz#6ae7c75a867775946e1d4a66623374e0245150e0"
 
