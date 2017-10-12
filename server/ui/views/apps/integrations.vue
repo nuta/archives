@@ -6,13 +6,11 @@
         <div v-if="integration.service == 'outgoing_webhook'">
           <label>Webhook URL</label>
           <input type="url" v-model="integration.webhook_url" placeholder="Webhook URL" required>
-          <label>Call webhook URL when:</label>
         </div>
 
         <div v-if="integration.service == 'ifttt'">
           <label>IFTTT Key</label>
           <input type="text" v-model="integration.ifttt_key" placeholder="IFTTT Key" required>
-          <label>Call webhook URL when:</label>
         </div>
 
         <div v-if="integration.service == 'slack'">
@@ -104,7 +102,6 @@ export default {
     return {
       appName: app.$router.currentRoute.params.appName,
       apps: [],
-      newone: { service: "webhook", config: {}, comment: "" },
       integrations: [],
       supportedServices: {
         outgoing_webhook: "Outgoing Webhook",
