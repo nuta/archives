@@ -16,6 +16,21 @@
             a device changes its state
           </p>
         </div>
+
+        <div v-if="integration.service == 'ifttt'">
+          <label>IFTTT Key</label>
+          <input type="text" v-model="integration.ifttt_key" placeholder="IFTTT Key" required>
+          <label>Call webhook URL when:</label>
+          <p>
+            <input type="checkbox" v-model="integration.on_event">
+            a device sent events
+          </p>
+          <p>
+            <input type="checkbox" v-model="integration.on_device_change">
+            a device changes its state
+          </p>
+        </div>
+
         <label>Comment (Optional)</label>
         <input type="text" v-model="integration.comment" placeholder="Comment (Optional)">
       </fieldset>
@@ -45,6 +60,21 @@
             a device changes its state
           </p>
         </div>
+
+        <div v-if="newIntegration.service == 'ifttt'">
+          <label>IFTTT Key</label>
+          <input type="text" v-model="newIntegration.ifttt_key" placeholder="IFTTT Key" required>
+          <label>Call webhook URL when:</label>
+          <p>
+            <input type="checkbox" v-model="newIntegration.on_event">
+            a device sent events
+          </p>
+          <p>
+            <input type="checkbox" v-model="newIntegration.on_device_change">
+            a device changes its state
+          </p>
+        </div>
+
         <label>Comment (Optional)</label>
         <input type="text" v-model="newIntegration.comment" placeholder="Comment (Optional)">
       </fieldset>
@@ -68,14 +98,16 @@ export default {
       newone: { service: "webhook", config: {}, comment: "" },
       integrations: [],
       supportedServices: {
-        outgoingWebhook: "Outgoing Webhook"
+        outgoing_webhook: "Outgoing Webhook",
+        ifttt: "ifttt",
       },
       newIntegration: {
         service: "outgoing_webhook",
         comment: "",
-        webhookUrl: "",
-        onEvent: true,
-        onDeviceChange: true
+        webhook_url: "",
+        ifttt_key: "",
+        on_event: true,
+        on_device_change: true
       }
     };
   },
@@ -91,6 +123,9 @@ export default {
           config['webhook_url'] = form.webhook_url
           break;
 
+        case "ifttt":
+          config['key'] = form.ifttt_key
+          break;
       }
 
       return JSON.stringify(config);
@@ -119,9 +154,10 @@ export default {
         return {
           service: integration.service,
           comment: integration.comment,
-          webhookUrl: config.webhookUrl || "",
-          onEvent: config.onEvent || false,
-          onDeviceChange: config.onDeviceChange || false
+          webhook_url: config.webhook_url || "",
+          ifttt_key: config.key || "",
+          on_event: config.on_event || false,
+          on_device_change: config.on_device_change || false
         };
       });
     });

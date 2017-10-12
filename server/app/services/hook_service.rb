@@ -26,6 +26,12 @@ class HookService
           accept_stores: true,
           device: device
         )
+
+      when 'ifttt'
+        CallOutgoingWebhookJob.perform_later(
+          url: "https://maker.ifttt.com/trigger/#{event}/with/key/#{config['key']}",
+          body: { value1: body }
+          )
       end
     end
   end
