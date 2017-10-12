@@ -59,6 +59,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const fetch = require('node-fetch')
 const uuid = require('uuid/v4')
+const sudo = require('sudo-prompt')
 
 function replaceBuffer(buf, value, id) {
   const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`
@@ -154,11 +155,10 @@ export default {
 
       // TODO: What if the image is large?
       let image = fs.readFileSync(originalDiskImageFile)
-      let device = {device_id: 'asd'}
       image = replaceBuffer(image, device.device_id, 'DEVICE_ID')
       image = replaceBuffer(image, device.device_secret, 'DEVICE_SECRET')
       image = replaceBuffer(image, api.serverURL, 'SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890')
-      image = replaceBuffer(image, device.adapter, 'ADAPTER')
+      image = replaceBuffer(image, this.adapter, 'ADAPTER')
       fs.writeFileSync(diskImageFile, image)
 
       //
@@ -167,37 +167,20 @@ export default {
       const diskImageSize = fs.statSync(diskImageFile).size
 
       // TODO: support Linux (GNU one)
-      const args = ['bs=4m', `if=${diskImageFile}`, `of=${this.devFile}`]
-      console.log(args)
-      const dd = spawn('/bin/dd', args)
+      const argv = ['dd', 'bs=4m', `if=${diskImageFile}`, `of=${this.devFile}`]
+      const options = { name: 'MakeStack Installer' }
+      console.log(argv)
+      let error, stdout, stderr = await sudo.exec(argv.join(' '), options)
 
-      const checkProgress = setInterval(() => {
-        dd.kill('SIGINFO')
-      }, 100)
+      console.log(stdout)
+      console.error(stderr)
+      if (error) {
+        this.message = 'something went wrong :('
+        alert(error)
+        return
+      }
 
-      dd.stdout.on('data', data => {
-        console.log(`${data}`)
-      })
-
-      dd.stderr.on('data', data => {
-        const str = data.toString()
-        const match = /[^\n]*\n(\d+) bytes/.exec(str)
-        const transferred = match[1]
-
-        this.percentage = Math.floor(transferred / diskImageSize * 100)
-        console.error(`${str}`)
-      })
-
-      dd.on('close', code => {
-        clearInterval(checkProgress);
-        if (code != 0) {
-          this.message = 'something went wrong :('
-        } else {
-          this.message = 'done!'
-        }
-
-        this.installing = false;
-      })
+      this.message = 'done!'
     }
   },
   beforeMount() {
