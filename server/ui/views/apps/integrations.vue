@@ -1,7 +1,7 @@
 <template>
 <dashboard-layout title="Integrations">
   <div class="integrations">
-    <form v-for="integration in integrations" v-on:submit.prevent="update(integration)">
+    <form v-for="integration in integrations">
       <fieldset>
         <div v-if="integration.service == 'outgoing_webhook'">
           <label>Outgoing Webhook URL</label>
@@ -43,7 +43,8 @@
         <input type="text" v-model="integration.comment" placeholder="Comment (Optional)">
       </fieldset>
 
-      <input type="submit" value="Update">
+      <button v-on:click="update(integration)">Update</button>
+      <button v-on:click="remove(integration)">Remove</button>
     </form>
 
     <form v-on:submit.prevent="create">
@@ -177,6 +178,9 @@ export default {
         integration.service,
         this.createConfigForServer(integration),
         integration.comment);
+    },
+    remove(integration) {
+      api.deleteIntegration(this.appName, integration.service)
     }
   },
   beforeMount() {

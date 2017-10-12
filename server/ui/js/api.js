@@ -132,7 +132,7 @@ export default new class {
   }
 
   deleteIntegration(appName, service) {
-    return this.invoke("GET", `/apps/${appName}/integrations/${service}`);
+    return this.invoke("DELETE", `/apps/${appName}/integrations/${service}`);
   }
 
   getDevices() {
