@@ -1,7 +1,7 @@
 class Integration < ApplicationRecord
     belongs_to :app
 
-    SUPPORTED_SERVICES = %w(outgoing_webhook ifttt slack)
+    SUPPORTED_SERVICES = %w(outgoing_webhook ifttt slack datadog)
 
     validates :service, inclusion: { in: SUPPORTED_SERVICES },
                         uniqueness: { scope: :app_id }

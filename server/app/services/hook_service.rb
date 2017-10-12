@@ -38,6 +38,14 @@ class HookService
           url: config['webhook_url'],
           body: { text: "#{device.name} published event `#{event}`: `#{body}`" }
           )
+
+      when 'datadog'
+        CallOutgoingWebhookJob.perform_later(
+          url: "https://app.datadoghq.com/api/v1/events",
+          params: { api_key: config['api_key'] },
+          body: { title: "#{device.name} published event `#{event}`", text: body },
+        )
+      end
     end
   end
 end

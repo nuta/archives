@@ -21,6 +21,11 @@
           placeholder="https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXX" required>
         </div>
 
+        <div v-if="integration.service == 'datadog'">
+          <label>Datadog API Key</label>
+          <input type="text" v-model="integration.datadog_api_key" placeholder="Datadog API Key" required>
+        </div>
+
        <label>Call webhook URL when:</label>
         <p>
           <input type="checkbox" v-model="integration.on_event">
@@ -64,6 +69,11 @@
           placeholder="Webhook URL" required>
         </div>
 
+        <div v-if="newIntegration.service == 'datadog'">
+          <label>Datadog API Key</label>
+          <input type="text" v-model="newIntegration.datadog_api_key" placeholder="Datadog API Key" required>
+        </div>
+
         <label>Call webhook URL when:</label>
         <p>
           <input type="checkbox" v-model="newIntegration.on_event">
@@ -99,13 +109,15 @@ export default {
       supportedServices: {
         outgoing_webhook: "Outgoing Webhook",
         ifttt: "IFTTT",
-        slack: "Slack"
+        slack: "Slack",
+        datadog: "Datadog"
       },
       newIntegration: {
         service: "outgoing_webhook",
         comment: "",
         webhook_url: "",
         slack_webhook_url: "",
+        datadog_api_key: "",
         ifttt_key: "",
         on_event: true,
         on_device_change: true
@@ -130,6 +142,10 @@ export default {
 
         case "slack":
           config['webhook_url'] = form.slack_webhook_url
+          break
+
+        case "datadog":
+          config['api_key'] = form.datadog_api_key
           break
       }
 
@@ -162,6 +178,7 @@ export default {
           webhook_url: config.webhook_url || "",
           slack_webhook_url: config.webhook_url || "",
           ifttt_key: config.key || "",
+          datadog_api_key: config.api_key || "",
           on_event: config.on_event || false,
           on_device_change: config.on_device_change || false
         };

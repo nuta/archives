@@ -50,9 +50,6 @@ class Device < ApplicationRecord
 
   def stores
     stores = {}
-
-    # XXX
-    stores["rand"] = {value:  generate_random_string(4), scope: 'device', override: false }
     
     AppStore.where(app: self.app).find_each do |store|
       stores[store.key] = {
