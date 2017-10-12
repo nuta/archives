@@ -32,7 +32,12 @@ class HookService
           url: "https://maker.ifttt.com/trigger/#{event}/with/key/#{config['key']}",
           body: { value1: body }
           )
-      end
+
+      when 'slack'
+        CallOutgoingWebhookJob.perform_later(
+          url: config['webhook_url'],
+          body: { text: "#{device.name} published event `#{event}`: `#{body}`" }
+          )
     end
   end
 end
