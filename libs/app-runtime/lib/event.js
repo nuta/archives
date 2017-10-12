@@ -1,11 +1,13 @@
 module.exports = class {
-  constructor(loggingApi) {
-    this.loggingApi = loggingApi;
+  constructor(logging) {
+    this.logging = logging;
   }
 
   get globals() {
     return {
-      publish: this.publish.bind(this)
+      Event: {
+        publish: this.publish.bind(this)
+      }
     }
   }
 
@@ -14,6 +16,6 @@ module.exports = class {
   }
 
   publish(event, data) {
-    loggingApi.print(`@${event} ${data}`);
+    this.logging.print(`@${event} ${data}`);
   }
 }

@@ -27,9 +27,9 @@ module.exports = class {
     this.globals = {};
     this.adapter = new HTTPAdapter(url, deviceId)
 
-    this.registerAPI("logging", LoggingAPI);
+    const logging = this.registerAPI("logging", LoggingAPI);
     this.registerAPI("timer", TimerAPI);
-    this.registerAPI("event", EventAPI, this.apis.logging);
+    this.registerAPI("event", EventAPI, logging);
     this.registerAPI("store", StoreAPI);
     this.registerAPI("gpio", GPIOAPI);
   }
