@@ -98,20 +98,19 @@ class Device < ApplicationRecord
   end
 
   def append_log_to(target, device, lines, time)
-    app = device.app
-    integrations = app ? app.integrations.all : []
-
     if target == :app
-      unless app
+      unless device.app
         # The device is not associated with any app. Aborting.
         return
       end
 
       log = app.log
       max_lines = App::APP_LOG_MAX_LINES
+      integrations = device.app.integrations.all  
     else
       log = device.log
       max_lines = DEVICE_LOG_MAX_LINES
+      integrations = []
     end
 
     device_name = self.name
