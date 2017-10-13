@@ -1,9 +1,19 @@
 #!/usr/bin/env node
+
+/* The image writer would be executed in sudo. Avoid
+requiring other stuffs for security. */
+const imageWriter = require('../lib/image_writer')
+if (process.env.IMAGE_WRITER !== undefined) {
+  imageWriter()
+  return
+}
+
 let program = require("caporal");
 let login = require("../lib/login");
 let mock = require("../lib/mock");
 let version = require("../lib/version");
 const listDrives = require('../lib/list_drives')
+const install = require('../lib/install')
 
 program.version(version)
   .command("login", "Get an access credential for an MakeStack Server account.")
@@ -16,5 +26,13 @@ program.version(version)
     .action(mock.run)
   .command("list-drives", "List available drives to install MakeStack OS/Linux.")
     .action(listDrives)
+  .command("install", "Install MakeStack OS/Linux to the device.")
+    .option("--name <name>", "The device name.", null, null, true)
+    .option("--type <type>", "The device type.", /^raspberrypi3$/,  null, true)
+    .option("--os <os>", "The OS image.", /^linux$/, null, true)
+    .option("--drive <drive>", "The drive. Use `list-drives' command.", null, null, true)
+    .option("--adapter <adapter>", "The network adapter.", /^ethernet$/, null, true)
+    .option('--ignore-duplication', 'Ignore duplicated device name.', null, false)
+    .action(install)
 
 program.parse(process.argv)

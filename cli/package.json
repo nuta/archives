@@ -23,8 +23,10 @@
     "caporal": "^0.7.0",
     "chalk": "^2.1.0",
     "drivelist": "^5.2.4",
+    "etcher-image-write": "^9.1.3",
     "hyperutils": "file:../libs/hyperutils",
     "inquirer": "^3.2.3",
+    "mountutils": "^1.2.2",
     "node-fetch": "^1.7.3"
   }
 }
