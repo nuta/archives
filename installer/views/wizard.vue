@@ -17,19 +17,19 @@
     </section>
 
     <section>
-      <label>Image</label>
-      <select v-model="osImageURL">
-        <template v-for="image in availableOSImages">
-          <option :value="image.url">{{ image.name }}</option>
+      <label>OS</label>
+      <select v-model="os">
+        <template v-for="name in availableOSes">
+          <option :value="name">{{ name }}</option>
         </template>
       </select>
     </section>
 
     <section>
       <label>Install To</label>
-      <select v-model="devFile">
-        <template v-for="path in availableDevFiles">
-          <option :value="path">{{ path }}</option>
+      <select v-model="drive">
+        <template v-for="drive in availableDrives">
+          <option :value="drive.device">{{ drive.description }} ({{ drive.device }})</option>
         </template>
       </select>
     </section>
@@ -44,6 +44,11 @@
     </section>
 
     <section>
+      <b>Overwrite</b>
+      <input type="checkbox" :value="ignoreDuplication">
+    </section>
+
+    <section>
       <b>{{ message }}</b>
       <input type="submit" :value="installButtonMsg">
     </section>
@@ -53,13 +58,9 @@
 
 <script>
 import api from 'renderer/api'
-const os = require('os')
-const fs = require('fs');
-const path = require('path');
-const { spawn } = require('child_process');
 const fetch = require('node-fetch')
-const uuid = require('uuid/v4')
-const sudo = require('sudo-prompt')
+const drivelist = require('drivelist')
+const makestack = require('makestack')
 
 function replaceBuffer(buf, value, id) {
   const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`
@@ -83,29 +84,19 @@ export default {
       deviceName: "",
       availableDeviceTypes: [ 'raspberrypi3' ],
       deviceType: "",
-      osImageURL: '',
-      devFile: "",
+      availableOSes: [ 'linux' ],
+      os: '',
+      drive: "",
       adapter: '',
       availableAdapters: [
         { name: 'ethernet', description: 'Ethernet (DHCP)' }
       ],
-      availableDevFiles: [],
+      availableDrives: [],
       percentage: 0,
-      installing: false
+      ignoreDuplication: false
     }
   },
   computed: {
-    availableOSImages() {
-      switch (this.deviceType) {
-        case 'raspberrypi3':
-          return [
-            {
-              name: 'MakeStack Linux version 0.0.1',
-              url: 'https://www.coins.tsukuba.ac.jp/~s1311386/kernel.img'
-             }
-          ]
-      }
-    },
     installButtonMsg() {
       if (this.installing) {
         return `Installing (${this.percentage}%)`
@@ -118,83 +109,56 @@ export default {
     }
   },
   methods: {
-    refreshAvailableDevFiles() {
-      this.availableDevFiles = ['/tmp/foo']
+    async refreshAvailableDrives() {
+      this.availableDrives = await makestack.drive.getAvailableDrives()
     },
-    async install() {
-      this.installing = true;
+    install() {
+      const flashCommand = [process.argv0, path.resolve(__dirname, 'flasher.js')]
+      makestack.install(
+        this.deviceName, this.deviceType, this.os,
+        this.adapter, this.drive, this.ignoreDuplication,
+        flashCommand, (stage, state) => {
 
-      //
-      //  Stage 1: Register the device
-      //
-      let device = (await api.registerDevice(this.deviceName, this.deviceType)).json
+        switch (stage) {
+          case 'look-for-device':
+            this.message = '(1/5) Looking for the drive'
+            break
+          case 'register':
+            this.message = '(2/5) Registering the device'
+            break
+          case 'download':
+            this.message = '(3/5) Downloading the disk image'
+            break
+          case 'config':
+            this.message = '(4/5) Writing config'
+            break
+          case 'flash':
+            this.message = '(5/5) Flashing'
+            break
+          case 'flashing':
+            const message = {write: 'Writing', check: 'Verifying' }[state.type]
+            this.message = `${message}...(${state.percentage}%)`
+            break
+        }
+      })
 
-      //
-      //  Stage 2: Download the OS image
-      //
-      const basename = path.basename(this.osImageURL)
-      const originalDiskImageFile = path.join(process.env.HOME, `.makestack/caches/${basename}`)
-      try {
-        fs.mkdirSync(path.join(process.env.HOME, '.makestack'))
-      } catch (e) {
-        // ignore
-      }
-
-      try {
-        fs.mkdirSync(path.join(process.env.HOME, '.makestack/caches'))
-      } catch (e) {
-        // ignore
-      }
-
-      fs.writeFileSync(originalDiskImageFile, await (await fetch(this.osImageURL)).buffer())
-
-      //
-      //  Stage 3: Overwrite config.sh
-      //
-      const diskImageFile = path.join(os.tmpdir(), uuid() + '.img')
-
-      // TODO: What if the image is large?
-      let image = fs.readFileSync(originalDiskImageFile)
-      image = replaceBuffer(image, device.device_id, 'DEVICE_ID')
-      image = replaceBuffer(image, device.device_secret, 'DEVICE_SECRET')
-      image = replaceBuffer(image, api.serverURL, 'SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890')
-      image = replaceBuffer(image, this.adapter, 'ADAPTER')
-      fs.writeFileSync(diskImageFile, image)
-
-      //
-      //  Stage 4: Flash!
-      //
-      const diskImageSize = fs.statSync(diskImageFile).size
-
-      // TODO: support Linux (GNU one)
-      const argv = ['dd', 'bs=4m', `if=${diskImageFile}`, `of=${this.devFile}`]
-      const options = { name: 'MakeStack Installer' }
-      console.log(argv)
-      let error, stdout, stderr = await sudo.exec(argv.join(' '), options)
-
-      console.log(stdout)
-      console.error(stderr)
-      if (error) {
-        this.message = 'something went wrong :('
-        alert(error)
-        return
-      }
-
-      this.message = 'done!'
+      process.env.ELECTRON_RUN_AS_NODE = undefined
     }
   },
-  beforeMount() {
+  async beforeMount() {
     if (!api.isLoggedIn())
       this.$router.push({ name: 'login' })
 
-    this.refreshAvailableDevFiles();
+    await this.refreshAvailableDrives()
     this.deviceType = this.availableDeviceTypes[0] || "";
-    this.devFile = this.availableDevFiles[0] || "";
+    this.drive = this.availableDrives[0] || "";
     this.adapter = this.availableAdapters[0].name || ''
 
     // DEBUG
     this.deviceName = 'abc'
-    this.osImageURL = 'https://www.coins.tsukuba.ac.jp/~s1311386/kernel.img'
+    this.drive = '/dev/disk2'
+    this.os = 'linux'
+    this.ignoreDuplication = true
   }
 }
 </script>
