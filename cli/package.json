@@ -21,6 +21,8 @@
   "dependencies": {
     "app-runtime": "file:../libs/app-runtime",
     "caporal": "^0.7.0",
+    "chalk": "^2.1.0",
+    "drivelist": "^5.2.4",
     "hyperutils": "file:../libs/hyperutils",
     "inquirer": "^3.2.3",
     "node-fetch": "^1.7.3"

@@ -3,15 +3,18 @@ let program = require("caporal");
 let login = require("../lib/login");
 let mock = require("../lib/mock");
 let version = require("../lib/version");
+const listDrives = require('../lib/list_drives')
 
 program.version(version)
   .command("login", "Get an access credential for an MakeStack Server account.")
-  .action(login)
+    .action(login)
   .command("mock create", "Create a mock device.")
     .action(mock.create)
     .argument("name", "The mock device name.")
   .command("mock run", "Run a mock device.")
     .argument("name", "The mock device name.")
-  .action(mock.run)
+    .action(mock.run)
+  .command("list-drives", "List available drives to install MakeStack OS/Linux.")
+    .action(listDrives)
 
 program.parse(process.argv)
