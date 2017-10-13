@@ -4,31 +4,36 @@ let fetch = require("node-fetch");
 let config = require("./config");
 
 module.exports = new class {
-  invoke(method, path, params, requiresCredentials=true) {
-    let reqHeaders = Object.assign({
-      "Content-Type": "application/json"
-    }, config.credentials);
-
+  invoke(method, path, params, requiresCredentials = true) {
     return new Promise((resolve, reject) => {
-      let status;
-      let headers;
+      if (!config.credentials)
+        reject('login first')  
+
+        let status, headers
       fetch(`${config.server.url}/api/v1${path}`, {
         method: method,
-        headers: reqHeaders,
+        headers: Object.assign({
+          "Content-Type": "application/json",
+        }, config.credentials),
         body: JSON.stringify(params)
       }).then(response => {
-        status = response.status;
-        headers = response.headers;
-        return response;
+        status = response.status
+        headers = response.headers
+        return response
       }).then(response => {
-        return response.json();
+        return response.json()
       }).then(json => {
-        if (200 <= status && status <= 299)
-          resolve({status, headers, json });
+        const result = { status, headers, json }
+        if (status == 200)
+          resolve(result)
         else
-          reject({status, headers, json });
-      });
-    });
+          reject(result)
+      })
+    })
+  }
+
+  get serverURL() {
+    return config.server.url
   }
 
   logout() {
