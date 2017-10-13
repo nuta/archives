@@ -5,7 +5,7 @@
 "app-runtime@file:../../../libs/app-runtime":
   version "0.0.1"
   dependencies:
-    hyperutils "file:../../../../.cache/yarn/v1/hyperutils"
+    hyperutils "file:../hyperutils"
     msgpack "^1.0.2"
     node-fetch "^1.7.3"
     vm2 "^3.5.2"
