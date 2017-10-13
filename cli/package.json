@@ -27,6 +27,9 @@
     "hyperutils": "file:../libs/hyperutils",
     "inquirer": "^3.2.3",
     "mountutils": "^1.2.2",
-    "node-fetch": "^1.7.3"
+    "node-fetch": "^1.7.3",
+    "node-ipc": "^9.1.1",
+    "shell-quote": "^1.6.1",
+    "sudo-prompt": "^7.1.1"
   }
 }
