@@ -2,7 +2,6 @@ process.env.BABEL_ENV = 'renderer'
 const production = process.env.NODE_ENV === 'production'
 
 const path = require('path')
-const { dependencies } = require('../package.json')
 const webpack = require('webpack')
 const BabiliWebpackPlugin = require('babili-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -11,7 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 let rendererConfig = {
   target: 'electron-renderer',
   entry: {
-    renderer: path.join(__dirname, '../renderer/index.js')
+    renderer: path.join(__dirname, 'ui/index.js')
   },
   module: {
     rules: [
@@ -51,10 +50,6 @@ let rendererConfig = {
         exclude: /node_modules/
       },
       {
-        test: /\.node$/,
-        use: 'node-loader'
-      },
-      {
         test: /\.(svg)(\?.*)?$/,
         use: {
           loader: 'url-loader',
@@ -73,22 +68,21 @@ let rendererConfig = {
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: path.resolve(__dirname, '../renderer/index.html'),
-      nodeModules: production ? false : path.resolve(__dirname, '../node_modules')
+      template: path.resolve(__dirname, 'ui/index.html'),
+      nodeModules: production ? false : path.resolve(__dirname, 'node_modules')
     }),
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin()
   ],
   output: {
     filename: '[name].js',
     libraryTarget: 'commonjs2',
-    path: path.join(__dirname, '../dist/electron')
+    path: path.join(__dirname, 'renderer')
   },
   resolve: {
     alias: {
-      'renderer': path.join(__dirname, '../renderer'),
+      'renderer': path.join(__dirname, 'ui'),
       'vue$': 'vue/dist/vue.esm.js',
-      'views': path.join(__dirname, '../views')
+      'views': path.join(__dirname, 'views')
     },
     extensions: ['.js', '.vue', '.json', '.css', '.node']
   },

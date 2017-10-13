@@ -58,23 +58,7 @@
 
 <script>
 import api from 'renderer/api'
-const fetch = require('node-fetch')
-const drivelist = require('drivelist')
-const makestack = require('makestack')
-
-function replaceBuffer(buf, value, id) {
-  const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`
-
-  const index = buf.indexOf(Buffer.from(needle))
-  if (index == -1)
-    throw `replaceBuffer: failed to replace ${id}`
-
-  let paddedValue = Buffer.alloc(needle.length, ' ')
-  let valueBuf = Buffer.from(value)
-  valueBuf.copy(paddedValue)
-  paddedValue.copy(buf, index)
-  return buf
-}
+import { ipcRenderer } from 'electron'
 
 export default {
   components: { },
@@ -110,39 +94,21 @@ export default {
   },
   methods: {
     async refreshAvailableDrives() {
-      this.availableDrives = await makestack.drive.getAvailableDrives()
+      this.availableDrives = ipcRenderer.sendSync('getAvailableDrives')
     },
     install() {
-      const flashCommand = [process.argv0, path.resolve(__dirname, 'flasher.js')]
-      makestack.install(
-        this.deviceName, this.deviceType, this.os,
-        this.adapter, this.drive, this.ignoreDuplication,
-        flashCommand, (stage, state) => {
-
-        switch (stage) {
-          case 'look-for-device':
-            this.message = '(1/5) Looking for the drive'
-            break
-          case 'register':
-            this.message = '(2/5) Registering the device'
-            break
-          case 'download':
-            this.message = '(3/5) Downloading the disk image'
-            break
-          case 'config':
-            this.message = '(4/5) Writing config'
-            break
-          case 'flash':
-            this.message = '(5/5) Flashing'
-            break
-          case 'flashing':
-            const message = {write: 'Writing', check: 'Verifying' }[state.type]
-            this.message = `${message}...(${state.percentage}%)`
-            break
-        }
+      ipcRenderer.on('progress', (event, arg) => {
+        console.log(arg)
       })
 
-      process.env.ELECTRON_RUN_AS_NODE = undefined
+      ipcRenderer.send('install', {
+        deviceName: this.deviceName,
+        deviceType: this.deviceType,
+        os: this.os,
+        adapter: this.adapter,
+        drive: this.drive,
+        ignoreDuplication: this.ignoreDuplication
+      })
     }
   },
   async beforeMount() {
