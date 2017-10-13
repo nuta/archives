@@ -6,6 +6,5 @@ FactoryGirl.define do
     device_id_prefix { device_id[0, Device::DEVICE_ID_PREFIX_LEN] }
     device_secret    { Digest::SHA256.hexdigest(FFaker::Internet.email) }
     device_type "mock"
-    status "new"
   end
 end

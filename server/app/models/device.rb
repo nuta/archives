@@ -4,6 +4,8 @@ class Device < ApplicationRecord
   has_many   :device_stores, dependent: :destroy
   has_many   :device_mappings, dependent: :destroy
   
+  value :status
+  value :last_heartbeated_at
   value :current_app_version
   sorted_set :log
   
@@ -32,7 +34,6 @@ class Device < ApplicationRecord
   validates_length_of     :name, in: 0..128
   validates_format_of     :name, with: DEVICE_NAME_REGEX
   validates_inclusion_of  :device_type, in: SUPPORTED_TYPES
-  validates_inclusion_of  :status, in: DEVICE_STATES
   validates_format_of     :tag, with: TAG_NAME_REGEX, allow_nil: true
   validates_length_of     :tag, in: 0..TAG_LEN, allow_nil: true
   validate :device_id_prefix_is_prefix
@@ -50,6 +51,9 @@ class Device < ApplicationRecord
     end
   end
 
+  # TODO: add validation status
+  # validates_inclusion_of  :status, in: DEVICE_STATES
+  
   def stores
     stores = {}
     

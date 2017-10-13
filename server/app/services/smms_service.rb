@@ -40,13 +40,10 @@ module SMMSService
       raise ActiveRecord::RecordNotFound
     end
 
+    device.last_heartbeated_at = Time.now
+    device.status = messages.dig(:device_info, :state)
     device.current_app_version = messages[:app_version]
     device.append_log(messages[:log])
-    device.update_attributes!(
-      status: messages.dig(:device_info, :state),
-      last_heartbeated_at: Time.now
-    )
-
     return device
   end
 

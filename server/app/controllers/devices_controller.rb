@@ -15,7 +15,6 @@ class DevicesController < ApplicationController
   def create
     @device = Device.new(device_params)
     @device.user = @user
-    @device.status = "new"
     @device.reset_credentials
   
     if @device.save

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171012070754) do
+ActiveRecord::Schema.define(version: 20171013111523) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -75,12 +75,10 @@ ActiveRecord::Schema.define(version: 20171012070754) do
     t.string "device_secret", null: false
     t.string "tag"
     t.string "device_type", null: false
-    t.string "status", null: false
     t.bigint "user_id", null: false
     t.bigint "app_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "last_heartbeated_at"
     t.index ["app_id"], name: "index_devices_on_app_id"
     t.index ["device_id_prefix"], name: "index_devices_on_device_id_prefix", unique: true
     t.index ["user_id", "name"], name: "index_devices_on_user_id_and_name", unique: true
