@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "hyperutils": "file:../hyperutils",
     "msgpack": "^1.0.2",
     "node-fetch": "^1.7.3",
     "vm2": "^3.5.2"

@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { ioctl } = require('hyperutils')
 
 const I2C_SLAVE = 0x0703;
 
