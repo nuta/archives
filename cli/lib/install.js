@@ -11,6 +11,7 @@ const sudo = require('sudo-prompt')
 const { mkdirp, createFile, generateTempPath,
   generateRandomString } = require('hyperutils')
 const api = require('./api')
+const { getDriveSize } = require('./drive')
 
 function replaceBuffer(buf, value, id) {
   const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`
@@ -24,22 +25,6 @@ function replaceBuffer(buf, value, id) {
   valueBuf.copy(paddedValue)
   paddedValue.copy(buf, index)
   return buf
-}
-
-function getDriveSize(drive) {
-  return new Promise((resolve, reject) => {
-    drivelist.list((error, drives) => {
-      if (error)
-        reject(error)
-
-      for (let i = 0; i < drives.length; i++) {
-        if (drives[i].device == drive)
-          resolve(drives[i].size)
-      }
-
-      reject(`No such a drive: ${drive}`)
-    })
-  })
 }
 
 async function registerOrGetDevice(name, type, ignoreDuplication) {
