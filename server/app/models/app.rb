@@ -7,7 +7,7 @@ class App < ApplicationRecord
   has_many :devices # nullified in disassociate_devices on destroy
   before_destroy :disassociate_devices
 
-  sorted_set :log
+  sorted_set :log, expiration: 1.hours
   
   RESERVED_APP_NAMES = %w(new)
   SUPPORTED_APIS = %w(makestack linux)

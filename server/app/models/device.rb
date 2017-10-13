@@ -4,10 +4,10 @@ class Device < ApplicationRecord
   has_many   :device_stores, dependent: :destroy
   has_many   :device_mappings, dependent: :destroy
   
-  value :status
-  value :last_heartbeated_at
-  value :current_app_version
-  sorted_set :log
+  value :status, expiration: 45.minutes
+  value :last_heartbeated_at, expiration: 3.days
+  value :current_app_version, expiration: 45.minutes
+  sorted_set :log, expiration: 1.hours
   
   SUPPORTED_TYPES = %w(mock raspberrypi3)
   DEVICE_STATES = %w(new booting ready running relaunch reboot down)
