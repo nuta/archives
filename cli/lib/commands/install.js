@@ -28,7 +28,7 @@ function progress(stage, state) {
 module.exports = async (args, opts, logger) => {
   await install(opts.name, opts.type, opts.os,
     opts.adapter, opts.drive, opts.ignoreDuplication,
-    progress)
+    process.argv, progress)
 
   console.info(chalk.bold.green('Done!'))
 }

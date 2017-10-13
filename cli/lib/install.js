@@ -70,24 +70,25 @@ function writeConfigToDiskIamge(orignalImage, device, adapter) {
   return imagePath
 }
 
-function prepareFlashCommand(ipcPath, drive, driveSize, imagePath) {
+function prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath) {
   let prefix = 'env '
   const env = {
     DRIVE: drive,
     IMAGE_WRITER: 'y',
     DRIVE_SIZE: driveSize,
     IMAGE_PATH: imagePath,
-    IPC_PATH: ipcPath
+    IPC_PATH: ipcPath,
+    ELECTRON_RUN_AS_NODE: '1'
   }
 
   for (let name in env) {
     prefix += `${name}=${quote([env[name]])} `
   }
 
-  return prefix + quote(process.argv)
+  return prefix + quote(flashCommand)
 }
 
-function flash(drive, driveSize, imagePath, progress) {
+function flash(flashCommand, drive, driveSize, imagePath, progress) {
   return new Promise((resolve, reject) => {
     const ipcPath = path.join(os.tmpdir(),
       'makestack-installer' + generateRandomString(32))
@@ -100,9 +101,9 @@ function flash(drive, driveSize, imagePath, progress) {
     })
     ipc.server.start()
 
-    const command = prepareFlashCommand(ipcPath, drive, driveSize, imagePath)
+    const command = prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath)
     const options = { name: 'MakeStack Installer' }
-    sudo.exec(command, options, (error, stdout, stderr) => {
+    require('child_process').exec(command, options, (error, stdout, stderr) => {
       if (error)
         reject(error)
 
@@ -112,7 +113,7 @@ function flash(drive, driveSize, imagePath, progress) {
   })
 }
 
-module.exports = async (name, type, os, adapter, drive, ignoreDuplication, progress) => {
+module.exports = async (name, type, os, adapter, drive, ignoreDuplication, flashCommand, progress) => {
   progress('look-for-drive')
   const driveSize = await getDriveSize(drive)
   progress('register')
@@ -122,6 +123,6 @@ module.exports = async (name, type, os, adapter, drive, ignoreDuplication, progr
   progress('config')
   const imagePath = writeConfigToDiskIamge(orignalImage, device, adapter)
   progress('flash')
-  await flash(drive, driveSize, imagePath, progress)
+  await flash(flashCommand, drive, driveSize, imagePath, progress)
   progress('success')
 }
