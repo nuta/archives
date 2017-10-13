@@ -103,7 +103,7 @@ function flash(flashCommand, drive, driveSize, imagePath, progress) {
 
     const command = prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath)
     const options = { name: 'MakeStack Installer' }
-    require('child_process').exec(command, options, (error, stdout, stderr) => {
+    sudo.exec(command, options, (error, stdout, stderr) => {
       if (error)
         reject(error)
 
