@@ -137,11 +137,16 @@ build_initramfs() {
 
     pushd app
     yarn
-    rm -rf node_modules/hyperutils/build
-    pushd node_modules/hyperutils
-    [ -f ./node_modules/.bin/node-gyp ] || npm i node-gyp
-    env $NODE_GYP_ENV ./node_modules/.bin/node-gyp rebuild --arch $NODE_GYP_ARCH
     popd
+
+    pushd app
+    for module in hyperutils msgpack; do
+      rm -rf node_modules/$module/build
+      pushd node_modules/$module
+      [ -f ./node_modules/.bin/node-gyp ] || npm i node-gyp
+      env $NODE_GYP_ENV ./node_modules/.bin/node-gyp rebuild --arch $NODE_GYP_ARCH
+      popd
+    done
     popd
 
     [ -e dev/console ] || sudo mknod dev/console c 5 1
