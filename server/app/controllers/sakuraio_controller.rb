@@ -18,7 +18,7 @@ class SakuraioController < ApplicationController
     end
 
     payload = channels.flatten.join
-    handle_smms_payload(payload)
+    SMMSService.receive(payload)
   end
 
   def set_device

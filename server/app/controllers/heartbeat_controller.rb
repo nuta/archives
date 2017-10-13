@@ -2,8 +2,8 @@ class HeartbeatController < ApplicationController
   skip_before_action :authenticate
 
   def heartbeat
-    device = handle_smms_payload(request.body.read)
-    render body: generate_smms_payload_for(device)
+    device = SMMSService.receive(request.body.read)
+    render body: SMMSService.payload_for(device)
   end
 
   def os_image
