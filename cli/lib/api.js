@@ -114,7 +114,7 @@ module.exports = new class {
   }
   
   registerDevice(name, deviceType, tag) {
-    return this.invoke("POST", "/devices", { device: { name, deviceType, tag } });
+    return this.invoke("POST", "/devices", { device: { name, device_type: deviceType, tag } });
   }
     
   deleteDevice(deviceName) {
