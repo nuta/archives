@@ -110,25 +110,6 @@ matrix:
       script:
         - yarn run build:linux
 
-    - language: node_js
-      env: M=coding-styles
-      node_js: "8"
-      addons:
-        apt:
-          sources:
-            - deadsnakes
-          packages:
-            - python3.6
-      cache:
-        apt: true
-      install:
-        -  npm i -g eslint eslint-config-standard eslint-plugin-standard eslint-plugin-import eslint-plugin-node eslint-plugin-promise
-      script:
-        - python3.6 ./tools/check-coding-styles.py
-
-  allow_failures:
-    - env: M=coding-styles
- 
 notifications:
   on_success: change
   on_failure: change
