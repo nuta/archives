@@ -2,8 +2,8 @@ let fs = require("fs");
 let path = require("path");
 let fetch = require("node-fetch");
 let AppRuntime = require("app-runtime");
-let api = require("./api");
-let config = require("./config");
+let api = require("../api");
+let config = require("../config");
 
 function create(args, opts, logger) {
     let deviceName = args.name;

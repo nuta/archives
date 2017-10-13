@@ -1,10 +1,15 @@
 const child_process = require('child_process')
 const path = require('path')
+const os = require('os')
 const fs = require('fs')
 const chalk = require('chalk')
 const drivelist = require('drivelist')
 const fetch = require('node-fetch')
-const { mkdirp, createFile, generateTempPath } = require('hyperutils')
+const ipc = require('node-ipc')
+const quote = require('shell-quote').quote
+const sudo = require('sudo-prompt')
+const { mkdirp, createFile, generateTempPath,
+  generateRandomString } = require('hyperutils')
 const api = require('./api')
 
 function replaceBuffer(buf, value, id) {
@@ -22,8 +27,6 @@ function replaceBuffer(buf, value, id) {
 }
 
 function getDriveSize(drive) {
-  console.info(chalk.bold.blue("==> (1/5) Looking for the drive..."))
-
   return new Promise((resolve, reject) => {
     drivelist.list((error, drives) => {
       if (error)
@@ -40,7 +43,6 @@ function getDriveSize(drive) {
 }
 
 async function registerOrGetDevice(name, type, ignoreDuplication) {
-  console.info(chalk.bold.blue("==> (2/5) Registering the device..."))
 
   let device
   try {
@@ -56,10 +58,13 @@ async function registerOrGetDevice(name, type, ignoreDuplication) {
   return device
 }
 
-async function downloadDiskImage() {
-  console.info(chalk.bold.blue("==> (3/5) Downloading the disk image..."))
-  const osImageURL = 'https://www.coins.tsukuba.ac.jp/~s1311386/kernel.img'
+function getDiskImageURL(type, os) {
+  // TODO
+  return 'https://www.coins.tsukuba.ac.jp/~s1311386/kernel.img'
+}
 
+async function downloadDiskImage(type, os) {
+  const osImageURL = getDiskImageURL()
   const basename = path.basename(osImageURL)
   const orignalImage = path.join(process.env.HOME, `.makestack/caches/${basename}`)
   createFile(orignalImage, await (await fetch(osImageURL)).buffer())
@@ -67,7 +72,6 @@ async function downloadDiskImage() {
 }
 
 function writeConfigToDiskIamge(orignalImage, device, adapter) {
-  console.info(chalk.bold.blue("==> (4/5) Writing configuration..."))
   const imagePath = generateTempPath()
 
   // TODO: What if the image is large?
@@ -81,59 +85,58 @@ function writeConfigToDiskIamge(orignalImage, device, adapter) {
   return imagePath
 }
 
-function flash(drive, driveSize, imagePath) {
+function prepareFlashCommand(ipcPath, drive, driveSize, imagePath) {
+  let prefix = 'env '
+  const env = {
+    DRIVE: drive,
+    IMAGE_WRITER: 'y',
+    DRIVE_SIZE: driveSize,
+    IMAGE_PATH: imagePath,
+    IPC_PATH: ipcPath
+  }
+
+  for (let name in env) {
+    prefix += `${name}=${quote([env[name]])} `
+  }
+
+  return prefix + quote(process.argv)
+}
+
+function flash(drive, driveSize, imagePath, progress) {
   return new Promise((resolve, reject) => {
-    console.info(chalk.bold.blue("==> (5/5) Flashing..."))
-    const writer = child_process.spawn('sudo', ['-E'].concat(process.argv), {
-      env: {
-        IMAGE_WRITER: 'y',
-        DRIVE: drive,
-        DRIVE_SIZE: driveSize,
-        IMAGE_PATH: imagePath
-      }
+    const ipcPath = path.join(os.tmpdir(),
+      'makestack-installer' + generateRandomString(32))
+
+    ipc.config.logger = () => { }
+    ipc.serve(ipcPath, () => {
+      ipc.server.on('progress', data => {
+        progress('flashing', JSON.parse(data))
+      })
     })
+    ipc.server.start()
 
-    writer.stdout.on('data', data => {
-      let [type, json] = data.toString().split(': ', 2)
-      if (type == 'info')
-        return
+    const command = prepareFlashCommand(ipcPath, drive, driveSize, imagePath)
+    const options = { name: 'MakeStack Installer' }
+    sudo.exec(command, options, (error, stdout, stderr) => {
+      if (error)
+        reject(error)
 
-      const state = JSON.parse(json)
-      switch (type) {
-        case 'progress':
-          switch (state.type) {
-            case 'write':
-              console.info(`writing to the drive...(${state.percentage}%)`)
-              break
-            case 'check':
-              console.info(`verifying...(${state.percentage}%)`)
-              break
-          }
-          break
-
-        case 'success':
-          resolve()
-          break
-
-        case 'error':
-          reject()
-          break
-      }
-    })
-
-    writer.on('exit', (code, signal) => {
-      if (code != 0)
-        reject('failed to flash')
+      ipc.server.stop()
+      resolve()
     })
   })
 }
 
-module.exports = async (args, opts, logger) => {
-  const driveSize = await getDriveSize(opts.drive)
-  const device = await registerOrGetDevice(opts.name, opts.type, opts.ignoreDuplication)
-  const orignalImage = await downloadDiskImage(opts.type, opts.os)
-  const imagePath = writeConfigToDiskIamge(orignalImage, device, opts.adapter)
-  await flash(opts.drive, driveSize, imagePath)
-
-  console.log(`${chalk.bold.green('Done!')}`)
+module.exports = async (name, type, os, adapter, drive, ignoreDuplication, progress) => {
+  progress('look-for-drive')
+  const driveSize = await getDriveSize(drive)
+  progress('register')
+  const device = await registerOrGetDevice(name, type, ignoreDuplication)
+  progress('download')
+  const orignalImage = await downloadDiskImage(type, os)
+  progress('config')
+  const imagePath = writeConfigToDiskIamge(orignalImage, device, adapter)
+  progress('flash')
+  await flash(drive, driveSize, imagePath, progress)
+  progress('success')
 }

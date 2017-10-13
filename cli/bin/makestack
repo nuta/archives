@@ -9,23 +9,18 @@ if (process.env.IMAGE_WRITER !== undefined) {
 }
 
 let program = require("caporal");
-let login = require("../lib/login");
-let mock = require("../lib/mock");
-let version = require("../lib/version");
-const listDrives = require('../lib/list_drives')
-const install = require('../lib/install')
 
-program.version(version)
+program
   .command("login", "Get an access credential for an MakeStack Server account.")
-    .action(login)
+    .action(require('../lib/commands/login'))
   .command("mock create", "Create a mock device.")
-    .action(mock.create)
+    .action(require('../lib/commands/mock').create)
     .argument("name", "The mock device name.")
   .command("mock run", "Run a mock device.")
     .argument("name", "The mock device name.")
-    .action(mock.run)
+    .action(require('../lib/commands/mock').run)
   .command("list-drives", "List available drives to install MakeStack OS/Linux.")
-    .action(listDrives)
+    .action(require('../lib/commands/list_drives'))
   .command("install", "Install MakeStack OS/Linux to the device.")
     .option("--name <name>", "The device name.", null, null, true)
     .option("--type <type>", "The device type.", /^raspberrypi3$/,  null, true)
@@ -33,6 +28,6 @@ program.version(version)
     .option("--drive <drive>", "The drive. Use `list-drives' command.", null, null, true)
     .option("--adapter <adapter>", "The network adapter.", /^ethernet$/, null, true)
     .option('--ignore-duplication', 'Ignore duplicated device name.', null, false)
-    .action(install)
+    .action(require('../lib/commands/install'))
 
 program.parse(process.argv)
