@@ -121,7 +121,7 @@ class Device < ApplicationRecord
       m = /\A@(?<event>[^ ]+) (?<body>.*)\z/.match(line)
       if m
         # Detected a event published from the device.
-        HookService.new.invoke(integrations, :event_published, self, {
+        HookService.invoke(integrations, :event_published, self, {
           event: m['event'],
           body: m['body']
         })

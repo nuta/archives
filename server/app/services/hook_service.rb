@@ -1,4 +1,6 @@
-class HookService
+module HookService
+  extend self
+
   def invoke(integrations, hook, model, options)
     case model
     when Device
