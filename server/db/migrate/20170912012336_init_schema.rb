@@ -1,6 +1,6 @@
 class InitSchema < ActiveRecord::Migration[4.2]
   def change
-    create_table "app_stores", force: :cascade do |t|
+    create_table "app_stores" do |t|
       t.string "key", null: false
       t.string "value"
       t.bigint "app_id", null: false
@@ -11,7 +11,7 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["app_id", "key"], name: "index_app_stores_on_app_id_and_key", unique: true
     end
 
-    create_table "apps", force: :cascade do |t|
+    create_table "apps" do |t|
       t.string "name", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
@@ -20,7 +20,7 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["user_id"], name: "index_apps_on_user_id"
     end
 
-    create_table "deployments", force: :cascade do |t|
+    create_table "deployments" do |t|
       t.integer "version", null: false
       t.string "tag"
       t.string "comment"
@@ -33,7 +33,7 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["app_id", "version"], name: "index_deployments_on_app_id_and_version", unique: true
     end
 
-    create_table "device_stores", force: :cascade do |t|
+    create_table "device_stores" do |t|
       t.string "key", null: false
       t.string "value"
       t.bigint "device_id", null: false
@@ -44,36 +44,44 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["device_id", "key"], name: "index_device_stores_on_device_id_and_key", unique: true
     end
 
-    create_table "devices", force: :cascade do |t|
+    create_table "devices" do |t|
       t.string "name", null: false
       t.string "device_id", null: false
       t.string "device_id_prefix", null: false
       t.string "device_secret", null: false
       t.string "tag"
       t.string "device_type", null: false
-      t.string "status", null: false
       t.bigint "user_id", null: false
       t.bigint "app_id"
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
-      t.datetime "last_heartbeated_at"
       t.index ["app_id"], name: "index_devices_on_app_id"
       t.index ["device_id_prefix"], name: "index_devices_on_device_id_prefix", unique: true
       t.index ["user_id"], name: "index_devices_on_user_id"
       t.index ["user_id", "name"], name: "index_devices_on_user_id_and_name", unique: true
     end
 
-    create_table "integrations", force: :cascade do |t|
+    create_table :device_mappings do |t|
+      t.references :device, foreign_key: true
+      t.string :token, null: false
+      t.string :type, null: false
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+    end
+
+    create_table "integrations" do |t|
       t.string "service", null: false
       t.text "config", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.bigint "app_id", null: false
       t.string "comment"
+      t.string "token"
+      t.string "token_prefix"
       t.index ["app_id"], name: "index_integrations_on_app_id"
     end
 
-    create_table "source_files", force: :cascade do |t|
+    create_table "source_files" do |t|
       t.string "path", null: false
       t.text "body"
       t.bigint "app_id", null: false
@@ -83,7 +91,7 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["app_id", "path"], name: "index_source_files_on_app_id_and_path"
     end
 
-    create_table "users", force: :cascade do |t|
+    create_table "users" do |t|
       t.string "provider", default: "email", null: false
       t.string "uid", default: "", null: false
       t.string "encrypted_password", default: "", null: false
