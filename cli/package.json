@@ -2,6 +2,7 @@
   "name": "makestack",
   "version": "0.0.1",
   "description": "MakeStack CLI Developer Tools",
+  "main": "lib/index.js",
   "bin": {
     "makestack": "bin/makestack"
   },
