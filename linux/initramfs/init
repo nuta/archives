@@ -42,7 +42,8 @@ ntpd -p 1.pool.ntp.org
 
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
-if [ "$DEBUG" = "" ]; then
+debug=$(egrep -o "debug" /proc/cmdline)
+if [ "$debug" = "" ]; then
     node app/main.js
 else
     mv app/test.js app/main.js

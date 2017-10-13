@@ -48,7 +48,7 @@ QEMU=(
     qemu-system-arm
     -machine raspi2
     -kernel $BUILD_DIR/kernel.img
-    -append '"console=ttyAMA0"'
+    -append '"console=ttyAMA0 debug"'
     -dtb $DTB_PATH
     -nographic
 )
