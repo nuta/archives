@@ -110,6 +110,18 @@ matrix:
       script:
         - yarn run build:linux
 
+    - language: node_js
+      node_js: "8"
+      env: M=cli
+      cache:
+        directories:
+          - cli/node_modules
+      install:
+        - cd cli
+        - yarn
+      script:
+        - yarn test
+
 notifications:
   on_success: change
   on_failure: change
