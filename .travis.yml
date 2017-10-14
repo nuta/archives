@@ -8,7 +8,7 @@ matrix:
   include:
     - language: c
       env: M=linux:x86_64
-      sudo: true # because of mknod and docker
+      sudo: true # because of mknod
       addons:
         apt:
           packages:
@@ -28,7 +28,7 @@ matrix:
 
     - language: c
       env: M=linux:raspberrypi3
-      sudo: true # because of mknod and docker
+      sudo: true # because of mknod
       addons:
         apt:
           packages:
