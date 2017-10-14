@@ -1,5 +1,4 @@
 const path = require('path')
-const url = require('url')
 const { app, BrowserWindow, ipcMain } = require('electron')
 const makestack = require('makestack')
 
@@ -11,11 +10,10 @@ function createWindow () {
     useContentSize: true
   })
 
-  mainWindow.loadURL(url.format({
-    pathname: path.join(__dirname, '../renderer/index.html'),
-    protocol: 'file:',
-    slashes: true
-  }))
+  const windowURL = (process.env.NODE_ENV == 'development')
+    ? "http://localhost:9080" : `file://${__dirname}/../renderer/index.html`
+  
+  mainWindow.loadURL(windowURL)
 
   mainWindow.on('closed', () => {
     mainWindow = null

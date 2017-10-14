@@ -112,7 +112,7 @@ switch(process.env.NODE_ENV) {
     rendererConfig.devtool = '#cheap-module-eval-source-map'
     rendererConfig.plugins.push(
       new webpack.DefinePlugin({
-        '__assets': `"${path.join(__dirname, '../assets').replace(/\\/g, '\\\\')}"`
+        'process.env.NODE_ENV': '"development"'
       })
     )
     break
