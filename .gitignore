@@ -1,6 +1,7 @@
 *.log
 *.jekyll-metadata
 node_modules
+coverage
 
 /server/db/*.sqlite3
 /server/tmp/pids
