@@ -34,6 +34,7 @@
     "sudo-prompt": "^7.1.1"
   },
   "devDependencies": {
+    "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "power-assert": "^1.4.4"
   }
