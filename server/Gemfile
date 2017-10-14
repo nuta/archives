@@ -10,7 +10,6 @@ gem 'puma', '~> 3.7'
 gem 'jbuilder'
 gem 'devise'
 gem 'devise_token_auth'
-gem 'jbuilder'
 gem 'sidekiq'
 gem 'pg', group: :postgres
 gem 'redis-objects'
