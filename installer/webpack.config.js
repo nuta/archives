@@ -3,7 +3,7 @@ const production = process.env.NODE_ENV === 'production'
 
 const path = require('path')
 const webpack = require('webpack')
-const BabiliWebpackPlugin = require('babili-webpack-plugin')
+const MinifyPlugin = require("babel-minify-webpack-plugin")
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
@@ -91,7 +91,7 @@ let rendererConfig = {
 switch(process.env.NODE_ENV) {
   case 'production': 
     rendererConfig.plugins.push(
-      new BabiliWebpackPlugin(),
+      new MinifyPlugin(),
       new CopyWebpackPlugin([
         {
           from: path.join(__dirname, '../assets'),

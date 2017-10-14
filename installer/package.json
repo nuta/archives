@@ -10,6 +10,7 @@
     "run": "npx webpack && ../tools/run-gui-app npx electron ."
   },
   "dependencies": {
+    "babel-minify-webpack-plugin": "^0.2.0",
     "makestack": "file:../cli",
     "node-fetch": "^1.7.3",
     "vue": "^2.4.4",
