@@ -19,7 +19,7 @@ class HTTPAdapter extends AdapterBase {
           this.onReceiveCallback(this.deserialize(buffer))
         })
       } else {
-        reject(response)
+        console.error('server returned error:', response)
       }
     })
   }
