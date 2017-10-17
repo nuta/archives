@@ -32,6 +32,7 @@ module.exports = class {
     this.registerAPI("event", EventAPI, logging);
     this.registerAPI("store", StoreAPI);
     this.registerAPI("gpio", GPIOAPI);
+    this.registerAPI("i2c", I2CAPI);
   }
 
   registerAPI(name, klass, ...args) {
