@@ -1,12 +1,11 @@
 const chalk = require('chalk')
 const { getAvailableDrives } = require('../drive')
 
-module.exports = async (args, opts, logger) => {
+module.exports = async(args, opts, logger) => {
   const drives = await getAvailableDrives()
   for (let i = 0; i < drives.length; i++) {
-    if (i > 0)
-      console.log('')
-      
+    if (i > 0) { console.log('') }
+
     console.log(`Drive: ${chalk.bold.green(drives[i].device)}`)
     console.log(`  name: ${drives[i].displayName}`)
     console.log(`  description: ${drives[i].description}`)

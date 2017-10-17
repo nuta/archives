@@ -1,14 +1,11 @@
-const child_process = require('child_process')
 const path = require('path')
 const os = require('os')
 const fs = require('fs')
-const chalk = require('chalk')
-const drivelist = require('drivelist')
 const fetch = require('node-fetch')
 const ipc = require('node-ipc')
 const quote = require('shell-quote').quote
 const sudo = require('sudo-prompt')
-const { mkdirp, createFile, generateTempPath,
+const { createFile, generateTempPath,
   generateRandomString } = require('hyperutils')
 const api = require('./api')
 const { getDriveSize } = require('./drive')
@@ -17,8 +14,9 @@ function replaceBuffer(buf, value, id) {
   const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`
 
   const index = buf.indexOf(Buffer.from(needle))
-  if (index == -1)
-    throw `replaceBuffer: failed to replace ${id}`
+  if (index === -1) {
+    throw new Error(`replaceBuffer: failed to replace ${id}`)
+  }
 
   let paddedValue = Buffer.alloc(needle.length, ' ')
   let valueBuf = Buffer.from(value)
@@ -28,15 +26,14 @@ function replaceBuffer(buf, value, id) {
 }
 
 async function registerOrGetDevice(name, type, ignoreDuplication) {
-
   let device
   try {
     device = (await api.registerDevice(name, type)).json
   } catch (e) {
-    if (ignoreDuplication && e.status == 422 && e.json.name == 'has already been taken') {
+    if (ignoreDuplication && e.status === 422 && e.json.name === 'has already been taken') {
       device = (await api.getDevice(name)).json
     } else {
-      throw `failed to register a device: server returned ${e.status}`
+      throw new Error(`failed to register a device: server returned ${e.status}`)
     }
   }
 
@@ -104,8 +101,7 @@ function flash(flashCommand, drive, driveSize, imagePath, progress) {
     const command = prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath)
     const options = { name: 'MakeStack Installer' }
     sudo.exec(command, options, (error, stdout, stderr) => {
-      if (error)
-        reject(error)
+      if (error) { reject(error) }
 
       ipc.server.stop()
       resolve()
@@ -113,7 +109,7 @@ function flash(flashCommand, drive, driveSize, imagePath, progress) {
   })
 }
 
-module.exports = async (name, type, os, adapter, drive, ignoreDuplication, flashCommand, progress) => {
+module.exports = async(name, type, os, adapter, drive, ignoreDuplication, flashCommand, progress) => {
   progress('look-for-drive')
   const driveSize = await getDriveSize(drive)
   progress('register')

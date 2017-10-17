@@ -1,59 +1,59 @@
-const os = require('os');
-const { NodeVM } = require('vm2');
-const LoggingAPI = require('./logging');
-const TimerAPI = require('./timer');
-const StoreAPI = require('./store');
-const EventAPI = require('./event');
+const os = require('os')
+const { NodeVM } = require('vm2')
+const LoggingAPI = require('./logging')
+const TimerAPI = require('./timer')
+const StoreAPI = require('./store')
+const EventAPI = require('./event')
 const HTTPAdapter = require('./adapters/http')
 
-let GPIOAPI, I2CAPI;
-switch(os.type()) {
+let GPIOAPI, I2CAPI
+switch (os.type()) {
   case 'Linux':
-    GPIOAPI = require('./linux/gpio');
-    I2CAPI = require('./linux/i2c');
-    break;
+    GPIOAPI = require('./linux/gpio')
+    I2CAPI = require('./linux/i2c')
+    break
   default:
-    GPIOAPI = require('./mock/gpio');
-    I2CAPI = require('./mock/i2c');
-    break;
+    GPIOAPI = require('./mock/gpio')
+    I2CAPI = require('./mock/i2c')
+    break
 }
 
 module.exports = class {
   constructor(url, deviceId) {
-    this.deviceId = deviceId;
-    this.appVersion = 0;
-    this.context = {};
-    this.apis = {};
-    this.globals = {};
+    this.deviceId = deviceId
+    this.appVersion = 0
+    this.context = {}
+    this.apis = {}
+    this.globals = {}
     this.adapter = new HTTPAdapter(url, deviceId)
 
-    const logging = this.registerAPI("logging", LoggingAPI);
-    this.registerAPI("timer", TimerAPI);
-    this.registerAPI("event", EventAPI, logging);
-    this.registerAPI("store", StoreAPI);
-    this.registerAPI("gpio", GPIOAPI);
-    this.registerAPI("i2c", I2CAPI);
+    const logging = this.registerAPI('logging', LoggingAPI)
+    this.registerAPI('timer', TimerAPI)
+    this.registerAPI('event', EventAPI, logging)
+    this.registerAPI('store', StoreAPI)
+    this.registerAPI('gpio', GPIOAPI)
+    this.registerAPI('i2c', I2CAPI)
   }
 
-  registerAPI(name, klass, ...args) {
-    let api = new klass(...args);
-    Object.assign(this.globals, api.globals);
-    this.apis[name] = api;
-    return api;
+  registerAPI(name, Klass, ...args) {
+    let api = new Klass(...args)
+    Object.assign(this.globals, api.globals)
+    this.apis[name] = api
+    return api
   }
 
   resetAPIs() {
     for (let apiName in this.apis) {
-      let api = this.apis[apiName].reset();
+      this.apis[apiName].reset()
     }
   }
 
   run() {
-    this.resetAPIs();
+    this.resetAPIs()
     this.adapter.send({
-      state: "booting",
+      state: 'booting',
       appVersion: 0,
-      log: ""
+      log: ''
     })
 
     this.adapter.onReceive(({ appUpdateRequest, stores }) => {
@@ -61,23 +61,23 @@ module.exports = class {
         console.log(`updating ${this.appVersion} -> ${appUpdateRequest}`)
         this.appVersion = appUpdateRequest
         this.adapter.getAppImage(appUpdateRequest).then((script) => {
-          this.resetAPIs();
+          this.resetAPIs()
           this.runScript(script)
         })
       }
 
-      this.apis.store.updateStores(stores);
+      this.apis.store.updateStores(stores)
     })
-  
+
     setInterval(() => {
-      console.log("heartbeating...");
+      console.log('heartbeating...')
       let log = this.apis.logging.getLog()
       this.adapter.send({
-        state: "running",
+        state: 'running',
         appVersion: this.appVersion,
         log: log
       })
-    }, 3000);
+    }, 3000)
   }
 
   runScript(script) {
@@ -86,13 +86,13 @@ module.exports = class {
       require: false,
       console: 'inherit',
       timeout: 5000
-    });
+    })
 
     try {
-      vm.run(script);
+      vm.run(script)
     } catch (e) {
-      let msg = e.stack.replace(/^/gm, '!');
-      this.apis.logging.print(msg);
+      let msg = e.stack.replace(/^/gm, '!')
+      this.apis.logging.print(msg)
     }
   }
 }

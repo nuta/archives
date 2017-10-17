@@ -16,16 +16,16 @@ function progress(stage, state) {
       console.info(chalk.bold.blue('==> (4/5) Writing config'))
       break
     case 'flash':
-    console.info(chalk.bold.blue('==> (5/5) Flashing'))
-    break
+      console.info(chalk.bold.blue('==> (5/5) Flashing'))
+      break
     case 'flashing':
-      const message = {write: 'Writing', check: 'Verifying' }[state.type]
+      const message = { write: 'Writing', check: 'Verifying' }[state.type]
       console.info(`${message}...(${state.percentage}%)`)
       break
-}
+  }
 }
 
-module.exports = async (args, opts, logger) => {
+module.exports = async(args, opts, logger) => {
   await install(opts.name, opts.type, opts.os,
     opts.adapter, opts.drive, opts.ignoreDuplication,
     process.argv, progress)

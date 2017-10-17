@@ -3,16 +3,16 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const makestack = require('makestack')
 
 let mainWindow
-function createWindow () {
+function createWindow() {
   mainWindow = new BrowserWindow({
     height: 500,
     width: 450,
     useContentSize: true
   })
 
-  const windowURL = (process.env.NODE_ENV == 'development')
-    ? "http://localhost:9080" : `file://${__dirname}/../renderer/index.html`
-  
+  const windowURL = (process.env.NODE_ENV === 'development')
+    ? 'http://localhost:9080' : `file://${__dirname}/../renderer/index.html`
+
   mainWindow.loadURL(windowURL)
 
   mainWindow.on('closed', () => {
@@ -40,13 +40,12 @@ ipcMain.on('getAvailableDrives', (event, args) => {
   })
 })
 
-ipcMain.on('install', async (event, args) => {
+ipcMain.on('install', async(event, args) => {
   const flashCommand = [process.argv0, path.resolve(__dirname, 'flasher.js')]
   await makestack.install(
     args.deviceName, args.deviceType, args.os,
     args.adapter, args.drive, args.ignoreDuplication,
     flashCommand, (stage, state) => {
-
       event.sender.send('progress', stage, state)
-  })
+    })
 })

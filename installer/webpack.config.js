@@ -32,7 +32,7 @@ module.exports = {
           loader: 'vue-loader',
           options: {
             loaders: {
-              js: ["babel-loader"],
+              js: ['babel-loader'],
               scss: 'vue-style-loader!css-loader!sass-loader'
             }
           }
@@ -45,15 +45,15 @@ module.exports = {
       {
         test: /\.scss$/,
         use: [
-            "style-loader",
-            "css-loader",
-            "postcss-loader",
-            {
-                loader: "sass-loader",
-                options: {
-                    includePaths: [path.resolve("css")]
-                }
+          'style-loader',
+          'css-loader',
+          'postcss-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              includePaths: [path.resolve('css')]
             }
+          }
         ]
       },
       {

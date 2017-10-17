@@ -1,6 +1,6 @@
 module.exports = class {
   constructor(logging) {
-    this.logging = logging;
+    this.logging = logging
   }
 
   get globals() {
@@ -16,6 +16,6 @@ module.exports = class {
   }
 
   publish(event, data) {
-    this.logging.print(`@${event} ${data}`);
+    this.logging.print(`@${event} ${data}`)
   }
 }

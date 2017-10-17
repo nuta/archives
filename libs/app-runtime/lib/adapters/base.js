@@ -1,6 +1,6 @@
 const msgpack = require('msgpack')
 
-const SMMS_VERSION_MSG = 1;
+const SMMS_VERSION_MSG = 1
 const SMMS_APP_UPDATE_REQUEST_MSG = 0x11
 const SMMS_DEVICE_ID_MSG = 0x0a
 const SMMS_DEVICE_INFO_MSG = 0x0b
@@ -19,11 +19,11 @@ class AdapterBase {
   }
 
   serialize(messages) {
-    const { state, appVersion, log } = messages;
+    const { state, appVersion, log } = messages
     const states = { new: 1, booting: 2, ready: 3, running: 4, down: 5, reboot: 6, relaunch: 7 }
 
     if (!states[state]) {
-      throw `Invalid device state: \`${state}'`;
+      throw new Error(`Invalid device state: \`${state}'`)
     }
 
     let payload = {}
@@ -35,19 +35,18 @@ class AdapterBase {
 
     return msgpack.pack(payload)
   }
-  
-  deserialize(payload) {
-    let stores = {};
 
-    let data = msgpack.unpack(payload);
-    let appUpdateRequest = data[SMMS_APP_UPDATE_REQUEST_MSG];
-    
+  deserialize(payload) {
+    let stores = {}
+
+    let data = msgpack.unpack(payload)
+    let appUpdateRequest = data[SMMS_APP_UPDATE_REQUEST_MSG]
+
     for (let k in msgpack.unpack(payload)) {
-      if (SMMS_STORE_MSG <= k && k < SMMS_STORE_MSG_END)
-        stores[data[k][0]] = data[k][1];
+      if (SMMS_STORE_MSG <= k && k < SMMS_STORE_MSG_END) { stores[data[k][0]] = data[k][1] }
     }
-    
-    return { appUpdateRequest, stores };
+
+    return { appUpdateRequest, stores }
   }
 }
 

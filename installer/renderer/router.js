@@ -9,6 +9,6 @@ let routes = [
 ]
 
 export default new VueRouter({
-  mode: "hash",
+  mode: 'hash',
   routes
 })
