@@ -12,6 +12,7 @@
   /lib64/*.so* mr,
 
   /sys/class/gpio/** rw,
+  /sys/devices/platform/soc/** rw,
   /dev/i2c*    rw,
   /dev/spidev* rw,
 
