@@ -1,0 +1,31 @@
+engines: 
+ scss-lint:
+    enabled: true
+
+  shellcheck:
+    enabled: true
+
+ reek:
+    enabled: true
+
+  rubocop:
+    enabled: true
+
+  pep8:
+    enabled: true
+
+  markdownlint:
+    enabled: true
+
+  git-legal:
+    enabled: true
+    config:
+      allow_affero_copyleft: false
+      allow_strong_copyleft: false
+
+  fixme:
+    enabled: true
+
+  eslint:
+    enabled: true
+    channel: "eslint-4"
