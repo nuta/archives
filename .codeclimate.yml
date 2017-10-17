@@ -1,11 +1,11 @@
 engines: 
- scss-lint:
+  scss-lint:
     enabled: true
 
   shellcheck:
     enabled: true
 
- reek:
+  reek:
     enabled: true
 
   rubocop:
