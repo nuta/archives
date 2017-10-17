@@ -51,7 +51,7 @@ module SMMSService
     payload = {}
     deployment = device.deployment
 
-    if deployment && device.current_app_version != deployment.version
+    if deployment && device.current_app_version.value.to_i != deployment.version
       # TODO: os_update_request
 
       payload[SMMS_APP_UPDATE_REQUEST] = deployment.version
