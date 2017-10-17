@@ -40,7 +40,7 @@ NAN_METHOD(Ioctl) {
         arg = NULL;
     } else {
         if (info[2]->IsInt32()) {
-            arg = reinterpret_cast<void*>(info[2]->IsInt32());
+            arg = reinterpret_cast<void*>(info[2]->Int32Value());
         } else {
             Local<Object> buffer = info[2]->ToObject();
             if (!Buffer::HasInstance(buffer)) {
