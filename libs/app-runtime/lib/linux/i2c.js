@@ -6,7 +6,7 @@ const I2C_SLAVE = 0x0703;
 module.exports = class {
 
   constructor() {
-    this.fd = fs.openSync('/dev/i2c-0', 'rw');
+    this.fd = fs.openSync('/dev/i2c-1', 'r+');
   }
   
   get globals() {
@@ -20,15 +20,15 @@ module.exports = class {
   }
 
   read(address, length) {
-    selectSlaveAddress(address);
+    this.selectSlaveAddress(address);
     let buffer = Buffer.alloc(length);
     fs.readSync(this.fd, buffer, 0, length);
     return buffer;
   }
 
   write(address, data) {
-    selectSlaveAddress(address);
-    fs.writeSync(this.fd, buffer);
+    this.selectSlaveAddress(address);
+    fs.writeSync(this.fd, Buffer.from(data));
   }
 
   selectSlaveAddress(address) {
