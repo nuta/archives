@@ -7,7 +7,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 
 require 'simplecov'
 require 'simplecov-json'
-SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
+#SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter
 SimpleCov.start
 
 require 'rspec/rails'
@@ -17,6 +17,7 @@ require 'database_cleaner'
 require 'support/factory_girl'
 require 'support/controller_helpers'
 require 'support/routing_helpers'
+require 'webmock/rspec'
 
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -34,7 +35,9 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
-
+ 
+  WebMock.disable_net_connect!
+    
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)

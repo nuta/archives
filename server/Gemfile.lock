@@ -49,6 +49,8 @@ GEM
     colorator (1.1.0)
     concurrent-ruby (1.0.5)
     connection_pool (2.2.1)
+    crack (0.4.3)
+      safe_yaml (~> 1.0.0)
     crass (1.0.2)
     database_cleaner (1.6.1)
     devise (4.3.0)
@@ -92,6 +94,7 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
+    hashdiff (0.3.7)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (0.8.6)
@@ -264,6 +267,10 @@ GEM
     unf_ext (0.0.7.4)
     warden (1.2.7)
       rack (>= 1.0)
+    webmock (3.1.0)
+      addressable (>= 2.3.6)
+      crack (>= 0.3.2)
+      hashdiff
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.2)
@@ -301,6 +308,7 @@ DEPENDENCIES
   spring-watcher-listen (~> 2.0.0)
   sqlite3
   strong_migrations
+  webmock
 
 BUNDLED WITH
    1.16.0.pre.3
