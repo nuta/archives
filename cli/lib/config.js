@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const CONFIG_DIR = `${process.env.HOME}/.makestack`;
 
-module.exports = new class {
+class Config {
     get server()    { return this.load("server"); }
     set server(val) { return this.save("server", val); }
     get mocks()    { return this.load("mocks"); }
@@ -24,4 +24,6 @@ module.exports = new class {
         
         fs.writeFileSync(path, JSON.stringify(data));
     }
-};
+}
+
+module.exports = new Config()

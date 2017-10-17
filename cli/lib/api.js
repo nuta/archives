@@ -3,7 +3,7 @@ let path = require("path");
 let fetch = require("node-fetch");
 let config = require("./config");
 
-module.exports = new class {
+class API {
   invoke(method, path, params, requiresCredentials = true) {
     return new Promise((resolve, reject) => {
       if (!config.credentials)
@@ -156,3 +156,5 @@ module.exports = new class {
     return this.invoke("PUT", `/apps/${appName}/stores/${key}`, { value });
   }
 }
+
+module.exports = new API()
