@@ -24,7 +24,7 @@ module.exports = new class {
         return response.json()
       }).then(json => {
         const result = { status, headers, json }
-        if (status == 200)
+        if (status == 200 || status == 201)
           resolve(result)
         else
           reject(result)
