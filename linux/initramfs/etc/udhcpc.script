@@ -10,6 +10,7 @@ renew|bound)
     ip route add default via $router dev $interface
     echo "nameserver $dns" > /etc/resolv.conf
     echo "DHCP: updated network settings"
+    echo "$interface: ip=$ip/$mask default=$router dns=$dns"
     ip addr show
     ;;
 esac
