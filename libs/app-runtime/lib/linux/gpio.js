@@ -25,7 +25,10 @@ module.exports = class {
   pinMode(pin, mode) {
     if (typeof pin !== 'number')
     throw "`pin' must be a number";
-    
+
+    if (fs.existsSync(`/sys/class/gpio/gpio${pin}`))
+      fs.writeFileSync(`/sys/class/gpio/unexport`, `${pin}`);
+
     fs.writeFileSync(`/sys/class/gpio/export`, `${pin}`);
     fs.writeFileSync(`/sys/class/gpio/gpio${pin}/direction`,
     (mode == INPUT) ? "in" : "out");
