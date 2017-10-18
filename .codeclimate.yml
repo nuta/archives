@@ -11,6 +11,11 @@ engines:
   rubocop:
     enabled: true
 
+  brakeman:
+    enabled: true
+    config:
+      app_path: server
+
   pep8:
     enabled: true
 
