@@ -1,12 +1,16 @@
 const { fork, spawnSync } = require('child_process')
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 const HTTPAdapter = require('./adapters/http')
 
 class Supervisor {
-  constructor(url, deviceId) {
+  constructor(url, deviceType, osVersion, deviceId) {
     this.app = null
+    this.osVersion = osVersion
     this.deviceId = deviceId
+    this.deviceType = deviceType
+    this.device = new (require(`./devices/${deviceType}`))()
     this.appVersion = 0
     this.log = ''
     this.stores = {}
@@ -17,6 +21,27 @@ class Supervisor {
     const log = this.log
     this.log = ''
     return log
+  }
+
+  updateOS(version) {
+    this.adapter.getOSImage(this.deviceType, version).then(image => {
+      console.log('saving os image...')
+      const tmpFilePath = path.join(os.tmpdir(), 'kernel.img')
+      fs.writeFileSync(tmpFilePath, image)
+
+      console.log('sending SIGTERM to the app...')
+      if (this.app)
+        this.app.kill()
+
+      // Wait the app to exit.
+      console.log('OS will be updated soon!')
+      setTimeout(() => {
+        console.log('updating os image...')
+        this.device.updateOS(tmpFilePath)
+        console.log('updateOS returned!')
+        this.adapter.send({ state: 'ready', osVersion: this.osVersion, appVersion: 0, log: 'os updated' })
+      }, 5000)
+    })
   }
 
   launchApp(appZip) {
@@ -72,9 +97,13 @@ class Supervisor {
   }
 
   start() {
-    this.adapter.send({ state: 'booting', appVersion: 0, log: '' })
-    this.adapter.onReceive(({ appUpdateRequest, stores }) => {
+    this.adapter.send({ state: 'booting', osVersion: this.osVersion, appVersion: 0, log: '' })
+    this.adapter.onReceive(({ osUpdateRequest, appUpdateRequest, stores }) => {
       this.stores = stores
+
+      if (osUpdateRequest) {
+        this.updateOS(osUpdateRequest)
+      }
 
       if (appUpdateRequest) {
         console.log(`updating ${this.appVersion} -> ${appUpdateRequest}`)
@@ -91,6 +120,7 @@ class Supervisor {
       console.log('heartbeating...')
       this.adapter.send({
         state: 'running',
+        osVersion: this.osVersion,
         appVersion: this.appVersion,
         log: this.popLog()
       })

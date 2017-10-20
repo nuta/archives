@@ -33,6 +33,16 @@ class HTTPAdapter extends AdapterBase {
       })
     })
   }
+
+  getOSImage(deviceType, version) {
+    return new Promise((resolve, reject) => {
+      let url = `${this.serverURL}/api/v1/os_image?os=linux&device_type=${deviceType}&version=${version}`
+
+      fetch(url).then(r => {
+        r.buffer().then(resolve).catch(reject)
+      })
+    })
+  }
 }
 
 module.exports = HTTPAdapter

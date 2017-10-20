@@ -12,8 +12,11 @@ function create(args, opts, logger) {
 }
 
 function run(args, opts, logger) {
-  let mock = config.mocks[args.name];
-  (new Supervisor(config.server.url, mock.device_id)).start()
+  let mock = config.mocks[args.name]
+  const osVersion = 'a' // A version defined in server/config/makestack.yml
+
+  const supervisor = new Supervisor(config.server.url, 'mock', osVersion, mock.device_id)
+  supervisor.start()
 }
 
 module.exports = { create, run }
