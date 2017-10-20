@@ -1,9 +1,9 @@
 class Deployment < ApplicationRecord
   belongs_to :app
 
-  MAX_IMAGE_SIZE      = 32 * 1024
+  MAX_IMAGE_SIZE      = 256 * 1024
   MAX_DEBUG_DATA_SIZE = 32 * 1024
-  
+
   validates_presence_of :app
   validates :debug, length: { in: 0..MAX_DEBUG_DATA_SIZE }, allow_nil: true
   validates_uniqueness_of :version, scope: :app_id
