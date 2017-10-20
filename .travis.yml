@@ -6,7 +6,8 @@ env: M=dummy
 
 matrix:
   include:
-    - language: c
+    - language: node_js
+      node_js: "8"
       env: M=linux:x86_64
       sudo: true # because of mknod
       addons:
@@ -21,12 +22,14 @@ matrix:
         apt: true
         directories:
           - linux/build/downloads
-      install: npm install -g yarn
-      script:
+      install:
+        - npm install -g yarn
         - cd linux
-        - ./builder --test x86_64
+      script:
+        - make TARGET=x86_64
 
-    - language: c
+    - language: node_js
+      node_js: "8"
       env: M=linux:raspberrypi3
       sudo: true # because of mknod
       addons:
@@ -44,19 +47,20 @@ matrix:
         apt: true
         directories:
           - linux/build/downloads
+          - qemu
       install:
         - npm install -g yarn
-        - mkdir -p linux/build/downloads
-        - cd linux/build/downloads
+        - mkdir -p qemu
+        - cd qemu
         - wget https://download.qemu.org/qemu-2.10.1.tar.xz
         - tar xf qemu-2.10.1.tar.xz
         - cd qemu-2.10.1
-        - ./configure
+        - ./configure --target-list=arm-softmmu
         - make -j2
         - sudo make install
-        - cd ../../..
+        - cd ../../linux
       script:
-        - ./builder --image raspberrypi3
+        - make TARGET=raspberrypi3
         
     - language: ruby
       env: M=server:backend
