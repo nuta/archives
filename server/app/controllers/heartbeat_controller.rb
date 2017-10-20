@@ -29,6 +29,6 @@ class HeartbeatController < ApplicationController
   private
 
   def look_for_os_image_url(os, deviceTypes, version)
-    MakeStack.settings.dig('os_releases', version, os, deviceTypes, 'url')
+    MakeStack.settings.dig(:os_releases, version, os, deviceTypes, :url)
   end
  end
