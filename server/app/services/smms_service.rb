@@ -31,6 +31,7 @@ module SMMSService
       device_info: device_info,
       device_id: data[SMMS_DEVICE_ID],
       log: data[SMMS_LOG],
+      os_version: data[SMMS_OS_VERSION],
       app_version: data[SMMS_APP_VERSION]
     }
 
@@ -49,6 +50,7 @@ module SMMSService
 
     device.last_heartbeated_at = Time.now
     device.status = messages.dig(:device_info, :state)
+    device.current_os_version = messages[:os_version]
     device.current_app_version = messages[:app_version]
     device.append_log(messages[:log])
     return device

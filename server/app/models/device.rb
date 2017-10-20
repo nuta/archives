@@ -6,6 +6,7 @@ class Device < ApplicationRecord
 
   value :status, expiration: 45.minutes
   value :last_heartbeated_at, expiration: 3.days
+  value :current_os_version, expiration: 45.minutes
   value :current_app_version, expiration: 45.minutes
   sorted_set :log, expiration: 1.hours
 
