@@ -1,4 +1,4 @@
-let AppRuntime = require('app-runtime')
+let Supervisor = require('supervisor')
 let api = require('../api')
 let config = require('../config')
 
@@ -13,7 +13,7 @@ function create(args, opts, logger) {
 
 function run(args, opts, logger) {
   let mock = config.mocks[args.name];
-  (new AppRuntime(config.server.url, mock.device_id)).run()
+  (new Supervisor(config.server.url, mock.device_id)).start()
 }
 
 module.exports = { create, run }

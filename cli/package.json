@@ -21,7 +21,6 @@
   },
   "homepage": "http://makestack.org",
   "dependencies": {
-    "app-runtime": "file:../libs/app-runtime",
     "caporal": "^0.7.0",
     "chalk": "^2.1.0",
     "drivelist": "^5.2.4",
@@ -32,7 +31,8 @@
     "node-fetch": "^1.7.3",
     "node-ipc": "^9.1.1",
     "shell-quote": "^1.6.1",
-    "sudo-prompt": "^7.1.1"
+    "sudo-prompt": "^7.1.1",
+    "supervisor": "file:../libs/supervisor"
   },
   "devDependencies": {
     "istanbul": "^0.4.5",
