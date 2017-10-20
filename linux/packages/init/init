@@ -31,10 +31,10 @@ done
 
 root=$(egrep -o "root=([^ ]+)" /proc/cmdline | awk -F= '{print $2}')
 [ "$root" = "" ] || echo "Error: root is not speicifed in /proc/cmdline" > /dev/stderr
-mkdir /disk
-mount $root /disk
+mkdir /boot
+mount $root /boot
 
-. /disk/config.sh
+. /boot/config.sh
 hostname makestack-linux
 apparmor_parser -r /etc/apparmor.d/*
 
