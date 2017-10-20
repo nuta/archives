@@ -15,6 +15,11 @@ module SMMSService
     data = MessagePack.unpack(payload)
     states = [:new, :booting, :ready, :down, :reboot, :relaunch]
 
+    # XXX: msgpack-lite used in Node stringifies number keys.
+    data.keys.each do |k|
+      data[k.to_i] = data[k]
+    end
+
     device_info = {
       state: states[(data[SMMS_DEVICE_INFO] || 0) & 0x07]
     }
