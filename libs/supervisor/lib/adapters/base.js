@@ -1,11 +1,13 @@
 const msgpack = require('msgpack-lite')
 
 const SMMS_VERSION_MSG = 1
-const SMMS_APP_UPDATE_REQUEST_MSG = 0x11
 const SMMS_DEVICE_ID_MSG = 0x0a
 const SMMS_DEVICE_INFO_MSG = 0x0b
 const SMMS_LOG_MSG = 0x0c
-const SMMS_APP_VERSION_MSG = 0x0d
+const SMMS_OS_VERSION_MSG = 0x10
+const SMMS_APP_VERSION_MSG = 0x11
+const SMMS_OS_UPDATE_REQUEST_MSG = 0x20
+const SMMS_APP_UPDATE_REQUEST_MSG = 0x21
 const SMMS_STORE_MSG = 0x40
 const SMMS_STORE_MSG_END = 0x7f
 

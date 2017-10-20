@@ -12,9 +12,9 @@ Simple Management/Messaging System
  0x0a  | device_id
  0x0b  | device_info
  0x0c  | log
- 0x0d  | app_version
- 0x0e  | crashdump
- 0x0f  | (reserved)
- 0x10  | os_update_request
- 0x11  | app_update_request
+ 0x0d  | crashdump
+ 0x10  | os_version
+ 0x11  | app_version
+ 0x20  | os_update_request
+ 0x21  | app_update_request
  0x40 + n | nth store (0 <= n <= 0x3f)
