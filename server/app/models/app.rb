@@ -22,8 +22,13 @@ class App < ApplicationRecord
   validates_inclusion_of  :api, in: SUPPORTED_APIS,
                           message: "%{value} is unsupported (unknown) API."
   validate :validate_num_of_apps, on: :create
+  validate :validate_os_version
 
-  # TODO: validate :os_version
+  def validate_os_version
+    unless MakeStack.settings[:os_releases].include?(self.os_version)
+      errors.add(:os_version, 'is not released.')
+    end
+  end
 
   def validate_num_of_apps
     if user && user.apps.count >= User::APPS_MAX_NUM
