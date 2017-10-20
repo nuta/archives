@@ -4,6 +4,8 @@ const program = require('caporal')
 program
   .command('login', 'Get an access credential for an MakeStack Server account.')
   .action(require('./commands/login'))
+  .command('deploy', 'Deploys the app.')
+  .action(require('./commands/deploy'))
   .command('mock create', 'Create a mock device.')
   .action(require('./commands/mock').create)
   .argument('name', 'The mock device name.')

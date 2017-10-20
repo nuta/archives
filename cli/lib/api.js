@@ -141,8 +141,9 @@ class API {
   }
 
   deploy(appName, image, debug, comment, tag) {
-    return this.invoke('POST', `/apps/${appName}/deployments`,
-      { deployment: { image, debug, comment, tag } })
+    const form = new FormData()
+    form.append('deployment[image]', image)
+    return this.doInvoke('POST', `/apps/${appName}/deployments`, {}, form)
   }
 
   createApp(appName, api) {
