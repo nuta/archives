@@ -1,36 +1,46 @@
 const fs = require('fs')
+const util = require('util')
+const FormData = require('form-data')
 const fetch = require('node-fetch')
 const config = require('./config')
 
 class API {
-  invoke(method, path, params, requiresCredentials = true) {
+  doInvoke(method, path, headers, body) {
     return new Promise((resolve, reject) => {
       if (!config.credentials) {
         reject(new Error('login first'))
       }
 
-      let status, headers
+      let respStatus, respHeaders
       fetch(`${config.server.url}/api/v1${path}`, {
         method: method,
-        headers: Object.assign({
-          'Content-Type': 'application/json'
-        }, config.credentials),
-        body: JSON.stringify(params)
+        headers:  Object.assign(headers, config.credentials),
+        body
       }).then(response => {
-        status = response.status
-        headers = response.headers
+        respStatus = response.status
+        respHeaders = response.headers
         return response
       }).then(response => {
         return response.json()
       }).then(json => {
-        const result = { status, headers, json }
-        if (status === 200 || status === 201) {
+        const result = { respStatus, respHeaders, json }
+        if (respStatus === 200 || respStatus === 201) {
           resolve(result)
         } else {
-          reject(result)
+          console.error(`server returned ${respStatus}\n`)
+          console.error(util.inspect(json, false, 8))
         }
       })
     })
+  }
+
+  invoke(method, path, params) {
+    const body = JSON.stringify(params)
+    const headers = {
+      'Content-Type': 'application/json'
+    }
+
+    return this.doInvoke(method, path, headers, body)
   }
 
   get serverURL() {
