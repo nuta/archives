@@ -1,24 +1,15 @@
 const fs = require('fs')
 
-const OUTPUT = 'out'
-const INPUT = 'in'
-
 module.exports = class {
-  get globals() {
-    return {
-      pinMode: this.pinMode.bind(this),
-      digitalWrite: this.digitalWrite.bind(this),
-      digitalRead: this.digitalRead.bind(this),
-      OUTPUT,
-      INPUT
-    }
+  get OUTPUT() {
+    return 'out'
   }
 
-  reset() {
-
+  get INPUT() {
+    return 'in'
   }
 
-  pinMode(pin, mode) {
+  setMode(pin, mode) {
     if (typeof pin !== 'number') {
       throw new Error("`pin' must be a number")
     }
@@ -27,14 +18,14 @@ module.exports = class {
 
     fs.writeFileSync(`/sys/class/gpio/export`, `${pin}`)
     fs.writeFileSync(`/sys/class/gpio/gpio${pin}/direction`,
-      (mode === INPUT) ? 'in' : 'out')
+      (mode === this.INPUT) ? 'in' : 'out')
   }
 
-  digitalWrite(pin, value) {
+  write(pin, value) {
     fs.writeFileSync(`/sys/class/gpio/gpio${pin}/value`, value ? '1' : '0')
   }
 
-  digitalRead(pin) {
+  read(pin) {
     return fs.readFileSync(`/sys/class/gpio/gpio${pin}/value`, 'utf-8') === '1'
   }
 }

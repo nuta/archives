@@ -29,7 +29,7 @@ class HTTPAdapter extends AdapterBase {
       let appImageserverURL = `${this.serverURL}/api/v1/app_image?device_id=${this.deviceId}&version=${version}`
 
       fetch(appImageserverURL).then(r => {
-        r.text().then(resolve).catch(reject)
+        r.buffer().then(resolve).catch(reject)
       })
     })
   }

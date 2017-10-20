@@ -1,12 +1,15 @@
 {
-  "name": "hyperutils",
+  "name": "supervisor",
   "version": "0.0.1",
-  "description": "An utility library to prevent `dependency hell'.",
+  "description": "MakeStack Linux Supervisor.",
   "private": true,
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "app-runtime": "file:../app-runtime",
+    "msgpack-lite": "^0.1.26",
+    "node-fetch": "^1.7.3"
   }
 }

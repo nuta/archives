@@ -1,5 +1,6 @@
 module.exports = {
-  ioctl: require('bindings')('ioctl.node').ioctl,
+  find: require('./find'),
+  copyFiles: require('./copy_files'),
   mkdirp: require('./mkdirp'),
   createFile: require('./create_file'),
   generateTempPath: require('./generate_temp_path'),

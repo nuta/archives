@@ -2,18 +2,14 @@ const fs = require('fs')
 const path = require('path')
 
 module.exports = dir => {
-  const dirs = dir.split(path.delimiter)
-  let dirpath = ''
+  const dirs = dir.split('/')
+  let dirpath = '/'
 
   for (let i = 0; i < dirs.length; i++) {
     dirpath = path.join(dirpath, dirs[i])
 
-    try {
+    if (!fs.existsSync(dirpath)) {
       fs.mkdirSync(dirpath)
-    } catch (e) {
-      if (e.code !== 'EEXIST') {
-        throw e
-      }
     }
   }
 }

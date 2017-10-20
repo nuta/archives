@@ -126,7 +126,7 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
     }
 
     if (parity !== this.computeParity(result, response)) {
-      this.apis.logging.error('sakura.io: parity mismatch')
+      console.error('sakura.io: parity mismatch')
       return
     }
 
@@ -135,9 +135,9 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
 }
 
 class SakuraIOAdapter {
-  constructor(apis, i2cAddress) {
+  constructor(i2cAPI, i2cAddress) {
     // TODO: support SPI
-    this.sakuraio = new I2CSakuraIODriver(apis)
+    this.sakuraio = new I2CSakuraIODriver(i2cAPI)
     this.connect()
     this.startReceiving()
   }

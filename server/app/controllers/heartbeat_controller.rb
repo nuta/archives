@@ -17,6 +17,6 @@ class HeartbeatController < ApplicationController
       return
     end
 
-    render body: @device.app_image(params[:version])
+    render type: 'application/zip', body: @device.app_image(params[:version])
   end
  end

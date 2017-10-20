@@ -1,18 +1,11 @@
 const fs = require('fs')
-const { ioctl } = require('hyperutils')
+const { ioctl } = require('../ioctl')
 
 const I2C_SLAVE = 0x0703
 
 module.exports = class {
   constructor() {
     this.fd = fs.openSync('/dev/i2c-1', 'r+')
-  }
-
-  get globals() {
-    return {
-      read: this.read.bind(this),
-      write: this.write.bind(this)
-    }
   }
 
   reset() {

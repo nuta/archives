@@ -2,15 +2,14 @@
   "name": "app-runtime",
   "version": "0.0.1",
   "description": "MakeStack API for the Full Linux Environment",
+  "gypfile": true,
   "private": true,
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "hyperutils": "file:../hyperutils",
-    "msgpack": "^1.0.2",
-    "node-fetch": "^1.7.3",
-    "vm2": "^3.5.2"
+    "bindings": "^1.3.0",
+    "nan": "^2.7.0"
   }
 }

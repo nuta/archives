@@ -3,14 +3,6 @@ module.exports = class {
     this.stores = {}
   }
 
-  get globals() {
-    return { Store: this }
-  }
-
-  reset() {
-    this.stores = {}
-  }
-
   onchange(key, callback) {
     if (key in this.stores) {
       this.stores[key].onchangeCallbacks = callback
@@ -22,7 +14,7 @@ module.exports = class {
     }
   }
 
-  updateStores(newStores) {
+  update(newStores) {
     for (let key in newStores) {
       let newValue = newStores[key]
       let store = this.stores[key]

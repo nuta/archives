@@ -1,4 +1,4 @@
-const msgpack = require('msgpack')
+const msgpack = require('msgpack-lite')
 
 const SMMS_VERSION_MSG = 1
 const SMMS_APP_UPDATE_REQUEST_MSG = 0x11
@@ -33,16 +33,16 @@ class AdapterBase {
     payload[SMMS_APP_VERSION_MSG] = appVersion
     payload[SMMS_LOG_MSG] = log
 
-    return msgpack.pack(payload)
+    return msgpack.encode(payload)
   }
 
   deserialize(payload) {
     let stores = {}
 
-    let data = msgpack.unpack(payload)
+    let data = msgpack.decode(payload)
     let appUpdateRequest = data[SMMS_APP_UPDATE_REQUEST_MSG]
 
-    for (let k in msgpack.unpack(payload)) {
+    for (let k in data) {
       if (SMMS_STORE_MSG <= k && k < SMMS_STORE_MSG_END) { stores[data[k][0]] = data[k][1] }
     }
 
