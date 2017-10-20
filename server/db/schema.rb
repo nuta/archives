@@ -12,10 +12,7 @@
 
 ActiveRecord::Schema.define(version: 20171020055609) do
 
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
-
-  create_table "app_stores", id: :serial, force: :cascade do |t|
+  create_table "app_stores", force: :cascade do |t|
     t.string "key", null: false
     t.string "value"
     t.bigint "app_id", null: false
@@ -26,7 +23,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["app_id"], name: "index_app_stores_on_app_id"
   end
 
-  create_table "apps", id: :serial, force: :cascade do |t|
+  create_table "apps", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -36,7 +33,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["user_id"], name: "index_apps_on_user_id"
   end
 
-  create_table "deployments", id: :serial, force: :cascade do |t|
+  create_table "deployments", force: :cascade do |t|
     t.integer "version", null: false
     t.string "tag"
     t.string "comment"
@@ -49,7 +46,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["app_id"], name: "index_deployments_on_app_id"
   end
 
-  create_table "device_mappings", id: :serial, force: :cascade do |t|
+  create_table "device_mappings", force: :cascade do |t|
     t.integer "device_id"
     t.string "token", null: false
     t.string "type", null: false
@@ -57,7 +54,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "device_stores", id: :serial, force: :cascade do |t|
+  create_table "device_stores", force: :cascade do |t|
     t.string "key", null: false
     t.string "value"
     t.bigint "device_id", null: false
@@ -68,7 +65,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["device_id"], name: "index_device_stores_on_device_id"
   end
 
-  create_table "devices", id: :serial, force: :cascade do |t|
+  create_table "devices", force: :cascade do |t|
     t.string "name", null: false
     t.string "device_id", null: false
     t.string "device_id_prefix", null: false
@@ -85,7 +82,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
-  create_table "integrations", id: :serial, force: :cascade do |t|
+  create_table "integrations", force: :cascade do |t|
     t.string "service", null: false
     t.text "config", null: false
     t.datetime "created_at", null: false
@@ -97,7 +94,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["app_id"], name: "index_integrations_on_app_id"
   end
 
-  create_table "source_files", id: :serial, force: :cascade do |t|
+  create_table "source_files", force: :cascade do |t|
     t.string "path", null: false
     t.text "body"
     t.bigint "app_id", null: false
@@ -107,7 +104,7 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["app_id"], name: "index_source_files_on_app_id"
   end
 
-  create_table "users", id: :serial, force: :cascade do |t|
+  create_table "users", force: :cascade do |t|
     t.string "provider", default: "email", null: false
     t.string "uid", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -138,13 +135,4 @@ ActiveRecord::Schema.define(version: 20171020055609) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  add_foreign_key "app_stores", "apps"
-  add_foreign_key "apps", "users"
-  add_foreign_key "deployments", "apps"
-  add_foreign_key "device_mappings", "devices"
-  add_foreign_key "device_stores", "devices"
-  add_foreign_key "devices", "apps"
-  add_foreign_key "devices", "users"
-  add_foreign_key "integrations", "apps"
-  add_foreign_key "source_files", "apps"
 end

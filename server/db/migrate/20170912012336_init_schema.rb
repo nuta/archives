@@ -17,6 +17,7 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.datetime "updated_at", null: false
       t.bigint "user_id", null: false
       t.string "api", null: false
+      t.string "os_version", null: false
       t.index ["user_id"], name: "index_apps_on_user_id"
     end
 
