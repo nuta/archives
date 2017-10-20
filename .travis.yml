@@ -61,7 +61,7 @@ matrix:
         - cd ../../linux
       script:
         - make TARGET=raspberrypi3
-        
+
     - language: ruby
       env: M=server:backend
       services:

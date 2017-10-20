@@ -164,7 +164,7 @@ export default {
       return JSON.stringify(config);
     },
     create() {
-      
+
       api.createIntegration(
         this.appName,
         this.newIntegration.service,

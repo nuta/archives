@@ -12,7 +12,7 @@ class SourceFile < ApplicationRecord
   validates_format_of     :path, with: PATH_REGEX
   validates :body, length: { in: 0..BODY_MAX_LEN}, allow_nil: false
   validate :validate_num_of_files, on: :create
-  
+
   def validate_num_of_files
     if app && app.source_files.count >= User::SOURCE_FILES_MAX_NUM_PER_APP
       errors.add(:source_files, "are too many.")

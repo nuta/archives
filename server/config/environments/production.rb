@@ -1,7 +1,7 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   config.host = ENV.fetch("APP_HOST")
-  
+
   # Code is not reloaded between requests.
   config.cache_classes = true
 

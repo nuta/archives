@@ -1,6 +1,6 @@
 class DevicesController < ApplicationController
   before_action :set_device, only: [:show, :log, :update, :destroy]
-  
+
   def index
     @devices = @user.devices.all
   end
@@ -16,7 +16,7 @@ class DevicesController < ApplicationController
     @device = Device.new(device_params)
     @device.user = @user
     @device.reset_credentials
-  
+
     if @device.save
       render :show, status: :created, location: @device
     else

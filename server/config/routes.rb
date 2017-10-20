@@ -1,19 +1,19 @@
 Rails.application.routes.draw do
   scope :api do
     if Rails.env.development?
-      require 'sidekiq/web'      
+      require 'sidekiq/web'
       mount Sidekiq::Web => '/sidekiq'
     end
-    
+
     scope :v1 do
       mount_devise_token_auth_for 'User', at: 'auth'
-  
+
       resources :apps, param: :app_name, format: false
       scope 'apps/:app_name' do
         resources :deployments, param: :version, format: false, only: %i(index show create)
         resources :app_stores, path: 'stores', param: :key, format: false, constraints: { key: /.+/ }
         resources :integrations, param: :service, format: false
-        
+
         get "log", to: "apps#log"
         get "files", to: "source_files#index"
         get "files/*path", to: "source_files#show", constraints: { path: /.+/ }

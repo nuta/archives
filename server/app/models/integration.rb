@@ -1,18 +1,18 @@
 class Integration < ApplicationRecord
   belongs_to :app
-  
+
   SUPPORTED_SERVICES = %w(incoming_webhook outgoing_webhook ifttt slack datadog)
   INTEGRATION_TOKEN_LEN = 40
   INTEGRATION_TOKEN_PREFIX_LEN = 20
-  
+
   validates :token_prefix, uniqueness: true
   validates :service, inclusion: { in: SUPPORTED_SERVICES },
       uniqueness: { scope: :app_id }
   validate :config_is_json
   validate :token_prefix_is_prefix
-  
+
   # TODO: validate contents in the config JSON
-  
+
   def config_is_json
     JSON.parse(self.config)
   rescue
@@ -30,15 +30,15 @@ class Integration < ApplicationRecord
     self.token_prefix = token[0, INTEGRATION_TOKEN_PREFIX_LEN]
     self.token = token
   end
-  
+
   def self.lookup_by_token(token)
     prefix = token[0, INTEGRATION_TOKEN_PREFIX_LEN]
     integration = Integration.find_by_token_prefix(prefix)
-    
+
     if integration && ActiveSupport::SecurityUtils.secure_compare(integration.token, token)
       integration
     else
       nil
     end
-  end  
+  end
 end

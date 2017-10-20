@@ -6,7 +6,7 @@
         <action-button v-on:click="deploy" positive
          :state="deployButton" waiting-message="Deploy" doing-message="Deploying..."
          done-message="Deployed" icon="fa-rocket"></action-button>
-        <action-button v-on:click="save" :state="saveButton" waiting-message="Save"   
+        <action-button v-on:click="save" :state="saveButton" waiting-message="Save"
          doing-message="Saving..." done-message="Saved" icon="fa-upload"></action-button>
       </div>
 
@@ -97,7 +97,7 @@ export default {
   },
   mounted() {
     let editor = ace.edit("editor");
-    editor.$blockScrolling = Infinity; 
+    editor.$blockScrolling = Infinity;
     editor.setTheme("ace/theme/solarized_light");
     editor.setShowPrintMargin(false);
 

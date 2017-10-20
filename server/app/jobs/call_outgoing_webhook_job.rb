@@ -11,7 +11,7 @@ class CallOutgoingWebhookJob < ApplicationJob
         unless stores.is_a?(Hash)
           raise "`stores' received from a webhook is not Hash"
         end
-        
+
         stores.each do |key, value|
           # TODO: accept other data types
           store = device.device_stores.where(key: key, data_type: 'string').first_or_create

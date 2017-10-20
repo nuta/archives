@@ -16,7 +16,7 @@ module HookService
   def handle_event_published(integrations, device, options)
     event = options[:event]
     body = options[:body]
- 
+
     integrations.each do |integration|
       config = JSON.parse(integration.config)
 

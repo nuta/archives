@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :user do
     username do
-      FFaker::InternetSE.user_name.gsub(".", "-") + 
+      FFaker::InternetSE.user_name.gsub(".", "-") +
       Array.new(5).map{|_| Random.rand(10).to_s}.join
     end
     email    { FFaker::Internet.email }

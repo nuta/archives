@@ -86,7 +86,7 @@ function run(argv, env, cwd) {
 
   if (cp.error) {
     throw new Error(`error: a child process returned \`${cp.error.code}'`)
-  } 
+  }
 }
 
 function sudo(argv, env) {

@@ -2,7 +2,7 @@ class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
   include Redis::Objects
-  
+
   after_destroy :delete_redis_objects
 
   def delete_redis_objects

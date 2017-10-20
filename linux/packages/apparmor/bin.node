@@ -1,6 +1,6 @@
 /bin/node {
   /bin/node mr,
-  
+
   owner /proc/[0-9]*/auxv r,
   /dev/null rw,
   /dev/zero rw,

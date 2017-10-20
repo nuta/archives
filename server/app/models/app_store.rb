@@ -2,8 +2,8 @@ class AppStore < ApplicationRecord
   belongs_to :app
 
   # This MUST be smaller than 256 because of a MakeStack Protocol limitaitond.
-  KEY_MAX_LEN = 64 
-  
+  KEY_MAX_LEN = 64
+
   KEY_REGEX = /\A[a-zA-Z][a-zA-Z0-9\~\!\@\$\%\&\.\-\_]*\z/
   DATA_TYPES = %w(string integer float bool)
 

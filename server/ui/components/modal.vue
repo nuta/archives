@@ -69,7 +69,7 @@ export default {
   background: #ffffff;
   border: 1px solid #efefef;
   border-radius: 3px;
-  
+
   .header {
     display: flex;
     justify-content: space-between;

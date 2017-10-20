@@ -177,7 +177,7 @@ nav {
     height: 35px;
     border-top: 5px solid $sidebar-color2;
     text-align: center;
-    
+
     h1 {
       font-size: 1em;
       font-weight: 700;
@@ -235,7 +235,7 @@ nav {
         &.green  { color: #47d268; }
         &.yellow { color: #f3d747; }
       }
-     
+
       span {
         font-size: 14px;
         font-weight: 600;
@@ -267,7 +267,7 @@ nav {
       padding-left: 15px;
       padding-bottom: 15px;
     }
-    
+
     & > ul {
       list-style-type: none;
       padding: 0;

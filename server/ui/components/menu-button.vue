@@ -49,23 +49,23 @@ export default {
     top: 10px;
     height: fit-content;
     width: fit-content;
-  
+
     z-index: 1000;
-  
+
     background: #ffffff;
     border: 1px solid #cccccc;
     border-radius: 5px;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
-  
+
     ul {
       list-style-type: none;
       margin: 10px;
       padding: 0;
-  
+
       li {
         padding: 7px;
         white-space: nowrap;
-  
+
         &:hover {
           background: #efefef;
           cursor: pointer;

@@ -8,11 +8,11 @@ class App < ApplicationRecord
   before_destroy :disassociate_devices
 
   sorted_set :log, expiration: 1.hours
-  
+
   RESERVED_APP_NAMES = %w(new)
   SUPPORTED_APIS = %w(makestack linux)
   APP_LOG_MAX_LINES = 512
-  
+
   validates_presence_of   :user
   validates_uniqueness_of :name, scope: :user_id, case_sensitive: false
   validates_exclusion_of  :name, in: RESERVED_APP_NAMES,

@@ -9,7 +9,7 @@ class HeartbeatController < ApplicationController
   def os_image
     head :not_implemented
   end
-  
+
   def app_image
     @device = Device.authenticate(params[:device_id])
     unless @device

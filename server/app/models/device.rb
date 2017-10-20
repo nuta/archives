@@ -1,14 +1,14 @@
 class Device < ApplicationRecord
   belongs_to :user
-  belongs_to :app, optional: true  
+  belongs_to :app, optional: true
   has_many   :device_stores, dependent: :destroy
   has_many   :device_mappings, dependent: :destroy
-  
+
   value :status, expiration: 45.minutes
   value :last_heartbeated_at, expiration: 3.days
   value :current_app_version, expiration: 45.minutes
   sorted_set :log, expiration: 1.hours
-  
+
   SUPPORTED_TYPES = %w(mock raspberrypi3)
   DEVICE_STATES = %w(new booting ready running relaunch reboot down)
   RESERVED_DEVICE_NAMES = %w(new)
@@ -21,7 +21,7 @@ class Device < ApplicationRecord
   TAG_NAME_REGEX = /\A[a-zA-Z][a-zA-Z0-9\:\/\-\_]*\z/
   TAG_LEN = 128
   DEVICE_LOG_MAX_LINES = 512
-  
+
   validates_presence_of   :user
   validates_presence_of   :device_id
   validates_uniqueness_of :device_id
@@ -53,10 +53,10 @@ class Device < ApplicationRecord
 
   # TODO: add validation status
   # validates_inclusion_of  :status, in: DEVICE_STATES
-  
+
   def stores
     stores = {}
-    
+
     AppStore.where(app: self.app).find_each do |store|
       stores[store.key] = {
          value: store.value,
@@ -66,10 +66,10 @@ class Device < ApplicationRecord
     end
 
     DeviceStore.where(device: self).find_each do |store|
-      stores[store.key] = { 
+      stores[store.key] = {
         value: store.value,
-        scope: 'device', 
-        override: stores.key?(store.key) 
+        scope: 'device',
+        override: stores.key?(store.key)
       }
     end
 
@@ -112,7 +112,7 @@ class Device < ApplicationRecord
 
       log = app.log
       max_lines = App::APP_LOG_MAX_LINES
-      integrations = device.app.integrations.all  
+      integrations = device.app.integrations.all
     else
       log = device.log
       max_lines = DEVICE_LOG_MAX_LINES
@@ -137,7 +137,7 @@ class Device < ApplicationRecord
 
   def append_log(body)
     return unless body.is_a?(String)
-    
+
     device_name = self.name
     time = Time.now.to_f
     lines = body.split("\n").reject(&:empty?)

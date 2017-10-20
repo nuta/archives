@@ -41,7 +41,7 @@ RSpec.describe AppsController, type: :controller do
       it "renders a JSON response with errors for the new app" do
         app = attributes_for(:app)
         app[:api] = "unsupported-one"
-        
+
         post :create, params: {app: app}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
@@ -56,7 +56,7 @@ RSpec.describe AppsController, type: :controller do
         valid = { api: "makestack" }
         put :update, params: {app_name: app.name, app: valid}
         app.reload
-        
+
         expect(response).to be_success
       end
 
@@ -73,7 +73,7 @@ RSpec.describe AppsController, type: :controller do
       it "renders a JSON response with errors for the app" do
         app = create(:app, user: user)
         invalid = { api: "unsupported-one" }
-        
+
         put :update, params: {app_name: app.name, app: invalid}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')

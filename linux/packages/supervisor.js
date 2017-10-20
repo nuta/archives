@@ -33,7 +33,7 @@ module.exports = {
       AR: `${config('target.toolchain_prefix')}ar`,
       CC: `${config('target.toolchain_prefix')}gcc`,
       CXX: `${config('target.toolchain_prefix')}g++`,
-      LINK: `${config('target.toolchain_prefix')}g++`           
+      LINK: `${config('target.toolchain_prefix')}g++`
     }, 'node_modules/app-runtime')
   },
 

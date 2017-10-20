@@ -36,7 +36,7 @@ class AppsController < ApplicationController
   end
 
   private
-  
+
   def app_params
     params.require(:app).permit(:name, :api)
   end

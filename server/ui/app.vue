@@ -128,7 +128,7 @@ label {
 
 .columns {
   display: flex;
-  
+
   &.right-aligned {
     justify-content: flex-end;
   }
@@ -191,7 +191,7 @@ label {
     .metadata {
       display: inline-block;
       margin-right: 50px;
-      
+
       tr td:first-child {
         padding-right: 30px;
         color: #888;

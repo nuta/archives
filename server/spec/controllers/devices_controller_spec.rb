@@ -41,7 +41,7 @@ RSpec.describe DevicesController, type: :controller do
       it "renders a JSON response with errors for the new device" do
         device = attributes_for(:device)
         device[:device_type] = "unsupported-one"
-        
+
         post :create, params: {device: device}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
@@ -56,7 +56,7 @@ RSpec.describe DevicesController, type: :controller do
         valid = { api: "makestack" }
         put :update, params: {device_name: device.name, device: valid}
         device.reload
-        
+
         expect(response).to be_success
       end
 
@@ -73,7 +73,7 @@ RSpec.describe DevicesController, type: :controller do
       it "renders a JSON response with errors for the device" do
         device = create(:device, user: user)
         invalid = { device_type: "unsupported-one" }
-        
+
         put :update, params: {device_name: device.name, device: invalid}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')

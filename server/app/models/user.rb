@@ -6,13 +6,13 @@ class User < ActiveRecord::Base
   include DeviseTokenAuth::Concerns::User
 
   has_many :apps, dependent: :destroy
-  has_many :devices, dependent: :destroy 
+  has_many :devices, dependent: :destroy
 
   # Quotas
   APPS_MAX_NUM = 30
   DEVICES_MAX_NUM = 30
   SOURCE_FILES_MAX_NUM_PER_APP = 16
-  
+
   RESERVED_USER_NAMES = %w(
     home app apps devise devices settings builds deployments
     admin user users team teams create me account admin cloud

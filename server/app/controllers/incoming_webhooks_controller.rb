@@ -12,7 +12,7 @@ class IncomingWebhooksController < ApplicationController
       device = @user.devices.find_by_name!(params[:device])
       update_device_stores(device, params[:stores])
     else
-      raise ActionController::BadRequest.new(), "unknown action"     
+      raise ActionController::BadRequest.new(), "unknown action"
     end
 
     head :ok
@@ -47,7 +47,7 @@ class IncomingWebhooksController < ApplicationController
         store.value = value
         store.save!
       end
-    end  
+    end
   end
 
   def update_device_stores(device, stores)
@@ -61,6 +61,6 @@ class IncomingWebhooksController < ApplicationController
         store.value = value
         store.save!
       end
-    end  
+    end
   end
 end

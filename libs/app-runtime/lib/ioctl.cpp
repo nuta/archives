@@ -47,7 +47,7 @@ NAN_METHOD(Ioctl) {
                 Nan::ThrowTypeError("`arg' must be Number or Buffer.");
                 return;
             }
-    
+
             arg = Buffer::Data(buffer);
         }
     }
