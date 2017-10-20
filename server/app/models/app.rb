@@ -23,6 +23,8 @@ class App < ApplicationRecord
                           message: "%{value} is unsupported (unknown) API."
   validate :validate_num_of_apps, on: :create
 
+  # TODO: validate :os_version
+
   def validate_num_of_apps
     if user && user.apps.count >= User::APPS_MAX_NUM
       errors.add(:apps, "are too many.")
