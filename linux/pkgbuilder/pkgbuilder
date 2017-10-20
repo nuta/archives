@@ -1,0 +1,203 @@
+#!/usr/bin/env node
+const path = require('path')
+const fs = require('fs')
+const { spawnSync } = require('child_process')
+const { find, mkdirp, copyFiles } = require('hyperutils')
+const { isNewerDirContent } = require('.').pkg
+
+global.build = {
+  config: {}
+}
+
+function addConfigPrefix(name, config) {
+  for (let key in (config || {})) {
+    if (key.indexOf('.') === -1) {
+      config[`${name}.${key}`] = config[key]
+      delete config[key]
+    }
+  }
+
+  return config
+}
+
+function loadPackages(target) {
+  let remainingPackages = [target]
+  let packages = {}
+  let buildOrder = []
+
+  while (remainingPackages.length > 0) {
+    let pkg = require(`../packages/${remainingPackages.pop()}`)
+
+    if (pkg.name in packages) {
+      throw new Error(`BUG: duplicated package loading: \`${pkg.name}'`)
+    }
+
+    if (pkg.config instanceof Function) {
+      pkg.config = pkg.config()
+    }
+
+    Object.assign(build.config, addConfigPrefix(pkg.name, pkg.config))
+
+    if (pkg.dependencies && pkg.dependencies.length > 0) {
+      const unloadedDependencies = pkg.dependencies.filter(name => !(name in packages))
+      if (unloadedDependencies.length > 0) {
+        // Resolve dependencies first.
+        remainingPackages.push(pkg.name)
+        remainingPackages = remainingPackages.concat(pkg.dependencies)
+        continue
+      }
+    }
+
+    for (let attr in pkg) {
+      if (['build', 'buildImage', 'changed'].includes(attr)) {
+        continue
+      }
+
+      const value = pkg[attr]
+      pkg[attr] = (value instanceof Function) ? value() : value
+    }
+
+    buildOrder.push(pkg.name)
+    packages[pkg.name] = pkg
+  }
+
+  return [packages, buildOrder]
+}
+
+function download(url) {
+  const filepath = path.resolve(build.downloadsDir, path.basename(url))
+  if (fs.existsSync(filepath)) {
+    // TODO: compare SHASUM
+    return filepath
+  }
+
+  spawnSync('curl', ['-fSLo', filepath, url], { stdio: 'inherit' })
+  return filepath
+}
+
+function extract(filepath, dest) {
+  if (fs.existsSync(dest))
+    return
+
+  if (filepath.match(/\.tar\.(xz|bz2?|gz)$/)) {
+    mkdirp(dest)
+    spawnSync('tar', ['xf', filepath, '-C', dest, '--strip-components', '1'], { stdio: 'inherit' })
+  } else if (filepath.match(/\.deb$/)) {
+    mkdirp(dest)
+    const cwd = process.cwd()
+    process.chdir(dest)
+    spawnSync('ar', ['x', filepath], { stdio: 'inherit' })
+    spawnSync('tar', ['vxf', 'data.tar.xz'], { stdio: 'inherit' })
+    process.chdir(cwd)
+  } else {
+    throw new Error(`unsupported file type: ${filepath}`)
+  }
+}
+
+function isInstalled(dest, pkg) {
+  return pkg[dest] === undefined || Object.keys(pkg[dest]).every(file => {
+    return fs.existsSync(path.resolve(build[`${dest}Dir`], `./${file}`))
+  })
+}
+
+function copyFilesInPkg(pkgName, files, destDir) {
+  const copiedFiles = []
+
+  for (let filepath in files) {
+    if (files[filepath] === false) {
+      // a special case for `console' package because a special
+      // file like /dev/console cannot be copied.
+      continue
+    }
+
+    const src = path.resolve(build.buildDir, pkgName, files[filepath])
+    const dest = path.resolve(destDir, `./${filepath}`)
+    if (!fs.existsSync(dest) || fs.statSync(src).ctimeMs > fs.statSync(dest).ctimeMs) {
+      copyFiles(src, dest)
+      copiedFiles.push(dest)
+    }
+  }
+
+  return copiedFiles
+}
+
+function buildPackage(pkg) {
+  const cwd = process.cwd()
+  const pkgBuildDir = path.resolve(build.buildDir, pkg.name)
+
+  if (pkg.url) {
+    const dlpath = download(pkg.url)
+    extract(dlpath, pkgBuildDir)
+  } else if (pkg.path) {
+    if (isNewerDirContent(pkg.path, pkgBuildDir, pkg.ignore)) {
+      copyFiles(pkg.path, pkgBuildDir, pkg.ignore)
+    }
+  } else {
+    mkdirp(pkgBuildDir)
+  }
+
+  process.chdir(pkgBuildDir)
+
+  if (pkg.build instanceof Function) {
+    pkg.build()
+  }
+
+  copyFilesInPkg(pkg.name, pkg.bootfs, build.bootfsDir)
+  copyFilesInPkg(pkg.name, pkg.rootfs, build.rootfsDir)
+
+  process.chdir(cwd)
+}
+
+function isBuildRequired(pkg) {
+  const installed = isInstalled('bootfs', pkg) && isInstalled('rootfs', pkg)
+
+  if (pkg.changed === undefined) {
+    return !installed
+  } else {
+    return !installed || pkg.changed()
+  }
+}
+
+function main() {
+  const target = process.argv[2]
+
+  build.target = target
+  build.rebuiltPackages = []
+  build.buildDir = path.resolve(__dirname, `../build/${target}`)
+  build.bootfsDir = path.resolve(build.buildDir, 'bootfs')
+  build.rootfsDir = path.resolve(build.buildDir, 'rootfs')
+  build.downloadsDir = path.resolve(__dirname, '../build/downloads')
+
+  mkdirp(build.buildDir)
+  mkdirp(build.bootfsDir)
+  mkdirp(build.rootfsDir)
+  mkdirp(build.downloadsDir)
+
+  const [packages, buildOrder] = loadPackages(target)
+
+  for (let i = 0; i < buildOrder.length; i++) {
+    const pkg = packages[buildOrder[i]]
+    if (isBuildRequired(pkg)) {
+      console.log(`==> (${i + 1}/${buildOrder.length}) Building ${pkg.name}...`)
+      buildPackage(pkg)
+      build.rebuiltPackages.push(pkg.name)
+    } else {
+      const copiedToBootFS = copyFilesInPkg(pkg.name, pkg.bootfs, build.bootfsDir)
+      const copiedToRootFS = copyFilesInPkg(pkg.name, pkg.rootfs, build.rootfsDir)
+
+      if (copiedToBootFS.length === 0 && copiedToRootFS.length === 0) {
+        console.log(`==> (${i + 1}/${buildOrder.length}) Skipping ${pkg.name}...`)
+      } else {
+        console.log(`==> (${i + 1}/${buildOrder.length}) Copied changed files from ${pkg.name}`)
+        build.rebuiltPackages.push(pkg.name)
+      }
+    }
+  }
+
+  const imageFile = path.resolve(build.buildDir, 'makestack-linux-raspberrypi3.img')
+  if (!fs.existsSync(imageFile)) {
+    packages[build.target].buildImage(imageFile)
+  }
+}
+
+main()

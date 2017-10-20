@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Busybox version: 1.27.2
-# Mon Oct  9 19:25:50 2017
+# Fri Oct 20 12:50:00 2017
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -179,8 +179,8 @@ CONFIG_GZIP_FAST=0
 # CONFIG_FEATURE_TAR_UNAME_GNAME is not set
 # CONFIG_FEATURE_TAR_NOPRESERVE_TIME is not set
 # CONFIG_FEATURE_TAR_SELINUX is not set
-# CONFIG_UNZIP is not set
-# CONFIG_FEATURE_UNZIP_CDF is not set
+CONFIG_UNZIP=y
+CONFIG_FEATURE_UNZIP_CDF=y
 # CONFIG_FEATURE_UNZIP_BZIP2 is not set
 # CONFIG_FEATURE_UNZIP_LZMA is not set
 # CONFIG_FEATURE_UNZIP_XZ is not set

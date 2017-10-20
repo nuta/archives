@@ -1,9 +1,0 @@
-{
-  "name": "app",
-  "version": "0.0.1",
-  "description": "A MakeStack agent.",
-  "private": true,
-  "dependencies": {
-    "app-runtime": "file:../../../libs/app-runtime"
-  }
-}

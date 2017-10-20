@@ -1,0 +1,22 @@
+{
+  "name": "pkgbuilder",
+  "version": "0.0.1",
+  "description": "A Linux distribution build system.",
+  "main": "lib/index.js",
+  "bin": {
+    "pkgbuilder": "pkgbuilder"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makestack/makestack.git"
+  },
+  "author": "Seiya Nuta <nuta@seiya.me>",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "bugs": {
+    "url": "https://github.com/makestack/makestack/issues"
+  },
+  "homepage": "http://makestack.org",
+  "dependencies": {
+    "hyperutils": "file:../../libs/hyperutils"
+  }
+}

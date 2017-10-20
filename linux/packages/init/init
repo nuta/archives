@@ -44,10 +44,9 @@ echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
 debug=$(egrep -o "debug" /proc/cmdline)
 if [ "$debug" = "" ]; then
-    node app/main.js
+    node /supervisor/supervisor
 else
-    mv app/test.js app/main.js
-    node app/main.js
+    echo "TODO: run tests!"
 fi
 
 echo "*** something went wrong, rebooting in 10 seconds..."

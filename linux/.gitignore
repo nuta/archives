@@ -1,13 +1,1 @@
-/kernel.img
-/test.log
-/build
-/initramfs/etc/apparmor.policy
-/initramfs/dev
-!/initramfs/dev/.gitkeep
-/initramfs/bin
-!/initramfs/bin/.gitkeep
-/initramfs/lib
-!/initramfs/lib/.gitkeep
-/initramfs/lib64
-!/initramfs/lib64/.gitkeep
-/initramfs.cpio
+build

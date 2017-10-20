@@ -23,6 +23,8 @@
   network inet  dgram,
   network inet6 dgram,
 
+  /supervisor/**        r,
+  /supervisor/**/*.node mr,
   /app/**        r,
   /app/**/*.node mr,
   /disk/data/*   rw,
