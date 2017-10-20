@@ -53,11 +53,14 @@ async function downloadDiskImage(type, os) {
   return orignalImage
 }
 
-function writeConfigToDiskIamge(orignalImage, device, adapter) {
+function writeConfigToDiskIamge(os, type, orignalImage, device, adapter) {
   const imagePath = generateTempPath()
+  const osVersion = 'v0.0.1' // TODO
 
   // TODO: What if the image is large?
   let image = fs.readFileSync(orignalImage)
+  image = replaceBuffer(image, type, 'DEVICE_TYPE')
+  image = replaceBuffer(image, osVersion, 'OS_VERSION')
   image = replaceBuffer(image, device.device_id, 'DEVICE_ID')
   image = replaceBuffer(image, device.device_secret, 'DEVICE_SECRET')
   image = replaceBuffer(image, api.serverURL, 'SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890')
@@ -117,7 +120,7 @@ module.exports = async(name, type, os, adapter, drive, ignoreDuplication, flashC
   progress('download')
   const orignalImage = await downloadDiskImage(type, os)
   progress('config')
-  const imagePath = writeConfigToDiskIamge(orignalImage, device, adapter)
+  const imagePath = writeConfigToDiskIamge(os, type, orignalImage, device, adapter)
   progress('flash')
   await flash(flashCommand, drive, driveSize, imagePath, progress)
   progress('success')

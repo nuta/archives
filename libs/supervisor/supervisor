@@ -2,7 +2,10 @@
 const Supervisor = require('.')
 
 const url = process.env['MAKESTACK_SERVER_URL']
+const deviceType = process.env['MAKESTACK_DEVICE_TYPE']
+const osVersion = process.env['MAKESTACK_OS_VERSION']
 const deviceId = process.env['MAKESTACK_DEVICE_ID']
 
-console.log('*** starting supervisor');
-(new Supervisor(url, deviceId)).start()
+console.log('*** starting supervisor')
+const supervisor = new Supervisor(url, deviceType, osVersion, deviceId)
+supervisor.start()
