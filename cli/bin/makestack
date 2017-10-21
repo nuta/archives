@@ -9,7 +9,7 @@ if (process.env.IMAGE_WRITER !== undefined) {
     process.exit(1)
   })
 
-  return
+  process.exit(0)
 }
 
 const cli = require('../lib/cli')
