@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: {
-    app: './ui/main.js',
+    app: './main.js',
     vendor: ['vue', 'vue-router']
   },
   output: {
@@ -14,9 +14,9 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue'],
     alias: {
-      js: path.resolve('ui/js'),
-      components: path.resolve('ui/components'),
-      layouts: path.resolve('ui/layouts'),
+      js: path.resolve('js'),
+      components: path.resolve('components'),
+      layouts: path.resolve('layouts'),
       vue: 'vue/dist/vue.js'
     }
   },
@@ -53,7 +53,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './ui/index.html',
+      template: './index.html',
       inject: true
     })
   ],

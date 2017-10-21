@@ -2,8 +2,8 @@
   "name": "makestack-server-ui",
   "private": true,
   "scripts": {
-    "build": "webpack --config ui/webpack.config.js --progress",
-    "dev": "webpack-dev-server -d --config ui/webpack.config.js"
+    "build": "webpack --config webpack.config.js --progress",
+    "dev": "webpack-dev-server -d --config webpack.config.js"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.3",
