@@ -10,9 +10,15 @@ class Deployment < ApplicationRecord
   validates :tag, format: { with: Device::TAG_NAME_REGEX },
                   length: { in: 0..Device::TAG_LEN }, allow_nil: true
   validates :comment, length: { in: 0..1024 }, allow_nil: true
+  validate :validate_image_format
   validate :validate_image_size
 
   before_create :set_version
+
+
+  def validate_image_format
+    self.image[0..1] == 'PK'
+  end
 
   def validate_image_size
     self.image.size < MAX_IMAGE_SIZE
