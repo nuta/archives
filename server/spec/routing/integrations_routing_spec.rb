@@ -11,8 +11,8 @@ RSpec.describe IntegrationsController, type: :routing do
     end
 
     it "routes to #show" do
-      expect(:get => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.service}").to \
-        route_to("integrations#show", app_name: app.name, service: integration.service)
+      expect(:get => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.name}").to \
+        route_to("integrations#show", app_name: app.name, name: integration.name)
     end
 
     it "routes to #create" do
@@ -21,18 +21,18 @@ RSpec.describe IntegrationsController, type: :routing do
     end
 
     it "routes to #update via PUT" do
-      expect(:put => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.service}").to \
-        route_to("integrations#update", app_name: app.name, service: integration.service)
+      expect(:put => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.name}").to \
+        route_to("integrations#update", app_name: app.name, name: integration.name)
     end
 
     it "routes to #update via PATCH" do
-      expect(:patch => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.service}").to \
-        route_to("integrations#update", app_name: app.name, service: integration.service)
+      expect(:patch => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.name}").to \
+        route_to("integrations#update", app_name: app.name, name: integration.name)
     end
 
     it "routes to #destroy" do
-      expect(:delete => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.service}").to \
-        route_to("integrations#destroy", app_name: app.name, service: integration.service)
+      expect(:delete => "#{api_prefix}/apps/#{app.name}/integrations/#{integration.name}").to \
+        route_to("integrations#destroy", app_name: app.name, name: integration.name)
     end
 
   end

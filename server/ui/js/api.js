@@ -132,13 +132,13 @@ export default new class {
       { service, config, comment })
   }
 
-  updateIntegration(appName, service, config, comment) {
-    return this.invoke('PUT', `/apps/${appName}/integrations/${service}`,
+  updateIntegration(appName, name, service, config, comment) {
+    return this.invoke('PUT', `/apps/${appName}/integrations/${name}`,
       { service, config, comment })
   }
 
-  deleteIntegration(appName, service) {
-    return this.invoke('DELETE', `/apps/${appName}/integrations/${service}`)
+  deleteIntegration(appName, name) {
+    return this.invoke('DELETE', `/apps/${appName}/integrations/${name}`)
   }
 
   getDevices() {

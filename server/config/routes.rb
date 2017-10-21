@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       resources :apps, param: :name do
         resources :deployments,  param: :version, only: %i(index show create)
         resources :app_stores,   param: :key, path: 'stores', as: :stores, constraints: { key: /.+/ }
-        resources :integrations, param: :service
+        resources :integrations, param: :name
         resources :source_files, param: :path, path: 'files', format: false, constraints: { path: /.+/ }
         get "log", to: "apps#log"
       end

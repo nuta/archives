@@ -163,24 +163,25 @@ export default {
 
       return JSON.stringify(config);
     },
-    create() {
 
+    create() {
       api.createIntegration(
         this.appName,
         this.newIntegration.service,
         this.createConfigForServer(this.newIntegration),
         this.newIntegration.comment);
     },
-    update(integration) {
 
+    update(integration) {
       api.updateIntegration(
         this.appName,
+        integration.name,
         integration.service,
         this.createConfigForServer(integration),
         integration.comment);
     },
     remove(integration) {
-      api.deleteIntegration(this.appName, integration.service)
+      api.deleteIntegration(this.appName, integration.name)
     }
   },
   beforeMount() {

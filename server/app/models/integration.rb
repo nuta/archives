@@ -5,13 +5,12 @@ class Integration < ApplicationRecord
   INTEGRATION_TOKEN_LEN = 40
   INTEGRATION_TOKEN_PREFIX_LEN = 20
 
+  validates :name, uniqueness: { scope: :app_id }
   validates :token_prefix, uniqueness: true
-  validates :service, inclusion: { in: SUPPORTED_SERVICES },
-      uniqueness: { scope: :app_id }
-  validate :config_is_json
+  validates :service, inclusion: { in: SUPPORTED_SERVICES }
   validate :token_prefix_is_prefix
 
-  # TODO: validate contents in the config JSON
+  before_create :set_name
 
   def config_is_json
     JSON.parse(self.config)
@@ -23,6 +22,12 @@ class Integration < ApplicationRecord
     if self.token && !self.token.start_with?(self.token_prefix)
       errors.add(:token_prefix, "is not prefix of integration (BUG).")
     end
+  end
+
+  def set_name
+    app_integrations = Integration.where(app: self.app, service: self.service)
+    minor_id = (app_integrations.count || 0) + 1
+    self.name = self.service + ((minor_id == 1) ? '' : minor_id.to_s)
   end
 
   def reset_token
