@@ -8,6 +8,7 @@ class ImagesController < ApplicationController
       return
     end
 
+    # TODO: sign_and_set_authorization_header
     redirect_to image_url
   end
 
