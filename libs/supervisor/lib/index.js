@@ -5,11 +5,13 @@ const path = require('path')
 const HTTPAdapter = require('./adapters/http')
 
 class Supervisor {
-  constructor({ adapter, appDir, deviceType, osVersion, deviceId, debugMode }) {
+  constructor({ adapter, appDir, deviceType, osVersion, deviceId, debugMode, appUID, appGID }) {
     this.app = null
     this.appDir = appDir
     this.osVersion = osVersion
     this.debugMode = debugMode
+    this.appUID = appUID
+    this.appGID = appGID
     this.deviceId = deviceId
     this.deviceType = deviceType
     this.device = new (require(`./devices/${deviceType}`))()
@@ -79,7 +81,9 @@ class Supervisor {
 
     this.app = fork('./start', {
       cwd: appDir,
-      stdio: 'inherit'
+      stdio: 'inherit',
+      uid: this.appUID,
+      gid: this.appGID
     })
     this.sendToApp('initialize', { stores: this.stores })
 

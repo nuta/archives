@@ -44,6 +44,8 @@ echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
 debug=$(egrep -o "debug" /proc/cmdline)
 if [ "$debug" = "" ]; then
+    export MAKESTACK_APP_UID=1000
+    export MAKESTACK_APP_GID=1000
     node /supervisor/supervisor
 else
     export MAKESTACK_DEBUG_MODE=1
