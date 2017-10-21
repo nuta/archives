@@ -9,8 +9,7 @@ class AppStore < ApplicationRecord
 
   validates :key, format: { with: KEY_REGEX }, uniqueness: { scope: :app_id },
     case_sensitive: false, length: { in: 1..KEY_MAX_LEN }
-  validates :data_type, inclusion: { in: DATA_TYPES },
-    case_sensitive: false, uniqueness: { scope: :app_id }, length: { in: 1..64 }
+  validates :data_type, inclusion: { in: DATA_TYPES }, case_sensitive: false, length: { in: 1..64 }
   validates :value, length: { in: 0..512 }
 
   before_save :set_empty_string_if_value_is_nil
