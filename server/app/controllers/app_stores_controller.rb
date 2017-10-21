@@ -3,7 +3,7 @@ class AppStoresController < ApplicationController
   before_action :set_app_store, only: [:show, :update, :destroy]
 
   def index
-    @app_stores = AppStore.all
+    @app_stores = @app.app_stores.all
   end
 
   def show
