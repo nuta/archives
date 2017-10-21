@@ -13,7 +13,7 @@ class SourceFilesController < ApplicationController
     @source_file = @app.source_files.find_or_initialize_by(path: params[:path])
 
     if @source_file.update(source_file_params)
-      render :show, status: :ok
+      render :show, status: :ok, location: @source_file
     else
       render json: @source_file.errors, status: :unprocessable_entity
     end

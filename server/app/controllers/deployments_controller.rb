@@ -14,7 +14,7 @@ class DeploymentsController < ApplicationController
     @deployment.app = @app
 
     if @deployment.save
-      render :show, status: :created # FIXME , location: @deployment
+      render :show, status: :created, location: @deployment
     else
       render json: @deployment.errors, status: :unprocessable_entity
     end
