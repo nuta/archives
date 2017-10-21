@@ -36,7 +36,12 @@ program
 program
   .command('build-plugin', 'Build a plugin using Docker.')
   .argument('path', 'The plugin directory.')
+  .argument('dest', 'The destination.')
   .action(require('./commands/build_plugin'))
+
+program
+  .command('github-releases-mock', 'Build a plugin using Docker.')
+  .action(require('./commands/github_releases_mock'))
 
 function run(argv) {
   program.parse(argv)

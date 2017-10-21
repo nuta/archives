@@ -3,7 +3,7 @@ const os = require('os')
 const path = require('path')
 const { spawnSync } = require('child_process')
 
-module.exports = (pluginDir) => {
+module.exports = (pluginDir, destPath) => {
   spawnSync('docker', ['build', '-t', 'makestack/plugin-builder', '-'], {
     input: fs.readFileSync(path.resolve(__dirname, 'plugin_builder.Dockerfile')),
     stdio: ['pipe', 'inherit', 'inherit'],
@@ -19,5 +19,5 @@ module.exports = (pluginDir) => {
     env: process.env // DOCKER_HOST, etc.
   })
 
-  fs.copyFileSync(path.resolve(tempdir, 'plugin.zip'), `${path.basename(pluginDir)}.plugin.zip`)
+  fs.copyFileSync(path.resolve(tempdir, 'plugin.zip'), destPath)
 }
