@@ -11,7 +11,7 @@ class Device < ApplicationRecord
   sorted_set :log, expiration: 1.hours
 
   SUPPORTED_TYPES = %w(mock raspberrypi3)
-  DEVICE_STATES = %w(new booting ready running relaunch reboot down)
+  DEVICE_STATES = %i(new booting ready running relaunch reboot down)
   RESERVED_DEVICE_NAMES = %w(new)
   DEVICE_NAME_REGEX = /\A[a-zA-Z][a-zA-Z0-9\-\_]*\z/
   DEVICE_ID_LEN = 40
@@ -51,9 +51,6 @@ class Device < ApplicationRecord
       errors.add(:devices, "are too many.")
     end
   end
-
-  # TODO: add validation status
-  # validates_inclusion_of  :status, in: DEVICE_STATES
 
   def stores
     stores = {}

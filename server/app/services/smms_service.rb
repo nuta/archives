@@ -40,7 +40,19 @@ module SMMSService
     end
 
     unless messages.key?(:device_id)
-      raise ActionController::BadRequest.new(), "device_id is not set"
+      raise ActionController::BadRequest.new(), "`device_id' is not set"
+    end
+
+    unless messages[:os_version].is_a?(String)
+      raise ActionController::BadRequest.new(), "`os_version' is not string"
+    end
+
+    unless messages[:app_version].is_a?(Integer)
+      raise ActionController::BadRequest.new(), "`app_version' is not integer"
+    end
+
+    unless Device::DEVICE_STATES.include?(messages.dig(:device_info, :state))
+      raise ActionController::BadRequest.new(), "`device_info.state' is not valid"
     end
 
     device = Device.authenticate(messages[:device_id])
