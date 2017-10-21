@@ -5,7 +5,7 @@ const path = require('path')
 const HTTPAdapter = require('./adapters/http')
 
 class Supervisor {
-  constructor({ adapter, appDir, deviceType, osVersion, deviceId, debugMode, appUID, appGID }) {
+  constructor({ adapter, appDir, deviceType, osVersion, deviceId, deviceSecret, debugMode, appUID, appGID }) {
     this.app = null
     this.appDir = appDir
     this.osVersion = osVersion
@@ -21,7 +21,7 @@ class Supervisor {
     this.adapterName = adapter.name
     switch (this.adapterName) {
       case 'http':
-        this.adapter = new HTTPAdapter(deviceId, adapter.url)
+        this.adapter = new HTTPAdapter(deviceId, deviceSecret, adapter.url)
         break
       default:
         throw new Error(`unknown adapter \`${this.adapterName}'`)

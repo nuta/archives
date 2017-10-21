@@ -13,7 +13,8 @@ module SMMSService
   SMMS_STORE_END = 0x7f
   SMMS_STORE_NUM = SMMS_STORE_END - SMMS_STORE + 1
 
-  def receive(payload)
+  def receive(payload, timestamp, hmac)
+    # Be careful! The message HMAC is not verified yet.
     data = MessagePack.unpack(payload)
     states = [:new, :booting, :ready, :down, :reboot, :relaunch]
 
@@ -61,6 +62,17 @@ module SMMSService
       raise ActiveRecord::RecordNotFound
     end
 
+    # Verify the message timestamp.
+    if DateTime.now.utc - DateTime.parse(timestamp) > 3.minutes
+      raise ActionController::BadRequest.new(), "timestamp is too old"
+    end
+
+    # Verify the message hmac.
+    if hmac != computeHMAC(device.device_secret, timestamp, payload)
+      raise ActionController::BadRequest.new(), "invalid HMAC digest"
+    end
+
+    # Verified the message. It's now safe to update DB.
     device.last_heartbeated_at = Time.now
     device.status = messages.dig(:device_info, :state)
     device.debug_mode = messages.dig(:device_info, :debug_mode)
@@ -94,5 +106,18 @@ module SMMSService
     end
 
     payload.to_msgpack
+  end
+
+  def sign(device, payload)
+    timestamp = Time.now.utc.iso8601
+    return timestamp, computeHMAC(device.device_secret, timestamp, payload)
+  end
+
+  private
+
+  def computeHMAC(device_secret, timestamp, payload)
+    shasum = OpenSSL::Digest::SHA256.hexdigest(payload)
+    return OpenSSL::HMAC.hexdigest('SHA256', device_secret,
+                                   timestamp + "\n" + shasum)
   end
 end

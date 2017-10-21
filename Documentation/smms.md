@@ -8,7 +8,7 @@ Simple Management/Messaging System
  0x02  | qos
  0x03  | qos_reply
  0x04  | nonce
- 0x05  | hmac
+ 0x05  | (reserved)
  0x0a  | device_id
  0x0b  | device_info (0-2 bits: state, 3th bit: debug mode)
  0x0c  | log

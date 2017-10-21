@@ -25,6 +25,7 @@ function run(args, opts, logger) {
     },
     deviceType: 'mock',
     deviceId: mock.device_id,
+    deviceSecret: mock.device_secret,
     debugMode: true,
     osVersion
   })
