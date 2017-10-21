@@ -15,6 +15,16 @@ class Deployment < ApplicationRecord
 
   before_create :set_version
 
+  def initialize(attrs)
+    image_file = attrs.delete(:image)
+    super
+
+    if image_file.instance_of?(ActionDispatch::Http::UploadedFile)
+      self.image = image_file.read
+    else
+      self.image = image_file
+    end
+  end
 
   def validate_image_format
     self.image[0..1] == 'PK'
