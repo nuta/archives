@@ -58,7 +58,7 @@ export default {
   methods: {
     create() {
       api.createAppStore(this.appName, this.newStore.key, this.newStore.dataType,
-          this.new_store.value)
+          this.newStore.value)
         .catch(error => notify("error", error));
 
 
