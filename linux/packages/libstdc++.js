@@ -11,6 +11,14 @@ module.exports = {
     return `http://http.us.debian.org/debian/pool/main/g/gcc-6/libstdc++6_${version}_${config('target.deb_arch')}.deb`
   },
 
+  sha256() {
+    switch (config('target.deb_arch')) {
+      case 'amd64': return '7d583f9d6b83de18dc6352d0e3ee8e0af9ab9dc2ddcf3e78a5c4380fcb77da3d'
+      case 'armhf': return 'b15930518cbd5ffa53864e5f51ec307e15110ffee920e9c697dfd3e79456faad'
+      default: throw new Error(`unknown target.deb_arch: \`${config('deb_arch')}'`)
+    }
+  },
+
   changed() {
     return false
   },

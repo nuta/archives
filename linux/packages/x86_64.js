@@ -22,6 +22,7 @@ module.exports = {
       'target.toolchain_prefix': '', // This assumes that the x86_64 build machine.
       'linux.version': version,
       'linux.url': `https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${version}.tar.xz`,
+      'linux.sha256': '32915a33bb0b993b779257748f89f31418992edba53acbe1160cb0f8ef3cb324',
       'linux.make_target': 'bzImage',
       'linux.bootfs': {
         '/vmlinuz': 'arch/x86/boot/bzImage'

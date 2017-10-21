@@ -1,4 +1,4 @@
-const { isRebuilt, assetPath } = require('../pkgbuilder').pkg
+const { assetPath } = require('../pkgbuilder').pkg
 
 const version = '1.20170811'
 
@@ -7,6 +7,7 @@ module.exports = {
   type: 'library',
   version,
   url: `https://github.com/raspberrypi/firmware/archive/${version}.tar.gz`,
+  sha256: 'a25f6281d64732892a2e838cc2346f1a88505b5c77a57a6540755362ea64043a',
 
   bootfs() {
     const binaryBlobs = [

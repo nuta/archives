@@ -64,7 +64,19 @@ function loadPackages(target) {
   return [packages, buildOrder]
 }
 
-function download(url) {
+function shasum(filepath) {
+  const cp = spawnSync('shasum', ['-a', '256', filepath], {
+    stdio: 'pipe',
+    encoding: 'utf-8'
+  })
+
+  if (cp.error)
+    throw new Error(cp.error)
+
+  return cp.stdout.split(' ')[0]
+}
+
+function download(url, sha256) {
   const filepath = path.resolve(build.downloadsDir, path.basename(url))
   if (fs.existsSync(filepath)) {
     // TODO: compare SHASUM
@@ -127,7 +139,12 @@ function buildPackage(pkg) {
 
   if (pkg.url) {
     const dlpath = download(pkg.url)
-    extract(dlpath, pkgBuildDir)
+
+    if (shasum(dlpath) !== pkg.sha256) {
+      throw new Error(`shasum mismatch: ${dlpath}`)
+    }
+
+    //    extract(dlpath, pkgBuildDir)
   } else if (pkg.path) {
     if (isNewerDirContent(pkg.path, pkgBuildDir, pkg.ignore)) {
       copyFiles(pkg.path, pkgBuildDir, pkg.ignore)

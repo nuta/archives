@@ -12,6 +12,10 @@ module.exports = {
     return config('linux.url')
   },
 
+  sha256() {
+    return config('linux.sha256')
+  },
+
   changed() {
     return isRebuilt('initramfs') ||
       isNewerFile('.config',

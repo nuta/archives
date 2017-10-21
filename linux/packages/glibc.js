@@ -11,6 +11,14 @@ module.exports = {
     return `http://http.us.debian.org/debian/pool/main/g/glibc/libc6_${version}_${config('target.deb_arch')}.deb`
   },
 
+  sha256() {
+    switch (config('target.deb_arch')) {
+      case 'amd64': return 'b3f7278d80d5d0dc428fe92309bbc0e0a1ed665548a9f660663c1e1151335ae9'
+      case 'armhf': return 'dd6bbae5d617a0e979c7ecfce7545c8ac9c50a827494adcc7985379d92d7a58c'
+      default: throw new Error(`unknown target.deb_arch: \`${config('deb_arch')}'`)
+    }
+  },
+
   changed() {
     return false
   },

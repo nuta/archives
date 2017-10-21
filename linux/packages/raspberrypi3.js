@@ -23,6 +23,7 @@ module.exports = {
       'target.toolchain_prefix': 'arm-linux-gnueabihf-',
       'linux.version': linuxVersion,
       'linux.url': `https://github.com/raspberrypi/linux/archive/raspberrypi-kernel_${linuxVersion}.tar.gz`,
+      'linux.sha256': '58addd6b6b65cc491d46bf2d3869d456976a49901d6986f004991745d4df7d66',
       'linux.make_target': 'zImage',
       'linux.bootfs': {
         '/kernel7.img': 'arch/arm/boot/zImage'

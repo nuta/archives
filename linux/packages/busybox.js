@@ -8,6 +8,7 @@ module.exports = {
   type: 'application',
   version,
   url,
+  sha256: '9d4be516b61e6480f156b11eb42577a13529f75d3383850bb75c50c285de63df',
 
   changed() {
     return isNewerFile('.config', assetPath('busybox', 'config'))
