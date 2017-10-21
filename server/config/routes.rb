@@ -21,9 +21,11 @@ Rails.application.routes.draw do
         get "log", to: "devices#log"
       end
 
-      post "heartbeat", to: "heartbeat#heartbeat"
-      get "os_image",   to: "heartbeat#os_image"
-      get "app_image",  to: "heartbeat#app_image"
+      post "smms", to: "smms#http"
+      scope :images do
+        get "/os/:version/:os/:device_type", to: "images#os_image"
+        get "/app/:device_id/:version",  to: "images#app_image"
+      end
 
       get "webhooks/*token", to: "incoming_webhooks#invoke", constraints: { token: /.+/ }
   end
