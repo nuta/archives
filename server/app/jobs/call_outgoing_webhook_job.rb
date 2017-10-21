@@ -13,9 +13,10 @@ class CallOutgoingWebhookJob < ApplicationJob
         end
 
         stores.each do |key, value|
-          # TODO: accept other data types
-          store = device.device_stores.where(key: key, data_type: 'string').first_or_create
-          store.value = value
+          data_type = determine_data_type(value)
+          store = device.device_stores.where(key: key).first_or_initialize
+          store.value = value.to_s
+          store.data_type = data_type
           store.save!
         end
       end
@@ -23,5 +24,17 @@ class CallOutgoingWebhookJob < ApplicationJob
 
   rescue => e
     logger.warn "failed to call webhook: #{e}"
+  end
+
+  private
+
+  def determine_data_type(value)
+    case value
+    when String then 'string'
+    when TrueClass, FalseClass then 'bool'
+    when Float then 'float'
+    when Integer then 'integer'
+    else raise 'unknown data type'
+    end
   end
 end
