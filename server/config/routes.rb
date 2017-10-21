@@ -23,7 +23,7 @@ Rails.application.routes.draw do
 
       post "smms", to: "smms#http"
       scope :images do
-        get "/os/:version/:os/:device_type", to: "images#os_image"
+        get "/os/:device_id/:version/:os/:device_type", to: "images#os_image"
         get "/app/:device_id/:version",  to: "images#app_image"
       end
 

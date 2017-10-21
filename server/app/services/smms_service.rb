@@ -116,8 +116,17 @@ module SMMSService
   private
 
   def computeHMAC(device_secret, timestamp, payload)
-    shasum = OpenSSL::Digest::SHA256.hexdigest(payload)
+    sha = Digest::SHA256.new
+
+    if payload.is_a?(File)
+      while content = payload.read(4096)
+        sha.update(content)
+      end
+    else
+      sha.update(payload)
+    end
+
     return OpenSSL::HMAC.hexdigest('SHA256', device_secret,
-                                   timestamp + "\n" + shasum)
+                                   timestamp + "\n" + sha.hexdigest)
   end
 end

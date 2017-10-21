@@ -91,10 +91,16 @@ class HTTPAdapter extends AdapterBase {
 
   getOSImage(deviceType, version) {
     return new Promise((resolve, reject) => {
-      let url = `${this.serverURL}/api/v1/images/os/linux/${version}/${deviceType}`
+      let url = `${this.serverURL}/api/v1/images/os/${this.deviceId}/${version}/linux/${deviceType}`
 
-      fetch(url).then(r => {
-        r.buffer().then(resolve).catch(reject)
+      fetch(url).then(response => {
+        response.buffer().then(buffer => {
+          if (!this.verifyHMAC(response.headers.get('Authorization'), buffer)) {
+            reject(new Error('server returned invalid timestamp or HMAC'))
+          }
+
+          resolve(buffer)
+        })
       })
     })
   }

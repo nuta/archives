@@ -5,6 +5,7 @@ coverage
 
 /server/db/*.sqlite3
 /server/tmp/pids
+/server/tmp/cache/downloads
 
 # Generated automatically by webpack.
 /server/public/index.html
