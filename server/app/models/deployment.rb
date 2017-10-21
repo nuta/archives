@@ -15,7 +15,7 @@ class Deployment < ApplicationRecord
 
   before_create :set_version
 
-  def initialize(attrs)
+  def initialize(attrs = {})
     image_file = attrs.delete(:image)
     super
 
