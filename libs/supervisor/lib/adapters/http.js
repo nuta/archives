@@ -32,12 +32,12 @@ class HTTPAdapter extends AdapterBase {
       return false
     }
 
-    if ((new Date() - (new Date(timestamp))) > 5 * 60 * 1000 /* msec */) {
+    if (typeof timestamp !== 'string' || (new Date() - (new Date(timestamp))) > 5 * 60 * 1000 /* msec */) {
       console.error('too old timestamp')
       return false
     }
 
-    if (hmac !== this.computeHMAC(timestamp, body)) {
+    if (typeof hmac !== 'string' || hmac !== this.computeHMAC(timestamp, body)) {
       console.error('invalid hmac')
       return false
     }
@@ -77,8 +77,14 @@ class HTTPAdapter extends AdapterBase {
     return new Promise((resolve, reject) => {
       let appImageserverURL = `${this.serverURL}/api/v1/images/app/${this.deviceId}/${version}`
 
-      fetch(appImageserverURL).then(r => {
-        r.buffer().then(resolve).catch(reject)
+      fetch(appImageserverURL).then(response => {
+        response.buffer().then(buffer => {
+          if (!this.verifyHMAC(response.headers.get('Authorization'), buffer)) {
+            reject(new Error('server returned invalid timestamp or HMAC'))
+          }
+
+          resolve(buffer)
+        })
       })
     })
   }

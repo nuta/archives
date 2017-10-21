@@ -18,7 +18,9 @@ class ImagesController < ApplicationController
       return
     end
 
-    render type: 'application/zip', body: @device.app_image(params[:version])
+    payload = @device.app_image(params[:version])
+    sign_and_set_authorization_header(@device, payload)
+    render type: 'application/zip', body: payload
   end
 
   private

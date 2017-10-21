@@ -12,6 +12,8 @@ class SmmsController < ApplicationController
     payload = SMMSService.payload_for(device)
     timestamp, hmac = SMMSService.sign(device, payload)
     response.headers['authorization'] = "SMMS #{timestamp} #{hmac}"
+
+    sign_and_set_authorization_header(device, payload)
     render body: payload
   end
  end

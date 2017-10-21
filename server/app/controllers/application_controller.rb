@@ -13,6 +13,11 @@ class ApplicationController < ActionController::API
     @app = @user.apps.find_by_name!(params[:app_name] || params[:name])
   end
 
+  def sign_and_set_authorization_header(device, payload)
+    timestamp, hmac = SMMSService.sign(device, payload)
+    response.headers['authorization'] = "SMMS #{timestamp} #{hmac}"
+  end
+
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:account_update, keys: [])
     devise_parameter_sanitizer.permit(:sign_up, keys: [:email, :username])
