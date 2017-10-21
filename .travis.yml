@@ -88,7 +88,7 @@ matrix:
       env: M=server:frontend
       cache: yarn
       install:
-        - cd server
+        - cd server/ui
         - yarn
       script: npm run build
 
