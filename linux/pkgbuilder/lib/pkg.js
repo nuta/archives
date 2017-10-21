@@ -1,4 +1,5 @@
 const fs = require('fs')
+const os = require('os')
 const path = require('path')
 const child_process = require('child_process')
 const { find, mkdirp } = require('hyperutils')
@@ -80,7 +81,7 @@ function run(argv, env, cwd) {
     cwd: cwd || process.cwd(),
     env: Object.assign({
       PATH: process.env.PATH,
-      MAKEFLAGS: '-j4' // FIXME
+      MAKEFLAGS: `-j${os.cpus().length}`
     }, env)
   })
 
@@ -95,7 +96,7 @@ function sudo(argv, env) {
     stdio: 'inherit',
     env: Object.assign({
       PATH: process.env.PATH,
-      MAKEFLAGS: '-j4' // FIXME
+      MAKEFLAGS: `-j${os.cpus().length}`
     }, env)
   })
 }
