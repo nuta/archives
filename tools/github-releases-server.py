@@ -17,30 +17,12 @@ ARCHS = [
     ('x64', ''),
 ]
 
-# Cross compilers for ARM are not installed by default. Check the existence of them.
-if find_executable('arm-linux-gnueabihf-gcc'):
-    # Ubuntu: apt install '*-arm-linux-gnueabihf'
-    ARCHS.append(('arm', 'arm-linux-gnueabihf-'))
-elif find_executable('arm-elf-eavi-gcc'):
-    # macOS: brew install seiyanuta/corss-compilers/arm-elf-eabi-binutils \
-    #                     seiyanuta/corss-compilers/arm-elf-eabi-gcc
-    ARCHS.append(('arm', 'arm-elf-eabi-'))
 
-
-PORT = 10101
+PORT = 8100
 
 logger = logging.getLogger('github-releases-server')
 logging.basicConfig(format='%(asctime)s %(levelname)s] %(message)s',
                     level=logging.INFO)
-
-def generate_releases(repo):
-    return {
-        'assets': [
-            {
-                'browser_download_url': f'localhost:{PORT}/{repo}.zip'
-            }
-        ]
-    }
 
 def get_os_image(device_type):
     if device_type == 'x86_64':
@@ -83,7 +65,8 @@ def generate_local_plugin(plugin_dir):
             for unused_module in ['nan']:
                 shutil.rmtree(os.path.join('node_modules', unused_module))
 
-        shutil.make_archive('plugin', 'zip')
+        os.chdir('..')
+        shutil.make_archive('plugin', 'zip', '.', os.path.basename(plugin_dir))
         zip = open('plugin.zip', 'rb').read()
         os.chdir(cwd)
 
@@ -93,7 +76,7 @@ class Server (http.server.SimpleHTTPRequestHandler):
     def response_json(self, obj):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(bin(json.dumps(obj)))
+        self.wfile.write(bytes(json.dumps(obj), 'utf-8'))
 
     def response_bin(self, data):
         self.send_response(200)
@@ -101,21 +84,41 @@ class Server (http.server.SimpleHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_GET(self):
-        # /repos/octocat/hdc1000/releases/latest
-        m = re.match(r'^\/repos/(?P<repo>.+/.+)/releases/latest$', self.path)
-        if m:
-            self.response_json(generate_releases(m.groupdict()['repo']))
-
-        # /os/raspberrypi3.img
-        m = re.match(r'^\/os/(?P<device_type>[^.]+).img$', self.path)
-        if m:
-            self.response_bin(get_os_image(m.groupdict()['device_type']))
-
-        # /plugins/app-runtime.zip
-        if self.path == '/plugins/app-runtime.zip':
+        # /repos/plugins/app-runtime.plugin.zip
+        if self.path == '/repos/plugins/app-runtime.plugin.zip':
             appruntime_dir = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                  '..', 'libs', 'app-runtime'))
             self.response_bin(generate_local_plugin(appruntime_dir))
+
+        # /os/raspberrypi3.img
+        m = re.match(r'^\/repos/os/(?P<device_type>[^.]+).img$', self.path)
+        if m:
+            self.response_bin(get_os_image(m.groupdict()['device_type']))
+
+        # /repos/octocat/hdc1000/releases/latest
+        m = re.match(r'^\/repos/(?P<repo>.+/.+)/releases/latest$', self.path)
+        if m:
+            host = self.headers['host']
+            repo = m.groupdict()['repo']
+            if repo == 'seiyanuta/makestack':
+                # official plugins
+                self.response_json({
+                    'assets': [
+                        {
+                            'name': 'app-runtime.plugin.zip',
+                            'browser_download_url': f'http://{host}/repos/plugins/app-runtime.plugin.zip'
+                        }
+                    ]
+                })
+            else:
+                self.response_json({
+                    'assets': [
+                        {
+                            'name': f'{os.path.basename(repo)}.plugin.zip',
+                            'browser_download_url': f'http://{host}/repos/plugins/{repo}.zip'
+                        }
+                    ]
+                })
 
 logger.info('starting a server...')
 with socketserver.TCPServer(("", PORT), Server) as httpd:

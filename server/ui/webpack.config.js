@@ -64,7 +64,8 @@ module.exports = {
     historyApiFallback: true,
     inline: true,
     proxy: {
-      '/api/*': 'http://localhost:3000'
+      '/api/*': 'http://localhost:3000',
+      '/repo/*': 'http://localhost:8100'
     }
   }
 }

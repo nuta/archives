@@ -7,22 +7,27 @@ export default new class {
     this.credentials = JSON.parse(localStorage.getItem('credentials'))
   }
 
-  invoke(method, path, params, requiresCredentials = true) {
-    let reqHeaders = Object.assign({
-      'Content-Type': 'application/json'
-    }, this.credentials)
+  invoke(method, path, body, requiresCredentials = true) {
+    let reqHeaders = Object.assign({}, this.credentials)
 
     if (requiresCredentials && (!this.user || !this.credentials)) {
       this.forceLogin()
+    }
+
+    if (typeof body !== 'string' && !(body instanceof FormData)) {
+      body = JSON.stringify(body)
+      Object.assign(reqHeaders, {
+        'Content-Type': 'application/json'
+      })
     }
 
     return new Promise((resolve, reject) => {
       let status
       let headers
       fetch(`/api/v1${path}`, {
-        method: method,
+        method,
         headers: reqHeaders,
-        body: JSON.stringify(params)
+        body
       }).then((response) => {
         status = response.status
         headers = response.headers
@@ -174,8 +179,13 @@ export default new class {
   }
 
   deploy(appName, image, debug, comment, tag) {
-    return this.invoke('POST', `/apps/${appName}/deployments`,
-      { deployment: { image, debug, comment, tag } })
+    let form = new FormData()
+    form.set('deployment[image]', image, 'app.zip')
+    form.set('deployment[debug]', debug)
+    form.set('deployment[comment]', comment)
+    form.set('deployment[tag]', tag)
+
+    return this.invoke('POST', `/apps/${appName}/deployments`, form)
   }
 
   createApp(appName, api) {

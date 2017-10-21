@@ -33,6 +33,90 @@
 import api from "js/api";
 import ActionButton from "components/action-button";
 import DashboardLayout from "layouts/dashboard";
+import 'whatwg-fetch';
+const Cookies = require('js-cookie')
+const JSZip = require('jszip')
+
+function fetchLatestGitHubRelease(url, name) {
+  console.log(`==> searching for \`${name}'`)
+
+  return new Promise((resolve, reject) => {
+    fetch(`${url}/repos/${name}/releases/latest`).then(resp => {
+      return resp.json()
+    }).then(json => {
+      resolve(json.assets)
+    }).catch(reject)
+  })
+}
+
+async function downloadPlugin(name) {
+  let githubURL
+
+  if (window.location.host === 'localhost:8080' && Cookies.get('use_local_mock_github_server')) {
+    // Use local mock github releases server (tools/github-releases-server.py).
+    githubURL = `http://localhost:8080`
+  } else {
+    githubURL = `https://api.github.com`
+  }
+
+  let repo
+  if (name.match(/^[a-zA-Z0-9\-\_]+$/)) {
+    // Builtin plugins (e.g. app-runtime)
+    repo = 'seiyanuta/makestack'
+  } else if (name.match(/^[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+$/)) {
+    // Plugins on GitHub (e.g. octocat/temperature-sensor)
+    repo = name
+  } else {
+    throw new Error(`invalid plugin name: \`${name}'`)
+  }
+
+  const assets = await fetchLatestGitHubRelease(githubURL, repo)
+  const pluginURL = assets.filter(asset => asset.name.indexOf(name) !== -1)[0].browser_download_url
+  if (!pluginURL) {
+    throw new Error(`unknown plugin: \`${name}'`)
+  }
+
+  console.log(`==> downloading \`${name}'`)
+  return (await fetch(pluginURL)).blob()
+}
+
+async function mergeZipFiles(destZip, srcZip) {
+  for (const filepath in srcZip.files) {
+    destZip.file(`node_modules/${filepath}`,
+      srcZip.files[filepath].async('arraybuffer'))
+  }
+
+  return destZip
+}
+
+async function buildApp (code) {
+  const appName = 'deploy-test'
+  let runtime = 'app-runtime'
+  let plugins = [runtime]
+  let zip = new JSZip()
+
+  // Populate plugin files.
+  for (let i = 0; i < plugins.length; i++) {
+    const pluginName = plugins[i]
+    const pluginZip = await downloadPlugin(pluginName)
+    zip = await mergeZipFiles(zip, await (new JSZip()).loadAsync(pluginZip))
+  }
+
+  // Copy start.js to the top level.
+  const startJsRelPath = `node_modules/${runtime}/start.js`
+  if (!zip.files[startJsRelPath]) {
+    throw new Error(`runtime start.js not found`)
+  }
+
+  zip.file('start.js', zip.files[startJsRelPath].async('arraybuffer'))
+
+  // Copy app files.
+  zip.file('main.js', code)
+  return new Blob([await zip.generateAsync({ type: 'arraybuffer' })],
+                  { type: 'application/zip' })
+}
+
+
 
 export default {
   components: { ActionButton, DashboardLayout },
@@ -53,10 +137,14 @@ export default {
     };
   },
   methods: {
-    deploy() {
+    async deploy() {
+      const code = ace.edit("editor").getValue()
+      this.deployButton = "Building...";
+      const image = await buildApp(code)
+
       let comment = "Deployment at " + (new Date()).toString(); // TODO
       this.deployButton = "Deploying...";
-      api.deploy(this.appName, ace.edit("editor").getValue(), "", comment, null).then(r => {
+      api.deploy(this.appName, image, "", comment, null).then(r => {
         this.deployButton = "done";
         setTimeout(() => { this.deployButton = "waiting"; }, 1500);
       }).catch(error => notify("error", error));
