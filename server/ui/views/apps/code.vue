@@ -130,7 +130,7 @@ export default {
       devices: [],
       fileName: "",
       prevFileBody: "",
-      sampleCode: "loop(3 /* seconds, () => {\n  print('Hello, World!');\n});",
+      sampleCode: "loop(3 /* seconds */, () => {\n  print('Hello, World!');\n});",
       autosaveAfter: 1000,
       deployButton: "waiting",
       saveButton: "waiting"
