@@ -9,13 +9,37 @@ class Integration < ApplicationRecord
   validates :token_prefix, uniqueness: true
   validates :service, inclusion: { in: SUPPORTED_SERVICES }
   validate :token_prefix_is_prefix
+  validate :validate_config_contents
 
   before_create :set_name
 
-  def config_is_json
-    JSON.parse(self.config)
-  rescue
-    errors.add(:config, "is not valid JSON.")
+  def validate_config_contents
+    begin
+      config = JSON.parse(self.config)
+    rescue
+      errors.add(:config, "is not valid JSON.")
+    end
+
+    case self.service
+    when 'outgoing_webhook'
+      unless URI::regexp(%w(http https)).match(config['webhook_url'])
+        errors.add(:config, "does not contain valid `webhook_url'")
+      end
+    when 'slack'
+      unless URI::regexp(%w(http https)).match(config['webhook_url'])
+        errors.add(:config, "does not contain valid `webhook_url'")
+      end
+    when 'ifttt'
+      unless config['key']
+        errors.add(:config, "does not contain `key''")
+      end
+    when 'datadog'
+      unless config['api_key']
+        errors.add(:config, "does not contain `api_key''")
+      end
+    else
+      errors.add(:config, "is not implemented in `validate_config_contents'.")
+    end
   end
 
   def token_prefix_is_prefix
