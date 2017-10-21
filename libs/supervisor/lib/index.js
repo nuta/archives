@@ -5,8 +5,9 @@ const path = require('path')
 const HTTPAdapter = require('./adapters/http')
 
 class Supervisor {
-  constructor(url, deviceType, osVersion, deviceId) {
+  constructor({ adapter, appDir, deviceType, osVersion, deviceId }) {
     this.app = null
+    this.appDir = appDir
     this.osVersion = osVersion
     this.deviceId = deviceId
     this.deviceType = deviceType
@@ -14,7 +15,14 @@ class Supervisor {
     this.appVersion = 0
     this.log = ''
     this.stores = {}
-    this.adapter = new HTTPAdapter(url, deviceId)
+    this.adapterName = adapter.name
+    switch (this.adapterName) {
+      case 'http':
+        this.adapter = new HTTPAdapter(deviceId, adapter.url)
+        break
+      default:
+        throw new Error(`unknown adapter \`${this.adapterName}'`)
+    }
   }
 
   popLog() {
@@ -45,16 +53,15 @@ class Supervisor {
   }
 
   launchApp(appZip) {
-    const APP_ZIP_DIR = '/tmp/app.zip'
-    const APP_DIR = '/tmp/app'
+    const appZipPath = path.join(os.tmpdir(), 'app.zip')
 
-    fs.writeFileSync(APP_ZIP_DIR, appZip)
-    spawnSync('rm', ['-r', APP_DIR])
-    spawnSync('unzip', [APP_ZIP_DIR, '-d', APP_DIR], {
+    fs.writeFileSync(appZipPath, appZip)
+    spawnSync('rm', ['-r', this.appDir])
+    spawnSync('unzip', [appZipPath, '-d', this.appDir], {
       stdio: 'inherit'
     })
 
-    this.spawnApp(APP_DIR)
+    this.spawnApp(this.appDir)
   }
 
   spawnApp(appDir) {

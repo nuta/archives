@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 const AdapterBase = require('./base')
 
 class HTTPAdapter extends AdapterBase {
-  constructor(serverURL, deviceId) {
+  constructor(deviceId, serverURL) {
     super()
 
     this.serverURL = serverURL
