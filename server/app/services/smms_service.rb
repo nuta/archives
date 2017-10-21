@@ -23,7 +23,8 @@ module SMMSService
     end
 
     device_info = {
-      state: states[(data[SMMS_DEVICE_INFO] || 0) & 0x07]
+      state: states[(data[SMMS_DEVICE_INFO] || 0) & 0x07],
+      debug_mode: states[(data[SMMS_DEVICE_INFO] || 0) & 0x08] != 0
     }
 
     messages = {
@@ -62,6 +63,7 @@ module SMMSService
 
     device.last_heartbeated_at = Time.now
     device.status = messages.dig(:device_info, :state)
+    device.debug_mode = messages.dig(:device_info, :debug_mode)
     device.current_os_version = messages[:os_version]
     device.current_app_version = messages[:app_version]
     device.append_log(messages[:log])

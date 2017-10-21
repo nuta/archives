@@ -10,7 +10,7 @@ Simple Management/Messaging System
  0x04  | nonce
  0x05  | hmac
  0x0a  | device_id
- 0x0b  | device_info
+ 0x0b  | device_info (0-2 bits: state, 3th bit: debug mode)
  0x0c  | log
  0x0d  | crashdump
  0x10  | os_version

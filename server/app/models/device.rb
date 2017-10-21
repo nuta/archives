@@ -5,6 +5,7 @@ class Device < ApplicationRecord
   has_many   :device_mappings, dependent: :destroy
 
   value :status, expiration: 45.minutes
+  value :debug_mode, expiration: 45.minutes
   value :last_heartbeated_at, expiration: 3.days
   value :current_os_version, expiration: 45.minutes
   value :current_app_version, expiration: 45.minutes

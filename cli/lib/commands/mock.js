@@ -25,7 +25,8 @@ function run(args, opts, logger) {
     },
     deviceType: 'mock',
     deviceId: mock.device_id,
-    osVersion,
+    debugMode: true,
+    osVersion
   })
 
   supervisor.start()

@@ -5,10 +5,11 @@ const path = require('path')
 const HTTPAdapter = require('./adapters/http')
 
 class Supervisor {
-  constructor({ adapter, appDir, deviceType, osVersion, deviceId }) {
+  constructor({ adapter, appDir, deviceType, osVersion, deviceId, debugMode }) {
     this.app = null
     this.appDir = appDir
     this.osVersion = osVersion
+    this.debugMode = debugMode
     this.deviceId = deviceId
     this.deviceType = deviceType
     this.device = new (require(`./devices/${deviceType}`))()
@@ -47,7 +48,13 @@ class Supervisor {
         console.log('updating os image...')
         this.device.updateOS(tmpFilePath)
         console.log('updateOS returned!')
-        this.adapter.send({ state: 'ready', osVersion: this.osVersion, appVersion: 0, log: 'os updated' })
+        this.adapter.send({
+          state: 'ready',
+          debugMode: this.debugMode,
+          osVersion: this.osVersion,
+          appVersion: 0,
+          log: 'os updated'
+        })
       }, 5000)
     })
   }
@@ -104,7 +111,14 @@ class Supervisor {
   }
 
   start() {
-    this.adapter.send({ state: 'booting', osVersion: this.osVersion, appVersion: 0, log: '' })
+    this.adapter.send({
+      state: 'booting',
+      debugMode: this.debugMode,
+      osVersion: this.osVersion,
+      appVersion: 0,
+      log: ''
+    })
+
     this.adapter.onReceive(({ osUpdateRequest, appUpdateRequest, stores }) => {
       this.stores = stores
 
@@ -127,6 +141,7 @@ class Supervisor {
       console.log('heartbeating...')
       this.adapter.send({
         state: 'running',
+        debugMode: this.debugMode,
         osVersion: this.osVersion,
         appVersion: this.appVersion,
         log: this.popLog()

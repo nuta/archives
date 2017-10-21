@@ -46,6 +46,7 @@ debug=$(egrep -o "debug" /proc/cmdline)
 if [ "$debug" = "" ]; then
     node /supervisor/supervisor
 else
+    export MAKESTACK_DEBUG_MODE=1
     echo "TODO: run tests!"
 fi
 

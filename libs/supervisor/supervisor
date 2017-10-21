@@ -7,9 +7,10 @@ const adapter = {
   url: process.env['MAKESTACK_SERVER_URL']
 }
 const deviceType = process.env['MAKESTACK_DEVICE_TYPE']
+const debugMode = process.env['MAKESTACK_DEBUG_MODE'] !== undefined
 const osVersion = process.env['MAKESTACK_OS_VERSION']
 const deviceId = process.env['MAKESTACK_DEVICE_ID']
 
 console.log('*** starting supervisor')
-const supervisor = new Supervisor({ appDir, adapter, deviceType, osVersion, deviceId })
+const supervisor = new Supervisor({ appDir, adapter, deviceType, osVersion, deviceId, debugMode })
 supervisor.start()
