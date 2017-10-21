@@ -181,9 +181,18 @@ export default new class {
   deploy(appName, image, debug, comment, tag) {
     let form = new FormData()
     form.set('deployment[image]', image, 'app.zip')
-    form.set('deployment[debug]', debug)
-    form.set('deployment[comment]', comment)
-    form.set('deployment[tag]', tag)
+
+    if (debug) {
+      form.set('deployment[debug]', debug)
+    }
+
+    if (comment) {
+      form.set('deployment[comment]', comment)
+    }
+
+    if (tag) {
+      form.set('deployment[tag]', tag)
+    }
 
     return this.invoke('POST', `/apps/${appName}/deployments`, form)
   }
