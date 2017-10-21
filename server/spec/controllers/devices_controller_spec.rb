@@ -16,7 +16,7 @@ RSpec.describe DevicesController, type: :controller do
   describe "GET #show" do
     it "returns a success response" do
       device = create(:device, user: user)
-      get :show, params: {device_name: device.name}
+      get :show, params: {name: device.name}
       expect(response).to be_success
     end
   end
@@ -54,7 +54,7 @@ RSpec.describe DevicesController, type: :controller do
       it "updates the requested device" do
         device = create(:device, user: user)
         valid = { api: "makestack" }
-        put :update, params: {device_name: device.name, device: valid}
+        put :update, params: {name: device.name, device: valid}
         device.reload
 
         expect(response).to be_success
@@ -63,7 +63,7 @@ RSpec.describe DevicesController, type: :controller do
       it "renders a JSON response with the device" do
         device = create(:device, user: user)
 
-        put :update, params: {device_name: device.name, device: attributes_for(:device)}
+        put :update, params: {name: device.name, device: attributes_for(:device)}
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
       end
@@ -74,7 +74,7 @@ RSpec.describe DevicesController, type: :controller do
         device = create(:device, user: user)
         invalid = { device_type: "unsupported-one" }
 
-        put :update, params: {device_name: device.name, device: invalid}
+        put :update, params: {name: device.name, device: invalid}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
       end
@@ -85,7 +85,7 @@ RSpec.describe DevicesController, type: :controller do
     it "destroys the requested device" do
       device = create(:device, user: user)
       expect {
-        delete :destroy, params: {device_name: device.name}
+        delete :destroy, params: {name: device.name}
       }.to change(Device, :count).by(-1)
     end
   end

@@ -16,7 +16,7 @@ RSpec.describe AppsController, type: :controller do
   describe "GET #show" do
     it "returns a success response" do
       app = create(:app, user: user)
-      get :show, params: {app_name: app.name}
+      get :show, params: {name: app.name}
       expect(response).to be_success
     end
   end
@@ -54,7 +54,7 @@ RSpec.describe AppsController, type: :controller do
       it "updates the requested app" do
         app = create(:app, user: user)
         valid = { api: "makestack" }
-        put :update, params: {app_name: app.name, app: valid}
+        put :update, params: {name: app.name, app: valid}
         app.reload
 
         expect(response).to be_success
@@ -63,7 +63,7 @@ RSpec.describe AppsController, type: :controller do
       it "renders a JSON response with the app" do
         app = create(:app, user: user)
 
-        put :update, params: {app_name: app.name, app: attributes_for(:app)}
+        put :update, params: {name: app.name, app: attributes_for(:app)}
         expect(response).to have_http_status(:ok)
         expect(response.content_type).to eq('application/json')
       end
@@ -74,7 +74,7 @@ RSpec.describe AppsController, type: :controller do
         app = create(:app, user: user)
         invalid = { api: "unsupported-one" }
 
-        put :update, params: {app_name: app.name, app: invalid}
+        put :update, params: {name: app.name, app: invalid}
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
       end
@@ -85,7 +85,7 @@ RSpec.describe AppsController, type: :controller do
     it "destroys the requested app" do
       app = create(:app, user: user)
       expect {
-        delete :destroy, params: {app_name: app.name}
+        delete :destroy, params: {name: app.name}
       }.to change(App, :count).by(-1)
     end
   end

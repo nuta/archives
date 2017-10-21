@@ -16,6 +16,7 @@ RSpec.describe AppStoresController, type: :routing do
     end
 
     it "routes to #create" do
+
       expect(:post => "#{api_prefix}/apps/#{app.name}/stores").to \
         route_to("app_stores#create", app_name: app.name)
     end

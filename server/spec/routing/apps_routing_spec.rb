@@ -10,7 +10,7 @@ RSpec.describe AppsController, type: :routing do
 
     it "routes to #show" do
       expect(:get => "#{api_prefix}/apps/#{app.name}").to \
-        route_to("apps#show", app_name: app.name)
+        route_to("apps#show", name: app.name)
     end
 
     it "routes to #create" do
@@ -19,17 +19,17 @@ RSpec.describe AppsController, type: :routing do
 
     it "routes to #update via PUT" do
       expect(:put => "#{api_prefix}/apps/#{app.name}").to \
-        route_to("apps#update", app_name: app.name)
+        route_to("apps#update", name: app.name)
     end
 
     it "routes to #update via PATCH" do
       expect(:patch => "#{api_prefix}/apps/#{app.name}").to \
-        route_to("apps#update", app_name: app.name)
+        route_to("apps#update", name: app.name)
     end
 
     it "routes to #destroy" do
       expect(:delete => "#{api_prefix}/apps/#{app.name}").to \
-        route_to("apps#destroy", app_name: app.name)
+        route_to("apps#destroy", name: app.name)
     end
   end
 end

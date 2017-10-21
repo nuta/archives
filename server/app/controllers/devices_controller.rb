@@ -44,7 +44,7 @@ class DevicesController < ApplicationController
   private
 
   def set_device
-    @device = @user.devices.find_by_name!(params[:device_name])
+    @device = @user.devices.find_by_name!(params[:name])
   end
 
   def device_params

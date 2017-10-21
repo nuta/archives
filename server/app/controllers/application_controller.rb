@@ -10,7 +10,7 @@ class ApplicationController < ActionController::API
   end
 
   def set_app
-    @app = @user.apps.find_by_name!(params[:app_name])
+    @app = @user.apps.find_by_name!(params[:app_name] || params[:name])
   end
 
   def configure_permitted_parameters
