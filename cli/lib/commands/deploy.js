@@ -63,9 +63,9 @@ async function downloadPlugin(name) {
   return (await fetch(url)).buffer()
 }
 
-async function mergeZipFiles(destZip, srcZip) {
+async function mergeZipFiles(pluginName, destZip, srcZip) {
   for (const filepath in srcZip.files) {
-    destZip.file(path.join('node_modules', filepath),
+    destZip.file(path.join('node_modules', pluginName, filepath),
       srcZip.files[filepath].async('arraybuffer'))
   }
 
@@ -83,7 +83,7 @@ module.exports = async (args, opts, logger) => {
   for (let i = 0; i < plugins.length; i++) {
     const pluginName = plugins[i]
     const pluginZip = await downloadPlugin(pluginName)
-    zip = await mergeZipFiles(zip, await (new JSZip()).loadAsync(pluginZip))
+    zip = await mergeZipFiles(pluginName, zip, await (new JSZip()).loadAsync(pluginZip))
   }
 
   // Copy start.js to the top level.

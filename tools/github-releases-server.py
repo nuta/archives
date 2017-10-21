@@ -65,8 +65,7 @@ def generate_local_plugin(plugin_dir):
             for unused_module in ['nan']:
                 shutil.rmtree(os.path.join('node_modules', unused_module))
 
-        os.chdir('..')
-        shutil.make_archive('plugin', 'zip', '.', os.path.basename(plugin_dir))
+        shutil.make_archive('plugin', 'zip')
         zip = open('plugin.zip', 'rb').read()
         os.chdir(cwd)
 
