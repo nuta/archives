@@ -144,7 +144,7 @@ function buildPackage(pkg) {
       throw new Error(`shasum mismatch: ${dlpath}`)
     }
 
-    //    extract(dlpath, pkgBuildDir)
+    extract(dlpath, pkgBuildDir)
   } else if (pkg.path) {
     if (isNewerDirContent(pkg.path, pkgBuildDir, pkg.ignore)) {
       copyFiles(pkg.path, pkgBuildDir, pkg.ignore)
