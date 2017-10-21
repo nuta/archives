@@ -4,12 +4,14 @@ class Integration < ApplicationRecord
   SUPPORTED_SERVICES = %w(incoming_webhook outgoing_webhook ifttt slack datadog)
   INTEGRATION_TOKEN_LEN = 40
   INTEGRATION_TOKEN_PREFIX_LEN = 20
+  INTEGRATIONS_MAX_NUM = 10
 
   validates :name, uniqueness: { scope: :app_id }
   validates :token_prefix, uniqueness: true
   validates :service, inclusion: { in: SUPPORTED_SERVICES }
   validate :token_prefix_is_prefix
   validate :validate_config_contents
+  validate :validate_num_of_integrations, on: :create
 
   before_create :set_name
 
@@ -45,6 +47,12 @@ class Integration < ApplicationRecord
   def token_prefix_is_prefix
     if self.token && !self.token.start_with?(self.token_prefix)
       errors.add(:token_prefix, "is not prefix of integration (BUG).")
+    end
+  end
+
+  def validate_num_of_integrations
+    if self.app.integrations.count >= INTEGRATIONS_MAX_NUM
+      errors.add(:integrations, "are too many.")
     end
   end
 
