@@ -15,7 +15,7 @@ class IntegrationsController < ApplicationController
     @integration.reset_token
 
     if @integration.save
-      render :show, status: :created, location: @integration
+      render :show, status: :created, location: app_integration_url(@app.name, @integration.name)
     else
       render json: @integration.errors, status: :unprocessable_entity
     end
@@ -23,7 +23,7 @@ class IntegrationsController < ApplicationController
 
   def update
     if @integration.update(integration_params)
-      render :show, status: :ok, location: @integration
+      render :show, status: :ok, location: app_integration_url(@app.name, @integration.name)
     else
       render json: @integration.errors, status: :unprocessable_entity
     end

@@ -14,7 +14,7 @@ class AppStoresController < ApplicationController
     @app_store.app = @app
 
     if @app_store.save
-      render :show, status: :created, location: @app_store
+      render :show, status: :created, location: app_store_url(@app.name, @app_store.key)
     else
       render json: @app_store.errors, status: :unprocessable_entity
     end
@@ -22,7 +22,7 @@ class AppStoresController < ApplicationController
 
   def update
     if @app_store.update(app_store_params)
-      render :show, status: :ok, location: @app_store
+      render :show, status: :ok, location: app_store_url(@app.name, @app_store.key)
     else
       render json: @app_store.errors, status: :unprocessable_entity
     end
