@@ -7,6 +7,7 @@ program
 
 program
   .command('deploy', 'Deploys the app.')
+  .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
   .action(require('./commands/deploy'))
 
 program

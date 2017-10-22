@@ -3,6 +3,7 @@ const os = require('os')
 const path = require('path')
 const express = require('express')
 const buildPlugin = require('../plugin_builder')
+const logger = require('../logger')
 
 module.exports = (args, opts, logger) => {
   const server = express()
@@ -49,6 +50,6 @@ module.exports = (args, opts, logger) => {
 
   const port = 8100
   server.listen(port, () => {
-    console.log(`listening on ${port}`)
+    logger.info(`listening on ${port}`)
   })
 }
