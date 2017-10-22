@@ -25,7 +25,15 @@
     </div>
   </section>
 
-  <div id="editor" ref="editor"></div>
+  <div class="editor-wrapper" @dragover.prevent="showUploadNavi = true" >
+    <div class="upload-navi" v-show="showUploadNavi" @dragleave.prevent="showUploadNavi = false" @drop.prevent="uploadFile">
+      <i class="fa fa-lg fa-cloud-upload" aria-hidden="true"></i>
+      &nbsp;
+      Drag & drop your source file here!
+    </div>
+
+    <div id="editor" ref="editor"></div>
+  </div>
 </dashboard-layout>
 </template>
 
@@ -133,10 +141,23 @@ export default {
       sampleCode: "loop(3 /* seconds */, () => {\n  print('Hello, World!');\n});",
       autosaveAfter: 1000,
       deployButton: "waiting",
-      saveButton: "waiting"
+      saveButton: "waiting",
+      showUploadNavi: false
     };
   },
   methods: {
+    uploadFile(event) {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const editor = ace.edit("editor")
+        editor.setValue(event.target.result)
+        editor.selection.moveCursorFileStart()
+      }
+
+      reader.readAsText(event.dataTransfer.files[0])
+      this.showUploadNavi = false
+    },
+
     async deploy() {
       const code = ace.edit("editor").getValue()
       this.deployButton = "Building...";
@@ -214,13 +235,36 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#editor {
+$editor-border-width: 7px;
+
+.editor-wrapper {
+  display: block;
+  position: relative;
+
+  #editor {
+    width: 100%;
+    min-height: 300px;
+    height: 70vh;
+    font-size: 14px;
+    border: $editor-border-width solid #f3f3f3;
+    border-radius: 5px;
+  }
+}
+
+.upload-navi {
+  padding: $editor-border-width;
+  padding-top: 30px;
+  z-index: 100;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  text-align: center;
   width: 100%;
-  min-height: 300px;
-  height: 70vh;
-  font-size: 14px;
-  border: 7px solid #f3f3f3;
-  border-radius: 5px;
+  height: 100%;
 }
 
 .save-button {
