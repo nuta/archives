@@ -1,46 +1,30 @@
 const fs = require('fs')
-const util = require('util')
 const FormData = require('form-data')
 const fetch = require('node-fetch')
 const config = require('./config')
 
 class API {
-  doInvoke(method, path, headers, body) {
+  invoke(method, path, headers, body) {
     return new Promise((resolve, reject) => {
       if (!config.credentials) {
         reject(new Error('login first'))
       }
 
-      let respStatus, respHeaders
+      if (!(body instanceof FormData)) {
+        body = JSON.stringify(body)
+        Object.assign(headers, {
+          'Content-Type': 'application/json'
+        })
+      }
+
       fetch(`${config.server.url}/api/v1${path}`, {
         method: method,
-        headers:  Object.assign(headers, config.credentials),
+        headers: Object.assign(headers, config.credentials),
         body
       }).then(response => {
-        respStatus = response.status
-        respHeaders = response.headers
-        return response
-      }).then(response => {
-        return response.json()
-      }).then(json => {
-        const result = { respStatus, respHeaders, json }
-        if (respStatus === 200 || respStatus === 201) {
-          resolve(result)
-        } else {
-          console.error(`server returned ${respStatus}\n`)
-          console.error(util.inspect(json, false, 8))
-        }
+        response.json().then(resolve).catch(reject)
       })
     })
-  }
-
-  invoke(method, path, params) {
-    const body = JSON.stringify(params)
-    const headers = {
-      'Content-Type': 'application/json'
-    }
-
-    return this.doInvoke(method, path, headers, body)
   }
 
   get serverURL() {
@@ -67,37 +51,44 @@ class API {
     })
   }
 
-  signup(username, email, password) {
-    return this.invoke('POST', '/auth', {
-      name: username,
-      email: email,
-      password: password
-    }, false)
-  }
-
-  deleteUser(username) {
-    return this.invoke('DELETE', '/auth', {
-      name: username
-    }, false)
-  }
-
-  resetPassword(email) {
-    return this.invoke('POST', '/auth/password', {
-      email: email,
-      redirectUrl: '/home'
-    }, false)
-  }
-
   getApps() {
     return this.invoke('GET', `/apps`)
+  }
+
+  createApp(appName, api) {
+    return this.invoke('POST', `/apps`, {
+      app: { name: appName, api: api }
+    })
+  }
+
+  getFiles(appName) {
+    return this.invoke('GET', `/apps/${appName}/files`)
+  }
+
+  saveFile(appName, path, body) {
+    return this.invoke('PUT', `/apps/${appName}/files/${path}`, { body })
   }
 
   getApp(appName) {
     return this.invoke('GET', `/apps/${appName}`)
   }
 
-  updateApp(appName, attrs) {
+  editApp(appName, attrs) {
     return this.invoke('PUT', `/apps/${appName}`, attrs)
+  }
+
+  getDeployments(appName) {
+    return this.invoke('GET', `/apps/${appName}/deployments`)
+  }
+
+  getDeployment(appName, version) {
+    return this.invoke('GET', `/apps/${appName}/deployments/${version}`)
+  }
+
+  deploy(appName, image, debug, comment, tag) {
+    const form = new FormData()
+    form.append('deployment[image]', image)
+    return this.invoke('POST', `/apps/${appName}/deployments`, {}, form)
   }
 
   deleteApp(appName) {
@@ -120,7 +111,7 @@ class API {
     return this.invoke('GET', `/devices/${deviceName}/stores`)
   }
 
-  updateDeviceStore(deviceName, key, value) {
+  setDeviceStore(deviceName, key, value) {
     return this.invoke('PUT', `/devices/${deviceName}/stores/${key}`, { value })
   }
 
@@ -132,39 +123,11 @@ class API {
     return this.invoke('DELETE', `/devices/${deviceName}`)
   }
 
-  getDeployments(appName) {
-    return this.invoke('GET', `/apps/${appName}/deployments`)
-  }
-
-  getDeployment(appName, version) {
-    return this.invoke('GET', `/apps/${appName}/deployments/${version}`)
-  }
-
-  deploy(appName, image, debug, comment, tag) {
-    const form = new FormData()
-    form.append('deployment[image]', image)
-    return this.doInvoke('POST', `/apps/${appName}/deployments`, {}, form)
-  }
-
-  createApp(appName, api) {
-    return this.invoke('POST', `/apps`, {
-      app: { name: appName, api: api }
-    })
-  }
-
-  getFiles(appName) {
-    return this.invoke('GET', `/apps/${appName}/files`)
-  }
-
-  saveFile(appName, path, body) {
-    return this.invoke('PUT', `/apps/${appName}/files/${path}`, { body })
-  }
-
   getAppStores(appName) {
     return this.invoke('GET', `/apps/${appName}/stores`)
   }
 
-  updateAppStore(appName, key, value) {
+  setAppStore(appName, key, value) {
     return this.invoke('PUT', `/apps/${appName}/stores/${key}`, { value })
   }
 }
