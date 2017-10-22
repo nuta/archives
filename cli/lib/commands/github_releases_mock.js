@@ -25,20 +25,21 @@ module.exports = (args, opts, logger) => {
   })
 
   server.get('/repos/:org/:repo/releases/latest', (req, res) => {
-    const host = req.hostname
     let json
     if (req.params.org === 'seiyanuta' && req.params.repo === 'makestack') {
       json = {
+        tag: 'v12345.0.0',
         assets: [{
           name: 'app-runtime.plugin.zip',
-          browser_download_url: `http://${host}/repos/plugins/app-runtime.plugin.zip`
+          browser_download_url: `http://localhost:8080/repos/plugins/app-runtime.plugin.zip`
         }]
       }
     } else {
       json = {
+        tag: 'v12345.0.0',
         assets: [{
           name: `${req.params.repo}.plugin.zip`,
-          browser_download_url: `http://${host}/repos/plugins/${repo}.plugin.zip`
+          browser_download_url: `http://localhost:8080/repos/plugins/${req.params.repo}.plugin.zip`
         }]
       }
     }
