@@ -9,6 +9,7 @@ const { createFile, generateTempPath,
   generateRandomString } = require('hyperutils')
 const api = require('./api')
 const { getDriveSize } = require('./drive')
+const { getLatestGitHubRelease } = require('./github_releases')
 
 function replaceBuffer(buf, value, id) {
   const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`
@@ -40,22 +41,16 @@ async function registerOrGetDevice(name, type, ignoreDuplication) {
   return device
 }
 
-function getDiskImageURL(type, os) {
-  // TODO
-  return 'https://www.coins.tsukuba.ac.jp/~s1311386/kernel.img'
-}
-
 async function downloadDiskImage(type, os) {
-  const osImageURL = getDiskImageURL()
+  const [version, osImageURL] = await getLatestGitHubRelease('seiyanuta/makestack', os, '.img')
   const basename = path.basename(osImageURL)
   const orignalImage = path.join(process.env.HOME, `.makestack/caches/${basename}`)
   createFile(orignalImage, await (await fetch(osImageURL)).buffer())
-  return orignalImage
+  return [version, orignalImage]
 }
 
-function writeConfigToDiskIamge(os, type, orignalImage, device, adapter) {
+function writeConfigToDiskIamge(os, osVersion, type, orignalImage, device, adapter) {
   const imagePath = generateTempPath()
-  const osVersion = 'v0.0.1' // TODO
 
   // TODO: What if the image is large?
   let image = fs.readFileSync(orignalImage)
@@ -118,9 +113,9 @@ module.exports = async(name, type, os, adapter, drive, ignoreDuplication, flashC
   progress('register')
   const device = await registerOrGetDevice(name, type, ignoreDuplication)
   progress('download')
-  const orignalImage = await downloadDiskImage(type, os)
+  const [osVersion, orignalImage] = await downloadDiskImage(type, os)
   progress('config')
-  const imagePath = writeConfigToDiskIamge(os, type, orignalImage, device, adapter)
+  const imagePath = writeConfigToDiskIamge(os, osVersion, type, orignalImage, device, adapter)
   progress('flash')
   await flash(flashCommand, drive, driveSize, imagePath, progress)
   progress('success')
