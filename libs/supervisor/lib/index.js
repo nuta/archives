@@ -3,6 +3,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const HTTPAdapter = require('./adapters/http')
+const logger = require('./logger')
 
 class Supervisor {
   constructor({ adapter, appDir, deviceType, osVersion, deviceId, deviceSecret, debugMode, appUID, appGID }) {
@@ -36,20 +37,20 @@ class Supervisor {
 
   updateOS(version) {
     this.adapter.getOSImage(this.deviceType, version).then(image => {
-      console.log('saving os image...')
+      logger.info('saving os image...')
       const tmpFilePath = path.join(os.tmpdir(), 'kernel.img')
       fs.writeFileSync(tmpFilePath, image)
 
-      console.log('sending SIGTERM to the app...')
+      logger.warn('sending SIGTERM to the app...')
       if (this.app)
         this.app.kill()
 
       // Wait the app to exit.
-      console.log('OS will be updated soon!')
+      logger.warn('OS will be updated soon!')
       setTimeout(() => {
-        console.log('updating os image...')
+        logger.info('updating os image...')
         this.device.updateOS(tmpFilePath)
-        console.log('updateOS returned!')
+        logger.info('updateOS returned!')
         this.adapter.send({
           state: 'ready',
           debugMode: this.debugMode,
@@ -75,7 +76,7 @@ class Supervisor {
 
   spawnApp(appDir) {
     if (this.app) {
-      console.log('killing the app')
+      logger.info('killing the app')
       this.app.kill()
     }
 
@@ -88,20 +89,20 @@ class Supervisor {
     this.sendToApp('initialize', { stores: this.stores })
 
     this.app.on('message', (data) => {
-      console.log('message', data)
+      logger.info('message', data)
       switch (data.type) {
         case 'log':
-          console.log('device', data.body)
+          logger.info('device', data.body)
           this.log += data.body
           break
         default:
-          console.log('unknown message', data.type)
+          logger.info('unknown message', data.type)
       }
     })
 
     this.app.on('exit', () => {
       this.app = null
-      console.log('app exited')
+      logger.info('app exited')
     })
   }
 
@@ -115,6 +116,9 @@ class Supervisor {
   }
 
   start() {
+    logger.info(`heartbeating (state=booting, os_ver="${this.osVersion}", ` +
+      `app_ver=0, debug=${this.debugMode})`)
+
     this.adapter.send({
       state: 'booting',
       debugMode: this.debugMode,
@@ -131,7 +135,7 @@ class Supervisor {
       }
 
       if (appUpdateRequest) {
-        console.log(`updating ${this.appVersion} -> ${appUpdateRequest}`)
+        logger.info(`updating ${this.appVersion} -> ${appUpdateRequest}`)
         this.appVersion = appUpdateRequest
         this.adapter.getAppImage(appUpdateRequest).then((appZip) => {
           this.launchApp(appZip)
@@ -142,7 +146,9 @@ class Supervisor {
     })
 
     setInterval(() => {
-      console.log('heartbeating...')
+      logger.info(`heartbeating (state=running, os_ver="${this.osVersion}", ` +
+      `app_ver=${this.appVersion}, debug=${this.debugMode})`)
+
       this.adapter.send({
         state: 'running',
         debugMode: this.debugMode,

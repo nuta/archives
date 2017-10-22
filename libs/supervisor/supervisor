@@ -14,6 +14,6 @@ const deviceSecret = process.env['MAKESTACK_DEVICE_SECRET']
 const appUID = process.env['MAKESTACK_APP_UID']
 const appGID = process.env['MAKESTACK_APP_GID']
 
-console.log('*** starting supervisor')
+console.log('Starting supervisor...')
 const supervisor = new Supervisor({ appDir, adapter, deviceType, osVersion, deviceId, deviceSecret, debugMode, appUID, appGID })
 supervisor.start()
