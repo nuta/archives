@@ -1,7 +1,8 @@
 class CallOutgoingWebhookJob < ApplicationJob
   queue_as :default
+  throttle limit: MakeStack.settings[:outgoing_webhook_limit_per_hour], period: 1.hour
 
-  def perform(url:, params: {}, body:, accept_stores: false, device: nil)
+  def execute(url:, params: {}, body:, accept_stores: false, device: nil)
     resp = RestClient.post(url, body.to_json, params: params, content_type: :json)
 
     # Update device stores.

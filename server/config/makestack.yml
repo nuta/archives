@@ -4,6 +4,7 @@ defaults: &defaults
   <<: *os_releases
 
 development:
+  outgoing_webhook_limit_per_hour: 5000
   os_releases:
     a:
       linux:
@@ -23,6 +24,7 @@ development:
           url: http://localhost:8100/repos/os/mock.img
 
 test:
+  outgoing_webhook_limit_per_hour: 3600
   os_releases:
     a:
       linux:
