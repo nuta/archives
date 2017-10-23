@@ -44,7 +44,7 @@ export default {
 
 <style lang="scss" scoped>
 .background {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
@@ -59,9 +59,9 @@ export default {
 }
 
 .modal {
-  position: absolute;
+  position: fixed;
   width: 500px;
-  top: 50px;
+  top: 100px;
   left: 50%;
   margin-left: -250px;
   padding: 10px;
