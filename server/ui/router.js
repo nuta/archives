@@ -10,6 +10,7 @@ import AppStoresView from './views/apps/stores'
 import AppSettingsView from './views/apps/settings'
 import CodeView from './views/apps/code'
 import IntegrationsView from './views/apps/integrations'
+import NewIntegrationView from './views/apps/new_integration'
 import DeploymentsView from './views/apps/deployments'
 import DevicesView from './views/devices'
 import DeviceOverviewView from './views/devices/overview'
@@ -27,6 +28,7 @@ let routes = [
   { name: 'deployments', path: '/apps/:appName/deployments', component: DeploymentsView },
   { name: 'appLog', path: '/apps/:appName/log', component: AppLogView },
   { name: 'integrations', path: '/apps/:appName/integrations', component: IntegrationsView },
+  { name: 'new_integration', path: '/apps/:appName/integrations/new', component: NewIntegrationView },
   { name: 'appOverview', path: '/apps/:appName', component: AppOverviewView },
   { name: 'appStores', path: '/apps/:appName/stores', component: AppStoresView },
   { name: 'appSettings', path: '/apps/:appName/settings', component: AppSettingsView },
