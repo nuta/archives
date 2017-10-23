@@ -19,73 +19,29 @@
              <td>{{ device.created_at | strftime }}</td>
           </tr>
         </table>
-
-        <menu-button icon="fa-ellipsis-h" :elements="menuElements"
-         @associateDevice="openAssociateDeviceModal(device.name)"></menu-button>
       </div>
     </div>
   </div>
-
-  <modal :title="associateDeviceModal.title" :active="associateDeviceModal.active"
-   @close="associateDeviceModal.active = false">
-    <form @submit.prevent="associateDeviceToApp">
-      <select v-model="associateDevice.appName">
-        <template v-for="app in apps">
-          <option :value="app.name">{{ app.name }}</option>
-        </template>
-      </select>
-
-      <input type="submit" value="Associate">
-    </form>
-  </modal>
 </dashboard-layout>
 </template>
 
 <script>
 import api from "js/api";
 import { strftime } from "js/filters";
-import MenuButton from "components/menu-button";
-import Modal from "components/modal";
 import DashboardLayout from "layouts/dashboard";
 
 export default {
-  components: { DashboardLayout, Modal, MenuButton },
+  components: { DashboardLayout },
   filters: { strftime },
   data() {
     return {
       devices: [],
-      apps: [],
-      menuElements:[
-          { event: 'associateDevice', title: 'Associate to an app' }
-      ],
-      associateDeviceModal: {
-        title: "",
-        active: false
-      },
-      associateDevice: {
-        deviceName: "",
-        appName: ""
-      }
+      apps: []
     };
-  },
-  methods: {
-    openAssociateDeviceModal(deviceName) {
-      this.associateDeviceModal.active = true;
-      this.associateDeviceModal.title = `Associate ${deviceName} to an app`;
-      this.associateDevice.deviceName = deviceName;
-    },
-    associateDeviceToApp() {
-      api.associateDeviceToApp(this.associateDevice.deviceName,
-                               this.associateDevice.appName);
-    }
   },
   beforeMount() {
     api.getDevices()
       .then(r => this.devices = r.json)
-      .catch(error => notify("error", error));
-
-    api.getApps()
-      .then(r => this.apps = r.json)
       .catch(error => notify("error", error));
   }
 };

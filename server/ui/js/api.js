@@ -149,6 +149,10 @@ export default new class {
     return this.invoke('GET', `/devices/${deviceName}`)
   }
 
+  updateDevice(deviceName, attrs) {
+    return this.invoke('PATCH', `/devices/${deviceName}`, { device: attrs })
+  }
+
   getDeviceLog(deviceName) {
     return this.invoke('GET', `/devices/${deviceName}/log`)
   }
@@ -160,10 +164,6 @@ export default new class {
   updateDeviceStore(deviceName, key, value) {
     return this.invoke('PUT', `/devices/${deviceName}/stores/${key}`,
       { value })
-  }
-
-  associateDeviceToApp(deviceName, appName) {
-    return this.invoke('PATCH', `/devices/${deviceName}`, { device: { app_name: appName } })
   }
 
   deleteDevice(deviceName) {
