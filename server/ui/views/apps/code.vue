@@ -32,7 +32,32 @@
       Drag & drop your source file here!
     </div>
 
-    <div id="editor" ref="editor"></div>
+    <modal title="Add a new file" :active="showNewFileModal" @close="showNewFileModal = false">
+      <input type="text" v-model="newFileName" placeholder="Filename">
+      <button @click="addNewFile">Add a new file</button>
+    </modal>
+
+    <div class="tabs">
+      <div v-for="file in files" class="tab" @click="editing = file.id" :class="{ active: editing === file.id }">{{ file.path }}</div>
+      <div class="tab" @click="showNewFileModal = true">
+        <i class="fa fa-plus" aria-hidden="true"></i>
+      </div>
+    </div>
+
+    <div v-for="file in files" class="editors">
+      <div class="editor" v-show="editing == file.id" :id="file.id" :ref="file.id"></div>
+    </div>
+
+    <div v-if="showOutputPanel" class="output-panel">
+      <div class="header">
+        <span class="title">Deploy Log</span>
+        <span class="close" @click="showOutputPanel = false">
+          <i class="fa fa-window-close" aria-hidden="true"></i>
+        </span>
+      </div>
+
+      <div class="body">{{ output }}</div>
+    </div>
   </div>
 </dashboard-layout>
 </template>
@@ -40,112 +65,50 @@
 <script>
 import api from "js/api";
 import ActionButton from "components/action-button";
+import Modal from "components/modal";
 import DashboardLayout from "layouts/dashboard";
 import 'whatwg-fetch';
 const Cookies = require('js-cookie')
 const JSZip = require('jszip')
 
-function fetchLatestGitHubRelease(url, name) {
-  console.log(`==> searching for \`${name}'`)
-
-  return new Promise((resolve, reject) => {
-    fetch(`${url}/repos/${name}/releases/latest`).then(resp => {
-      return resp.json()
-    }).then(json => {
-      resolve(json.assets)
-    }).catch(reject)
-  })
-}
-
-async function downloadPlugin(name) {
-  let githubURL
-
-  if (window.location.host === 'localhost:8080' && Cookies.get('use_local_mock_github_server')) {
-    // Use local mock github releases server (tools/github-releases-server.py).
-    githubURL = `http://localhost:8080`
-  } else {
-    githubURL = `https://api.github.com`
-  }
-
-  let repo
-  if (name.match(/^[a-zA-Z0-9\-\_]+$/)) {
-    // Builtin plugins (e.g. app-runtime)
-    repo = 'seiyanuta/makestack'
-  } else if (name.match(/^[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+$/)) {
-    // Plugins on GitHub (e.g. octocat/temperature-sensor)
-    repo = name
-  } else {
-    throw new Error(`invalid plugin name: \`${name}'`)
-  }
-
-  const assets = await fetchLatestGitHubRelease(githubURL, repo)
-  const pluginURL = assets.filter(asset => asset.name.indexOf(name) !== -1)[0].browser_download_url
-  if (!pluginURL) {
-    throw new Error(`unknown plugin: \`${name}'`)
-  }
-
-  console.log(`==> downloading \`${name}'`)
-  return (await fetch(pluginURL)).blob()
-}
-
-async function mergeZipFiles(pluginName, destZip, srcZip) {
-  for (const filepath in srcZip.files) {
-    destZip.file(`node_modules/${pluginName}/${filepath}`,
-      srcZip.files[filepath].async('arraybuffer'))
-  }
-
-  return destZip
-}
-
-async function buildApp (code) {
-  const appName = 'deploy-test'
-  let runtime = 'app-runtime'
-  let plugins = [runtime]
-  let zip = new JSZip()
-
-  // Populate plugin files.
-  for (let i = 0; i < plugins.length; i++) {
-    const pluginName = plugins[i]
-    const pluginZip = await downloadPlugin(pluginName)
-    zip = await mergeZipFiles(pluginName, zip, await (new JSZip()).loadAsync(pluginZip))
-  }
-
-  // Copy start.js to the top level.
-  const startJsRelPath = `node_modules/${runtime}/start.js`
-  if (!zip.files[startJsRelPath]) {
-    throw new Error(`runtime start.js not found`)
-  }
-
-  zip.file('start.js', zip.files[startJsRelPath].async('arraybuffer'))
-
-  // Copy app files.
-  zip.file('main.js', code)
-  return new Blob([await zip.generateAsync({ type: 'arraybuffer' })],
-                  { type: 'application/zip' })
-}
-
-
-
 export default {
-  components: { ActionButton, DashboardLayout },
+  components: { ActionButton, DashboardLayout, Modal },
   data() {
     return {
       appName: app.$router.currentRoute.params.appName,
-      editor: {},
-      deployMetadata: {},
-      deployMode: "associated",
-      targetDeviceName: "",
       devices: [],
-      fileName: "",
-      prevFileBody: "",
-      sampleCode: "loop(3 /* seconds */, () => {\n  print('Hello, World!');\n});",
+      files: [],
       autosaveAfter: 1000,
       deployButton: "waiting",
       saveButton: "waiting",
-      showUploadNavi: false
+      showUploadNavi: false,
+      editing: '',
+      output: '',
+      showOutputPanel: true,
+      showNewFileModal: false,
+      newFileName: ''
     };
   },
   methods: {
+    addNewFile() {
+      const id = `editor${this.files.length}`
+      const path = this.newFileName
+
+      this.files.push({
+        id,
+        path,
+        body: '',
+        editing: false
+      })
+
+      this.showNewFileModal = false
+      this.newFileName = ''
+
+      this.$nextTick(() => {
+        this.addEditor(id, path, '')
+        this.editing = id
+      })
+    },
     uploadFile(event) {
       const reader = new FileReader()
       reader.onload = (event) => {
@@ -157,65 +120,180 @@ export default {
       reader.readAsText(event.dataTransfer.files[0])
       this.showUploadNavi = false
     },
+    clearOutput() {
+      this.output = ""
+    },
+    logOutput(line) {
+      this.output += `${line}\n`
+    },
+    fetchLatestGitHubRelease(url, name) {
+      return new Promise((resolve, reject) => {
+        fetch(`${url}/repos/${name}/releases/latest`).then(resp => {
+          return resp.json()
+        }).then(json => {
+          resolve(json.assets)
+        }).catch(reject)
+      })
+    },
+    async downloadPlugin(name) {
+      let githubURL
 
+      if (window.location.host === 'localhost:8080' && Cookies.get('use_local_mock_github_server')) {
+        // Use local mock github releases server (tools/github-releases-server.py).
+        githubURL = `http://localhost:8080`
+      } else {
+        githubURL = `https://api.github.com`
+      }
+
+      let repo
+      if (name.match(/^[a-zA-Z0-9\-\_]+$/)) {
+        // Builtin plugins (e.g. app-runtime)
+        repo = 'seiyanuta/makestack'
+      } else if (name.match(/^[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+$/)) {
+        // Plugins on GitHub (e.g. octocat/temperature-sensor)
+        repo = name
+      } else {
+        throw new Error(`invalid plugin name: \`${name}'`)
+      }
+
+      const assets = await this.fetchLatestGitHubRelease(githubURL, repo)
+      const pluginURL = assets.filter(asset => asset.name.indexOf(name) !== -1)[0].browser_download_url
+      if (!pluginURL) {
+        throw new Error(`unknown plugin: \`${name}'`)
+      }
+
+      return (await fetch(pluginURL)).blob()
+    },
+    async mergeZipFiles(pluginName, destZip, srcZip) {
+      for (const filepath in srcZip.files) {
+        destZip.file(`node_modules/${pluginName}/${filepath}`,
+          srcZip.files[filepath].async('arraybuffer'))
+      }
+
+      return destZip
+    },
+    async buildApp (files) {
+      let runtime = 'app-runtime'
+      let plugins = [runtime]
+      let zip = new JSZip()
+
+      // Populate plugin files.
+      for (let i = 0; i < plugins.length; i++) {
+        const pluginName = plugins[i]
+        this.logOutput(`Downloading a plugin \`${pluginName}'`)
+        const pluginZip = await this.downloadPlugin(pluginName)
+        zip = await this.mergeZipFiles(pluginName, zip, await (new JSZip()).loadAsync(pluginZip))
+      }
+
+      // Copy start.js to the top level.
+      const startJsRelPath = `node_modules/${runtime}/start.js`
+      if (!zip.files[startJsRelPath]) {
+        throw new Error(`runtime start.js not found`)
+      }
+
+      this.logOutput(`Copying start.js from \`${runtime}'`)
+      zip.file('start.js', zip.files[startJsRelPath].async('arraybuffer'))
+
+      // Copy app files.
+      for (let i = 0; i < files.length; i++) {
+        this.logOutput(`Adding \`${files[i].path}'`)
+        zip.file(files[i].path, files[i].body)
+      }
+
+      return new Blob([await zip.generateAsync({ type: 'arraybuffer' })],
+                      { type: 'application/zip' })
+    },
+    getFiles() {
+      let files = []
+      for (let i = 0; i < this.files.length; i++) {
+        files.push({
+          path: this.files[i].path,
+          body: ace.edit(this.files[i].id).getValue()
+        })
+      }
+
+      return files
+    },
     async deploy() {
-      const code = ace.edit("editor").getValue()
-      this.deployButton = "Building...";
-      const image = await buildApp(code)
+      const timeStarted = new Date()
+      this.deployButton = "Building..."
 
+      this.logOutput('Building the app...')
+      const image = await this.buildApp(this.getFiles())
+
+      this.logOutput('Generated a .zip file, deploying...')
       let comment = "Deployment at " + (new Date()).toString(); // TODO
       this.deployButton = "Deploying...";
       api.deploy(this.appName, image, "", comment, null).then(r => {
-        this.deployButton = "done";
+        const took = (((new Date()) - timeStarted) / 1000).toPrecision(3)
+        this.deployButton = "done"
+        this.logOutput(`Deployed #${r.json.version}, took ${took} seconds`)
         setTimeout(() => { this.deployButton = "waiting"; }, 1500);
       }).catch(error => notify("error", error));
     },
     save() {
-      let body = ace.edit("editor").getValue();
-      this.saveButton = "doing";
-      api.saveFile(this.appName, this.fileName, body).then(r => {
-        this.saveButton = "done";
-        setTimeout(() => { this.saveButton = "waiting"; }, 1500);
-      }).catch(error => notify("error", error));
+      for (let i = 0; i < this.files.length; i++) {
+        const file = this.files[i]
+        let body = ace.edit(file.id).getValue();
+        this.saveButton = "doing";
+        api.saveFile(this.appName, file.path, body).then(r => {
+          this.saveButton = "done";
+          setTimeout(() => { this.saveButton = "waiting"; }, 1500);
+        }).catch(error => notify("error", error));
+      }
+    },
+    addEditor(id, path, body) {
+      const editor = ace.edit(id)
+      const ext = path.split('.').pop()
+      this.configureAceEditor(editor, ext)
+      this.setEditorBody(id, body)
+    },
+    setEditorBody(id, body) {
+      const editor = ace.edit(id)
+      editor.setValue(body)
+      editor.selection.moveCursorFileStart()
+    },
+    configureAceEditor(editor, ext) {
+      editor.$blockScrolling = Infinity
+      editor.setTheme("ace/theme/solarized_light")
+      editor.setShowPrintMargin(false)
+
+      const session = editor.getSession()
+      const modes = {
+        js: 'javascript',
+        yaml: 'yaml'
+      }
+      session.setMode('ace/mode/' + (modes[ext] || 'text'))
+      session.setUseSoftTabs(true)
     }
   },
   beforeMount() {
     api.getFiles(this.appName).then(r => {
-      let files = r.json;
-      let path, body;
-
-      switch (files.length) {
-      case 0:
-        path = "app.js";
-        body = this.sampleCode;
-        break;
-      case 1:
-        path = files[0].path;
-        body = files[0].body;
-        break;
-      default:
-        alert("Editing multiple files is not supported yet.");
+      let files = []
+      for (let i = 0; i < r.json.length; i++) {
+        const file = r.json[i]
+        files.push({
+          id: `editor${i}`,
+          path: file.path,
+          body: file.body,
+          editing: i == 0
+        })
       }
 
-      this.fileName = path;
-      this.prevFileBody = body;
-      let editor = ace.edit("editor");
-      editor.setValue(body);
-      editor.selection.moveCursorFileStart();
-    }).catch(error => notify("error", error));
+      this.files = files
+      this.editing = this.files[0].id
+      this.$nextTick(() => {
+        for (let i = 0; i < this.files.length; i++) {
+          this.addEditor(files[i].id, files[i].path, files[i].body)
+        }
+      })
+    })
+//    }).catch(error => notify("error", error));
   },
   mounted() {
-    let editor = ace.edit("editor");
-    editor.$blockScrolling = Infinity;
-    editor.setTheme("ace/theme/solarized_light");
-    editor.setShowPrintMargin(false);
-
-    let session = editor.getSession();
-    session.setMode("ace/mode/javascript");
-    session.setUseSoftTabs(true);
-
     let component = this;
     let autosaveTimer;
+    /*
     session.on('change', function(e) {
       if (component.prevFileBody == editor.getValue())
         return;
@@ -230,24 +308,70 @@ export default {
         component.save();
       }, component.autosaveAfter);
     });
+    */
   }
 };
 </script>
 
 <style lang="scss" scoped>
-$editor-border-width: 7px;
+$editor-border-width: 3px;
+$editor-border-color: #e6e6ec;
 
 .editor-wrapper {
   display: block;
+  min-height: 300px;
   position: relative;
 
-  #editor {
+  .tabs {
+    .tab {
+      display: inline-block;
+      border: 2px solid $editor-border-color;
+      padding: 10px;
+      font-size: 15px;
+
+      &.active {
+        background: #ffcc00;
+      }
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .editor {
     width: 100%;
+    box-sizing: border-box;
     min-height: 300px;
-    height: 70vh;
+    height: 40vh;
     font-size: 14px;
-    border: $editor-border-width solid #f3f3f3;
-    border-radius: 5px;
+    border: $editor-border-width solid $editor-border-color;
+  }
+
+  .output-panel {
+    color: #fcfcfa;
+    background: #2c292d;
+    height: 200px;
+    font-family: "Source Code Pro", monospace;
+    font-size: 13px;
+    overflow: scroll;
+
+    .header {
+      background: #cfcfcf;
+      color: #2c292d;
+      padding: 5px 5px 5px 10px;
+      display: flex;
+      justify-content: space-between;
+
+      .close:hover {
+        cursor: pointer;
+      }
+    }
+
+    .body {
+      padding: 7px;
+      white-space: pre;
+    }
   }
 }
 
