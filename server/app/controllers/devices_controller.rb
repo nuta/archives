@@ -25,9 +25,9 @@ class DevicesController < ApplicationController
   end
 
   def update
-    app_name = params.dig(:device, :app_name)
-    if app_name
-      @device.app = @user.apps.find_by_name!(app_name)
+    app = params.dig(:device, :app)
+    if app
+      @device.app = @user.apps.find_by_name!(app)
     end
 
     if @device.update(device_params)
