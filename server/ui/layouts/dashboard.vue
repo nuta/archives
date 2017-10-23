@@ -324,6 +324,8 @@ nav {
   }
 
   main {
+    max-width: 900px;
+    margin: 0 auto 0;
     padding: 30px 40px;
   }
 }
