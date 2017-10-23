@@ -272,8 +272,10 @@ nav {
 .content {
   width: 100%;
   overflow: scroll;
+  background: #fcfcff;
 
   header {
+    background: #ffffff;
     height: 40px;
     border-bottom: 1px solid #efefef;
     display: flex;
