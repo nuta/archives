@@ -221,8 +221,12 @@ export default new class {
     })
   }
 
-  updateAppStore(appName, key, value) {
+  updateAppStore(appName, key, type, value) {
     return this.invoke('PUT', `/apps/${appName}/stores/${key}`,
-      { store: { value } })
+      { store: { data_type: type, value } })
+  }
+
+  deleteAppStore(appName, key) {
+    return this.invoke('DELETE', `/apps/${appName}/stores/${key}`)
   }
 }()
