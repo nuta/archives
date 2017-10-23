@@ -12,11 +12,6 @@
           <span>{{ username }}</span>
         </div>
         <ul class="links">
-          <router-link :to="{ name: 'home' }"><li>
-            <i class="fa green fa-home fa-fw" aria-hidden="true"></i>
-            <span>Home</span>
-          </li></router-link>
-
           <router-link :to="{ name: 'apps' }"><li>
             <i class="fa red fa-diamond fa-fw" aria-hidden="true"></i>
             <span>Apps</span>
@@ -26,10 +21,6 @@
             <i class="fa fa-caret-up" aria-hidden="true"></i>
             <p>{{ appName }}</p>
             <ul>
-              <router-link :to="{ name: 'appOverview' }"><li>
-                <i class="fa fa-home" aria-hidden="true"></i>
-                <span>Overview</span>
-              </li></router-link>
               <router-link :to="{ name: 'code' }"><li>
                 <i class="fa fa-pencil" aria-hidden="true"></i>
                 <span>Code</span>
@@ -66,9 +57,9 @@
             <i class="fa fa-caret-up" aria-hidden="true"></i>
             <p>{{ deviceName }}</p>
             <ul>
-              <router-link :to="{ name: 'deviceOverview' }"><li>
-                <i class="fa fa-home" aria-hidden="true"></i>
-                <span>Overview</span>
+              <router-link :to="{ name: 'deviceSettings' }"><li>
+                <i class="fa fa-sliders" aria-hidden="true"></i>
+                <span>Settings</span>
               </li></router-link>
               <router-link :to="{ name: 'deviceStores' }"><li>
                 <i class="fa fa-database" aria-hidden="true"></i>
@@ -77,10 +68,6 @@
               <router-link :to="{ name: 'deviceLog' }"><li>
                 <i class="fa fa-file-text-o" aria-hidden="true"></i>
                 <span>Log</span>
-              </li></router-link>
-              <router-link :to="{ name: 'deviceSettings' }"><li>
-                <i class="fa fa-sliders" aria-hidden="true"></i>
-                <span>Settings</span>
               </li></router-link>
             </ul>
           </div>

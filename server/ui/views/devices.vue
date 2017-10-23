@@ -3,7 +3,7 @@
   <div class="list">
     <div v-for="device in devices" class="element">
       <div class="title">
-        <router-link :to="{ name: 'deviceOverview', params: { deviceName: device.name }}">
+        <router-link :to="{ name: 'deviceSettings', params: { deviceName: device.name }}">
           {{ device.name }}
         </router-link>
       </div>

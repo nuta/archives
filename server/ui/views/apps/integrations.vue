@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <router-link :to="{ name: 'new_integration', params: { appName: this.appName }}">
+  <router-link :to="{ name: 'newIntegration', params: { appName: this.appName }}">
     <button> add an integration</button>
   </router-link>
 </dashboard-layout>
