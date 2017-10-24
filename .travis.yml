@@ -72,7 +72,7 @@ matrix:
       install:
         - cd server
         - bundle install --jobs 2 --path vendor/bundle
-        - 'echo "test:\n  adapter: sqlite3" > config/database.uml'
+        - 'echo "test:\n  adapter: sqlite3" > config/database.yml'
         - bundle exec rails db:migrate RAILS_ENV=test
       before_script:
         - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -94,7 +94,7 @@ matrix:
       install:
         - cd server
         - psql -c 'create database travis_ci_test;' -U postgres
-        - 'echo "test:\n  adapter: postgresql\n  database: travis_ci_test" > config/database.uml'
+        - 'echo "test:\n  adapter: postgresql\n  database: travis_ci_test" > config/database.yml'
         - bundle install --jobs 2 --path vendor/bundle
         - bundle exec rails db:migrate RAILS_ENV=test
       before_script:
