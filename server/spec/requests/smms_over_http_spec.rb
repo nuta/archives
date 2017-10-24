@@ -1,13 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "SMMS over HTTP", type: :request do
-  def send_msg(device, version: 1, device_info:, app_version: 0, os_version: 'a')
+  def send_msg(device, version: 1, device_info:, app_version: 0, os_version: 'a', log: '')
     payload = {
       SMMSService::SMMS_VERSION => version,
       SMMSService::SMMS_DEVICE_INFO => device_info,
       SMMSService::SMMS_OS_VERSION => os_version,
       SMMSService::SMMS_APP_VERSION => app_version,
-      SMMSService::SMMS_DEVICE_ID => device.device_id
+      SMMSService::SMMS_DEVICE_ID => device.device_id,
+      SMMSService::SMMS_LOG => log
     }.to_msgpack
 
     timestamp, hmac = SMMSService::sign(device, payload)
@@ -74,6 +75,89 @@ RSpec.describe "SMMS over HTTP", type: :request do
         device = create(:device, app: nil)
         post '/api/v1/smms', headers: { authetication: 'SMMS 0001' }
         expect(response).to have_http_status(:forbidden)
+        expect(response.body).to eq('')
+      end
+    end
+  end
+
+  describe "app image endpoint" do
+    let(:device) { create(:device) }
+    let!(:deployments) { create_list(:deployment, 7, app: device.app) }
+    let(:latest_deployment) { deployments[-1] }
+
+    context "associated to an app with deployments" do
+      it "returns app image" do
+        get "/api/v1/images/app/#{device.device_id}/#{latest_deployment.version}"
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq(latest_deployment.image)
+      end
+    end
+
+    context "associated to an app with no deployments" do
+      it "returns :not_found" do
+        device = create(:device)
+        get "/api/v1/images/app/#{device.device_id}/1"
+        expect(response).to have_http_status(:not_found)
+        expect(response.body).to eq('')
+      end
+    end
+
+    context "not associated to any apps" do
+      it "returns 404" do
+        device2 = create(:device, app: nil)
+        get "/api/v1/images/app/#{device2.device_id}/1"
+        expect(response).to have_http_status(:not_found)
+        expect(response.body).to eq('')
+      end
+    end
+  end
+
+  describe "logging" do
+    let(:device) { create(:device) }
+    let!(:deployments) { create_list(:deployment, 7, app: device.app) }
+    let(:latest_deployment) { deployments[-1] }
+
+
+    context "associated to an app" do
+      it "stores log" do
+        device = create(:device)
+        log = "This is first line!\nThe next line!\n"
+
+        payload = send_msg(device, device_info: 1, log: log) # booting
+        expect(response).to have_http_status(:ok)
+        expect(device.get_log.map{|l| l[:body]}.join("\n")).to include(log.strip)
+        expect(device.app.get_log.map{|l| l[:body]}.join("\n")).to include(log.strip)
+      end
+    end
+
+    context "not associated to any apps" do
+      it "returns 404" do
+        device2 = create(:device, app: nil)
+        get "/api/v1/images/app/#{device2.device_id}/1"
+        expect(response).to have_http_status(:not_found)
+        expect(response.body).to eq('')
+      end
+    end
+  end
+
+  describe "os image endpoint" do
+    let(:device) { create(:device) }
+    let!(:deployments) { create_list(:deployment, 7, app: device.app) }
+    let(:latest_deployment) { deployments[-1] }
+    let(:os_version) { 'a' }
+
+    context "associated to an app with deployments" do
+      it "returns app image" do
+        get "/api/v1/images/os/#{device.device_id}/#{os_version}/linux/#{device.device_type}"
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq('mock kernel image!')
+      end
+    end
+
+    context "image not found" do
+      it "returns 404" do
+        get "/api/v1/images/os/#{device.device_id}/not-found/linux/raspberrypi3"
+        expect(response).to have_http_status(:not_found)
         expect(response.body).to eq('')
       end
     end
