@@ -12,7 +12,6 @@ RSpec.describe DevicesController, type: :controller do
     end
   end
 
-
   describe "GET #show" do
     it "returns a success response" do
       device = create(:device, user: user)
