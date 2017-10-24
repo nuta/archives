@@ -145,7 +145,7 @@ class Device < ApplicationRecord
   end
 
   def app_image(version)
-    self.app.deployments.find_by_version!(version).image
+    deployment.try(:image)
   end
 
   def self.authenticate(device_id)
