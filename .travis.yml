@@ -72,7 +72,7 @@ matrix:
       install:
         - cd server
         - bundle install --jobs 2 --path vendor/bundle
-        - 'printf "test:\n  adapter: sqlite3" > config/database.yml'
+        - 'printf "test:\n  adapter: sqlite3\n  database: db/test.sqlite3" > config/database.yml'
         - bundle exec rails db:migrate RAILS_ENV=test
       before_script:
         - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
