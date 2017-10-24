@@ -63,7 +63,28 @@ matrix:
         - make TARGET=raspberrypi3
 
     - language: ruby
-      env: M=server:backend
+      env: M=server:backend:sqlite3
+      services:
+        - redis-server
+      cache:
+        directories:
+          - server/vendor/bundle
+      install:
+        - cd server
+        - bundle install --jobs 2 --path vendor/bundle
+        - echo "test:\n  adapter: sqlite3" > config/database.uml
+        - bundle exec rails db:migrate RAILS_ENV=test
+      before_script:
+        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        - chmod +x ./cc-test-reporter
+        - ./cc-test-reporter before-build
+      script:
+        - bundle exec rspec
+      after_script:
+        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
+    - language: ruby
+      env: M=server:backend:postgresql
       services:
         - postgresql
         - redis-server
@@ -72,6 +93,8 @@ matrix:
           - server/vendor/bundle
       install:
         - cd server
+        - psql -c 'create database travis_ci_test;' -U postgres
+        - echo "test:\n  adapter: postgresql\n  database: travis_ci_test" > config/database.uml
         - bundle install --jobs 2 --path vendor/bundle
         - bundle exec rails db:migrate RAILS_ENV=test
       before_script:
