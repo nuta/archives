@@ -32,6 +32,9 @@ class Integration < ApplicationRecord
       unless URI::regexp(%w(http https)).match(config.dig('webhook_url'))
         errors.add(:config, "does not contain valid `webhook_url'")
       end
+      unless (config.dig('webhook_url') || '').start_with('https://hooks.slack.com/services/')
+        errors.add(:config, "`webhook_url' must starts with `https://hooks.slack.com/services/'")
+      end
     when 'ifttt'
       unless config.dig('key')
         errors.add(:config, "does not contain `key''")
