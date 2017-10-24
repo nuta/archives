@@ -75,14 +75,6 @@ class Device < ApplicationRecord
     stores
   end
 
-  def reboot!
-    self.update_attributes!(status: 'relaunch')
-  end
-
-  def disassociate!
-    self.update_attributes!(app: nil, status: 'relaunch')
-  end
-
   def reset_credentials
     device_id     = RandomIdGenerator::generate(DEVICE_ID_LEN)
     device_secret = RandomIdGenerator::generate(DEVICE_SECRET_LEN)
