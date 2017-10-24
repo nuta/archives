@@ -33,7 +33,9 @@ class Deployment < ApplicationRecord
   end
 
   def validate_image_size
-    self.image.size < MAX_IMAGE_SIZE
+    unless self.image.size < MAX_IMAGE_SIZE
+      errors.add(:image, 'is too big')
+    end
   end
 
   def set_version
