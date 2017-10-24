@@ -23,6 +23,10 @@ class ImagesController < ApplicationController
 
   def app_image
     payload = @device.app_image(params[:version])
+    unless payload
+      head :not_found
+      return
+    end
 
     sign_and_set_authorization_header(@device, payload)
     render type: 'application/zip', body: payload
