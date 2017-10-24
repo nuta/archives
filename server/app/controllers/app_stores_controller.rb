@@ -10,8 +10,7 @@ class AppStoresController < ApplicationController
   end
 
   def create
-    @app_store = AppStore.new(app_store_params)
-    @app_store.app = @app
+    @app_store = @app.app_stores.new(app_store_params)
 
     if @app_store.save
       render :show, status: :created, location: app_store_url(@app.name, @app_store.key)
