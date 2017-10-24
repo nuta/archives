@@ -15,6 +15,7 @@ require 'database_cleaner'
 require 'support/factory_girl'
 require 'support/controller_helpers'
 require 'support/routing_helpers'
+require 'support/stores_shared_examples'
 require 'webmock/rspec'
 
 # Checks for pending migration and applies them before tests are run.
