@@ -53,4 +53,17 @@ RSpec.configure do |config|
       example.run
     end
   end
+
+  config.around(:each) do |example|
+    clean_redis do
+      example.run
+    end
+  end
+
+  def clean_redis(&block)
+    Redis.__current.flushall
+    yield
+  rescue
+    Redis.__current.flushall
+  end
 end
