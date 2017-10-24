@@ -30,6 +30,6 @@ class SourceFilesController < ApplicationController
   end
 
   def source_file_params
-    params.require(:source_file).permit(:path, :body)
+    params.require(:source_file).permit(:body)
   end
 end

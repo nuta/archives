@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :deployment do
     app
-    image "image body"
+    image "PK"
     debug "debug body"
   end
 end

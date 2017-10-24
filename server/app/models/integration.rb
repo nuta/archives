@@ -7,7 +7,7 @@ class Integration < ApplicationRecord
   INTEGRATIONS_MAX_NUM = 10
 
   validates :name, uniqueness: { scope: :app_id }
-  validates :token_prefix, uniqueness: true
+  validates :token_prefix, uniqueness: true, allow_nil: true
   validates :service, inclusion: { in: SUPPORTED_SERVICES }
   validate :token_prefix_is_prefix
   validate :validate_config_contents
@@ -20,23 +20,24 @@ class Integration < ApplicationRecord
       config = JSON.parse(self.config)
     rescue
       errors.add(:config, "is not valid JSON.")
+      return
     end
 
     case self.service
     when 'outgoing_webhook'
-      unless URI::regexp(%w(http https)).match(config['webhook_url'])
+      unless URI::regexp(%w(http https)).match(config.dig('webhook_url'))
         errors.add(:config, "does not contain valid `webhook_url'")
       end
     when 'slack'
-      unless URI::regexp(%w(http https)).match(config['webhook_url'])
+      unless URI::regexp(%w(http https)).match(config.dig('webhook_url'))
         errors.add(:config, "does not contain valid `webhook_url'")
       end
     when 'ifttt'
-      unless config['key']
+      unless config.dig('key')
         errors.add(:config, "does not contain `key''")
       end
     when 'datadog'
-      unless config['api_key']
+      unless config.dig('api_key')
         errors.add(:config, "does not contain `api_key''")
       end
     else
@@ -51,7 +52,7 @@ class Integration < ApplicationRecord
   end
 
   def validate_num_of_integrations
-    if self.app.integrations.count >= INTEGRATIONS_MAX_NUM
+    if self.app && self.app.integrations.count >= INTEGRATIONS_MAX_NUM
       errors.add(:integrations, "are too many.")
     end
   end

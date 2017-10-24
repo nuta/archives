@@ -4,10 +4,16 @@ class SmmsController < ApplicationController
   def http
     auth, timestamp, hmac = (request.headers['Authorization'] || '').split(' ')
     if auth != 'SMMS'
-      raise ActionController::BadRequest.new(), "invalid Authorization header"
+      head :forbidden
+      return
     end
 
-    device = SMMSService.receive(request.body.read, timestamp, hmac)
+    begin
+      device = SMMSService.receive(request.body.read, timestamp, hmac)
+    rescue ActionController::BadRequest
+      head :bad_request
+      return
+    end
 
     payload = SMMSService.payload_for(device)
     timestamp, hmac = SMMSService.sign(device, payload)

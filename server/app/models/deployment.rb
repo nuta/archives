@@ -27,7 +27,9 @@ class Deployment < ApplicationRecord
   end
 
   def validate_image_format
-    self.image[0..1] == 'PK'
+    unless self.image[0..1] == 'PK'
+      errors.add(:image, 'is not valid zip file.')
+    end
   end
 
   def validate_image_size
