@@ -5,6 +5,12 @@ const I2C_SLAVE = 0x0703
 
 module.exports = class {
   constructor() {
+    if (!fs.existsSync('/dev/i2c-1')) {
+      console.log('i2c device not found, disabling I2C API')
+      this.fd = fs.openSync('/dev/null')
+      return
+    }
+
     this.fd = fs.openSync('/dev/i2c-1', 'r+')
   }
 
