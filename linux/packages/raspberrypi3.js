@@ -17,7 +17,7 @@ module.exports = {
       'target.node_arch': 'armv7l',
       'target.node_gyp_arch': 'arm',
       'target.libTriplet': 'arm-linux-gnueabihf',
-      'glibc.ldDestPath': '/lib64/ld-linux-armhf.so.3',
+      'glibc.ldDestPath': '/lib/ld-linux-armhf.so.3',
       'glibc.ldSourcePath': 'lib/arm-linux-gnueabihf/ld-linux-armhf.so.3',
       'target.ubuntu_pkg_url': 'http://ports.ubuntu.com/ubuntu-ports',
       'target.toolchain_prefix': 'arm-linux-gnueabihf-',
