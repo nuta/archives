@@ -13,7 +13,12 @@ module.exports = {
   ignore,
 
   changed() {
-    return isNewerDirContent(supervisorPath, buildPath('supervisor'), ignore)
+    const isChanged = isNewerDirContent(supervisorPath, buildPath('supervisor'), ignore)
+    if (isChanged) {
+      // TODO: do this in pkgbuilder
+      run(['rm', '-r', buildPath('supervisor')])
+      run(['cp', '-r', supervisorPath, buildPath('supervisor') ])
+    }
   },
 
   build() {
