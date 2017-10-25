@@ -67,6 +67,7 @@ class Supervisor {
 
     fs.writeFileSync(appZipPath, appZip)
     spawnSync('rm', ['-r', this.appDir])
+    spawnSync('mkdir', ['-p', this.appDir])
     spawnSync('unzip', ['-q', appZipPath, '-d', this.appDir], {
       stdio: 'inherit'
     })
