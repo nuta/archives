@@ -25,7 +25,8 @@
 
   /supervisor/**        r,
   /supervisor/**/*.node mr,
-  /app/**        r,
+  /app/**        rw,
   /app/**/*.node mr,
   /disk/data/*   rw,
+  /tmp/**        rw,
 }

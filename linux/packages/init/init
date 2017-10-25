@@ -6,7 +6,7 @@
 
 
 cd /
-mkdir -p sys proc tmp
+mkdir -p sys proc tmp app
 mount -t sysfs    sysfs    /sys
 mount -t securityfs securityfs /sys/kernel/security
 mount -t proc     proc     /proc
