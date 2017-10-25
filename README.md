@@ -2,7 +2,7 @@ codeclimate-clang-static-analyzer
 =================================
 [![Docker Automated build](https://img.shields.io/docker/automated/seiyanuta/codeclimate-clang-static-analyzer.svg)](https://hub.docker.com/r/seiyanuta/codeclimate-clang-static-analyzer/)
 
-A CodeClimate engine for [Clang Static Analyzer](http://clang-analyzer.llvm.org/).
+A CodeClimate engine with [Clang Static Analyzer](http://clang-analyzer.llvm.org/).
 
 How to use
 ----------
