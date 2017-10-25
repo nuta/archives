@@ -1,7 +1,7 @@
 #!/bin/node
 const Supervisor = require('.')
 
-const appDir = '/app'
+const appDir = '/app/current'
 const adapter = {
   name: process.env['MAKESTACK_ADAPTER'],
   url: process.env['MAKESTACK_SERVER_URL']
