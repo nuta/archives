@@ -11,8 +11,8 @@ class Supervisor {
     this.appDir = appDir
     this.osVersion = osVersion
     this.debugMode = debugMode
-    this.appUID = appUID
-    this.appGID = appGID
+    this.appUID = parseInt(appUID) || undefined
+    this.appGID = parseInt(appGID) || undefined
     this.deviceId = deviceId
     this.deviceType = deviceType
     this.device = new (require(`./devices/${deviceType}`))()
