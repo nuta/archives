@@ -7,7 +7,7 @@ module.exports = class {
   constructor() {
     if (!fs.existsSync('/dev/i2c-1')) {
       console.log('i2c device not found, disabling I2C API')
-      this.fd = fs.openSync('/dev/null')
+      this.fd = fs.openSync('/dev/null', 'r')
       return
     }
 
