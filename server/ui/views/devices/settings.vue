@@ -50,7 +50,7 @@ export default {
   },
   methods: {
     update() {
-      api.updateDevice(device.name, {
+      api.updateDevice(this.deviceName, {
         app: this.associatedTo,
         tag: this.tag
       })
