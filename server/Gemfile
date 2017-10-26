@@ -32,6 +32,10 @@ group :development, :test do
   gem 'guard-rspec', require: false
 end
 
+group :development do
+  gem 'rails_best_practices'
+end
+
 group :test do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'rspec-rails'
