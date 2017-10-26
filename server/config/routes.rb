@@ -28,6 +28,7 @@ Rails.application.routes.draw do
       end
 
       get "webhooks/*token", to: "incoming_webhooks#invoke", constraints: { token: /.+/ }
+      get "sakuraio", to: "sakuraio#invoke"
   end
   end
 end
