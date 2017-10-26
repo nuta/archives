@@ -11,6 +11,7 @@ module.exports = async(args, opts, logger) => {
   try {
     await login(answers.url, answers.username, answers.password)
   } catch (e) {
+    logger.error(require('util').inspect(e))
     logger.error('failed to login', e)
     process.exit(1)
   }

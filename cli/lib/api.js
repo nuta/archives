@@ -4,7 +4,9 @@ const fetch = require('node-fetch')
 const config = require('./config')
 
 class API {
-  invoke(method, path, headers, body) {
+  invoke(method, path, body) {
+    const headers = {}
+
     return new Promise((resolve, reject) => {
       if (!config.credentials) {
         reject(new Error('login first'))
@@ -17,12 +19,18 @@ class API {
         })
       }
 
+      let respHeaders;
       fetch(`${config.server.url}/api/v1${path}`, {
         method: method,
         headers: Object.assign(headers, config.credentials),
         body
       }).then(response => {
-        response.json().then(resolve).catch(reject)
+        respHeaders = response.headers
+        return response
+      }).then(response => {
+        return response.json()
+      }).then(json => {
+        resolve({ headers: respHeaders, json })
       })
     })
   }
@@ -40,13 +48,13 @@ class API {
     return this.invoke('POST', '/auth/sign_in', {
       username: username,
       password: password
-    }, false).then(r => {
+    }).then(({ headers, json }) => {
       config.credentials = {
         username: username,
-        email: r.json['data']['email'],
-        uid: r.headers.get('uid'),
-        'access-token': r.headers.get('access-token'),
-        'access-token-secret': r.headers.get('access-token-secret')
+        email: json['data']['email'],
+        uid: headers.get('uid'),
+        'access-token': headers.get('access-token'),
+        'access-token-secret': headers.get('access-token-secret')
       }
     })
   }
