@@ -9,6 +9,8 @@ class Integration < ApplicationRecord
   validates :name, uniqueness: { scope: :app_id }
   validates :token_prefix, uniqueness: true, allow_nil: true
   validates :service, inclusion: { in: SUPPORTED_SERVICES }
+  validates :comment, length: { in: 0..256 }, allow_nil: true
+  validates :config, length: { in: 0..1024 }
   validate :token_prefix_is_prefix
   validate :validate_config_contents
   validate :validate_num_of_integrations, on: :create
