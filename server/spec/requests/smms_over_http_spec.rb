@@ -145,12 +145,25 @@ RSpec.describe "SMMS over HTTP", type: :request do
     let!(:deployments) { create_list(:deployment, 7, app: device.app) }
     let(:latest_deployment) { deployments[-1] }
     let(:os_version) { 'a' }
+    let(:mock_osimage_content) { 'mock image :D' }
+
+    before do
+      # create mock image cache
+      cache_dir = "#{Rails.root}/tmp/cache/downloads"
+      FileUtils.mkdir_p(cache_dir)
+
+      image_url = 'http://localhost:8100/repos/os/mock.img'
+      path = File.join(cache_dir, OpenSSL::Digest::SHA1.hexdigest(image_url))
+      File.open(path, 'w') do |f|
+        f.write(mock_osimage_content)
+      end
+    end
 
     context "associated to an app with deployments" do
       it "returns app image" do
         get "/api/v1/images/os/#{device.device_id}/#{os_version}/linux/#{device.device_type}"
         expect(response).to have_http_status(:ok)
-        expect(response.body).to eq('mock kernel image!')
+        expect(response.body).to eq(mock_osimage_content)
       end
     end
 
