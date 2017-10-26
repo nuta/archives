@@ -10,11 +10,11 @@ RSpec.describe App, type: :model do
     it { is_expected.to have_many(:devices) }
   end
 
-  describe 'validation' do
+  describe 'validations' do
     it 'does not allow invalid os version' do
-     app = build_stubbed(:app, os_version: 'abc')
-     expect(app).not_to be_valid
-    end
+      app = build_stubbed(:app, os_version: 'abc')
+      expect(app).not_to be_valid
+     end
 
     it 'does not allow new app beyond the limit' do
       user = create(:user)
@@ -23,14 +23,25 @@ RSpec.describe App, type: :model do
       expect(app).not_to be_valid
     end
 
-    it 'does not allow invalid name' do
-      app = build_stubbed(:app, name: 'hello123/')
-      expect(app).not_to be_valid
+    it 'does not allow invalid names' do
+      invalid_names = ['hello123/', '"foo"', nil, 'x' * 256, '0abc', '-asd', 'd<']
+      invalid_names.each do |name|
+        app = build_stubbed(:app, name: name)
+        expect(app).not_to be_valid
+      end
     end
 
     it 'does not allow reserved app names' do
       App::RESERVED_APP_NAMES.each do |app_name|
         app = build(:app, name: app_name)
+        expect(app).not_to be_valid
+      end
+    end
+
+    it 'does not allow invalid apis' do
+      invalid_apis = ['1', nil, 'x' * 256, 'abc', 'linux2', 'makestack_']
+      invalid_apis.each do |api|
+        app = build_stubbed(:app, api: api)
         expect(app).not_to be_valid
       end
     end

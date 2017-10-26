@@ -17,5 +17,20 @@ RSpec.describe Integration, type: :model do
       integration = build_stubbed(:integration, config: config)
       expect(integration).not_to be_valid
     end
+
+    it 'does not allow a too long comment' do
+      integration = build_stubbed(:integration, comment: 'x' * 257)
+      expect(integration).not_to be_valid
+    end
+
+    it 'does not allow a invalid JSON' do
+      integration = build_stubbed(:integration, config: '{foo:}')
+      expect(integration).not_to be_valid
+    end
+
+    it 'does not allow a too long config' do
+      integration = build_stubbed(:integration, config: 'x' * 257)
+      expect(integration).not_to be_valid
+    end
   end
 end
