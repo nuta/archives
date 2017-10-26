@@ -2,7 +2,7 @@ class SourceFile < ApplicationRecord
   belongs_to :app
 
   PATH_MAX_LEN = 128
-  PATH_REGEX = /\A[^<>\/'"]+(\/[^<>\/'"]+)*\z/
+  PATH_REGEX = /\A[a-zA-Z0-9\-\_\.]+\z/
   BODY_MAX_LEN = 8 * 1024
 
   validates_presence_of   :app
