@@ -61,7 +61,6 @@ class ImagesController < ApplicationController
   end
 
   def download_file(url, filepath)
-    p url
     File.open(filepath, 'w') do |f|
       block = proc {|resp| resp.read_body {|chunk| f.write(chunk) }}
       RestClient::Request.new(method: :get, url: url, block_response: block).execute
