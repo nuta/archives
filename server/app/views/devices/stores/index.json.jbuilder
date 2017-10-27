@@ -1,1 +1,1 @@
-json.array! @device_stores, partial: 'devices/device_stores/device_store', as: :device_store
+json.array! @stores, partial: 'devices/stores/store', as: :store
