@@ -3,6 +3,6 @@ class DeviceMapping < ApplicationRecord
 
   SUPPORTED_TYPES = %w(sakuraio)
 
-  validates :token, uniqueness: { scope: :device_id }
+  validates :token, uniqueness: true
   validates :type, inclusion: { in: SUPPORTED_TYPES }
 end
