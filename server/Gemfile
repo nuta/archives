@@ -34,6 +34,7 @@ end
 
 group :development do
   gem 'rails_best_practices'
+  gem 'rails-erd'
 end
 
 group :test do
