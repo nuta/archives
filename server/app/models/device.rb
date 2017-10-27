@@ -24,7 +24,6 @@ class Device < ApplicationRecord
   DEVICE_SECRET_REGEX = /\A[a-zA-Z0-9\-\_\.\~]{#{DEVICE_SECRET_LEN}}\z/
   TAG_NAME_REGEX = /\A[a-zA-Z][a-zA-Z0-9\:\/\-\_]*\z/
   TAG_LEN = 128
-  DEVICE_LOG_MAX_LINES = 512
 
   delegate :id, to: :app, prefix: true, allow_nil: true
   quota scope: :user_id, limit: User::DEVICES_MAX_NUM
