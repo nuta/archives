@@ -9,10 +9,6 @@ class ApplicationController < ActionController::API
     @user = current_user
   end
 
-  def set_app
-    @app = @user.apps.find_by_name!(params[:app_name] || params[:name])
-  end
-
   def sign_and_set_authorization_header(device, payload)
     timestamp, hmac = SMMSService.sign(device, payload)
     response.headers['authorization'] = "SMMS #{timestamp} #{hmac}"

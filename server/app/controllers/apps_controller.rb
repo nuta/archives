@@ -37,6 +37,10 @@ class AppsController < ApplicationController
 
   private
 
+  def set_app
+    @app = @user.apps.find_by_name!(params[:name])
+  end
+
   def app_params
     params.require(:app).permit(:name, :api, :os_version)
   end

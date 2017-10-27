@@ -9,16 +9,24 @@ Rails.application.routes.draw do
       mount_devise_token_auth_for 'User', at: 'auth'
 
       resources :apps, param: :name do
-        resources :deployments,  param: :version, only: %i(index show create)
-        resources :app_stores,   param: :key, path: 'stores', as: :stores, constraints: { key: /.+/ }
-        resources :integrations, param: :name
-        resources :source_files, param: :path, path: 'files', format: false,
+        resources :deployments,  controller: 'apps/deployments',
+          param: :version, only: %i(index show create)
+
+        resources :app_stores, controller: 'apps/stores',
+          param: :key, path: 'stores', as: :stores, constraints: { key: /.+/ }
+
+        resources :integrations, controller: 'apps/integrations', param: :name
+
+        resources :source_files, controller: 'apps/source_files',
+          param: :path, path: 'files', format: false,
          constraints: { path: /.+/ }, only: [:index, :show, :update, :destroy]
+
         get "log", to: "apps#log"
       end
 
       resources :devices, param: :name do
-        resources :device_stores, param: :key, path: 'stores', as: :store, constraints: { key: /.+/ }
+        resources :device_stores, controller: 'devices/stores',
+          param: :key, path: 'stores', as: :store, constraints: { key: /.+/ }
         get "log", to: "devices#log"
       end
 

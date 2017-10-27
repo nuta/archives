@@ -1,6 +1,8 @@
 module DeviceLog
   extend ActiveSupport::Concern
 
+  APP_LOG_MAX_LINES = 512
+
   included do
     sorted_set :log, expiration: 1.hours
   end
@@ -16,6 +18,7 @@ module DeviceLog
   end
 
   def append_log_to(target, device, lines, time)
+    max_lines = APP_LOG_MAX_LINES
     if target == :app
       unless device.app
         # The device is not associated with any app. Aborting.
@@ -23,11 +26,9 @@ module DeviceLog
       end
 
       log = app.log
-      max_lines = App::APP_LOG_MAX_LINES
       integrations = device.app.integrations.all
     else
       log = device.log
-      max_lines = DEVICE_LOG_MAX_LINES
       integrations = []
     end
 

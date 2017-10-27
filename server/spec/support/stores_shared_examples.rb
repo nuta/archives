@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.shared_examples 'store' do
-  let(:model) { described_class.name.gsub('sController', '').constantize }
+  let(:model) { described_class.name.demodulize.gsub('sController', '').constantize }
   let(:model_name)    { model.name.underscore.to_sym }
   let(:parent_model) { described_class.name.gsub('StoresController', '').constantize }
   let(:parent_model_name) { parent_model.name.underscore.to_sym }
