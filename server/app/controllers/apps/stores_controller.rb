@@ -1,43 +1,43 @@
 class Apps::StoresController < Apps::ApplicationController
   before_action :set_app
-  before_action :set_app_store, only: [:show, :update, :destroy]
+  before_action :set_store, only: [:show, :update, :destroy]
 
   def index
-    @app_stores = @app.app_stores.all
+    @stores = @app.stores.all
   end
 
   def show
   end
 
   def create
-    @app_store = @app.app_stores.new(app_store_params)
+    @store = @app.stores.new(store_params)
 
-    if @app_store.save
-      render :show, status: :created, location: app_store_url(@app.name, @app_store.key)
+    if @store.save
+      render :show, status: :created, location: app_store_url(@app.name, @store.key)
     else
-      render json: @app_store.errors, status: :unprocessable_entity
+      render json: @store.errors, status: :unprocessable_entity
     end
   end
 
   def update
-    if @app_store.update(app_store_params)
-      render :show, status: :ok, location: app_store_url(@app.name, @app_store.key)
+    if @store.update(store_params)
+      render :show, status: :ok, location: app_store_url(@app.name, @store.key)
     else
-      render json: @app_store.errors, status: :unprocessable_entity
+      render json: @store.errors, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @app_store.destroy
+    @store.destroy
   end
 
   private
 
-  def set_app_store
-    @app_store = @app.app_stores.find_by_key(params[:key])
+  def set_store
+    @store = @app.stores.find_by_key(params[:key])
   end
 
-  def app_store_params
+  def store_params
     params.require(:store).permit(:key, :value, :data_type)
   end
 end

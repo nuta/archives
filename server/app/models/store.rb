@@ -1,7 +1,7 @@
-class AppStore < ApplicationRecord
+class Store < ApplicationRecord
   include Quota
 
-  belongs_to :app
+  belongs_to :owner, polymorphic: true
 
   # This MUST be smaller than 256 because of a SMMS limitaiton.
   KEY_MAX_LEN = 64
@@ -9,11 +9,11 @@ class AppStore < ApplicationRecord
   KEY_REGEX = /\A[a-zA-Z][a-zA-Z0-9\~\!\@\$\%\&\.\-\_]*\z/
   DATA_TYPES = %w(string integer float bool)
 
-  quota scope: :app_id, limit: User::STORES_MAX_NUM_PER_APP
+  quota scope: :owner_id, limit: User::STORES_MAX_NUM
 
   validates :key,
     format: { with: KEY_REGEX },
-    uniqueness: { scope: :app_id },
+    uniqueness: { scope: [:owner_type, :owner_id] },
     case_sensitive: false,
     length: { in: 1..KEY_MAX_LEN }
 

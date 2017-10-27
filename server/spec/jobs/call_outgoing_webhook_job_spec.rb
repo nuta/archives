@@ -49,9 +49,9 @@ RSpec.describe CallOutgoingWebhookJob, type: :job do
         }.not_to raise_exception
 
         stores.each do |key, value|
-          expect(device.device_stores.where(key: key)).to exist
-          expect(device.device_stores.find_by_key(key).value).to eq(value.to_s)
-          expect(device.device_stores.find_by_key(key).data_type).to eq(store_types[key])
+          expect(device.stores.where(key: key)).to exist
+          expect(device.stores.find_by_key(key).value).to eq(value.to_s)
+          expect(device.stores.find_by_key(key).data_type).to eq(store_types[key])
         end
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe CallOutgoingWebhookJob, type: :job do
           )
         }.not_to raise_exception
 
-        expect(device.device_stores.all).to eq([])
+        expect(device.stores.all).to eq([])
       end
     end
   end

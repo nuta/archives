@@ -15,7 +15,7 @@ class CallOutgoingWebhookJob < ApplicationJob
 
         stores.each do |key, value|
           data_type = determine_data_type(value)
-          store = device.device_stores.where(key: key).first_or_initialize
+          store = device.stores.where(key: key).first_or_initialize
           store.value = value.to_s
           store.data_type = data_type
           store.save!

@@ -4,7 +4,7 @@ RSpec.describe Device, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:app) }
-    it { is_expected.to have_many(:device_stores).dependent(:destroy) }
+    it { is_expected.to have_many(:stores).dependent(:destroy) }
     it { is_expected.to have_many(:device_mappings).dependent(:destroy) }
   end
 

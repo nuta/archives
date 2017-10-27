@@ -1,1 +1,1 @@
-json.partial! "apps/app_stores/app_store", app_store: @app_store
+json.partial! "apps/stores/store", store: @store

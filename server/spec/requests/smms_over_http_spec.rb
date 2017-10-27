@@ -180,12 +180,12 @@ RSpec.describe "SMMS over HTTP", type: :request do
     context "some device stores are set" do
       it "returns stores" do
         device = create(:device)
-        stores = create_list(:device_store, 5, device: device)
+        stores = create_list(:device_store, 5, owner: device)
 
         payload = send_msg(device, device_info: 1) # booting
         expect(response).to have_http_status(:ok)
 
-        stores.each_with_index do |store, i|
+        stores.sort_by(&:key).each_with_index do |store, i|
           expect(payload[SMMSService::SMMS_STORE + i]).to eq([store.key, store.value])
         end
       end
@@ -194,12 +194,12 @@ RSpec.describe "SMMS over HTTP", type: :request do
     context "some app stores are set" do
       it "returns stores" do
         device = create(:device, app: create(:app))
-        stores = create_list(:app_store, 5, app: device.app)
+        stores = create_list(:app_store, 5, owner: device.app)
 
         payload = send_msg(device, device_info: 1) # booting
         expect(response).to have_http_status(:ok)
 
-        stores.each_with_index do |store, i|
+        stores.sort_by(&:key).each_with_index do |store, i|
           expect(payload[SMMSService::SMMS_STORE + i]).to eq([store.key, store.value])
         end
       end
@@ -208,21 +208,27 @@ RSpec.describe "SMMS over HTTP", type: :request do
     context "some device and app stores are set" do
       it "returns stores" do
         device = create(:device, app: create(:app))
-        create(:device_store, device: device, key: 'k1', value: 'v1')
-        create(:device_store, device: device, key: 'k2', value: 'v2')
-        create(:device_store, device: device, key: 'k3', value: 'v3')
-        create(:app_store, app: device.app,   key: 'k4', value: 'v5')
-        create(:app_store, app: device.app,   key: 'k5', value: 'v5')
-        create(:app_store, app: device.app,   key: 'k1', value: 'v6')
+        create(:device_store, owner: device,     key: 'k2', value: 'v2')
+        create(:device_store, owner: device,     key: 'k1', value: 'v1')
+        create(:device_store, owner: device,     key: 'k3', value: 'v3')
+        create(:app_store,    owner: device.app, key: 'k4', value: 'v5')
+        create(:app_store,    owner: device.app, key: 'k5', value: 'v5')
+        create(:app_store,    owner: device.app, key: 'k1', value: 'v6')
+
+        create(:device_store, owner: create(:device),  key: 'k0', value: 'v3')
+        create(:app_store,    owner: create(:app), key: 'abc', value: 'v6')
+        create(:device_store, owner: create(:device, user: device.user),  key: 'k0', value: 'v3')
+        create(:app_store,    owner: create(:app, user: device.user), key: 'abc', value: 'v6')
 
         payload = send_msg(device, device_info: 1) # booting
         expect(response).to have_http_status(:ok)
 
-        expect(payload[SMMSService::SMMS_STORE + 0]).to eq(['k4', 'v5'])
-        expect(payload[SMMSService::SMMS_STORE + 1]).to eq(['k5', 'v5'])
-        expect(payload[SMMSService::SMMS_STORE + 2]).to eq(['k1', 'v1'])
-        expect(payload[SMMSService::SMMS_STORE + 3]).to eq(['k2', 'v2'])
-        expect(payload[SMMSService::SMMS_STORE + 4]).to eq(['k3', 'v3'])
+        expect(payload[SMMSService::SMMS_STORE + 0]).to eq(['k1', 'v1'])
+        expect(payload[SMMSService::SMMS_STORE + 1]).to eq(['k2', 'v2'])
+        expect(payload[SMMSService::SMMS_STORE + 2]).to eq(['k3', 'v3'])
+        expect(payload[SMMSService::SMMS_STORE + 3]).to eq(['k4', 'v5'])
+        expect(payload[SMMSService::SMMS_STORE + 4]).to eq(['k5', 'v5'])
+        expect(payload[SMMSService::SMMS_STORE + 5]).to eq(nil)
       end
     end
   end

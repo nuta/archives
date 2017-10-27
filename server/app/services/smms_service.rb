@@ -96,7 +96,7 @@ module SMMSService
     end
 
     # store
-    device.stores.each_with_index do |(key, store), index|
+    device.formatted_stores.each_with_index do |(key, store), index|
       if index >= SMMS_STORE_NUM
         Rails.logger.warn "too many stores"
         break

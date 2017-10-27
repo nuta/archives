@@ -4,8 +4,8 @@ class Device < ApplicationRecord
 
   belongs_to :user
   belongs_to :app, optional: true
-  has_many   :device_stores, dependent: :destroy
-  has_many   :device_mappings, dependent: :destroy
+  has_many :stores, as: :owner, dependent: :destroy
+  has_many :device_mappings, dependent: :destroy
 
   value :status, expiration: 45.minutes
   value :debug_mode, expiration: 45.minutes
@@ -26,6 +26,7 @@ class Device < ApplicationRecord
   TAG_LEN = 128
   DEVICE_LOG_MAX_LINES = 512
 
+  delegate :id, to: :app, prefix: true, allow_nil: true
   quota scope: :user_id, limit: User::DEVICES_MAX_NUM
 
   validates :device_id,
@@ -77,26 +78,18 @@ class Device < ApplicationRecord
     end
   end
 
-  def stores
+  def formatted_stores
     stores = {}
 
-    AppStore.where(app: self.app).find_each do |store|
-      stores[store.key] = {
-         value: store.value,
-          scope: 'app',
-          override: false
-         }
+    Store.where(owner_type: 'App', owner_id: self.app_id).find_each do |store|
+      stores[store.key] = { value: store.value }
     end
 
-    DeviceStore.where(device: self).find_each do |store|
-      stores[store.key] = {
-        value: store.value,
-        scope: 'device',
-        override: stores.key?(store.key)
-      }
+    Store.where(owner_type: 'Device', owner_id: self.id).find_each do |store|
+      stores[store.key] = { value: store.value }
     end
 
-    stores
+    Hash[stores.sort]
   end
 
   def reset_credentials
