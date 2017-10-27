@@ -21,14 +21,15 @@ Rails.application.routes.draw do
           param: :path, path: 'files', format: false,
          constraints: { path: /.+/ }, only: [:index, :show, :update, :destroy]
 
-        get "log", to: "apps#log"
+        resources :log, controller: 'apps/log', only: [:index]
       end
 
       resources :devices, param: :name do
         resources :device_stores, controller: 'devices/stores',
           param: :key, path: 'stores', as: :store, constraints: { key: /.+/ }
-        get "log", to: "devices#log"
-      end
+
+        resources :log, controller: 'devices/log', only: [:index]
+        end
 
       post "smms", to: "smms#http"
       scope :images do

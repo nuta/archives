@@ -8,10 +8,6 @@ class DevicesController < ApplicationController
   def show
   end
 
-  def log
-    @log = @device.get_log(params[:since])
-  end
-
   def create
     @device = @user.devices.new(device_params)
 

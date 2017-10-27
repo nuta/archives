@@ -8,10 +8,6 @@ class AppsController < ApplicationController
   def show
   end
 
-  def log
-    @log = @app.get_log(params[:since])
-  end
-
   def create
     @app = App.new(app_params)
     @app.user = @user
