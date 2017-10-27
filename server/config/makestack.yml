@@ -26,6 +26,22 @@ development:
 test:
   outgoing_webhook_limit_per_hour: 3600
   os_releases:
+    z:
+      linux:
+        x86_64:
+          url: http://localhost:8100/repos/os/x86_64.img
+        raspberrypi3:
+          url: http://localhost:8100/repos/os/raspberrypi3.img
+        mock:
+          url: http://localhost:8100/repos/os/mock.img
+    v123.456.789:
+      linux:
+        x86_64:
+          url: http://localhost:8100/repos/os/x86_64.img
+        raspberrypi3:
+          url: http://localhost:8100/repos/os/raspberrypi3.img
+        mock:
+          url: http://localhost:8100/repos/os/mock.img
     a:
       linux:
         x86_64:

@@ -13,9 +13,7 @@ class DevicesController < ApplicationController
   end
 
   def create
-    @device = Device.new(device_params)
-    @device.user = @user
-    @device.reset_credentials
+    @device = @user.devices.new(device_params)
 
     if @device.save
       render :show, status: :created, location: @device

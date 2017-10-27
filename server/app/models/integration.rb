@@ -1,4 +1,6 @@
 class Integration < ApplicationRecord
+  include Quota
+
   belongs_to :app
 
   SUPPORTED_SERVICES = %w(incoming_webhook outgoing_webhook ifttt slack datadog)
@@ -6,15 +8,28 @@ class Integration < ApplicationRecord
   INTEGRATION_TOKEN_PREFIX_LEN = 20
   INTEGRATIONS_MAX_NUM = 10
 
-  validates :name, uniqueness: { scope: :app_id }
-  validates :token_prefix, uniqueness: true, allow_nil: true
-  validates :service, inclusion: { in: SUPPORTED_SERVICES }
-  validates :comment, length: { in: 0..256 }, allow_nil: true
-  validates :config, length: { in: 0..1024 }
-  validate :token_prefix_is_prefix
-  validate :validate_config_contents
-  validate :validate_num_of_integrations, on: :create
+  quota scope: :app_id, limit: INTEGRATIONS_MAX_NUM
 
+  validates :name,
+    uniqueness: { scope: :app_id }
+
+  validates :service,
+    inclusion: { in: SUPPORTED_SERVICES }
+
+  validate :validate_config_contents
+    validates :config,
+    length: { in: 0..1024 }
+
+  validates :comment,
+    length: { in: 0..256 },
+    allow_nil: true
+
+   validate :token_prefix_is_prefix
+   validates :token_prefix,
+     uniqueness: true,
+     allow_nil: true
+
+  after_initialize :set_token, if: :new_record?
   before_create :set_name
 
   def validate_config_contents
@@ -56,10 +71,8 @@ class Integration < ApplicationRecord
     end
   end
 
-  def validate_num_of_integrations
-    if self.app && self.app.integrations.count >= INTEGRATIONS_MAX_NUM
-      errors.add(:integrations, "are too many.")
-    end
+  def set_token
+    self.reset_token
   end
 
   def set_name

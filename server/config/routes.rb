@@ -12,7 +12,8 @@ Rails.application.routes.draw do
         resources :deployments,  param: :version, only: %i(index show create)
         resources :app_stores,   param: :key, path: 'stores', as: :stores, constraints: { key: /.+/ }
         resources :integrations, param: :name
-        resources :source_files, param: :path, path: 'files', format: false, constraints: { path: /.+/ }
+        resources :source_files, param: :path, path: 'files', format: false,
+         constraints: { path: /.+/ }, only: [:index, :show, :update, :destroy]
         get "log", to: "apps#log"
       end
 
@@ -23,8 +24,8 @@ Rails.application.routes.draw do
 
       post "smms", to: "smms#http"
       scope :images do
-        get "/os/:device_id/:version/:os/:device_type", to: "images#os_image"
-        get "/app/:device_id/:version",  to: "images#app_image"
+        get "/os/:device_id/:version/:os/:device_type", to: "images#os_image", constraints: { device_id: /.+/ }
+        get "/app/:device_id/:version",  to: "images#app_image", constraints: { device_id: /.+/ }
       end
 
       get "webhooks/*token", to: "incoming_webhooks#invoke", constraints: { token: /.+/ }

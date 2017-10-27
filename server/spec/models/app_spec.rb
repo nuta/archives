@@ -46,4 +46,13 @@ RSpec.describe App, type: :model do
       end
     end
   end
+
+  describe 'default_value_for :os_version' do
+    it 'set the latest os version if it is not provided' do
+      latest = MakeStack.settings[:os_releases].keys[-1]
+      app = build_stubbed(:app, os_version: nil)
+      expect(app).to be_valid
+      expect(app.os_version).to eq(latest)
+    end
+  end
 end

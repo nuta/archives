@@ -10,8 +10,7 @@ class DeploymentsController < ApplicationController
   end
 
   def create
-    @deployment = Deployment.new(deployment_params)
-    @deployment.app = @app
+    @deployment = @app.deployments.new(deployment_params)
 
     if @deployment.save
       render :show, status: :created, location: app_deployment_url(@app.name, @deployment.version)
