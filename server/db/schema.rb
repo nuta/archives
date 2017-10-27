@@ -10,21 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171021073410) do
+ActiveRecord::Schema.define(version: 20171027000001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "app_stores", id: :serial, force: :cascade do |t|
-    t.string "key", null: false
-    t.string "value"
-    t.bigint "app_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "data_type", null: false
-    t.index ["app_id", "key"], name: "index_app_stores_on_app_id_and_key", unique: true
-    t.index ["app_id"], name: "index_app_stores_on_app_id"
-  end
 
   create_table "apps", id: :serial, force: :cascade do |t|
     t.string "name", null: false
@@ -32,7 +21,7 @@ ActiveRecord::Schema.define(version: 20171021073410) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.string "api", null: false
-    t.string "os_version"
+    t.string "os_version", null: false
     t.index ["user_id"], name: "index_apps_on_user_id"
   end
 
@@ -50,22 +39,13 @@ ActiveRecord::Schema.define(version: 20171021073410) do
   end
 
   create_table "device_mappings", id: :serial, force: :cascade do |t|
-    t.integer "device_id"
+    t.bigint "device_id", null: false
     t.string "token", null: false
     t.string "type", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "device_stores", id: :serial, force: :cascade do |t|
-    t.string "key", null: false
-    t.string "value"
-    t.bigint "device_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "data_type", null: false
-    t.index ["device_id", "key"], name: "index_device_stores_on_device_id_and_key", unique: true
-    t.index ["device_id"], name: "index_device_stores_on_device_id"
+    t.index ["device_id"], name: "index_device_mappings_on_device_id"
+    t.index ["token"], name: "index_device_mappings_on_token"
   end
 
   create_table "devices", id: :serial, force: :cascade do |t|
@@ -91,11 +71,12 @@ ActiveRecord::Schema.define(version: 20171021073410) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "app_id", null: false
+    t.string "name", null: false
     t.string "comment"
     t.string "token"
     t.string "token_prefix"
-    t.string "name"
     t.index ["app_id"], name: "index_integrations_on_app_id"
+    t.index ["token_prefix"], name: "index_integrations_on_token_prefix"
   end
 
   create_table "source_files", id: :serial, force: :cascade do |t|
@@ -106,6 +87,18 @@ ActiveRecord::Schema.define(version: 20171021073410) do
     t.datetime "updated_at", null: false
     t.index ["app_id", "path"], name: "index_source_files_on_app_id_and_path"
     t.index ["app_id"], name: "index_source_files_on_app_id"
+  end
+
+  create_table "stores", id: :serial, force: :cascade do |t|
+    t.string "key", null: false
+    t.string "value"
+    t.bigint "owner_id"
+    t.string "owner_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "data_type", null: false
+    t.index ["owner_type", "owner_id", "key"], name: "index_stores_on_owner_type_and_owner_id_and_key", unique: true
+    t.index ["owner_type", "owner_id"], name: "index_stores_on_owner_type_and_owner_id"
   end
 
   create_table "users", id: :serial, force: :cascade do |t|
@@ -139,11 +132,9 @@ ActiveRecord::Schema.define(version: 20171021073410) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
-  add_foreign_key "app_stores", "apps"
   add_foreign_key "apps", "users"
   add_foreign_key "deployments", "apps"
   add_foreign_key "device_mappings", "devices"
-  add_foreign_key "device_stores", "devices"
   add_foreign_key "devices", "apps"
   add_foreign_key "devices", "users"
   add_foreign_key "integrations", "apps"

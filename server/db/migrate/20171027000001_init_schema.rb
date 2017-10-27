@@ -1,16 +1,5 @@
 class InitSchema < ActiveRecord::Migration[4.2]
   def change
-    create_table "app_stores" do |t|
-      t.string "key", null: false
-      t.string "value"
-      t.bigint "app_id", null: false
-      t.datetime "created_at", null: false
-      t.datetime "updated_at", null: false
-      t.string "data_type", null: false
-      t.index ["app_id"], name: "index_app_stores_on_app_id"
-      t.index ["app_id", "key"], name: "index_app_stores_on_app_id_and_key", unique: true
-    end
-
     create_table "apps" do |t|
       t.string "name", null: false
       t.datetime "created_at", null: false
@@ -34,17 +23,6 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["app_id", "version"], name: "index_deployments_on_app_id_and_version", unique: true
     end
 
-    create_table "device_stores" do |t|
-      t.string "key", null: false
-      t.string "value"
-      t.bigint "device_id", null: false
-      t.datetime "created_at", null: false
-      t.datetime "updated_at", null: false
-      t.string "data_type", null: false
-      t.index ["device_id"], name: "index_device_stores_on_device_id"
-      t.index ["device_id", "key"], name: "index_device_stores_on_device_id_and_key", unique: true
-    end
-
     create_table "devices" do |t|
       t.string "name", null: false
       t.string "device_id", null: false
@@ -62,12 +40,14 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["user_id", "name"], name: "index_devices_on_user_id_and_name", unique: true
     end
 
-    create_table :device_mappings do |t|
-      t.references :device, foreign_key: true
+    create_table "device_mappings" do |t|
+      t.bigint "device_id", null: false
       t.string :token, null: false
       t.string :type, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
+      t.index ["device_id"], name: "index_device_mappings_on_device_id"
+      t.index ["token"], name: "index_device_mappings_on_token"
     end
 
     create_table "integrations" do |t|
@@ -76,10 +56,12 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.bigint "app_id", null: false
+      t.string "name", null: false
       t.string "comment"
       t.string "token"
       t.string "token_prefix"
       t.index ["app_id"], name: "index_integrations_on_app_id"
+      t.index ["token_prefix"], name: "index_integrations_on_token_prefix"
     end
 
     create_table "source_files" do |t|
@@ -90,6 +72,18 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.datetime "updated_at", null: false
       t.index ["app_id"], name: "index_source_files_on_app_id"
       t.index ["app_id", "path"], name: "index_source_files_on_app_id_and_path"
+    end
+
+    create_table "stores" do |t|
+      t.string "key", null: false
+      t.string "value"
+      t.bigint "owner_id"
+      t.string "owner_type"
+      t.datetime "created_at", null: false
+      t.datetime "updated_at", null: false
+      t.string "data_type", null: false
+      t.index ["owner_type", "owner_id",], name: "index_stores_on_owner_type_and_owner_id"
+      t.index ["owner_type", "owner_id", "key"], name: "index_stores_on_owner_type_and_owner_id_and_key", unique: true
     end
 
     create_table "users" do |t|
@@ -123,12 +117,11 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.index ["username"], name: "index_users_on_username", unique: true
     end
 
-    add_foreign_key "app_stores", "apps"
     add_foreign_key "apps", "users"
     add_foreign_key "deployments", "apps"
-    add_foreign_key "device_stores", "devices"
     add_foreign_key "devices", "apps"
     add_foreign_key "devices", "users"
+    add_foreign_key "device_mappings", "devices"
     add_foreign_key "integrations", "apps"
     add_foreign_key "source_files", "apps"
   end
