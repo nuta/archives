@@ -1,15 +1,27 @@
 *.log
-*.jekyll-metadata
 node_modules
 coverage
 
+# server
 /server/db/*.sqlite3
 /server/tmp/pids
 /server/tmp/cache/downloads
-
-# Generated automatically by webpack.
 /server/public/index.html
 /server/public/app.*.js
 /server/public/vendor.*.js
 /server/public/documentation
 !/server/public/documentation/.gitkeep
+
+# server/static
+.jekyll-metadata
+_site
+.sass-cache
+
+# installer
+/installer/dist
+
+# libs/app-runtime
+/libs/app-runtime/build
+
+# linux
+/linux/build

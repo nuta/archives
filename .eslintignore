@@ -1,8 +1,7 @@
-/cli/coverage
-/cli/node_modules
-/installer/node_modules
-/server/vendor
-/server/node_modules
-/linux/build
-/linux/initramfs/app/node_modules
-/libs/*/node_modules
+cli/node_modules
+installer/node_modules
+server/vendor
+server/coverage
+server/ui/node_modules
+linux/build
+libs/*/node_modules
