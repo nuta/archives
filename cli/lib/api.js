@@ -19,7 +19,7 @@ class API {
         })
       }
 
-      let respHeaders;
+      let respHeaders
       fetch(`${config.server.url}/api/v1${path}`, {
         method: method,
         headers: Object.assign(headers, config.credentials),

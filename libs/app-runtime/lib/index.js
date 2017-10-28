@@ -18,7 +18,6 @@ switch (os.type()) {
 }
 
 module.exports = (mainModulePath) => {
-
   global.Logging = new LoggingAPI()
   global.Timer = new TimerAPI()
   global.Store = new StoreAPI()
@@ -29,8 +28,8 @@ module.exports = (mainModulePath) => {
   process.on('message', (data) => {
     switch (data.type) {
       case 'initialize':
-      logger.info(`initialize message: stores=${JSON.stringify(data.stores)}`)
-      Store.update(data.stores)
+        logger.info(`initialize message: stores=${JSON.stringify(data.stores)}`)
+        Store.update(data.stores)
         require(mainModulePath)
         break
 

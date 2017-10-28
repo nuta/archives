@@ -42,8 +42,9 @@ class Supervisor {
       fs.writeFileSync(tmpFilePath, image)
 
       logger.warn('sending SIGTERM to the app...')
-      if (this.app)
+      if (this.app) {
         this.app.kill()
+      }
 
       // Wait the app to exit.
       logger.warn('OS will be updated soon!')
