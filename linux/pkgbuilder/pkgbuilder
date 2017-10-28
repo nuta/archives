@@ -192,8 +192,7 @@ function main() {
 
   const [packages, buildOrder] = loadPackages(target)
 
-  for (let i = 0; i < buildOrder.length; i++) {
-    const pkg = packages[buildOrder[i]]
+  for (const [i, pkg] of buildOrder.entries()) {
     if (isBuildRequired(pkg)) {
       console.log(`==> (${i + 1}/${buildOrder.length}) Building ${pkg.name}...`)
       buildPackage(pkg)

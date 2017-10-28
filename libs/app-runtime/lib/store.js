@@ -25,8 +25,8 @@ module.exports = class {
 
       if (oldValue != null && oldValue !== newValue) {
         let callbacks = store.onchangeCallbacks
-        for (let i = 0; i < callbacks.length; i++) {
-          callbacks[i](newValue)
+        for (const callback of callbacks) {
+          callback(newValue)
         }
       }
     }

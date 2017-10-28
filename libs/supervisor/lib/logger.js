@@ -7,8 +7,8 @@ function print(level, ...messages) {
   }
 
   let body = ''
-  for (let i = 0; i < messages.length; i++) {
-    body += messages[i] + ' '
+  for (const message of messages) {
+    body += message + ' '
   }
 
   const time = (new Date()).toTimeString().split(' ')[0]

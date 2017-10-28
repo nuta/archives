@@ -150,8 +150,8 @@ module.exports = {
     ]
 
     const blobFiles = {}
-    for (let i = 0; i < binaryBlobs.length; i++) {
-      blobFiles[`/${binaryBlobs[i]}`] = `boot/${binaryBlobs[i]}`
+    for (const relpath of binaryBlobs) {
+      blobFiles[`/${relpath}`] = `boot/${relpath}`
     }
 
     const configFiles = {

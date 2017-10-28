@@ -31,8 +31,8 @@ const FILE_CHUNK_SIZE = 16
 class SakuraIODriverBase extends Driver {
   computeParity(firstByte, data) {
     let parity = firstByte ^ data.length
-    for (let i = 0; i < data.length; i++) {
-      parity ^= data[i]
+    for (const byte of data) {
+      parity ^= byte
     }
 
     return parity
@@ -201,8 +201,8 @@ class SakuraIOAdapter {
       throw new Error('sakura.io: # of channel must be less than 16')
     }
 
-    for (let i = 0; i < channels.length; i++) {
-      this.sakuraio.enqueueTx(i, channels[i])
+    for (const [i, ch] of channels.entries()) {
+      this.sakuraio.enqueueTx(i, ch)
     }
 
     this.sakuraio.flushTx()

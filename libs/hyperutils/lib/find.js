@@ -12,8 +12,8 @@ module.exports = (basedir) => {
   do {
     const currentDir = dirs.pop()
     const ls = fs.readdirSync(currentDir)
-    for (let i = 0; i < ls.length; i++) {
-      const filepath = path.join(currentDir, ls[i])
+    for (const relpath of ls) {
+      const filepath = path.join(currentDir, relpath)
       if (fs.statSync(filepath).isDirectory()) {
         dirs.push(filepath)
       } else {

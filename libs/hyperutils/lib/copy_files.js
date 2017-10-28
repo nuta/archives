@@ -16,9 +16,7 @@ module.exports = (srcDir, destDir, ignorePatterns = []) => {
     return
   }
 
-  for (let i = 0; i < files.length; i++) {
-    const filepath = files[i]
-
+  for (const filepath of files) {
     if (ignorePatterns.some(pattern => filepath.match(pattern))) {
       continue
     }

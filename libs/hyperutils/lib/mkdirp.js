@@ -5,8 +5,8 @@ module.exports = dir => {
   const dirs = dir.split('/')
   let dirpath = '/'
 
-  for (let i = 0; i < dirs.length; i++) {
-    dirpath = path.join(dirpath, dirs[i])
+  for (const relpath of dirs) {
+    dirpath = path.join(dirpath, relpath)
 
     if (!fs.existsSync(dirpath)) {
       fs.mkdirSync(dirpath)

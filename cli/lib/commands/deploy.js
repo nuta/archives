@@ -41,9 +41,7 @@ module.exports = async (args, opts) => {
   let zip = new JSZip()
 
   // Populate plugin files.
-  for (let i = 0; i < plugins.length; i++) {
-    const pluginName = plugins[i]
-
+  for (const pluginName of plugins) {
     logger.progress(`downloading \`${pluginName}'`)
     const pluginZip = await downloadPlugin(pluginName)
 
@@ -59,9 +57,9 @@ module.exports = async (args, opts) => {
   // Copy app files.
   logger.progress(`copying files from \`${appName}'`)
   let files = find(opts.appDir)
-  for (let i = 0; i < files.length; i++) {
-    logger.debug(`adding \`${files[i]}'`)
-    zip.file(files[i], fs.createReadStream(path.join(opts.appDir, files[i])))
+  for (const file of files) {
+    logger.debug(`adding \`${file}'`)
+    zip.file(file, fs.createReadStream(path.join(opts.appDir, file)))
   }
 
   logger.progress(`generating zip file`)

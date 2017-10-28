@@ -12,9 +12,7 @@ function getLatestGitHubRelease(repo, prefix, suffix) {
     fetch(url).then(response => {
       return response.json()
     }).then(release => {
-      for (let i = 0; i < release.assets.length; i++) {
-        const asset = release.assets[i]
-
+      for (const asset of release.assets) {
         if (asset.name.startsWith(prefix) && asset.name.endsWith(suffix)) {
           resolve([release.tag_name, asset.browser_download_url])
         }

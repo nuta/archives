@@ -3,12 +3,12 @@ const { getAvailableDrives } = require('../drive')
 
 module.exports = async(args, opts, logger) => {
   const drives = await getAvailableDrives()
-  for (let i = 0; i < drives.length; i++) {
+  for (const [i, drive] of drives.entries()) {
     if (i > 0) { console.log('') }
 
-    console.log(`Drive: ${chalk.bold.green(drives[i].device)}`)
-    console.log(`  name: ${drives[i].displayName}`)
-    console.log(`  description: ${drives[i].description}`)
-    console.log(`  size: ${drives[i].size / 1024 / 1024}MiB`)
+    console.log(`Drive: ${chalk.bold.green(drive.device)}`)
+    console.log(`  name: ${drive.displayName}`)
+    console.log(`  description: ${drive.description}`)
+    console.log(`  size: ${drive.size / 1024 / 1024}MiB`)
   }
 }

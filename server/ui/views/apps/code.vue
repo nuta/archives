@@ -178,8 +178,7 @@ export default {
       let zip = new JSZip()
 
       // Populate plugin files.
-      for (let i = 0; i < plugins.length; i++) {
-        const pluginName = plugins[i]
+      for (const pluginName of plugins) {
         this.logOutput(`Downloading a plugin \`${pluginName}'`)
         const pluginZip = await this.downloadPlugin(pluginName)
         zip = await this.mergeZipFiles(pluginName, zip, await (new JSZip()).loadAsync(pluginZip))
@@ -195,9 +194,9 @@ export default {
       zip.file('start.js', zip.files[startJsRelPath].async('arraybuffer'))
 
       // Copy app files.
-      for (let i = 0; i < files.length; i++) {
-        this.logOutput(`Adding \`${files[i].path}'`)
-        zip.file(files[i].path, files[i].body)
+      for (const file of files) {
+        this.logOutput(`Adding \`${file.path}'`)
+        zip.file(file.path, file.body)
       }
 
       return new Blob([await zip.generateAsync({ type: 'arraybuffer' })],
@@ -205,10 +204,10 @@ export default {
     },
     getFiles() {
       let files = []
-      for (let i = 0; i < this.files.length; i++) {
+      for (const file of this.files) {
         files.push({
-          path: this.files[i].path,
-          body: ace.edit(this.files[i].id).getValue()
+          path: file.path,
+          body: ace.edit(file.id).getValue()
         })
       }
 
@@ -232,8 +231,7 @@ export default {
       }).catch(error => notify("error", error));
     },
     save() {
-      for (let i = 0; i < this.files.length; i++) {
-        const file = this.files[i]
+      for (const file of this.files) {
         let body = ace.edit(file.id).getValue();
         this.saveButton = "doing";
         api.saveFile(this.appName, file.path, body).then(r => {
@@ -270,8 +268,7 @@ export default {
   beforeMount() {
     api.getFiles(this.appName).then(r => {
       let files = []
-      for (let i = 0; i < r.json.length; i++) {
-        const file = r.json[i]
+      for (const file of r.json) {
         files.push({
           id: `editor${i}`,
           path: file.path,
@@ -283,8 +280,8 @@ export default {
       this.files = files
       this.editing = this.files[0].id
       this.$nextTick(() => {
-        for (let i = 0; i < this.files.length; i++) {
-          this.addEditor(files[i].id, files[i].path, files[i].body)
+        for (const file of this.files) {
+          this.addEditor(file.id, file.path, file.body)
         }
       })
     })

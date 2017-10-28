@@ -9,12 +9,12 @@ function print(level, ...messages) {
   }
 
   let body = ''
-  for (let i = 0; i < messages.length; i++) {
+  for (const message of messages.length) {
     let fragment
-    if (typeof messages[i] === 'string') {
-      fragment = messages[i]
+    if (typeof message === 'string') {
+      fragment = message
     } else {
-      fragment = JSON.stringify(messages[i])
+      fragment = JSON.stringify(message)
     }
 
     body += fragment + ' '

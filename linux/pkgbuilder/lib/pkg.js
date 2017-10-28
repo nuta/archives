@@ -30,8 +30,8 @@ function isNewerDirContent(dir1, dir2, ignorePatterns) {
   }
 
   let files = find(dir1)
-  for (let i = 0; i < files.length; i++) {
-    if (ignorePatterns.some(pattern => files[i].match(pattern))) {
+  for (const file of files) {
+    if (ignorePatterns.some(pattern => file.match(pattern))) {
       continue
     }
 

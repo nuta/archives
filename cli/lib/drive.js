@@ -5,9 +5,9 @@ function getDriveSize(drive) {
     drivelist.list((error, drives) => {
       if (error) { reject(error) }
 
-      for (let i = 0; i < drives.length; i++) {
-        if (drives[i].device === drive) {
-          resolve(drives[i].size)
+      for (const drive of drives) {
+        if (drive.device === drive) {
+          resolve(drive.size)
         }
       }
 
