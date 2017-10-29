@@ -32,6 +32,7 @@ group :development, :test do
 end
 
 group :development do
+  gem 'bullet'
   gem 'rails_best_practices', require: false
   gem 'rails-erd', require: false
   gem 'foreman', require: false

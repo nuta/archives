@@ -44,6 +44,9 @@ GEM
     arel (8.0.0)
     bcrypt (3.1.11)
     builder (3.2.3)
+    bullet (5.6.1)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.10.0)
     byebug (9.1.0)
     choice (0.2.0)
     code_analyzer (0.4.8)
@@ -285,6 +288,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.4)
+    uniform_notifier (1.10.0)
     warden (1.2.7)
       rack (>= 1.0)
     webmock (3.1.0)
@@ -300,6 +304,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_record_query_trace
+  bullet
   byebug
   database_cleaner
   devise

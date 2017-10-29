@@ -47,4 +47,9 @@ Rails.application.configure do
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.log_tags = [->(r){ Base64.encode64(Digest::MD5.digest(r.uuid)).strip }]
+
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.rails_logger = true
+  end
 end
