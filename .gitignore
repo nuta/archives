@@ -3,6 +3,8 @@ node_modules
 coverage
 
 # server
+/server/.bundle
+/server/vendor
 /server/db/*.sqlite3
 /server/tmp/pids
 /server/tmp/cache/downloads
