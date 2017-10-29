@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe User, type: :model do
   describe 'associations' do
-    it { is_expected.to has_many(:app).dependent(:destroy) }
-    it { is_expected.to has_many(:device).dependent(:destroy) }
+    it { is_expected.to have_many(:apps).dependent(:destroy) }
+    it { is_expected.to have_many(:devices).dependent(:destroy) }
   end
 
   describe 'destroy' do
