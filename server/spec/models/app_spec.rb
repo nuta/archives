@@ -10,6 +10,28 @@ RSpec.describe App, type: :model do
     it { is_expected.to have_many(:devices) }
   end
 
+  describe 'destroy' do
+    subject { create(:app) }
+    it_should_behave_like 'a removable model', [Store, SourceFile, Integration]
+  end
+
+  describe '#disassociate_devices' do
+    let!(:app) { create(:app) }
+    let!(:devices) { create_list(:device, 10, app: app, user: app.user) }
+
+    it 'nullifies devices' do
+      expect {
+        app.destroy
+      }.to change(Device, :count).by(0)
+
+      devices.each do |device|
+        expect(Device.where(id: device)).to be_exists
+        device.reload
+        expect(device.app).to be_nil
+      end
+    end
+  end
+
   describe 'validations' do
     it 'does not allow invalid os version' do
       app = build_stubbed(:app, os_version: 'abc')

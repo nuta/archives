@@ -12,11 +12,13 @@ require 'rspec/rails'
 require 'rspec/json_expectations'
 require 'ffaker'
 require 'database_cleaner'
-require 'support/factory_girl'
-require 'support/controller_helpers'
-require 'support/routing_helpers'
-require 'support/stores_shared_examples'
 require 'webmock/rspec'
+
+%w(* shared_examples/*).each do |pattern|
+  Dir[Rails.root.join("spec/support/#{pattern}.rb")].each do |f|
+    require f
+  end
+end
 
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
