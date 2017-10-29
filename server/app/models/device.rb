@@ -111,6 +111,10 @@ class Device < ApplicationRecord
     deployment.try(:image)
   end
 
+  def disassociate!
+    self.update_attributes!(app: nil)
+  end
+
   def self.authenticate(device_id)
     prefix = device_id[0, DEVICE_ID_PREFIX_LEN]
     device = Device.find_by_device_id_prefix(prefix)
