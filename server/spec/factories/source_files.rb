@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :source_file do
     app
-    path { File.basename(FFaker::Filesystem.file_name) }
+    path { SecureRandom.hex(20) + '.js' }
     body { FFaker::Lorem.sentence }
   end
 end
