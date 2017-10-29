@@ -38,4 +38,4 @@ engines:
 exclude_paths:
   - "server/db/schema.rb"
   - "server/db/migrate"
-
+  - "server/spec"
