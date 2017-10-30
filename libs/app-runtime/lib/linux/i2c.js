@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { ioctl } = require('../ioctl')
+const ioctl = require('../ioctl')
 
 const I2C_SLAVE = 0x0703
 
@@ -11,10 +11,11 @@ module.exports = class {
       return
     }
 
-    this.fd = fs.openSync('/dev/i2c-1', 'r+')
+    this.fd = fs.openSync('/dev/i2c-1', 'rs+')
   }
 
   reset() {
+    fs.closeSync(this.fd)
   }
 
   read(address, length) {
@@ -31,7 +32,7 @@ module.exports = class {
 
   selectSlaveAddress(address) {
     if (ioctl(this.fd, I2C_SLAVE, address) !== 0) {
-      throw new Error('failed to open I2C bus')
+      throw new Error('failed to set I2C_SLAVE')
     }
   }
 }
