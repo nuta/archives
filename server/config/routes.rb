@@ -37,8 +37,12 @@ Rails.application.routes.draw do
         get "/app/:device_id/:version",  to: "images#app_image", constraints: { device_id: /.+/ }
       end
 
-      get "webhooks/*token", to: "incoming_webhooks#invoke", constraints: { token: /.+/ }
-      get "sakuraio", to: "sakuraio#invoke"
+      post "webhooks/*token", to: "incoming_webhooks#invoke", constraints: { token: /.+/ }
+
+      scope :sakuraio do
+        post 'webhook', to: 'sakuraio#webhook'
+        get 'file', to: 'sakuraio#file'
+      end
   end
   end
 end

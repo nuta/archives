@@ -5,6 +5,7 @@ defaults: &defaults
 
 development:
   outgoing_webhook_limit_per_hour: 5000
+  push_to_sakuraio_limit_per_hour: 5000
   os_releases:
     a:
       linux:
@@ -25,6 +26,7 @@ development:
 
 test:
   outgoing_webhook_limit_per_hour: 3600
+  push_to_sakuraio_limit_per_hour: 5000
   os_releases:
     z:
       linux:
