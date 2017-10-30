@@ -1,10 +1,12 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import VueHead from 'vue-head'
 import VueProgressBar from 'vue-progressbar'
 import router from './router'
 import App from './app'
 
 Vue.use(VueRouter)
+Vue.use(VueHead)
 Vue.use(VueProgressBar, {
   color: 'rgb(143, 195, 255)',
   failedColor: 'red',
