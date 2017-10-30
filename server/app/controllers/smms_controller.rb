@@ -10,7 +10,8 @@ class SmmsController < ApplicationController
     end
 
     begin
-      device = SMMSService.receive(request.body.read, timestamp, hmac)
+      device = SMMSService.receive(request.body.read, hmac_enabled: true,
+                                   timestamp: timestamp, hmac: hmac)
     rescue ActionController::BadRequest => e
       logger.warn "invalid smms payload: #{e}"
       head :bad_request

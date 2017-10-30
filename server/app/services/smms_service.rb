@@ -13,7 +13,7 @@ module SMMSService
   SMMS_STORE_END = 0x7f
   SMMS_STORE_NUM = SMMS_STORE_END - SMMS_STORE + 1
 
-  def receive(payload, timestamp, hmac)
+  def receive(payload, hmac_enabled: true, timestamp: nil, hmac: nil, device_id: nil)
     # Be careful! The message HMAC is not verified yet.
     data = MessagePack.unpack(payload)
     states = [:new, :booting, :ready, :down, :reboot, :relaunch]
@@ -31,7 +31,7 @@ module SMMSService
     messages = {
       version: data[SMMS_VERSION],
       device_info: device_info,
-      device_id: data[SMMS_DEVICE_ID],
+      device_id: device_id || data[SMMS_DEVICE_ID],
       log: data[SMMS_LOG],
       os_version: data[SMMS_OS_VERSION],
       app_version: data[SMMS_APP_VERSION]
@@ -63,13 +63,15 @@ module SMMSService
     end
 
     # Verify the message timestamp.
-    if DateTime.now.utc - DateTime.parse(timestamp) > 3.minutes
-      raise ActionController::BadRequest.new(), "timestamp is too old"
-    end
+    if hmac_enabled
+      if DateTime.now.utc - DateTime.parse(timestamp) > 3.minutes
+        raise ActionController::BadRequest.new(), "timestamp is too old"
+      end
 
-    # Verify the message hmac.
-    if hmac != computeHMAC(device.device_secret, timestamp, payload)
-      raise ActionController::BadRequest.new(), "invalid HMAC digest"
+      # Verify the message hmac.
+      if hmac != computeHMAC(device.device_secret, timestamp, payload)
+        raise ActionController::BadRequest.new(), "invalid HMAC digest"
+      end
     end
 
     # Verified the message. It's now safe to update DB.
