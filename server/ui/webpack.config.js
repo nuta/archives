@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   entry: {
     app: './main.js',
-    vendor: ['vue', 'vue-router']
+    vendor: ['vue', 'vue-router', 'vue-progressbar']
   },
   output: {
     path: path.resolve('public'),
