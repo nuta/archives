@@ -1,3 +1,6 @@
+const util = require('util')
+
+
 function print(level, ...messages) {
   const colors = {
     'DEBUG': '35',
@@ -8,7 +11,7 @@ function print(level, ...messages) {
 
   let body = ''
   for (const message of messages) {
-    body += message + ' '
+    body += ((typeof message === 'string') ? message : util.inspect(message)) + ' '
   }
 
   const time = (new Date()).toTimeString().split(' ')[0]
