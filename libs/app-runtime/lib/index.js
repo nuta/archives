@@ -17,7 +17,7 @@ switch (os.type()) {
     break
 }
 
-module.exports = (mainModulePath) => {
+function start(mainModulePath) {
   global.Logging = new LoggingAPI()
   global.Timer = new TimerAPI()
   global.Store = new StoreAPI()
@@ -44,4 +44,11 @@ module.exports = (mainModulePath) => {
   })
 
   logger.info("waiting for `initialize' message from Supervisor...")
+}
+
+module.exports = {
+  GPIOAPI,
+  I2CAPI,
+  Driver: require('./driver'),
+  start
 }

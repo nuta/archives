@@ -1,4 +1,4 @@
 const path = require('path')
-const launch = require('app-runtime')
+const { start } = require('app-runtime')
 
-launch(path.resolve(__dirname, 'main'))
+start(path.resolve(__dirname, 'main'))
