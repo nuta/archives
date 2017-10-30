@@ -4,5 +4,5 @@ class DeviceMapping < ApplicationRecord
   SUPPORTED_TYPES = %w(sakuraio)
 
   validates :token, uniqueness: true
-  validates :type, inclusion: { in: SUPPORTED_TYPES }
+  validates :token_type, inclusion: { in: SUPPORTED_TYPES }
 end

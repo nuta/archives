@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027000001) do
+ActiveRecord::Schema.define(version: 20171030015520) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,7 +41,7 @@ ActiveRecord::Schema.define(version: 20171027000001) do
   create_table "device_mappings", id: :serial, force: :cascade do |t|
     t.bigint "device_id", null: false
     t.string "token", null: false
-    t.string "type", null: false
+    t.string "token_type", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["device_id"], name: "index_device_mappings_on_device_id"
