@@ -13,7 +13,7 @@ class ImagesController < ApplicationController
 
     begin
       sign_and_set_authorization_header(@device, open(image_filepath, 'rb'))
-      send_file image_filepath, type: 'application/x-os-image'
+      send_file image_filepath, content_type: 'application/x-os-image'
     rescue Errno::ENOENT
       # The downloaded file could be accidentally removed before send_file
       # by cache cleaning job (not implemented yet, by the way) or something.
@@ -29,7 +29,8 @@ class ImagesController < ApplicationController
     end
 
     sign_and_set_authorization_header(@device, payload)
-    render type: 'application/zip', body: payload
+    response.headers["Content-Length"] = payload.length
+    render content_type: 'application/zip', body: payload
   end
 
   private
