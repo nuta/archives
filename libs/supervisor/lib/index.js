@@ -3,7 +3,9 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const HTTPAdapter = require('./adapters/http')
+const SakuraioAdapter = require('./adapters/sakuraio')
 const logger = require('./logger')
+const { I2CAPI } = require('app-runtime')
 
 class Supervisor {
   constructor({ adapter, appDir, deviceType, osVersion, deviceId, deviceSecret, debugMode, appUID, appGID }) {
@@ -23,6 +25,9 @@ class Supervisor {
     switch (this.adapterName) {
       case 'http':
         this.adapter = new HTTPAdapter(deviceId, deviceSecret, adapter.url)
+        break
+      case 'sakuraio':
+        this.adapter = new SakuraioAdapter(new I2CAPI())
         break
       default:
         throw new Error(`unknown adapter \`${this.adapterName}'`)
@@ -117,7 +122,8 @@ class Supervisor {
     this.app.send(Object.assign({ type }, data))
   }
 
-  start() {
+  async start() {
+    await this.adapter.connect()
     logger.info(`heartbeating (state=booting, os_ver="${this.osVersion}", ` +
       `app_ver=0, debug=${this.debugMode})`)
 
@@ -129,18 +135,26 @@ class Supervisor {
       log: ''
     })
 
+    let downloading = false // XXX: use mutex or something better way
     this.adapter.onReceive(({ osUpdateRequest, appUpdateRequest, stores }) => {
       this.stores = stores
 
-      if (osUpdateRequest) {
+      if (!downloading && osUpdateRequest) {
+        downloading = true
         this.updateOS(osUpdateRequest)
+        downloading = false
       }
 
-      if (appUpdateRequest) {
+      if (!downloading && appUpdateRequest) {
+        downloading = true
         logger.info(`updating ${this.appVersion} -> ${appUpdateRequest}`)
         this.appVersion = appUpdateRequest
         this.adapter.getAppImage(appUpdateRequest).then((appZip) => {
+          downloading = false
           this.launchApp(appZip)
+        }).catch(e => {
+          logger.error('failed to download app image:', e)
+          downloading = false
         })
       } else {
         this.sendToApp('stores', { stores })

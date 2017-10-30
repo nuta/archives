@@ -35,6 +35,7 @@ class AdapterBase {
     payload[SMMS_OS_VERSION_MSG] = osVersion
     payload[SMMS_APP_VERSION_MSG] = appVersion
     payload[SMMS_LOG_MSG] = log
+    payload[0xff] = 0xff
 
     return msgpack.encode(payload)
   }

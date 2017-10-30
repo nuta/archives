@@ -5,19 +5,23 @@
  * Feedback Form: https://www.sakura.ad.jp/request_form/service/iot (Google Translate is your friend)
  *
  */
-const msgpack = require('msgpack')
-const Driver = require('./driver')
+const msgpack = require('msgpack-lite')
+const { Driver } = require('app-runtime')
+const AdapterBase = require('./base')
+const logger = require('../logger')
 
 // 1 - 19999 are reserved for OS images.
-const APP_IMAGE_FILEID_OFFSET = 20000
+const APP_IMAGE_FILEID_OFFSET = 0 //FIXME 20000
 // sakura.io allows to send 16 channels at a time. 16th one is used
 // for CHANNEL_COMMIT.
 const CHANNELS_MAX = 15
-const CHANNEL_COMMIT = 15
+const CHANNEL_COMMIT = 16
 const BYTES_PER_CHANNEL = 8
+const CH_TYPE_8BYTES = 0x62
 const PACKET_LEN_MAX = CHANNELS_MAX * BYTES_PER_CHANNEL
 const CONNECTION_READY = 0x80
-const CMD_ERROR_NONE = 0x01
+const CMD_RESULT_SUCCESS = 0x01
+const CMD_RESULT_PROCESSING = 0x07
 const CMD_GET_CONNECTION_STATUS = 0x01
 const CMD_START_FILE_DOWNLOAD = 0x40
 const CMD_GET_FILE_METADATA = 0x41
@@ -39,10 +43,14 @@ class SakuraIODriverBase extends Driver {
   }
 
   async enqueueTx(channel, type, value) {
-    let request = Buffer.from([channel, type] + value)
-    if (request.length !== 10) {
-      throw new Error('BUG: sakura.io: request must be 10 bytes')
+    if (value.length > BYTES_PER_CHANNEL) {
+      throw new Error('BUG: sakura.io: enqueue value must be equal to or less than 8 bytes')
     }
+
+    let request = Buffer.alloc(BYTES_PER_CHANNEL + 2)
+    request.writeUInt8(channel, 0)
+    request.writeUInt8(type, 1)
+    value.copy(request, 2)
 
     await this.command(CMD_TX_ENQUEUE, request)
   }
@@ -77,117 +85,141 @@ class SakuraIODriverBase extends Driver {
     await this.command(CMD_START_FILE_DOWNLOAD, buf)
   }
 
-  getFileMetadata() {
-    const [, response] = this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
+  async isDownloadingFile() {
+    const [result,] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
+    return (result !== CMD_RESULT_SUCCESS)
+  }
+
+  async getFileMetadata() {
+    const [result, response] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
     const status = response.readUInt8(0)
     const size = response.readUInt32LE(1)
-    const timestamp = response.readUInt64LE(5)
+    const timestamp = response.readUInt32LE(5)
     const crc = response.readUInt8(13)
     return [status, size, timestamp, crc]
   }
 
-  getFileData() {
-    return this.command(CMD_GET_FILE_DATA, Buffer.from([16]))
+  async getFileData(chunkSize) {
+    return await this.command(CMD_GET_FILE_DATA, Buffer.from([chunkSize]))
+  }
+
+  async getFileDownloadStatus() {
+    return await this.command(0x42, Buffer.alloc(0))
   }
 
   async getConnectionStatus() {
     const [result, resp] = await this.command(CMD_GET_CONNECTION_STATUS, Buffer.alloc(0))
     const status = resp.readUInt8(0)
 
-    return (result === CMD_ERROR_NONE) ? status : 0x7f
+    return (result === CMD_RESULT_SUCCESS) ? status : 0x7f
   }
 }
 
 class I2CSakuraIODriver extends SakuraIODriverBase {
-  constructor(apis, i2cAddress) {
+  constructor(i2c) {
     super()
-    this.apis = apis
-    this.addr = i2cAddress
+    this.i2c = i2c
+    this.addr = 0x4f
   }
 
   async command(command, data) {
-    const i2c = this.apis.i2c
-
     // Send a request.
-    let request = [command, data.length] + data + [this.computeParity(command, data)]
-    i2c.write(this.addr, Buffer.from(request))
+    let request = Buffer.alloc(2 + data.length + 1)
+    request.writeUInt8(command, 0)
+    request.writeUInt8(data.length, 1)
+    data.copy(request, 2)
+    request.writeUInt8(this.computeParity(command, data), 2 + data.length)
 
-    await this.delay(10)
+    this.i2c.write(this.addr, request)
+
+    // XXX: we need lock or busywait
+    let x = 0
+    const [,start] = process.hrtime()
+    for(let i=0; i < 100000; i++) {
+        x += Math.random()
+    }
+
 
     // Receive a response from the module.
-    let result = i2c.read(this.addr, 1)
-    let responseLength = i2c.read(this.addr, 1)
-    let parity = i2c.read(this.addr, 1)
-    let response = i2c.read(this.addr, responseLength)
+    let buf            = (await this.i2c.read(this.addr, 32))
+    let result         = buf.readUInt8(0)
+    let responseLength = buf.readUInt8(1)
+    let parity         = buf.readUInt8(responseLength + 2)
+    let response       = buf.slice(2, responseLength + 2)
 
-    if (result !== CMD_ERROR_NONE) {
-      console.warn(`sakura.io: module returned ${command}`)
-      return result
+    if (result !== CMD_RESULT_SUCCESS) {
+      logger.warn(`sakura.io: module returned ${result}`)
+      return [result,]
     }
 
     if (parity !== this.computeParity(result, response)) {
-      console.error('sakura.io: parity mismatch')
-      return
+      logger.error('sakura.io: parity mismatch')
+      return [result,] // FIXME
     }
 
     return [result, response]
   }
 }
 
-class SakuraIOAdapter {
-  constructor(i2cAPI, i2cAddress) {
-    // TODO: support SPI
-    this.sakuraio = new I2CSakuraIODriver(i2cAPI)
-    this.connect()
-    this.startReceiving()
+function delay(msec) {
+  return new Promise((resolve, reject) => setTimeout(resolve, msec))
+}
+
+class SakuraIOAdapter extends AdapterBase {
+  constructor(i2c) {
+    super()
+    this.sakuraio = new I2CSakuraIODriver(i2c)
+    this.received = []
   }
 
   async connect() {
     // Wait until the module gets connected.
     while (true) {
-      console.log('sakuraio: connecting...')
-      if (this.sakuraio.getConnectionStatus() & CONNECTION_READY) { break }
+      logger.debug('sakuraio: connecting...')
+      if ((await this.sakuraio.getConnectionStatus()) & CONNECTION_READY) {
+        break
+      }
 
-      await this.delay(1000)
+      await delay(1000)
     }
-    console.log('sakuraio: connected!')
+
+    logger.debug('sakuraio: connected!')
   }
 
-  startReceiving() {
+  async receive() {
     // Receive payloads from sakura.io.
-    let received = []
-    setInterval(() => {
-      let [, queued] = this.sakuraio.getRxQueueLength()
-      if (queued > 0) {
-        let commited = false
-        for (let i = 0; i < queued; i++) {
-          let [channel, data] = this.sakuraio.dequeueRx()
-          console.log(`sakuraio: received channel=${channel} data=${data}`)
-          if (channel === CHANNEL_COMMIT) {
-            commited = true
-            break
-          }
-
-          received[channel] = data
+    let [, queued] = await this.sakuraio.getRxQueueLength()
+    if (queued > 0) {
+      let commited = false
+      for (let i = 0; i < queued; i++) {
+        let [channel, data] = await this.sakuraio.dequeueRx()
+        if (channel === CHANNEL_COMMIT) {
+          commited = true
+          break
         }
 
-        // Received whole payload.
-        if (commited) {
-          let payload = Buffer.alloc(PACKET_LEN_MAX)
-          for (let i = 0; i < CHANNELS_MAX; i++) {
-            if (received[i] === undefined) {
-              console.error('sakuraio: detected a loss of channel')
+        this.received[channel] = data
+      }
+
+      // Received whole payload.
+      if (commited) {
+        let payload = Buffer.alloc(PACKET_LEN_MAX)
+        for (let i = 0; i < CHANNELS_MAX; i++) {
+          if (this.received[i]) {
+            if (i < 0 && this.received[i - 1] === undefined && this.received[i]) {
+              logger.error('sakuraio: detected a loss of channel')
               return
             }
 
-            received[i].copy(payload, i * BYTES_PER_CHANNEL)
+            this.received[i].copy(payload, i * BYTES_PER_CHANNEL)
           }
-
-          received = []
-          this.onReceiveCallback(this.deserialize(payload))
         }
+
+        this.received = []
+        logger.debug('sakuraio: received payload', payload)
+        this.onReceiveCallback(this.deserialize(payload))
       }
-    }, 15 * 1000)
+    }
   }
 
   doSend(payload) {
@@ -202,14 +234,16 @@ class SakuraIOAdapter {
     }
 
     for (const [i, ch] of channels.entries()) {
-      this.sakuraio.enqueueTx(i, ch)
+      this.sakuraio.enqueueTx(i, CH_TYPE_8BYTES, ch)
     }
 
     this.sakuraio.flushTx()
   }
 
   send(messages) {
-    let withoutLog = messages.filter(k => k !== 'log')
+    let withoutLog = Object.assign({}, messages)
+    delete withoutLog['log']
+
     let withoutLogLength = this.serialize(withoutLog).length
     if (withoutLogLength > PACKET_LEN_MAX) {
       throw new Error('too many messages')
@@ -220,47 +254,47 @@ class SakuraIOAdapter {
     let logLength = PACKET_LEN_MAX - MSGPACK_LOG_HEADER - withoutLogLength
     let shortenedMessage = Object.assign({}, withoutLog)
     shortenedMessage.log = messages['log'].substring(0, logLength)
-    let payload = msgpack.pack(shortenedMessage)
+    let payload = this.serialize(shortenedMessage)
 
     this.doSend(payload)
+    this.receive()
   }
 
   async getAppImage(version) {
-    console('sakura.io: requesting a file download....')
+    logger.info('sakura.io: requesting a file download....')
     this.sakuraio.requestFileDownload(APP_IMAGE_FILEID_OFFSET + version)
 
-    // We assume that file downloading is slow. delay for a while.
-    await this.delay(500)
-
     // Wait until the module finish downloading the app image file.
-    let status, fileSize
     while (true) {
-      [status, fileSize] = this.sakuraio.getFileMetadata()
-
-      if (status === CMD_ERROR_NONE) {
+      if (!await this.sakuraio.isDownloadingFile()) {
         break
       }
 
-      await this.delay(1000)
+      await delay(1000)
+    }
+
+    const [,fileSize] = await this.sakuraio.getFileMetadata()
+    if (fileSize == 0) {
+        throw new Error('sakura.io: failed to download a file')
     }
 
     let appImage = Buffer.alloc(fileSize)
     let offset = 0
     while (offset < fileSize) {
-      const [result, data] = this.sakuraio.getFileData(FILE_CHUNK_SIZE)
-      if (result !== CMD_ERROR_NONE) {
-        console.log('sakura.io: getFileData returned an error, retrying in 500 msec....')
-        await this.delay(500)
+      const [result, data] = await this.sakuraio.getFileData(FILE_CHUNK_SIZE)
+      if (result !== CMD_RESULT_SUCCESS) {
+        logger.debug('sakura.io: getFileData returned an error, retrying in 500 msec....')
+        await delay(500)
         continue
       }
 
-      appImage.from(data, offset)
+      data.copy(appImage, offset)
       offset += data.length
-      const perc = (offset / data.length) * 100
-      console.log(`sakura.io: received ${offset} bytes ${perc}%`)
+      const perc = (offset / fileSize) * 100
+      logger.debug(`sakura.io: received ${offset} bytes ${perc}%`)
     }
 
-    console.log(`sakura.io: Hooray! You got a new app image!`)
+    logger.debug('sakura.io: Hooray! You got a new app image!')
     return Promise.resolve(appImage)
   }
 }
