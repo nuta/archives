@@ -17,7 +17,7 @@ defaults:
     values:
       layout: documentation
 
-destination: ../public/documentation
+destination: ../server/public/documentation
 exclude:
 
 markdown: kramdown
