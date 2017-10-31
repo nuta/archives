@@ -173,8 +173,25 @@ label {
   &:active  { color: $default-font-color; }
 }
 
+.welcome-card {
+  border: 1px solid #cccccc;
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 10px;
+  text-align: center;
+
+  .title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .description {
+  }
+}
+
 .list {
   border: 1px solid #cccccc;
+  background: #ffffff;
   border-radius: 4px;
   padding: 10px;
 
