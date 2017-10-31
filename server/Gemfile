@@ -28,6 +28,7 @@ group :development, :test do
   gem 'ffaker', require: false
   gem 'factory_girl_rails', require: false
   gem 'jekyll', require: false
+  gem 'rouge', require: false
   gem 'guard-rspec', require: false
 end
 
