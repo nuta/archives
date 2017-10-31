@@ -21,6 +21,15 @@ program
   .action(require('./commands/app').delete_)
 
 program
+  .command('device list', 'List devices.')
+  .action(require('./commands/device').list)
+
+program
+  .command('device delete', 'Delete an device.')
+  .argument('name', 'The device name.')
+  .action(require('./commands/device').delete_)
+
+program
   .command('deploy', 'Deploys the app.')
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
   .action(require('./commands/deploy'))
