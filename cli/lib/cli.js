@@ -6,6 +6,21 @@ program
   .action(require('./commands/login'))
 
 program
+  .command('app list', 'List apps.')
+  .action(require('./commands/app').list)
+
+program
+  .command('app create', 'Create an app.')
+  .argument('name', 'The app name.')
+  .option('--api <api>', 'The API.', /^linux$/, null, true)
+  .action(require('./commands/app').create)
+
+program
+  .command('app delete', 'Delete an app.')
+  .argument('name', 'The app name.')
+  .action(require('./commands/app').delete_)
+
+program
   .command('deploy', 'Deploys the app.')
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
   .action(require('./commands/deploy'))

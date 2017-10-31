@@ -1,4 +1,5 @@
 const fs = require('fs')
+const util = require('util')
 const FormData = require('form-data')
 const fetch = require('node-fetch')
 const { loadCredentials, saveCredentials } = require('./config')
@@ -20,18 +21,21 @@ class API {
         })
       }
 
-      let respHeaders
+      let status
       fetch(`${credentials.url}/api/v1${path}`, {
         method: method,
         headers: Object.assign(headers, credentials),
         body
       }).then(response => {
-        respHeaders = response.headers
-        return response
-      }).then(response => {
-        return response.json()
+        status = response.status
+        return (status === 204) ? Promise.resolve({}) : response.json()
       }).then(json => {
-        resolve({ headers: respHeaders, json })
+        if (!(status >= 200 && status <= 300)) {
+          const msg = util.inspect(json)
+          throw new Error(`Error: server returned ${status}: \`${msg}'`)
+        }
+
+        resolve(json)
       })
     })
   }
