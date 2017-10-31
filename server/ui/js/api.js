@@ -8,7 +8,7 @@ export default new class {
   }
 
   invoke(method, path, body, requiresCredentials = true) {
-    let reqHeaders = Object.assign({}, this.credentials)
+    let headers = Object.assign({}, this.credentials)
 
     if (requiresCredentials && (!this.user || !this.credentials)) {
       this.forceLogin()
@@ -16,44 +16,35 @@ export default new class {
 
     if (typeof body !== 'string' && !(body instanceof FormData)) {
       body = JSON.stringify(body)
-      Object.assign(reqHeaders, {
-        'Content-Type': 'application/json'
-      })
+      Object.assign(headers, { 'Content-Type': 'application/json' })
     }
 
     return new Promise((resolve, reject) => {
-      let status
-      let headers
-      fetch(`/api/v1${path}`, {
-        method,
-        headers: reqHeaders,
-        body
-      }).then((response) => {
-        status = response.status
-        headers = response.headers
-        return response
-      }).then((response) => {
-        if (response.status === 401 && app.$router.currentRoute.name !== 'login') {
-          this.forceLogin((app.$router.currentRoute.name === 'home') ? null : 'Login first.')
-        }
-        return response
-      }).then((response) => {
-        return response.json()
-      }).catch(error => {
-        reject(new Error(`server returned ${status}" ${error}`))
-      }).then((json) => {
-        if (status >= 200 && status <= 299) {
-          resolve({ status, headers, json })
-        } else {
-          reject(new Error(`server returned ${status}" ${json}`))
-        }
-      })
+      fetch(`/api/v1${path}`, { method, headers, body })
+        .then(response => {
+          if (response.status === 401 && app.$router.currentRoute.name !== 'login') {
+            this.forceLogin((app.$router.currentRoute.name === 'home') ? null : 'Login first.')
+          }
+          return response
+        })
+        .then(response => {
+          return response.json()
+        })
+        .then(resolve)
+        .catch(error => {
+          alert(`something went wrong :(\n\n${error.stack}`)
+        })
     })
   }
 
   logout() {
     localStorage.removeItem('user')
     localStorage.removeItem('credentials')
+  }
+
+  forceLogin(errmsg) {
+    this.logout()
+    app.$router.push({name: 'login'})
   }
 
   login(username, password) {
@@ -75,11 +66,6 @@ export default new class {
       localStorage.setItem('credentials', JSON.stringify(this.credentials))
       localStorage.setItem('user', JSON.stringify(this.user))
     })
-  }
-
-  forceLogin(errmsg) {
-    this.logout()
-    app.$router.push({name: 'login'})
   }
 
   signup(username, email, password) {
