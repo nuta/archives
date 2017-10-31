@@ -45,17 +45,20 @@ class API {
   }
 
   login(url, username, password) {
-    let headers
+    let status, headers
     return fetch(`${url}/api/v1/auth/sign_in`, {
       method: 'POST',
-      body: JSON.stringify({
-        username: username,
-        password: password
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
     }).then((response) => {
+      status = response.status
       headers = response.headers
       return response.json()
     }).then(json => {
+      if (status !== 200) {
+        throw new Error(`Error: failed to login: \`${json.errors}'`)
+      }
+
       saveCredentials({
         url,
         username,
