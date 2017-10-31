@@ -22,7 +22,21 @@ function saveCredentials(data) {
   return save('credentials', data)
 }
 
+function loadMocks() {
+  return load('mocks')
+}
+
+function updateMocks(data) {
+  save('mocks', Object.assign(loadMocks(), data))
+}
+function saveMocks(data) {
+  return save('mocks', data)
+}
+
 module.exports = {
   loadCredentials,
-  saveCredentials
+  saveCredentials,
+  loadMocks,
+  saveMocks,
+  updateMocks
 }

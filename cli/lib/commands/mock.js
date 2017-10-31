@@ -2,26 +2,26 @@ let os = require('os')
 let path = require('path')
 let Supervisor = require('makestack-supervisor')
 let api = require('../api')
-let config = require('../config')
+let { loadMocks, updateMocks } = require('../config')
 
 function create(args, opts, logger) {
   let deviceName = args.name
   api.registerDevice(deviceName, 'mock', null).then(r => {
-    Object.assign(config.mocks, { deviceName: r.json })
+    updateMocks({ deviceName: r.json })
   }).catch(e => {
     logger.error('failed to create a mock device', e)
   })
 }
 
 function run(args, opts, logger) {
-  let mock = config.mocks[args.name]
+  let mock = loadMocks()[args.name]
   const osVersion = 'a' // A version defined in server/config/makestack.yml
 
   const supervisor = new Supervisor({
     appDir: path.resolve(os.homedir(), '.makestack/mock-app'),
     adapter: {
       name: 'http',
-      url: config.server.url
+      url: api.serverURL
     },
     deviceType: 'mock',
     deviceId: mock.device_id,
