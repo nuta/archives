@@ -65,7 +65,11 @@ module.exports = {
     inline: true,
     proxy: {
       '/api/*': 'http://localhost:3000',
-      '/repo/*': 'http://localhost:8100'
+      '/repo/*': 'http://localhost:8100',
+      '/documentation': {
+        target: 'http://localhost:4000',
+        pathRewrite: { '^/documentation': '' }
+      }
     }
   }
 }
