@@ -4,4 +4,5 @@ module.exports = class {
   setMode(pin, mode) { }
   write(pin, value) { }
   read(pin) { return 0 }
+  onInterrupt(pin, mode, callback) {}
 }

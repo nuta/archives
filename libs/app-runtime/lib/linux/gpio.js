@@ -28,4 +28,15 @@ module.exports = class {
   read(pin) {
     return fs.readFileSync(`/sys/class/gpio/gpio${pin}/value`, 'utf-8') === '1'
   }
+
+  onInterrupt(pin, mode, callback) {
+    callback = (typeof mode === 'function') ? mode : callback
+    const edge = mode || 'rising'
+
+    this.setMode(pin, this.INPUT)
+    fs.writeFileSync(`/sys/class/gpio/gpio${pin}/edge`, edge)
+    fs.watch(`/sys/class/gpio/gpio${pin}/value`, () => {
+      callback()
+    })
+  }
 }
