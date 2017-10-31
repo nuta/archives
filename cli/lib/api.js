@@ -1,14 +1,15 @@
 const fs = require('fs')
 const FormData = require('form-data')
 const fetch = require('node-fetch')
-const config = require('./config')
+const { loadCredentials, saveCredentials } = require('./config')
 
 class API {
   invoke(method, path, body) {
     const headers = {}
 
     return new Promise((resolve, reject) => {
-      if (!config.credentials) {
+      const credentials = loadCredentials()
+      if (!credentials) {
         reject(new Error('login first'))
       }
 
@@ -20,9 +21,9 @@ class API {
       }
 
       let respHeaders
-      fetch(`${config.server.url}/api/v1${path}`, {
+      fetch(`${credentials.url}/api/v1${path}`, {
         method: method,
-        headers: Object.assign(headers, config.credentials),
+        headers: Object.assign(headers, credentials),
         body
       }).then(response => {
         respHeaders = response.headers
@@ -36,7 +37,7 @@ class API {
   }
 
   get serverURL() {
-    return config.server.url
+    return loadCredentials().url
   }
 
   logout() {
@@ -44,18 +45,25 @@ class API {
   }
 
   login(url, username, password) {
-    config.server = { url }
-    return this.invoke('POST', '/auth/sign_in', {
-      username: username,
-      password: password
-    }).then(({ headers, json }) => {
-      config.credentials = {
+    let headers
+    return fetch(`${url}/api/v1/auth/sign_in`, {
+      method: 'POST',
+      body: JSON.stringify({
         username: username,
+        password: password
+      })
+    }).then((response) => {
+      headers = response.headers
+      return response.json()
+    }).then(json => {
+      saveCredentials({
+        url,
+        username,
         email: json['data']['email'],
         uid: headers.get('uid'),
         'access-token': headers.get('access-token'),
         'access-token-secret': headers.get('access-token-secret')
-      }
+      })
     })
   }
 
