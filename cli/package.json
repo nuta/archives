@@ -31,16 +31,16 @@
     "hyperutils": "file:../libs/hyperutils",
     "inquirer": "^3.2.3",
     "jszip": "^3.1.4",
+    "makestack-supervisor": "file:../libs/supervisor",
     "mountutils": "^1.2.2",
     "node-fetch": "^1.7.3",
     "node-ipc": "^9.1.1",
     "shell-quote": "^1.6.1",
     "sudo-prompt": "^7.1.1",
-    "makestack-supervisor": "file:../libs/supervisor",
     "winston": "next"
   },
   "devDependencies": {
-    "istanbul": "^0.4.5",
+    "istanbul": "next",
     "mocha": "^4.0.1",
     "nock": "^9.0.27",
     "power-assert": "^1.4.4",
