@@ -1,0 +1,28 @@
+title: MakeStack Documentation
+email: nuta@seiya
+
+description:
+baseurl: ""
+url: ""
+permalink: /documentation
+github_username:  makestack
+
+collections:
+  - guides
+
+defaults:
+  - scope:
+      path: ""
+      type: guides
+    values:
+      layout: documentation
+
+destination: ../public/documentation
+exclude:
+
+markdown: kramdown
+plugins:
+
+sass:
+    sass_dir: _sass
+

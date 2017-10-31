@@ -1,3 +1,7 @@
+---
+layout: documentation
+---
+
 Simple Management/Messaging System
 ===================================
 

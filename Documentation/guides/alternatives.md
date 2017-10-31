@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: documentation
 ---
 
 Alternatives
