@@ -7,7 +7,7 @@ module.exports = {
     vendor: ['vue', 'vue-router', 'vue-head', 'vue-progressbar']
   },
   output: {
-    path: path.resolve('public'),
+    path: path.resolve('../public'),
     publicPath: '/',
     filename: '[name].[chunkhash].js'
   },
