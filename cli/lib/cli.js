@@ -30,9 +30,15 @@ program
   .action(require('./commands/device').delete_)
 
 program
-  .command('deploy', 'Deploys the app.')
+  .command('deploy', 'Deploy the app.')
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
   .action(require('./commands/deploy'))
+
+program
+  .command('add-device', 'Add an device to the app.')
+  .argument('name', 'The device name.')
+  .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
+  .action(require('./commands/add_device'))
 
 program
   .command('mock create', 'Create a mock device.')
