@@ -3,7 +3,7 @@ email: nuta@seiya
 
 description:
 baseurl: ""
-url: ""
+url:
 permalink: /documentation
 github_username:  makestack
 
@@ -22,6 +22,7 @@ exclude:
 
 markdown: kramdown
 plugins:
+highlighter: rouge
 
 sass:
     sass_dir: _sass
