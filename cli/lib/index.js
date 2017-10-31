@@ -1,5 +1,6 @@
 module.exports = {
   install: require('./install'),
   drive: require('./drive'),
-  imageWriter: require('./image_writer')
+  imageWriter: require('./image_writer'),
+  login: require('./login')
 }

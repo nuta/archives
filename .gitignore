@@ -2,6 +2,9 @@
 node_modules
 coverage
 
+# cli
+/cli/tests/tmp
+
 # server
 /server/.bundle
 /server/vendor
