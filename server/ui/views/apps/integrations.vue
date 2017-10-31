@@ -65,23 +65,21 @@ export default {
       api.deleteIntegration(this.appName, integration.name)
     }
   },
-  beforeMount() {
-    api.getIntegrations(this.appName).then(r => {
-      this.integrations = r.json.map(integration => {
-        let config = JSON.parse(integration.config);
-        return {
-          service: integration.service,
-          comment: integration.comment,
-          webhook_url: config.webhook_url,
-          incoming_webhook_token: integration.token,
-          slack_webhook_url: config.webhook_url,
-          ifttt_key: config.key,
-          datadog_api_key: config.api_key,
-          on_event: config.on_event,
-          on_device_change: config.on_device_change
-        };
-      });
-    });
+  async beforeMount() {
+    this.integrations = (await api.getIntegrations(this.appName)).map(integration => {
+      let config = JSON.parse(integration.config);
+      return {
+        service: integration.service,
+        comment: integration.comment,
+        webhook_url: config.webhook_url,
+        incoming_webhook_token: integration.token,
+        slack_webhook_url: config.webhook_url,
+        ifttt_key: config.key,
+        datadog_api_key: config.api_key,
+        on_event: config.on_event,
+        on_device_change: config.on_device_change
+      }
+    })
   }
 };
 </script>

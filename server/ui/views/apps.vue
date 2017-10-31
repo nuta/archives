@@ -42,7 +42,7 @@
             </router-link>
           </div>
         </div>
-  
+
         <div class="rightside">
           <table class="metadata">
             <tr>
@@ -74,10 +74,8 @@ export default {
     };
   },
   filters: { describeAPI },
-  beforeMount() {
-    api.getApps()
-      .then(r => this.apps = r.json)
-      .catch(error => notify("error", error));
+  async beforeMount() {
+    this.apps = await api.getApps()
   }
 };
 </script>

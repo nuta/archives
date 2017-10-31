@@ -39,10 +39,8 @@ export default {
       apps: []
     };
   },
-  beforeMount() {
-    api.getDevices()
-      .then(r => this.devices = r.json)
-      .catch(error => notify("error", error));
+  async beforeMount() {
+    this.devices = await api.getDevices()
   }
 };
 </script>

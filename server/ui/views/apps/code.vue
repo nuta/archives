@@ -223,21 +223,20 @@ export default {
       this.logOutput('Generated a .zip file, deploying...')
       let comment = "Deployment at " + (new Date()).toString(); // TODO
       this.deployButton = "Deploying...";
-      api.deploy(this.appName, image, "", comment, null).then(r => {
-        const took = (((new Date()) - timeStarted) / 1000).toPrecision(3)
-        this.deployButton = "done"
-        this.logOutput(`Deployed #${r.json.version}, took ${took} seconds`)
-        setTimeout(() => { this.deployButton = "waiting"; }, 1500);
-      }).catch(error => notify("error", error));
+
+      const r = await api.deploy(this.appName, image, "", comment, null)
+      const took = (((new Date()) - timeStarted) / 1000).toPrecision(3)
+      this.deployButton = "done"
+      this.logOutput(`Deployed #${r.version}, took ${took} seconds`)
+      setTimeout(() => { this.deployButton = "waiting"; }, 1500);
     },
-    save() {
+    async save() {
       for (const file of this.files) {
         let body = ace.edit(file.id).getValue();
         this.saveButton = "doing";
-        api.saveFile(this.appName, file.path, body).then(r => {
-          this.saveButton = "done";
-          setTimeout(() => { this.saveButton = "waiting"; }, 1500);
-        }).catch(error => notify("error", error));
+        await api.saveFile(this.appName, file.path, body)
+        this.saveButton = "done"
+        setTimeout(() => { this.saveButton = "waiting"; }, 1500)
       }
     },
     addEditor(id, path, body) {
@@ -265,31 +264,26 @@ export default {
       session.setUseSoftTabs(true)
     }
   },
-  beforeMount() {
-    api.getFiles(this.appName).then(r => {
-      let files = []
-      for (const file of r.json) {
-        files.push({
-          id: `editor${i}`,
-          path: file.path,
-          body: file.body,
-          editing: i == 0
-        })
-      }
-
-      this.files = files
-      this.editing = this.files[0].id
-      this.$nextTick(() => {
-        for (const file of this.files) {
-          this.addEditor(file.id, file.path, file.body)
-        }
+  async beforeMount() {
+    let files = []
+    for (const file of await api.getFiles(this.appName)) {
+      files.push({
+        id: `editor${i}`,
+        path: file.path,
+        body: file.body,
+        editing: i == 0
       })
+    }
+
+    this.files = files
+    this.editing = this.files[0].id
+    this.$nextTick(() => {
+      for (const file of this.files) {
+        this.addEditor(file.id, file.path, file.body)
+      }
     })
-//    }).catch(error => notify("error", error));
   },
   mounted() {
-    let component = this;
-    let autosaveTimer;
     /*
     session.on('change', function(e) {
       if (component.prevFileBody == editor.getValue())
