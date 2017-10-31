@@ -35,7 +35,7 @@
     "node-ipc": "^9.1.1",
     "shell-quote": "^1.6.1",
     "sudo-prompt": "^7.1.1",
-    "supervisor": "file:../libs/supervisor",
+    "makestack-supervisor": "file:../libs/supervisor",
     "winston": "next"
   },
   "devDependencies": {

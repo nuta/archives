@@ -1,6 +1,6 @@
 let os = require('os')
 let path = require('path')
-let Supervisor = require('supervisor')
+let Supervisor = require('makestack-supervisor')
 let api = require('../api')
 let config = require('../config')
 
