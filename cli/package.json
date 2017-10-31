@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "mocha tests",
+    "autotest": "supervisor -q -n exit -x mocha -- tests",
     "cov": "istanbul cover _mocha tests"
   },
   "repository": {
@@ -42,6 +43,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "nock": "^9.0.27",
-    "power-assert": "^1.4.4"
+    "power-assert": "^1.4.4",
+    "supervisor": "^0.12.0"
   }
 }
