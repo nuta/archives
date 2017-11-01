@@ -28,7 +28,7 @@ class SakuraioController < ApplicationController
     end
 
     # ["85a57374617465a7", "626f6f74696e67a9", ...] => "\x85\xA5\x73\x74..."
-    payload = channels.join.scan(/../).map(&:hex).pack('c*').gsub(/\x00+$/, '')
+    payload = channels.join.scan(/../).map(&:hex).pack('c*')
     SMMSService.receive(payload, hmac_enabled: false, device_id: @device.device_id)
 
     resp = SMMSService.payload_for(@device)

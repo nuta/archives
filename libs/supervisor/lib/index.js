@@ -18,7 +18,7 @@ class Supervisor {
     this.deviceId = deviceId
     this.deviceType = deviceType
     this.device = new (require(`./devices/${deviceType}`))()
-    this.appVersion = 0
+    this.appVersion = 'X'
     this.log = ''
     this.stores = {}
     this.adapterName = adapter.name
@@ -122,56 +122,57 @@ class Supervisor {
     this.app.send(Object.assign({ type }, data))
   }
 
-  async start() {
-    await this.adapter.connect()
-    logger.info(`heartbeating (state=booting, os_ver="${this.osVersion}", ` +
-      `app_ver=0, debug=${this.debugMode})`)
+  sendHeartbeat(state) {
+    logger.info(`heartbeating (state=running, os_ver="${this.osVersion}", ` +
+      `app_ver="${this.appVersion}", debug=${this.debugMode})`)
 
     this.adapter.send({
-      state: 'booting',
+      state,
       debugMode: this.debugMode,
       osVersion: this.osVersion,
-      appVersion: 0,
-      log: ''
+      appVersion: this.appVersion,
+      log: this.popLog()
     })
+  }
+
+  async start() {
+    await this.adapter.connect()
+    this.sendHeartbeat('ready')
 
     let downloading = false // XXX: use mutex or something better way
-    this.adapter.onReceive(({ osUpdateRequest, appUpdateRequest, stores }) => {
-      this.stores = stores
-
-      if (!downloading && osUpdateRequest) {
+    this.adapter.onReceive(messages => {
+      // Update OS.
+      if (!downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
         downloading = true
-        this.updateOS(osUpdateRequest)
+        this.updateOS(messages.osVersion)
         downloading = false
       }
 
-      if (!downloading && appUpdateRequest) {
+      // Update App
+      if (!downloading && messages.appVersion && messages.appVersion !== this.appVersion) {
         downloading = true
-        logger.info(`updating ${this.appVersion} -> ${appUpdateRequest}`)
-        this.appVersion = appUpdateRequest
-        this.adapter.getAppImage(appUpdateRequest).then((appZip) => {
+        logger.info(`updating ${this.appVersion} -> ${messages.appVersion}`)
+        this.appVersion = messages.appVersion
+        this.adapter.getAppImage(messages.appVersion).then((appZip) => {
           downloading = false
           this.launchApp(appZip)
         }).catch(e => {
           logger.error('failed to download app image:', e)
           downloading = false
         })
-      } else {
-        this.sendToApp('stores', { stores })
+
+        return
+      }
+
+      // Send new stores to the app.
+      if (messages.stores) {
+        this.stores = messages.stores
+        this.sendToApp('stores', { stores: messages.stores })
       }
     })
 
     setInterval(() => {
-      logger.info(`heartbeating (state=running, os_ver="${this.osVersion}", ` +
-      `app_ver=${this.appVersion}, debug=${this.debugMode})`)
-
-      this.adapter.send({
-        state: 'running',
-        debugMode: this.debugMode,
-        osVersion: this.osVersion,
-        appVersion: this.appVersion,
-        log: this.popLog()
-      })
+      this.sendHeartbeat('running')
     }, 3000)
   }
 }

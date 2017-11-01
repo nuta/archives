@@ -45,7 +45,12 @@ class HTTPAdapter extends AdapterBase {
     return true
   }
 
+  connect() {
+    // Nothing to do.
+  }
+
   send(messages) {
+    messages.deviceId = this.deviceId
     const body = this.serialize(messages)
     const timestamp = (new Date()).toISOString()
     const hmac = this.computeHMAC(timestamp, body)

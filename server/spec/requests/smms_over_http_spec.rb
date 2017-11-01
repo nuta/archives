@@ -1,15 +1,26 @@
 require "rails_helper"
 
 RSpec.describe "SMMS over HTTP", type: :request do
-  def send_msg(device, version: 1, device_info:, app_version: 0, os_version: 'a', log: '')
-    payload = {
-      SMMSService::SMMS_VERSION => version,
-      SMMSService::SMMS_DEVICE_INFO => device_info,
-      SMMSService::SMMS_OS_VERSION => os_version,
-      SMMSService::SMMS_APP_VERSION => app_version,
-      SMMSService::SMMS_DEVICE_ID => device.device_id,
-      SMMSService::SMMS_LOG => log
-    }.to_msgpack
+  def build_payload(messages)
+    payload = ''
+    messages.each do |type, data|
+      lenbuf = SMMSService.send(:generate_variable_length, data)
+      payload += [type].pack('C') + lenbuf + data
+    end
+
+    total_length = SMMSService.send(:generate_variable_length, payload)
+    header = [SMMSService::SMMS_VERSION << 4].pack('C') + total_length
+    header + payload
+  end
+
+  def send_msg(device, device_info:, app_version: 0, os_version: 'a', log: '')
+    payload = build_payload({
+      SMMSService::SMMS_DEVICE_INFO_MSG => [device_info].pack('C'),
+      SMMSService::SMMS_OS_VERSION_MSG => os_version,
+      SMMSService::SMMS_APP_VERSION_MSG => app_version.to_s,
+      SMMSService::SMMS_DEVICE_ID_MSG => device.device_id,
+      SMMSService::SMMS_LOG_MSG => log
+    })
 
     timestamp, hmac = SMMSService::sign(device, payload)
 
@@ -21,12 +32,10 @@ RSpec.describe "SMMS over HTTP", type: :request do
     post '/api/v1/smms', headers: headers, params: payload
 
     begin
-      payload = MessagePack.unpack(response.body)
-    rescue
-      return {}
+      SMMSService.send(:parse_payload, response.body)
+    rescue => e
+      raise "something went wrong with parse_payload: #{e}"
     end
-
-    return payload
   end
 
   describe "heartbeating" do
@@ -57,16 +66,7 @@ RSpec.describe "SMMS over HTTP", type: :request do
         payload = send_msg(device, device_info: 1) # booting
         expect(response).to have_http_status(:ok)
 
-        expect(payload[SMMSService::SMMS_APP_UPDATE_REQUEST]).to eq(deployments[-1].version)
-      end
-    end
-
-    context "future version umber" do
-      it "returns :forbidden" do
-        device = create(:device, app: nil)
-        payload = send_msg(device, version: 123456789, device_info: 1)
-        expect(response).to have_http_status(:bad_request)
-        expect(payload).to eq({})
+        expect(payload[:app_version]).to eq(deployments[-1].version.to_s)
       end
     end
 
@@ -186,7 +186,7 @@ RSpec.describe "SMMS over HTTP", type: :request do
         expect(response).to have_http_status(:ok)
 
         stores.sort_by(&:key).each_with_index do |store, i|
-          expect(payload[SMMSService::SMMS_STORE + i]).to eq([store.key, store.value])
+          expect(payload[:stores][i]).to eq({ key: store.key, value: store.value })
         end
       end
     end
@@ -200,7 +200,7 @@ RSpec.describe "SMMS over HTTP", type: :request do
         expect(response).to have_http_status(:ok)
 
         stores.sort_by(&:key).each_with_index do |store, i|
-          expect(payload[SMMSService::SMMS_STORE + i]).to eq([store.key, store.value])
+          expect(payload[:stores][i]).to eq({ key: store.key, value: store.value })
         end
       end
     end
@@ -223,12 +223,12 @@ RSpec.describe "SMMS over HTTP", type: :request do
         payload = send_msg(device, device_info: 1) # booting
         expect(response).to have_http_status(:ok)
 
-        expect(payload[SMMSService::SMMS_STORE + 0]).to eq(['k1', 'v1'])
-        expect(payload[SMMSService::SMMS_STORE + 1]).to eq(['k2', 'v2'])
-        expect(payload[SMMSService::SMMS_STORE + 2]).to eq(['k3', 'v3'])
-        expect(payload[SMMSService::SMMS_STORE + 3]).to eq(['k4', 'v5'])
-        expect(payload[SMMSService::SMMS_STORE + 4]).to eq(['k5', 'v5'])
-        expect(payload[SMMSService::SMMS_STORE + 5]).to eq(nil)
+        expect(payload[:stores][0]).to eq({ key: 'k1', value: 'v1' })
+        expect(payload[:stores][1]).to eq({ key: 'k2', value: 'v2' })
+        expect(payload[:stores][2]).to eq({ key: 'k3', value: 'v3' })
+        expect(payload[:stores][3]).to eq({ key: 'k4', value: 'v5' })
+        expect(payload[:stores][4]).to eq({ key: 'k5', value: 'v5' })
+        expect(payload[:stores][5]).to eq(nil)
       end
     end
   end

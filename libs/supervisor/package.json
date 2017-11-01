@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "app-runtime": "file:../app-runtime",
-    "msgpack-lite": "^0.1.26",
     "node-fetch": "^1.7.3"
   }
 }

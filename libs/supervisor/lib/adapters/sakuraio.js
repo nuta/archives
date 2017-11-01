@@ -5,7 +5,6 @@
  * Feedback Form: https://www.sakura.ad.jp/request_form/service/iot (Google Translate is your friend)
  *
  */
-const msgpack = require('msgpack-lite')
 const { Driver } = require('app-runtime')
 const AdapterBase = require('./base')
 const logger = require('../logger')

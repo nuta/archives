@@ -14,9 +14,8 @@ gem 'sidekiq'
 gem 'pg', group: :postgres
 gem 'redis-objects'
 gem 'redis-namespace'
-gem 'msgpack'
 gem 'rest-client'
-gem 'strong_migrations'
+#gem 'strong_migrations'
 
 group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]

@@ -14,7 +14,7 @@ class Device < ApplicationRecord
   value :current_app_version, expiration: 45.minutes
 
   SUPPORTED_TYPES = %w(mock raspberrypi3)
-  DEVICE_STATES = %i(new booting ready running relaunch reboot down)
+  DEVICE_STATES = %w(new booting ready running relaunch reboot down)
   RESERVED_DEVICE_NAMES = %w(new)
   DEVICE_NAME_REGEX = /\A[a-zA-Z][a-zA-Z0-9\-\_]*\z/
   DEVICE_ID_LEN = 40

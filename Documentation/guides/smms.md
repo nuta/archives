@@ -19,6 +19,4 @@ Simple Management/Messaging System
  0x0d  | crashdump
  0x10  | os_version
  0x11  | app_version
- 0x20  | os_update_request
- 0x21  | app_update_request
- 0x40 + n | nth store (0 <= n <= 0x3f)
+ 0x20  | store

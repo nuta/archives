@@ -14,25 +14,25 @@ RSpec.describe SakuraioController, type: :controller do
             {
                 "channel": 0,
                 "type": "b",
-                "value": "87a13101a23130c0",
+                "value": "10240b0102100676",
                 "datetime": "2017-10-30T01:50:10.151406408Z"
             },
             {
                 "channel": 1,
                 "type": "b",
-                "value": "a2313102a23132a0",
+                "value": "302e302e31110676",
                 "datetime": "2017-10-30T01:50:10.288406408Z"
             },
             {
                 "channel": 2,
                 "type": "b",
-                "value": "a23136a161a23137",
+                "value": "302e302e320c0f48",
                 "datetime": "2017-10-30T01:50:10.306406408Z"
             },
             {
                 "channel": 3,
                 "type": "b",
-                "value": "00a3323535ccff00",
+                "value": "656c6c6f210a0000",
                 "datetime": "2017-10-30T01:50:10.339406408Z"
             }
           ]
@@ -55,7 +55,7 @@ EOS
       }
 
       it 'handles a message correctly' do
-        stub_request(:post, "https://api.sakura.io/incoming/v1/").to_return(status: 200)
+        stub_request(:post, "https://api.sakura.io/incoming/v1/abc").to_return(status: 200)
 
         post :webhook, params: message
         expect(device.status.value).to eq('ready')
