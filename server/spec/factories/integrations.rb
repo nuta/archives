@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :integration do
     app
     name { FFaker::InternetSE.slug }

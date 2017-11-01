@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :user do
     username { 'a' + SecureRandom.hex(13) }
     email    { "#{username}@example.com" }

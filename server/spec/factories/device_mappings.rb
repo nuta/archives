@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :device_mapping do
     device
     token_type 'sakuraio'

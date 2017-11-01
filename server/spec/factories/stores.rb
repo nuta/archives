@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :store do
     data_type { "string" }
     key   { FFaker::InternetSE.slug }
