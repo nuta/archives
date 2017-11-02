@@ -35,10 +35,10 @@ describe('login', () => {
     spawnSync(`rm -r ${TMP_CONFIG_DIR}`)
   })
 
-  it('creates .credentials.json', () => {
+  it('creates .credentials.json', async () => {
     const credentialsJSON = path.join(TMP_CONFIG_DIR, 'credentials.json')
 
-    makestack.login(server, username, password)
+    await makestack.login(server, username, password)
     assert.ok(fs.existsSync(credentialsJSON))
     assert.deepEqual(loadJSON(credentialsJSON), {
       uid,
