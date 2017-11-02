@@ -115,10 +115,9 @@ class SakuraIODriverBase extends Driver {
 }
 
 class I2CSakuraIODriver extends SakuraIODriverBase {
-  constructor(i2c) {
+  constructor(I2C) {
     super()
-    this.i2c = i2c
-    this.addr = 0x4f
+    this.i2c = new I2C({ address: 0x4f })
   }
 
   async command(command, data) {
@@ -129,7 +128,7 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
     data.copy(request, 2)
     request.writeUInt8(this.computeParity(command, data), 2 + data.length)
 
-    this.i2c.write(this.addr, request)
+    this.i2c.write(request)
 
     // XXX: we need lock or busywait
     let x = 0
@@ -140,7 +139,7 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
 
 
     // Receive a response from the module.
-    let buf            = (await this.i2c.read(this.addr, 32))
+    let buf            = (await this.i2c.read(32))
     let result         = buf.readUInt8(0)
     let responseLength = buf.readUInt8(1)
     let parity         = buf.readUInt8(responseLength + 2)

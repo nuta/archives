@@ -5,7 +5,6 @@ const path = require('path')
 const HTTPAdapter = require('./adapters/http')
 const SakuraioAdapter = require('./adapters/sakuraio')
 const logger = require('./logger')
-const { I2CAPI } = require('app-runtime')
 
 class Supervisor {
   constructor({ adapter, appDir, deviceType, osVersion, deviceId, deviceSecret, debugMode, appUID, appGID }) {
@@ -22,12 +21,16 @@ class Supervisor {
     this.log = ''
     this.stores = {}
     this.adapterName = adapter.name
+
+    process.env.DEVICE_TYPE = deviceType
+    this.appAPI = require('app-runtime')
+
     switch (this.adapterName) {
       case 'http':
         this.adapter = new HTTPAdapter(deviceId, deviceSecret, adapter.url)
         break
       case 'sakuraio':
-        this.adapter = new SakuraioAdapter(new I2CAPI())
+        this.adapter = new SakuraioAdapter(this.appAPI.I2C)
         break
       default:
         throw new Error(`unknown adapter \`${this.adapterName}'`)
@@ -87,11 +90,14 @@ class Supervisor {
       this.app.kill()
     }
 
-    this.app = fork('./start', {
+    this.app = fork('./start', [], {
       cwd: appDir,
       stdio: 'inherit',
       uid: this.appUID,
-      gid: this.appGID
+      gid: this.appGID,
+      env: {
+        DEVICE_TYPE: this.deviceType
+      }
     })
     this.sendToApp('initialize', { stores: this.stores })
 
