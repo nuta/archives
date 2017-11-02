@@ -1,3 +1,4 @@
+const chalk = require('chalk')
 const { createLogger, transports, addColors, format } = require('winston')
 
 const levels = {
@@ -26,7 +27,8 @@ module.exports = createLogger({
     new transports.Console()
   ],
   format: format.combine(
-    format.colorize(),
-    format.printf(info => `[${info.level.padEnd(20)}] ${info.message}`)
+    format.printf(info => {
+      return `${chalk.blue.bold(info.level.padStart(10) + ':')} ${info.message}`
+    })
   )
 })
