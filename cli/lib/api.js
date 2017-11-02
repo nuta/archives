@@ -111,7 +111,7 @@ class API {
   deploy(appName, image, debug, comment, tag) {
     const form = new FormData()
     form.append('deployment[image]', image)
-    return this.invoke('POST', `/apps/${appName}/deployments`, {}, form)
+    return this.invoke('POST', `/apps/${appName}/deployments`, form)
   }
 
   deleteApp(appName) {
