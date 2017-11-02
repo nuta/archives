@@ -3,12 +3,14 @@ const LoggingAPI = require('./logging')
 const TimerAPI = require('./timer')
 const StoreAPI = require('./store')
 const EventAPI = require('./event')
+const plugin = require('./plugin')
 
 let builtins = {
   Logging: new LoggingAPI(),
   Timer: new TimerAPI(),
   Store: new StoreAPI(),
-  Event: new EventAPI()
+  Event: new EventAPI(),
+  plugin
 }
 
 const deviceType = process.env.DEVICE_TYPE
