@@ -25,28 +25,40 @@ async function downloadPlugin(name) {
   return (await fetch(url)).buffer()
 }
 
-async function mergeZipFiles(pluginName, destZip, srcZip) {
+async function mergeZipFiles(basepath, destZip, srcZip) {
   for (const filepath in srcZip.files) {
-    destZip.file(path.join('node_modules', pluginName, filepath),
-      srcZip.files[filepath].async('arraybuffer'))
+    const file = srcZip.files[filepath].async('arraybuffer')
+    destZip.file(path.join(basepath, filepath), file)
   }
 
   return destZip
 }
 
+async function downloadAndExtractPackage(name, zip, basepath) {
+  logger.progress(`downloading \`${name}'`)
+  const pluginZip = await downloadPlugin(name)
+
+  logger.progress(`extracting \`${name}'`)
+  zip = await mergeZipFiles(basepath, zip, await (new JSZip()).loadAsync(pluginZip))
+  return zip
+}
+
 module.exports = async (args, opts) => {
-  const appName = loadAppYAML(opts.appDir).name
+  const appYAML = loadAppYAML(opts.appDir)
+  const appName = appYAML.name
   let runtime = 'app-runtime'
-  let plugins = [runtime]
+  let plugins = appYAML.plugins || []
   let zip = new JSZip()
+
+  // Download the runtime.
+  zip = await downloadAndExtractPackage(runtime, zip, `node_modules/${runtime}`)
 
   // Populate plugin files.
   for (const pluginName of plugins) {
-    logger.progress(`downloading \`${pluginName}'`)
-    const pluginZip = await downloadPlugin(pluginName)
-
-    logger.progress(`extracting \`${pluginName}'`)
-    zip = await mergeZipFiles(pluginName, zip, await (new JSZip()).loadAsync(pluginZip))
+    zip = await downloadAndExtractPackage(pluginName, zip, `plugins/${pluginName}`)
+    zip.file(path.join(`plugins/${pluginName}/package.json`, JSON.stringify({
+      private: true
+    })))
   }
 
   // Copy start.js to the top level.
