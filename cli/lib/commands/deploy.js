@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 const { find } = require('hyperutils')
 const api = require('../api')
 const logger = require('../logger')
-const { loadAppJSON } = require('../appdir')
+const { loadAppYAML } = require('../appdir')
 const { getLatestGitHubRelease } = require('../github_releases')
 
 async function downloadPlugin(name) {
@@ -35,7 +35,7 @@ async function mergeZipFiles(pluginName, destZip, srcZip) {
 }
 
 module.exports = async (args, opts) => {
-  const appName = loadAppJSON(opts.appDir).name
+  const appName = loadAppYAML(opts.appDir).name
   let runtime = 'app-runtime'
   let plugins = [runtime]
   let zip = new JSZip()

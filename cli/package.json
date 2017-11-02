@@ -30,6 +30,7 @@
     "form-data": "^2.3.1",
     "hyperutils": "file:../libs/hyperutils",
     "inquirer": "^3.2.3",
+    "js-yaml": "^3.10.0",
     "jszip": "^3.1.4",
     "makestack-supervisor": "file:../libs/supervisor",
     "mountutils": "^1.2.2",

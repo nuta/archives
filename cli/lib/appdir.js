@@ -1,17 +1,18 @@
 const fs = require('fs')
 const path = require('path')
+const yaml = require('js-yaml')
 
-function loadAppJSON(appDir) {
+function loadAppYAML(appDir) {
   if (!fs.existsSync(appDir)) {
     throw new Error(`invalid app dir: ${appDir}`)
   }
 
-  const appJsonPath = path.join(appDir, 'app.json')
-  if (!fs.existsSync(appJsonPath)) {
-    throw new Error(`app.json not found: ${appJsonPath}`)
+  const appYAMLPath = path.join(appDir, 'app.yaml')
+  if (!fs.existsSync(appYAMLPath)) {
+    throw new Error(`app.yaml not found: ${appYAMLPath}`)
   }
 
-  return JSON.parse(fs.readFileSync(appJsonPath))
+  return yaml.safeLoad(fs.readFileSync(appYAMLPath))
 }
 
-module.exports = { loadAppJSON }
+module.exports = { loadAppYAML }
