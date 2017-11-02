@@ -9,12 +9,12 @@ function print(level, ...messages) {
   }
 
   let body = ''
-  for (const message of messages.length) {
+  for (const message of messages) {
     let fragment
     if (typeof message === 'string') {
       fragment = message
     } else {
-      fragment = JSON.stringify(message)
+      fragment = util.inspect(message)
     }
 
     body += fragment + ' '
