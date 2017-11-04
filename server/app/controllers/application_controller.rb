@@ -3,10 +3,15 @@ class ApplicationController < ActionController::API
 
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :authenticate, unless: :devise_controller?
+  before_action :set_default_response_format
 
   def authenticate
     authenticate_user!
     @user = current_user
+  end
+
+  def set_default_response_format
+    request.format = :json
   end
 
   def sign_and_set_authorization_header(device, payload)
