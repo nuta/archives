@@ -20,12 +20,12 @@ class App < ApplicationRecord
   validates :name,
     presence: true,
     uniqueness: { scope: :user_id, case_sensitive: false },
-    exclusion: { in: RESERVED_APP_NAMES, message: "%{value} is not available." },
+    exclusion: { in: RESERVED_APP_NAMES, message: "`%{value}' is not available." },
     format: { with: /\A[a-zA-Z][a-zA-Z0-9\-\_]*\z/ },
     length: { in: 1..128 }
 
   validates :api,
-    inclusion: { in: SUPPORTED_APIS, message: "%{value} is unsupported (unknown) API." }
+    inclusion: { in: SUPPORTED_APIS, message: "`%{value}' is unsupported (unknown) API." }
 
   validate :validate_os_version
 
