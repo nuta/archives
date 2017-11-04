@@ -1,43 +1,62 @@
 <template>
 <dashboard-layout title="Create a new app">
-  <form v-on:submit.prevent="createApp">
-    <fieldset>
-      <label>Name</label>
-      <input type="text" v-model="appName" required="required" autofocus placeholder="Name">
-    </fieldset>
-
-    <fieldset>
-      <label>API</label>
-      <div class="columns">
-        <radiobox name="api" value="linux" title="A full LInux Environment" description="A feature-rich Linux Environment featuring Node.js with Arduino-like API." selected></radiobox>
+  <form @submit.prevent="createApp">
+    <div class="uk-margin">
+      <label class="uk-form-label">Name</label>
+      <div class="uk-form-controls">
+        <input type="text" v-model="appName" class="uk-input uk-form-width-large" required="required" autofocus placeholder="Name">
       </div>
-    </fieldset>
-    <input type="submit" value="Create">
+    </div>
+
+    <div class="uk-margin">
+      <label class="uk-form-label">API</label>
+        <div class="uk-form-controls uk-form-controls-text">
+          <label>
+            <input type="radio" class="uk-radio" v-model="appAPI" value="linux">
+            <b>Node.js:</b>
+            A full Linux environment for super-rapid prototyping.</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="uk-margin">
+      <input type="submit" class="uk-button uk-button-primary uk-margin-xlarge-top" value="Create">
+    </div>
   </form>
 </dashboard-layout>
 </template>
 
 <script>
-import api from "js/api";
-import Radiobox from "components/radiobox";
-import DashboardLayout from "layouts/dashboard";
+import api from "js/api"
+import DashboardLayout from "layouts/dashboard"
 
 export default {
-  components: { DashboardLayout, Radiobox },
+  components: { DashboardLayout },
   data() {
     return {
-      appName: ""
+      appName: '',
+      appAPI: 'linux'
     };
   },
   methods: {
-    createApp() {
-      let appApi = document.querySelector("input[name=api]:checked").value;
-      api.createApp(this.appName, appApi).then(() => {
-        this.$router.push({ name: "apps" });
-      }).catch(reason => {
-        debugger;
-      });
+    async createApp() {
+      const templateFiles = [
+        { path: 'main.js', body: '// main.js' },
+        { path: 'app.yaml', body:  '# app.yaml' }
+      ]
+
+      await api.createApp(this.appName, this.appAPI)
+
+      for (const file of templateFiles) {
+        await api.saveFile(this.appName, file.path, file.body)
+      }
+
+      this.$Notification.success('Created a new app.')
+      this.$router.push({ name: "apps" })
     }
+  },
+  beforeMount() {
+    this.$Progress.finish()
   }
-};
+}
 </script>

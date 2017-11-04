@@ -1,24 +1,38 @@
 <template>
-<login-layout>
-  <form v-on:submit.prevent="login">
-    <fieldset>
-      <label>Username</label>
-      <input type="text" v-model="username" required="required" autofocus placeholder="Username">
-      <label>Password</label>
-      <input type="password" v-model="password" required="required" placeholder="Password">
-    </fieldset>
-    <input type="submit" value="Login">
+<wizard-layout title="Login">
+  <form @submit.prevent="login">
+    <div class="uk-margin">
+      <label class="uk-form-label">Username</label>
+      <div class="uk-form-controls">
+        <input type="text" v-model="username" placeholder="Username" class="uk-input uk-form-width-large" required="required" autofocus>
+      </div>
+    </div>
+
+    <div class="uk-margin">
+      <label class="uk-form-label">Password</label>
+      <div class="uk-form-controls">
+        <input type="password" v-model="password" placeholder="Password" class="uk-input uk-form-width-large" required="required" autofocus>
+      </div>
+    </div>
+
+    <div class="uk-text-align-center">
+      <input type="submit" value="Login" class="uk-button uk-button-primary uk-margin-large-top">
+    </div>
+
+    <div class="uk-text-align-center uk-margin-medium-top">
+      <router-link :to="{ name: 'reset-password' }" class="uk-link-text">Reset Password</router-link>
+    </div>
   </form>
-</login-layout>
+</wizard-layout>
 </template>
 
 
 <script>
 import api from "js/api";
-import LoginLayout from "layouts/login";
+import WizardLayout from "layouts/wizard";
 
 export default {
-  components: { LoginLayout },
+  components: { WizardLayout },
   data: () => {
     return {
       username: "",
@@ -27,12 +41,13 @@ export default {
   },
   methods: {
     login() {
-      api.login(this.username, this.password).then(() => {
-        this.$router.push("/apps");
-      }).catch((r) => {
-        alert(r);
-      });
+      api.login(this.username, this.password)
+      this.$router.push("/apps")
+      this.$Progress.finish()
     }
+  },
+  mounted() {
+    this.$Progress.finish()
   }
-};
+}
 </script>

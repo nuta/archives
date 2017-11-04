@@ -44,7 +44,7 @@ module.exports = {
           {
             loader: 'sass-loader',
             options: {
-              includePaths: [path.resolve('css')]
+              includePaths: [path.resolve(__dirname, 'css')]
             }
           }
         ]

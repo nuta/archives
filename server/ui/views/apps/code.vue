@@ -1,96 +1,174 @@
 <template>
-<dashboard-layout title="Code">
-  <section>
-    <div class="two-columns">
-      <div class="columns">
-        <action-button v-on:click="deploy" positive
-         :state="deployButton" waiting-message="Deploy" doing-message="Deploying..."
-         done-message="Deployed" icon="fa-rocket"></action-button>
-        <action-button v-on:click="save" :state="saveButton" waiting-message="Save"
-         doing-message="Saving..." done-message="Saved" icon="fa-upload"></action-button>
-      </div>
+<app-layout path="code" :app-name="appName">
+  <remote-content :loading="loading"></remote-content>
+  <div>
+    <section>
+      <div class="uk-grid">
+        <div>
+          <label class="uk-form-label">Edit</label>
+          <div class="uk-from-controls">
+            <button v-on:click="save" class="uk-button uk-button-small uk-button-default">
+              <i class="fa fa-upload" aria-hidden="true"></i>
+              {{ saveButton }}
+            </button>
 
-      <div>
-        <div class="rows">
-          <div class="right-aligned columns">
+            <button v-on:click="undo" class="uk-button uk-button-small uk-button-default">
+              <i class="fa fa-undo" aria-hidden="true"></i>
+            </button>
+
+            <button v-on:click="redo" class="uk-button uk-button-small uk-button-default">
+              <i class="fa fa-repeat" aria-hidden="true"></i>
+            </button>
+
+            <button v-on:click="search" class="uk-button uk-button-small uk-button-default">
+              <i class="fa fa-binoculars" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="uk-form-label">Deploy</label>
+          <div class="uk-from-controls">
+            <select class="uk-select uk-form-small uk-form-width-medium">
+              <option>associated devices</option>
+            </select>
+
+            <button v-on:click="deploy" class="uk-button uk-button-small uk-button-primary">
+              <i class="fa fa-rocket" aria-hidden="true"></i>
+              {{ deployButton }}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="uk-form-label">Panels</label>
+          <div class="uk-from-controls">
+            <button v-on:click="showOutput" class="uk-button uk-button-small uk-button-default">
+              <i class="fa fa-align-left" aria-hidden="true"></i>
+              Output
+            </button>
+
+            <button v-on:click="showLog" class="uk-button uk-button-small uk-button-default">
+              <i class="fa fa-list" aria-hidden="true"></i>
+              Log
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="uk-form-label">Misc.</label>
+          <div class="uk-from-controls">
             <a href="/documentation">
-              <button>
-                <i class="fa fa-book" aria-hidden="true"></i>
-                Documentation
+              <button class="uk-button uk-button-small uk-button-default">
+                <i class="fa fa-question-circle" aria-hidden="true"></i>
               </button>
             </a>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div class="editor-wrapper" @dragover.prevent="showUploadNavi = true" >
-    <div class="upload-navi" v-show="showUploadNavi" @dragleave.prevent="showUploadNavi = false" @drop.prevent="uploadFile">
-      <i class="fa fa-lg fa-cloud-upload" aria-hidden="true"></i>
-      &nbsp;
-      Drag & drop your source file here!
-    </div>
-
-    <modal title="Add a new file" :active="showNewFileModal" @close="showNewFileModal = false">
-      <input type="text" v-model="newFileName" placeholder="Filename">
-      <button @click="addNewFile">Add a new file</button>
-    </modal>
-
-    <div class="tabs">
-      <div v-for="file in files" class="tab" @click="editing = file.id" :class="{ active: editing === file.id }">{{ file.path }}</div>
-      <div class="tab" @click="showNewFileModal = true">
-        <i class="fa fa-plus" aria-hidden="true"></i>
-      </div>
-    </div>
-
-    <div v-for="file in files" class="editors">
-      <div class="editor" v-show="editing == file.id" :id="file.id" :ref="file.id"></div>
-    </div>
-
-    <div v-if="showOutputPanel" class="output-panel">
-      <div class="header">
-        <span class="title">Deploy Log</span>
-        <span class="close" @click="showOutputPanel = false">
-          <i class="fa fa-window-close" aria-hidden="true"></i>
-        </span>
+    <div class="editor-wrapper" @dragover.prevent="showUploadNavi = true" >
+      <div class="upload-navi" v-show="showUploadNavi" @dragleave.prevent="showUploadNavi = false" @drop.prevent="uploadFile">
+        <i class="fa fa-lg fa-cloud-upload" aria-hidden="true"></i>
+        &nbsp;
+        Drag & drop your source file here!
       </div>
 
-      <div class="body">{{ output }}</div>
+      <div class="uk-flex-top" uk-modal id="add-new-file-modal">
+        <div class="uk-modal-dialog">
+          <div class="uk-modal-header">
+            <button class="uk-modal-close-default" type="button" uk-close></button>
+            <h2 class="uk-modal-title">Add a new file</h2>
+          </div>
+
+          <form @submit.prevent="addNewFile">
+            <div class="uk-modal-body">
+                <input type="text" class="uk-input" v-model="newFileName" placeholder="Filename">
+            </div>
+            <div class="uk-modal-footer">
+              <input type="submit" class="uk-button uk-button-primary" value="Add a new file">
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <div v-for="file in files" class="tab" @click="editing = file.id" :class="{ active: editing === file.id }">{{ file.path }}</div>
+        <div class="tab new-file-button" uk-toggle="target: #add-new-file-modal">
+          <i class="fa fa-plus" aria-hidden="true"></i>
+        </div>
+      </div>
+
+      <div v-for="file in files" class="editors">
+        <div class="editor" v-show="editing == file.id" :id="file.id" :ref="file.id"></div>
+      </div>
+
+      <div v-if="showOutputPanel" class="output-panel">
+        <div class="header">
+          <span class="title">Deploy Log</span>
+          <span class="close" @click="showOutputPanel = false">
+            <i class="fa fa-window-close" aria-hidden="true"></i>
+          </span>
+        </div>
+
+        <div class="body">{{ output }}</div>
+      </div>
     </div>
   </div>
-</dashboard-layout>
+</app-layout>
 </template>
 
 <script>
-import api from "js/api";
-import ActionButton from "components/action-button";
-import Modal from "components/modal";
-import DashboardLayout from "layouts/dashboard";
-import 'whatwg-fetch';
+import api from "js/api"
+import RemoteContent from "components/remote-content"
+import AppLayout from "layouts/app"
+import 'whatwg-fetch'
 const Cookies = require('js-cookie')
 const JSZip = require('jszip')
 
 export default {
-  components: { ActionButton, DashboardLayout, Modal },
+  components: { AppLayout, RemoteContent },
   data() {
     return {
       appName: app.$router.currentRoute.params.appName,
+      loading: true,
       devices: [],
       files: [],
       autosaveAfter: 1000,
-      deployButton: "waiting",
-      saveButton: "waiting",
+      deployButton: "Deploy",
+      saveButton: "Save",
       showUploadNavi: false,
       editing: '',
       output: '',
       showOutputPanel: true,
-      showNewFileModal: false,
       newFileName: ''
     };
   },
   methods: {
+    undo() {
+
+    },
+
+    redo() {
+
+    },
+
+    search() {
+
+    },
+
+    showOutput() {
+
+    },
+
+    showLog() {
+
+    },
+
     addNewFile() {
+      UIkit.modal(document.querySelector('#add-new-file-modal')).hide()
+
       const id = `editor${this.files.length}`
       const path = this.newFileName
 
@@ -101,7 +179,6 @@ export default {
         editing: false
       })
 
-      this.showNewFileModal = false
       this.newFileName = ''
 
       this.$nextTick(() => {
@@ -215,6 +292,7 @@ export default {
     },
     async deploy() {
       const timeStarted = new Date()
+      this.clearOutput()
       this.deployButton = "Building..."
 
       this.logOutput('Building the app...')
@@ -226,9 +304,9 @@ export default {
 
       const r = await api.deploy(this.appName, image, "", comment, null)
       const took = (((new Date()) - timeStarted) / 1000).toPrecision(3)
-      this.deployButton = "done"
+      this.deployButton = "Done!"
       this.logOutput(`Deployed #${r.version}, took ${took} seconds`)
-      setTimeout(() => { this.deployButton = "waiting"; }, 1500);
+      setTimeout(() => { this.deployButton = "Deploy"; }, 1500);
     },
     async save() {
       for (const file of this.files) {
@@ -236,7 +314,7 @@ export default {
         this.saveButton = "doing";
         await api.saveFile(this.appName, file.path, body)
         this.saveButton = "done"
-        setTimeout(() => { this.saveButton = "waiting"; }, 1500)
+        setTimeout(() => { this.saveButton = "Save" }, 1500)
       }
     },
     addEditor(id, path, body) {
@@ -252,7 +330,7 @@ export default {
     },
     configureAceEditor(editor, ext) {
       editor.$blockScrolling = Infinity
-      editor.setTheme("ace/theme/solarized_light")
+      editor.setTheme('ace/theme/xcode')
       editor.setShowPrintMargin(false)
 
       const session = editor.getSession()
@@ -265,67 +343,66 @@ export default {
     }
   },
   async beforeMount() {
-    let files = []
-    for (const file of await api.getFiles(this.appName)) {
-      files.push({
+    this.files = (await api.getFiles(this.appName)).map((file, i) => {
+      return {
         id: `editor${i}`,
         path: file.path,
         body: file.body,
-        editing: i == 0
-      })
-    }
+        editing: i === 0
+      }
+    })
 
-    this.files = files
     this.editing = this.files[0].id
     this.$nextTick(() => {
       for (const file of this.files) {
         this.addEditor(file.id, file.path, file.body)
       }
+
+      this.loading = false
+      this.$Progress.finish()
     })
   },
   mounted() {
-    /*
-    session.on('change', function(e) {
-      if (component.prevFileBody == editor.getValue())
-        return;
-
-      clearTimeout(autosaveTimer);
-      autosaveTimer = setTimeout(() => {
-        let body = editor.getValue();
-        if (body == component.prevFileBody)
-          return;
-
-        component.prevFileBody = body;
-        component.save();
-      }, component.autosaveAfter);
-    });
-    */
+    // TODO: autosave
   }
 };
 </script>
 
 <style lang="scss" scoped>
-$editor-border-width: 3px;
-$editor-border-color: #e6e6ec;
+$editor-border-width: 1px;
+$editor-border-color: #a6a6ac;
 
 .editor-wrapper {
   display: block;
   min-height: 300px;
+  margin-top: 20px;
   position: relative;
 
   .tabs {
     .tab {
+      background: #f3f3f3;
       display: inline-block;
-      border: 2px solid $editor-border-color;
-      padding: 10px;
+      border: solid $editor-border-color;
+      border-width: 1px 1px 0px 1px;
       font-size: 15px;
+      padding: 5px 10px;
+      opacity: 0.7;
+      vertical-align: bottom;
+      margin-right: 2px;
+      box-sizing: border-box;
 
       &.active {
-        background: #ffcc00;
+        background: #ffffff;
+        opacity: 1;
       }
 
       &:hover {
         cursor: pointer;
+      }
+
+      &.new-file-button {
+        background: #ffffff;
+        padding: 5px 7px;
       }
     }
   }

@@ -1,41 +1,57 @@
 <template>
-<dashboard-layout title="Create a new integration">
+<app-layout :app-name="appName">
+  <h3>Create a new integration</h3>
   <form v-on:submit.prevent="create">
-    <fieldset>
-      <label>Service</label>
-      <select v-model="newIntegration.service">
-        <template v-for="(title, value) in supportedServices">
-          <option :value="value">{{ title }}</option>
-        </template>
-      </select>
+    <div class="uk-margin">
+      <label class="uk-form-label">Service</label>
+      <div class="uk-form-controls">
+        <select v-model="newIntegration.service" class="uk-select uk-form-width-large">
+          <template v-for="(title, value) in supportedServices">
+            <option :value="value">{{ title }}</option>
+          </template>
+        </select>
+      </div>
+    </div>
 
+    <div class="uk-margin">
       <div v-if="newIntegration.service == 'outgoing_webhook'">
-        <label>Outgoing Webhook URL</label>
-        <input type="url" v-model="newIntegration.webhook_url" placeholder="Webhook URL" required>
+        <label class="uk-form-label">Outgoing Webhook URL</label>
+        <div class="uk-form-controls">
+          <input type="url" v-model="newIntegration.webhook_url" class="uk-input uk-form-width-large" placeholder="Webhook URL" required>
+        </div>
       </div>
 
       <div v-if="newIntegration.service == 'incoming_webhook'">
-        Just click Create!
+        We will generate a webhook URL just for you!
       </div>
 
       <div v-if="newIntegration.service == 'ifttt'">
-        <label>IFTTT Key</label>
-        <input type="text" v-model="newIntegration.ifttt_key" placeholder="IFTTT Key" required>
-        <label>Call webhook URL when:</label>
+        <label class="uk-form-label">IFTTT Key</label>
+        <input type="text" v-model="newIntegration.ifttt_key" class="uk-input uk-form-width-large" placeholder="IFTTT Key" required>
+        <div class="uk-form-controls">
+          <label>Call webhook URL when:</label>
+        </div>
       </div>
 
       <div v-if="newIntegration.service == 'slack'">
-        <label>Slack Webhook URL</label>
-        <input type="text" v-model="newIntegration.slack_webhook_url"
-        placeholder="Webhook URL" required>
+        <label class="uk-form-label">Slack Webhook URL</label>
+        <div class="uk-form-controls">
+          <input type="text" v-model="newIntegration.slack_webhook_url"
+           class="uk-input uk-form-width-large" placeholder="Webhook URL" required>
+        </div>
       </div>
 
       <div v-if="newIntegration.service == 'datadog'">
-        <label>Datadog API Key</label>
-        <input type="text" v-model="newIntegration.datadog_api_key" placeholder="Datadog API Key" required>
+        <label class="uk-form-label">Datadog API Key</label>
+        <div class="uk-form-controls">
+          <input type="text" v-model="newIntegration.datadog_api_key"
+           class="uk-input uk-form-width-large" placeholder="Datadog API Key" required>
+        </div>
       </div>
+    </div>
 
-      <label>Call webhook URL when:</label>
+    <div class="uk-margin">
+      <label class="uk-form-label">Call webhook URL when:</label>
       <p>
         <input type="checkbox" v-model="newIntegration.on_event">
         a device sent events
@@ -44,22 +60,27 @@
         <input type="checkbox" v-model="newIntegration.on_device_change">
         a device changes its state
       </p>
+    </div>
 
-      <label>Comment (Optional)</label>
-      <input type="text" v-model="newIntegration.comment" placeholder="Comment (Optional)">
-    </fieldset>
+    <div class="uk-margin">
+      <label class="uk-form-label">Comment (Optional)</label>
+      <div class="uk-form-controls">
+        <input type="text" v-model="newIntegration.comment"
+         class="uk-input uk-form-width-large" placeholder="Comment (Optional)">
+  　　  </div>
+    </div>
 
-    <input type="submit" value="Add an integration">
+    <input type="submit" class="uk-button uk-button-primary uk-margin-xlarge-top" value="Add an integration">
   </form>
-</dashboard-layout>
+</app-layout>
 </template>
 
 <script>
 import api from "js/api";
-import DashboardLayout from "layouts/dashboard";
+import AppLayout from "layouts/app";
 
 export default {
-  components: { DashboardLayout },
+  components: { AppLayout },
   data() {
     return {
       appName: app.$router.currentRoute.params.appName,
@@ -114,12 +135,15 @@ export default {
       return JSON.stringify(config);
     },
 
-    create() {
-      api.createIntegration(
+    async create() {
+      await api.createIntegration(
         this.appName,
         this.newIntegration.service,
         this.createConfigForServer(this.newIntegration),
-        this.newIntegration.comment);
+        this.newIntegration.comment)
+
+      this.$Notification.success('Created a new integration.')
+      this.$router.push({ name: 'integrations', params: { appName: this.appName } })
     },
   }
 };

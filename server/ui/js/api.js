@@ -1,6 +1,6 @@
 import 'whatwg-fetch'
 
-export default new class {
+class API {
   constructor() {
     let dummyUser = { name: '', email: '' }
     this.user = JSON.parse(localStorage.getItem('user')) || dummyUser
@@ -22,17 +22,25 @@ export default new class {
     return new Promise((resolve, reject) => {
       fetch(`/api/v1${path}`, { method, headers, body })
         .then(response => {
-          if (response.status === 401 && app.$router.currentRoute.name !== 'login') {
-            this.forceLogin((app.$router.currentRoute.name === 'home') ? null : 'Login first.')
+          const currentRoute = app.$router.currentRoute.name
+          if (response.status === 401 && currentRoute !== 'login') {
+            this.forceLogin((currentRoute === 'home') ? null : 'Login first.')
           }
           return response
         })
         .then(response => {
-          return response.json()
+          if (!(response.status >= 200 && response.status < 300)) {
+            throw new Error(`server returned ${response.status}`)
+          }
+          return response
+        })
+        .then(response => {
+          return (response.status === 204) ? Promise.resolve({}) : response.json()
         })
         .then(resolve)
-        .catch(error => {
-          alert(`something went wrong :(\n\n${error.stack}`)
+        .catch(e => {
+          UIkit.notification(e.toString(), { status: 'danger' })
+          console.error(e)
         })
     })
   }
@@ -48,19 +56,29 @@ export default new class {
   }
 
   login(username, password) {
-    return this.invoke('POST', '/auth/sign_in', {
-      username: username,
-      password: password
-    }, false).then(r => {
+    let status, headers
+    return fetch(`/api/v1/auth/sign_in`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    }).then((response) => {
+      status = response.status
+      headers = response.headers
+      return response.json()
+    }).then(json => {
+      if (status !== 200) {
+        throw new Error(`Error: failed to login: \`${json.errors}'`)
+      }
+
       this.user = {
         username: username,
-        email: r.json['data']['email']
+        email: json['data']['email']
       }
 
       this.credentials = {
-        uid: r.headers.get('uid'),
-        'access-token': r.headers.get('access-token'),
-        'access-token-secret': r.headers.get('access-token-secret')
+        uid: headers.get('uid'),
+        'access-token': headers.get('access-token'),
+        'access-token-secret': headers.get('access-token-secret')
       }
 
       localStorage.setItem('credentials', JSON.stringify(this.credentials))
@@ -68,25 +86,33 @@ export default new class {
     })
   }
 
-  signup(username, email, password) {
+  createUser(username, email, password, passwordConfirmation) {
     return this.invoke('POST', '/auth', {
-      name: username,
-      email: email,
-      password: password
+      username,
+      email,
+      password,
+      password_confirmation: passwordConfirmation
     }, false)
   }
 
-  deleteUser(username) {
-    return this.invoke('DELETE', '/auth', {
+  getUser(username) {
+    return this.invoke('GET', '/auth', {
       name: username
     }, false)
   }
 
+  deleteUser() {
+    return this.invoke('DELETE', '/auth')
+  }
+
+  updateUser(attrs) {
+    // It is necessary to update credentials in local storage
+    // when the email address has been changed.
+    return this.invoke('PUT', '/auth', attrs)
+  }
+
   resetPassword(email) {
-    return this.invoke('POST', '/auth/password', {
-      email: email,
-      redirect_url: '/home'
-    }, false)
+    return this.invoke('POST', '/auth/password', { email }, false)
   }
 
   getApps() {
@@ -97,12 +123,13 @@ export default new class {
     return this.invoke('GET', `/apps/${appName}`)
   }
 
-  getAppLog(appName, since = 0) {
-    return this.invoke('GET', `/apps/${appName}/log?since=${since}`)
+  getAppLog(appName, since) {
+    const unixtime = since ? Math.floor(since.getTime() / 1000) : 0
+    return this.invoke('GET', `/apps/${appName}/log?since=${unixtime}`)
   }
 
   updateApp(appName, attrs) {
-    return this.invoke('PUT', `/apps/${appName}`, attrs)
+    return this.invoke('PUT', `/apps/${appName}`, { app: attrs })
   }
 
   deleteApp(appName) {
@@ -215,4 +242,10 @@ export default new class {
   deleteAppStore(appName, key) {
     return this.invoke('DELETE', `/apps/${appName}/stores/${key}`)
   }
-}()
+
+  getOSReleases() {
+    return this.invoke('GET', '/os/releases')
+  }
+}
+
+export default new API()

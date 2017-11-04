@@ -1,39 +1,44 @@
 <template>
-<dashboard-layout title="Log">
+<app-layout path="appLog" :app-name="appName">
   <log-viewer :lines="log"></log-viewer>
-</dashboard-layout>
+</app-layout>
 </template>
 
 <script>
-import api from "js/api";
-import LogViewer from "components/log-viewer";
-import DashboardLayout from "layouts/dashboard";
+import api from "js/api"
+import LogViewer from "components/log-viewer"
+import AppLayout from "layouts/app"
 
 export default {
-  components: { DashboardLayout, LogViewer },
+  components: { AppLayout, LogViewer },
   data() {
     return {
       appName: app.$router.currentRoute.params.appName,
       log: [],
-      timer: undefined
+      timer: undefined,
+      lastFetchedAt: null
     };
   },
-  beforeMount() {
-    let since = Date.now();
-    api.getAppLog(this.appName).then(r => {
-      this.log = r.json.lines;
-      this.timer = setInterval(() => {
-        api.getAppLog(this.appName, since)
-          .then(r => {
-            since = Date.now();
-            this.log.concat(r.json.lines);
-          }).catch(error => notify("error", error));
-      }, 3000);
-    }).catch(error => notify("error", error));
+  methods: {
+    async fetchNewLines() {
+      const lines = (await api.getAppLog(this.appName, this.lastFetchedAt)).lines || []
+      this.lastFetchedAt = new Date()
+      return lines
+    }
+  },
+  async beforeMount() {
+    this.log = await this.fetchNewLines()
+    this.$Progress.finish()
+
+    this.timer = setInterval(async () => {
+      this.$Progress.start()
+      this.log= this.log.concat(await this.fetchNewLines())
+      this.$Progress.finish()
+    }, 5000)
   },
   beforeRouteLeave (to, from, next) {
-    clearInterval(this.timer);
-    next();
+    clearInterval(this.timer)
+    next()
   }
 };
 </script>

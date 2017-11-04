@@ -8,10 +8,19 @@ import App from './app'
 Vue.use(VueRouter)
 Vue.use(VueHead)
 Vue.use(VueProgressBar, {
-  color: 'rgb(143, 195, 255)',
+  color: '#ffba00',
   failedColor: 'red',
-  height: '2px'
+  height: '5px'
 })
+
+Vue.prototype.$Notification = {
+  success(message) {
+    UIkit.notification(message, { status: 'success', pos: 'bottom-center' })
+  },
+  error(message) {
+    UIkit.notification(message, { status: 'danger', pos: 'bottom-center' })
+  }
+}
 
 window.app = new Vue(Vue.util.extend({ router }, App))
 app.$mount('#app')

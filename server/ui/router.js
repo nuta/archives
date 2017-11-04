@@ -1,5 +1,8 @@
 import VueRouter from 'vue-router'
+import CreateAccountView from './views/create-account'
+import ResetPasswordView from './views/reset-password'
 import LoginView from './views/login'
+import ForceLoginView from './views/force-login'
 import SettingsView from './views/settings'
 import AppsView from './views/apps'
 import NewAppView from './views/apps/new'
@@ -16,7 +19,10 @@ import DeviceLogView from './views/devices/log'
 import DeviceSettingsView from './views/devices/settings'
 
 let routes = [
+  { name: 'create-account', path: '/create-account', component: CreateAccountView },
+  { name: 'reset-password', path: '/reset-password', component: ResetPasswordView },
   { name: 'login', path: '/login', component: LoginView },
+  { name: 'force-login', path: '/force-login', component: ForceLoginView },
   { name: 'settings', path: '/settings', component: SettingsView },
   { name: 'home', path: '/apps', component: AppsView },
   { name: 'apps', path: '/apps', component: AppsView },

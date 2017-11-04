@@ -1,62 +1,74 @@
 <template>
-<dashboard-layout title="Integrations">
-  <div class="integrations">
-    <div class="element" v-for="integration in integrations">
-      <div class="left-column">
-        <div class="header">
-          <span class="title">{{ integration.service }}</span>
-          <span class="description">{{ integration.comment }}</span>
-        </div>
+<app-layout path="integrations" :app-name="appName">
 
-        <table class="fields">
+  <div class="uk-container">
+    <router-link :to="{ name: 'newIntegration', params: { appName: this.appName }}">
+      <button class="uk-button uk-button-primary uk-align-right">
+        <span uk-icon="icon: plus"></span>
+        Add an integration
+      </button>
+    </router-link>
+  </div>
+
+  <remote-content :loading="loading" :content="integrations">
+    <p slot="welcome-title">Integrate with external awesome services!</p>
+
+    <table slot="content" class="uk-table uk-table-divider">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Comment</th>
+          <th>URL / API key</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="integration in integrations">
+          <td>{{ integration.service }}</td>
+          <td>{{ integration.comment }}</td>
           <td v-if="integration.service == 'outgoing_webhook'">
-            <span class="name">Webhook URL</span>
-            <span class="value">{{ integration.webhook_url }}</span>
+            {{ integration.webhook_url }}
           </td>
 
           <td v-if="integration.service == 'incoming_webhook'">
-            <span class="name">Token</span>
-            <span class="value">{{ integration.incoming_webhook_token }}</span>
+            {{ integration.incoming_webhook_token }}
           </td>
 
           <td v-if="integration.service == 'ifttt'">
-            <span class="name">API Key</span>
-            <span class="value">{{ integration.ifttt_key }}</span>
+            {{ integration.ifttt_key }}
           </td>
 
           <td v-if="integration.service == 'slack'">
-            <span class="name">Webhook URL</span>
-            <span class="value">{{ integration.slack_webhook_url }}</span>
+            {{ integration.slack_webhook_url }}
           </td>
 
           <td v-if="integration.service == 'datadog'">
-            <span class="name">API Key</span>
-            <span class="value">{{ integration.datadog_api_key }}</span>
+            {{ integration.datadog_api_key }}
           </td>
-        </table>
-      </div>
-
-      <div class="right-column">
-        <button v-on:click="remove(integration)">Remove</button>
-      </div>
-    </div>
-  </div>
-
-  <router-link :to="{ name: 'newIntegration', params: { appName: this.appName }}">
-    <button> add an integration</button>
-  </router-link>
-</dashboard-layout>
+          <td class="actions">
+            <button v-on:click="remove(integration)" class="uk-button uk-button-danger">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+              Remove
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </remote-content>
+</app-layout>
 </template>
 
 <script>
 import api from "js/api";
-import DashboardLayout from "layouts/dashboard";
+import RemoteContent from "components/remote-content";
+import AppLayout from "layouts/app";
 
 export default {
-  components: { DashboardLayout },
+  components: { AppLayout, RemoteContent },
   data() {
     return {
       appName: app.$router.currentRoute.params.appName,
+      loading: true,
       integrations: []
     };
   },
@@ -80,45 +92,9 @@ export default {
         on_device_change: config.on_device_change
       }
     })
+
+    this.$Progress.finish()
+    this.loading = false
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.integrations {
-  .element {
-    padding: 16px;
-    border: 1px solid #e8e8e8;
-    border-radius: 3px;
-    display: flex;
-    justify-content: space-between;
-
-    .title {
-      font-size: 24px;
-      font-weight: 700;
-      display: inline-box;
-    }
-
-    .description {
-      color: #777777;
-      margin-left: 10px;
-    }
-
-    .fields {
-      margin-top: 20px;
-
-      .name {
-        font-weight: 600;
-      }
-
-      .value {
-        color: #7a7a7a;
-      }
-    }
-
-    &:not(:first-child) {
-      margin-top: 10px;
-    }
-  }
-}
-</style>

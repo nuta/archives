@@ -1,123 +1,77 @@
 <template>
   <div class="dashboard">
-    <div class="container">
-      <nav>
-        <div class="title">
-          <h1>
-            MakeStack
-          </h1>
-        </div>
-        <div class="user">
-          <img :src="avatarUrl" class="avatar">
-          <span>{{ username }}</span>
-        </div>
-        <ul class="links">
-          <router-link :to="{ name: 'apps' }"><li>
-            <i class="fa red fa-diamond fa-fw" aria-hidden="true"></i>
-            <span>Apps</span>
-          </li></router-link>
-
-          <div v-if="appName" class="sublinks">
-            <i class="fa fa-caret-up" aria-hidden="true"></i>
-            <p>{{ appName }}</p>
-            <ul>
-              <router-link :to="{ name: 'code' }"><li>
-                <i class="fa fa-pencil" aria-hidden="true"></i>
-                <span>Code</span>
-              </li></router-link>
-              <router-link :to="{ name: 'appStores' }"><li>
-                <i class="fa fa-database" aria-hidden="true"></i>
-                <span>Stores</span>
-              </li></router-link>
-              <router-link :to="{ name: 'deployments' }"><li>
-                <i class="fa fa-rocket" aria-hidden="true"></i>
-                <span>Deployments</span>
-              </li></router-link>
-              <router-link :to="{ name: 'appLog' }"><li>
-                <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                <span>Log</span>
-              </li></router-link>
-              <router-link :to="{ name: 'integrations' }"><li>
-                <i class="fa fa-plug" aria-hidden="true"></i>
-                <span>Integrations</span>
-              </li></router-link>
-              <router-link :to="{ name: 'appSettings' }"><li>
-                <i class="fa fa-sliders" aria-hidden="true"></i>
-                <span>Settings</span>
-              </li></router-link>
-            </ul>
-          </div>
-
-          <router-link :to="{ name: 'devices' }"><li>
-            <i class="fa yellow fa-clone fa-fw" aria-hidden="true"></i>
-            <span>Devices</span>
-          </li></router-link>
-
-          <div v-if="deviceName" class="sublinks">
-            <i class="fa fa-caret-up" aria-hidden="true"></i>
-            <p>{{ deviceName }}</p>
-            <ul>
-              <router-link :to="{ name: 'deviceSettings' }"><li>
-                <i class="fa fa-sliders" aria-hidden="true"></i>
-                <span>Settings</span>
-              </li></router-link>
-              <router-link :to="{ name: 'deviceStores' }"><li>
-                <i class="fa fa-database" aria-hidden="true"></i>
-                <span>Stores</span>
-              </li></router-link>
-              <router-link :to="{ name: 'deviceLog' }"><li>
-                <i class="fa fa-file-text-o" aria-hidden="true"></i>
-                <span>Log</span>
-              </li></router-link>
-            </ul>
-          </div>
-
-          <router-link :to="{ name: 'settings' }"><li>
-            <i class="fa blue fa-magic fa-fw" aria-hidden="true"></i>
-            <span>Settings</span>
-          </li></router-link>
-        </ul>
-      </nav>
-
-      <div class="content">
-        <header>
-          <div class="leftside">
-            <span v-if="appName" class="title">
-              {{ appName }}
-            </span>
-          </div>
-          <div class="center">
-            <span class="title">{{ title }}</span>
-          </div>
-          <div class="rightside">
-            <a href="/documentation" class="undecorated-link" alt="documentation"><i class="fa fa-question-circle" aria-hidden="true"></i></a>
-          </div>
-        </header>
-        <main>
-          <slot></slot>
-        </main>
+    <nav class="uk-navbar-container" uk-navbar>
+      <div class="uk-navbar-left">
+        <a href="/" class="uk-navbar-item uk-logo">
+          MakeStack
+        </a>
       </div>
-    </div>
 
-  <notification :level="notificationLevel" :message="notificationMessage"></notification>
+      <div class="uk-navbar-center">
+        <ul class="uk-navbar-nav">
+          <li>
+            <router-link :to="{ name: 'apps' }">
+              <span uk-icon="icon: nut"></span>
+              <span class="path">Apps</span>
+            </router-link>
+          </li>
+
+          <li>
+            <router-link :to="{ name: 'devices' }">
+              <span uk-icon="icon: copy"></span>
+              <span class="path">Devices</span>
+            </router-link>
+          </li>
+
+          <li>
+            <router-link :to="{ name: 'settings' }">
+              <span uk-icon="icon: user"></span>
+              <span class="path">Settings</span>
+            </router-link>
+          </li>
+
+          <li>
+            <a href="/documentation">
+              <span uk-icon="icon: lifesaver"></span>
+              <span class="path">Documentation</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="uk-navbar-right">
+        <div class="uk-navbar-item">
+          <img :src="avatarUrl" class="uk-border-circle" width="30" height="30">
+        </div>
+      </div>
+      <div uk-dropdown>
+          <ul class="uk-nav uk-dropdown-nav">
+              <li><router-link :to="{ name: 'force-login' }">Logout</router-link></li>
+          </ul>
+      </div>
+    </nav>
+
+    <h1>{{ title }}</h1>
+    <div class="uk-container">
+      <main>
+        <slot></slot>
+      </main>
+    </div>
   </div>
 </template>
 
 <script>
 import api from "js/api";
 import md5 from "blueimp-md5";
-import Notification from "components/notification";
 
 export default {
   props: ["title"],
-  components: { Notification },
+  components: { },
   data() {
     return {
       appName: this.$router.currentRoute.params.appName,
       deviceName: this.$router.currentRoute.params.deviceName,
-      username: api.user.username,
-      notificationLevel: "",
-      notificationMessage: ""
+      username: api.user.username
     };
   },
   computed: {
@@ -125,197 +79,77 @@ export default {
       return "https://www.gravatar.com/avatar/" + md5(api.user.email) + "?s=20&d=mm";
     }
   },
-  beforeMount() {
-    // XXX
-    window.notify = (level, message) => {
-      this.notificationLevel   = level;
-      this.notificationMessage = message;
-    };
-  }
-};
+}
 </script>
 
-<style lang="scss" scoped>
-$sidebar-color: #fafafa;
-$sidebar-link-color1: #fafafa;
-$sidebar-link-color2: #586575;
-$sidebar-color1: #586575;
-$sidebar-color2: #4a90aa;
-$sidebar-color3: #586575;
-$sidebar-color4: #E7DACB;
-
+<style lang="scss">
 .dashboard {
-  height: 100%;
-  width: 100%;
-}
-
-.container {
-  display: flex;
-  height:100%;
+  & > h1 {
+    background: #f3f3f3;
+    width: 100%;
+    font-size: 40px;
+    font-weight: 200;
+    padding: 20px 30px;
+    margin: 0 0 30px 0;
+    border-bottom: 1px solid #d7d7d7;
+  }
 }
 
 nav {
-  width: 200px;
-  background: $sidebar-color1;
-  height: 100%;
-  color: $sidebar-color;
+  background: linear-gradient(to left, #7474bf, #348ac7) !important;
+  height: 50px;
 
-  .title {
-    height: 35px;
-    border-top: 5px solid $sidebar-color2;
-    text-align: center;
+  .uk-logo {
+    color: #fefefe;
+    font-family: Roboto;
+    font-weight: 100;
 
-    h1 {
-      font-size: 1em;
-      font-weight: 700;
-      margin: 0;
-      padding-top: 9px;
+    &:hover {
+      color: #dadada;
     }
   }
 
-  .user {
-    margin-top: 3px;
-    padding: 2px 0;
-    background: $sidebar-color3;
-    text-align: center;
+  .uk-navbar-nav > li > a {
+    font-size: 16px;
+    font-weight: 300;
+    color: #fefefe;
+    text-transform: none;
 
-    img {
-      border: 1px solid #eeeeee;
-      background: #eeeeee;
-      border-radius: 10px;
-      position: relative;
-      height: 16px;
-      top: 2px;
+    &:hover {
+      color: #dadada;
     }
 
-    span {
-      margin-left: 3px;
-      position: relative;
-      top: -2px;
-      font-size: 14px;
-      font-weight: 600;
-    }
-  }
-
-  .links {
-    list-style-type: none;
-    margin-top: 20px;
-    padding: 0;
-
-    a {
-      color: $sidebar-link-color1;
-      text-decoration: none;
-
-      li {
-        padding: 10px 20px;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-
-      .fa {
-        font-size: 14px;
-        margin-right: 5px;
-        &.red  { color: #ff6b77; }
-        &.blue   { color: #7194e8; }
-        &.green  { color: #47d268; }
-        &.yellow { color: #f3d747; }
-      }
-
-      span {
-        font-size: 14px;
-        font-weight: 600;
-      }
-    }
-  }
-
-  .sublinks {
-    background: $sidebar-color4;
-    padding-top: 10px;
-    padding-bottom: 5px;
-    margin-bottom: 30px;
-
-    .fa-caret-up {
-      display: block;
-      height: 0;
-      position: relative;
-      font-size: 25px;
-      color: $sidebar-color4;
-      top: -26px;
-      left: 22px;
-    }
-
-    & > p {
-      margin: 0;
-      color: $sidebar-link-color2;
-      font-size: 0.9rem;
-      font-weight: 700;
-      padding-left: 15px;
-      padding-bottom: 15px;
-    }
-
-    & > ul {
-      list-style-type: none;
-      padding: 0;
-      padding-left: 20px;
-
-      li {
-        color: $sidebar-link-color2;
-        padding: 0;
-        margin: 0px 0px 14px 10px;
-      }
+    .uk-icon {
+      padding-right: 5px;
     }
   }
 }
 
-.content {
-  width: 100%;
-  overflow: scroll;
-  background: #fcfcff;
-
-  header {
-    background: #ffffff;
-    height: 40px;
-    border-bottom: 1px solid #efefef;
-    display: flex;
-    justify-content: space-between;
-
-    .leftside {
-      .title {
-        color: #5a5a5a;
-        margin-left: 10px;
-        position: relative;
-        top: 10px;
-        font-size: 16px;
-        font-weight: bold;
-      }
-    }
-
-    .center {
-      text-align: center;
-      margin: 0;
-      padding: 0;
-
-      .title {
-        position: relative;
-        top: 7px;
-        font-size: 18px;
-        font-weight: bold;
-      }
-    }
-
-    .rightside {
-      position: relative;
-      right: 20px;
-      top: 7px;
-    }
+main {
+  & > .uk-tab {
+    margin-top: -25px;
   }
 
-  main {
-    max-width: 900px;
-    margin: 0 auto 0;
-    padding: 30px 40px;
+  .uk-button, .uk-tab > * > a {
+    text-transform: none;
+  }
+
+  table {
+    .actions {
+      text-align: right;
+      vertical-align: middle;
+      padding: 0;
+
+      & > a {
+        &:not(:first-child) {
+          margin-left: 15px;
+        }
+
+        button {
+          padding: 0;
+        }
+      }
+    }
   }
 }
 </style>

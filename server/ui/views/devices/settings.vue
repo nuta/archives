@@ -1,95 +1,65 @@
 <template>
-<dashboard-layout :title="deviceName">
-  <div class="separated-sections">
-    <form @submit.prevent="update">
-      <section>
-        <div class="left-column">
-          <p class="title">Associated app</p>
-          <p class="description"></p>
-          </p>
-        </div>
-        <div class="right-column">
-          <select v-model="associatedTo">
+<device-layout :title="deviceName" :device-name="deviceName">
+
+  <remote-content :loading="loading" :content="device">
+    <form slot="content" @submit.prevent="update" class="uk-form-horizontal">
+      <div class="uk-margin">
+        <label class="uk-form-label">Associated app</label>
+        <div class="uk-form-controls">
+          <select v-model="associatedTo" class="uk-select">
+            <option value="" disabled selected>Not associated</option>
             <template v-for="app in apps">
               <option :value="app.name">{{ app.name }}</option>
             </template>
           </select>
         </div>
-      </section>
+      </div>
 
-      <section>
-        <div class="left-column">
-          <p class="title">Tag</p>
-          <p class="description"></p>
-          </p>
+      <div class="uk-margin">
+        <label class="uk-form-label">Tag</label>
+        <div class="uk-form-controls">
+          <input type="text" v-model="tag" class="uk-input" placeholder="e.g. staging, group1, palo_alto">
         </div>
-        <div class="right-column">
-          <input type="text" v-model="tag" placeholder="e.g. staging, group1, palo_alto">
-        </div>
-      </section>
+      </div>
 
-      <input type="submit" value="Save">
+      <input type="submit" value="Save" class="uk-button uk-button-primary uk-align-right">
     </form>
-  </div>
-</dashboard-layout>
+  </remote-content>
+</device-layout>
 </template>
 
 <script>
 import api from "js/api";
-import DashboardLayout from "layouts/dashboard";
+import RemoteContent from "components/remote-content";
+import DeviceLayout from "layouts/device";
 
 export default {
-  components: { DashboardLayout },
+  components: { DeviceLayout, RemoteContent },
   data() {
     return {
       deviceName: app.$router.currentRoute.params.deviceName,
+      device: null,
       apps: [],
       associatedTo: '',
-      tag: ''
+      tag: '',
+      loading: true
     }
   },
   methods: {
     update() {
       api.updateDevice(this.deviceName, {
-        app: this.associatedTo,
-        tag: this.tag
+        app: this.associatedTo || undefined,
+        tag: this.tag || undefined
       })
     }
   },
   async beforeMount() {
-    const device = (await api.getDevice(this.deviceName)).json
-    this.apps = (await api.getApps()).json
-    this.associatedTo = device.app || this.apps[0].name
+    this.device = await api.getDevice(this.deviceName)
+    this.apps = await api.getApps()
+    this.associatedTo = this.device.app || ''
+
+    this.loading = false
+    this.$Progress.finish()
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.separated-sections {
-  section {
-    display: flex;
-    justify-content: space-between;
-
-    &:not(:first-child) {
-      margin-top: 30px;
-      border-top: 1px solid #dadada;
-    }
-
-    .left-column {
-      .title {
-        font-size: 25px;
-        font-weight: 600;
-      }
-
-      .description {
-        font-size: 13px;
-        color: #666;
-      }
-    }
-
-    .right-column {
-      align-self: center;
-    }
-  }
-}
-</style>
