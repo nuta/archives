@@ -43,6 +43,10 @@ Rails.application.routes.draw do
         post 'webhook', to: 'sakuraio#webhook'
         get 'file', to: 'sakuraio#file'
       end
+
+      scope :os do
+        get 'releases', to: "os#index"
+      end
   end
   end
 end

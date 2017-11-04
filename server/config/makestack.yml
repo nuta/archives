@@ -8,6 +8,7 @@ development:
   push_to_sakuraio_limit_per_hour: 5000
   os_releases:
     a:
+      title: 'MakeStack Linux version a'
       linux:
         x86_64:
           url: http://localhost:8100/repos/os/x86_64.img
@@ -16,6 +17,7 @@ development:
         mock:
           url: http://localhost:8100/repos/os/mock.img
     b:
+      title: 'MakeStack Linux version b'
       linux:
         x86_64:
           url: http://localhost:8100/repos/os/x86_64.img
@@ -30,6 +32,7 @@ test:
   os_releases:
     z:
       linux:
+        title: 'MakeStack Linux version z'
         x86_64:
           url: http://localhost:8100/repos/os/x86_64.img
         raspberrypi3:
@@ -38,6 +41,7 @@ test:
           url: http://localhost:8100/repos/os/mock.img
     v123.456.789:
       linux:
+        title: 'MakeStack Linux version v123.456.789'
         x86_64:
           url: http://localhost:8100/repos/os/x86_64.img
         raspberrypi3:
@@ -46,6 +50,7 @@ test:
           url: http://localhost:8100/repos/os/mock.img
     a:
       linux:
+        title: 'MakeStack Linux version a'
         x86_64:
           url: http://localhost:8100/repos/os/x86_64.img
         raspberrypi3:
