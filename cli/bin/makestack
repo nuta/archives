@@ -2,15 +2,13 @@
 
 /* The image writer would be executed in sudo. Avoid
 requiring other stuffs for security. */
-const imageWriter = require('../lib/image_writer')
 if (process.env.IMAGE_WRITER !== undefined) {
+  const imageWriter = require('../lib/image_writer')
   imageWriter().catch(error => {
     console.error(error)
     process.exit(1)
   })
-
-  process.exit(0)
+} else {
+  const cli = require('../lib/cli')
+  cli.run(process.argv)
 }
-
-const cli = require('../lib/cli')
-cli.run(process.argv)
