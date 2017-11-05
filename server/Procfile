@@ -2,3 +2,4 @@ server: cat .secrets && PORT=3000 ./bin/rails server
 ui: cd ui && npm run dev
 sidekiq: bundle exec sidekiq -C ./config/sidekiq.yml
 static: cd ../Documentation && jekyll serve --incremental
+github-releases-mock: cd ../cli && ./bin/makestack github-releases-mock
