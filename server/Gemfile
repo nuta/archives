@@ -18,11 +18,12 @@ gem 'rest-client'
 #gem 'strong_migrations'
 
 group :development, :test do
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
   gem 'sqlite3'
   gem 'pry-rails'
+  gem 'pry-byebug'
+  gem 'pry-stack_explorer'
   gem 'active_record_query_trace'
   gem 'ffaker', require: false
   gem 'factory_bot_rails', require: false
