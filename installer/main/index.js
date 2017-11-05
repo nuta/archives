@@ -5,13 +5,16 @@ const makestack = require('makestack')
 let mainWindow
 function createWindow() {
   mainWindow = new BrowserWindow({
-    height: 500,
-    width: 450,
-    useContentSize: true
+    height: 550,
+    width: 450
   })
 
-  const windowURL = (process.env.NODE_ENV === 'development')
-    ? 'http://localhost:9080' : `file://${__dirname}/../renderer/index.html`
+  const windowURL = (process.env.NODE_ENV === 'development') ?
+    'http://localhost:9080' : `file://${__dirname}/../renderer/index.html`
+
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.webContents.openDevTools({ mode: 'detach' })
+  }
 
   mainWindow.loadURL(windowURL)
 
@@ -42,10 +45,15 @@ ipcMain.on('getAvailableDrives', (event, args) => {
 
 ipcMain.on('install', async(event, args) => {
   const flashCommand = [process.argv0, path.resolve(__dirname, 'flasher.js')]
-  await makestack.install(
-    args.deviceName, args.deviceType, args.os,
-    args.adapter, args.drive, args.ignoreDuplication,
-    flashCommand, (stage, state) => {
-      event.sender.send('progress', stage, state)
-    })
+  await makestack.install({
+    deviceName: args.deviceName,
+    deviceType: args.deviceType,
+    osType: args.os,
+    adapter: args.adapter,
+    drive: args.drive,
+    ignoreDuplication: args.ignoreDuplication,
+    flashCommand
+  }, (stage, state) => {
+    event.sender.send('progress', stage, state)
+  })
 })

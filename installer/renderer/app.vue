@@ -11,17 +11,19 @@ export default {
 
 <style lang="scss">
 $default-font-color: #183f18;
-$ui-fonts: "Open Sans", sans-serif;
 
 html, body {
-  height:100%;
+  height: 100%;
 }
 
 body {
   margin: 0;
   font-size: 15px;
-  font-family: $ui-fonts;
+  font-family: -apple-system, BlinkMacSystemFont, Ubuntu, Cantarell, sans-serif;
   color: $default-font-color;
+  -webkit-app-region: drag;
 }
 
+#app {
+}
 </style>
