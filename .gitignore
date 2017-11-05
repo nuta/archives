@@ -1,3 +1,4 @@
+.secrets
 *.log
 node_modules
 coverage
