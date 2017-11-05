@@ -8,8 +8,8 @@
       </div>
     </div>
 
-    <div class="uk-text-algin-center">
-      <input type="submit" value="Reset Password" class="uk-button uk-button-primary uk-margin-large-top">
+    <div class="uk-text-center uk-margin-medium-top">
+      <input type="submit" value="Reset Password" class="uk-button uk-button-primary">
     </div>
   </form>
 </wizard-layout>

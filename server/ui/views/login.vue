@@ -15,11 +15,11 @@
       </div>
     </div>
 
-    <div class="uk-text-align-center">
+    <div class="uk-text-center">
       <input type="submit" value="Login" class="uk-button uk-button-primary uk-margin-large-top">
     </div>
 
-    <div class="uk-text-align-center uk-margin-medium-top">
+    <div class="uk-text-center uk-margin-small-top">
       <router-link :to="{ name: 'reset-password' }" class="uk-link-text">Reset Password</router-link>
     </div>
   </form>
