@@ -59,6 +59,29 @@ RSpec.describe DevicesController, type: :controller do
         expect(response).to be_success
       end
 
+      context "" do
+        let(:device) { create(:device, app: nil, user: user) }
+        let(:app) { create(:app, user: user) }
+        let(:other_user_app) { create(:app) }
+
+        it "updates the requested device" do
+          put :update, params: { name: device.name, device: { app: app.name } }
+          device.reload
+
+          expect(response).to be_success
+          expect(device.app).to eq(app)
+        end
+
+        it "updates the requested device" do
+          expect {
+            put :update, params: { name: device.name, device: { app: other_user_app.name } }
+            device.reload
+          }.to raise_exception(ActiveRecord::RecordNotFound)
+
+          expect(device.app).to eq(nil)
+        end
+      end
+
       it "renders a JSON response with the device" do
         device = create(:device, user: user)
 
