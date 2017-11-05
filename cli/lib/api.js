@@ -32,7 +32,7 @@ class API {
       }).then(json => {
         if (!(status >= 200 && status <= 300)) {
           const msg = util.inspect(json)
-          throw new Error(`Error: server returned ${status}: \`${msg}'`)
+          reject(Error(`Error: server returned ${status}: \`${msg}'`))
         }
 
         resolve(json)
