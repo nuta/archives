@@ -29,7 +29,11 @@
       </div>
     </div>
 
-    <div class="uk-text-algin-center">
+    <div class="uk-margin-large-top">
+     <div class="g-recaptcha" data-sitekey="6LfjLzcUAAAAAFxsQ5jwrFlcv7kZzHy-JJ_Iri5w"></div>
+    </div>
+
+    <div class="uk-text-center">
       <input type="submit" value="Create Account" class="uk-button uk-button-primary uk-margin-large-top">
     </div>
   </form>
@@ -53,7 +57,14 @@ export default {
   },
   methods: {
     async createAccount() {
-      await api.createUser(this.username, this.email, this.password, this.passwordConfirmation)
+      await api.createUser({
+        username: this.username,
+        email: this.email,
+        password: this.password,
+        passwordConfirmation: this.passwordConfirmation,
+        recaptcha: grecaptcha.getResponse()
+      })
+
       this.$Notification.success('Sent an activation e-mail.')
       this.$router.push("/force-login")
     }

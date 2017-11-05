@@ -6,7 +6,8 @@ Rails.application.routes.draw do
     end
 
     scope :v1 do
-      mount_devise_token_auth_for 'User', at: 'auth'
+      mount_devise_token_auth_for 'User', at: 'auth',
+        controllers: { registrations: 'auth/registrations' }
 
       resources :apps, param: :name do
         resources :deployments,  controller: 'apps/deployments',
