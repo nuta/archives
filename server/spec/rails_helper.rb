@@ -6,7 +6,13 @@ require File.expand_path('../../config/environment', __FILE__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 
 require 'simplecov'
-SimpleCov.start
+
+SimpleCov.profiles.define 'makestack' do
+  load_profile 'rails'
+  add_filter 'vendor'
+end
+
+SimpleCov.start 'makestack'
 
 require 'rspec/rails'
 require 'rspec/json_expectations'
