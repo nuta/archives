@@ -29,27 +29,29 @@ function replaceBuffer(buf, value, id) {
 async function registerOrGetDevice(name, type, ignoreDuplication) {
   let device
   try {
-    device = (await api.registerDevice(name, type)).json
+    device = await api.registerDevice(name, type)
   } catch (e) {
-    if (ignoreDuplication && e.status === 422 && e.json.name === 'has already been taken') {
-      device = (await api.getDevice(name)).json
+    // FIXME: add an option to accept 4xx errors
+    if (ignoreDuplication && e.message.includes("name: [ 'has already been taken' ]")) {
+      // There is already a device with same name.
+      device = await api.getDevice(name)
     } else {
-      throw new Error(`failed to register a device: server returned ${e.status}`)
+      throw new Error('failed to register/fetch the device')
     }
   }
 
   return device
 }
 
-async function downloadDiskImage(type, os) {
-  const [version, osImageURL] = await getLatestGitHubRelease('seiyanuta/makestack', os, '.img')
+async function downloadDiskImage(osType, deviceType) {
+  const [version, osImageURL] = await getLatestGitHubRelease('seiyanuta/makestack', `makestack-${osType}-${deviceType}`, '.img')
   const basename = path.basename(osImageURL)
   const orignalImage = path.join(process.env.HOME, `.makestack/caches/${basename}`)
   createFile(orignalImage, await (await fetch(osImageURL)).buffer())
   return [version, orignalImage]
 }
 
-function writeConfigToDiskIamge(os, osVersion, type, orignalImage, device, adapter) {
+function writeConfigToDiskIamge(osVersion, type, orignalImage, device, adapter) {
   const imagePath = generateTempPath()
 
   // TODO: What if the image is large?
@@ -107,15 +109,15 @@ function flash(flashCommand, drive, driveSize, imagePath, progress) {
   })
 }
 
-module.exports = async(name, type, os, adapter, drive, ignoreDuplication, flashCommand, progress) => {
+module.exports = async ({ deviceName, deviceType, osType, adapter, drive, ignoreDuplication, flashCommand }, progress) => {
   progress('look-for-drive')
   const driveSize = await getDriveSize(drive)
   progress('register')
-  const device = await registerOrGetDevice(name, type, ignoreDuplication)
+  const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication)
   progress('download')
-  const [osVersion, orignalImage] = await downloadDiskImage(type, os)
+  const [osVersion, orignalImage] = await downloadDiskImage(osType, deviceType)
   progress('config')
-  const imagePath = writeConfigToDiskIamge(os, osVersion, type, orignalImage, device, adapter)
+  const imagePath = writeConfigToDiskIamge(osVersion, deviceType, orignalImage, device, adapter)
   progress('flash')
   await flash(flashCommand, drive, driveSize, imagePath, progress)
   progress('success')

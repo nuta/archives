@@ -1,9 +1,10 @@
+const path = require('path')
 const chalk = require('chalk')
 const install = require('../install')
 
 function progress(stage, state) {
   switch (stage) {
-    case 'look-for-device':
+    case 'look-for-drive':
       console.info(chalk.bold.blue('==> (1/5) Looking for the drive'))
       break
     case 'register':
@@ -26,9 +27,15 @@ function progress(stage, state) {
 }
 
 module.exports = async(args, opts, logger) => {
-  await install(opts.name, opts.type, opts.os,
-    opts.adapter, opts.drive, opts.ignoreDuplication,
-    process.argv, progress)
+  await install({
+    deviceName: opts.name,
+    deviceType: opts.type,
+    osType: opts.os,
+    adapter: opts.adapter,
+    drive: opts.drive,
+    ignoreDuplication: opts.ignoreDuplication,
+    flashCommand: [process.argv0, path.resolve(__dirname, '../../bin/makestack')]
+  }, progress)
 
   console.info(chalk.bold.green('Done!'))
 }

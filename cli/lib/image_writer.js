@@ -20,13 +20,17 @@ function connectIPC(ipcPath) {
 
 function umount(drive) {
   return new Promise((resolve, reject) => {
-    mountutils.unmountDisk(drive, (error) => {
-      if (error) { reject(error) } else { resolve() }
+    mountutils.unmountDisk(drive, error => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
     })
   })
 }
 
-module.exports = async() => {
+module.exports = async () => {
   const ipcPath = process.env.IPC_PATH
   const drive = process.env.DRIVE
   const driveSize = parseInt(process.env.DRIVE_SIZE)
@@ -37,15 +41,16 @@ module.exports = async() => {
     throw new Error("specify `IPC_PATH', `DRIVE_PATH', `DRIVE_SIZE' and `IMAGE_PATH'")
   }
 
-  console.log('info:', drive, driveSize, imagePath)
+  console.log('image-writer:',
+    `drive=${drive}, drive_size=${driveSize}, image_path=${imagePath}`)
 
-  console.log('info:', `connecting to ${ipcPath}`)
+  console.log('image-writer:', `connecting to ${ipcPath}`)
   const server = await connectIPC(ipcPath)
 
-  console.log('info:', 'unmounting')
+  console.log('image-writer:', 'unmounting')
   await umount(drive)
 
-  console.log('info:', 'writing')
+  console.log('image-writer:', 'writing')
   const writer = imageWrite.write({
     fd: fs.openSync(drive, 'rs+'),
     device: drive,
@@ -59,15 +64,18 @@ module.exports = async() => {
 
   writer.on('progress', state => {
     server.emit('progress', JSON.stringify(state))
+    console.log('image-writer:', `${state.type} ${state.percentage}%`)
   })
 
   writer.on('done', results => {
     server.emit('success', JSON.stringify(results))
+    console.log('image-writer:', 'done')
     ipc.disconnect('server')
   })
 
   writer.on('error', error => {
     server.emit('error', error)
+    console.error('image-writer:', 'error:', error)
     ipc.disconnect('server')
   })
 }

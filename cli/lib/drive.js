@@ -1,17 +1,17 @@
 const drivelist = require('drivelist')
 
-function getDriveSize(drive) {
+function getDriveSize(devfile) {
   return new Promise((resolve, reject) => {
     drivelist.list((error, drives) => {
       if (error) { reject(error) }
 
       for (const drive of drives) {
-        if (drive.device === drive) {
+        if (devfile === drive.device) {
           resolve(drive.size)
         }
       }
 
-      reject(new Error(`No such a drive: ${drive}`))
+      reject(new Error(`No such a drive: ${devfile}`))
     })
   })
 }
