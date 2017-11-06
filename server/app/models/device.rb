@@ -115,6 +115,48 @@ class Device < ApplicationRecord
     self.update_attributes!(app: nil)
   end
 
+  def append_log_to(target, device, lines, time)
+    max_lines = APP_LOG_MAX_LINES
+    if target == :app
+      unless device.app
+        # The device is not associated with any app. Aborting.
+        return
+      end
+
+      log = app.log
+      integrations = device.app.integrations.all
+    else
+      log = device.log
+      integrations = []
+    end
+
+    device_name = self.name
+    lines.each_with_index do |line, index|
+      log["#{time}:#{index}:#{device_name}:#{line}"] = time
+      m = /\A@(?<event>[^ ]+) (?<body>.*)\z/.match(line)
+      if m
+        # Detected a event published from the device.
+        HookService.invoke(integrations, :event_published, self, {
+          event: m['event'],
+          body: m['body']
+        })
+      end
+    end
+
+    log.remrangebyrank(0, -max_lines)
+  end
+
+  def append_log(body)
+    return unless body.is_a?(String)
+
+    device_name = self.name
+    time = Time.now.to_f
+    lines = body.split("\n").reject(&:empty?)
+
+    append_log_to(:device, self, lines, time)
+    append_log_to(:app, self, lines, time)
+  end
+
   def self.authenticate(device_id)
     prefix = device_id[0, DEVICE_ID_PREFIX_LEN]
     device = Device.find_by_device_id_prefix(prefix)
