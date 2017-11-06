@@ -28,6 +28,6 @@ class PushToSakuraioJob < ApplicationJob
     }
 
     url = "https://api.sakura.io/incoming/v1/#{webhook_token}"
-      RestClient.post(url, body.to_json, content_type: :json)
+    RestClient.post(url, body.to_json, content_type: :json)
   end
 end
