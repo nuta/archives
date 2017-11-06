@@ -4,14 +4,17 @@ const { mkdirp } = require('hyperutils')
 
 const CONFIG_DIR = process.env.CONFIG_DIR || `${process.env.HOME}/.makestack`
 
+function getConfigPath(name) {
+  return `${CONFIG_DIR}/${name}.json`
+}
+
 function load(name) {
-  return JSON.parse(fs.readFileSync(`${CONFIG_DIR}/${name}.json`))
+  return JSON.parse(fs.readFileSync(getConfigPath(name)))
 }
 
 function save(name, data) {
-  const filepath = `${CONFIG_DIR}/${name}.json`
-  mkdirp(path.dirname(filepath))
-  fs.writeFileSync(filepath, JSON.stringify(data))
+  mkdirp(path.dirname(getConfigPath(name)))
+  fs.writeFileSync(getConfigPath(name), JSON.stringify(data))
 }
 
 function loadCredentials() {
@@ -27,8 +30,10 @@ function loadMocks() {
 }
 
 function updateMocks(data) {
-  save('mocks', Object.assign(loadMocks(), data))
+  const mocks = (fs.existsSync(getConfigPath('mocks'))) ? loadMocks() : {}
+  save('mocks', Object.assign(mocks, data))
 }
+
 function saveMocks(data) {
   return save('mocks', data)
 }
