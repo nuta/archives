@@ -71,10 +71,10 @@ RSpec.describe "SMMS over HTTP", type: :request do
     end
 
     context "invalid authetication header" do
-      it "returns :forbidden" do
+      it "returns :unauthorized" do
         device = create(:device, app: nil)
         post '/api/v1/smms', headers: { authetication: 'SMMS 0001' }
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
         expect(response.body).to eq('')
       end
     end

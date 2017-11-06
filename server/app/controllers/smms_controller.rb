@@ -5,7 +5,7 @@ class SmmsController < ApplicationController
     auth, timestamp, hmac = (request.headers['Authorization'] || '').split(' ')
     if auth != 'SMMS'
       logger.warn "invalid authentication header"
-      head :forbidden
+      head :unauthorized
       return
     end
 
