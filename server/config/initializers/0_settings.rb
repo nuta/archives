@@ -9,7 +9,7 @@ module MakeStack
 
   private
 
-  def load_config(name)
+  def self.load_config(name)
     suffix = (Rails.env.production?) ? '.production' : ".development"
     filename = "#{name}#{suffix}.yml"
     YAML.load(open("#{Rails.root}/config/#{filename}").read).with_indifferent_access
