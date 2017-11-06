@@ -159,8 +159,8 @@ RSpec.describe "SMMS over HTTP", type: :request do
       end
     end
 
-    context "associated to an app with deployments" do
-      it "returns app image" do
+    context "image exists" do
+      it "returns os image" do
         get "/api/v1/images/os/#{device.device_id}/#{os_version}/linux/#{device.device_type}"
         expect(response).to have_http_status(:ok)
         expect(response.body).to eq(mock_osimage_content)
