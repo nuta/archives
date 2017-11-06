@@ -1,5 +1,17 @@
 module MakeStack
   def self.settings
-    @settings ||= YAML.load(open("#{Rails.root}/config/makestack.yml").read)[Rails.env].with_indifferent_access
+    @settings ||= load_config('settings')
+  end
+
+  def self.os_releases
+    @os_releases ||= load_config('os_releases')
+  end
+
+  private
+
+  def load_config(name)
+    suffix = (Rails.env.production?) ? '.production' : ".development"
+    filename = "#{name}#{suffix}.yml"
+    YAML.load(open("#{Rails.root}/config/#{filename}").read).with_indifferent_access
   end
 end

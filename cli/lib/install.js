@@ -44,7 +44,8 @@ async function registerOrGetDevice(name, type, ignoreDuplication) {
 }
 
 async function downloadDiskImage(osType, deviceType) {
-  const [version, osImageURL] = await getLatestGitHubRelease('seiyanuta/makestack', `makestack-${osType}-${deviceType}`, '.img')
+  const [version, osImageURL] = await getLatestGitHubRelease('seiyanuta/makestack',
+    `makestack-${osType}-`, `${deviceType}.img`)
   const basename = path.basename(osImageURL)
   const orignalImage = path.join(process.env.HOME, `.makestack/caches/${basename}`)
   createFile(orignalImage, await (await fetch(osImageURL)).buffer())
