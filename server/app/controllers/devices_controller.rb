@@ -2,7 +2,7 @@ class DevicesController < ApplicationController
   before_action :set_device, only: [:show, :log, :update, :destroy]
 
   def index
-    @devices = @user.devices.all
+    @devices = @user.devices.includes(:app).all
   end
 
   def show
