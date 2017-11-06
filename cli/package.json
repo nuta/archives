@@ -13,12 +13,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/makestack/makestack.git"
+    "url": "git+https://github.com/seiyanuta/makestack.git"
   },
   "author": "Seiya Nuta <nuta@seiya.me>",
   "license": "SEE LICENSE IN LICENSE.md",
   "bugs": {
-    "url": "https://github.com/makestack/makestack/issues"
+    "url": "https://github.com/seiyanuta/makestack/issues"
   },
   "homepage": "http://makestack.org",
   "dependencies": {
