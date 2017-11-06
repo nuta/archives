@@ -171,6 +171,16 @@ class API {
     return this.invoke('GET', `/devices/${deviceName}/log`)
   }
 
+  createDeviceStore(deviceName, key, type, value) {
+    return this.invoke('POST', `/devices/${deviceName}/stores`, {
+      store: { key, data_type: type, value }
+    })
+  }
+
+  deleteDeviceStore(deviceName, key) {
+    return this.invoke('DELETE', `/devices/${deviceName}/stores/${key}`)
+  }
+
   getDeviceStores(deviceName) {
     return this.invoke('GET', `/devices/${deviceName}/stores`)
   }
