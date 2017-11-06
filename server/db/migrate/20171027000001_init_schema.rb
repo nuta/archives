@@ -43,7 +43,7 @@ class InitSchema < ActiveRecord::Migration[4.2]
     create_table "device_mappings" do |t|
       t.bigint "device_id", null: false
       t.string :token, null: false
-      t.string :device_type, null: false
+      t.string :token_type, null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
       t.index ["device_id"], name: "index_device_mappings_on_device_id"
