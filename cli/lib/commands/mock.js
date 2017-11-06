@@ -6,8 +6,8 @@ let { loadMocks, updateMocks } = require('../config')
 
 function create(args, opts, logger) {
   let deviceName = args.name
-  api.registerDevice(deviceName, 'mock', null).then(r => {
-    updateMocks({ deviceName: r.json })
+  api.registerDevice(deviceName, 'mock', null).then(device => {
+    updateMocks({ [deviceName]: device })
   }).catch(e => {
     logger.error('failed to create a mock device', e)
   })
