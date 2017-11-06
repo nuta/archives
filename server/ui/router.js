@@ -41,6 +41,6 @@ let routes = [
 ]
 
 export default new VueRouter({
-  mode: 'history',
+  mode: ROUTER_MODE,
   routes
 })

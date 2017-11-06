@@ -70,7 +70,7 @@ export default {
     }
   },
   mounted() {
-    grecaptcha.render(this.$refs.recaptcha, { sitekey: '6LfjLzcUAAAAAFxsQ5jwrFlcv7kZzHy-JJ_Iri5w' })
+    grecaptcha.render(this.$refs.recaptcha, { sitekey: RECAPTCHA_SITEKEY })
     this.$Progress.finish()
   }
 }

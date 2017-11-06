@@ -1,5 +1,7 @@
 const path = require('path')
+const { DefinePlugin } = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const config = require('./config')
 
 module.exports = {
   entry: {
@@ -52,6 +54,10 @@ module.exports = {
     ]
   },
   plugins: [
+    new DefinePlugin({
+      ROUTER_MODE: JSON.stringify(config.ROUTER_MODE),
+      RECAPTCHA_SITEKEY: JSON.stringify(config.RECAPTCHA_SITEKEY)
+    }),
     new HtmlWebpackPlugin({
       template: './index.html',
       inject: true
