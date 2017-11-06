@@ -15,7 +15,7 @@ gem 'pg', group: :postgres
 gem 'redis-objects'
 gem 'redis-namespace'
 gem 'rest-client'
-#gem 'strong_migrations'
+gem 'strong_migrations'
 
 group :development, :test do
   gem 'spring'
