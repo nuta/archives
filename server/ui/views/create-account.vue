@@ -29,8 +29,8 @@
       </div>
     </div>
 
-    <div class="uk-margin-large-top">
-     <div class="g-recaptcha" data-sitekey="6LfjLzcUAAAAAFxsQ5jwrFlcv7kZzHy-JJ_Iri5w"></div>
+    <div class="uk-margin-small-top">
+     <div ref="recaptcha"></div>
     </div>
 
     <div class="uk-text-center">
@@ -70,6 +70,7 @@ export default {
     }
   },
   mounted() {
+    grecaptcha.render(this.$refs.recaptcha, { sitekey: '6LfjLzcUAAAAAFxsQ5jwrFlcv7kZzHy-JJ_Iri5w' })
     this.$Progress.finish()
   }
 }
