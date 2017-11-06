@@ -7,7 +7,7 @@ coverage
 /cli/tests/tmp
 
 # server
-/server/config/makestack.yml
+/server/config/settings.production.yml
 /server/ui/config.js
 /server/.bundle
 /server/vendor
