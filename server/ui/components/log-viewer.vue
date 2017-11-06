@@ -12,7 +12,7 @@
       <tbody>
         <tr v-for="line in lines">
           <td class="time">{{ line.time | strftime }}</td>
-          <td class="device">{{ line.device_name }}</td>
+          <td class="device">{{ line.device }}</td>
           <td class="type"><span :class="['uk-label', getTypeClass(line.body)]">{{ getTypeName(line.body) }}</span></td>
           <td class="body">{{ line.body }}</td>
         </tr>
