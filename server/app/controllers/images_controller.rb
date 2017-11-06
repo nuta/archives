@@ -59,6 +59,8 @@ class ImagesController < ApplicationController
 
     # We assume that File.rename() is atomic.
     File.rename(tmp_filepath, filepath)
+
+    filepath
   end
 
   def download_file(url, filepath)
@@ -69,6 +71,6 @@ class ImagesController < ApplicationController
   end
 
   def look_for_os_image_url(version, os, deviceTypes)
-    MakeStack.os_releases.dig(version, os, deviceTypes, :url)
+    MakeStack.os_releases.dig(version, os, :assets, deviceTypes, :url)
   end
  end
