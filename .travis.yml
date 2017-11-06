@@ -112,6 +112,7 @@ matrix:
       cache: yarn
       install:
         - cd server/ui
+        - cp config.js.example config.js
         - yarn
       script: npm run build
 
