@@ -1,4 +1,5 @@
 import VueRouter from 'vue-router'
+import WelcomeView from './views/welcome'
 import CreateAccountView from './views/create-account'
 import ResetPasswordView from './views/reset-password'
 import LoginView from './views/login'
@@ -19,6 +20,7 @@ import DeviceLogView from './views/devices/log'
 import DeviceSettingsView from './views/devices/settings'
 
 let routes = [
+  { name: 'welcome', path: '/', component: WelcomeView },
   { name: 'create-account', path: '/create-account', component: CreateAccountView },
   { name: 'reset-password', path: '/reset-password', component: ResetPasswordView },
   { name: 'login', path: '/login', component: LoginView },
