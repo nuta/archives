@@ -1,0 +1,36 @@
+production:
+  protocol: # https
+  host: # makestack.org
+  port: # 443
+  outgoing_webhook_limit_per_hour: 5000
+  push_to_sakuraio_limit_per_hour: 5000
+  os_releases:
+
+development: &development
+  protocol: http
+  host: localhost
+  port: 8080 # access through webpack-dev-server
+  outgoing_webhook_limit_per_hour: 5000
+  push_to_sakuraio_limit_per_hour: 5000
+  os_releases:
+    a:
+      title: 'MakeStack Linux version a'
+      linux:
+        x86_64:
+          url: http://localhost:8100/repos/os/x86_64.img
+        raspberrypi3:
+          url: http://localhost:8100/repos/os/raspberrypi3.img
+        mock:
+          url: http://localhost:8100/repos/os/mock.img
+    b:
+      title: 'MakeStack Linux version b'
+      linux:
+        x86_64:
+          url: http://localhost:8100/repos/os/x86_64.img
+        raspberrypi3:
+          url: http://localhost:8100/repos/os/raspberrypi3.img
+        mock:
+          url: http://localhost:8100/repos/os/mock.img
+
+test:
+  <<: &development
