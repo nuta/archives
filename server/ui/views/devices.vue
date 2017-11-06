@@ -8,6 +8,7 @@
         <tr>
           <th>Name</th>
           <th>Type</th>
+          <td>App</td>
           <th>Tag</th>
           <td>Registered at</td>
           <th></th>
@@ -21,14 +22,23 @@
             </router-link>
           </td>
           <td>{{ device.device_type }}</td>
+          <td>
+            <template v-if="device.app">
+              <router-link :to="{ name: 'code', params: { appName: device.app }}">
+                <span uk-icon="icon: forward"></span>
+                {{ device.app }}
+              </router-link>
+            </template>
+            <template v-else>
+              (not associated)
+            </template>
+          </td>
           <td>{{ device.tag || "(unspecified)" }}</td>
           <td>{{ device.created_at | strftime }}</td>
           <td class="actions">
             <router-link :to="{ name: 'deviceSettings', params: { deviceName: device.name }}">
-              <button class="uk-button">
-                <span uk-icon="icon: forward"></span>
-                Open Dashboard
-              </button>
+              <span uk-icon="icon: forward"></span>
+              Open Dashboard
             </router-link>
           </td>
         </tr>
