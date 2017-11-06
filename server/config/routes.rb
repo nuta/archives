@@ -30,7 +30,7 @@ Rails.application.routes.draw do
           param: :key, path: 'stores', as: :store, constraints: { key: /.+/ }
 
         resources :log, controller: 'devices/log', only: [:index]
-        end
+      end
 
       post "smms", to: "smms#http"
       scope :images do
