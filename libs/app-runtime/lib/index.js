@@ -13,10 +13,12 @@ let builtins = {
   plugin
 }
 
-const deviceType = process.env.DEVICE_TYPE
-const device = require(`./devices/${deviceType}`)
-Object.assign(builtins, device.builtins)
-device.initialize()
+if (process.env.DEVICE_TYPE) {
+  const deviceType = process.env.DEVICE_TYPE
+  const device = require(`./devices/${deviceType}`)
+  Object.assign(builtins, device.builtins)
+  device.initialize()
+}
 
 function start(mainModulePath) {
   Object.assign(global, builtins)
