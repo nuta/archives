@@ -192,21 +192,25 @@ function main() {
 
   const [packages, buildOrder] = loadPackages(target)
 
-  for (const [i, pkg] of buildOrder.entries()) {
+  for (const [i, pkgName] of buildOrder.entries()) {
+    const pkg = packages[pkgName]
+
     if (isBuildRequired(pkg)) {
-      console.log(`==> (${i + 1}/${buildOrder.length}) Building ${pkg.name}...`)
+      console.log(`==> (${i + 1}/${buildOrder.length}) Building ${pkgName}...`)
       buildPackage(pkg)
-      build.rebuiltPackages.push(pkg.name)
+      build.rebuiltPackages.push(pkgName)
     } else {
+      console.log(`==> (${ i + 1}/${buildOrder.length}) Copying files from ${pkgName}...`)
       const copiedToBootFS = copyFilesInPkg(pkg.name, pkg.bootfs, build.bootfsDir)
       const copiedToRootFS = copyFilesInPkg(pkg.name, pkg.rootfs, build.rootfsDir)
 
-      if (copiedToBootFS.length === 0 && copiedToRootFS.length === 0) {
-        console.log(`==> (${i + 1}/${buildOrder.length}) Skipping ${pkg.name}...`)
-      } else {
-        console.log(`==> (${i + 1}/${buildOrder.length}) Copied changed files from ${pkg.name}`)
-        build.rebuiltPackages.push(pkg.name)
+      let num = 0
+      if (copiedToBootFS.length > 0 || copiedToRootFS.length > 0) {
+        num = copiedToBootFS + copiedToRootFS
+        build.rebuiltPackages.push(pkgName)
       }
+
+      console.log(`==> (${i + 1}/${buildOrder.length}) Copied ${num} files from ${pkgName}`)
     }
   }
 

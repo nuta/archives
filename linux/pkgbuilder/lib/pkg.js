@@ -35,8 +35,8 @@ function isNewerDirContent(dir1, dir2, ignorePatterns) {
       continue
     }
 
-    const file1 = path.join(dir1, files[i])
-    const file2 = path.join(dir2, files[i])
+    const file1 = path.join(dir1, file)
+    const file2 = path.join(dir2, file)
     if (!fs.existsSync(file2))
       return true
 
