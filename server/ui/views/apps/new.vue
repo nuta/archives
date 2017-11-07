@@ -41,7 +41,7 @@ export default {
   methods: {
     async createApp() {
       const templateFiles = [
-        { path: 'main.js', body: '// main.js' },
+        { path: 'app.js', body: '// app.js' },
         { path: 'app.yaml', body:  '# app.yaml' }
       ]
 
