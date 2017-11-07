@@ -19,6 +19,8 @@ module.exports = {
       run(['rm', '-r', buildPath('supervisor')])
       run(['cp', '-r', supervisorPath, buildPath('supervisor') ])
     }
+
+    return isChanged
   },
 
   build() {
