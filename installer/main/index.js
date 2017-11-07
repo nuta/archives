@@ -5,7 +5,7 @@ const makestack = require('makestack')
 let mainWindow
 function createWindow() {
   mainWindow = new BrowserWindow({
-    height: 550,
+    height: 570,
     width: 450
   })
 

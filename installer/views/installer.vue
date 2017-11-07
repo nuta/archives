@@ -1,5 +1,5 @@
 <template>
-<div class="wallpaper">
+<main-layout>
   <header>
     <h1>MakeStack Installer</h1>
   </header>
@@ -12,7 +12,7 @@
       </section>
 
       <section>
-        <label>Type</label>
+        <label>Device Type</label>
         <select v-model="deviceType">
           <template v-for="type in availableDeviceTypes">
             <option :value="type">{{ type }}</option>
@@ -48,35 +48,34 @@
       </section>
 
       <section>
-        <label><input type="checkbox" :value="ignoreDuplication">Overwrite</label>
+        <label><input type="checkbox" :value="ignoreDuplication">Ignore a device name duplication.</label>
       </section>
 
       <section>
-        <div class="install-button-wrapper">
           <input type="submit" :value="installButtonMessage">
-        </div>
       </section>
     </form>
   </main>
-</div>
+</main-layout>
 </template>
 
 <script>
 import api from 'renderer/api'
+import MainLayout from 'layouts/main'
 import { ipcRenderer } from 'electron'
 
 export default {
-  components: { },
+  components: { MainLayout },
   data() {
     return {
       installButtonMessage: 'Install',
       deviceName: '',
       availableDeviceTypes: [ 'raspberrypi3', 'mock' ],
-      deviceType: '',
+      deviceType: null,
       availableOSes: [ 'linux' ],
-      os: '',
-      drive: '',
-      adapter: '',
+      os: null,
+      drive: null,
+      adapter: null,
       availableAdapters: [
         { name: 'ethernet', description: 'Ethernet (DHCP)' }
       ],
@@ -86,8 +85,13 @@ export default {
     }
   },
   methods: {
-    async refreshAvailableDrives() {
+    refreshAvailableDrives() {
       this.availableDrives = ipcRenderer.sendSync('getAvailableDrives')
+      if (!this.drive) {
+        this.$nextTick(() => {
+          this.drive = this.availableDrives[0].device
+        })
+      }
     },
     install() {
       const component = this
@@ -133,90 +137,17 @@ export default {
       this.$router.push({ name: 'login' })
 
     await this.refreshAvailableDrives()
-    this.deviceType = this.availableDeviceTypes[0] || ''
-    this.drive = this.availableDrives[0] || ''
-    this.adapter = this.availableAdapters[0].name || ''
-
-    // DEBUG
-    this.deviceName = 'abc'
-    this.drive = '/dev/disk2'
-    this.os = 'linux'
-    this.deviceType = 'mock'
-    this.ignoreDuplication = true
+    this.deviceType = this.availableDeviceTypes[0]
+    this.adapter = this.availableAdapters[0].name
+    this.os = this.availableOSes[0]
+  },
+  mounted() {
+    setInterval(async () => {
+      this.refreshAvailableDrives()
+    }, 3000)
   }
 }
 </script>
 
 <style lang="scss" scoped>
-header {
-  background: linear-gradient(to left, #7474bf, #348ac7);
-
-  h1 {
-    text-align: center;
-    font-weight: 200;
-    font-size: 25px;
-    padding: 35px 5px;
-    color: #ffffff;
-    margin: 0;
-  }
-}
-
-.wallpaper {
-  width: 100vw;
-  height: 100vh;
-  background: #f6f6f6;
-}
-
-main {
-  margin-top: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 300px;
-}
-
-section {
-  &:not(:first-child) {
-    margin-top: 15px;
-  }
-
-  label {
-    display: block;
-    font-size: 15px;
-    margin-bottom: 5px;
-  }
-
-  input[type=text], input[type=password], select {
-    width: 100%;
-    font-size: 15px;
-  }
-
-  input[type=checkbox] {
-    margin-right: 10px;
-  }
-
-  .install-button-wrapper {
-    text-align: center;
-  }
-
-  input[type=submit] {
-    width: 300px;
-    margin-top: 25px;
-    border-radius: 5px;
-    padding: 10px 25px;
-    font-size: 15px;
-    font-weight: 600;
-    background: #1e87f0;
-    color: #ffffff;
-    border: 1px solid transparent;
-
-    &:active {
-      background: #0e6dcd;
-    }
-
-    &:hover {
-      background: #0f7ae5;
-      cursor: pointer;
-    }
-  }
-}
 </style>

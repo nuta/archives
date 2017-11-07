@@ -1,9 +1,9 @@
 import VueRouter from 'vue-router'
-import InstallView from 'views/install'
+import InstallerView from 'views/installer'
 import LoginView from 'views/login'
 
 let routes = [
-  { name: 'install', path: '/', component: InstallView },
+  { name: 'installer', path: '/', component: InstallerView },
   { name: 'login', path: '/login', component: LoginView },
   { path: '*', redirect: '/' }
 ]

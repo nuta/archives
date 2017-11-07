@@ -20,7 +20,8 @@ module.exports = {
     alias: {
       'renderer': path.join(__dirname, 'renderer'),
       'vue$': 'vue/dist/vue.esm.js',
-      'views': path.join(__dirname, 'views')
+      'views': path.join(__dirname, 'views'),
+      'layouts': path.join(__dirname, 'layouts')
     },
     extensions: ['.js', '.vue']
   },

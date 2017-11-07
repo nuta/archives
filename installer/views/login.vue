@@ -1,28 +1,39 @@
 <template>
-<main>
-  <form v-on:submit.prevent="login">
-    <div>
-      <label>Server URL</label>
-      <input type="text" v-model="url" required="required" autofocus placeholder="URL">
-    </div>
-    <div>
-      <label>Username</label>
-      <input type="text" v-model="username" required="required" autofocus placeholder="Username">
-    </div>
-    <div>
-      <label>Password</label>
-      <input type="password" v-model="password" required="required" placeholder="Password">
-    </div>
-    <input type="submit" value="Login">
-  </form>
-</main>
+<main-layout>
+  <header>
+    <h1>MakeStack Installer</h1>
+  </header>
+
+  <main>
+    <form v-on:submit.prevent="login">
+      <section>
+        <label>Server URL</label>
+        <input type="text" v-model="url" required="required" autofocus placeholder="URL">
+      </section>
+      <section>
+        <label>Username</label>
+        <input type="text" v-model="username" required="required" autofocus placeholder="Username">
+      </section>
+      <section>
+        <label>Password</label>
+        <input type="password" v-model="password" required="required" placeholder="Password">
+      </section>
+
+      <section>
+        <input type="submit" value="Login">
+      </section>
+    </form>
+  </main>
+</main-layout>
 </template>
 
 
 <script>
-import api from "renderer/api";
+import MainLayout from "layouts/main"
+import api from "renderer/api"
 
 export default {
+  components: { MainLayout },
   data: () => {
     return {
       url: "http://localhost:8080",
@@ -33,7 +44,7 @@ export default {
   methods: {
     login() {
       api.login(this.url, this.username, this.password).then(() => {
-        this.$router.push({ name: 'wizard' })
+        this.$router.push({ name: 'installer' })
       }).catch((r) => {
         console.error(r)
         alert('something went wrong!')
