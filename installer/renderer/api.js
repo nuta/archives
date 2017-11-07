@@ -1,5 +1,5 @@
+const fetch = require('node-fetch')
 const fs = require('fs')
-const fetch = require('whatwg-fetch')
 
 const CONFIG_DIR = `${process.env.HOME}/.makestack`
 
