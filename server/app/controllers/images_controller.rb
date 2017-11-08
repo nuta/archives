@@ -28,7 +28,6 @@ class ImagesController < ApplicationController
       return
     end
 
-    sign_and_set_authorization_header(@device, payload)
     response.headers["Content-Length"] = payload.length
     render content_type: 'application/zip', body: payload
   end

@@ -4,6 +4,7 @@ const SMMS_DEVICE_INFO_MSG = 0x0b
 const SMMS_LOG_MSG = 0x0c
 const SMMS_OS_VERSION_MSG = 0x10
 const SMMS_APP_VERSION_MSG = 0x11
+const SMMS_APP_IMAGE_HMAC_MSG = 0x13
 const SMMS_STORE_MSG = 0x20
 
 class AdapterBase {
@@ -143,8 +144,9 @@ class AdapterBase {
         case SMMS_APP_VERSION_MSG:
           messages.appVersion = data.toString('utf-8')
           break
-}
-
+        case SMMS_APP_IMAGE_HMAC_MSG:
+          messages.appImageHMAC = data.toString('utf-8')
+      }
       offset += 1 + lengthLength + length
     }
 

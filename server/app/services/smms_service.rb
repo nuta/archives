@@ -7,6 +7,7 @@ module SMMSService
   SMMS_LOG_MSG = 0x0c
   SMMS_OS_VERSION_MSG = 0x10
   SMMS_APP_VERSION_MSG = 0x11
+  SMMS_APP_IMAGE_HMAC_MSG = 0x13
   SMMS_STORE_MSG = 0x20
 
   #
@@ -82,7 +83,8 @@ module SMMSService
   #
   def payload_for(device)
     payload = ""
-    app_version = device.try(:deployment).try(:version).try(:to_s)
+    deployment = device.deployment
+    app_version = deployment.try(:version).try(:to_s)
     app_os_version = device.try(:app).try(:os_version)
 
     if app_os_version && device.current_os_version.value != app_os_version
@@ -90,7 +92,9 @@ module SMMSService
     end
 
     if app_version && device.current_app_version.value != app_version
+      app_image_hmac = device.sign(deployment.image_shasum)
       payload += generate_message(SMMS_APP_VERSION_MSG, app_version)
+      payload += generate_message(SMMS_APP_IMAGE_HMAC_MSG, app_image_hmac)
     end
 
     # store

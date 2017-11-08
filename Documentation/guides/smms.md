@@ -19,4 +19,5 @@ Simple Management/Messaging System
  0x0d  | crashdump
  0x10  | os_version
  0x11  | app_version
+ 0x13  | app_image_hmac
  0x20  | store

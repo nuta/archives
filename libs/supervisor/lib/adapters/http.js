@@ -84,10 +84,6 @@ class HTTPAdapter extends AdapterBase {
 
       fetch(appImageserverURL).then(response => {
         response.buffer().then(buffer => {
-          if (!this.verifyHMAC(response.headers.get('Authorization'), buffer)) {
-            reject(new Error('server returned invalid timestamp or HMAC'))
-          }
-
           resolve(buffer)
         })
       })

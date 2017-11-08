@@ -27,6 +27,7 @@ class Deployment < ApplicationRecord
   validate :validate_image_size
 
   before_create :set_version
+  before_create :compute_shasum
 
   def initialize(attrs = {})
     image_file = attrs.delete(:image)
@@ -53,5 +54,9 @@ class Deployment < ApplicationRecord
 
   def set_version
     self.version = (Deployment.where(app: self.app).maximum(:version) || 0) + 1
+  end
+
+  def compute_shasum
+    self.image_shasum = Digest::SHA256.hexdigest(self.image)
   end
 end

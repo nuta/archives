@@ -107,6 +107,10 @@ class Device < ApplicationRecord
                       .last
   end
 
+  def sign(data)
+    OpenSSL::HMAC.hexdigest('SHA256', self.device_secret, data)
+  end
+
   def app_image(version)
     deployment.try(:image)
   end

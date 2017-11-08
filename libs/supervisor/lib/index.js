@@ -1,6 +1,7 @@
 const { fork, spawnSync } = require('child_process')
 const fs = require('fs')
 const os = require('os')
+const crypto = require('crypto')
 const path = require('path')
 const HTTPAdapter = require('./adapters/http')
 const SakuraioAdapter = require('./adapters/sakuraio')
@@ -15,6 +16,7 @@ class Supervisor {
     this.appUID = parseInt(appUID) || undefined
     this.appGID = parseInt(appGID) || undefined
     this.deviceId = deviceId
+    this.deviceSecret = deviceSecret
     this.deviceType = deviceType
     this.device = new (require(`./devices/${deviceType}`))()
     this.appVersion = 'X'
@@ -28,9 +30,11 @@ class Supervisor {
     switch (this.adapterName) {
       case 'http':
         this.adapter = new HTTPAdapter(deviceId, deviceSecret, adapter.url)
+        this.verifyHMAC = true
         break
       case 'sakuraio':
         this.adapter = new SakuraioAdapter(this.appAPI.I2C)
+        this.verifyHMAC = false
         break
       default:
         throw new Error(`unknown adapter \`${this.adapterName}'`)
@@ -141,6 +145,21 @@ class Supervisor {
     })
   }
 
+  verifyImageHMAC(hmac, image) {
+    if (!hmac) {
+      return false
+    }
+
+    const hash = crypto.createHash('sha256')
+    hash.update(image)
+    const shasum = hash.digest('hex')
+
+    const hmac2 = crypto.createHmac('sha256', this.deviceSecret)
+    hmac2.update(shasum)
+
+    return (hmac === hmac2.digest('hex'))
+  }
+
   async start() {
     await this.adapter.connect()
     this.sendHeartbeat('ready')
@@ -161,6 +180,12 @@ class Supervisor {
         this.appVersion = messages.appVersion
         this.adapter.getAppImage(messages.appVersion).then((appZip) => {
           downloading = false
+
+          if (this.verifyHMAC && !this.verifyImageHMAC(messages.appImageHMAC, appZip)) {
+            logger.warn('invalid app image HMAC, aborting update')
+            return
+          }
+
           this.launchApp(appZip)
         }).catch(e => {
           logger.error('failed to download app image:', e)
