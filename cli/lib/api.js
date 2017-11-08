@@ -110,6 +110,7 @@ class API {
 
   deploy(appName, image, debug, comment, tag) {
     const form = new FormData()
+    form.append('deployment[deployed_at]', 'client')
     form.append('deployment[image]', image)
     return this.invoke('POST', `/apps/${appName}/deployments`, form)
   }

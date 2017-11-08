@@ -3,5 +3,6 @@ FactoryBot.define do
     app
     image "PK"
     debug "debug body"
+    deployed_from "client"
   end
 end

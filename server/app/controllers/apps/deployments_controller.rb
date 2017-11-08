@@ -26,6 +26,6 @@ class Apps::DeploymentsController < Apps::ApplicationController
   end
 
   def deployment_params
-    params.require(:deployment).permit(:image, :debug, :comment, :tag)
+    params.require(:deployment).permit(:image, :debug, :comment, :tag, :deployed_from)
   end
 end

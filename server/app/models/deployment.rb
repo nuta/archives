@@ -19,6 +19,10 @@ class Deployment < ApplicationRecord
     length: { in: 0..MAX_DEBUG_DATA_SIZE },
     allow_nil: true
 
+  validates :deployed_from,
+    length: { in: 0..32 },
+    allow_nil: true
+
   validate :validate_image_format
   validate :validate_image_size
 

@@ -9,6 +9,7 @@
           <th>Version</th>
           <th>Comment</th>
           <th>Tag</th>
+          <th>Deployed from</th>
           <th>Deployed at</th>
         </tr>
       </thead>
@@ -17,6 +18,7 @@
           <td>#{{ deployment.version }}</td>
           <td>{{ deployment.comment }}</td>
           <td>{{ deployment.tag }}</td>
+          <td>{{ deployment.deployed_from }}</td>
           <td>{{ deployment.created_at }}</td>
         </tr>
       </tbody>
