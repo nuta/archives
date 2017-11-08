@@ -213,32 +213,11 @@ export default {
       })
     },
     async downloadPlugin(name) {
-      let githubURL
-
-      if (window.location.host === 'localhost:8080' && Cookies.get('use_local_mock_github_server')) {
-        // Use local mock github releases server (tools/github-releases-server.py).
-        githubURL = `http://localhost:8080`
-      } else {
-        githubURL = `https://api.github.com`
+      if (name !== 'app-runtime') {
+        throw new Error('third-party plugin not supproted yet')
       }
 
-      let repo
-      if (name.match(/^[a-zA-Z0-9\-\_]+$/)) {
-        // Builtin plugins (e.g. app-runtime)
-        repo = 'seiyanuta/makestack'
-      } else if (name.match(/^[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+$/)) {
-        // Plugins on GitHub (e.g. octocat/temperature-sensor)
-        repo = name
-      } else {
-        throw new Error(`invalid plugin name: \`${name}'`)
-      }
-
-      const assets = await this.fetchLatestGitHubRelease(githubURL, repo)
-      const pluginURL = assets.filter(asset => asset.name.indexOf(name) !== -1)[0].browser_download_url
-      if (!pluginURL) {
-        throw new Error(`unknown plugin: \`${name}'`)
-      }
-
+      const pluginURL = '/api/v1/plugins/_/_/app-runtime'
       return (await fetch(pluginURL)).blob()
     },
     async mergeZipFiles(pluginName, destZip, srcZip) {

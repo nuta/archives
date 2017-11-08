@@ -71,10 +71,6 @@ program
   .action(require('./commands/build_plugin'))
 
 program
-  .command('github-releases-mock', 'Build a plugin using Docker.')
-  .action(require('./commands/github_releases_mock'))
-
-program
   .command('node-red', 'Program the app with Node-RED.')
   .option('--port <port>', 'The port.', null, 31313)
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
