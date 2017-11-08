@@ -70,8 +70,19 @@ export default {
     }
   },
   mounted() {
-    grecaptcha.render(this.$refs.recaptcha, { sitekey: RECAPTCHA_SITEKEY })
-    this.$Progress.finish()
+    if (window.grecaptcha) {
+        grecaptcha.render(this.$refs.recaptcha, { sitekey: RECAPTCHA_SITEKEY })
+        this.$Progress.finish()
+    } else {
+      // Google reCAPTCHA is not ready.
+      const timer = setInterval(() => {
+        if (window.grecaptcha) {
+          grecaptcha.render(this.$refs.recaptcha, { sitekey: RECAPTCHA_SITEKEY })
+          this.$Progress.finish()
+          clearInterval(timer)
+        }
+      }, 500)
+    }
   }
 }
 </script>
