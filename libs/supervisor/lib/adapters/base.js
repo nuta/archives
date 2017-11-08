@@ -147,9 +147,11 @@ class AdapterBase {
           break
         case SMMS_OS_IMAGE_HMAC_MSG:
           messages.osImageHMAC = data.toString('utf-8')
+          break
         case SMMS_APP_IMAGE_HMAC_MSG:
           messages.appImageHMAC = data.toString('utf-8')
-      }
+          break
+        }
       offset += 1 + lengthLength + length
     }
 
