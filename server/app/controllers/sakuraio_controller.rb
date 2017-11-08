@@ -31,7 +31,7 @@ class SakuraioController < ApplicationController
     payload = channels.join.scan(/../).map(&:hex).pack('c*')
     SMMSService.receive(payload, hmac_enabled: false, device_id: @device.device_id)
 
-    resp = SMMSService.payload_for(@device)
+    resp = SMMSService.payload_for(@device, include_hmac: false)
     PushToSakuraioJob.perform_now(webhook_token: @webhook_token, module_id: @mapping.token, payload: resp)
   end
 

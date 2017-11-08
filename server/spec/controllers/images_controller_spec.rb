@@ -3,69 +3,19 @@ require 'rails_helper'
 RSpec.describe ImagesController, type: :controller do
   describe '#os_image' do
     let!(:device) { create(:device) }
-    let(:mock_osimage_a) { 'mock image A' }
-    let(:mock_osimage_c) { 'mock image C' }
+    let(:os_version) { 'a' }
+    let(:image_url) { MakeStack.os_releases[os_version][:linux][:assets][device.device_type][:url] }
 
-    before do
-      # create mock image cache
-      cache_dir = "#{Rails.root}/tmp/cache/downloads"
-      FileUtils.mkdir_p(cache_dir)
+    it 'returns os image' do
+      get 'os_image', params: {
+        device_id: device.device_id,
+        version: os_version,
+        os: 'linux',
+        device_type: device.device_type
+      }
 
-      image_url = 'http://localhost:8100/repos/os/mock.img'
-      path = File.join(cache_dir, OpenSSL::Digest::SHA1.hexdigest(image_url))
-      File.open(path, 'w') do |f|
-        f.write(mock_osimage_a)
-      end
-    end
-
-    before do
-      stub_request(:get, 'http://localhost:8100/repos/os/mock2.img')
-        .to_return(status: 200, body: mock_osimage_c)
-    end
-
-    after(:each) do
-      FileUtils.rm_r("#{Rails.root}/tmp/cache/downloads")
-    end
-
-    context 'hit cache' do
-      it 'returns os image' do
-        get 'os_image', params: {
-          device_id: device.device_id,
-          version: 'a',
-          os: 'linux',
-          device_type: device.device_type
-        }
-
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to eq(mock_osimage_a)
-      end
-    end
-
-    context 'miss cache' do
-      it 'downloads and returns os image' do
-        get 'os_image', params: {
-          device_id: device.device_id,
-          version: 'c',
-          os: 'linux',
-          device_type: device.device_type
-        }
-
-        expect(response).to have_http_status(:ok)
-        expect(response.body).to eq(mock_osimage_c)
-      end
-    end
-
-    context 'not found' do
-      it 'returns :not_found' do
-        get 'os_image', params: {
-          device_id: device.device_id,
-          version: 'xyz',
-          os: 'linux',
-          device_type: device.device_type
-        }
-
-        expect(response).to have_http_status(:not_found)
-      end
+      expect(response).to have_http_status(:found)
+      expect(response).to redirect_to(image_url)
     end
 
     context 'unknown device' do

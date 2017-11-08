@@ -7,6 +7,7 @@ module SMMSService
   SMMS_LOG_MSG = 0x0c
   SMMS_OS_VERSION_MSG = 0x10
   SMMS_APP_VERSION_MSG = 0x11
+  SMMS_OS_IMAGE_HMAC_MSG = 0x12
   SMMS_APP_IMAGE_HMAC_MSG = 0x13
   SMMS_STORE_MSG = 0x20
 
@@ -81,20 +82,29 @@ module SMMSService
   #
   #  Device <- Server
   #
-  def payload_for(device)
+  def payload_for(device, include_hmac: true)
     payload = ""
     deployment = device.deployment
     app_version = deployment.try(:version).try(:to_s)
     app_os_version = device.try(:app).try(:os_version)
 
     if app_os_version && device.current_os_version.value != app_os_version
+      # FIXME: use device.os instead of device.app.api
       payload += generate_message(SMMS_OS_VERSION_MSG, app_os_version)
+      if include_hmac
+        os_image_shasum = MakeStack.os_releases.dig(app_os_version, device.app.api,
+          :assets, device.device_type, :shasum)
+        os_image_hmac = device.sign(os_image_shasum)
+        payload += generate_message(SMMS_OS_IMAGE_HMAC_MSG, os_image_hmac)
+      end
     end
 
     if app_version && device.current_app_version.value != app_version
-      app_image_hmac = device.sign(deployment.image_shasum)
       payload += generate_message(SMMS_APP_VERSION_MSG, app_version)
-      payload += generate_message(SMMS_APP_IMAGE_HMAC_MSG, app_image_hmac)
+      if include_hmac
+        app_image_hmac = device.sign(deployment.image_shasum)
+        payload += generate_message(SMMS_APP_IMAGE_HMAC_MSG, app_image_hmac)
+      end
     end
 
     # store

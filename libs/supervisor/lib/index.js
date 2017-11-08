@@ -47,32 +47,30 @@ class Supervisor {
     return log
   }
 
-  updateOS(version) {
-    this.adapter.getOSImage(this.deviceType, version).then(image => {
-      logger.info('saving os image...')
-      const tmpFilePath = path.join(os.tmpdir(), 'kernel.img')
-      fs.writeFileSync(tmpFilePath, image)
+  updateOS(image) {
+    logger.info('saving os image...')
+    const tmpFilePath = path.join(os.tmpdir(), 'kernel.img')
+    fs.writeFileSync(tmpFilePath, image)
 
-      logger.warn('sending SIGTERM to the app...')
-      if (this.app) {
-        this.app.kill()
-      }
+    logger.warn('sending SIGTERM to the app...')
+    if (this.app) {
+      this.app.kill()
+    }
 
-      // Wait the app to exit.
-      logger.warn('OS will be updated soon!')
-      setTimeout(() => {
-        logger.info('updating os image...')
-        this.device.updateOS(tmpFilePath)
-        logger.info('updateOS returned!')
-        this.adapter.send({
-          state: 'ready',
-          debugMode: this.debugMode,
-          osVersion: this.osVersion,
-          appVersion: 0,
-          log: 'os updated'
-        })
-      }, 5000)
-    })
+    // Wait the app to exit.
+    logger.warn('OS will be updated soon!')
+    setTimeout(() => {
+      logger.info('updating os image...')
+      this.device.updateOS(tmpFilePath)
+      logger.info('updateOS returned!')
+      this.adapter.send({
+        state: 'ready',
+        debugMode: this.debugMode,
+        osVersion: this.osVersion,
+        appVersion: 0,
+        log: 'os updated'
+      })
+    }, 5000)
   }
 
   launchApp(appZip) {
@@ -169,8 +167,21 @@ class Supervisor {
       // Update OS.
       if (!downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
         downloading = true
-        this.updateOS(messages.osVersion)
-        downloading = false
+        logger.info(`updating os ${this.osVersion} -> ${messages.osVersion}`)
+
+        this.adapter.getOSImage(this.deviceType, this.osVersion).then(image => {
+          downloading = false
+
+          if (this.verifyHMAC && !this.verifyImageHMAC(messages.osImageHMAC, image)) {
+            logger.warn('invalid app image HMAC, aborting update')
+            return
+          }
+
+          this.updateOS(messages.osVersion)
+        }).catch(e => {
+          logger.error('failed to download app image:', e)
+          downloading = false
+        })
       }
 
       // Update App

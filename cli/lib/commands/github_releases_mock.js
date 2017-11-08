@@ -23,7 +23,7 @@ module.exports = (args, opts, logger) => {
     res.send(fs.readFileSync(destPath))
   })
 
-  server.get('/repos/os/:type', (req, res) => {
+  server.get('/repos/os/:type.img', (req, res) => {
     const images = {
       x86_64() { return fs.readFileSync('linux/build/x86_64/bootfs/kernel7.img') },
       raspberypi3() { return fs.readFileSync('linux/build/raspberrypi3/bootfs/vmlinuz') },
