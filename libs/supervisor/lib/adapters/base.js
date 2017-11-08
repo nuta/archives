@@ -4,7 +4,7 @@ const SMMS_DEVICE_INFO_MSG = 0x0b
 const SMMS_LOG_MSG = 0x0c
 const SMMS_OS_VERSION_MSG = 0x10
 const SMMS_APP_VERSION_MSG = 0x11
-const SMMS_STORE_MSG = 0x40
+const SMMS_STORE_MSG = 0x20
 
 class AdapterBase {
   constructor() {

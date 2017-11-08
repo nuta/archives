@@ -7,7 +7,7 @@ module SMMSService
   SMMS_LOG_MSG = 0x0c
   SMMS_OS_VERSION_MSG = 0x10
   SMMS_APP_VERSION_MSG = 0x11
-  SMMS_STORE_MSG = 0x40
+  SMMS_STORE_MSG = 0x20
 
   #
   #  Device -> Server
