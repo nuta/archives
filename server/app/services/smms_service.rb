@@ -2,6 +2,8 @@ module SMMSService
   extend self
 
   SMMS_VERSION = 1
+  SMMS_HMAC_MSG = 0x06
+  SMMS_TIMESTAMP_MSG = 0x07
   SMMS_DEVICE_ID_MSG = 0x0a
   SMMS_DEVICE_INFO_MSG = 0x0b
   SMMS_LOG_MSG = 0x0c
@@ -14,17 +16,17 @@ module SMMSService
   #
   #  Device -> Server
   #
-  def receive(payload, hmac_enabled: true, timestamp: nil, hmac: nil, device_id: nil)
+  def receive(payload, hmac_enabled: true, device_id: nil)
     # Be careful! The message HMAC is not verified yet.
-    messages = parse_payload(payload, defaults: {
-      device_id: device_id,
-      hmac: hmac,
-      timestamp: timestamp
-    })
+    messages, hmac_protected_end = parse_payload(payload, defaults: { device_id: device_id })
 
     #
     #  Verify messages.
     #
+    unless messages[:device_id]
+      raise ActionController::BadRequest.new(), "`device_id' is not set"
+    end
+
     device = Device.authenticate(messages[:device_id])
     unless device
       raise ActiveRecord::RecordNotFound
@@ -41,7 +43,7 @@ module SMMSService
       end
 
       # Verify the message hmac.
-      if messages[:hmac] != computeHMAC(device.device_secret, messages[:timestamp], payload)
+      if messages[:hmac] != device.sign(payload[0..hmac_protected_end])
         raise ActionController::BadRequest.new(), "invalid HMAC digest"
       end
     end
@@ -103,6 +105,7 @@ module SMMSService
       payload += generate_message(SMMS_APP_VERSION_MSG, app_version)
       if include_hmac
         app_image_hmac = device.sign(deployment.image_shasum)
+        p deployment.image_shasum, app_image_hmac
         payload += generate_message(SMMS_APP_IMAGE_HMAC_MSG, app_image_hmac)
       end
     end
@@ -113,16 +116,20 @@ module SMMSService
       payload += generate_message(SMMS_STORE_MSG, data)
     end
 
-    header = [SMMS_VERSION << 4].pack('C') + generate_variable_length(payload)
-    header + payload
-  end
+    if include_hmac
+      payload += generate_message(SMMS_TIMESTAMP_MSG, Time.now.utc.iso8601)
+      hmacMsgLength = 1 + 1 + 64 # type, length, sha256sum
 
-  #
-  #  Computes a payload HMAC signature for the device.
-  #
-  def sign(device, payload)
-    timestamp = Time.now.utc.iso8601
-    return timestamp, computeHMAC(device.device_secret, timestamp, payload)
+      dummy = payload + 'a' * hmacMsgLength
+      header = [SMMS_VERSION << 4].pack('C') + generate_variable_length(dummy)
+
+      hmac = device.sign(header + payload)
+      payload += generate_message(SMMS_HMAC_MSG, hmac)
+    else
+      header = [SMMS_VERSION << 4].pack('C') + generate_variable_length(payload)
+    end
+
+    header + payload
   end
 
   private
@@ -147,13 +154,27 @@ module SMMSService
     #  Parse messages.
     #
     messages = {}
+    defaults.each do |key, value|
+      messages[key] ||= value
+    end
+
+    hmac_protected_end = nil
     offset = header_length
     while offset < header_length + total_length
+      if hmac_protected_end
+        raise 'invalid payload: hmac message must be the last one'
+      end
+
       type = payload[offset].unpack('C')[0]
       length, length_length = parse_variable_length(payload[(offset + 1)..-1])
       data = payload[offset + 1 + length_length, length]
 
       case type
+      when SMMS_HMAC_MSG
+        hmac_protected_end = offset - 1
+        messages[:hmac] = data
+      when SMMS_TIMESTAMP_MSG
+        messages[:timestamp] = data
       when SMMS_DEVICE_ID_MSG
         messages[:device_id] = data
       when SMMS_DEVICE_INFO_MSG
@@ -175,11 +196,7 @@ module SMMSService
       offset += 1 + length_length + length
     end
 
-    defaults.each do |key, value|
-      messages[key] ||= value
-    end
-
-    messages
+    [messages, hmac_protected_end]
   end
 
   def generate_message(type, data)
@@ -218,22 +235,5 @@ module SMMSService
       i += 1
       base *= 128
     end
-  end
-
-  private
-
-  def computeHMAC(device_secret, timestamp, payload)
-    sha = Digest::SHA256.new
-
-    if payload.is_a?(File)
-      while content = payload.read(4096)
-        sha.update(content)
-      end
-    else
-      sha.update(payload)
-    end
-
-    return OpenSSL::HMAC.hexdigest('SHA256', device_secret,
-                                   timestamp + "\n" + sha.hexdigest)
   end
 end
