@@ -21,7 +21,7 @@ module MakeStackServer
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 5.1
 
-    config.autoload_paths += ["#{config.root}/lib"]
+    config.autoload_paths += ["#{config.root}/app/lib"]
     config.autoload_paths += ["#{config.root}/app/services"]
     config.filter_parameters += [:image]
 
