@@ -16,7 +16,7 @@ function run(args, opts, logger) {
   let mock = loadMocks()[args.name]
   const osVersion = 'a' // A version defined in server/config/makestack.yml
 
-  process.env.DEVICE_TYPE = mock.deviceType // FIXME: used by app-runtime
+  process.env.DEVICE_TYPE = mock.device_type // FIXME: used by app-runtime
   const Supervisor = require('makestack-supervisor')
   const supervisor = new Supervisor({
     appDir: path.resolve(os.homedir(), '.makestack/mock-app'),
@@ -24,7 +24,7 @@ function run(args, opts, logger) {
       name: opts.adapter,
       url: api.serverURL
     },
-    deviceType: mock.deviceType,
+    deviceType: mock.device_type,
     deviceId: mock.device_id,
     deviceSecret: mock.device_secret,
     debugMode: true,
