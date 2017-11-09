@@ -72,4 +72,26 @@ RSpec.describe Device, type: :model do
       expect(device2).not_to be_valid
     end
   end
+
+  describe '#app_image' do
+    let(:app) { create(:app) }
+    let!(:oldest_deployment) { create(:deployment, app: app) }
+    let!(:old_deployment) { create(:deployment, app: app) }
+    let!(:newest_deployment) { create(:deployment, app: app) }
+    let!(:other_app_newest_deployment) { create(:deployment) }
+    let(:device) { create(:device, app: app) }
+
+    context 'version is latest' do
+      it 'returns latest version' do
+        expect(device.app_image('latest')).to eq(newest_deployment.image)
+      end
+    end
+
+    context 'version is old one' do
+      it 'returns specified version' do
+        expect(device.app_image(old_deployment.version)).to eq(old_deployment.image)
+        expect(device.app_image(oldest_deployment.version)).to eq(oldest_deployment.image)
+      end
+    end
+  end
 end

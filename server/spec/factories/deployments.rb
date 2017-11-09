@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :deployment do
     app
-    image "PK"
-    image_shasum { Digest::SHA256.hexdigest('PK') }
+    image { "PK#{FFaker::InternetSE.slug}" }
+    image_shasum { Digest::SHA256.hexdigest(image) }
     debug "debug body"
     deployed_from "client"
   end

@@ -100,18 +100,24 @@ class Device < ApplicationRecord
     self.device_secret = device_secret
   end
 
-  def deployment
-    @deployment ||= Deployment \
-                      .where(app: self.app, tag: [self.tag, nil])
-                      .order("created_at")
-                      .last
-  end
-
   def sign(data)
     OpenSSL::HMAC.hexdigest('SHA256', self.device_secret, data)
   end
 
   def app_image(version)
+    return nil unless self.app
+
+    if version == 'latest'
+      deployment = Deployment \
+        .where(app: self.app, tag: [self.tag, nil])
+        .order("created_at")
+        .last
+    else
+      deployment = Deployment
+        .where(app: self.app, tag: [self.tag, nil])
+        .find_by_version(version)
+    end
+
     deployment.try(:image)
   end
 
