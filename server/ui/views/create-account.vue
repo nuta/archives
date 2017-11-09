@@ -35,6 +35,8 @@
 
     <div class="uk-text-center">
       <input type="submit" value="Create Account" class="uk-button uk-button-primary uk-margin-large-top">
+      <p>By clicking "Create Account", you agree to our <a href="/term-of-service">Term of Service</a>
+      and <a href="/privacy-policy">Privacy Policy</a>.</p>
     </div>
   </form>
 </wizard-layout>
@@ -62,7 +64,8 @@ export default {
         email: this.email,
         password: this.password,
         passwordConfirmation: this.passwordConfirmation,
-        recaptcha: grecaptcha.getResponse()
+        recaptcha: grecaptcha.getResponse(),
+        agreeTos: 'yes'
       })
 
       this.$Notification.success('Sent an activation e-mail.')

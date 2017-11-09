@@ -86,13 +86,14 @@ class API {
     })
   }
 
-  createUser({ username, email, password, passwordConfirmation, recaptcha }) {
+  createUser({ username, email, password, passwordConfirmation, recaptcha, agreeTos }) {
     return this.invoke('POST', '/auth', {
       username,
       email,
       password,
       password_confirmation: passwordConfirmation,
-      recaptcha
+      recaptcha,
+      agree_tos: agreeTos
     }, false)
   }
 
