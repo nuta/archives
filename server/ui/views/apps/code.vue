@@ -255,8 +255,15 @@ export default {
         zip.file(file.path, file.body)
       }
 
-      return new Blob([await zip.generateAsync({ type: 'arraybuffer' })],
-                      { type: 'application/zip' })
+      const zipImage = await zip.generateAsync({
+        type: 'arraybuffer',
+        compression: 'DEFLATE',
+        compressionOptions: {
+          level: 9
+        }
+      })
+
+      return new Blob([zipImage], { type: 'application/zip' })
     },
     getFiles() {
       let files = []

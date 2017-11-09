@@ -54,10 +54,18 @@ async function deploy(appYAML, files) {
   }
 
   logger.progress('generating zip file')
-  const data = Buffer.from(await zip.generateAsync({ type: 'arraybuffer' }))
+  const zipImage = await zip.generateAsync({
+    type: 'arraybuffer',
+    compression: 'DEFLATE',
+    compressionOptions: {
+      level: 9
+    }
+  })
+
+  const appImage = new Blob([zipImage], { type: 'application/zip' })
 
   logger.progress('deploying')
-  await api.deploy(appName, data)
+  await api.deploy(appName, appImage)
 }
 
 async function deployAppDir(appDir) {
