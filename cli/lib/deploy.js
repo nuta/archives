@@ -1,29 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 const JSZip = require('jszip')
-const fetch = require('node-fetch')
 const { find } = require('hyperutils')
 const api = require('./api')
 const logger = require('./logger')
 const { loadAppYAML } = require('./appdir')
-const { getLatestGitHubRelease } = require('./github_releases')
-
-async function downloadPlugin(name) {
-  let repo
-  if (name.match(/^[a-zA-Z0-9\-\_]+$/)) {
-    // Builtin plugins (e.g. app-runtime)
-    repo = 'seiyanuta/makestack'
-  } else if (name.match(/^[a-zA-Z0-9\-\_]+\/[a-zA-Z0-9\-\_]+$/)) {
-    // Plugins on GitHub (e.g. octocat/temperature-sensor)
-    repo = name
-  } else {
-    throw new Error(`invalid plugin name: \`${name}'`)
-  }
-
-  const [, url] = await getLatestGitHubRelease(repo, name, '.plugin.zip')
-
-  return (await fetch(url)).buffer()
-}
 
 async function mergeZipFiles(basepath, destZip, srcZip) {
   for (const filepath in srcZip.files) {
@@ -36,7 +17,7 @@ async function mergeZipFiles(basepath, destZip, srcZip) {
 
 async function downloadAndExtractPackage(name, zip, basepath) {
   logger.progress(`downloading \`${name}'`)
-  const pluginZip = await downloadPlugin(name)
+  const pluginZip = await api.downloadPlugin(name)
 
   logger.progress(`extracting \`${name}'`)
   zip = await mergeZipFiles(basepath, zip, await (new JSZip()).loadAsync(pluginZip))

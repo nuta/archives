@@ -154,6 +154,19 @@ class API {
   setAppStore(appName, key, value) {
     return this.invoke('PUT', `/apps/${appName}/stores/${key}`, { value })
   }
+
+  downloadPlugin(name) {
+    if (name !== 'app-runtime') {
+      throw new Error('third-party plugin is not supported yet')
+    }
+    const repo = '_/_'
+
+    return new Promise((resolve, reject) => {
+      fetch(`${this.serverURL}/api/v1/plugins/${repo}/${name}`).then(response => {
+        response.buffer().then(resolve, reject)
+      })
+    })
+  }
 }
 
 module.exports = new API()

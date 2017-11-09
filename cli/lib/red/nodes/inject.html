@@ -1,0 +1,56 @@
+<script type="text/javascript">
+RED.nodes.registerType('inject', {
+  category: 'input',
+  color: '#afafaf',
+  defaults: {
+    name: { value: '' },
+    payload: { value: '' },
+    interval: { value: '1' },
+    unit: { value: 's' }
+  },
+  icon: 'inject.png',
+  inputs: 0,
+  outputs: 1,
+  label() {
+     return this.name || 'inject'
+  }
+})
+</script>
+
+<script type="text/x-red" data-template-name="inject">
+<div class="form-row">
+  <label for="node-input-name">
+    <i class="icon-tag"></i>
+    Name
+  </label>
+  <input type="text" id="node-input-name" placeholder="Name">
+</div>
+
+<div class="form-row">
+  <label for="node-input-payload">
+    <i class="envelope-tag"></i>
+    Payload
+  </label>
+  <input type="text" id="node-input-payload" placeholder="Payload">
+</div>
+
+<div class="form-row">
+    <label for="node-input-interval">
+      <i class="icon-repeat"></i>
+      Repeat
+    </label>
+
+  every
+  <input type="text" id="node-input-interval" style="width: 30%">
+
+  <select id="node-input-unit" style="width: 30%">
+    <option value="s">seconds</option>
+    <option value="m">minutes</option>
+    <option value="h">hours</option>
+  </select>
+</div>
+</script>
+
+<script type="text/x-red" data-help-name="inject">
+<p>Injects a message.</p>
+</script>

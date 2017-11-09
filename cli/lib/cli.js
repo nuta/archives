@@ -79,10 +79,10 @@ program
   .action(require('./commands/build_plugin'))
 
 program
-  .command('node-red', 'Program the app with Node-RED.')
+  .command('red', 'Program the app with Node-RED.')
   .option('--port <port>', 'The port.', null, 31313)
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
-  .action(require('./commands/node-red'))
+  .action(require('./commands/red'))
 
 function run(argv) {
   program.parse(argv)
