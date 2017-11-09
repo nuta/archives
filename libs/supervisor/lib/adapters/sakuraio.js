@@ -5,7 +5,8 @@
  * Feedback Form: https://www.sakura.ad.jp/request_form/service/iot (Google Translate is your friend)
  *
  */
-const { Driver } = require('app-runtime')
+const { builtins, Driver } = require('app-runtime')
+const { I2C } = builtins
 const AdapterBase = require('./base')
 const logger = require('../logger')
 
@@ -115,7 +116,7 @@ class SakuraIODriverBase extends Driver {
 }
 
 class I2CSakuraIODriver extends SakuraIODriverBase {
-  constructor(I2C) {
+  constructor() {
     super()
     this.i2c = new I2C({ address: 0x4f })
   }
@@ -215,7 +216,7 @@ class SakuraIOAdapter extends AdapterBase {
 
         this.received = []
         logger.debug('sakuraio: received payload', payload)
-        this.onReceiveCallback(this.deserialize(payload))
+        this.onReceiveCallback(payload)
       }
     }
   }
@@ -238,22 +239,7 @@ class SakuraIOAdapter extends AdapterBase {
     this.sakuraio.flushTx()
   }
 
-  send(messages) {
-    let withoutLog = Object.assign({}, messages)
-    delete withoutLog['log']
-
-    let withoutLogLength = this.serialize(withoutLog).length
-    if (withoutLogLength > PACKET_LEN_MAX) {
-      throw new Error('too many messages')
-    }
-
-    // Shorten log to satisfy PACKET_LEN_MAX.
-    const MSGPACK_LOG_HEADER = 2 // Message Pack str8 header
-    let logLength = PACKET_LEN_MAX - MSGPACK_LOG_HEADER - withoutLogLength
-    let shortenedMessage = Object.assign({}, withoutLog)
-    shortenedMessage.log = messages['log'].substring(0, logLength)
-    let payload = this.serialize(shortenedMessage)
-
+  send(payload) {
     this.doSend(payload)
     this.receive()
   }
