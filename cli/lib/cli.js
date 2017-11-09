@@ -49,11 +49,13 @@ program
 program
   .command('mock create', 'Create a mock device.')
   .argument('name', 'The mock device name.')
+  .option('--device-type <device-type>', 'The device type.', /^raspberrypi3|mock$/, 'mock')
   .action(require('./commands/mock').create)
 
 program
   .command('mock run', 'Run a mock device.')
   .argument('name', 'The mock device name.')
+  .option('--adapter <adapter>', 'The network adapter.', /^http|sakuraio$/, 'http')
   .action(require('./commands/mock').run)
 
 program
