@@ -82,6 +82,7 @@ program
   .command('red', 'Program the app with Node-RED.')
   .option('--port <port>', 'The port.', null, 31313)
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
+  .option('--dev', 'Restart Node-RED automatically for Node-RED node development.', null, false)
   .action(require('./commands/red'))
 
 function run(argv) {

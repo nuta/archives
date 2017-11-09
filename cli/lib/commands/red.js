@@ -6,6 +6,7 @@ const chalk = require('chalk')
 const express = require('express')
 const bodyParser = require('body-parser')
 const proxy = require('http-proxy-middleware')
+const supervisor = require('supervisor')
 const { spawn, spawnSync } = require('child_process')
 const { mkdirp } = require('hyperutils')
 const { deploy } = require('../deploy')
@@ -213,6 +214,15 @@ function spawnProxyServer(port, appDir, nodeRedJSON) {
 }
 
 module.exports = (args, opts, logger) => {
+  if (opts.dev) {
+    const argv = process.argv.slice(1).filter(arg => arg !== '--dev')
+
+    supervisor.run(['-w', path.resolve(__dirname, '../../lib') + ',' +
+      path.resolve(NODE_RED_USER_DIR, '.makestack/node-red'), '-e', 'js,html', '--',
+      ...argv])
+    return
+  }
+
   // Ensure that the directory specified by opts.appDir is a MakeStack app.
   loadAppYAML(opts.appDir)
 
