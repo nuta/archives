@@ -45,7 +45,8 @@ RSpec.describe "Authentication", type: :request do
             username: new_user[:username],
             email: new_user[:email],
             password: new_user[:password],
-            recaptcha: 'good-response'
+            recaptcha: 'good-response',
+            agree_tos: 'yes'
           }
 
           expect(response).to have_http_status(:ok)
@@ -53,7 +54,23 @@ RSpec.describe "Authentication", type: :request do
       end
     end
 
-    context "with invalid response" do
+    context "with invalid reCAPTCHA" do
+      it "does not create a new user" do
+        expect {
+          post  '/api/v1/auth', params: {
+            username: new_user['username'],
+            email: new_user['email'],
+            password: new_user['password'],
+            recaptcha: 'bad-response',
+            agree_tos: 'yes'
+          }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        }.to change(User, :count).by(0)
+      end
+    end
+
+    context "without tos agreement" do
       it "does not create a new user" do
         expect {
           post  '/api/v1/auth', params: {
