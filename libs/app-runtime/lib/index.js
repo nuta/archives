@@ -16,8 +16,7 @@ let builtins = {
 if (process.env.DEVICE_TYPE) {
   const deviceType = process.env.DEVICE_TYPE
   const device = require(`./devices/${deviceType}`)
-  Object.assign(builtins, device.builtins)
-  device.initialize()
+  Object.assign(builtins, device.initialize())
 }
 
 function start(mainModulePath) {

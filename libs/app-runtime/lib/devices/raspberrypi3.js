@@ -2,8 +2,7 @@ const GPIO = require('../linux/gpio')
 const I2C = require('../linux/i2c')
 
 function initialize() {
-  API.register('I2C', I2C)
-  API.register('GPIO', GPIO)
+  return { I2C, GPIO }
 }
 
-module.exports = initialize
+module.exports = { initialize }

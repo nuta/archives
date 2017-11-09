@@ -37,17 +37,16 @@ class Supervisor {
     this.stores = {}
     this.adapterName = adapter.name
 
-    process.env.DEVICE_TYPE = deviceType
-    this.appAPI = require('app-runtime')
-
     switch (this.adapterName) {
       case 'http':
         this.adapter = new HTTPAdapter(this.deviceId, adapter.url)
         this.verifyHMAC = true
+        this.includeDeviceId = true
         break
       case 'sakuraio':
-        this.adapter = new SakuraioAdapter(this.appAPI.I2C)
+        this.adapter = new SakuraioAdapter()
         this.verifyHMAC = false
+        this.includeDeviceId = false
         break
       default:
         throw new Error(`unknown adapter \`${this.adapterName}'`)
@@ -193,7 +192,7 @@ class Supervisor {
   serialize(messages, includeHMAC = true) {
     let payload = Buffer.alloc(0)
 
-    if ('deviceId' in messages) {
+    if (this.includeDeviceId && 'deviceId' in messages) {
       const deviceIdMsg = this.generateMessage(SMMS_DEVICE_ID_MSG, messages.deviceId)
       payload = Buffer.concat([payload, deviceIdMsg])
     }
