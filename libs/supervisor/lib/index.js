@@ -120,7 +120,7 @@ class Supervisor {
       logger.info('message', data)
       switch (data.type) {
         case 'log':
-          logger.info('device', data.body)
+          logger.info('log:', data.body.trimRight())
           this.log += data.body
           break
         default:
