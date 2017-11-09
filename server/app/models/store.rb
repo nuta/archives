@@ -3,7 +3,6 @@ class Store < ApplicationRecord
 
   belongs_to :owner, polymorphic: true
 
-  # This MUST be smaller than 256 because of a SMMS limitaiton.
   KEY_MAX_LEN = 64
 
   KEY_REGEX = /\A[a-zA-Z][a-zA-Z0-9\~\!\@\$\%\&\.\-\_]*\z/
