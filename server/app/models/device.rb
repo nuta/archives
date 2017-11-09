@@ -104,14 +104,19 @@ class Device < ApplicationRecord
     OpenSSL::HMAC.hexdigest('SHA256', self.device_secret, data)
   end
 
+  def latest_deployment
+    Deployment \
+      .where(app: self.app, tag: [self.tag, nil])
+      .order("created_at")
+      .last
+  end
+
+
   def app_image(version)
     return nil unless self.app
 
     if version == 'latest'
-      deployment = Deployment \
-        .where(app: self.app, tag: [self.tag, nil])
-        .order("created_at")
-        .last
+      deployment = self.latest_deployment
     else
       deployment = Deployment
         .where(app: self.app, tag: [self.tag, nil])

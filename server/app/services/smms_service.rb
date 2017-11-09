@@ -86,7 +86,7 @@ module SMMSService
   #
   def payload_for(device, include_hmac: true)
     payload = ""
-    deployment = device.deployment
+    deployment = device.latest_deployment
     app_version = deployment.try(:version).try(:to_s)
     app_os_version = device.try(:app).try(:os_version)
 
