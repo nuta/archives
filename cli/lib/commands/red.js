@@ -7,8 +7,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const proxy = require('http-proxy-middleware')
 const supervisor = require('supervisor')
-const { spawn, spawnSync } = require('child_process')
+const { fork, spawnSync } = require('child_process')
 const { mkdirp } = require('hyperutils')
+const api = require('../api')
 const { deploy } = require('../deploy')
 const { loadAppYAML } = require('../appdir')
 
@@ -61,13 +62,9 @@ function installNodeRED() {
 }
 
 function spawnNodeRED() {
-  const cb = spawn('node', ['red', '-u', NODE_RED_USER_DIR], { cwd: NODE_RED_DIR })
+  const nodeRedProcess = fork('red', ['-u', NODE_RED_USER_DIR], { cwd: NODE_RED_DIR })
 
-  cb.stdout.setEncoding('utf8')
-  cb.stderr.setEncoding('utf8')
-  cb.stdout.on('data', data => console.log(chalk.blue(`Node-RED: ${data.trimRight()}`)))
-  cb.stderr.on('data', data => console.log(chalk.red(`Node-RED: ${data.trimRight()}`)))
-  cb.on('close', () => {
+  nodeRedProcess.on('close', () => {
     console.error(chalk.bold.red('Node-RED exited unexpectedly.'))
     process.exit(1)
   })
@@ -75,8 +72,10 @@ function spawnNodeRED() {
   process.on('SIGTERM', () => process.exit(1))
   process.on('SIGINT', () => process.exit(1))
   process.on('exit', () => {
-    cb.kill()
+    nodeRedProcess.kill()
   })
+
+  return nodeRedProcess
 }
 
 function loadFlows(nodeRedJSON) {
@@ -213,6 +212,14 @@ function spawnProxyServer(port, appDir, nodeRedJSON) {
   })
 }
 
+function streamAppLog(appName, nodeRedProcess) {
+  api.streamAppLog(appName, lines => {
+    for (const line of lines) {
+      nodeRedProcess.send({ type: 'log', 'log': line })
+    }
+  })
+}
+
 module.exports = (args, opts, logger) => {
   if (opts.dev) {
     const argv = process.argv.slice(1).filter(arg => arg !== '--dev')
@@ -224,7 +231,7 @@ module.exports = (args, opts, logger) => {
   }
 
   // Ensure that the directory specified by opts.appDir is a MakeStack app.
-  loadAppYAML(opts.appDir)
+  const appYAML = loadAppYAML(opts.appDir)
 
   const nodeRedJSON = path.resolve(opts.appDir, 'red.json')
   if (!fs.existsSync(nodeRedJSON)) {
@@ -235,7 +242,9 @@ module.exports = (args, opts, logger) => {
   logger.info('==> Setting up Node-RED')
   installNodeRED()
   logger.info('==> Starting Node-RED')
-  spawnNodeRED()
+  const nodeRedProcess = spawnNodeRED()
+  logger.info('==> Stream app log')
+  streamAppLog(appYAML.name, nodeRedProcess)
   logger.info('==> Starting a proxy server')
   spawnProxyServer(opts.port, opts.appDir, nodeRedJSON)
 }

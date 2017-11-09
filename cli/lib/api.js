@@ -167,6 +167,21 @@ class API {
       })
     })
   }
+
+  getAppLog(appName, since) {
+    const unixtime = since ? Math.floor(since.getTime() / 1000) : 0
+    return this.invoke('GET', `/apps/${appName}/log?since=${unixtime}`)
+  }
+
+  async streamAppLog(appName, callback) {
+    callback((await this.getAppLog(appName)).lines)
+
+    let lastFetchedAt = null
+    setInterval(async () => {
+      callback((await this.getAppLog(appName, lastFetchedAt)).lines)
+      lastFetchedAt = new Date()
+    }, 5000)
+  }
 }
 
 module.exports = new API()
