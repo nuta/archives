@@ -35,6 +35,12 @@ program
   .action(require('./commands/deploy'))
 
 program
+  .command('deploy-image', 'Deploy the app with a prebuilt image.')
+  .option('--app <app>', 'The app name.', null, process.cwd())
+  .argument('image', 'The prebuilt image.')
+  .action(require('./commands/deploy-image'))
+
+program
   .command('add-device', 'Add an device to the app.')
   .argument('name', 'The device name.')
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
