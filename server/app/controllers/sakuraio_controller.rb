@@ -16,7 +16,7 @@ class SakuraioController < ApplicationController
     # TODO: suppport OS images
     device_id = @device.device_id
     host = request.headers['X-Original-Host'] || 'localhost:8080' #XXX
-    render plain: "#{request.protocol}#{host}/api/v1/images/app/#{device_id}/#{params[:number]}"
+    render plain: "#{request.protocol}#{host}/api/v1/images/app/#{device_id}/latest"
   end
 
   private
