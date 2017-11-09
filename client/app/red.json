@@ -1,0 +1,58 @@
+{
+  "flows": [
+    {
+      "id": "fa5ac137.92397",
+      "type": "tab",
+      "label": "Flow 1"
+    },
+    {
+      "id": "55319b7.5bc7c64",
+      "type": "inject",
+      "z": "fa5ac137.92397",
+      "name": "hello",
+      "payload": "helo",
+      "interval": "2",
+      "unit": "s",
+      "x": 270,
+      "y": 60,
+      "wires": [
+        [
+          "fddf84b1.a5b588"
+        ]
+      ]
+    },
+    {
+      "id": "c68a611e.12834",
+      "type": "inject",
+      "z": "fa5ac137.92397",
+      "name": "foo",
+      "payload": "foo",
+      "interval": "1",
+      "unit": "s",
+      "x": 153.5,
+      "y": 196,
+      "wires": [
+        [
+          "fddf84b1.a5b588",
+          "c9f02cf6.6044c"
+        ]
+      ]
+    },
+    {
+      "id": "fddf84b1.a5b588",
+      "type": "log",
+      "z": "fa5ac137.92397",
+      "x": 470,
+      "y": 120,
+      "wires": []
+    },
+    {
+      "id": "c9f02cf6.6044c",
+      "type": "log",
+      "z": "fa5ac137.92397",
+      "x": 370,
+      "y": 200,
+      "wires": []
+    }
+  ]
+}

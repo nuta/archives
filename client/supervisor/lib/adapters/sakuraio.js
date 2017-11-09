@@ -5,7 +5,7 @@
  * Feedback Form: https://www.sakura.ad.jp/request_form/service/iot (Google Translate is your friend)
  *
  */
-const { builtins, Driver } = require('app-runtime')
+const { builtins, Driver } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime')
 const { I2C } = builtins
 const AdapterBase = require('./base')
 const logger = require('../logger')

@@ -16,7 +16,5 @@
     "url": "https://github.com/makestack/makestack/issues"
   },
   "homepage": "http://makestack.org",
-  "dependencies": {
-    "hyperutils": "file:../../libs/hyperutils"
-  }
+  "dependencies": {}
 }

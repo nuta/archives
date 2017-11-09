@@ -1,12 +1,14 @@
 {
-  "name": "hyperutils",
+  "name": "nodejs-runtime",
   "version": "0.0.1",
-  "description": "An utility library to prevent `dependency hell'.",
+  "description": "MakeStack Node.js app runtime environment.",
+  "gypfile": true,
   "private": true,
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "nan": "^2.7.0"
   }
 }

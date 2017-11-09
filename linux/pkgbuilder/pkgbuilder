@@ -2,8 +2,8 @@
 const path = require('path')
 const fs = require('fs')
 const { spawnSync } = require('child_process')
-const { find, mkdirp, copyFiles } = require('hyperutils')
 const { isNewerDirContent } = require('.').pkg
+const { find, mkdirp, copyFiles } = require('./lib/helpers')
 
 global.build = {
   config: {}

@@ -6,7 +6,7 @@ const ipc = require('node-ipc')
 const quote = require('shell-quote').quote
 const sudo = require('sudo-prompt')
 const { createFile, generateTempPath,
-  generateRandomString } = require('hyperutils')
+  generateRandomString } = require('./helpers')
 const api = require('./api')
 const { getDriveSize } = require('./drive')
 const { getLatestGitHubRelease } = require('./github_releases')

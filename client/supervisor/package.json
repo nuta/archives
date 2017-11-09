@@ -1,14 +1,13 @@
 {
-  "name": "app-runtime",
+  "name": "makestack-supervisor",
   "version": "0.0.1",
-  "description": "MakeStack API for the Full Linux Environment",
-  "gypfile": true,
+  "description": "MakeStack Linux Supervisor.",
   "private": true,
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "nan": "^2.7.0"
+    "node-fetch": "^1.7.3"
   }
 }

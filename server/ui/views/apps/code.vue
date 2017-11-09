@@ -213,11 +213,11 @@ export default {
       })
     },
     async downloadPlugin(name) {
-      if (name !== 'app-runtime') {
+      if (name !== 'nodejs-runtime') {
         throw new Error('third-party plugin not supproted yet')
       }
 
-      const pluginURL = '/api/v1/plugins/_/_/app-runtime'
+      const pluginURL = '/api/v1/plugins/_/_/nodejs-runtime'
       return (await fetch(pluginURL)).blob()
     },
     async mergeZipFiles(pluginName, destZip, srcZip) {
@@ -229,7 +229,7 @@ export default {
       return destZip
     },
     async buildApp (files) {
-      let runtime = 'app-runtime'
+      let runtime = 'nodejs-runtime'
       let plugins = [runtime]
       let zip = new JSZip()
 

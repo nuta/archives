@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const JSZip = require('jszip')
-const { find } = require('hyperutils')
+const { find } = require('./helpers')
 const api = require('./api')
 const logger = require('./logger')
 const { loadAppYAML } = require('./appdir')
@@ -26,7 +26,7 @@ async function downloadAndExtractPackage(name, zip, basepath) {
 
 async function deploy(appYAML, files) {
   const appName = appYAML.name
-  let runtime = 'app-runtime'
+  let runtime = 'nodejs-runtime'
   let plugins = appYAML.plugins || []
   let zip = new JSZip()
 

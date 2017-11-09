@@ -156,7 +156,7 @@ class API {
   }
 
   downloadPlugin(name) {
-    if (name !== 'app-runtime') {
+    if (name !== 'nodejs-runtime') {
       throw new Error('third-party plugin is not supported yet')
     }
     const repo = '_/_'

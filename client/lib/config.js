@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { mkdirp } = require('hyperutils')
+const { mkdirp } = require('./helpers')
 
 const CONFIG_DIR = process.env.CONFIG_DIR || `${process.env.HOME}/.makestack`
 

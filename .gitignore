@@ -3,8 +3,9 @@
 node_modules
 coverage
 
-# cli
-/cli/tests/tmp
+# client
+/client/tests/tmp
+/client/nodejs-runtime/build
 
 # server
 /server/config/settings.production.yml
@@ -27,9 +28,6 @@ _site
 
 # installer
 /installer/dist
-
-# libs/app-runtime
-/libs/app-runtime/build
 
 # linux
 /linux/build

@@ -2,7 +2,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const child_process = require('child_process')
-const { find, mkdirp } = require('hyperutils')
+const { find, mkdirp } = require('./helpers')
 
 function config(key) {
   if (!(key in build.config)) {
