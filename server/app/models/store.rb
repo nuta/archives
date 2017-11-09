@@ -13,13 +13,11 @@ class Store < ApplicationRecord
 
   validates :key,
     format: { with: KEY_REGEX },
-    uniqueness: { scope: [:owner_type, :owner_id] },
-    case_sensitive: false,
+    uniqueness: { scope: [:owner_type, :owner_id], case_sensitive: false },
     length: { in: 1..KEY_MAX_LEN }
 
   validates :data_type,
     inclusion: { in: DATA_TYPES },
-    case_sensitive: false,
     length: { in: 1..64 }
 
   validates :value,

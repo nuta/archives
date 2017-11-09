@@ -14,7 +14,7 @@ RSpec.describe Store, type: :model do
       end
     end
 
-    it 'disallow invalid keys' do
+    it 'disallows invalid keys' do
       invalid_keys = ['$FOO', '/hoge', nil, 'a' * 70]
       invalid_keys.each do |key|
         store = build_stubbed(:app_store, key: key)
@@ -22,7 +22,14 @@ RSpec.describe Store, type: :model do
       end
     end
 
-    it 'disallow invalid values' do
+    it 'disallows case-sensitive keys' do
+      key = 'hello'
+      another_one = create(:app_store, key: key)
+      store = build_stubbed(:app_store, key: key.upcase, owner_id: another_one.owner_id)
+      expect(store).not_to be_valid
+    end
+
+    it 'disallows invalid values' do
       invalid_values = [nil, 'a' * 1024]
       invalid_values.each do |value|
         store = build_stubbed(:app_store, value: value)
