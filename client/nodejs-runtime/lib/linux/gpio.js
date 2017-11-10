@@ -1,42 +1,65 @@
 const fs = require('fs')
 
-module.exports = class {
-  get OUTPUT() {
+class GPIO {
+  constructor({ pin, mode }) {
+    if (typeof pin !== 'number') {
+      throw new Error("`this.pin' must be a number")
+    }
+
+    this.pin = pin
+    this.setMode(mode)
+  }
+
+  static get OUTPUT() {
     return 'out'
   }
 
-  get INPUT() {
+  static get INPUT() {
     return 'in'
   }
 
-  setMode(pin, mode) {
-    if (typeof pin !== 'number') {
-      throw new Error("`pin' must be a number")
+  setMode(mode) {
+    if (mode !== GPIO.INPUT && mode !== GPIO.OUTPUT) {
+      throw new Error(`invalid pin mode \`${mode}'`)
     }
 
-    if (fs.existsSync(`/sys/class/gpio/gpio${pin}`)) { fs.writeFileSync(`/sys/class/gpio/unexport`, `${pin}`) }
+    if (fs.existsSync(`/sys/class/gpio/gpio${this.pin}`)) {
+      fs.writeFileSync(`/sys/class/gpio/unexport`, `${this.pin}`)
+    }
 
-    fs.writeFileSync(`/sys/class/gpio/export`, `${pin}`)
-    fs.writeFileSync(`/sys/class/gpio/gpio${pin}/direction`,
-      (mode === this.INPUT) ? 'in' : 'out')
+    fs.writeFileSync(`/sys/class/gpio/export`, `${this.pin}`)
+    fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/direction`,
+      (mode === GPIO.INPUT) ? 'in' : 'out')
   }
 
-  write(pin, value) {
-    fs.writeFileSync(`/sys/class/gpio/gpio${pin}/value`, value ? '1' : '0')
+  write(value) {
+    fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/value`, value ? '1' : '0')
   }
 
-  read(pin) {
-    return fs.readFileSync(`/sys/class/gpio/gpio${pin}/value`, 'utf-8') === '1'
+  read() {
+    return fs.readFileSync(`/sys/class/gpio/gpio${this.pin}/value`, 'utf-8') === '1\n'
   }
 
-  onInterrupt(pin, mode, callback) {
-    callback = (typeof mode === 'function') ? mode : callback
-    const edge = mode || 'rising'
+  onInterrupt(mode, callback) {
+    if (typeof mode === 'function') {
+      callback = mode
+      mode = 'rising'
+    }
 
-    this.setMode(pin, this.INPUT)
-    fs.writeFileSync(`/sys/class/gpio/gpio${pin}/edge`, edge)
-    fs.watch(`/sys/class/gpio/gpio${pin}/value`, () => {
+    this.setMode(GPIO.INPUT)
+    fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/edge`, mode)
+    fs.watch(`/sys/class/gpio/gpio${this.pin}/value`, () => {
+      callback()
+    })
+  }
+
+  onChange(callback) {
+    this.setMode(GPIO.INPUT)
+    fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/edge`, 'both')
+    fs.watch(`/sys/class/gpio/gpio${this.pin}/value`, () => {
       callback()
     })
   }
 }
+
+module.exports = GPIO
