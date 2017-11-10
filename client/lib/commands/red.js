@@ -144,8 +144,7 @@ function transpile(flows) {
         outputs: ${outputs}
       }
 
-      ev_${nodeId}.on('input', __inputs__ => {
-        const __input__ = __inputs__[0];
+      ev_${nodeId}.on('input', __input__ => {
         ${nodeCodeContent}
       })
 

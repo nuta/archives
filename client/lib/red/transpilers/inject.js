@@ -13,7 +13,7 @@ module.exports = config => {
     type: 'input',
     code: `
 setInterval(() => {
-  __outputs__([\`${config.payload}\`])
+  __outputs__([{ topic: \`${config.topic}\`, payload: \`${config.payload}\` }])
 }, ${interval})
 `
   }

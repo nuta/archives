@@ -4,6 +4,7 @@ RED.nodes.registerType('inject', {
   color: '#afafaf',
   defaults: {
     name: { value: '' },
+    topic: { value: '' },
     payload: { value: '' },
     interval: { value: '1' },
     unit: { value: 's' }
@@ -27,19 +28,26 @@ RED.nodes.registerType('inject', {
 </div>
 
 <div class="form-row">
+  <label for="node-input-topic">
+    <i class="icon-tasks"></i>
+    Topic
+  </label>
+  <input type="text" id="node-input-topic" placeholder="Topic">
+</div>
+
+<div class="form-row">
   <label for="node-input-payload">
-    <i class="envelope-tag"></i>
+    <i class="icon-envelope"></i>
     Payload
   </label>
   <input type="text" id="node-input-payload" placeholder="Payload">
 </div>
 
 <div class="form-row">
-    <label for="node-input-interval">
-      <i class="icon-repeat"></i>
-      Repeat
-    </label>
-
+  <label for="node-input-interval">
+    <i class="icon-repeat"></i>
+    Repeat
+  </label>
   every
   <input type="text" id="node-input-interval" style="width: 30%">
 
