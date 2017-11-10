@@ -34,6 +34,10 @@ module SMMSService
 
     #  Verify the message timestamp.
     if hmac_enabled
+      unless messages[:hmac]
+        raise ActionController::BadRequest.new(), "`hmac' is not set"
+      end
+
       unless messages[:timestamp]
         raise ActionController::BadRequest.new(), "`timestamp' is not set"
       end
