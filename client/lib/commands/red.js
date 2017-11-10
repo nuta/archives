@@ -84,7 +84,7 @@ function loadFlows(nodeRedJSON) {
 }
 
 function loadTranspilers() {
-  const transiplerNames = ['inject', 'log', 'function'] // TODO: autoload
+  const transiplerNames = ['inject', 'log', 'function', 'gpio-in', 'gpio-out'] // TODO: autoload
   const transpilers = []
   for (const name of transiplerNames) {
     transpilers[name] = require(`../red/transpilers/${name}`)

@@ -1,0 +1,38 @@
+<script type="text/javascript">
+RED.nodes.registerType('gpio-out', {
+  category: 'GPIO',
+  color: '#cfafaf',
+  defaults: {
+    name: { value: '' },
+    pin: { value: '' }
+  },
+  icon: 'arduino.png',
+  inputs: 1,
+  outputs: 0,
+  label() {
+     return this.name || 'gpio-out'
+  }
+})
+</script>
+
+<script type="text/x-red" data-template-name="gpio-out">
+<div class="form-row">
+  <label for="node-input-name">
+    <i class="icon-tag"></i>
+    Name
+  </label>
+  <input type="text" id="node-input-name" placeholder="Name">
+</div>
+
+<div class="form-row">
+  <label for="node-input-pin">
+    <i class="fa fa-circle"></i>
+    Pin Number
+  </label>
+  <input type="text" id="node-input-pin" placeholder="Pin">
+</div>
+</script>
+
+<script type="text/x-red" data-help-name="gpio-out">
+<p>Changes a state of GPIO pin. <code>msg.payload</code> must be <code>0</code> or <code>1</code>.</p>
+</script>
