@@ -41,11 +41,13 @@ class Supervisor {
       case 'http':
         this.adapter = new HTTPAdapter(this.deviceId, adapter.url)
         this.verifyHMAC = true
+        this.includeHMAC = true
         this.includeDeviceId = true
         break
       case 'sakuraio':
         this.adapter = new SakuraioAdapter()
         this.verifyHMAC = false
+        this.includeHMAC = false
         this.includeDeviceId = false
         break
       default:
@@ -189,7 +191,7 @@ class Supervisor {
     return msg
   }
 
-  serialize(messages, includeHMAC = true) {
+  serialize(messages) {
     let payload = Buffer.alloc(0)
 
     if (this.includeDeviceId && 'deviceId' in messages) {
@@ -228,7 +230,7 @@ class Supervisor {
     let header = Buffer.alloc(1)
     header.writeUInt8(SMMS_VERSION << 4, 0)
 
-    if (includeHMAC) {
+    if (this.includeHMAC) {
       const timestamp = (new Date()).toISOString()
       const timestampMsg = this.generateMessage(SMMS_TIMESTAMP_MSG, timestamp)
       payload = Buffer.concat([payload, timestampMsg])
