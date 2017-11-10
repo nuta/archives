@@ -115,15 +115,6 @@ function transpile(flows) {
       }
     }
 
-    function __invoke_input_nodes__() {
-      for (const id in __nodes__) {
-        const { type, ev } = __nodes__[id]
-        if (type === 'input') {
-          ev.emit('input', {})
-        }
-      }
-    }
-
     function __initialize_nodes__() {
   `
 
@@ -133,7 +124,8 @@ function transpile(flows) {
     }
 
     const nodeId = generateNodeId(flow.id)
-    const { type: nodeType, code: nodeCodeContent } = transpilers[flow.type](flow)
+    flow.nodeId = nodeId
+    const { type: nodeType, init, oninput } = transpilers[flow.type](flow)
     const outputs = JSON.stringify(flow.wires.map(wire => wire.map(generateNodeId)))
 
     let nodeCode = `
@@ -144,8 +136,9 @@ function transpile(flows) {
         outputs: ${outputs}
       }
 
+      ${init}
       ev_${nodeId}.on('input', __input__ => {
-        ${nodeCodeContent}
+        ${oninput}
       })
 
     `
@@ -159,7 +152,6 @@ function transpile(flows) {
     }
 
     __initialize_nodes__()
-    __invoke_input_nodes__()
   `
 
   console.log(code)

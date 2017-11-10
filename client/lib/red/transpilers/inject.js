@@ -11,7 +11,8 @@ module.exports = config => {
 
   return {
     type: 'input',
-    code: `
+    oninput: '',
+    init: `
 setInterval(() => {
   __outputs__([{ topic: \`${config.topic}\`, payload: \`${config.payload}\` }])
 }, ${interval})

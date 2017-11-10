@@ -1,8 +1,8 @@
 module.exports = config => {
   return {
     type: 'function',
-    code: `
-
+    init: '',
+    oninput: `
  __outputs__([
   ((msg) => {
     ${config.code};

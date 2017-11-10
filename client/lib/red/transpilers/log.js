@@ -1,7 +1,8 @@
 module.exports = config => {
   return {
     type: 'output',
-    code: `
+    init: '',
+    oninput: `
 if (__input__ && typeof __input__.payload === 'string') {
   Logging.print(__input__.payload)
 } else {
