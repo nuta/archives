@@ -1,0 +1,66 @@
+<script type="text/javascript">
+RED.nodes.registerType('function', {
+  category: 'function',
+  color: '#fdd0a2',
+  defaults: {
+    name: { value: '' },
+    code: { value: 'return msg' }
+  },
+  icon: 'function.png',
+  inputs: 1,
+  outputs: 1,
+  label() {
+     return this.name || 'function'
+  },
+  oneditprepare() {
+    this.editor = RED.editor.createEditor({
+      id: 'node-input-code-editor',
+      mode: 'ace/mode/javascript',
+      value: $("#node-input-code").val(),
+      globals: {
+          msg:true,
+          context:true,
+          RED: true,
+          util: true,
+          flow: true,
+          global: true,
+          console: true,
+          Buffer: true,
+          setTimeout: true,
+          clearTimeout: true,
+          setInterval: true,
+          clearInterval: true
+      }
+    })
+  },
+  oneditsave() {
+    $("#node-input-code").val(this.editor.getValue())
+  }
+})
+</script>
+
+<script type="text/x-red" data-template-name="function">
+<div class="form-row">
+  <label for="node-input-name">
+    <i class="icon-tag"></i>
+    Name
+  </label>
+  <input type="text" id="node-input-name" placeholder="Name">
+</div>
+
+<div class="form-row" style="margin-bottom: 0px;">
+  <label for="node-input-code-editor">
+    <i class="icon-wrench"></i>
+    Function
+  </label>
+</div>
+
+<div class="form-row">
+  <input type="hidden" id="node-input-code">
+  <div class="node-text-editor" id="node-input-code-editor" style="height: 300px;"></div>
+</div>
+</script>
+
+<script type="text/x-red" data-help-name="function">
+<p>A JavaScript (Node.js) function. The input payload is in <code>msg.payload</code>.</p>
+</script>
