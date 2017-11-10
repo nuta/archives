@@ -46,11 +46,13 @@ export default {
     }
   },
   methods: {
-    update() {
-      api.updateDevice(this.deviceName, {
+    async update() {
+      await api.updateDevice(this.deviceName, {
         app: this.associatedTo || undefined,
         tag: this.tag || undefined
       })
+
+     this.$Notification.success('Updated settings.')
     }
   },
   async beforeMount() {
