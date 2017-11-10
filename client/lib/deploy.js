@@ -54,28 +54,27 @@ async function deploy(appYAML, files) {
   }
 
   logger.progress('generating zip file')
-  const zipImage = await zip.generateAsync({
+  const appImage = Buffer.from(await zip.generateAsync({
     type: 'arraybuffer',
     compression: 'DEFLATE',
     compressionOptions: {
       level: 9
     }
-  })
-
-  const appImage = new Blob([zipImage], { type: 'application/zip' })
+  }))
 
   logger.progress('deploying')
-  await api.deploy(appName, appImage)
+  const deployment = await api.deploy(appName, appImage)
+  logger.success(`Successfully deployed version #${deployment.version}!`)
 }
 
 async function deployAppDir(appDir) {
   const appYAML = loadAppYAML(appDir)
   let files = []
 
-  for (const path of find(appDir)) {
+  for (const filepath of find(appDir)) {
     files.push({
-      path,
-      body: fs.readFileSync(path.join(appDir, path))
+      filepath,
+      body: fs.readFileSync(path.join(appDir, filepath))
     })
   }
 
