@@ -5,15 +5,17 @@ const levels = {
   error: 1,
   warn: 2,
   progress: 3,
-  info: 4,
-  recommend: 5,
-  debug: 6
+  success: 4,
+  info: 5,
+  recommend: 6,
+  debug: 7
 }
 
 const colors = {
   error: 'red',
   warn: 'yellow',
   progress: 'blue',
+  success: 'green',
   recommend: 'yellow',
   debug: 'magenta'
 }
