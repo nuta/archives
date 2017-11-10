@@ -147,12 +147,12 @@ matrix:
 
     - language: node_js
       node_js: "8"
-      env: M=cli
+      env: M=client
       cache:
         directories:
-          - cli/node_modules
+          - client/node_modules
       install:
-        - cd cli
+        - cd client
         - yarn
       before_script:
         - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
