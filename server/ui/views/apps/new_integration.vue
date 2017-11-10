@@ -27,9 +27,8 @@
 
       <div v-if="newIntegration.service == 'ifttt'">
         <label class="uk-form-label">IFTTT Key</label>
-        <input type="text" v-model="newIntegration.ifttt_key" class="uk-input uk-form-width-large" placeholder="IFTTT Key" required>
         <div class="uk-form-controls">
-          <label>Call webhook URL when:</label>
+          <input type="text" v-model="newIntegration.ifttt_key" class="uk-input uk-form-width-large" placeholder="IFTTT Key" required>
         </div>
       </div>
 
@@ -52,14 +51,16 @@
 
     <div class="uk-margin">
       <label class="uk-form-label">Call webhook URL when:</label>
-      <p>
-        <input type="checkbox" v-model="newIntegration.on_event">
-        a device sent events
-      </p>
-      <p>
-        <input type="checkbox" v-model="newIntegration.on_device_change">
-        a device changes its state
-      </p>
+      <div class="uk-form-controls">
+        <div class="uk-form-controls">
+          <input type="checkbox" v-model="newIntegration.on_event">
+          a device sent events
+        </div>
+        <div class="uk-form-controls">
+          <input type="checkbox" v-model="newIntegration.on_device_change">
+          a device changes its state
+        </div>
+      </div>
     </div>
 
     <div class="uk-margin">
@@ -70,7 +71,7 @@
   　　  </div>
     </div>
 
-    <input type="submit" class="uk-button uk-button-primary uk-margin-xlarge-top" value="Add an integration">
+    <input type="submit" class="uk-button uk-button-primary uk-margin-small-top" value="Add an integration">
   </form>
 </app-layout>
 </template>
