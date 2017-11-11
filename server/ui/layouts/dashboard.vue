@@ -3,6 +3,7 @@
     <nav class="uk-navbar-container" uk-navbar>
       <div class="uk-navbar-left">
         <a href="/" class="uk-navbar-item uk-logo">
+          <img src="/logo.svg" class="logo">
           MakeStack
         </a>
       </div>
@@ -104,8 +105,16 @@ nav {
     font-family: Roboto;
     font-weight: 100;
 
+    .logo {
+      position: relative;
+      bottom: 5px;
+      width: 25px;
+      stroke: #fefefe !important;
+      margin-right: 5px;
+    }
+
     &:hover {
-      color: #dadada;
+      color: #fefefe;
     }
   }
 
