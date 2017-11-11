@@ -1,4 +1,5 @@
 const logger = require('./logger')
+const AppAPI = require('./api')
 const LoggingAPI = require('./logging')
 const TimerAPI = require('./timer')
 const StoreAPI = require('./store')
@@ -10,6 +11,7 @@ let builtins = {
   Timer: new TimerAPI(),
   Store: new StoreAPI(),
   Event: new EventAPI(),
+  App: new AppAPI(),
   plugin
 }
 

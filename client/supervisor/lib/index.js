@@ -36,6 +36,7 @@ class Supervisor {
     this.log = ''
     this.stores = {}
     this.adapterName = adapter.name
+    this.updateEnabled = true
 
     switch (this.adapterName) {
       case 'http':
@@ -106,17 +107,38 @@ class Supervisor {
       stdio: 'inherit'
     })
 
-    this.spawnApp(this.appDir)
+    this.spawnApp()
   }
 
-  spawnApp(appDir) {
+  spawnApp() {
     if (this.app) {
       logger.info('killing the app')
-      this.app.kill()
-    }
 
+      this.app.on('exit', () => {
+        // This callback could called after 'error' event.
+        // This guard is for preventing spawn an app twice.
+        if (!this.app) {
+          this.doSpawnApp()
+        }
+      })
+
+      this.app.on('error', () => {
+        // This callback could called after 'error' event.
+        // This guard is for preventing spawn an app twice.
+        if (!this.app) {
+          this.doSpawnApp()
+        }
+      })
+
+      this.app.kill()
+    } else {
+      this.doSpawnApp()
+    }
+  }
+
+  doSpawnApp() {
     this.app = fork('./start', [], {
-      cwd: appDir,
+      cwd: this.appDir,
       stdio: 'inherit',
       uid: this.appUID,
       gid: this.appGID,
@@ -132,6 +154,9 @@ class Supervisor {
         case 'log':
           logger.info('log:', data.body.trimRight())
           this.log += data.body
+          break
+        case 'setUpdateEnabled':
+          this.updateEnabled = (data.body !== false)
           break
         default:
           logger.info('unknown message', data.type)
@@ -396,7 +421,7 @@ class Supervisor {
       }
 
       // Update OS.
-      if (!downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
+      if (this.updateEnabled && !downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
         downloading = true
         logger.info(`updating os ${this.osVersion} -> ${messages.osVersion}`)
 
@@ -416,7 +441,7 @@ class Supervisor {
       }
 
       // Update App
-      if (!downloading && messages.appVersion && messages.appVersion !== this.appVersion) {
+      if (this.updateEnabled && !downloading && messages.appVersion && messages.appVersion !== this.appVersion) {
         downloading = true
         logger.info(`updating ${this.appVersion} -> ${messages.appVersion}`)
         this.appVersion = messages.appVersion
