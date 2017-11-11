@@ -6,7 +6,7 @@
  *
  */
 const { builtins, Driver } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime')
-const { I2C } = builtins
+const { I2C, Timer } = builtins
 const AdapterBase = require('./base')
 const logger = require('../logger')
 
@@ -131,13 +131,7 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
 
     this.i2c.write(request)
 
-    // XXX: we need lock or busywait
-    let x = 0
-    const [,start] = process.hrtime()
-    for(let i=0; i < 100000; i++) {
-        x += Math.random()
-    }
-
+    Timer.busywait(10 * 1000)
 
     // Receive a response from the module.
     let buf            = (await this.i2c.read(32))
