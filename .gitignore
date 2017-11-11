@@ -10,6 +10,7 @@ coverage
 # server
 /server/config/settings.production.yml
 /server/ui/config.js
+/server/ui/config.json
 /server/.bundle
 /server/vendor
 /server/db/*.sqlite3
