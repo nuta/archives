@@ -101,9 +101,7 @@ class Supervisor {
       stdio: 'inherit'
     })
 
-
-    console.log(fs.readdirSync(this.appDir))
-    spawnSync('unzip', ['-o', '-q', appZipPath, '-d', this.appDir], {
+    spawnSync('unzip', ['-q', appZipPath, '-d', this.appDir], {
       stdio: 'inherit'
     })
 
