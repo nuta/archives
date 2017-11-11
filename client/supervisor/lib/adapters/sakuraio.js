@@ -86,12 +86,12 @@ class SakuraIODriverBase extends Driver {
   }
 
   async isDownloadingFile() {
-    const [result,] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
+    const [result] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
     return (result !== CMD_RESULT_SUCCESS)
   }
 
   async getFileMetadata() {
-    const [result, response] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
+    const [, response] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
     const status = response.readUInt8(0)
     const size = response.readUInt32LE(1)
     const timestamp = response.readUInt32LE(5)
@@ -100,11 +100,11 @@ class SakuraIODriverBase extends Driver {
   }
 
   async getFileData(chunkSize) {
-    return await this.command(CMD_GET_FILE_DATA, Buffer.from([chunkSize]))
+    return this.command(CMD_GET_FILE_DATA, Buffer.from([chunkSize]))
   }
 
   async getFileDownloadStatus() {
-    return await this.command(0x42, Buffer.alloc(0))
+    return this.command(0x42, Buffer.alloc(0))
   }
 
   async getConnectionStatus() {
@@ -142,12 +142,12 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
 
     if (result !== CMD_RESULT_SUCCESS) {
       logger.warn(`sakura.io: module returned ${result}`)
-      return [result,]
+      return [result]
     }
 
     if (parity !== this.computeParity(result, response)) {
       logger.error('sakura.io: parity mismatch')
-      return [result,] // FIXME
+      return [result] // FIXME
     }
 
     return [result, response]
@@ -251,9 +251,9 @@ class SakuraIOAdapter extends AdapterBase {
       await delay(1000)
     }
 
-    const [,fileSize] = await this.sakuraio.getFileMetadata()
-    if (fileSize == 0) {
-        throw new Error('sakura.io: failed to download a file')
+    const [fileSize] = await this.sakuraio.getFileMetadata()
+    if (fileSize === 0) {
+      throw new Error('sakura.io: failed to download a file')
     }
 
     let appImage = Buffer.alloc(fileSize)
