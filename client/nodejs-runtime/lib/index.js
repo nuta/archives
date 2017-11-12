@@ -1,5 +1,5 @@
 const logger = require('./logger')
-const AppAPI = require('./api')
+const AppAPI = require('./app')
 const LoggingAPI = require('./logging')
 const TimerAPI = require('./timer')
 const StoreAPI = require('./store')
