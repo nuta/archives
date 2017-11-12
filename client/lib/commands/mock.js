@@ -25,6 +25,7 @@ function run(args, opts, logger) {
       name: opts.adapter,
       url: api.serverURL
     },
+    osType: 'mock',
     deviceType: mock.device_type,
     deviceId: mock.device_id,
     deviceSecret: mock.device_secret,

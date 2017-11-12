@@ -12,7 +12,7 @@ program
 program
   .command('app create', 'Create an app.')
   .argument('name', 'The app name.')
-  .option('--api <api>', 'The API.', /^linux$/, null, true)
+  .option('--api <api>', 'The API.', /^nodejs$/, null, true)
   .action(require('./commands/app').create)
 
 program

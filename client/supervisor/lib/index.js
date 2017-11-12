@@ -21,9 +21,12 @@ const SMMS_APP_IMAGE_HMAC_MSG = 0x13
 const SMMS_STORE_MSG = 0x20
 
 class Supervisor {
-  constructor({ adapter, appDir, deviceType, osVersion, deviceId, deviceSecret, debugMode, appUID, appGID }) {
+  constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
+    deviceSecret, debugMode, appUID, appGID }) {
+
     this.app = null
     this.appDir = appDir
+    this.osType = osType
     this.osVersion = osVersion
     this.debugMode = debugMode
     this.appUID = parseInt(appUID) || undefined
@@ -40,7 +43,7 @@ class Supervisor {
 
     switch (this.adapterName) {
       case 'http':
-        this.adapter = new HTTPAdapter(this.deviceId, adapter.url)
+        this.adapter = new HTTPAdapter(this.osType, this.deviceId, adapter.url)
         this.verifyHMAC = true
         this.includeHMAC = true
         this.includeDeviceId = true

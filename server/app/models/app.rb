@@ -12,7 +12,7 @@ class App < ApplicationRecord
   before_destroy :disassociate_devices
 
   RESERVED_APP_NAMES = %w(new)
-  SUPPORTED_APIS = %w(makestack linux)
+  SUPPORTED_APIS = %w(nodejs)
   APP_LOG_MAX_LINES = 512
 
   quota scope: :user_id, limit: User::APPS_MAX_NUM

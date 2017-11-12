@@ -53,7 +53,7 @@ RSpec.describe AppsController, type: :controller do
     context "with valid params" do
       it "updates the requested app" do
         app = create(:app, user: user)
-        valid = { api: "makestack" }
+        valid = { api: "nodejs" }
         put :update, params: {name: app.name, app: valid}
         app.reload
 

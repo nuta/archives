@@ -9,10 +9,10 @@ module.exports = class {
   reset() {
   }
 
-  read(address, length) {
+  read(length) {
     return Buffer.alloc(length)
   }
 
-  write(address, data) {
+  write(data) {
   }
 }

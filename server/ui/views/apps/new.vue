@@ -12,7 +12,7 @@
       <label class="uk-form-label">API</label>
         <div class="uk-form-controls uk-form-controls-text">
           <label>
-            <input type="radio" class="uk-radio" v-model="appAPI" value="linux">
+            <input type="radio" class="uk-radio" v-model="appAPI" value="nodejs">
             <b>Node.js:</b>
             A full Linux environment for super-rapid prototyping.</label>
         </div>
