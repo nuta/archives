@@ -4,6 +4,7 @@ namespace :config do
   task :generate do
     config_json = {
       RECAPTCHA_SITEKEY: ENV.fetch('RECAPTCHA_SITEKEY'),
+      WELCOME_MESSAGE: ENV.fetch('WELCOME_MESSAGE', 'This is a demonstration place to play with MakeStack.'),
       ROUTER_MODE: ENV.fetch('ROUTER_MODE', 'hash')
     }.to_json
 

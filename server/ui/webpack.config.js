@@ -56,6 +56,7 @@ module.exports = {
   plugins: [
     new DefinePlugin({
       ROUTER_MODE: JSON.stringify(config.ROUTER_MODE),
+      WELCOME_MESSAGE: JSON.stringify(config.WELCOME_MESSAGE),
       RECAPTCHA_SITEKEY: JSON.stringify(config.RECAPTCHA_SITEKEY)
     }),
     new HtmlWebpackPlugin({

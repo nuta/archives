@@ -65,6 +65,10 @@
     "GENERATE_CONFIG_FROM_ENV": {
       "description": "Generate config files during deployment. Leave this parameter alone.",
       "value": "1"
+    },
+    "WELCOME_MESSAGE": {
+      "description": "A description in the top page.",
+      "value": "This is a demonstration place to play with MakeStack."
     }
   }
 }
