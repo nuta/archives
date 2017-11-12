@@ -35,8 +35,18 @@
 
     <div class="uk-text-center">
       <input type="submit" value="Create Account" class="uk-button uk-button-primary uk-margin-large-top">
-      <p>By clicking "Create Account", you agree to our <a href="/term-of-service">Term of Service</a>
-      and <a href="/privacy-policy">Privacy Policy</a>.</p>
+      <p class="uk-text-small uk-text-bold">By clicking "Create Account", you agree to our Term of Service and Privacy Policy.</p>
+    </div>
+
+    <div class="uk-margin">
+      <details>
+        <summary>Term of Service</summary>
+        <pre>{{ termOfService }}</pre>
+      </details>
+      <details>
+        <summary>Privacy Policy</summary>
+        <pre>{{ privacyPolicy }}</pre>
+      </details>
     </div>
   </form>
 </wizard-layout>
@@ -51,6 +61,8 @@ export default {
   components: { WizardLayout },
   data: () => {
     return {
+      termOfService: TERM_OF_SERVICE,
+      privacyPolicy: PRIVACY_POLICY,
       username: "",
       email: "",
       password: "",
@@ -89,3 +101,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+pre {
+  white-space: pre-wrap;
+}
+</style>
