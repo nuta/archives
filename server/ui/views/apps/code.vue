@@ -7,7 +7,7 @@
         <div>
           <label class="uk-form-label">Edit</label>
           <div class="uk-from-controls">
-            <button v-on:click="save" class="uk-button uk-button-small uk-button-default">
+            <button v-on:click="saveAll" class="uk-button uk-button-small uk-button-default">
               <i class="fa fa-upload" aria-hidden="true"></i>
               {{ saveButton }}
             </button>
@@ -136,6 +136,7 @@ export default {
       loading: true,
       devices: [],
       files: [],
+      prevFileContents: {},
       autosaveAfter: 1000,
       deployButton: "Deploy",
       saveButton: "Save",
@@ -172,15 +173,17 @@ export default {
 
       const id = `editor${this.files.length}`
       const path = this.newFileName
+      const body = ''
 
       this.files.push({
         id,
         path,
-        body: '',
+        body,
         editing: false
       })
 
       this.newFileName = ''
+      this.prevFileContents[path] = body
 
       this.$nextTick(() => {
         this.addEditor(id, path, '')
@@ -301,12 +304,13 @@ export default {
       this.logOutput(`Deployed #${r.version}, took ${took} seconds`)
       setTimeout(() => { this.deployButton = "Deploy"; }, 1500);
     },
-    async save() {
+    async saveAll() {
       for (const file of this.files) {
-        let body = ace.edit(file.id).getValue();
-        this.saveButton = "doing";
+        let body = ace.edit(file.id).getValue()
+        this.saveButton = "Saving"
         await api.saveFile(this.appName, file.path, body)
-        this.saveButton = "done"
+        this.prevFileContents[file.path] = body
+        this.saveButton = "Done"
         setTimeout(() => { this.saveButton = "Save" }, 1500)
       }
     },
@@ -337,6 +341,7 @@ export default {
   },
   async beforeMount() {
     this.files = (await api.getFiles(this.appName)).map((file, i) => {
+      this.prevFileContents[file.path] = file.body
       return {
         id: `editor${i}`,
         path: file.path,
@@ -356,7 +361,16 @@ export default {
     })
   },
   mounted() {
-    // TODO: autosave
+    // autosave
+    setInterval(() => {
+      for (const file of this.files) {
+        let body = ace.edit(file.id).getValue()
+        if (body !== this.prevFileContents[file.path]) {
+          this.saveAll()
+          return
+        }
+      }
+    }, 3000)
   }
 };
 </script>
