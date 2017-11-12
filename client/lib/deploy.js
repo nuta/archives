@@ -28,6 +28,7 @@ async function deploy(appYAML, files) {
   const appName = appYAML.name
   let runtime = 'nodejs-runtime'
   let plugins = appYAML.plugins || []
+  plugins = plugins.map(pluginName => `nodejs-${pluginName}`)
   let zip = new JSZip()
 
   // Download the runtime.
@@ -35,10 +36,10 @@ async function deploy(appYAML, files) {
 
   // Populate plugin files.
   for (const pluginName of plugins) {
-    zip = await downloadAndExtractPackage(pluginName, zip, `plugins/${pluginName}`)
-    zip.file(path.join(`plugins/${pluginName}/package.json`, JSON.stringify({
-      private: true
-    })))
+    if (!zip.files[`plugins/${pluginName}/package.json`]) {
+      zip.file(`plugins/${pluginName}/package.json`,
+        JSON.stringify({ name: pluginName, private: true }))
+    }
   }
 
   // Copy start.js to the top level.

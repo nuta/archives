@@ -126,6 +126,7 @@ import AppLayout from "layouts/app"
 import 'whatwg-fetch'
 const Cookies = require('js-cookie')
 const JSZip = require('jszip')
+const yaml = require('js-yaml')
 
 export default {
   components: { AppLayout, RemoteContent },
@@ -212,17 +213,21 @@ export default {
         }).catch(reject)
       })
     },
-    async downloadPlugin(name) {
-      if (name !== 'nodejs-runtime') {
-        throw new Error('third-party plugin not supproted yet')
-      }
-
-      const pluginURL = '/api/v1/plugins/_/_/nodejs-runtime'
-      return (await fetch(pluginURL)).blob()
+    loadAppYAML() {
+      const appYAML = this.files.filter(file => file.path === 'app.yaml')[0]
+      return (appYAML) ?  yaml.safeLoad(appYAML.body) : {}
     },
-    async mergeZipFiles(pluginName, destZip, srcZip) {
+    async downloadAndExtractPackage(name, zip, basepath) {
+      this.logOutput(`Downloading \`${name}'`)
+      const pluginZip = await api.downloadPlugin(name)
+
+      this.logOutput(`Extracting \`${name}'`)
+      zip = await this.mergeZipFiles(basepath, zip, await (new JSZip()).loadAsync(pluginZip))
+      return zip
+    },
+    async mergeZipFiles(basepath, destZip, srcZip) {
       for (const filepath in srcZip.files) {
-        destZip.file(`node_modules/${pluginName}/${filepath}`,
+        destZip.file(`${basepath}/${filepath}`,
           srcZip.files[filepath].async('arraybuffer'))
       }
 
@@ -230,23 +235,25 @@ export default {
     },
     async buildApp (files) {
       let runtime = 'nodejs-runtime'
-      let plugins = [runtime]
+      let plugins = this.loadAppYAML().plugins || []
+      plugins = plugins.map(pluginName => `nodejs-${pluginName}`)
       let zip = new JSZip()
+
+      // Download the runtime.
+      zip = await this.downloadAndExtractPackage(runtime, zip, `node_modules/${runtime}`)
 
       // Populate plugin files.
       for (const pluginName of plugins) {
-        this.logOutput(`Downloading a plugin \`${pluginName}'`)
-        const pluginZip = await this.downloadPlugin(pluginName)
-        zip = await this.mergeZipFiles(pluginName, zip, await (new JSZip()).loadAsync(pluginZip))
+        zip = await this.downloadAndExtractPackage(pluginName, zip, `plugins/${pluginName}`)
+        if (!zip.files[`plugins/${pluginName}/package.json`]) {
+          zip.file(`plugins/${pluginName}/package.json`,
+            JSON.stringify({ name: pluginName, private: true }))
+        }
       }
 
       // Copy start.js to the top level.
-      const startJsRelPath = `node_modules/${runtime}/start.js`
-      if (!zip.files[startJsRelPath]) {
-        throw new Error(`runtime start.js not found`)
-      }
-
       this.logOutput(`Copying start.js from \`${runtime}'`)
+      const startJsRelPath = `node_modules/${runtime}/start.js`
       zip.file('start.js', zip.files[startJsRelPath].async('arraybuffer'))
 
       // Copy app files.

@@ -156,10 +156,14 @@ class API {
   }
 
   downloadPlugin(name) {
-    if (name !== 'nodejs-runtime') {
-      throw new Error('third-party plugin is not supported yet')
+    let repo
+    if (name.includes('/')) {
+      // A third-party plugin on GitHub.
+      repo = name
+      name = 'nodejs-' + name.split('/').pop()
+    } else {
+      repo = '_/_'
     }
-    const repo = '_/_'
 
     return new Promise((resolve, reject) => {
       fetch(`${this.serverURL}/api/v1/plugins/${repo}/${name}`).then(response => {
