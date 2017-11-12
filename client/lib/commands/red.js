@@ -7,14 +7,17 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const proxy = require('http-proxy-middleware')
 const supervisor = require('supervisor')
+const JSZip = require('jszip')
 const { fork, spawnSync } = require('child_process')
-const { mkdirp } = require('../helpers')
 const api = require('../api')
 const { deploy } = require('../deploy')
 const { loadAppYAML } = require('../appdir')
+const { mkdirp, createFile } = require('../helpers')
 
 const NODE_RED_USER_DIR = path.resolve(os.homedir(), '.makestack/node-red')
 const NODE_RED_DIR = path.resolve(os.homedir(), '.makestack/node-red/node-red')
+const NODE_RED_USER_NODES_DIR = path.resolve(os.homedir(), '.makestack/node-red/nodes')
+const NODE_RED_USER_TRANSPILERS_DIR = path.resolve(os.homedir(), '.makestack/node-red/transpilers')
 const NODE_RED_URL = 'https://github.com/node-red/node-red/archive/0.17.5.tar.gz'
 const NODE_RED_PORT = 1880
 const NODE_RED_SETTINGS = `
@@ -22,7 +25,7 @@ module.exports = {
   uiPort: ${NODE_RED_PORT},
   uiHost: "127.0.0.1",
   debugMaxLength: 1000,
-  nodesDir: "${path.resolve(NODE_RED_USER_DIR, 'nodes')}",
+  nodesDir: "${NODE_RED_USER_NODES_DIR}",
   coreNodesDir: "${path.resolve(__dirname, '../red/nodes')}",
   logging: {
     console: {
@@ -84,10 +87,17 @@ function loadFlows(nodeRedJSON) {
 }
 
 function loadTranspilers() {
-  const transiplerNames = ['inject', 'log', 'function', 'gpio-in', 'gpio-out'] // TODO: autoload
   const transpilers = []
-  for (const name of transiplerNames) {
-    transpilers[name] = require(`../red/transpilers/${name}`)
+
+  // Official nodes.
+  const officialTranspilersDir = path.resolve(__dirname, '../red/transpilers')
+  for (const filename of fs.readdirSync(officialTranspilersDir)) {
+    transpilers[path.parse(filename).name] = require(`${officialTranspilersDir}/${filename}`)
+  }
+
+  // Plugin nodes.
+  for (const filename of fs.readdirSync(NODE_RED_USER_TRANSPILERS_DIR)) {
+    transpilers[path.parse(filename).name] = require(path.join(NODE_RED_USER_TRANSPILERS_DIR, filename))
   }
 
   return transpilers
@@ -100,6 +110,8 @@ function generateNodeId(id) {
 
 function transpile(flows) {
   const transpilers = loadTranspilers()
+  const loadedModules = ['events']
+  const loadedPlugins = []
 
   console.log(require('util').inspect(flows, false, 8))
 
@@ -125,10 +137,25 @@ function transpile(flows) {
 
     const nodeId = generateNodeId(flow.id)
     flow.nodeId = nodeId
-    const { type: nodeType, init, oninput } = transpilers[flow.type](flow)
+    const { type: nodeType, init, oninput, modules, plugins } = transpilers[flow.type](flow)
     const outputs = JSON.stringify(flow.wires.map(wire => wire.map(generateNodeId)))
 
-    let nodeCode = `
+    let nodeCode = ''
+    for (const moduleName of modules || []) {
+      if (!(moduleName in loadedModules)) {
+        nodeCode += `const ${moduleName} = require('${moduleName}')`
+        loadedModules.push(moduleName)
+      }
+    }
+
+    for (const pluginName of plugins || []) {
+      if (!(pluginName in loadedPlugins)) {
+        nodeCode += `const ${pluginName} = plugin('${pluginName}')`
+        loadedPlugins.push(pluginName)
+      }
+    }
+
+    nodeCode += `
       const ev_${nodeId} = new EventEmitter()
       __nodes__['${nodeId}'] = {
         ev: ev_${nodeId},
@@ -211,18 +238,36 @@ function streamAppLog(appName, nodeRedProcess) {
   })
 }
 
-module.exports = (args, opts, logger) => {
+module.exports = async (args, opts, logger) => {
   if (opts.dev) {
     const argv = process.argv.slice(1).filter(arg => arg !== '--dev')
 
     supervisor.run(['-w', path.resolve(__dirname, '../../lib') + ',' +
-      path.resolve(NODE_RED_USER_DIR, '.makestack/node-red'), '-e', 'js,html', '--',
-      ...argv])
+      path.resolve(NODE_RED_USER_DIR, '.makestack/node-red') + ',' +
+      path.resolve(__dirname, '../../../plugins'),
+      '-e', 'js,html', '--', ...argv])
     return
   }
 
-  // Ensure that the directory specified by opts.appDir is a MakeStack app.
   const appYAML = loadAppYAML(opts.appDir)
+
+  // Download plugins.
+  mkdirp(NODE_RED_USER_NODES_DIR)
+  mkdirp(NODE_RED_USER_TRANSPILERS_DIR)
+  for (const pluginName of appYAML.plugins || []) {
+    const pluginZip = await (new JSZip()).loadAsync(await api.downloadPlugin(`nodejs-${pluginName}`))
+    for (const filepath in pluginZip.files) {
+      if (filepath.startsWith('red/nodes/')) {
+        createFile(`${NODE_RED_USER_NODES_DIR}/${path.basename(filepath)}`,
+          await pluginZip.files[filepath].async('string'))
+      }
+
+      if (filepath.startsWith('red/transpilers/')) {
+        createFile(`${NODE_RED_USER_TRANSPILERS_DIR}/${path.basename(filepath)}`,
+          await pluginZip.files[filepath].async('string'))
+      }
+    }
+  }
 
   const nodeRedJSON = path.resolve(opts.appDir, 'red.json')
   if (!fs.existsSync(nodeRedJSON)) {

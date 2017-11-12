@@ -36,6 +36,7 @@ async function deploy(appYAML, files) {
 
   // Populate plugin files.
   for (const pluginName of plugins) {
+    zip = await downloadAndExtractPackage(pluginName, zip, `plugins/${pluginName}`)
     if (!zip.files[`plugins/${pluginName}/package.json`]) {
       zip.file(`plugins/${pluginName}/package.json`,
         JSON.stringify({ name: pluginName, private: true }))
