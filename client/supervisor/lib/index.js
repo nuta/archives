@@ -93,7 +93,7 @@ class Supervisor {
     const appZipPath = path.join(os.tmpdir(), 'app.zip')
 
     fs.writeFileSync(appZipPath, appZip)
-    spawnSync('rm', ['-rf', path.join(this.appDir, '*')], {
+    spawnSync('rm', ['-rf', path.join(this.appDir)], {
       stdio: 'inherit'
     })
 
