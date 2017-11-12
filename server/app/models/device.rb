@@ -5,7 +5,6 @@ class Device < ApplicationRecord
   belongs_to :user
   belongs_to :app, optional: true
   has_many :stores, as: :owner, dependent: :destroy
-  has_many :device_mappings, dependent: :destroy
 
   value :status, expiration: 45.minutes
   value :debug_mode, expiration: 45.minutes

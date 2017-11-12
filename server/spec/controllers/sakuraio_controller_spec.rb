@@ -45,10 +45,7 @@ EOS
       let!(:user) { create(:user) }
       let!(:app) { create(:app, user: user) }
       let!(:deployment) { create(:deployment, app: app) }
-      let!(:device) { create(:device, user: user, app: app) }
-      let!(:device_mapping) {
-        create(:device_mapping, device: device, token: token, token_type: 'sakuraio')
-      }
+      let!(:device) { create(:device, user: user, app: app, sakuraio_module_token: token) }
       let!(:integration) {
         create(:integration, app: app, service: 'sakuraio',
           config: '{"incoming_webhook_token": "abc"}')
