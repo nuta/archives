@@ -11,7 +11,7 @@ const AdapterBase = require('./base')
 const logger = require('../logger')
 
 // 1 - 19999 are reserved for OS images.
-const APP_IMAGE_FILEID_OFFSET = 0 //FIXME 20000
+const APP_IMAGE_FILEID = 1
 // sakura.io allows to send 16 channels at a time. 16th one is used
 // for CHANNEL_COMMIT.
 const CHANNELS_MAX = 15
@@ -154,10 +154,6 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
   }
 }
 
-function delay(msec) {
-  return new Promise((resolve, reject) => setTimeout(resolve, msec))
-}
-
 class SakuraIOAdapter extends AdapterBase {
   constructor(i2c) {
     super()
@@ -173,7 +169,7 @@ class SakuraIOAdapter extends AdapterBase {
         break
       }
 
-      await delay(1000)
+      await Timer.sleep(1000)
     }
 
     logger.debug('sakuraio: connected!')
@@ -233,25 +229,25 @@ class SakuraIOAdapter extends AdapterBase {
     this.sakuraio.flushTx()
   }
 
-  send(payload) {
+  async send(payload) {
     this.doSend(payload)
     this.receive()
   }
 
   async getAppImage(version) {
     logger.info('sakura.io: requesting a file download....')
-    this.sakuraio.requestFileDownload(APP_IMAGE_FILEID_OFFSET + version)
+    await this.sakuraio.requestFileDownload(APP_IMAGE_FILEID)
 
     // Wait until the module finish downloading the app image file.
     while (true) {
-      if (!await this.sakuraio.isDownloadingFile()) {
+      if (!(await this.sakuraio.isDownloadingFile())) {
         break
       }
 
-      await delay(1000)
+      await Timer.sleep(1000)
     }
 
-    const [fileSize] = await this.sakuraio.getFileMetadata()
+    const [, fileSize] = await this.sakuraio.getFileMetadata()
     if (fileSize === 0) {
       throw new Error('sakura.io: failed to download a file')
     }
@@ -262,13 +258,13 @@ class SakuraIOAdapter extends AdapterBase {
       const [result, data] = await this.sakuraio.getFileData(FILE_CHUNK_SIZE)
       if (result !== CMD_RESULT_SUCCESS) {
         logger.debug('sakura.io: getFileData returned an error, retrying in 500 msec....')
-        await delay(500)
+        await Timer.sleep(500)
         continue
       }
 
       data.copy(appImage, offset)
       offset += data.length
-      const perc = (offset / fileSize) * 100
+      const perc = ((offset / fileSize) * 100).toFixed(2)
       logger.debug(`sakura.io: received ${offset} bytes ${perc}%`)
     }
 
