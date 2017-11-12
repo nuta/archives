@@ -42,6 +42,6 @@ class DevicesController < ApplicationController
   end
 
   def device_params
-    params.require(:device).permit(:name, :tag, :device_type)
+    params.require(:device).permit(:name, :tag, :device_type, :sakuraio_module_token)
   end
 end

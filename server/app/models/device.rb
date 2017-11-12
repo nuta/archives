@@ -111,7 +111,6 @@ class Device < ApplicationRecord
       .last
   end
 
-
   def app_image(version)
     return nil unless self.app
 

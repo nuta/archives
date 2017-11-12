@@ -31,19 +31,23 @@
           </td>
 
           <td v-if="integration.service == 'incoming_webhook'">
-            {{ integration.incoming_webhook_token }}
+            <code>{{ integration.incoming_webhook_token }}</code>
           </td>
 
           <td v-if="integration.service == 'ifttt'">
-            {{ integration.ifttt_key }}
+            <code>{{ integration.ifttt_key }}</code>
           </td>
 
           <td v-if="integration.service == 'slack'">
-            {{ integration.slack_webhook_url }}
+            <code>{{ integration.slack_webhook_url }}</code>
+          </td>
+
+          <td v-if="integration.service == 'sakuraio'">
+            <code>{{ integration.incoming_webhook_token }}</code> (Incoming Webhook)
           </td>
 
           <td v-if="integration.service == 'datadog'">
-            {{ integration.datadog_api_key }}
+            <code>{{ integration.datadog_api_key }}</code>
           </td>
           <td class="actions">
             <button v-on:click="remove(integration)" class="uk-button uk-button-danger">

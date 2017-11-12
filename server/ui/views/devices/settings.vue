@@ -22,6 +22,13 @@
         </div>
       </div>
 
+      <div class="uk-margin">
+        <label class="uk-form-label">sakura.io integration</label>
+        <div class="uk-form-controls">
+          <input type="text" v-model="sakuraio_module_token" class="uk-input" placeholder="The sakura.io communication module ID.">
+        </div>
+      </div>
+
       <input type="submit" value="Save" class="uk-button uk-button-primary uk-align-right">
     </form>
   </remote-content>
@@ -42,6 +49,7 @@ export default {
       apps: [],
       associatedTo: '',
       tag: '',
+      sakuraio_module_token: '',
       loading: true
     }
   },
@@ -49,7 +57,8 @@ export default {
     async update() {
       await api.updateDevice(this.deviceName, {
         app: this.associatedTo || undefined,
-        tag: this.tag || undefined
+        tag: this.tag || undefined,
+        sakuraio_module_token: this.sakuraio_module_token || undefined
       })
 
      this.$Notification.success('Updated settings.')
@@ -59,6 +68,7 @@ export default {
     this.device = await api.getDevice(this.deviceName)
     this.apps = await api.getApps()
     this.associatedTo = this.device.app || ''
+    this.sakuraio_module_token = this.device.sakuraio_module_token || ''
 
     this.loading = false
     this.$Progress.finish()

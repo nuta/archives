@@ -10,7 +10,7 @@ RSpec.describe Device, type: :model do
 
   describe 'destroy' do
     subject { create(:device) }
-    it_should_behave_like 'a removable model', [Store, DeviceMapping]
+    it_should_behave_like 'a removable model', [Store]
   end
 
   describe 'validations' do

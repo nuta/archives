@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171108035615) do
+ActiveRecord::Schema.define(version: 20171112054446) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(version: 20171108035615) do
     t.bigint "app_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "sakuraio_module_token"
     t.index ["app_id"], name: "index_devices_on_app_id"
     t.index ["device_id_prefix"], name: "index_devices_on_device_id_prefix", unique: true
     t.index ["user_id", "name"], name: "index_devices_on_user_id_and_name", unique: true

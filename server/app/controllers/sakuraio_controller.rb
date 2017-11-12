@@ -32,12 +32,15 @@ class SakuraioController < ApplicationController
     SMMSService.receive(payload, hmac_enabled: false, device_id: @device.device_id)
 
     resp = SMMSService.payload_for(@device, include_hmac: false)
-    PushToSakuraioJob.perform_now(webhook_token: @webhook_token, module_id: @mapping.token, payload: resp)
+    PushToSakuraioJob.perform_now(
+      webhook_token: @webhook_token,
+      module_id: @device.sakuraio_module_token,
+      payload: resp
+    )
   end
 
   def set_device
-    @mapping ||= DeviceMapping.where(token_type: 'sakuraio', token: params[:module]).first!
-    @device ||= @mapping.device
+    @device ||= Device.find_by_sakuraio_module_token!(params[:module])
   end
 
   def set_webhook_token
