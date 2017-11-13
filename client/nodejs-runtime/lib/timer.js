@@ -1,5 +1,5 @@
 class TimerAPI {
-  loop(interval, callback) {
+  interval(interval, callback) {
     setInterval(callback, interval * 1000)
   }
 
