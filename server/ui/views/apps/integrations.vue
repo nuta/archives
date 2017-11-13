@@ -43,7 +43,7 @@
           </td>
 
           <td v-if="integration.service == 'sakuraio'">
-            <code>{{ integration.incoming_webhook_token }}</code> (Incoming Webhook)
+            <code>{{ integration.sakuraio_incoming_webhook_token }}</code> (Incoming Webhook)
           </td>
 
           <td v-if="integration.service == 'datadog'">
@@ -89,6 +89,7 @@ export default {
         comment: integration.comment,
         webhook_url: config.webhook_url,
         incoming_webhook_token: integration.token,
+        sakuraio_incoming_webhook_token: config.incoming_webhook_token,
         slack_webhook_url: config.webhook_url,
         ifttt_key: config.key,
         datadog_api_key: config.api_key,

@@ -47,6 +47,14 @@
            class="uk-input uk-form-width-large" placeholder="Datadog API Key" required>
         </div>
       </div>
+
+      <div v-if="newIntegration.service == 'sakuraio'">
+        <label class="uk-form-label">sakura.io Incoming Webhook Token</label>
+        <div class="uk-form-controls">
+          <input type="text" v-model="newIntegration.sakuraio_incoming_webhook_token"
+           class="uk-input uk-form-width-large" placeholder="aaaaaaaa-1111-2222-3333-abcdef1234567" required>
+        </div>
+      </div>
     </div>
 
     <div class="uk-margin">
@@ -90,13 +98,15 @@ export default {
         ifttt: "IFTTT",
         slack: "Slack",
         datadog: "Datadog",
-        incoming_webhook: "Incoming Webhook"
+        incoming_webhook: "Incoming Webhook",
+        sakuraio: "sakura.io"
       },
       newIntegration: {
         service: "outgoing_webhook",
         comment: "",
         webhook_url: "",
         incoming_webhook_token: "",
+        sakuraio_incoming_webhook_token: "",
         slack_webhook_url: "",
         datadog_api_key: "",
         ifttt_key: "",
@@ -129,6 +139,10 @@ export default {
           config['api_key'] = form.datadog_api_key
           break
 
+        case "sakuraio":
+          config['incoming_webhook_token'] = form.sakuraio_incoming_webhook_token
+          break
+
         case "incoming_webhook":
           break
       }
@@ -146,6 +160,9 @@ export default {
       this.$Notification.success('Created a new integration.')
       this.$router.push({ name: 'integrations', params: { appName: this.appName } })
     },
+  },
+  mounted() {
+    this.$Progress.finish()
   }
 };
 </script>
