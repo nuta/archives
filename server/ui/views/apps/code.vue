@@ -7,7 +7,7 @@
         <div>
           <label class="uk-form-label">Edit</label>
           <div class="uk-from-controls">
-            <button v-on:click="saveAll" class="uk-button uk-button-small uk-button-default">
+            <button v-on:click="saveAll" class="save-button uk-button uk-button-small uk-button-default">
               <i class="fa fa-upload" aria-hidden="true"></i>
               {{ saveButton }}
             </button>
@@ -33,7 +33,7 @@
               <option>associated devices</option>
             </select>
 
-            <button v-on:click="deploy" class="uk-button uk-button-small uk-button-primary">
+            <button v-on:click="deploy" class="deploy-button uk-button uk-button-small uk-button-primary">
               <i class="fa fa-rocket" aria-hidden="true"></i>
               {{ deployButton }}
             </button>
@@ -467,6 +467,10 @@ $editor-border-color: #a6a6ac;
 }
 
 .save-button {
+  width: 100px;
+}
+
+.deploy-button {
   width: 120px;
 }
 </style>
