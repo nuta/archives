@@ -36,7 +36,12 @@ mount $root /boot
 
 . /boot/config.sh
 hostname makestack-linux
-apparmor_parser -r /etc/apparmor.d/*
+
+if [ "$DISABLE_APPARMOR" = "yes" ]; then
+  apparmor_parser -C -r /etc/apparmor.d/*
+else
+  apparmor_parser -r /etc/apparmor.d/*
+fi
 
 ntpd -p 1.pool.ntp.org
 
