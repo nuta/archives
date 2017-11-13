@@ -1,31 +1,29 @@
 module.exports = class {
   constructor() {
     this.stores = {}
+    this.onChangeCallbacks = {}
   }
 
-  onchange(key, callback) {
-    if (key in this.stores) {
-      this.stores[key].onchangeCallbacks = callback
+  onChange(key, callback) {
+    if (this.stores[key] !== undefined) {
+      callback(this.stores[key])
+    }
+
+    if (key in this.onChangeCallbacks) {
+      this.onChangeCallbacks[key].push(callback)
     } else {
-      this.stores[key] = {
-        value: null,
-        onchangeCallbacks: []
-      }
+      this.onChangeCallbacks[key] = [callback]
     }
   }
 
   update(newStores) {
-    for (let key in newStores) {
-      let newValue = newStores[key]
-      let store = this.stores[key]
-      if (!store) { continue }
+    for (const key in newStores) {
+      const oldValue = this.stores[key]
+      const newValue = newStores[key]
+      this.stores[key] = newValue
 
-      let oldValue = store.value
-      store.value = newValue
-
-      if (oldValue != null && oldValue !== newValue) {
-        let callbacks = store.onchangeCallbacks
-        for (const callback of callbacks) {
+      if (this.onChangeCallbacks[key] && oldValue !== newValue) {
+        for (const callback of this.onChangeCallbacks[key]) {
           callback(newValue)
         }
       }
