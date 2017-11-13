@@ -9,7 +9,6 @@ const { createFile, generateTempPath,
   generateRandomString } = require('./helpers')
 const api = require('./api')
 const { getDriveSize } = require('./drive')
-const { getLatestGitHubRelease } = require('./github_releases')
 
 function replaceBuffer(buf, value, id) {
   const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`
@@ -43,9 +42,18 @@ async function registerOrGetDevice(name, type, ignoreDuplication) {
   return device
 }
 
+function getLatestOSRelease(osType, deviceType) {
+  return new Promise((resolve, reject) => {
+    api.getOSReleases().then(({ releases }) => {
+      const version = Object.keys(releases).pop()
+      const osImageURL = releases[version][osType]['assets'][deviceType]['url']
+      resolve({ version, osImageURL })
+    }).catch(reject)
+  })
+}
+
 async function downloadDiskImage(osType, deviceType) {
-  const [version, osImageURL] = await getLatestGitHubRelease('seiyanuta/makestack',
-    `makestack-${osType}-`, `${deviceType}.img`)
+  const { version, osImageURL } = await getLatestOSRelease(osType, deviceType)
   const basename = path.basename(osImageURL)
   const orignalImage = path.join(process.env.HOME, `.makestack/caches/${basename}`)
   createFile(orignalImage, await (await fetch(osImageURL)).buffer())

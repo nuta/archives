@@ -186,6 +186,10 @@ class API {
       lastFetchedAt = new Date()
     }, 5000)
   }
+
+  getOSReleases() {
+    return this.invoke('GET', '/os/releases')
+  }
 }
 
 module.exports = new API()
