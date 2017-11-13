@@ -1,6 +1,6 @@
 module.exports = class {
   print(message) {
-    process.send({ type: 'log', body: message + '\n' })
+    process.send({ type: 'log', body: message })
   }
 
   error(message) {

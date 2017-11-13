@@ -155,7 +155,7 @@ class Supervisor {
       switch (data.type) {
         case 'log':
           logger.info('log:', data.body.trimRight())
-          this.log += data.body
+          this.log += data.trimRight() + '\n'
           break
         case 'setUpdateEnabled':
           this.updateEnabled = (data.body !== false)
