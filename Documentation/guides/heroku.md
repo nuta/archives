@@ -75,9 +75,9 @@ Configuration (Heroku)
 ```bash
 cd path/to/makestack
 heroku addons:create heroku-redis:hobby-dev
-heroku buildpacks:set https://github.com/seiyanuta/buildpack-makestack.git
-heroku buildpacks:set heroku/nodejs
-heroku buildpacks:set heroku/ruby
+heroku buildpacks:set --index 1 https://github.com/seiyanuta/makestack-on-heroku.git
+heroku buildpacks:set --index 2 heroku/nodejs
+heroku buildpacks:set --index 3 heroku/ruby
 ```
 
 Deploy to Heroku
