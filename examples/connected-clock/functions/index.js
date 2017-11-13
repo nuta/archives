@@ -10,11 +10,17 @@ function padStart(str, n, fill) {
 }
 
 exports.webhook = functions.https.onRequest((req, res) => {
-  let now = new Date()
-  let hours = padStart(now.getHours().toString(), 2, '0')
-  let mins = padStart(now.getMinutes().toString(), 2, '0')
-  let secs = padStart(now.getSeconds().toString(), 2, '0')
+  const sensorData = Math.floor(req.body.body)
+  const event = req.body.event
+  const now = new Date()
+  const hours = padStart(now.getHours().toString(), 2, '0')
+  const mins = padStart(now.getMinutes().toString(), 2, '0')
 
-  let message = `${hours}:${mins}:${secs}`
-  res.send(JSON.stringify({ stores: { message } }))
+  let messages = JSON.stringify([
+    `${hours}:${mins}`,
+    `${event === 't' ? 'temperature' : 'humidity'} ${sensorData}`,
+    `weather: i duuno`
+  ])
+
+  res.send(JSON.stringify({ stores: { messages } }))
 })
