@@ -1,0 +1,46 @@
+#!/bin/sh
+set -ue
+[ "$1" = "" ] && echo "Usage: $0 version" && exit 1
+
+VERSION=$1
+DIST_DIR=$(realpath dist)
+
+mkdir -p $DIST_DIR
+
+echo "==> Packaging client..."
+npm pack client
+mv client-*.tgz $DIST_DIR/makestack-client-$VERSION.tar.gz
+
+echo "==> Packaging installer..."
+cd installer
+yarn build:macos
+yarn build:linux
+
+pushd builds/makestack-installer-darwin-x64
+zip -r $DIST_DIR/makestack-installer-macos.zip makestack-installer.app
+popd
+
+pushd builds
+tar Jcf $DIST_DIR/makestack-installer-linux-x64.tar.xz makestack-installer-linux-x64
+popd
+
+yarn build:linux
+cd ..
+
+echo "==> Packaging Plugins..."
+for plugin in plugins/*; do
+  ./client/bin/makestack build-plugin $plugin $DIST_DIR/$(basename $plugin)-$VERSION.zip
+echo
+done
+
+echo "==> Building linux..."
+cd linux
+for target in raspberrypi3; do
+  mkdir -p $DIST_DIR/linux/$target
+  rm -rf build/client
+  mkdir -p build/client
+  cp -r ../client/nodejs-runtime build/client/nodejs-runtime
+  cp -r ../client/supervisor build/client/supervisor
+  docker build -t makestck/pkgbuilder .
+  docker run --rm -e TARGET=$target -v $DIST_DIR/linux/$target:/dist -t makestck/pkgbuilder
+done
