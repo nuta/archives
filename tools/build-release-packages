@@ -17,14 +17,13 @@ yarn build:macos
 yarn build:linux
 
 pushd builds/makestack-installer-darwin-x64
-zip -r $DIST_DIR/makestack-installer-macos.zip makestack-installer.app
+zip -r $DIST_DIR/makestack-installer-$VERSION-macos.zip makestack-installer.app
 popd
 
 pushd builds
-tar Jcf $DIST_DIR/makestack-installer-linux-x64.tar.xz makestack-installer-linux-x64
+tar Jcf $DIST_DIR/makestack-installer-$VERSION-linux-x64.tar.xz makestack-installer-linux-x64
 popd
 
-yarn build:linux
 cd ..
 
 echo "==> Packaging Plugins..."
@@ -43,4 +42,6 @@ for target in raspberrypi3; do
   cp -r ../client/supervisor build/client/supervisor
   docker build -t makestck/pkgbuilder .
   docker run --rm -e TARGET=$target -v $DIST_DIR/linux/$target:/dist -t makestck/pkgbuilder
+  mv $DIST_DIR/linux/$target/makestack-linux-$target.img $DIST_DIR/makestack-linux-$VERSION-$target.img
+  rm -rf $DIST_DIR/linux
 done
