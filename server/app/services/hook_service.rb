@@ -7,7 +7,6 @@ module HookService
       case hook
       when :event_published
         handle_event_published(integrations, model, options)
-      end
       when :command_invoked
         handle_command_invoked(integrations, model, options)
       end
@@ -27,7 +26,7 @@ module HookService
       when 'outgoing_webhook'
         CallOutgoingWebhookJob.perform_later(
           url: config['webhook_url'],
-          body: { type: 'command_invoked', device: device.name, event: event, body: body },
+          body: { type: 'event_published', device: device.name, event: event, body: body },
           accept_stores: true,
           device: device
         )
