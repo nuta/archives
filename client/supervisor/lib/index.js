@@ -321,7 +321,7 @@ class Supervisor {
             messages.stores = {}
           }
 
-          messages.stores[key] = value
+          messages.stores[key.toString('utf-8')] = value.toString('utf-8')
           break
         }
         case SMMS_OS_VERSION_MSG:
