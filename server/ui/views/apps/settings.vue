@@ -14,8 +14,8 @@
         <div class="uk-form-controls">
           <select v-model="osVersion" class="uk-select">
             <template v-for="(release, version) in osReleases">
-              <template v-if="appAPI in release">
-                <option :value="version">{{ release[appAPI].title }}</option>
+              <template v-for="(asset, os) in release">
+                <option :value="version">{{ asset.title }}</option>
               </template>
             </template>
           </select>
