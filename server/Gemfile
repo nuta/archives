@@ -27,8 +27,6 @@ group :development, :test do
   gem 'active_record_query_trace'
   gem 'ffaker', require: false
   gem 'factory_bot_rails', require: false
-  gem 'jekyll', require: false
-  gem 'rouge', require: false
   gem 'guard-rspec', require: false
 end
 

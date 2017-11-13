@@ -1,5 +1,0 @@
----
-layout: documentation
----
-
-Hello!

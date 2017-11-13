@@ -23,11 +23,6 @@ coverage
 /server/public/documentation
 !/server/public/documentation/.gitkeep
 
-# server/static
-.jekyll-metadata
-_site
-.sass-cache
-
 # installer
 /installer/dist
 /installer/builds
