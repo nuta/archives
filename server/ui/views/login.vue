@@ -40,8 +40,8 @@ export default {
     };
   },
   methods: {
-    login() {
-      api.login(this.username, this.password)
+    async login() {
+      await api.login(this.username, this.password)
       this.$router.push("/apps")
       this.$Progress.finish()
     }
