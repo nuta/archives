@@ -15,6 +15,8 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.string "tag"
       t.string "comment"
       t.string "debug"
+      t.string "deployed_from"
+      t.string "image_shasum"
       t.bigint "app_id", null: false
       t.datetime "created_at", null: false
       t.datetime "updated_at", null: false
@@ -30,6 +32,7 @@ class InitSchema < ActiveRecord::Migration[4.2]
       t.string "device_secret", null: false
       t.string "tag"
       t.string "device_type", null: false
+      t.string "sakuraio_module_token"
       t.bigint "user_id", null: false
       t.bigint "app_id"
       t.datetime "created_at", null: false

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171112054446) do
+ActiveRecord::Schema.define(version: 20171027000001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,12 +30,12 @@ ActiveRecord::Schema.define(version: 20171112054446) do
     t.string "tag"
     t.string "comment"
     t.string "debug"
+    t.string "deployed_from"
+    t.string "image_shasum"
     t.bigint "app_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.binary "image", null: false
-    t.string "deployed_from"
-    t.string "image_shasum"
     t.index ["app_id", "version"], name: "index_deployments_on_app_id_and_version", unique: true
     t.index ["app_id"], name: "index_deployments_on_app_id"
   end
@@ -57,11 +57,11 @@ ActiveRecord::Schema.define(version: 20171112054446) do
     t.string "device_secret", null: false
     t.string "tag"
     t.string "device_type", null: false
+    t.string "sakuraio_module_token"
     t.bigint "user_id", null: false
     t.bigint "app_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "sakuraio_module_token"
     t.index ["app_id"], name: "index_devices_on_app_id"
     t.index ["device_id_prefix"], name: "index_devices_on_device_id_prefix", unique: true
     t.index ["user_id", "name"], name: "index_devices_on_user_id_and_name", unique: true
