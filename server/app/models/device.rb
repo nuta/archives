@@ -11,6 +11,7 @@ class Device < ApplicationRecord
   value :last_heartbeated_at, expiration: 3.days
   value :current_os_version, expiration: 45.minutes
   value :current_app_version, expiration: 45.minutes
+  value :last_command_id, expiration: 3.hours
 
   SUPPORTED_TYPES = %w(mock raspberrypi3)
   DEVICE_STATES = %w(new booting ready running relaunch reboot down)
@@ -85,6 +86,10 @@ class Device < ApplicationRecord
 
     Store.where(owner_type: 'Device', owner_id: self.id).find_each do |store|
       stores[store.key] = { value: store.value }
+
+      if store.is_command?
+        store.destroy
+      end
     end
 
     Hash[stores.sort]
@@ -128,6 +133,13 @@ class Device < ApplicationRecord
     self.update_attributes!(app: nil)
   end
 
+  def send_command!(command, arg)
+    command_id = (self.last_command_id.value || 0) + 1
+    Store.create!(owner_type: 'Device', owner_id: self.id, key: ">#{command_id} #{command}",
+      data_type: 'string', value: arg)
+    self.last_command_id = command_id
+  end
+
   def append_log_to(target, device, lines, time)
     max_lines = APP_LOG_MAX_LINES
     if target == :app
@@ -146,12 +158,22 @@ class Device < ApplicationRecord
     device_name = self.name
     lines.each_with_index do |line, index|
       log["#{time}:#{index}:#{device_name}:#{line}"] = time
+
       m = /\A@(?<event>[^ ]+) (?<body>.*)\z/.match(line)
       if m
         # Detected a event published from the device.
         HookService.invoke(integrations, :event_published, self, {
           event: m['event'],
           body: m['body']
+        })
+      end
+
+      m = /\A>(?<command_id>[^ ]+) (?<return_value>.*)\z/.match(line)
+      if m
+        # Detected a event published from the device.
+        HookService.invoke(integrations, :command_invoked, self, {
+          command_id: m['command_id'],
+          return_value: m['return_value']
         })
       end
     end
