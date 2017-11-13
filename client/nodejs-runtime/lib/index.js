@@ -1,5 +1,10 @@
+process.on('unhandledRejection', (reason, p) => {
+  console.log('runtime: unhandled rejection:\n', reason, '\n\n', p)
+  console.log('runtime: exiting...')
+  process.exit(1)
+})
+
 const path = require('path')
-const fs = require('fs')
 const logger = require('./logger')
 const AppAPI = require('./app')
 const SubProcessAPI = require('./subprocess')
