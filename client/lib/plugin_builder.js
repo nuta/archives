@@ -11,7 +11,7 @@ module.exports = (pluginDir, destPath) => {
   })
 
   // Note that docker-machine in macOS does not mounting volumes outside home directory.
-  const tempdir = path.join(os.homedir(), '.makestack')
+  const tempdir = path.join(os.homedir(), '.makestack', 'plugin-builder')
 
   spawnSync('docker', ['run', '--rm', '-v', `${path.resolve(pluginDir)}:/plugin:ro`,
     '-v', `${tempdir}:/dist`, '-t', 'makestack/plugin-builder'], {
