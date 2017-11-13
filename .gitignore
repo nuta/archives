@@ -2,6 +2,7 @@
 *.log
 node_modules
 coverage
+/dist
 
 # client
 /client/tests/tmp
@@ -29,6 +30,7 @@ _site
 
 # installer
 /installer/dist
+/installer/builds
 
 # linux
 /linux/build
