@@ -47,17 +47,10 @@ ntpd -p 1.pool.ntp.org
 
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
-debug=$(egrep -o "debug" /proc/cmdline)
-if [ "$debug" = "" ]; then
-    export MAKESTACK_OS_TYPE=linux
-    export MAKESTACK_APP_UID=0
-    export MAKESTACK_APP_GID=0
-    echo "Starting MakeStack Supervisor..."
-    node /supervisor/supervisor
-else
-    export MAKESTACK_DEBUG_MODE=1
-    echo "TODO: run tests!"
-fi
+export MAKESTACK_APP_UID=0
+export MAKESTACK_APP_GID=0
+echo "Starting MakeStack Supervisor..."
+node /supervisor/supervisor
 
 echo "*** something went wrong, rebooting in 10 seconds..."
 sleep 10
