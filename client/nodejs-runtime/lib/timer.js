@@ -16,7 +16,7 @@ class TimerAPI {
 
   sleep(duration) {
     return new Promise((resolve, reject) => {
-      setTimeout(resolve, duration)
+      setTimeout(resolve, duration * 1000)
     })
   }
 
