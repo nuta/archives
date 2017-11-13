@@ -22,7 +22,7 @@ const SMMS_STORE_MSG = 0x20
 
 class Supervisor {
   constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
-    deviceSecret, debugMode, appUID, appGID }) {
+    deviceSecret, debugMode, appUID, appGID, heartbeatInterval }) {
 
     this.app = null
     this.appDir = appDir
@@ -31,6 +31,7 @@ class Supervisor {
     this.debugMode = debugMode
     this.appUID = parseInt(appUID) || undefined
     this.appGID = parseInt(appGID) || undefined
+    this.heartbeatInterval = heartbeatInterval || 15
     this.deviceId = deviceId
     this.deviceSecret = deviceSecret
     this.deviceType = deviceType
@@ -472,7 +473,7 @@ class Supervisor {
 
     setInterval(() => {
       this.sendHeartbeat('running')
-    }, 3000)
+    }, this.heartbeatInterval * 1000)
   }
 }
 
