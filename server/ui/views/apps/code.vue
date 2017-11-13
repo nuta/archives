@@ -218,7 +218,7 @@ export default {
     },
     loadAppYAML() {
       const appYAML = this.files.filter(file => file.path === 'app.yaml')[0]
-      return (appYAML) ?  yaml.safeLoad(appYAML.body) : {}
+      return (appYAML) ?  yaml.safeLoad(ace.edit(appYAML.id).getValue()) : {}
     },
     async downloadAndExtractPackage(name, zip, basepath) {
       this.logOutput(`Downloading \`${name}'`)
