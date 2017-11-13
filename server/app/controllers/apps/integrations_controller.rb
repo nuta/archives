@@ -34,7 +34,7 @@ class Apps::IntegrationsController < Apps::ApplicationController
   private
 
   def set_integration
-    @integration = @app.integrations.find_by_service(params[:name])
+    @integration = @app.integrations.find_by_service!(params[:name])
   end
 
   def integration_params
