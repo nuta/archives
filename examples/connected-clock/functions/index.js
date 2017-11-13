@@ -15,7 +15,7 @@ exports.webhook = functions.https.onRequest((req, res) => {
   fetch(OPEN_WEATHER_MAP_URL, { headers: { 'Content-Type': 'application/json' } })
     .then(response => response.json()).then(json => {
       const sensorType = req.body.event === 't' ? 'temperature' : 'humidity'
-      const sensorData = req.body.body.toFixed(2)
+      const sensorData = parseFloat(req.body.body).toFixed(2)
       console.log(json)
       const weather = json.list[0].weather[0].main.toUpperCase()
 

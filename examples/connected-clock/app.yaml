@@ -1,1 +1,2 @@
 name: connected-clock
+plugins: ['hdc1000', 'aqm0802a']
