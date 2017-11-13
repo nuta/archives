@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if cat $1/README.md | grep MakeStack > /dev/null; then
+  echo "MakeStack"
+  exit 0
+else
+  exit 1
+fi

@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+BUILD_DIR=$1
+
+echo ""
+echo "-----> Copying MakeStack Server..."
+cd $BUILD_DIR
+mv server/* .
+mv heroku/* .
+
+echo "-----> Copied!"
+ls -al
