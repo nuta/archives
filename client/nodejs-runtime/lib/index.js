@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const logger = require('./logger')
 const AppAPI = require('./app')
+const SubProcessAPI = require('./subprocess')
 const LoggingAPI = require('./logging')
 const TimerAPI = require('./timer')
 const StoreAPI = require('./store')
@@ -14,6 +15,7 @@ let builtins = {
   Store: new StoreAPI(),
   Event: new EventAPI(),
   App: new AppAPI(),
+  SubProcess: new SubProcessAPI(),
   plugin
 }
 
