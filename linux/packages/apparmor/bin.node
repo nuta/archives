@@ -1,5 +1,5 @@
 /bin/node {
-  /bin/node mr,
+  /bin/node mrcix,
 
   owner /proc/[0-9]*/auxv r,
   /dev/null rw,
@@ -23,6 +23,7 @@
   network inet  dgram,
   network inet6 dgram,
 
+  /bin/busybox ix,
   /supervisor/**        r,
   /supervisor/**/*.node mr,
   /app/**        rw,
