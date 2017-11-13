@@ -3,6 +3,13 @@ class TimerAPI {
     setInterval(callback, interval * 1000)
   }
 
+  /* Don't awit this function! It won't be resolved nor rejected forever. */
+  async loop(callback) {
+    while (true) {
+      await callback()
+    }
+  }
+
   delay(duration, callback) {
     setTimeout(callback, duration * 1000)
   }
