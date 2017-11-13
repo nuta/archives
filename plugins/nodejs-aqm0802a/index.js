@@ -1,0 +1,27 @@
+class AQM0802A {
+  constructor(address = 0x3e) {
+    this.bus = new I2C({ address })
+
+    for (const cmd of [0x39, 0x14, 0x74, 0x56, 0x6c, 0x0c]) {
+      this.bus.write([0x00, cmd])
+    }
+
+    this.clear()
+  }
+
+  clear() {
+    this.bus.write([0x00, 0x01])
+  }
+
+  update(text) {
+    const shortenedText = text.toString().substring(0, 16)
+
+    this.clear()
+    for (const [i, ch] of shortenedText.split('').entries()) {
+      this.bus.write([0x00, 0x80 + ((i > 7) ? 0x40 + i - 8 : i)])
+      this.bus.write([0x40, ch.charCodeAt(0)])
+    }
+  }
+}
+
+module.exports = AQM0802A
