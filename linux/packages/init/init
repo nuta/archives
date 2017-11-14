@@ -21,14 +21,6 @@ cat <<"EOF"
 
 EOF
 
-for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
-    [ "$interface" = "lo" ] && continue
-    [ "$interface" = "irlan0" ] && continue
-
-    ip link set $interface up
-    udhcpc -i $interface -s /etc/udhcpc.script
-done
-
 root=$(egrep -o "root=([^ ]+)" /proc/cmdline | awk -F= '{print $2}')
 [ "$root" = "" ] || echo "Error: root is not speicifed in /proc/cmdline" > /dev/stderr
 mkdir /boot
@@ -41,6 +33,16 @@ if [ "$DISABLE_APPARMOR" = "yes" ]; then
   apparmor_parser -C -r /etc/apparmor.d/*
 else
   apparmor_parser -r /etc/apparmor.d/*
+fi
+
+if [ "$MAKESTACK_ADAPTER" = "http" ]; then
+  for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
+    [ "$interface" = "lo" ] && continue
+    [ "$interface" = "irlan0" ] && continue
+
+    ip link set $interface up
+    udhcpc -i $interface -s /etc/udhcpc.script
+  done
 fi
 
 ntpd -p 1.pool.ntp.org
