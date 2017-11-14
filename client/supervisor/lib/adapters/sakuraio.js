@@ -169,7 +169,7 @@ class SakuraIOAdapter extends AdapterBase {
         break
       }
 
-      await Timer.sleep(1000)
+      await Timer.sleep(1)
     }
 
     logger.debug('sakuraio: connected!')
@@ -244,7 +244,7 @@ class SakuraIOAdapter extends AdapterBase {
         break
       }
 
-      await Timer.sleep(1000)
+      await Timer.sleep(1)
     }
 
     const [, fileSize] = await this.sakuraio.getFileMetadata()
@@ -257,8 +257,8 @@ class SakuraIOAdapter extends AdapterBase {
     while (offset < fileSize) {
       const [result, data] = await this.sakuraio.getFileData(FILE_CHUNK_SIZE)
       if (result !== CMD_RESULT_SUCCESS) {
-        logger.debug('sakura.io: getFileData returned an error, retrying in 500 msec....')
-        await Timer.sleep(500)
+        logger.debug('sakura.io: getFileData returned an error, retrying in a sec....')
+        await Timer.sleep(1)
         continue
       }
 

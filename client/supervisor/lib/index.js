@@ -41,6 +41,7 @@ class Supervisor {
     this.stores = {}
     this.adapterName = adapter.name
     this.updateEnabled = true
+    this.downloading = false
 
     switch (this.adapterName) {
       case 'http':
@@ -411,7 +412,6 @@ class Supervisor {
     await this.adapter.connect()
     this.sendHeartbeat('ready')
 
-    let downloading = false // XXX: use mutex or something better way
     this.adapter.onReceive(payload => {
       const [messages, hmacProtectedEnd] = this.deserialize(payload)
       const hmacProtectedPayload = payload.slice(0, hmacProtectedEnd)
@@ -423,12 +423,12 @@ class Supervisor {
       }
 
       // Update OS.
-      if (this.updateEnabled && !downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
-        downloading = true
+      if (this.updateEnabled && !this.downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
+        this.downloading = true
         logger.info(`updating os ${this.osVersion} -> ${messages.osVersion}`)
 
         this.adapter.getOSImage(this.deviceType, this.osVersion).then(image => {
-          downloading = false
+          this.downloading = false
 
           if (this.verifyHMAC && !this.verifyImageHMAC(messages.osImageHMAC, image)) {
             logger.warn('invalid app image HMAC, aborting update')
@@ -438,17 +438,17 @@ class Supervisor {
           this.updateOS(messages.osVersion)
         }).catch(e => {
           logger.error('failed to download app image:', e)
-          downloading = false
+          this.downloading = false
         })
       }
 
       // Update App
-      if (this.updateEnabled && !downloading && messages.appVersion && messages.appVersion !== this.appVersion) {
-        downloading = true
+      if (this.updateEnabled && !this.downloading && messages.appVersion && messages.appVersion !== this.appVersion) {
+        this.downloading = true
         logger.info(`updating ${this.appVersion} -> ${messages.appVersion}`)
         this.appVersion = messages.appVersion
         this.adapter.getAppImage(messages.appVersion).then(appZip => {
-          downloading = false
+          this.downloading = false
 
           if (this.verifyHMAC && !this.verifyImageHMAC(messages.appImageHMAC, appZip)) {
             logger.warn('invalid app image HMAC, aborting update')
@@ -458,7 +458,7 @@ class Supervisor {
           this.launchApp(appZip)
         }).catch(e => {
           logger.error('failed to download app image:', e)
-          downloading = false
+          this.downloading = false
         })
 
         return
@@ -472,7 +472,9 @@ class Supervisor {
     })
 
     setInterval(() => {
-      this.sendHeartbeat('running')
+      if (!this.downloading) {
+        this.sendHeartbeat('running')
+      }
     }, this.heartbeatInterval * 1000)
   }
 }
