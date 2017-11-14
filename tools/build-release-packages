@@ -27,7 +27,7 @@ popd
 cd ..
 
 echo "==> Packaging Plugins..."
-for plugin in plugins/*; do
+for plugin in client/nodejs-runtime plugins/*; do
   ./client/bin/makestack build-plugin $plugin $DIST_DIR/$(basename $plugin)-$VERSION.plugin.zip
 echo
 done
