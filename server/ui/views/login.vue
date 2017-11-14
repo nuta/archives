@@ -47,6 +47,11 @@ export default {
     }
   },
   mounted() {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('account_confirmation_success') === 'true') {
+      this.$Notification.success('Verified your email address. Thank you!')
+    }
+
     this.$Progress.finish()
   }
 }
