@@ -109,9 +109,7 @@ class SakuraIODriverBase extends Driver {
 
   async getConnectionStatus() {
     const [result, resp] = await this.command(CMD_GET_CONNECTION_STATUS, Buffer.alloc(0))
-    const status = resp.readUInt8(0)
-
-    return (result === CMD_RESULT_SUCCESS) ? status : 0x7f
+    return (result === CMD_RESULT_SUCCESS) ? resp.readUInt8(0) : 0x7f
   }
 }
 
