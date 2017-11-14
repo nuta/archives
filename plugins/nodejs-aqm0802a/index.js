@@ -9,17 +9,20 @@ class AQM0802A {
     this.clear()
   }
 
-  clear() {
+  async clear() {
     this.bus.write([0x00, 0x01])
+    await Timer.busywait(5 * 1000)
   }
 
-  update(text) {
+  async update(text) {
     const shortenedText = text.toString().substring(0, 16)
 
     this.clear()
     for (const [i, ch] of shortenedText.split('').entries()) {
       this.bus.write([0x00, 0x80 + ((i > 7) ? 0x40 + i - 8 : i)])
+      await Timer.busywait(5 * 1000)
       this.bus.write([0x40, ch.charCodeAt(0)])
+      await Timer.busywait(5 * 1000)
     }
   }
 }
