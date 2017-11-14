@@ -146,7 +146,7 @@ class Supervisor {
       uid: this.appUID,
       gid: this.appGID,
       env: {
-        DEVICE_TYPE: this.deviceType
+        MAKESTACK_DEVICE_TYPE: this.deviceType
       }
     })
     this.sendToApp('initialize', { stores: this.stores })

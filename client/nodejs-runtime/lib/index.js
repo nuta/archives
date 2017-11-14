@@ -27,8 +27,8 @@ let builtins = {
 const mock = require(`./devices/mock`)
 Object.assign(builtins, mock.initialize())
 
-if (process.env.DEVICE_TYPE) {
-  const deviceType = process.env.DEVICE_TYPE
+if (process.env.MAKESTACK_DEVICE_TYPE) {
+  const deviceType = process.env.MAKESTACK_DEVICE_TYPE
   const device = require(`./devices/${deviceType}`)
   Object.assign(builtins, device.initialize())
 }

@@ -17,7 +17,7 @@ function run(args, opts, logger) {
   const osVersion = 'a' // A version defined in server/config/makestack.yml
 
   process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../nodejs-runtime')
-  process.env.DEVICE_TYPE = mock.device_type // FIXME: used by nodejs-runtime
+  process.env.MAKESTACK_DEVICE_TYPE = mock.device_type // FIXME: used by nodejs-runtime
   const Supervisor = require('../../supervisor')
   const supervisor = new Supervisor({
     appDir: path.resolve(os.homedir(), '.makestack/mock-app'),
