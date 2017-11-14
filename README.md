@@ -4,9 +4,17 @@
 MakeStack
 =========
 
-MakeStack is a **work-in-progress** software stack for connected devices consists of: a Linux distribution for rapid-prototyping,
-a management server with web interface, and comfortable developer tools.
+MakeStack is a software stack for connected devices for super-rapid prototyping that includes:
+
+- Easy-to-use Node.js API
+- A minimalized (13MB!) Linux distribution for Raspberry Pi
+- A Rails and Vue.js based server backend
+- A Electron-based GUI device OS installer
+- A Node.js SDK with CLI frontend to manage apps & devices
+- Node-RED device-side programming
+- Plugins
+- Free from vendor lock-in -- fully open sourced :)
 
 License
 -------
-See `LICENSE.md`.
+CC0 or MIT. See `LICENSE.md`.
