@@ -42,6 +42,9 @@ module.exports = {
       CXX: `${config('target.toolchain_prefix')}g++`,
       LINK: `${config('target.toolchain_prefix')}g++`
     }, 'node_modules/nodejs-runtime')
+
+    run(['mkdir', '-p', `native/${config('target.node_gyp_arch')}`], {}, 'node_modules/nodejs-runtime')
+    run(['mv', 'build/Release/ioctl.node', `native/${config('target.node_gyp_arch')}`], {}, 'node_modules/nodejs-runtime')
   },
 
   rootfs() {
