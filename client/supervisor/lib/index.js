@@ -169,6 +169,12 @@ class Supervisor {
     this.app.on('exit', () => {
       this.app = null
       logger.info('app exited')
+      setTimeout(() => {
+        if (!this.app) {
+          logger.info('restarting app...')
+          this.spawnApp()
+        }
+      }, 5000)
     })
   }
 
