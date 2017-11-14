@@ -1,8 +1,9 @@
+MakeStack
+=========
 [![Build Status](https://travis-ci.org/seiyanuta/makestack.svg?branch=master)](https://travis-ci.org/seiyanuta/makestack)
 [![Maintainability](https://api.codeclimate.com/v1/badges/16d7d304999e8aa97dd4/maintainability)](https://codeclimate.com/github/seiyanuta/makestack/maintainability)
 
-MakeStack
-=========
+![Demo Video](https://makestack.github.io/demo.gif)
 
 MakeStack is a software stack for connected devices for super-rapid prototyping that includes:
 
