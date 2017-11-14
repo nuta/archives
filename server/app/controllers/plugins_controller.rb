@@ -13,7 +13,7 @@ class PluginsController < ApplicationController
         accept: 'application/json'
 
       latest_tag = JSON.parse(r.body)['tag_name']
-      redirect_to "https://github.com/#{github_repo}/releases/download/#{latest_tag}/#{plugin}.#{latest_tag}.plugin.zip"
+      redirect_to "https://github.com/#{github_repo}/releases/download/#{latest_tag}/#{plugin}-#{latest_tag}.plugin.zip"
     end
   end
 
