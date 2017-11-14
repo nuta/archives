@@ -26,11 +26,11 @@ class HDC1000 {
     return data
   }
 
-  read_temperature() {
+  readTemperature() {
     return ((this.read(HDC1000_TEMP_REG) / 65536) * 165) - 40
   }
 
-  read_humidity() {
+  readHumidity() {
     return (this.read(HDC1000_HUMID_REG) / 65536) * 100
   }
 }
