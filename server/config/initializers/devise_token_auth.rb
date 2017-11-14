@@ -35,8 +35,8 @@ DeviseTokenAuth.setup do |config|
   # config.default_callbacks = true
 
   base_url = "#{MakeStack.settings[:protocol]}://#{MakeStack.settings[:host]}:#{MakeStack.settings[:port]}"
-  config.default_confirm_success_url = "#{base_url}/login"
-  config.default_password_reset_url  = "#{base_url}/login"
+  config.default_confirm_success_url = "#{base_url}/#/login"
+  config.default_password_reset_url  = "#{base_url}/#/login"
 
   # Makes it possible to change the headers names
   config.headers_names = {
