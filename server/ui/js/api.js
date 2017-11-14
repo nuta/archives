@@ -271,7 +271,9 @@ class API {
     }
 
     return new Promise((resolve, reject) => {
-      fetch(`/api/v1/plugins/${repo}/${name}`).then(response => {
+      fetch(`/api/v1/plugins/${repo}/${name}`, {
+        headers: this.credentials
+      }).then(response => {
         response.blob().then(resolve, reject)
       })
     })

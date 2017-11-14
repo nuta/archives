@@ -1,6 +1,4 @@
 class PluginsController < ApplicationController
-  skip_before_action :authenticate
-
   def download
     github_repo = (official?) ? 'seiyanuta/makestack' : "#{params[:org]}/#{params[:name]}"
     plugin = params[:name]
@@ -13,7 +11,10 @@ class PluginsController < ApplicationController
         accept: 'application/json'
 
       latest_tag = JSON.parse(r.body)['tag_name']
-      redirect_to "https://github.com/#{github_repo}/releases/download/#{latest_tag}/#{plugin}-#{latest_tag}.plugin.zip"
+      plugin_url = "https://github.com/#{github_repo}/releases/download/#{latest_tag}/#{plugin}-#{latest_tag}.plugin.zip"
+      r = RestClient.get plugin_url
+
+      render body: r.body
     end
   end
 

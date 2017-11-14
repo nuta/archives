@@ -166,7 +166,9 @@ class API {
     }
 
     return new Promise((resolve, reject) => {
-      fetch(`${this.serverURL}/api/v1/plugins/${repo}/${name}`).then(response => {
+      fetch(`${this.serverURL}/api/v1/plugins/${repo}/${name}`, {
+        headers: loadCredentials()
+      }).then(response => {
         response.buffer().then(resolve, reject)
       })
     })
