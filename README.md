@@ -9,7 +9,9 @@ MakeStack
 
 MakeStack is a software stack for connected devices for super-rapid prototyping that includes:
 
-- Easy-to-use Node.js API
+- Focus on Developer Experience: easy-to-use Node.js API
+- Remote app/os update, remote configuration management, sending command to device, etc.
+- Integration with Incoming/Outgoing Webhook, IFTTT, Slack, and Datadog
 - A minimalized (13MB!) Linux distribution for Raspberry Pi
 - A Rails and Vue.js based server backend
 - A Electron-based GUI device OS installer
