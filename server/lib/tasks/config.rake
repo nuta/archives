@@ -46,6 +46,8 @@ namespace :config do
       host: ENV.fetch('SERVER_HOST'),
       port: ENV.fetch('SERVER_PORT'),
       mailer_sender: ENV.fetch('MAILER_SENDER', "bot@#{ENV.fetch('SERVER_HOST')}")
+      outgoing_webhook_limit_per_hour: ENV.fetch('OUTGOING_WEBHOOK_LIMIT_PER_HOUR', 5000),
+      push_to_sakuraio_limit_per_hour: ENV.fetch('PUSH_TO_SAKURAIO_LIMIT_PER_HOUR', 5000)
     }.stringify_keys.to_yaml
 
     open('ui/config.json', 'w').write(config_json)
