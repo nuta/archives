@@ -1,6 +1,6 @@
 class Auth::RegistrationsController < DeviseTokenAuth::RegistrationsController
   prepend_before_action :verify_tos_agreement, only: [:create]
-#  prepend_before_action :verify_recaptcha, only: [:create]
+  prepend_before_action :verify_recaptcha, only: [:create]
 
   private
 
