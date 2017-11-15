@@ -15,8 +15,7 @@ class SakuraioController < ApplicationController
   def file
     # TODO: suppport OS images
     device_id = @device.device_id
-    host = request.headers['X-Original-Host'] || 'localhost:8080' #XXX
-    render plain: "#{request.protocol}#{host}/api/v1/images/app/#{device_id}/latest"
+    render plain: "#{MakeStack.settings[:protocol]}://#{MakeStack.settings[:host]}:#{MakeStack.settings[:port]}/api/v1/images/app/#{device_id}/latest"
   end
 
   private
