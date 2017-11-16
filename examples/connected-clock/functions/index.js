@@ -16,7 +16,6 @@ exports.webhook = functions.https.onRequest((req, res) => {
     .then(response => response.json()).then(json => {
       const sensorType = req.body.event === 't' ? 'temperature' : 'humidity'
       const sensorData = parseFloat(req.body.body).toFixed(2)
-      console.log(json)
       const weather = json.list[0].weather[0].main.toUpperCase()
 
       const messages = JSON.stringify([
