@@ -100,6 +100,11 @@ module SMMSService
       if include_hmac
         os_image_shasum = MakeStack.os_releases.dig(app_os_version, device.app.api,
           :assets, device.device_type, :shasum)
+
+        unless os_image_shasum
+          raise "BUG: os image not found in MakeStack.os_releases."
+        end
+
         os_image_hmac = device.sign(os_image_shasum)
         payload += generate_message(SMMS_OS_IMAGE_HMAC_MSG, os_image_hmac)
       end
