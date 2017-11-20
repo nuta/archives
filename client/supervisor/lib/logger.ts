@@ -1,7 +1,6 @@
-const util = require('util')
+import * as util from 'util';
 
-
-function print(level, ...messages) {
+function log(level: string, ...messages: string[]): void {
   const colors = {
     'DEBUG': '35',
     'INFO': '34',
@@ -19,25 +18,18 @@ function print(level, ...messages) {
   console.log(`[\x1b[1;34msupervisor\x1b[0m ${time} \x1b[${color}m${level}\x1b[0m] ${body}`)
 }
 
-function debug(...messages) {
-  print('DEBUG', ...messages)
+export function debug(...messages: any[]): void {
+  log('DEBUG', ...messages)
 }
 
-function info(...messages) {
-  print('INFO', ...messages)
+export function info(...messages: any[]): void {
+  log('INFO', ...messages)
 }
 
-function error(...messages) {
-  print('ERROR', ...messages)
+export function error(...messages: any[]): void {
+  log('ERROR', ...messages)
 }
 
-function warn(...messages) {
-  print('WARN', ...messages)
-}
-
-module.exports = {
-  debug,
-  info,
-  error,
-  warn
+export function warn(...messages: any[]): void {
+  log('WARN', ...messages)
 }

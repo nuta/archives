@@ -1,4 +1,4 @@
-const fs = require('fs')
+import * as fs from 'fs';
 
 module.exports = class {
   updateOS(imagePath) {

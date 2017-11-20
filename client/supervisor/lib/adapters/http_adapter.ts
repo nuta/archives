@@ -1,7 +1,11 @@
-const fetch = require('node-fetch')
-const AdapterBase = require('./base')
+const fetch = require('node-fetch');
+import AdapterBase from './adapter_base';
 
-class HTTPAdapter extends AdapterBase {
+export default class HTTPAdapter extends AdapterBase {
+  osType: string;
+  deviceId: string;
+  serverURL: string;
+
   constructor(osType, deviceId, serverURL) {
     super()
 
@@ -39,7 +43,7 @@ class HTTPAdapter extends AdapterBase {
 
   getOSImage(deviceType, version) {
     return new Promise((resolve, reject) => {
-      let url = `${this.serverURL}/api/v1/images/os/${this.deviceId}/${version}/${osType}/${deviceType}`
+      let url = `${this.serverURL}/api/v1/images/os/${this.deviceId}/${version}/${this.osType}/${deviceType}`
 
       fetch(url).then(response => {
         response.buffer().then(resolve)
@@ -47,5 +51,3 @@ class HTTPAdapter extends AdapterBase {
     })
   }
 }
-
-module.exports = HTTPAdapter

@@ -1,4 +1,6 @@
-class AdapterBase {
+export default class AdapterBase {
+  onReceiveCallback: (Buffer) => void;
+
   constructor() {
     this.onReceiveCallback = () => { }
   }
@@ -7,5 +9,3 @@ class AdapterBase {
     this.onReceiveCallback = callback
   }
 }
-
-module.exports = AdapterBase

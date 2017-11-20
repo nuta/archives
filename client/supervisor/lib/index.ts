@@ -1,12 +1,12 @@
-const { fork, spawnSync } = require('child_process')
-const assert = require('assert')
-const fs = require('fs')
-const os = require('os')
-const crypto = require('crypto')
-const path = require('path')
-const HTTPAdapter = require('./adapters/http')
-const SakuraioAdapter = require('./adapters/sakuraio')
-const logger = require('./logger')
+import { fork, spawnSync } from 'child_process';
+import * as assert from 'assert';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as crypto from 'crypto';
+import * as path from 'path';
+import HTTPAdapter from './adapters/http_adapter';
+import SakuraioAdapter from './adapters/sakuraio_adapter';
+import * as logger from './logger';
 
 const SMMS_VERSION = 1
 const SMMS_HMAC_MSG = 0x06
@@ -21,6 +21,29 @@ const SMMS_APP_IMAGE_HMAC_MSG = 0x13
 const SMMS_STORE_MSG = 0x20
 
 class Supervisor {
+  app: any;
+  appDir: string;
+  osType: string;
+  osVersion: string;
+  debugMode: boolean;
+  appUID: number;
+  appGID: number;
+  heartbeatInterval: number;
+  deviceId: string;
+  deviceSecret: string;
+  deviceType: string;
+  device: any;
+  appVersion: string;
+  log: string;
+  stores: any;
+  adapterName: string;
+  updateEnabled: boolean;
+  downloading: boolean;
+  adapter: any;
+  verifyHMAC: boolean;
+  includeHMAC: boolean;
+  includeDeviceId: boolean;
+
   constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
     deviceSecret, debugMode, appUID, appGID, heartbeatInterval }) {
 
@@ -67,7 +90,7 @@ class Supervisor {
     return log
   }
 
-  updateOS(image) {
+  updateOS(image: Buffer) {
     logger.info('saving os image...')
     const tmpFilePath = path.join(os.tmpdir(), 'kernel.img')
     fs.writeFileSync(tmpFilePath, image)
@@ -94,7 +117,7 @@ class Supervisor {
     }, 5000)
   }
 
-  launchApp(appZip) {
+  launchApp(appZip: Buffer) {
     const appZipPath = path.join(os.tmpdir(), 'app.zip')
 
     fs.writeFileSync(appZipPath, appZip)
@@ -148,7 +171,7 @@ class Supervisor {
       env: {
         MAKESTACK_DEVICE_TYPE: this.deviceType
       }
-    })
+    } as any)
     this.sendToApp('initialize', { stores: this.stores })
 
     this.app.on('message', (data) => {
@@ -178,7 +201,7 @@ class Supervisor {
     })
   }
 
-  sendToApp(type, data) {
+  sendToApp(type: string, data: Object) {
     if (!this.app) {
       // The app is being killed.
       return
@@ -187,7 +210,7 @@ class Supervisor {
     this.app.send(Object.assign({ type }, data))
   }
 
-  generateVariableLength(buf) {
+  generateVariableLength(buf: Buffer) {
     let len = buf.length
     let lenbuf = Buffer.alloc(0)
 
@@ -201,7 +224,7 @@ class Supervisor {
     return ((lenbuf.length > 0) ? lenbuf : Buffer.from([0x00]))
   }
 
-  parseVariableLength(buf) {
+  parseVariableLength(buf: Buffer) {
     let length = 0
     let i = 0
     let base = 1
@@ -222,7 +245,7 @@ class Supervisor {
     }
   }
 
-  generateMessage(type, payload) {
+  generateMessage(type: number, payload: any) {
     const buf = Buffer.from(payload)
     const lenbuf = this.generateVariableLength(buf)
     const msg = Buffer.alloc(1 + buf.length + 1)
@@ -294,7 +317,7 @@ class Supervisor {
     return Buffer.concat([header, payload])
   }
 
-  deserialize(payload) {
+  deserialize(payload: Buffer) {
     let version = payload.readUInt8(0)
     if (version >> 4 !== SMMS_VERSION) {
       throw new Error('unsupported smms version')
@@ -302,7 +325,7 @@ class Supervisor {
 
     const [totalLength, totalLengthLength] = this.parseVariableLength(payload.slice(1))
     const headerLength = 1 + totalLengthLength
-    let messages = {}
+    let messages: any = {}
     let offset = headerLength
     let hmacProtectedEnd = null
     while (offset < headerLength + totalLength) {
@@ -378,13 +401,13 @@ class Supervisor {
     return hmac.digest('hex')
   }
 
-  verifyMessageHMAC(payload, hmac, timestamp) {
+  verifyMessageHMAC(payload: Buffer, hmac: string, timestamp: string) {
     if (typeof timestamp !== 'string') {
       console.error('timestamp is not set')
       return false
     }
 
-    if ((new Date() - (new Date(timestamp))) > 5 * 60 * 1000 /* msec */) {
+    if (((new Date()).getTime() - (new Date(timestamp)).getTime()) > 5 * 60 * 1000 /* msec */) {
       console.error('too old timestamp')
       return false
     }

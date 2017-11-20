@@ -1,14 +1,13 @@
 /*
  * A sakura.io communication module adapter.
  *
- * Refer: https://sakura.io/docs (Send them a feedback if you cannot understand Japanese)
- * Feedback Form: https://www.sakura.ad.jp/request_form/service/iot (Google Translate is your friend)
+ * Refer: https://sakura.io/docs (Google Translate is your friend)
  *
  */
-const { builtins, Driver } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime')
-const { I2C, Timer } = builtins
-const AdapterBase = require('./base')
-const logger = require('../logger')
+const { builtins, Driver } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime');
+const { I2C, Timer } = builtins;
+import AdapterBase from './adapter_base';
+import * as logger from '../logger';
 
 // 1 - 19999 are reserved for OS images.
 const APP_IMAGE_FILEID = 1
@@ -152,10 +151,13 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
   }
 }
 
-class SakuraIOAdapter extends AdapterBase {
-  constructor(i2c) {
+export default class SakuraIOAdapter extends AdapterBase {
+  sakuraio: SakuraIODriverBase;
+  received: Buffer[];
+
+  constructor() {
     super()
-    this.sakuraio = new I2CSakuraIODriver(i2c)
+    this.sakuraio = new I2CSakuraIODriver()
     this.received = []
   }
 
@@ -270,5 +272,3 @@ class SakuraIOAdapter extends AdapterBase {
     return Promise.resolve(appImage)
   }
 }
-
-module.exports = SakuraIOAdapter
