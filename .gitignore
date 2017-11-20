@@ -7,6 +7,7 @@ coverage
 # client
 /client/tests/tmp
 /client/nodejs-runtime/build
+/client/supervisor/dist
 
 # server
 /server/config/settings.production.yml
