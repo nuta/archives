@@ -11,6 +11,14 @@ indent_style = tab
 indent_style = space
 indent_size = 2
 
+[*.ts]
+indent_style = space
+indent_size = 2
+
+[*.vue]
+indent_style = space
+indent_size = 2
+
 [*.rb]
 indent_style = space
 indent_size = 2
