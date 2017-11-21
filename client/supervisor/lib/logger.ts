@@ -2,9 +2,9 @@ import * as util from 'util';
 
 function log(level: string, ...messages: string[]): void {
   const colors = {
-    'DEBUG': '35',
+    ' DBG': '35',
     'INFO': '34',
-    'ERROR': '31',
+    ' ERR': '31',
     'WARN': '33'
   }
 
@@ -19,7 +19,7 @@ function log(level: string, ...messages: string[]): void {
 }
 
 export function debug(...messages: any[]): void {
-  log('DEBUG', ...messages)
+  log(' DBG', ...messages)
 }
 
 export function info(...messages: any[]): void {
@@ -27,7 +27,7 @@ export function info(...messages: any[]): void {
 }
 
 export function error(...messages: any[]): void {
-  log('ERROR', ...messages)
+  log(' ERR', ...messages)
 }
 
 export function warn(...messages: any[]): void {

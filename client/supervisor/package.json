@@ -9,7 +9,6 @@
     "build": "tsc --pretty"
   },
   "dependencies": {
-    "node-fetch": "^1.7.3"
   },
   "devDependencies": {
     "@types/node": "^8.0.53",
