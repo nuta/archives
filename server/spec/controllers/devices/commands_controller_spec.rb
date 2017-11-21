@@ -16,7 +16,7 @@ RSpec.describe Devices::CommandsController, type: :controller do
         }.to change(Store, :count).by(1)
 
         command_store = Store.where(owner_type: 'Device', owner_id: device.id).last
-        expect(command_store.key).to start_with('>')
+        expect(command_store.key).to start_with('<')
         expect(command_store.value).to start_with(arg)
       end
     end
