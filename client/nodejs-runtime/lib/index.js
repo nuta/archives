@@ -12,6 +12,7 @@ const LoggingAPI = require('./logging')
 const TimerAPI = require('./timer')
 const StoreAPI = require('./store')
 const EventAPI = require('./event')
+const SerialAPI = require('./serial')
 const plugin = require('./plugin')
 
 let builtins = {
@@ -21,6 +22,7 @@ let builtins = {
   Event: new EventAPI(),
   App: new AppAPI(),
   SubProcess: new SubProcessAPI(),
+  Serial: SerialAPI,
   plugin
 }
 

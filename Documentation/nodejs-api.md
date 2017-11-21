@@ -202,3 +202,43 @@ You don't have to `require` to use. This API is defined as a global `I2C` object
   const device = new I2C({ address: 0x40 })
   device.write([0x01, 0x00, 0x00])
   ```
+
+## Serial
+You don't have to `require` to use. This API is defined as a global `Serial` object.
+
+### read
+- **Definition:** `() => Buffer`
+- **Usage:**
+  ```js
+  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
+  port.read()
+  ```
+
+### write
+- **Definition:** `(data: Buffer) => void`
+- **Usage:**
+  ```js
+  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
+  port.write('Hello!\n')
+  ```
+
+### onData
+- **Definition:** `(callback: (data) => void)`
+- **Usage:**
+  ```js
+  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
+  port.onData(chunk => {
+    console.log(chunk)
+  })
+  ```
+
+### onNewLine
+- **Definition:** `(callback: (line) => void)`
+- **Description:** Polls data from the serial port and call `callback` each line.  The trailing `\r` and `\n` are removed.
+- **Usage:**
+  ```js
+  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
+  port.onLine(line => {
+    console.log(line)
+  })
+  ```
