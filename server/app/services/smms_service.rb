@@ -114,7 +114,6 @@ module SMMSService
       payload += generate_message(SMMS_APP_VERSION_MSG, app_version)
       if include_hmac
         app_image_hmac = device.sign(deployment.image_shasum)
-        p deployment.image_shasum, app_image_hmac
         payload += generate_message(SMMS_APP_IMAGE_HMAC_MSG, app_image_hmac)
       end
     end
