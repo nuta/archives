@@ -59,6 +59,11 @@ program
   .action(require('./commands/mock').run)
 
 program
+  .command('repl', 'A Read-Eval-Print-Loop (REPL) console.')
+  .argument('name', 'The device name.')
+  .action(require('./commands/repl'))
+
+program
   .command('list-drives', 'List available drives to install MakeStack OS/Linux.')
   .action(require('./commands/list_drives'))
 

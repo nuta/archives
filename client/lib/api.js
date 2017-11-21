@@ -192,6 +192,14 @@ class API {
   getOSReleases() {
     return this.invoke('GET', '/os/releases')
   }
+
+  invokeCommand(deviceName, command, arg) {
+    return this.invoke('POST', `/devices/${deviceName}/commands`, { command, arg })
+  }
+
+  getCommandResults(deviceName) {
+    return this.invoke('GET', `/devices/${deviceName}/commands`)
+  }
 }
 
 module.exports = new API()

@@ -4,6 +4,8 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as crypto from 'crypto';
 import * as path from 'path';
+import * as util from 'util';
+import * as vm from 'vm';
 import HTTPAdapter from './adapters/http_adapter';
 import SakuraioAdapter from './adapters/sakuraio_adapter';
 import * as logger from './logger';
@@ -43,6 +45,8 @@ class Supervisor {
   verifyHMAC: boolean;
   includeHMAC: boolean;
   includeDeviceId: boolean;
+  replEnabled: boolean;
+  replVM?: any;
 
   constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
     deviceSecret, debugMode, appUID, appGID, heartbeatInterval }) {
@@ -58,13 +62,19 @@ class Supervisor {
     this.deviceId = deviceId
     this.deviceSecret = deviceSecret
     this.deviceType = deviceType
-    this.device = new (require(`./devices/${deviceType}`))()
+    this.device = new (require(`./devices/${deviceType}`).default)()
     this.appVersion = 'X'
     this.log = ''
     this.stores = {}
     this.adapterName = adapter.name
     this.updateEnabled = true
     this.downloading = false
+    this.replEnabled = debugMode;
+
+    if (this.replEnabled) {
+      const { builtins } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime');
+      this.replVM = vm.createContext(builtins);
+    }
 
     switch (this.adapterName) {
       case 'http':
@@ -495,8 +505,31 @@ class Supervisor {
 
       // Send new stores to the app.
       if (messages.stores) {
-        this.stores = messages.stores
-        this.sendToApp('stores', { stores: messages.stores })
+        const stores = {}
+        const replRegex = /^<([0-9]+) __repl__$/
+        for (const key in messages.stores) {
+          const m = replRegex.exec(key)
+          if (this.replEnabled && m) {
+            // A REPL command.
+            const commandId = m[1]
+            const code = messages.stores[key]
+
+            logger.debug(`REPL: eval id=${commandId} code='${code}'`)
+            const result = JSON.stringify(
+              util.inspect(
+                vm.runInContext(code, this.replVM)
+              )
+            )
+
+            // Event.publish()
+            this.log += `>${commandId} __repl__ ${result}\n`
+          } else {
+            stores[key] = messages.stores[key]
+          }
+        }
+
+        this.stores = stores
+        this.sendToApp('stores', { stores })
       }
     })
 
