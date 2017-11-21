@@ -30,7 +30,7 @@ Rails.application.routes.draw do
           param: :key, path: 'stores', as: :store, constraints: { key: /.+/ }
 
         resources :log, controller: 'devices/log', only: [:index]
-        resources :commands, controller: 'devices/commands', only: [:create]
+        resources :commands, controller: 'devices/commands', only: [:index, :create]
       end
 
       post "smms", to: "smms#http"

@@ -12,6 +12,7 @@ class Device < ApplicationRecord
   value :current_os_version, expiration: 45.minutes
   value :current_app_version, expiration: 45.minutes
   value :last_command_id, expiration: 3.hours
+  hash_key :command_results, expiration: 5.minutes
 
   SUPPORTED_TYPES = %w(mock raspberrypi3)
   DEVICE_STATES = %w(new booting ready running relaunch reboot down)
@@ -95,6 +96,15 @@ class Device < ApplicationRecord
     Hash[stores.sort]
   end
 
+  def formatted_command_results
+    results = {}
+    self.command_results.value.map do |k, v|
+      results[k] = v
+    end
+
+    results
+  end
+
   def reset_credentials
     device_id     = RandomIdGenerator::generate(DEVICE_ID_LEN)
     device_secret = RandomIdGenerator::generate(DEVICE_SECRET_LEN)
@@ -133,10 +143,16 @@ class Device < ApplicationRecord
     self.update_attributes!(app: nil)
   end
 
-  def send_command!(command, arg)
-    command_id = (self.last_command_id.value || 0) + 1
-    Store.create!(owner_type: 'Device', owner_id: self.id, key: ">#{command_id} #{command}",
-      data_type: 'string', value: arg)
+  def invoke_command!(command, arg)
+    command_id = (self.last_command_id.value.to_i || 0) + 1
+    Store.create!(
+      owner_type: 'Device',
+      owner_id: self.id,
+      key: "<#{command_id} #{command}",
+      data_type: 'string',
+      value: arg
+    )
+
     self.last_command_id = command_id
   end
 
@@ -171,6 +187,8 @@ class Device < ApplicationRecord
       m = /\A>(?<command_id>[^ ]+) (?<return_value>.*)\z/.match(line)
       if m
         # Detected a event published from the device.
+        self.command_results[m['command_id']] = m['return_value']
+
         HookService.invoke(integrations, :command_invoked, self, {
           command_id: m['command_id'],
           return_value: m['return_value']

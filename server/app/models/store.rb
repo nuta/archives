@@ -5,7 +5,7 @@ class Store < ApplicationRecord
 
   KEY_MAX_LEN = 64
 
-  KEY_REGEX = /\A([>][0-9]+ )?[a-zA-Z][a-zA-Z0-9\~\!\@\$\%\&\.\-\_]*\z/
+  KEY_REGEX = /\A([<][0-9]+ )?[a-zA-Z\_][a-zA-Z0-9\~\!\@\$\%\&\.\-\_]*\z/
   DATA_TYPES = %w(string integer float bool)
 
   quota scope: :owner_id, limit: User::STORES_MAX_NUM
@@ -23,6 +23,6 @@ class Store < ApplicationRecord
     length: { in: 0..512 }
 
   def is_command?
-    self.key.start_with?('>')
+    self.key.start_with?('<')
   end
 end
