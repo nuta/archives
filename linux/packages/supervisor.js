@@ -34,7 +34,8 @@ module.exports = {
       run(['npm', 'i', 'node-gyp'], {}, path.dirname(nodeGyp))
     }
 
-    run(['yarn'])
+    run(['rm', '-rf', 'node_modules'])
+    run(['yarn', '--production'])
     run(['rm', '-rf', 'node_modules/nodejs-runtime/build'])
     run([nodeGyp, 'rebuild', '--arch', config('target.node_gyp_arch')], {
       AR: `${config('target.toolchain_prefix')}ar`,
