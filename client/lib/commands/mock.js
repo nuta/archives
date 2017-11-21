@@ -31,7 +31,7 @@ function run(args, opts, logger) {
     deviceSecret: mock.device_secret,
     debugMode: true,
     osVersion,
-    heartbeatInterval: 5
+    heartbeatInterval: 2
   })
 
   supervisor.start()
