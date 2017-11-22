@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const { spawnSync } = require('child_process')
 const { config, run, buildPath, isNewerDirContent } = require('../pkgbuilder').pkg
 
 const ignore = [/^node_modules/]
@@ -13,7 +14,7 @@ module.exports = {
   ignore,
 
   check() {
-    if (!fs.existsSync('/usr/bin/node-gyp') && !fs.existsSync('/usr/local/bin/node-gyp')) {
+    if (spawnSync('which', ['node-gyp']).status !== 0) {
       throw new Error('Install node-gyp first!')
     }
   },
