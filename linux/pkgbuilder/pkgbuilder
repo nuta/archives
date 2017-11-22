@@ -49,7 +49,7 @@ function loadPackages(target) {
     }
 
     for (let attr in pkg) {
-      if (['build', 'buildImage', 'changed'].includes(attr)) {
+      if (['build', 'buildImage', 'changed', 'check'].includes(attr)) {
         continue
       }
 
@@ -194,6 +194,10 @@ function main() {
 
   for (const [i, pkgName] of buildOrder.entries()) {
     const pkg = packages[pkgName]
+
+    if (typeof pkg.check === 'function') {
+      pkg.check()
+    }
 
     if (isBuildRequired(pkg)) {
       console.log(`==> (${i + 1}/${buildOrder.length}) Building ${pkgName}...`)

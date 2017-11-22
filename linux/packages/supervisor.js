@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { config, mkdirp, run, buildPath, isNewerDirContent } = require('../pkgbuilder').pkg
+const { config, run, buildPath, isNewerDirContent } = require('../pkgbuilder').pkg
 
 const ignore = [/^node_modules/]
 const supervisorPath = path.resolve(__dirname, '../../client/supervisor')
@@ -11,6 +11,12 @@ module.exports = {
   type: 'application',
   path: supervisorPath,
   ignore,
+
+  check() {
+    if (!fs.existsSync('/usr/bin/node-gyp') && !fs.existsSync('/usr/local/bin/node-gyp')) {
+      throw new Error('Install node-gyp first!')
+    }
+  },
 
   changed() {
     const isChanged = isNewerDirContent(supervisorPath, buildPath('supervisor'), ignore)
@@ -28,24 +34,15 @@ module.exports = {
     packageJSON.dependencies['nodejs-runtime'] = 'file:' + appRuntimePath
     fs.writeFileSync('package.json', JSON.stringify(packageJSON))
 
-    const nodeGyp = buildPath('node-gyp/node_modules/.bin/node-gyp')
-    if (!fs.existsSync(nodeGyp)) {
-      mkdirp(path.dirname(nodeGyp))
-      run(['npm', 'i', 'node-gyp'], {}, path.dirname(nodeGyp))
-    }
-
     run(['rm', '-rf', 'node_modules'])
     run(['yarn', '--production'])
-    run(['rm', '-rf', 'node_modules/nodejs-runtime/build'])
-    run([nodeGyp, 'rebuild', '--arch', config('target.node_gyp_arch')], {
+    run(['npm', 'run', 'build'], {
+      ARCH: config('target.node_gyp_arch'),
       AR: `${config('target.toolchain_prefix')}ar`,
       CC: `${config('target.toolchain_prefix')}gcc`,
       CXX: `${config('target.toolchain_prefix')}g++`,
       LINK: `${config('target.toolchain_prefix')}g++`
     }, 'node_modules/nodejs-runtime')
-
-    run(['mkdir', '-p', `native/${config('target.node_gyp_arch')}`], {}, 'node_modules/nodejs-runtime')
-    run(['mv', 'build/Release/ioctl.node', `native/${config('target.node_gyp_arch')}`], {}, 'node_modules/nodejs-runtime')
   },
 
   rootfs() {
