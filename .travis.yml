@@ -24,7 +24,7 @@ matrix:
         directories:
           - linux/build/downloads
       install:
-        - npm install -g yarn
+        - npm install -g yarn node-gyp
         - cd linux
       script:
         - make TARGET=x86_64
@@ -50,7 +50,7 @@ matrix:
           - linux/build/downloads
           - qemu
       install:
-        - npm install -g yarn
+        - npm install -g yarn node-gyp
         - mkdir -p qemu
         - cd qemu
         - wget https://download.qemu.org/qemu-2.10.1.tar.xz
