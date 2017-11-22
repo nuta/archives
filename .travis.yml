@@ -18,6 +18,7 @@ matrix:
             - qemu
             - zsh
             - nodejs
+            - virtualbox
       cache:
         apt: true
         directories:
