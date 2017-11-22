@@ -242,3 +242,15 @@ You don't have to `require` to use. This API is defined as a global `Serial` obj
     console.log(line)
   })
   ```
+
+## SPI
+**CAUTION: SPI API may not work. Its implementation is still buggy.**
+You don't have to `require` to use. This API is defined as a global `SPI` object.
+
+### transfer
+- **Definition:** `(tx: Buffer) => Buffer`
+- **Usage:**
+  ```js
+  const device = new SPI({ path: '/dev/spidev0.0', speed: 100000, mode: 'MODE3' })
+  console.log(device.transfer([0x30, 0x00, 0x00]))
+  ```

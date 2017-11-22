@@ -6,14 +6,14 @@ process.on('unhandledRejection', (reason, p) => {
 
 const path = require('path')
 const logger = require('./logger')
-const AppAPI = require('./app')
-const SubProcessAPI = require('./subprocess')
-const LoggingAPI = require('./logging')
-const TimerAPI = require('./timer')
-const StoreAPI = require('./store')
-const EventAPI = require('./event')
-const SerialAPI = require('./serial')
-const plugin = require('./plugin')
+const AppAPI = require('./api/app')
+const SubProcessAPI = require('./api/subprocess')
+const LoggingAPI = require('./api/logging')
+const TimerAPI = require('./api/timer')
+const StoreAPI = require('./api/store')
+const EventAPI = require('./api/event')
+const SerialAPI = require('./api/serial')
+const plugin = require('./api/plugin')
 
 let builtins = {
   Logging: new LoggingAPI(),
@@ -65,7 +65,6 @@ function start(appDir) {
 }
 
 module.exports = {
-  Driver: require('./driver'),
   builtins,
   start
 }

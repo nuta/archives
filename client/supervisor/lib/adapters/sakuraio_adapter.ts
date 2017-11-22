@@ -4,7 +4,7 @@
  * Refer: https://sakura.io/docs (Google Translate is your friend)
  *
  */
-const { builtins, Driver } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime');
+const { builtins } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime');
 const { I2C, Timer } = builtins;
 import AdapterBase from './adapter_base';
 import * as logger from '../logger';
@@ -31,7 +31,7 @@ const CMD_RX_DEQUEUE = 0x30
 const CMD_RX_LENGTH = 0x32
 const FILE_CHUNK_SIZE = 16
 
-class SakuraIODriverBase extends Driver {
+class SakuraIODriverBase {
   computeParity(firstByte, data) {
     let parity = firstByte ^ data.length
     for (const byte of data) {
