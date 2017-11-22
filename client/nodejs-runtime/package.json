@@ -6,7 +6,7 @@
   "private": true,
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node-gyp rebuild --arch $ARCH && mkdir -p native/$ARCH && mv build/Release/*node native/$ARCH && rm -rf build"
   },
   "dependencies": {
     "nan": "^2.7.0"
