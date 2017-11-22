@@ -31,7 +31,9 @@ const CMD_RX_DEQUEUE = 0x30
 const CMD_RX_LENGTH = 0x32
 const FILE_CHUNK_SIZE = 16
 
-class SakuraIODriverBase {
+abstract class SakuraIODriverBase {
+  abstract command(command: number, data: Buffer): Promise<[number, Buffer]>;
+
   computeParity(firstByte, data) {
     let parity = firstByte ^ data.length
     for (const byte of data) {
@@ -58,7 +60,7 @@ class SakuraIODriverBase {
     await this.command(CMD_TX_SEND, Buffer.alloc(0))
   }
 
-  async dequeueRx() {
+  async dequeueRx(): Promise<[number, Buffer]> {
     const [, resp] = await this.command(CMD_RX_DEQUEUE, Buffer.alloc(0))
     let channel = resp.readUInt8(0)
 
@@ -113,12 +115,14 @@ class SakuraIODriverBase {
 }
 
 class I2CSakuraIODriver extends SakuraIODriverBase {
+  i2c: any;
+
   constructor() {
     super()
     this.i2c = new I2C({ address: 0x4f })
   }
 
-  async command(command, data) {
+  async command(command: number, data: Buffer): Promise<[number, Buffer]> {
     // Send a request.
     let request = Buffer.alloc(2 + data.length + 1)
     request.writeUInt8(command, 0)
@@ -139,12 +143,12 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
 
     if (result !== CMD_RESULT_SUCCESS) {
       logger.warn(`sakura.io: module returned ${result}`)
-      return [result]
+      return [result, Buffer.alloc(0)]
     }
 
     if (parity !== this.computeParity(result, response)) {
       logger.error('sakura.io: parity mismatch')
-      return [result] // FIXME
+      return [result, Buffer.alloc(0)] // FIXME
     }
 
     return [result, response]
@@ -152,7 +156,7 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
 }
 
 export default class SakuraIOAdapter extends AdapterBase {
-  sakuraio: SakuraIODriverBase;
+  sakuraio: I2CSakuraIODriver;
   received: Buffer[];
 
   constructor() {
