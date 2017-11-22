@@ -44,6 +44,7 @@ module.exports = {
     mkdirp(mountPoint)
     run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
     run(['mkfs.fat', '-n', 'MAKESTACK', imageFile])
+    run(['mkdir', '-p', mountPoint])
     sudo(['mount', imageFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
     run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
     sudo(['umount', mountPoint])
