@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 const path = require('path')
 const fs = require('fs')
-const { spawnSync } = require('child_process')
 const { isNewerDirContent } = require('.').pkg
-const { find, mkdirp, copyFiles } = require('./lib/helpers')
+const { find, mkdirp, copyFiles, shasum, download, extract } = require('./lib/helpers')
 
 global.build = {
   config: {}
@@ -64,56 +63,14 @@ function loadPackages(target) {
   return [packages, buildOrder]
 }
 
-function shasum(filepath) {
-  const cp = spawnSync('shasum', ['-a', '256', filepath], {
-    stdio: 'pipe',
-    encoding: 'utf-8'
-  })
-
-  if (cp.error)
-    throw new Error(cp.error)
-
-  return cp.stdout.split(' ')[0]
-}
-
-function download(url, sha256) {
-  const filepath = path.resolve(build.downloadsDir, path.basename(url))
-  if (fs.existsSync(filepath)) {
-    // TODO: compare SHASUM
-    return filepath
-  }
-
-  spawnSync('curl', ['-fSLo', filepath, url], { stdio: 'inherit' })
-  return filepath
-}
-
-function extract(filepath, dest) {
-  if (fs.existsSync(dest))
-    return
-
-  if (filepath.match(/\.tar\.(xz|bz2?|gz)$/)) {
-    mkdirp(dest)
-    spawnSync('tar', ['xf', filepath, '-C', dest, '--strip-components', '1'], { stdio: 'inherit' })
-  } else if (filepath.match(/\.deb$/)) {
-    mkdirp(dest)
-    const cwd = process.cwd()
-    process.chdir(dest)
-    spawnSync('ar', ['x', filepath], { stdio: 'inherit' })
-    spawnSync('tar', ['vxf', 'data.tar.xz'], { stdio: 'inherit' })
-    process.chdir(cwd)
-  } else {
-    throw new Error(`unsupported file type: ${filepath}`)
-  }
-}
-
 function isInstalled(dest, pkg) {
   return pkg[dest] === undefined || Object.keys(pkg[dest]).every(file => {
     return fs.existsSync(path.resolve(build[`${dest}Dir`], `./${file}`))
   })
 }
 
-function copyFilesInPkg(pkgName, files, destDir) {
-  const copiedFiles = []
+function getPkgFilesToCopy(pkgName, files, destDir) {
+  const filesToCopy = []
 
   for (let filepath in files) {
     if (files[filepath] === false) {
@@ -125,12 +82,17 @@ function copyFilesInPkg(pkgName, files, destDir) {
     const src = path.resolve(build.buildDir, pkgName, files[filepath])
     const dest = path.resolve(destDir, `./${filepath}`)
     if (!fs.existsSync(dest) || fs.statSync(src).ctimeMs > fs.statSync(dest).ctimeMs) {
-      copyFiles(src, dest)
-      copiedFiles.push(dest)
+      filesToCopy.push([src, dest])
     }
   }
 
-  return copiedFiles
+  return filesToCopy
+}
+
+function copyFilesInPkg(pkgName, files, destDir) {
+  for (const [src, dst] of getPkgFilesToCopy(pkgName, files, destDir)) {
+    copyFiles(src, dst)
+  }
 }
 
 function buildPackage(pkg) {
@@ -204,17 +166,24 @@ function main() {
       buildPackage(pkg)
       build.rebuiltPackages.push(pkgName)
     } else {
-      console.log(`==> (${ i + 1}/${buildOrder.length}) Copying files from ${pkgName}...`)
-      const copiedToBootFS = copyFilesInPkg(pkg.name, pkg.bootfs, build.bootfsDir)
-      const copiedToRootFS = copyFilesInPkg(pkg.name, pkg.rootfs, build.rootfsDir)
+      const filesToBootFS = getPkgFilesToCopy(pkg.name, pkg.bootfs, build.bootfsDir)
+      const filesToRootFS = getPkgFilesToCopy(pkg.name, pkg.rootfs, build.rootfsDir)
 
-      let num = 0
-      if (copiedToBootFS.length > 0 || copiedToRootFS.length > 0) {
-        num = copiedToBootFS + copiedToRootFS
+      if (filesToBootFS.length > 0 || filesToRootFS.length > 0) {
+        for (const [src, dest] of filesToBootFS) {
+          copyFiles(src, dest)
+        }
+
+        for (const [src, dest] of filesToRootFS) {
+          copyFiles(src, dest)
+        }
+
         build.rebuiltPackages.push(pkgName)
+        const num = filesToBootFS.length + filesToRootFS.length
+        console.log(`==> (${i + 1}/${buildOrder.length}) Copying ${num} files from ${pkgName}...`)
+      } else {
+        console.log(`==> Skipping ${pkgName}`)
       }
-
-      console.log(`==> (${i + 1}/${buildOrder.length}) Copied ${num} files from ${pkgName}`)
     }
   }
 
