@@ -11,7 +11,9 @@ class SerialAPI {
   }
 
   static list() {
-    return fs.readdirSync('/dev').filter(filepath => filepath.match(/^(ttyAMA0|ttyUSB)/))
+    return fs.readdirSync('/dev')
+      .filter(filepath => filepath.match(/^(ttyAMA0|ttyUSB)/))
+      .map(filepath => `/dev/${filepath}`)
   }
 
   configure(baudrate) {
