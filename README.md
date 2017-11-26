@@ -2,8 +2,6 @@ MakeStack
 =========
 
 [![Build Status](https://travis-ci.org/seiyanuta/makestack.svg?branch=master)](https://travis-ci.org/seiyanuta/makestack)
-[![Maintainability](https://api.codeclimate.com/v1/badges/16d7d304999e8aa97dd4/maintainability)](https://codeclimate.com/github/seiyanuta/makestack/maintainability)
-[![npm version](https://badge.fury.io/js/makestack.svg)](https://badge.fury.io/js/makestack)
 
 ![Demo Video](https://makestack.github.io/demo.gif)
 

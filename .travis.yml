@@ -75,14 +75,8 @@ matrix:
         - bundle install --jobs 2 --path vendor/bundle
         - 'printf "test:\n  adapter: sqlite3\n  database: db/test.sqlite3" > config/database.yml'
         - bundle exec rails db:migrate RAILS_ENV=test
-      before_script:
-        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-        - chmod +x ./cc-test-reporter
-        - ./cc-test-reporter before-build
       script:
         - bundle exec rspec
-      after_script:
-        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
     - language: ruby
       env: M=server:backend:postgresql
@@ -98,14 +92,8 @@ matrix:
         - 'printf "test:\n  adapter: postgresql\n  database: travis_ci_test" > config/database.yml'
         - bundle install --jobs 2 --path vendor/bundle
         - bundle exec rails db:migrate RAILS_ENV=test
-      before_script:
-        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-        - chmod +x ./cc-test-reporter
-        - ./cc-test-reporter before-build
       script:
         - bundle exec rspec
-      after_script:
-        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
     - language: node_js
       node_js: "8"
@@ -155,14 +143,8 @@ matrix:
       install:
         - cd client
         - yarn
-      before_script:
-        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-        - chmod +x ./cc-test-reporter
-        - ./cc-test-reporter before-build
       script:
         - yarn run cov
-      after_script:
-        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
     - language: node_js
       node_js: "8"
