@@ -28,6 +28,7 @@ class Supervisor {
   osType: string;
   osVersion: string;
   debugMode: boolean;
+  testMode: boolean;
   appUID: number;
   appGID: number;
   heartbeatInterval: number;
@@ -37,6 +38,7 @@ class Supervisor {
   device: any;
   appVersion: string;
   log: string;
+  allLog: string;
   stores: any;
   adapterName: string;
   updateEnabled: boolean;
@@ -49,22 +51,25 @@ class Supervisor {
   replVM?: any;
 
   constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
-    deviceSecret, debugMode, appUID, appGID, heartbeatInterval }) {
+    deviceSecret, debugMode, testMode, appUID, appGID, heartbeatInterval }) {
 
     this.app = null
     this.appDir = appDir
     this.osType = osType
     this.osVersion = osVersion
     this.debugMode = debugMode
+    this.testMode = testMode
     this.appUID = parseInt(appUID) || undefined
     this.appGID = parseInt(appGID) || undefined
     this.heartbeatInterval = heartbeatInterval || 15
     this.deviceId = deviceId
     this.deviceSecret = deviceSecret
     this.deviceType = deviceType
-    this.device = new (require(`./devices/${deviceType}`))()
+    const { Device } = require(`./devices/${deviceType}`)
+    this.device = new Device()
     this.appVersion = 'X'
     this.log = ''
+    this.allLog = ''
     this.stores = {}
     this.adapterName = adapter.name
     this.updateEnabled = true
@@ -78,7 +83,7 @@ class Supervisor {
 
     switch (this.adapterName) {
       case 'http':
-        this.adapter = new HTTPAdapter(this.osType, this.deviceId, adapter.url)
+        this.adapter = new HTTPAdapter(this.osType, this.deviceType, this.deviceId, adapter.url)
         this.verifyHMAC = true
         this.includeHMAC = true
         this.includeDeviceId = true
@@ -173,6 +178,7 @@ class Supervisor {
   }
 
   doSpawnApp() {
+    logger.info('starting an app')
     this.app = fork('./start', [], {
       cwd: this.appDir,
       stdio: 'inherit',
@@ -190,6 +196,9 @@ class Supervisor {
         case 'log':
           logger.info('log:', data.body.trimRight())
           this.log += data.body.trimRight() + '\n'
+          if (this.testMode) {
+            this.allLog += data.body.trimRight() + '\n'
+          }
           break
         case 'setUpdateEnabled':
           this.updateEnabled = (data.body !== false)
@@ -202,12 +211,25 @@ class Supervisor {
     this.app.on('exit', () => {
       this.app = null
       logger.info('app exited')
+
       setTimeout(() => {
         if (!this.app) {
           logger.info('restarting app...')
           this.spawnApp()
         }
       }, 5000)
+    })
+  }
+
+  waitForApp() {
+    return new Promise((resolve, reject) => {
+      if (!this.app) {
+        resolve(this.allLog)
+        return
+      }
+
+      this.app.on('exit',  () => { resolve(this.allLog) })
+      this.app.on('error', () => { resolve(this.allLog) })
     })
   }
 
@@ -391,11 +413,11 @@ class Supervisor {
     return [messages, hmacProtectedEnd]
   }
 
-  sendHeartbeat(state) {
+  async sendHeartbeat(state) {
     logger.info(`heartbeating (state=running, os_ver="${this.osVersion}", ` +
       `app_ver="${this.appVersion}", debug=${this.debugMode})`)
 
-    this.adapter.send(this.serialize({
+    await this.adapter.send(this.serialize({
       state,
       deviceId: this.deviceId,
       debugMode: this.debugMode,
@@ -417,8 +439,9 @@ class Supervisor {
       return false
     }
 
-    if (((new Date()).getTime() - (new Date(timestamp)).getTime()) > 5 * 60 * 1000 /* msec */) {
-      console.error('too old timestamp')
+    const diffFromTimestamp = Math.abs(((new Date()).getTime() - (new Date(timestamp)).getTime()))
+    if (diffFromTimestamp > 5 * 60 * 1000 /* msec */) {
+      console.error('invalid timestamp')
       return false
     }
 
@@ -448,10 +471,7 @@ class Supervisor {
   }
 
   async start() {
-    await this.adapter.connect()
-    this.sendHeartbeat('ready')
-
-    this.adapter.onReceive(payload => {
+    this.adapter.onReceive(async payload => {
       const [messages, hmacProtectedEnd] = this.deserialize(payload)
       const hmacProtectedPayload = payload.slice(0, hmacProtectedEnd)
 
@@ -470,7 +490,7 @@ class Supervisor {
           this.downloading = false
 
           if (this.verifyHMAC && !this.verifyImageHMAC(messages.osImageHMAC, image)) {
-            logger.warn('invalid app image HMAC, aborting update')
+            logger.warn('invalid os image HMAC, aborting update')
             return
           }
 
@@ -483,23 +503,27 @@ class Supervisor {
 
       // Update App
       if (this.updateEnabled && !this.downloading && messages.appVersion && messages.appVersion !== this.appVersion) {
-        this.downloading = true
         logger.info(`updating ${this.appVersion} -> ${messages.appVersion}`)
         this.appVersion = messages.appVersion
-        this.adapter.getAppImage(messages.appVersion).then(appZip => {
-          this.downloading = false
 
-          if (this.verifyHMAC && !this.verifyImageHMAC(messages.appImageHMAC, appZip)) {
-            logger.warn('invalid app image HMAC, aborting update')
-            return
-          }
-
-          this.launchApp(appZip)
-        }).catch(e => {
+        let appZip
+        this.downloading = true
+        try {
+          appZip = await this.adapter.getAppImage(messages.appVersion)
+        } catch(e) {
           logger.error('failed to download app image:', e)
           this.downloading = false
-        })
+          return
+        } finally {
+          this.downloading = false
+        }
 
+        if (this.verifyHMAC && !this.verifyImageHMAC(messages.appImageHMAC, appZip)) {
+          logger.warn('invalid app image HMAC, aborting update')
+          return
+        }
+
+        this.launchApp(appZip)
         return
       }
 
@@ -533,9 +557,11 @@ class Supervisor {
       }
     })
 
-    setInterval(() => {
+    await this.adapter.connect()
+    await this.sendHeartbeat('ready')
+    setInterval(async () => {
       if (!this.downloading) {
-        this.sendHeartbeat('running')
+        await this.sendHeartbeat('running')
       }
     }, this.heartbeatInterval * 1000)
   }

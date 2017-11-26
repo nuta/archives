@@ -6,7 +6,7 @@
  */
 const { builtins } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime');
 const { I2C, Timer } = builtins;
-import AdapterBase from './adapter_base';
+import { AdapterBase } from './adapter_base';
 import * as logger from '../logger';
 
 // 1 - 19999 are reserved for OS images.
@@ -274,5 +274,9 @@ export default class SakuraIOAdapter extends AdapterBase {
 
     logger.debug('sakura.io: Hooray! You got a new app image!')
     return Promise.resolve(appImage)
+  }
+
+  getOSImage(version) {
+    return Promise.reject('sakura.io: getOSImage is not supported yet')
   }
 }

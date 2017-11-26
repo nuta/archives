@@ -10,7 +10,8 @@
     "test:live": "mocha -w",
     "pretest": "tsc --pretty",
     "prepublish": "npm run build",
-    "build": "tsc --pretty"
+    "build": "tsc --pretty",
+    "build:live": "tsc --pretty -w"
   },
   "dependencies": {},
   "devDependencies": {
