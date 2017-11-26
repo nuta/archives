@@ -164,6 +164,20 @@ matrix:
       after_script:
         - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
 
+    - language: node_js
+      node_js: "8"
+      env: M=supervisor
+      cache:
+        directories:
+          - client/supervisor/node_modules
+      install:
+        - cd client/supervisor
+        - yarn
+      script:
+        - yarn run cov
+      after_script:
+        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+
 notifications:
   on_success: change
   on_failure: change

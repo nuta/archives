@@ -3,7 +3,8 @@
     "outDir": "./dist",
     "allowJs": true,
     "target": "es2017",
-    "module": "commonjs"
+    "module": "commonjs",
+    "sourceMap": true
   },
   "include": [
     "./lib/**/*"
