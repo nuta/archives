@@ -1,9 +1,3 @@
-process.on('unhandledRejection', (reason, p) => {
-  console.log('runtime: unhandled rejection:\n', reason, '\n\n', p)
-  console.log('runtime: exiting...')
-  process.exit(1)
-})
-
 const path = require('path')
 const logger = require('./logger')
 const AppAPI = require('./api/app')
@@ -36,6 +30,12 @@ if (process.env.MAKESTACK_DEVICE_TYPE) {
 }
 
 function start(appDir) {
+  process.on('unhandledRejection', (reason, p) => {
+    console.log('runtime: unhandled rejection:\n', reason, '\n\n', p)
+    console.log('runtime: exiting...')
+    process.exit(1)
+  })
+
   Object.assign(global, builtins)
 
   process.on('message', (data) => {

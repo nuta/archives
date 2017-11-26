@@ -6,9 +6,19 @@
   "private": true,
   "main": "lib/index.js",
   "scripts": {
+    "cov": "istanbul cover _mocha",
+    "test": "mocha",
+    "test:live": "mocha -w",
+    "prepublish": "npm run build",
     "build": "node-gyp rebuild --arch $ARCH && mkdir -p native/$ARCH && mv build/Release/*node native/$ARCH && rm -rf build"
   },
-  "dependencies": {
-    "nan": "^2.7.0"
+  "dependencies": {},
+  "devDependencies": {
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^4.0.1",
+    "mock-fs": "^4.4.2",
+    "nan": "^2.7.0",
+    "power-assert": "^1.4.4",
+    "sinon": "^4.1.2"
   }
 }
