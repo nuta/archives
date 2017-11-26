@@ -70,7 +70,7 @@ function writeConfigToDiskIamge(osVersion, type, orignalImage, device, adapter) 
   image = replaceBuffer(image, device.device_id, 'DEVICE_ID')
   image = replaceBuffer(image, device.device_secret, 'DEVICE_SECRET')
   image = replaceBuffer(image, api.serverURL, 'SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890')
-  image = replaceBuffer(image, adapter, 'ADAPTER')
+  image = replaceBuffer(image, adapter, 'NETWORK_ADAPTER')
   fs.writeFileSync(imagePath, image)
 
   return imagePath

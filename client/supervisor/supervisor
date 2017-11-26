@@ -3,7 +3,7 @@ const Supervisor = require('.')
 
 const appDir = '/app/current'
 const adapter = {
-  name: process.env['MAKESTACK_ADAPTER'],
+  name: process.env['MAKESTACK_NETWORK_ADAPTER'],
   url: process.env['MAKESTACK_SERVER_URL']
 }
 const osType = process.env['MAKESTACK_OS_TYPE']

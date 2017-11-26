@@ -35,7 +35,7 @@ else
   apparmor_parser -r /etc/apparmor.d/*
 fi
 
-if [ "$MAKESTACK_ADAPTER" = "http" ]; then
+if [ "$MAKESTACK_NETWORK_ADAPTER" = "http" ]; then
   for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
     [ "$interface" = "lo" ] && continue
     [ "$interface" = "irlan0" ] && continue
@@ -45,7 +45,9 @@ if [ "$MAKESTACK_ADAPTER" = "http" ]; then
   done
 fi
 
-ntpd -p 1.pool.ntp.org
+if [ "$MAKESTACK_NETWORK_ADAPTER" = "http" ]; then
+  ntpd -p 1.pool.ntp.org
+fi
 
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
@@ -54,6 +56,6 @@ export MAKESTACK_APP_GID=0
 echo "Starting MakeStack Supervisor..."
 node /supervisor/supervisor
 
-echo "*** something went wrong, rebooting in 10 seconds..."
+echo "*** MakeStack Supervisor exited with $?, rebooting in 10 seconds..."
 sleep 10
 reboot -f
