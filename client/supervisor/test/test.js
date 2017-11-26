@@ -1,7 +1,6 @@
 const assert = require('power-assert')
 const nock = require('nock')
 const os = require('os')
-const mockfs = require('mock-fs')
 const sinon = require('sinon')
 const path = require('path')
 
@@ -56,15 +55,9 @@ describe('Supervisor', function () {
       osVersion,
       heartbeatInterval: this.heartbeatInterval
     })
-
-    mockfs({})
   })
 
   afterEach(function () {
-    mockfs.restore()
-  })
-
-  after(function () {
     this.clock.restore()
   })
 
