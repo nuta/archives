@@ -185,13 +185,19 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
   ```
 
 ## I2C
-You don't have to `require` to use. This API is defined as a global `I2C` object.
+You don't have to `require` to use. This API is defined as a global `I2C` class.
+
+### Constructor
+- **Definition:** `({ address: number }) => I2C`
+- **Usage:**
+  ```js
+  const device = new I2C({ address: 0x40 })
+  ```
 
 ### read
 - **Definition:** `(length: number) => Buffer`
 - **Usage:**
   ```js
-  const device = new I2C({ address: 0x40 })
   const data = device.read(2)
   ```
 
@@ -199,18 +205,25 @@ You don't have to `require` to use. This API is defined as a global `I2C` object
 - **Definition:** `(data: Buffer) => void`
 - **Usage:**
   ```js
-  const device = new I2C({ address: 0x40 })
   device.write([0x01, 0x00, 0x00])
   ```
 
 ## Serial
-You don't have to `require` to use. This API is defined as a global `Serial` object.
+**CAUTION: Serial API may not work. Its implementation is still buggy.**
+
+You don't have to `require` to use. This API is defined as a global `Serial` class.
+
+### Constructor
+- **Definition:** `({ path: string, baudrate: 9600 | 115200 }) => I2C`
+- **Usage:**
+  ```js
+  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
+  ```
 
 ### read
 - **Definition:** `() => Buffer`
 - **Usage:**
   ```js
-  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
   port.read()
   ```
 
@@ -218,7 +231,6 @@ You don't have to `require` to use. This API is defined as a global `Serial` obj
 - **Definition:** `(data: Buffer) => void`
 - **Usage:**
   ```js
-  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
   port.write('Hello!\n')
   ```
 
@@ -226,7 +238,6 @@ You don't have to `require` to use. This API is defined as a global `Serial` obj
 - **Definition:** `(callback: (data) => void)`
 - **Usage:**
   ```js
-  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
   port.onData(chunk => {
     console.log(chunk)
   })
@@ -237,7 +248,6 @@ You don't have to `require` to use. This API is defined as a global `Serial` obj
 - **Description:** Polls data from the serial port and call `callback` each line.  The trailing `\r` and `\n` are removed.
 - **Usage:**
   ```js
-  const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
   port.onLine(line => {
     console.log(line)
   })
@@ -245,12 +255,19 @@ You don't have to `require` to use. This API is defined as a global `Serial` obj
 
 ## SPI
 **CAUTION: SPI API may not work. Its implementation is still buggy.**
-You don't have to `require` to use. This API is defined as a global `SPI` object.
+
+You don't have to `require` to use. This API is defined as a global `SPI` class.
+
+### Constructor
+- **Definition:** `({ slave: number, speed: number, mode: 'MODE0' | 'MODE1' | 'MODE2' | 'MODE3' }) => SPI`
+- **Usage:**
+  ```js
+  const device = new SPI({ slave: 0 /* depends on the device */, speed: 100000, mode: 'MODE3' })
+  ```
 
 ### transfer
 - **Definition:** `(tx: Buffer) => Buffer`
 - **Usage:**
   ```js
-  const device = new SPI({ path: '/dev/spidev0.0', speed: 100000, mode: 'MODE3' })
   console.log(device.transfer([0x30, 0x00, 0x00]))
   ```
