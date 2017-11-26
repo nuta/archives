@@ -3,17 +3,12 @@ const ioctl = require('../ioctl')
 
 const I2C_SLAVE = 0x0703
 
-module.exports = class {
+class LinuxI2CAPI {
+  // abstract path: string
+
   constructor({ address }) {
     this.address = address
-
-    if (!fs.existsSync('/dev/i2c-1')) {
-      console.log('i2c device not found, disabling I2C API')
-      this.fd = fs.openSync('/dev/null', 'r')
-      return
-    }
-
-    this.fd = fs.openSync('/dev/i2c-1', 'rs+')
+    this.fd = fs.openSync(this.path, 'rs+')
   }
 
   reset() {
@@ -38,3 +33,5 @@ module.exports = class {
     }
   }
 }
+
+module.exports = { LinuxI2CAPI }

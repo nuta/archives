@@ -11,11 +11,27 @@ const SPI_MODES = {
   MODE3: SPI_CPHA | SPI_CPOL
 }
 
-class SPIAPI {
-  constructor({ path, ss, speed, order, mode, bits }) {
+class LinuxSPIAPI {
+  // abstract bus: string
+
+  constructor({ path, ss, slave, speed, order, mode, bits }) {
+    if (!path && !slave) {
+      throw new Error("Specify `path' or `slave'.")
+    }
+
+    if (this.slave) {
+      path = `/dev/spidev${this.bus}.${slave}`
+    }
+
+    if (this.ss) {
+      this.ss = new GPIO({ pin: ss, mode: GPIO.OUTPUT })
+      this.deselectSlave()
+    } else {
+      // Chip Select (or Slave Select) is controlled by the kernel
+      this.ss = undefined
+    }
+
     this.fd = fs.openSync(path, 'rs+')
-    this.ss = new GPIO({ pin: ss, mode: GPIO.OUTPUT })
-    this.ss.write(true)
     this.configure(mode, bits, speed, order)
   }
 
@@ -39,16 +55,28 @@ class SPIAPI {
     )
   }
 
+  selectSlave() {
+    if (this.ss) {
+      this.ss.write(false)
+    }
+  }
+
+  deselectSlave() {
+    if (this.ss) {
+      this.ss.write(true)
+    }
+  }
+
   transfer(tx) {
     const rx = Buffer.alloc(tx.length)
-    this.ss.write(false)
+    this.selectSlave()
     try {
       spi.transfer(this.fd, this.speed, Buffer.from(tx), rx)
     } finally {
-      this.ss.write(true)
+      this.deselectSlave()
     }
     return rx
   }
 }
 
-module.exports = SPIAPI
+module.exports = { LinuxSPIAPI }

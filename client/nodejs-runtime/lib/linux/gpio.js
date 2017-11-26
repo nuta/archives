@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-class GPIO {
+class LinuxGPIOAPI {
   constructor({ pin, mode }) {
     if (typeof pin !== 'number') {
       throw new Error("`this.pin' must be a number")
@@ -19,7 +19,7 @@ class GPIO {
   }
 
   setMode(mode) {
-    if (mode !== GPIO.INPUT && mode !== GPIO.OUTPUT) {
+    if (mode !== LinuxGPIOAPI.INPUT && mode !== LinuxGPIOAPI.OUTPUT) {
       throw new Error(`invalid pin mode \`${mode}'`)
     }
 
@@ -29,7 +29,7 @@ class GPIO {
 
     fs.writeFileSync(`/sys/class/gpio/export`, `${this.pin}`)
     fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/direction`,
-      (mode === GPIO.INPUT) ? 'in' : 'out')
+      (mode === LinuxGPIOAPI.INPUT) ? 'in' : 'out')
   }
 
   write(value) {
@@ -62,4 +62,4 @@ class GPIO {
   }
 }
 
-module.exports = GPIO
+module.exports = { LinuxGPIOAPI }
