@@ -220,6 +220,14 @@ You don't have to `require` to use. This API is defined as a global `Serial` cla
   const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
   ```
 
+### Serial.list
+- **Definition:** `() => [string]`
+- **Description:** Returns a list of serial devices.
+- **Usage:**
+  ```js
+  Serial.list()
+  ```
+
 ### read
 - **Definition:** `() => Buffer`
 - **Usage:**

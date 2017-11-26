@@ -10,6 +10,10 @@ class SerialAPI {
     this.configure(baudrate)
   }
 
+  static list() {
+    return fs.readdirSync('/dev').filter(filepath => filepath.match(/^(ttyAMA0|ttyUSB)/))
+  }
+
   configure(baudrate) {
     if (!baudrate) {
       throw new Error("`baudrate' is not speicified")
