@@ -178,6 +178,18 @@ matrix:
       script:
         - yarn run cov
 
+    - language: node_js
+      node_js: "8"
+      env: M=nodejs-runtime
+      cache:
+        directories:
+          - client/nodejs-runtime/node_modules
+      install:
+        - cd client/nodejs-runtime
+        - yarn
+      script:
+        - yarn run cov
+
 notifications:
   on_success: change
   on_failure: change
