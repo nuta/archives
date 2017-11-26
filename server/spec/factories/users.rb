@@ -1,13 +1,13 @@
 FactoryBot.define do
   factory :user do
-    username { 'a' + SecureRandom.hex(13) }
+    sequence(:username) {|n| "user#{n}" }
     email    { "#{username}@example.com" }
     password { FFaker::InternetSE.password }
     confirmed_at { Time.now }
   end
 
   factory :heavy_user, class: 'User' do
-    username { 'a' + SecureRandom.hex(13) }
+    sequence(:username) {|n| "user#{n}" }
     email    { "#{username}@example.com" }
     password { FFaker::InternetSE.password }
     confirmed_at { Time.now }

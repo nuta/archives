@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :app do
     user
+    sequence(:name) {|n| "app#{n}" }
     api  "nodejs"
     os_version "a"
-    name { FFaker::InternetSE.slug.gsub(".", "-") }
   end
 end

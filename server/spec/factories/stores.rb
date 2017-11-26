@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :store do
     data_type { "string" }
-    key   { FFaker::InternetSE.slug }
+    sequence(:key) {|n| "key#{n}" }
     value { FFaker::DizzleIpsum.words.join(' ') }
 
     factory :app_store do
