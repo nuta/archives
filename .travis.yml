@@ -112,11 +112,11 @@ matrix:
       node_js: "8"
       cache:
         directories:
-          - installer/node_modules
+          - sdk/installer/node_modules
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
-        - cd installer
+        - cd sdk/installer
         - npm install -g yarn
         - yarn
       script:
@@ -127,9 +127,9 @@ matrix:
       env: M=installer:linux
       cache:
         directories:
-          - installer/node_modules
+          - sdk/installer/node_modules
       install:
-        - cd installer
+        - cd sdk/installer
         - yarn
       script:
         - yarn run build:linux
@@ -151,9 +151,9 @@ matrix:
       env: M=supervisor
       cache:
         directories:
-          - client/supervisor/node_modules
+          - supervisor/node_modules
       install:
-        - cd client/nodejs-runtime
+        - cd runtime
         - yarn
         - cd ../supervisor
         - yarn
@@ -162,12 +162,12 @@ matrix:
 
     - language: node_js
       node_js: "8"
-      env: M=nodejs-runtime
+      env: M=runtime
       cache:
         directories:
-          - client/nodejs-runtime/node_modules
+          - runtime/node_modules
       install:
-        - cd client/nodejs-runtime
+        - cd runtime
         - yarn
       script:
         - yarn run cov

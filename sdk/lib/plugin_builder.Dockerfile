@@ -10,8 +10,10 @@ CMD \
     cp -r /plugin /build && \
     cd /build && \
     if [ -f package.json ]; then \
-      yarn && \
+      rm -rf node_modules && \
+      yarn --prod && \
       \
+      node-gyp rebuild --arch x64 && \
       mkdir -p native/x64 && \
       mv build/Release/*.node native/x64 && \
       rm -rf build && \
@@ -34,6 +36,6 @@ CMD \
       mv build/Release/*.node native/arm64 && \
       rm -rf build && \
       \
-      rm -rf node_modules/nan yarn.lock binding.gyp; \
+      rm -rf coverage test lib/native node_modules/nan node_modules/.yarn-integrity yarn.lock binding.gyp; \
     fi; \
-    zip -FSr /dist/plugin.zip *
+    rm /dist/plugin.zip; zip -FSr /dist/plugin.zip *

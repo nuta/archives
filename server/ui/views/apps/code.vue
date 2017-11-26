@@ -238,9 +238,8 @@ export default {
       return destZip
     },
     async buildApp (files) {
-      let runtime = 'nodejs-runtime'
+      let runtime = 'runtime'
       let plugins = this.loadAppYAML().plugins || []
-      plugins = plugins.map(pluginName => `nodejs-${pluginName}`)
       let zip = new JSZip()
 
       // Download the runtime.

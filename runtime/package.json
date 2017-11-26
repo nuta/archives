@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-runtime",
+  "name": "makestack-runtime",
   "version": "0.0.1",
   "description": "MakeStack Node.js app runtime environment.",
   "gypfile": true,
@@ -10,12 +10,11 @@
     "test": "mocha",
     "test:live": "mocha -w",
     "prepublish": "npm run build",
-    "build": "npm run build:x64",
-    "build:x64": "node-gyp rebuild --arch arm && mkdir -p native/x64 && mv build/Release/*node native/x64 && rm -rf build",
-    "build:arm": "node-gyp rebuild --arch arm && mkdir -p native/arm && mv build/Release/*node native/arm && rm -rf build",
-    "build:arm64": "node-gyp rebuild --arch arm64 && mkdir -p native/arm64 && mv build/Release/*node native/arm64 && rm -rf build"
+    "build": "node-gyp rebuild --arch x64 && mkdir -p native/x64 && mv build/Release/*.node native/x64 && rm -rf build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "nan": "^2.7.0"
+  },
   "devDependencies": {
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",

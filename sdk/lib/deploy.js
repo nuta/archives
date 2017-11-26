@@ -26,9 +26,8 @@ async function downloadAndExtractPackage(name, zip, basepath) {
 
 async function deploy(appYAML, files) {
   const appName = appYAML.name
-  let runtime = 'nodejs-runtime'
+  let runtime = 'runtime'
   let plugins = appYAML.plugins || []
-  plugins = plugins.map(pluginName => `nodejs-${pluginName}`)
   let zip = new JSZip()
 
   // Download the runtime.

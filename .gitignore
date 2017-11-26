@@ -5,9 +5,15 @@ coverage
 /dist
 
 # client
-/client/tests/tmp
-/client/nodejs-runtime/build
-/client/supervisor/dist
+/sdk/tests/tmp
+/sdk/installer/dist
+/sdk/installer/builds
+
+# runtime
+/runtime/build
+
+# supervisor
+/supervisor/dist
 
 # server
 /server/config/settings.production.yml
@@ -23,10 +29,6 @@ coverage
 /server/public/vendor.*.js
 /server/public/documentation
 !/server/public/documentation/.gitkeep
-
-# installer
-/installer/dist
-/installer/builds
 
 # linux
 /linux/build

@@ -7,7 +7,8 @@ RUN apt-get install -qy nodejs build-essential bc dosfstools cpio \
 RUN npm install -g node-gyp yarn
 
 RUN mkdir /makestack
-ADD build/client /makestack/client
+ADD build/supervisor /makestack/supervisor
+ADD build/runtime /makestack/runtime
 ADD pkgbuilder /makestack/linux/pkgbuilder
 ADD packages /makestack/linux/packages
 

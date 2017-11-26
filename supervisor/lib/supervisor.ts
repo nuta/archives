@@ -77,7 +77,7 @@ class Supervisor {
     this.replEnabled = debugMode;
 
     if (this.replEnabled) {
-      const { builtins } = require(process.env.RUNTIME_MODULE || 'nodejs-runtime');
+      const { builtins } = require(process.env.RUNTIME_MODULE || 'makestack-runtime');
       this.replVM = vm.createContext(builtins);
     }
 

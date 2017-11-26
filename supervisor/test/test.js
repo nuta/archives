@@ -7,7 +7,7 @@ const path = require('path')
 const deviceId = 'Uz3GDcfqQ0axGQ70p5x30asCzjT0bLOumk-YdeG0'
 const deviceSecret = 'MsK91P2I6kVfFKdHXPbe.UEySJuwZuuNiLECQqnh'
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3'
-process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../nodejs-runtime')
+process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../makestack-runtime')
 
 const serverURL = 'http://test-server'
 

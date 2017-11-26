@@ -4,8 +4,8 @@ const { spawnSync } = require('child_process')
 const { config, run, buildPath, isNewerDirContent } = require('../pkgbuilder').pkg
 
 const ignore = [/^node_modules/]
-const supervisorPath = path.resolve(__dirname, '../../client/supervisor')
-const appRuntimePath = path.resolve(__dirname, '../../client/nodejs-runtime')
+const supervisorPath = path.resolve(__dirname, '../../supervisor')
+const runtimePath = path.resolve(__dirname, '../../runtime')
 
 module.exports = {
   name: 'supervisor',
@@ -32,7 +32,7 @@ module.exports = {
 
   build() {
     let packageJSON = JSON.parse(fs.readFileSync('package.json'))
-    packageJSON.dependencies['nodejs-runtime'] = 'file:' + appRuntimePath
+    packageJSON.dependencies['makestack-runtime'] = 'file:' + runtimePath
     fs.writeFileSync('package.json', JSON.stringify(packageJSON))
 
     run(['rm', '-rf', 'node_modules'])
@@ -43,7 +43,7 @@ module.exports = {
       CC: `${config('target.toolchain_prefix')}gcc`,
       CXX: `${config('target.toolchain_prefix')}g++`,
       LINK: `${config('target.toolchain_prefix')}g++`
-    }, 'node_modules/nodejs-runtime')
+    }, 'node_modules/makestack-runtime')
   },
 
   rootfs() {

@@ -6,9 +6,9 @@ function plugin(name) {
     throw new Error(`invalid plugin name: ${name}`)
   }
 
-  // This file will be installed at <appdir>/node_modules/nodejs-runtime/lib/plugin.js
+  // This file will be installed at <appdir>/node_modules/runtime/lib/plugin.js
   const appDir = path.resolve(__dirname, '../../..')
-  return require(`${appDir}/plugins/nodejs-${name}`)
+  return require(`${appDir}/plugins/${name}`)
 }
 
 module.exports = plugin

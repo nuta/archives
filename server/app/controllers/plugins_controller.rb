@@ -32,8 +32,8 @@ class PluginsController < ApplicationController
 
       makestack_command = File.join(File.dirname(__FILE__), '../../../client/bin/makestack')
 
-      if plugin == 'nodejs-runtime'
-        plugin_dir = File.join(File.dirname(__FILE__), '../../../client/nodejs-runtime')
+      if plugin == 'runtime'
+        plugin_dir = File.join(File.dirname(__FILE__), '../../../runtime')
       else
         plugin_dir = File.join(File.dirname(__FILE__), '../../../plugins/', plugin)
         unless Dir.exist?(plugin_dir)

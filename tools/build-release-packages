@@ -7,12 +7,12 @@ DIST_DIR=$(realpath dist)
 
 mkdir -p $DIST_DIR
 
-echo "==> Packaging client..."
-npm pack client
-mv client-*.tgz $DIST_DIR/makestack-client-$VERSION.tar.gz
+echo "==> Packaging SDK..."
+npm pack makestack
+mv makestack-*.tgz $DIST_DIR/makestack-sdk-$VERSION.tar.gz
 
 echo "==> Packaging installer..."
-cd installer
+pushd sdk/installer
 yarn build:macos
 yarn build:linux
 
@@ -24,11 +24,11 @@ pushd builds
 tar Jcf $DIST_DIR/makestack-installer-$VERSION-linux-x64.tar.xz makestack-installer-linux-x64
 popd
 
-cd ..
+popd
 
 echo "==> Packaging Plugins..."
-for plugin in client/nodejs-runtime plugins/*; do
-  ./client/bin/makestack build-plugin $plugin $DIST_DIR/$(basename $plugin)-$VERSION.plugin.zip
+for plugin in runtime plugins/*; do
+  ./sdk/bin/makestack build-plugin $plugin $DIST_DIR/$(basename $plugin)-$VERSION.plugin.zip
 echo
 done
 
@@ -36,10 +36,10 @@ echo "==> Building linux..."
 cd linux
 for target in raspberrypi3; do
   mkdir -p $DIST_DIR/linux/$target
-  rm -rf build/client
-  mkdir -p build/client
-  cp -r ../client/nodejs-runtime build/client/nodejs-runtime
-  cp -r ../client/supervisor build/client/supervisor
+  rm -rf build
+  mkdir -p build
+  cp -r ../runtime     build/runtime
+  cp -r ../supervisor  build/supervisor
   docker build -t makestck/pkgbuilder .
   docker run --rm -e TARGET=$target -v $DIST_DIR/linux/$target:/dist -t makestck/pkgbuilder
   mv $DIST_DIR/linux/$target/makestack-linux-$target.img $DIST_DIR/makestack-linux-$VERSION-$target.img
