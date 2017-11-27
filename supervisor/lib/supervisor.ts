@@ -9,7 +9,7 @@ import HTTPAdapter from './adapters/http_adapter';
 import SakuraioAdapter from './adapters/sakuraio_adapter';
 import * as logger from './logger';
 import { serialize, deserialize } from './smms';
-import { computeHMAC, verifyMessageHMAC, verifyImageHMAC } from './hmac';
+import { verifyMessageHMAC, verifyImageHMAC } from './hmac';
 
 class Supervisor {
   app: any;
@@ -119,7 +119,8 @@ class Supervisor {
         log: 'os updated'
       }, {
         includeDeviceId: this.includeDeviceId,
-        includeHMAC: this.includeHMAC
+        includeHMAC: this.includeHMAC,
+        deviceSecret: this.deviceSecret
       }))
     }, 5000)
   }
@@ -235,7 +236,7 @@ class Supervisor {
   }
 
   async sendHeartbeat(state) {
-    if (!this.downloading) {
+    if (this.downloading) {
       return
     }
 
@@ -251,7 +252,8 @@ class Supervisor {
       log: this.popLog()
     }, {
       includeDeviceId: this.includeDeviceId,
-      includeHMAC: this.includeHMAC
+      includeHMAC: this.includeHMAC,
+      deviceSecret: this.deviceSecret
     }))
   }
 
@@ -271,7 +273,7 @@ class Supervisor {
       this.downloading = false
     }
 
-    if (this.verifyHMAC && !verifyImageHMAC(appImageHMAC, appZip)) {
+    if (this.verifyHMAC && !verifyImageHMAC(this.deviceSecret, appImageHMAC, appZip)) {
       logger.warn('invalid app image HMAC, aborting update')
       return
     }
@@ -286,7 +288,7 @@ class Supervisor {
     this.adapter.getOSImage(this.deviceType, this.osVersion).then(image => {
       this.downloading = false
 
-      if (this.verifyHMAC && !verifyImageHMAC(osImageHMAC, image)) {
+      if (this.verifyHMAC && !verifyImageHMAC(this.deviceSecret, osImageHMAC, image)) {
         logger.warn('invalid os image HMAC, aborting update')
         return
       }
@@ -333,11 +335,12 @@ class Supervisor {
   isAppUpdateRequired(messages): boolean {
     return this.updateEnabled && !this.downloading && messages.appVersion && messages.appVersion !== this.appVersion
   }
+
   async onSMMSReceive(payload) {
     const [messages, hmacProtectedEnd] = deserialize(payload)
     const hmacProtectedPayload = payload.slice(0, hmacProtectedEnd)
 
-    if (this.verifyHMAC && !verifyMessageHMAC(hmacProtectedPayload, messages.hmac, messages.timestamp)) {
+    if (this.verifyHMAC && !verifyMessageHMAC(this.deviceSecret, hmacProtectedPayload, messages.hmac, messages.timestamp)) {
       logger.warn('invalid message hmac, discarding...')
       return
     }
@@ -361,9 +364,10 @@ class Supervisor {
 
 
   async start() {
-    this.adapter.onReceive(this.onSMMSReceive)
+    this.adapter.onReceive(payload => { this.onSMMSReceive(payload) })
     await this.adapter.connect()
     await this.sendHeartbeat('ready')
+
     setInterval(() => {
       this.sendHeartbeat('running')
     }, this.heartbeatInterval * 1000)

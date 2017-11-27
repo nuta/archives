@@ -59,7 +59,7 @@ export function generateMessage(type: number, payload: any) {
   return msg
 }
 
-export function serialize(messages, { includeDeviceId, includeHMAC }) {
+export function serialize(messages, { includeDeviceId, includeHMAC, deviceSecret }) {
   let payload = Buffer.alloc(0)
 
   if (includeDeviceId && messages.deviceId) {
@@ -107,7 +107,7 @@ export function serialize(messages, { includeDeviceId, includeHMAC }) {
     const dummy = Buffer.concat([payload, Buffer.alloc(hmacMsgLength)])
     header = Buffer.concat([header, generateVariableLength(dummy)])
 
-    const hmac = computeHMAC(Buffer.concat([header, payload]))
+    const hmac = computeHMAC(deviceSecret, Buffer.concat([header, payload]))
     const hmacMsg = generateMessage(SMMS_HMAC_MSG, hmac)
 
     assert.equal(hmacMsgLength, hmacMsg.length)

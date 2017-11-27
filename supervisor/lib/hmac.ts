@@ -1,12 +1,12 @@
 import * as crypto from 'crypto';
 
-export function computeHMAC(data) {
-  const hmac = crypto.createHmac('sha256', this.deviceSecret)
+export function computeHMAC(deviceSecret, data) {
+  const hmac = crypto.createHmac('sha256', deviceSecret)
   hmac.update(data)
   return hmac.digest('hex')
 }
 
-export function verifyMessageHMAC(payload: Buffer, hmac: string, timestamp: string) {
+export function verifyMessageHMAC(deviceSecret: string, payload: Buffer, hmac: string, timestamp: string) {
   if (typeof timestamp !== 'string') {
     console.error('timestamp is not set')
     return false
@@ -23,7 +23,7 @@ export function verifyMessageHMAC(payload: Buffer, hmac: string, timestamp: stri
     return false
   }
 
-  if (hmac !== this.computeHMAC(payload)) {
+  if (hmac !== computeHMAC(deviceSecret, payload)) {
     console.error('invalid hmac')
     return false
   }
@@ -31,7 +31,7 @@ export function verifyMessageHMAC(payload: Buffer, hmac: string, timestamp: stri
   return true
 }
 
-export function verifyImageHMAC(hmac, image) {
+export function verifyImageHMAC(deviceSecret, hmac, image) {
   if (!hmac) {
     return false
   }
@@ -40,5 +40,5 @@ export function verifyImageHMAC(hmac, image) {
   hash.update(image)
   const shasum = hash.digest('hex')
 
-  return (hmac === computeHMAC(shasum))
+  return (hmac === computeHMAC(deviceSecret, shasum))
 }
