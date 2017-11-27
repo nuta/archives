@@ -364,7 +364,7 @@ class Supervisor {
 
 
   async start() {
-    this.adapter.onReceive(payload => { this.onSMMSReceive(payload) })
+    this.adapter.onReceive(payload => this.onSMMSReceive(payload))
     await this.adapter.connect()
     await this.sendHeartbeat('ready')
 
