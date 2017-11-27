@@ -5,7 +5,7 @@ let { loadMocks, updateMocks } = require('../config')
 
 function create(args, opts, logger) {
   let deviceName = args.name
-  api.registerDevice(deviceName, 'mock', null).then(device => {
+  api.registerDevice(deviceName, 'sdk', null).then(device => {
     updateMocks({ [deviceName]: device })
   }).catch(e => {
     logger.error('failed to create a mock device', e)
@@ -15,7 +15,7 @@ function create(args, opts, logger) {
 function run(args, opts, logger) {
   let mock = loadMocks()[args.name]
 
-  process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../runtime')
+  process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../../runtime')
   process.env.MAKESTACK_DEVICE_TYPE = mock.device_type // FIXME: used by runtime
   const Supervisor = require('../../../supervisor')
   const supervisor = new Supervisor({
@@ -24,7 +24,7 @@ function run(args, opts, logger) {
       name: opts.adapter,
       url: api.serverURL
     },
-    osType: 'mock',
+    osType: 'sdk',
     deviceType: mock.device_type,
     deviceId: mock.device_id,
     deviceSecret: mock.device_secret,
