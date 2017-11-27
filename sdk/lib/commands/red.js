@@ -14,10 +14,12 @@ const { deploy } = require('../deploy')
 const { loadAppYAML } = require('../appdir')
 const { mkdirp, createFile } = require('../helpers')
 
-const NODE_RED_USER_DIR = path.resolve(os.homedir(), '.makestack/node-red')
+const NODE_RED_OFFICIAL_NODES_DIR = path.resolve(__dirname, '../red')
 const NODE_RED_DIR = path.resolve(os.homedir(), '.makestack/node-red/node-red')
-const NODE_RED_USER_NODES_DIR = path.resolve(os.homedir(), '.makestack/node-red/nodes')
-const NODE_RED_USER_TRANSPILERS_DIR = path.resolve(os.homedir(), '.makestack/node-red/transpilers')
+const NODE_RED_USER_DIR = path.resolve(os.homedir(), '.makestack/node-red')
+const NODE_RED_NODES_DIR = path.resolve(os.homedir(), '.makestack/node-red/nodes')
+const NODE_RED_EMPTY_NODES_DIR = path.resolve(os.homedir(), '.makestack/node-red/nodes2')
+const NODE_RED_TRANSPILERS_DIR = path.resolve(os.homedir(), '.makestack/node-red/transpilers')
 const NODE_RED_URL = 'https://github.com/node-red/node-red/archive/0.17.5.tar.gz'
 const NODE_RED_PORT = 1880
 const NODE_RED_SETTINGS = `
@@ -25,8 +27,8 @@ module.exports = {
   uiPort: ${NODE_RED_PORT},
   uiHost: "127.0.0.1",
   debugMaxLength: 1000,
-  nodesDir: "${NODE_RED_USER_NODES_DIR}",
-  coreNodesDir: "${path.resolve(__dirname, '../red/nodes')}",
+  coreNodesDir: "${NODE_RED_NODES_DIR}",
+  nodesDir: "${NODE_RED_EMPTY_NODES_DIR}",
   logging: {
     console: {
       level: "info", // trace, debug, info, warn, error, or fatal
@@ -49,10 +51,23 @@ module.exports = {
 }
 `
 
+function generateNodeScript(filepath) {
+  const id = path.parse(filepath).name
+  const camelcase = id.replace(/-([a-z])/, (m, s) => s.toUpperCase())
+  return `
+module.exports = (RED) => {
+  function ${camelcase}Node(config) {
+    RED.nodes.createNode(this, config)
+  }
+
+  RED.nodes.registerType('${id}', ${camelcase}Node)
+}
+`
+}
+
 function installNodeRED() {
   if (!fs.existsSync(path.join(NODE_RED_DIR, 'red.js'))) {
     mkdirp(NODE_RED_DIR)
-    mkdirp(NODE_RED_USER_DIR)
     spawnSync('curl', ['-LO', NODE_RED_URL], { cwd: NODE_RED_DIR })
     spawnSync('tar',
       ['xf', path.basename(NODE_RED_URL), '--strip-components', '1'],
@@ -90,14 +105,16 @@ function loadTranspilers() {
   const transpilers = []
 
   // Official nodes.
-  const officialTranspilersDir = path.resolve(__dirname, '../red/transpilers')
+  const officialTranspilersDir = path.resolve(__dirname, '../red')
   for (const filename of fs.readdirSync(officialTranspilersDir)) {
-    transpilers[path.parse(filename).name] = require(`${officialTranspilersDir}/${filename}`)
+    if (filename.match(/.js$/)) {
+      transpilers[path.parse(filename).name] = require(`${officialTranspilersDir}/${filename}`)
+    }
   }
 
   // Plugin nodes.
-  for (const filename of fs.readdirSync(NODE_RED_USER_TRANSPILERS_DIR)) {
-    transpilers[path.parse(filename).name] = require(path.join(NODE_RED_USER_TRANSPILERS_DIR, filename))
+  for (const filename of fs.readdirSync(NODE_RED_TRANSPILERS_DIR)) {
+    transpilers[path.parse(filename).name] = require(path.join(NODE_RED_TRANSPILERS_DIR, filename))
   }
 
   return transpilers
@@ -243,7 +260,7 @@ module.exports = async (args, opts, logger) => {
     const argv = process.argv.slice(1).filter(arg => arg !== '--dev')
 
     supervisor.run(['-w', path.resolve(__dirname, '../../lib') + ',' +
-      path.resolve(NODE_RED_USER_DIR, '.makestack/node-red') + ',' +
+      path.resolve(NODE_RED_DIR, '.makestack/node-red') + ',' +
       path.resolve(__dirname, '../../../plugins'),
       '-e', 'js,html', '--', ...argv])
     return
@@ -251,20 +268,40 @@ module.exports = async (args, opts, logger) => {
 
   const appYAML = loadAppYAML(opts.appDir)
 
+  mkdirp(NODE_RED_USER_DIR)
+  mkdirp(NODE_RED_NODES_DIR)
+  mkdirp(NODE_RED_EMPTY_NODES_DIR)
+  mkdirp(NODE_RED_TRANSPILERS_DIR)
+
+  // Official plugins.
+  for (const filepath of fs.readdirSync(NODE_RED_OFFICIAL_NODES_DIR)) {
+    if (filepath.match(/\.js$/)) {
+      createFile(`${NODE_RED_TRANSPILERS_DIR}/${path.basename(filepath)}`,
+        fs.readFileSync(path.join(NODE_RED_OFFICIAL_NODES_DIR, filepath)))
+    }
+
+    if (filepath.match(/\.html$/)) {
+      createFile(`${NODE_RED_NODES_DIR}/${path.basename(filepath)}`,
+        fs.readFileSync(path.join(NODE_RED_OFFICIAL_NODES_DIR, filepath)))
+      createFile(`${NODE_RED_NODES_DIR}/${path.parse(filepath).name}.js`,
+        generateNodeScript(filepath))
+    }
+  }
+
   // Download plugins.
-  mkdirp(NODE_RED_USER_NODES_DIR)
-  mkdirp(NODE_RED_USER_TRANSPILERS_DIR)
   for (const pluginName of appYAML.plugins || []) {
     const pluginZip = await (new JSZip()).loadAsync(await api.downloadPlugin(`nodejs-${pluginName}`))
     for (const filepath in pluginZip.files) {
-      if (filepath.startsWith('red/nodes/')) {
-        createFile(`${NODE_RED_USER_NODES_DIR}/${path.basename(filepath)}`,
+      if (filepath.startsWith('red/') && filepath.match(/\.js$/)) {
+        createFile(`${NODE_RED_TRANSPILERS_DIR}/${path.basename(filepath)}`,
           await pluginZip.files[filepath].async('string'))
       }
 
-      if (filepath.startsWith('red/transpilers/')) {
-        createFile(`${NODE_RED_USER_TRANSPILERS_DIR}/${path.basename(filepath)}`,
+      if (filepath.startsWith('red/') && filepath.match(/\.html$/)) {
+        createFile(`${NODE_RED_NODES_DIR}/${path.basename(filepath)}`,
           await pluginZip.files[filepath].async('string'))
+        createFile(`${NODE_RED_NODES_DIR}/${path.parse(filepath).name}.js`,
+          generateNodeScript(path.basename(filepath)))
       }
     }
   }
