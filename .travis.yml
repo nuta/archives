@@ -136,12 +136,12 @@ matrix:
 
     - language: node_js
       node_js: "8"
-      env: M=client
+      env: M=SDK
       cache:
         directories:
-          - client/node_modules
+          - sdk/node_modules
       install:
-        - cd client
+        - cd sdk
         - yarn
       script:
         - yarn run cov
