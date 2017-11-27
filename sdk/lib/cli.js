@@ -47,9 +47,18 @@ program
   .action(require('./commands/add_device'))
 
 program
+  .command('run', 'Run as a device.')
+  .option('--device-id <device-id>', 'The device ID.', null, null, true)
+  .option('--device-secret <device-secret>', 'The device secret.', null, null, true)
+  .option('--adapter <adapter>', 'The network adapter.', /^http|sakuraio$/, 'http')
+  .option('--server <url>', 'The server url.', /^(http|https):\/\//, null, false)
+  .option('--heartbeat-interval <seconds>', 'The server url.', null, 15)
+  .action(require('./commands/run'))
+
+program
   .command('mock create', 'Create a mock device.')
   .argument('name', 'The mock device name.')
-  .option('--device-type <device-type>', 'The device type.', /^raspberrypi3|mock$/, 'mock')
+  .option('--device-type <device-type>', 'The device type.', /^raspberrypi3|sdk$/, 'sdk')
   .action(require('./commands/mock').create)
 
 program

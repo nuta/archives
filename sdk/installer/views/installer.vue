@@ -70,7 +70,7 @@ export default {
     return {
       installButtonMessage: 'Install',
       deviceName: '',
-      availableDeviceTypes: [ 'raspberrypi3', 'mock' ],
+      availableDeviceTypes: [ 'raspberrypi3' ],
       deviceType: null,
       availableOSes: [ 'linux' ],
       os: null,

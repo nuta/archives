@@ -291,12 +291,12 @@ class Supervisor {
   serialize(messages) {
     let payload = Buffer.alloc(0)
 
-    if (this.includeDeviceId && 'deviceId' in messages) {
+    if (this.includeDeviceId && messages.deviceId) {
       const deviceIdMsg = this.generateMessage(SMMS_DEVICE_ID_MSG, messages.deviceId)
       payload = Buffer.concat([payload, deviceIdMsg])
     }
 
-    if ('state' in messages) {
+    if (messages.state) {
       const states = { booting: 1, ready: 2, running: 3 }
 
       if (!states[messages.state]) {
@@ -309,17 +309,17 @@ class Supervisor {
       payload = Buffer.concat([payload, deviceInfoMsg])
     }
 
-    if ('log' in messages) {
+    if (messages.log) {
       const logMsg = this.generateMessage(SMMS_LOG_MSG, messages.log)
       payload = Buffer.concat([payload, logMsg])
     }
 
-    if ('osVersion' in messages) {
+    if (messages.osVersion) {
       const osVersionMsg = this.generateMessage(SMMS_OS_VERSION_MSG, messages.osVersion)
       payload = Buffer.concat([payload, osVersionMsg])
     }
 
-    if ('appVersion' in messages) {
+    if (messages.appVersion) {
       const appVersionMsg = this.generateMessage(SMMS_APP_VERSION_MSG, messages.appVersion)
       payload = Buffer.concat([payload, appVersionMsg])
     }
@@ -482,7 +482,7 @@ class Supervisor {
       }
 
       // Update OS.
-      if (this.updateEnabled && !this.downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
+      if (this.updateEnabled && this.osVersion && !this.downloading && messages.osVersion && messages.osVersion !== this.osVersion) {
         this.downloading = true
         logger.info(`updating os ${this.osVersion} -> ${messages.osVersion}`)
 

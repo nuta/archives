@@ -14,7 +14,7 @@ class Device < ApplicationRecord
   value :last_command_id, expiration: 3.hours
   hash_key :command_results, expiration: 5.minutes
 
-  SUPPORTED_TYPES = %w(mock raspberrypi3)
+  SUPPORTED_TYPES = %w(sdk raspberrypi3)
   DEVICE_STATES = %w(new booting ready running relaunch reboot down)
   RESERVED_DEVICE_NAMES = %w(new)
   DEVICE_NAME_REGEX = /\A[a-zA-Z][a-zA-Z0-9\-\_]*\z/

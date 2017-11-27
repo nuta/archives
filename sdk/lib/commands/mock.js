@@ -14,7 +14,6 @@ function create(args, opts, logger) {
 
 function run(args, opts, logger) {
   let mock = loadMocks()[args.name]
-  const osVersion = 'a' // A version defined in server/config/makestack.yml
 
   process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../runtime')
   process.env.MAKESTACK_DEVICE_TYPE = mock.device_type // FIXME: used by runtime
@@ -30,7 +29,7 @@ function run(args, opts, logger) {
     deviceId: mock.device_id,
     deviceSecret: mock.device_secret,
     debugMode: true,
-    osVersion,
+    osVersion: null,
     heartbeatInterval: 2
   })
 

@@ -7,10 +7,9 @@
     "makestack": "bin/makestack"
   },
   "scripts": {
-    "test": "mocha tests",
-    "autotest": "supervisor -q -n exit -x mocha -- tests",
-    "cov": "istanbul cover _mocha tests",
-    "livebuild": "./node_modules/.bin/supervisor -w supervisor/lib -e 'js,ts' -n exit -x sh -- -c 'cd supervisor && yarn build'"
+    "cov": "istanbul cover _mocha",
+    "test": "mocha",
+    "test:live": "mocha -w"
   },
   "repository": {
     "type": "git",
