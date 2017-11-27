@@ -6,8 +6,8 @@ a:
         url: http://localhost:8100/repos/os/x86_64.img
       raspberrypi3:
         url: http://localhost:8100/repos/os/raspberrypi3.img
-      mock:
-        url: http://localhost:8100/repos/os/mock.img
+      sdk:
+        url: http://localhost:8100/repos/os/sdk.img
         shasum: 733045e06887bba40eadfc4ee9012b588c58c5762d6a7e5780ac74ff4ea24ebb
 b:
   linux:
@@ -17,8 +17,8 @@ b:
         url: http://localhost:8100/repos/os/x86_64.img
       raspberrypi3:
         url: http://localhost:8100/repos/os/raspberrypi3.img
-      mock:
-        url: http://localhost:8100/repos/os/mock.img
+      sdk:
+        url: http://localhost:8100/repos/os/sdk.img
         shasum: 733045e06887bba40eadfc4ee9012b588c58c5762d6a7e5780ac74ff4ea24ebb
 c:
   linux:
@@ -28,6 +28,6 @@ c:
         url: http://localhost:8100/repos/os/x86_64.img
       raspberrypi3:
         url: http://localhost:8100/repos/os/raspberrypi3.img
-      mock:
-        url: http://localhost:8100/repos/os/mock2.img
+      sdk:
+        url: http://localhost:8100/repos/os/sdk2.img
         shasum: 733045e06887bba40eadfc4ee9012b588c58c5762d6a7e5780ac74ff4ea24ebb
