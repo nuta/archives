@@ -7,13 +7,9 @@ const path = require('path')
 const deviceId = 'Uz3GDcfqQ0axGQ70p5x30asCzjT0bLOumk-YdeG0'
 const deviceSecret = 'MsK91P2I6kVfFKdHXPbe.UEySJuwZuuNiLECQqnh'
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3'
-process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../makestack-runtime')
+process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../runtime')
 
 const serverURL = 'http://test-server'
-
-function getStdoutFromFakeConsole() {
-  return console.log.getCalls().map(call => call.args.join(' ')).join('\n')
-}
 
 describe('Supervisor', function () {
   beforeEach(function () {
