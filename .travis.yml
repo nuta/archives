@@ -29,7 +29,7 @@ matrix:
         - cd linux
         - make prepare
       script:
-        - make TARGET=x64
+        - make TARGET=x64 BUILD=release
 
     - language: node_js
       node_js: "8"
@@ -65,7 +65,7 @@ matrix:
         - cd ../../linux
         - make prepare
       script:
-        - make TARGET=raspberrypi3
+        - make TARGET=raspberrypi3 BUILD=release
 
     - language: ruby
       env: M=server:backend:sqlite3
