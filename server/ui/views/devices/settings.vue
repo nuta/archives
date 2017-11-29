@@ -32,6 +32,37 @@
       <input type="submit" value="Save" class="uk-button uk-button-primary uk-align-right">
     </form>
   </remote-content>
+
+
+  <div class="uk-margin-xlarge-top">
+    <h3>Reboot the device</h3>
+    <p>Send a reboot command to {{ deviceName }}.</p>
+    <button class="uk-button uk-button-danger" uk-toggle="target: #reboot-modal">
+      Reboot
+    </button>
+  </div>
+
+
+  <div class="uk-flex-top" uk-modal id="reboot-modal">
+    <div class="uk-modal-dialog">
+      <div class="uk-modal-header">
+        <button class="uk-modal-close-default" type="button" uk-close></button>
+        <h2 class="uk-modal-title">Reboot a device</h2>
+      </div>
+      <div class="uk-modal-body">
+        Are you sure you want to reboot {{ deviceName }}?
+      </div>
+      <div class="uk-modal-footer uk-text-right">
+          <button uk-toggle="target: #reboot-modal" class="uk-button uk-button-primary">
+            Cancel
+          </button>
+          <button @click="reboot" class="uk-button uk-button-danger">
+            Reboot {{ deviceName }}
+          </button>
+      </div>
+    </div>
+  </div>
+
 </device-layout>
 </template>
 
@@ -62,6 +93,11 @@ export default {
       })
 
      this.$Notification.success('Updated settings.')
+    },
+    async reboot() {
+      await api.rebootDevice(this.deviceName)
+      UIkit.modal('#reboot-modal').hide()
+      this.$Notification.success('Requested reboot.')
     }
   },
   async beforeMount() {

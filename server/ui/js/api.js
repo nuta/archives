@@ -195,6 +195,14 @@ class API {
     return this.invoke('DELETE', `/devices/${deviceName}`)
   }
 
+  invokeCommand(deviceName, command, arg = []) {
+    return this.invoke('POST', `/devices/${deviceName}/commands`, { command, arg })
+  }
+
+  rebootDevice(deviceName) {
+    return this.invokeCommand(deviceName, '__reboot__')
+  }
+
   getDeployments(appName) {
     return this.invoke('GET', `/apps/${appName}/deployments`)
   }

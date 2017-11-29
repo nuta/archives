@@ -324,14 +324,33 @@ class Supervisor {
     this.log += `>${commandId} __repl__ ${result}\n`
   }
 
+  tryBuiltinCommand(name: string, key: string, callback: (string) => void): boolean {
+    const regex = new RegExp('^<([0-9]+) __' + name + '__$')
+    const m = regex.exec(key)
+    if (m) {
+      callback(m[1])
+      return true
+    }
+
+    return false
+  }
+
+  reboot() {
+    // /init script reboots the system if Supervisor exit with 0.
+    logger.info('Received a reboot command. Exiting with 0...')
+    process.exit(0)
+  }
+
   handleStoreMessage(stores: [string]) {
     const storesToApp = {}
-    const replRegex = /^<([0-9]+) __repl__$/
     for (const key in stores) {
-      const m = replRegex.exec(key)
-      if (this.replEnabled && m) {
-        this.handleREPLCommand(m[1], stores[key])
-      } else {
+      const isBuiltinCommand = [
+        this.replEnabled &&
+          this.tryBuiltinCommand('repl', key, id => this.handleREPLCommand(id, stores[key])),
+        this.tryBuiltinCommand('reboot', key, id => this.reboot())
+      ].some(x => x)
+
+      if (!isBuiltinCommand) {
         storesToApp[key] = stores[key]
       }
     }
