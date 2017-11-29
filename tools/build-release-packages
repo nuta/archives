@@ -34,14 +34,9 @@ done
 
 echo "==> Building linux..."
 cd linux
+make prepare
 for target in raspberrypi3; do
-  mkdir -p $DIST_DIR/linux/$target
-  rm -rf build
-  mkdir -p build
-  cp -r ../runtime     build/runtime
-  cp -r ../supervisor  build/supervisor
-  docker build -t makestck/pkgbuilder .
-  docker run --rm -e TARGET=$target -e BUILD=release -v $DIST_DIR/linux/$target:/dist -t makestck/pkgbuilder
-  mv $DIST_DIR/linux/$target/makestack-linux-$target.img $DIST_DIR/makestack-linux-$VERSION-$target.img
+  make TARGET=$target BUILD=release
+  mv build/$target/makestack-linux-$target.img $DIST_DIR/makestack-linux-$VERSION-$target.img
   rm -rf $DIST_DIR/linux
 done

@@ -1,13 +1,16 @@
 $(V).SILENT:
+.PHONY: default build prepare
+default: build
 
-.PHONY: default kernel yarn
-default: kernel
+TARGET ?= x86_64
+BUILD ?= debug
 
-kernel:
-	$(MAKE) yarn
-	./pkgbuilder/pkgbuilder $(TARGET)
+prepare:
+	docker build -t makestack/linux .
 
-yarn: pkgbuilder/node_modules
-
-pkgbuilder/node_modules:
-	cd pkgbuilder && yarn
+build:
+	docker run --rm \
+	  -e TARGET=$(TARGET) \
+	  -e MAKEFLAGS="-j$(shell getconf _NPROCESSORS_ONLN)" \
+	  -e BUILD=$(BUILD) \
+	  -v $(shell realpath ..):/makestack -it makestack/linux
