@@ -1,10 +1,10 @@
-const fs = require('fs')
-const path = require('path')
-const JSZip = require('jszip')
-const { find } = require('./helpers')
-const api = require('./api')
-const logger = require('./logger')
-const { loadAppYAML } = require('./appdir')
+import * as fs from 'fs';
+import * as path from 'path';
+import * as JSZip from 'jszip';
+import { find } from './helpers';
+import { api } from './api';
+import { logger } from './logger';
+import { loadAppYAML } from './appdir';
 
 async function mergeZipFiles(basepath, destZip, srcZip) {
   for (const filepath in srcZip.files) {
@@ -24,7 +24,7 @@ async function downloadAndExtractPackage(name, zip, basepath) {
   return zip
 }
 
-async function deploy(appYAML, files) {
+export async function deploy(appYAML, files) {
   const appName = appYAML.name
   let runtime = 'runtime'
   let plugins = appYAML.plugins || []
@@ -68,7 +68,7 @@ async function deploy(appYAML, files) {
   logger.success(`Successfully deployed version #${deployment.version}!`)
 }
 
-async function deployAppDir(appDir) {
+export async function deployAppDir(appDir) {
   const appYAML = loadAppYAML(appDir)
   let files = []
 
@@ -81,5 +81,3 @@ async function deployAppDir(appDir) {
 
   await deploy(appYAML, files)
 }
-
-module.exports = { deployAppDir, deploy }

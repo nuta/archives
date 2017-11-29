@@ -3,7 +3,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 
-function mkdirp(dir) {
+export function mkdirp(dir) {
   const dirs = dir.split('/')
   let dirpath = '/'
 
@@ -16,13 +16,13 @@ function mkdirp(dir) {
   }
 }
 
-function generateRandomString(n) {
+export function generateRandomString(n) {
   const buf = Buffer.alloc((n / 2) + 1)
   crypto.randomFillSync(buf)
   return buf.toString('hex').substring(0, n)
 }
 
-function find(basedir) {
+export function find(basedir) {
   let files = []
   let dirs = [basedir]
 
@@ -46,13 +46,11 @@ function find(basedir) {
   return files
 }
 
-function createFile(filepath, body) {
+export function createFile(filepath, body) {
   mkdirp(path.dirname(filepath))
   fs.writeFileSync(filepath, body)
 }
 
-function generateTempPath() {
+export function generateTempPath() {
   return path.join(os.tmpdir(), generateRandomString(32) + '.img')
 }
-
-module.exports = { find, generateRandomString, mkdirp, createFile, generateTempPath }

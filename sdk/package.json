@@ -1,15 +1,19 @@
 {
   "name": "makestack",
   "version": "0.0.1",
-  "description": "MakeStack CLI Developer Tools",
-  "main": "lib/index.js",
+  "description": "MakeStack SDK with CLI Developer Tools.",
+  "main": "dist/index.js",
   "bin": {
     "makestack": "bin/makestack"
   },
   "scripts": {
     "cov": "istanbul cover _mocha",
     "test": "mocha",
-    "test:live": "mocha -w"
+    "test:live": "mocha -w",
+    "pretest": "tsc --pretty",
+    "prepublish": "npm run build",
+    "build": "tsc --pretty",
+    "build:live": "tsc --pretty -w"
   },
   "repository": {
     "type": "git",
@@ -40,10 +44,15 @@
     "winston": "next"
   },
   "devDependencies": {
+    "@types/mocha": "^2.2.44",
+    "@types/node": "^8.0.53",
     "istanbul": "next",
     "mocha": "^4.0.1",
     "nock": "^9.0.27",
     "power-assert": "^1.4.4",
-    "supervisor": "^0.12.0"
+    "source-map-support": "^0.5.0",
+    "supervisor": "^0.12.0",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.2"
   }
 }

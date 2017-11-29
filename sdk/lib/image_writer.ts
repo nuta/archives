@@ -30,7 +30,7 @@ function umount(drive) {
   })
 }
 
-module.exports = async () => {
+export async function imageWriter() {
   const ipcPath = process.env.IPC_PATH
   const drive = process.env.DRIVE
   const driveSize = parseInt(process.env.DRIVE_SIZE)
@@ -45,7 +45,7 @@ module.exports = async () => {
     `drive=${drive}, drive_size=${driveSize}, image_path=${imagePath}`)
 
   console.log('image-writer:', `connecting to ${ipcPath}`)
-  const server = await connectIPC(ipcPath)
+  const server: any = await connectIPC(ipcPath)
 
   console.log('image-writer:', 'unmounting')
   await umount(drive)

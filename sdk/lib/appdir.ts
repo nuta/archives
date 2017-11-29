@@ -1,8 +1,8 @@
-const fs = require('fs')
-const path = require('path')
-const yaml = require('js-yaml')
+import fs = require('fs');
+import path = require('path');
+import yaml = require('js-yaml');
 
-function loadAppYAML(appDir) {
+export function loadAppYAML(appDir) {
   if (!fs.existsSync(appDir)) {
     throw new Error(`invalid app dir: ${appDir}`)
   }
@@ -14,5 +14,3 @@ function loadAppYAML(appDir) {
 
   return yaml.safeLoad(fs.readFileSync(appYAMLPath)) || {}
 }
-
-module.exports = { loadAppYAML }

@@ -1,5 +1,5 @@
 const { deployAppDir } = require('../deploy')
 
-module.exports = async (args, opts) => {
+export async function main(args, opts, logger) {
   await deployAppDir(opts.appDir)
 }

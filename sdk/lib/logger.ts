@@ -1,5 +1,5 @@
-const chalk = require('chalk')
-const { createLogger, transports, addColors, format } = require('winston')
+import * as chalk from 'chalk';
+import { createLogger, transports, addColors, format } from 'winston';
 
 const levels = {
   error: 1,
@@ -22,7 +22,7 @@ const colors = {
 
 addColors(colors)
 
-module.exports = createLogger({
+export const logger = createLogger({
   level: process.env.LOG_LEVEL || 'info',
   levels: levels,
   transports: [

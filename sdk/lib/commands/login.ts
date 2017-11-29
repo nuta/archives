@@ -1,7 +1,7 @@
-const login = require('../login')
-const inquirer = require('inquirer')
+import { login } from '../login';
+import * as inquirer from 'inquirer';
 
-module.exports = async(args, opts, logger) => {
+export async function main(args, opts, logger) {
   const answers = await inquirer.prompt([
     { message: 'Server URL', name: 'url', type: 'input' },
     { message: 'Username', name: 'username', type: 'input' },

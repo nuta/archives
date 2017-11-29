@@ -26,7 +26,7 @@ function progress(stage, state) {
   }
 }
 
-module.exports = async(args, opts, logger) => {
+export async function main(args, opts, logger) {
   await install({
     deviceName: opts.name,
     deviceType: opts.type,

@@ -4,7 +4,8 @@ node_modules
 coverage
 /dist
 
-# client
+# sdk
+/sdk/dist
 /sdk/tests/tmp
 /sdk/installer/dist
 /sdk/installer/builds

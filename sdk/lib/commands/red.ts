@@ -1,18 +1,18 @@
-const crypto = require('crypto')
-const fs = require('fs')
-const os = require('os')
-const path = require('path')
-const chalk = require('chalk')
-const express = require('express')
-const bodyParser = require('body-parser')
-const proxy = require('http-proxy-middleware')
-const supervisor = require('supervisor')
-const JSZip = require('jszip')
-const { fork, spawnSync } = require('child_process')
-const api = require('../api')
-const { deploy } = require('../deploy')
-const { loadAppYAML } = require('../appdir')
-const { mkdirp, createFile } = require('../helpers')
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import * as chalk from 'chalk';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import * as proxy from 'http-proxy-middleware';
+import * as supervisor from 'supervisor';
+import * as JSZip from 'jszip';
+import { fork, spawnSync } from 'child_process';
+import { api } from '../api';
+import { deploy } from '../deploy';
+import { loadAppYAML } from '../appdir';
+import { mkdirp, createFile } from '../helpers';
 
 const NODE_RED_OFFICIAL_NODES_DIR = path.resolve(__dirname, '../red')
 const NODE_RED_DIR = path.resolve(os.homedir(), '.makestack/node-red/node-red')
@@ -255,7 +255,7 @@ function streamAppLog(appName, nodeRedProcess) {
   })
 }
 
-module.exports = async (args, opts, logger) => {
+export async function main(args, opts, logger) {
   if (opts.dev) {
     const argv = process.argv.slice(1).filter(arg => arg !== '--dev')
 

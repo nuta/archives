@@ -1,6 +1,6 @@
 const drivelist = require('drivelist')
 
-function getDriveSize(devfile) {
+export function getDriveSize(devfile) {
   return new Promise((resolve, reject) => {
     drivelist.list((error, drives) => {
       if (error) { reject(error) }
@@ -16,9 +16,8 @@ function getDriveSize(devfile) {
   })
 }
 
-module.exports = { getDriveSize, getAvailableDrives }
 
-function getAvailableDrives() {
+export function getAvailableDrives() {
   return new Promise((resolve, reject) => {
     drivelist.list((error, drives) => {
       if (error) { reject(error) }

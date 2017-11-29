@@ -1,9 +1,9 @@
-const fs = require('fs')
-const os = require('os')
-const path = require('path')
-const { spawnSync } = require('child_process')
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import { spawnSync } from 'child_process';
 
-module.exports = (pluginDir, destPath) => {
+export function buildPlugin(pluginDir, destPath) {
   spawnSync('docker', ['build', '-t', 'makestack/plugin-builder', '-'], {
     input: fs.readFileSync(path.resolve(__dirname, 'plugin_builder.Dockerfile')),
     stdio: ['pipe', 'inherit', 'inherit'],

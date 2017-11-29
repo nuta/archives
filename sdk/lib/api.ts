@@ -1,11 +1,11 @@
-const fs = require('fs')
-const util = require('util')
-const FormData = require('form-data')
-const fetch = require('node-fetch')
-const { loadCredentials, saveCredentials } = require('./config')
+import * as fs from 'fs';
+import * as util from 'util';
+import * as FormData from 'form-data';
+import * as fetch from 'node-fetch';
+import { loadCredentials, saveCredentials } from './config';
 
 class API {
-  invoke(method, path, body) {
+  invoke(method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, body?: any): Promise<any> {
     const headers = {}
 
     return new Promise((resolve, reject) => {
@@ -42,10 +42,6 @@ class API {
 
   get serverURL() {
     return loadCredentials().url
-  }
-
-  logout() {
-    fs.unlinkSync(this.credentialsPath)
   }
 
   login(url, username, password) {
@@ -108,7 +104,7 @@ class API {
     return this.invoke('GET', `/apps/${appName}/deployments/${version}`)
   }
 
-  deploy(appName, image, debug, comment, tag) {
+  deploy(appName: string, image: Buffer, debug?: Buffer, comment?: string, tag?: string) {
     const form = new FormData()
     form.append('deployment[deployed_at]', 'client')
     form.append('deployment[image]', image)
@@ -127,6 +123,10 @@ class API {
     return this.invoke('GET', `/devices/${deviceName}`)
   }
 
+  updateDevice(deviceName, attrs) {
+    return this.invoke('PATCH', `/devices/${deviceName}`, { device: attrs })
+  }
+
   getDeviceLog(deviceName) {
     return this.invoke('GET', `/devices/${deviceName}/log`)
   }
@@ -139,7 +139,7 @@ class API {
     return this.invoke('PUT', `/devices/${deviceName}/stores/${key}`, { value })
   }
 
-  registerDevice(name, deviceType, tag) {
+  registerDevice(name, deviceType, tag?) {
     return this.invoke('POST', '/devices', { device: { name, device_type: deviceType, tag } })
   }
 
@@ -174,7 +174,7 @@ class API {
     })
   }
 
-  getAppLog(appName, since) {
+  getAppLog(appName, since?): Promise<{lines: [string]}> {
     const unixtime = since ? Math.floor(since.getTime() / 1000) : 0
     return this.invoke('GET', `/apps/${appName}/log?since=${unixtime}`)
   }
@@ -202,4 +202,4 @@ class API {
   }
 }
 
-module.exports = new API()
+export const api = new API()

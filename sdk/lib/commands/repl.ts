@@ -1,6 +1,6 @@
-const readline = require('readline')
-const util = require('util')
-const api = require('../api')
+import * as readline from 'readline';
+import * as util from 'util';
+import { api } from '../api';
 
 async function input(rl) {
   return new Promise((resolve, reject) => {
@@ -12,7 +12,7 @@ async function sleep(sec) {
   return new Promise((resolve, reject) => setTimeout(resolve, sec * 1000))
 }
 
-module.exports = async (args, opts, logger) => {
+export async function main(args, opts, logger) {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout

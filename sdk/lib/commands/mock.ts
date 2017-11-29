@@ -1,9 +1,9 @@
-let os = require('os')
-let path = require('path')
-let api = require('../api')
-let { loadMocks, updateMocks } = require('../config')
+import * as os from 'os';
+import * as path from 'path';
+import { api } from '../api';
+import { loadMocks, updateMocks } from '../config';
 
-function create(args, opts, logger) {
+export function create(args, opts, logger) {
   let deviceName = args.name
   api.registerDevice(deviceName, 'sdk', null).then(device => {
     updateMocks({ [deviceName]: device })
@@ -12,7 +12,7 @@ function create(args, opts, logger) {
   })
 }
 
-function run(args, opts, logger) {
+export function run(args, opts, logger) {
   let mock = loadMocks()[args.name]
 
   process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../../runtime')
@@ -35,5 +35,3 @@ function run(args, opts, logger) {
 
   supervisor.start()
 }
-
-module.exports = { create, run }
