@@ -34,12 +34,13 @@ start_daemon() {
   backoff=1
   while :; do
     sh -c "$script"
-    if [ $? -eq 0 ] ;then
-      echo "'$script' exited with 0. Stopping the daemon..."
+    exitcode=$?
+    if [ $exitcode -eq 0 ] ;then
+      echo "'$script' exited with $exitcode. Stopping the daemon..."
       break
     fi
 
-    echo "*** '$script' exited with $?. Restarting in $backoff seconds..."
+    echo "*** '$script' exited with $exitcode. Restarting in $backoff seconds..."
     sleep $backoff
     backoff=$(($backoff << 1))
   done
@@ -51,11 +52,21 @@ else
   apparmor_parser -r /etc/apparmor.d/*
 fi
 
+# Initialize random seed.
+RANDSEED_FILE=/boot/randseed
+RANDSEED_SIZE=512
+echo /boot/*
+if [ -f "$RANDSEED_FILE" ]; then
+  echo "*** Feeding random seed"
+  cat "$RANDSEED_FILE" > /dev/urandom
+fi
+
 if [ "$MAKESTACK_NETWORK_ADAPTER" = "http" ]; then
   for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
     [ "$interface" = "lo" ] && continue
     [ "$interface" = "irlan0" ] && continue
 
+    echo "*** Initializing $interface"
     ip link set $interface up
     start_daemon "udhcpc -f -i $interface -s /etc/udhcpc.script" &
   done
@@ -65,14 +76,17 @@ if [ "$MAKESTACK_NETWORK_ADAPTER" = "http" ]; then
   start_daemon "ntpd -n -p 1.pool.ntp.org" &
 fi
 
-echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
+echo "*** Boot time: $(awk '{print $1}' /proc/uptime) secs"
 
 export MAKESTACK_APP_UID=0
 export MAKESTACK_APP_GID=0
-echo "Starting MakeStack Supervisor..."
+echo "*** Starting MakeStack Supervisor..."
 
 # Don't append `&'. start_daemon must return if the supervisor exited with 0 to reboot.`
 start_daemon "node /supervisor/supervisor"
+
+echo "*** Saving random seed..."
+dd if=/dev/urandom of=$RANDSEED_FILE bs=$RANDSEED_SIZE count=1
 
 echo "*** Rebooting in 10 seconds..."
 sleep 10
