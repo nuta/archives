@@ -1,7 +1,6 @@
-cli/node_modules
-installer/node_modules
-server/vendor
-server/coverage
-server/ui/node_modules
-linux/build
-libs/*/node_modules
+**/dist/**
+**/node_modules/**
+**/coverage/**
+**/vendor/**
+**/build/**
+server/public
