@@ -14,6 +14,7 @@ import { verifyMessageHMAC, verifyImageHMAC } from './hmac';
 class Supervisor {
   app: any;
   appDir: string;
+  currentAppDir: string;
   osType: string;
   osVersion: string;
   debugMode: boolean;
@@ -42,8 +43,15 @@ class Supervisor {
   constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
     deviceSecret, debugMode, testMode, appUID, appGID, heartbeatInterval }) {
 
+    process.on('unhandledRejection', (reason, p) => {
+      console.log('supervisor: unhandled rejection:', reason)
+      console.log('supervisor: exiting...')
+      process.exit(1)
+    })
+
     this.app = null
     this.appDir = appDir
+    this.currentAppDir = path.join(appDir, 'current')
     this.osType = osType
     this.osVersion = osVersion
     this.debugMode = debugMode
@@ -126,18 +134,22 @@ class Supervisor {
   }
 
   launchApp(appZip: Buffer) {
-    const appZipPath = path.join(os.tmpdir(), 'app.zip')
+    const appZipPath = path.join(this.appDir, 'app.zip')
 
     fs.writeFileSync(appZipPath, appZip)
-    spawnSync('rm', ['-rf', path.join(this.appDir)], {
+    spawnSync('rm', ['-rf', this.currentAppDir], {
       stdio: 'inherit'
     })
 
-    spawnSync('mkdir', ['-p', this.appDir], {
+    spawnSync('mkdir', ['-p', this.currentAppDir], {
       stdio: 'inherit'
     })
 
-    spawnSync('unzip', ['-q', appZipPath, '-d', this.appDir], {
+    spawnSync('unzip', ['-q', appZipPath, '-d', this.currentAppDir], {
+      stdio: 'inherit'
+    })
+
+    spawnSync('rm', ['-rf', appZipPath], {
       stdio: 'inherit'
     })
 
@@ -173,7 +185,7 @@ class Supervisor {
   doSpawnApp() {
     logger.info('starting an app')
     this.app = fork('./start', [], {
-      cwd: this.appDir,
+      cwd: this.currentAppDir,
       stdio: 'inherit',
       uid: this.appUID,
       gid: this.appGID,
