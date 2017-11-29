@@ -35,8 +35,7 @@ module.exports = {
     packageJSON.dependencies['makestack-runtime'] = 'file:' + runtimePath
     fs.writeFileSync('package.json', JSON.stringify(packageJSON))
 
-    run(['rm', '-rf', 'node_modules'])
-    run(['yarn', '--production'])
+    run(['yarn'])
     run(['npm', 'run', 'build'], {
       ARCH: config('target.node_gyp_arch'),
       AR: `${config('target.toolchain_prefix')}ar`,
@@ -48,7 +47,10 @@ module.exports = {
 
   rootfs() {
     return {
-      '/supervisor': `.`
+      '/supervisor/package.json': 'package.json',
+      '/supervisor/supervisor': 'supervisor',
+      '/supervisor/dist': 'dist',
+      '/supervisor/node_modules/makestack-runtime': 'node_modules/makestack-runtime'
     }
   }
 }
