@@ -8,7 +8,7 @@ matrix:
   include:
     - language: node_js
       node_js: "8"
-      env: M=linux:x86_64
+      env: M=linux:x64
       sudo: true # because of mknod
       addons:
         apt:
@@ -27,7 +27,7 @@ matrix:
         - npm install -g yarn node-gyp
         - cd linux
       script:
-        - make TARGET=x86_64
+        - make TARGET=x64
 
     - language: node_js
       node_js: "8"

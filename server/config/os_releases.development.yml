@@ -2,8 +2,8 @@ a:
   linux:
     title: 'MakeStack Linux version a'
     assets:
-      x86_64:
-        url: http://localhost:8100/repos/os/x86_64.img
+      x64:
+        url: http://localhost:8100/repos/os/x64.img
       raspberrypi3:
         url: http://localhost:8100/repos/os/raspberrypi3.img
       sdk:
@@ -13,8 +13,8 @@ b:
   linux:
     title: 'MakeStack Linux version b'
     assets:
-      x86_64:
-        url: http://localhost:8100/repos/os/x86_64.img
+      x64:
+        url: http://localhost:8100/repos/os/x64.img
       raspberrypi3:
         url: http://localhost:8100/repos/os/raspberrypi3.img
       sdk:
@@ -24,8 +24,8 @@ c:
   linux:
     title: 'MakeStack Linux version c'
     assets:
-      x86_64:
-        url: http://localhost:8100/repos/os/x86_64.img
+      x64:
+        url: http://localhost:8100/repos/os/x64.img
       raspberrypi3:
         url: http://localhost:8100/repos/os/raspberrypi3.img
       sdk:

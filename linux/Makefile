@@ -2,7 +2,7 @@ $(V).SILENT:
 .PHONY: default build prepare
 default: build
 
-TARGET ?= x86_64
+TARGET ?= x64
 BUILD ?= debug
 
 prepare:

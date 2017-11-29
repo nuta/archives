@@ -5,13 +5,13 @@ const version = '4.9.53'
 const dependencies = ['linux', 'bootfs-files']
 
 module.exports = {
-  name: 'x86_64',
+  name: 'x64',
   type: 'target',
   dependencies,
 
   config() {
     return {
-      'target.name': 'x86_64',
+      'target.name': 'x64',
       'target.linux_arch': 'x86',
       'target.deb_arch': 'amd64',
       'target.node_arch': 'x64',
