@@ -118,7 +118,7 @@ function flash(flashCommand, drive, driveSize, imagePath, progress) {
   })
 }
 
-module.exports = async ({ deviceName, deviceType, osType, adapter, drive, ignoreDuplication, flashCommand }, progress) => {
+module.exports = async({ deviceName, deviceType, osType, adapter, drive, ignoreDuplication, flashCommand }, progress) => {
   progress('look-for-drive')
   const driveSize = await getDriveSize(drive)
   progress('register')

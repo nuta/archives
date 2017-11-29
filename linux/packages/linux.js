@@ -19,7 +19,7 @@ module.exports = {
   changed() {
     return isRebuilt('initramfs') ||
       isNewerFile('.config',
-          assetPath(config('target.name'), 'linux.config'))
+        assetPath(config('target.name'), 'linux.config'))
   },
 
   build() {

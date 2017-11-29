@@ -9,7 +9,7 @@ Store.onChange('messages', newMessages => {
   displayMessages = JSON.parse(newMessages)
 })
 
-Timer.loop(async () => {
+Timer.loop(async() => {
   if (displayMessages.length === 0) {
     await Timer.sleep(3)
     return

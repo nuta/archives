@@ -1,9 +1,9 @@
 module.exports = config => {
   let unit
   switch (config.unit) {
-    case 's': unit = 1000; break;
-    case 'm': unit = 1000 * 60; break;
-    case 'h': unit = 1000 * 60 * 60; break;
+    case 's': unit = 1000; break
+    case 'm': unit = 1000 * 60; break
+    case 'h': unit = 1000 * 60 * 60; break
     default: unit = 1000
   }
 

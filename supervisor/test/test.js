@@ -12,8 +12,8 @@ process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../runtime')
 
 const serverURL = 'http://test-server'
 
-describe('Supervisor', function () {
-  beforeEach(function () {
+describe('Supervisor', function() {
+  beforeEach(function() {
     const adapter = 'http'
     const osVersion = 'c'
     const appVersion = '9'
@@ -59,11 +59,11 @@ describe('Supervisor', function () {
     })
   })
 
-  afterEach(function () {
+  afterEach(function() {
     this.clock.restore()
   })
 
-  it('generates a heartbeat request', function (done) {
+  it('generates a heartbeat request', function(done) {
     this.instance.start().then(() => {
       assert.strictEqual(this.heartbeatRequest.isDone(), true)
       this.instance.waitForApp().then(log => {

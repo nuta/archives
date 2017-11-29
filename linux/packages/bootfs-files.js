@@ -1,4 +1,3 @@
-const fs = require('fs')
 const { assetPath } = require('../pkgbuilder').pkg
 
 module.exports = {

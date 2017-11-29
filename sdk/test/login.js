@@ -35,7 +35,7 @@ describe('login', () => {
     spawnSync(`rm -r ${TMP_CONFIG_DIR}`)
   })
 
-  it('creates .credentials.json', async () => {
+  it('creates .credentials.json', async() => {
     const credentialsJSON = path.join(TMP_CONFIG_DIR, 'credentials.json')
 
     await makestack.login(server, username, password)

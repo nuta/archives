@@ -43,7 +43,7 @@ class LinuxSPIAPI {
 
     const modeNumber = SPI_MODES[this.mode]
     if (typeof modeNumber !== 'number') {
-        throw new Error('invalid spi mode')
+      throw new Error('invalid spi mode')
     }
 
     spi.configure(
@@ -51,7 +51,7 @@ class LinuxSPIAPI {
       modeNumber,
       this.bits,
       this.speed,
-      (this.order == 'LSBFIRST') ? 1 : 0
+      (this.order === 'LSBFIRST') ? 1 : 0
     )
   }
 

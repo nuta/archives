@@ -71,8 +71,7 @@ function shasum(filepath) {
     encoding: 'utf-8'
   })
 
-  if (cp.error)
-    throw new Error(cp.error)
+  if (cp.error) { throw new Error(cp.error) }
 
   return cp.stdout.split(' ')[0]
 }
@@ -89,8 +88,7 @@ function download(url, sha256) {
 }
 
 function extract(filepath, dest) {
-  if (fs.existsSync(dest))
-    return
+  if (fs.existsSync(dest)) { return }
 
   if (filepath.match(/\.tar\.(xz|bz2?|gz)$/)) {
     mkdirp(dest)

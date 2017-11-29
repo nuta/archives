@@ -156,7 +156,7 @@ module.exports = {
 
     const configFiles = {
       '/cmdline.txt': assetPath('raspberrypi-firmware', 'cmdline.txt'),
-      '/config.txt':  assetPath('raspberrypi-firmware', 'config.txt')
+      '/config.txt': assetPath('raspberrypi-firmware', 'config.txt')
     }
 
     return Object.assign(configFiles, blobFiles)

@@ -9,8 +9,8 @@ function createWindow() {
     width: 450
   })
 
-  const windowURL = (process.env.NODE_ENV === 'development') ?
-    'http://localhost:9080' : `file://${__dirname}/../renderer/index.html`
+  const windowURL = (process.env.NODE_ENV === 'development')
+    ? 'http://localhost:9080' : `file://${__dirname}/../renderer/index.html`
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools({ mode: 'detach' })

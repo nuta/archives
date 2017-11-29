@@ -39,7 +39,7 @@ module.exports = {
   buildImage(imageFile) {
     const mountPoint = buildPath('image')
     const username = spawnSync('whoami', { encoding: 'utf-8' })
-                       .stdout.replace('\n', '')
+      .stdout.replace('\n', '')
 
     run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
     run(['mkfs.fat', '-n', 'MAKESTACK', imageFile])

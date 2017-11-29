@@ -20,5 +20,5 @@ module.exports = {
   build() {
     process.chdir(rootfsPath('.'))
     run(['sh', '-c', `find . | cpio -ov --format=newc > ${config('initramfs.cpio_path')}`])
-  },
+  }
 }

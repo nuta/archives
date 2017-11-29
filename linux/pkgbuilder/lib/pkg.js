@@ -1,7 +1,7 @@
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
-const child_process = require('child_process')
+const { spawnSync } = require('child_process')
 const { find, mkdirp } = require('./helpers')
 
 function config(key) {
@@ -24,7 +24,6 @@ function isNewerFile(file1, file2) {
 }
 
 function isNewerDirContent(dir1, dir2, ignorePatterns) {
-
   if (!fs.existsSync(dir2)) {
     return true
   }
@@ -37,13 +36,11 @@ function isNewerDirContent(dir1, dir2, ignorePatterns) {
 
     const file1 = path.join(dir1, file)
     const file2 = path.join(dir2, file)
-    if (!fs.existsSync(file2))
-      return true
+    if (!fs.existsSync(file2)) { return true }
 
     const stat1 = fs.statSync(file1)
     const stat2 = fs.statSync(file2)
-    if (stat1.ctimeMs > stat2.ctimeMs)
-      return true
+    if (stat1.ctimeMs > stat2.ctimeMs) { return true }
   }
 
   return false
@@ -76,7 +73,7 @@ function isRebuilt(pkg) {
 
 function run(argv, env, cwd) {
   console.log(`+++ ${argv.join(' ')}`)
-  const cp = child_process.spawnSync(argv[0], argv.slice(1), {
+  const cp = spawnSync(argv[0], argv.slice(1), {
     stdio: 'inherit',
     cwd: cwd || process.cwd(),
     env: Object.assign({
@@ -96,7 +93,7 @@ function run(argv, env, cwd) {
 
 function sudo(argv, env) {
   console.log(`+++ sudo ${argv.join(' ')}`)
-  child_process.spawnSync('sudo', argv, {
+  spawnSync('sudo', argv, {
     stdio: 'inherit',
     env: Object.assign({
       PATH: process.env.PATH,
