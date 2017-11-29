@@ -1,10 +1,8 @@
 /bin/node {
   /bin/node mrcix,
 
-  owner /proc/[0-9]*/auxv r,
   /dev/null rw,
   /dev/zero rw,
-  /dev/random  r,
   /dev/urandom r,
   /lib/**      r,
   /lib/*.so*   mr,
