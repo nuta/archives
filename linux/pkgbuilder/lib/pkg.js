@@ -86,7 +86,11 @@ function run(argv, env, cwd) {
   })
 
   if (cp.error) {
-    throw new Error(`error: a child process returned \`${cp.error.code}'`)
+    throw new Error(`error: failed to run ${argv[0]}: ${cp.error}`)
+  }
+
+  if (cp.status !== 0) {
+    throw new Error(`error: \`${argv[0]}' exited with ${cp.status}.`)
   }
 }
 
