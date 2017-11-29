@@ -28,6 +28,14 @@ module.exports = {
     copyFile(assetPath(config('target.name'), 'linux.config'), '.config')
     run(['sed', '-i', `s#__INITRAMFS_CPIO_PATH__#${cpioPath}#`, '.config'])
 
+    if (process.env.BUILD === 'release') {
+      run(['sed', '-i', `s/__CONFIG_KERNEL_XZ__/CONFIG_KERNEL_XZ=y/`, '.config'])
+      run(['sed', '-i', `s/__CONFIG_KERNEL_LZ4__/# CONFIG_KERNEL_LZ4 is not set/`, '.config'])
+    } else {
+      run(['sed', '-i', `s/__CONFIG_KERNEL_XZ__/# CONFIG_KERNEL_XZ is not set/`, '.config'])
+      run(['sed', '-i', `s/__CONFIG_KERNEL_LZ4__/CONFIG_KERNEL_LZ4=y/`, '.config'])
+    }
+
     run(['make', config('linux.make_target')], {
       ARCH: config('target.linux_arch'),
       CROSS_COMPILE: config('target.toolchain_prefix')

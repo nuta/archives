@@ -41,7 +41,7 @@ for target in raspberrypi3; do
   cp -r ../runtime     build/runtime
   cp -r ../supervisor  build/supervisor
   docker build -t makestck/pkgbuilder .
-  docker run --rm -e TARGET=$target -v $DIST_DIR/linux/$target:/dist -t makestck/pkgbuilder
+  docker run --rm -e TARGET=$target -e BUILD=release -v $DIST_DIR/linux/$target:/dist -t makestck/pkgbuilder
   mv $DIST_DIR/linux/$target/makestack-linux-$target.img $DIST_DIR/makestack-linux-$VERSION-$target.img
   rm -rf $DIST_DIR/linux
 done
