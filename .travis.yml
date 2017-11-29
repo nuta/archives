@@ -17,6 +17,7 @@ matrix:
             - wget
             - qemu
             - zsh
+            - realpath
             - nodejs
             - virtualbox
       cache:
@@ -43,6 +44,7 @@ matrix:
             - build-essential
             - wget
             - zsh
+            - realpath
             - nodejs
       cache:
         apt: true
