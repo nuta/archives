@@ -27,6 +27,7 @@ matrix:
       install:
         - npm install -g yarn node-gyp
         - cd linux
+        - make prepare
       script:
         - make TARGET=x64
 
@@ -62,6 +63,7 @@ matrix:
         - make -j2
         - sudo make install
         - cd ../../linux
+        - make prepare
       script:
         - make TARGET=raspberrypi3
 
