@@ -29,6 +29,22 @@ mount $root /boot
 . /boot/config.sh
 hostname makestack-linux
 
+start_daemon() {
+  script=$1
+  backoff=1
+  while :; do
+    sh -c "$script"
+    if [ $? -eq 0 ] ;then
+      echo "'$script' exited with 0. Stopping the daemon..."
+      break
+    fi
+
+    echo "*** '$script' exited with $?. Restarting in $backoff seconds..."
+    sleep $backoff
+    backoff=$(($backoff << 1))
+  done
+}
+
 if [ "$DISABLE_APPARMOR" = "yes" ]; then
   apparmor_parser -C -r /etc/apparmor.d/*
 else
@@ -41,12 +57,12 @@ if [ "$MAKESTACK_NETWORK_ADAPTER" = "http" ]; then
     [ "$interface" = "irlan0" ] && continue
 
     ip link set $interface up
-    udhcpc -i $interface -s /etc/udhcpc.script
+    start_daemon "udhcpc -f -i $interface -s /etc/udhcpc.script" &
   done
 fi
 
 if [ "$MAKESTACK_NETWORK_ADAPTER" = "http" ]; then
-  ntpd -p 1.pool.ntp.org
+  start_daemon "ntpd -n -p 1.pool.ntp.org" &
 fi
 
 echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
@@ -54,8 +70,10 @@ echo "Boot time: $(awk '{print $1}' /proc/uptime) secs"
 export MAKESTACK_APP_UID=0
 export MAKESTACK_APP_GID=0
 echo "Starting MakeStack Supervisor..."
-node /supervisor/supervisor
 
-echo "*** MakeStack Supervisor exited with $?, rebooting in 10 seconds..."
+# Don't append `&'. start_daemon must return if the supervisor exited with 0 to reboot.`
+start_daemon "node /supervisor/supervisor"
+
+echo "*** Rebooting in 10 seconds..."
 sleep 10
 reboot -f
