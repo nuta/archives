@@ -43,6 +43,8 @@ module.exports = {
       CXX: `${config('target.toolchain_prefix')}g++`,
       LINK: `${config('target.toolchain_prefix')}g++`
     }, 'node_modules/makestack-runtime')
+
+    run(['rm', '-rf', 'node_modules/makestack-runtime/node_modules'])
   },
 
   rootfs() {
