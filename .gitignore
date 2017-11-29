@@ -32,3 +32,4 @@ coverage
 
 # linux
 /linux/build
+/linux/disk
