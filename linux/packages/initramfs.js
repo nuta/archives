@@ -1,6 +1,6 @@
 const { isRebuilt, run, config, rootfsPath, buildPath } = require('../pkgbuilder').pkg
 
-const dependencies = ['busybox', 'apparmor', 'glibc', 'console', 'libstdc++', 'libgcc', 'node', 'supervisor', 'init']
+const dependencies = ['busybox', 'apparmor', 'glibc', 'libstdc++', 'libgcc', 'node', 'supervisor', 'init']
 
 module.exports = {
   name: 'initramfs',
