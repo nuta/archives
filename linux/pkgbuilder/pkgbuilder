@@ -182,7 +182,7 @@ function main() {
         const num = filesToBootFS.length + filesToRootFS.length
         console.log(`==> (${i + 1}/${buildOrder.length}) Copying ${num} files from ${pkgName}...`)
       } else {
-        console.log(`==> Skipping ${pkgName}`)
+        console.log(`==> (${i + 1}/${buildOrder.length}) Skipping ${pkgName}`)
       }
     }
   }
