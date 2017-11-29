@@ -55,7 +55,6 @@ fi
 # Initialize random seed.
 RANDSEED_FILE=/boot/randseed
 RANDSEED_SIZE=512
-echo /boot/*
 if [ -f "$RANDSEED_FILE" ]; then
   echo "*** Feeding random seed"
   cat "$RANDSEED_FILE" > /dev/urandom
