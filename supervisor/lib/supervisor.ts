@@ -41,6 +41,7 @@ class Supervisor {
   includeDeviceId: boolean;
   replEnabled: boolean;
   replVM?: any;
+  rebooting: boolean;
 
   constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
     deviceSecret, debugMode, testMode, appUID, appGID, heartbeatInterval }) {
@@ -74,6 +75,7 @@ class Supervisor {
     this.updateEnabled = true
     this.downloading = false
     this.replEnabled = debugMode;
+    this.rebooting = false;
 
     if (this.replEnabled) {
       const { builtins } = require(process.env.RUNTIME_MODULE || '@makestack/runtime');
@@ -108,11 +110,7 @@ class Supervisor {
     logger.info('saving os image...')
     const tmpFilePath = path.join(os.tmpdir(), 'kernel.img')
     fs.writeFileSync(tmpFilePath, image)
-
-    logger.warn('sending SIGTERM to the app...')
-    if (this.app) {
-      this.app.kill()
-    }
+    this.killApp()
 
     // Wait the app to exit.
     logger.warn('OS will be updated soon!')
@@ -135,6 +133,13 @@ class Supervisor {
     }, 5000)
   }
 
+  killApp() {
+    if (this.app) {
+      logger.warn('sending SIGTERM to the app...')
+      this.app.kill()
+    }
+  }
+
   launchApp(appZip: Buffer) {
     fsutils.removeFiles(this.currentAppDir)
     unzip.extract(appZip, this.currentAppDir)
@@ -146,6 +151,10 @@ class Supervisor {
       logger.info('killing the app')
 
       this.app.on('exit', () => {
+        if (this.rebooting) {
+          this.doReboot()
+        }
+
         // This callback could called after 'error' event.
         // This guard is for preventing spawn an app twice.
         if (!this.app) {
@@ -321,6 +330,20 @@ class Supervisor {
   }
 
   reboot() {
+    this.rebooting = true
+    if (this.app) {
+      setTimeout(() => {
+        logger.warn('app does not exit, forcing reboot...')
+        this.doReboot()
+      }, 10 * 1000)
+
+      this.killApp()
+    } else {
+      this.doReboot()
+    }
+  }
+
+  doReboot() {
     // /init script reboots the system if Supervisor exit with 0.
     logger.info('Received a reboot command. Exiting with 0...')
     process.exit(0)
