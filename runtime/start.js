@@ -1,3 +1,3 @@
-const { start } = require('makestack-runtime')
+const { start } = require('@makestack/runtime')
 
 start(__dirname)

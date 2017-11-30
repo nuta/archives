@@ -32,7 +32,7 @@ module.exports = {
 
   build() {
     let packageJSON = JSON.parse(fs.readFileSync('package.json'))
-    packageJSON.dependencies['makestack-runtime'] = 'file:' + runtimePath
+    packageJSON.dependencies['@makestack/runtime'] = 'file:' + runtimePath
     fs.writeFileSync('package.json', JSON.stringify(packageJSON))
 
     run(['yarn'])
@@ -42,9 +42,9 @@ module.exports = {
       CC: `${config('target.toolchain_prefix')}gcc`,
       CXX: `${config('target.toolchain_prefix')}g++`,
       LINK: `${config('target.toolchain_prefix')}g++`
-    }, 'node_modules/makestack-runtime')
+    }, 'node_modules/@makestack/runtime')
 
-    run(['rm', '-rf', 'node_modules/makestack-runtime/node_modules'])
+    run(['rm', '-rf', 'node_modules/@makestack/runtime/node_modules'])
   },
 
   rootfs() {
@@ -52,7 +52,7 @@ module.exports = {
       '/supervisor/package.json': 'package.json',
       '/supervisor/supervisor': 'supervisor',
       '/supervisor/dist': 'dist',
-      '/supervisor/node_modules/makestack-runtime': 'node_modules/makestack-runtime'
+      '/supervisor/node_modules/@makestack/runtime': 'node_modules/@makestack/runtime'
     }
   }
 }

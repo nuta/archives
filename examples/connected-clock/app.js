@@ -1,8 +1,9 @@
-const AQM0802A = plugin('aqm0802a')
-const HDC1000 = plugin('hdc1000')
+const AQM0802A = require('@makestack/aqm0802a')
+const HDC1000 = require('@makestack/hdc1000')
 
 const display = new AQM0802A()
 const sensor = new HDC1000()
+
 let displayMessages = []
 
 Store.onChange('messages', newMessages => {

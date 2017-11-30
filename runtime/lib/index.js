@@ -7,7 +7,6 @@ const TimerAPI = require('./api/timer')
 const StoreAPI = require('./api/store')
 const EventAPI = require('./api/event')
 const SerialAPI = require('./api/serial')
-const plugin = require('./api/plugin')
 
 let builtins = {
   Logging: new LoggingAPI(),
@@ -16,8 +15,7 @@ let builtins = {
   Event: new EventAPI(),
   App: new AppAPI(),
   SubProcess: new SubProcessAPI(),
-  Serial: SerialAPI,
-  plugin
+  Serial: SerialAPI
 }
 
 if (process.env.MAKESTACK_DEVICE_TYPE) {

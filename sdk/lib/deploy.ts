@@ -31,13 +31,13 @@ export async function deploy(appYAML, files) {
   let zip = new JSZip()
 
   // Download the runtime.
-  zip = await downloadAndExtractPackage(runtime, zip, `node_modules/${runtime}`)
+  zip = await downloadAndExtractPackage(runtime, zip, `node_modules/@makestack/${runtime}`)
 
   // Populate plugin files.
   for (const pluginName of plugins) {
-    zip = await downloadAndExtractPackage(pluginName, zip, `plugins/${pluginName}`)
-    if (!zip.files[`plugins/${pluginName}/package.json`]) {
-      zip.file(`plugins/${pluginName}/package.json`,
+    zip = await downloadAndExtractPackage(pluginName, zip, `node_modules/@makestack/${pluginName}`)
+    if (!zip.files[`node_modules/@makestack/${pluginName}/package.json`]) {
+      zip.file(`node_modules/@makestack/${pluginName}/package.json`,
         JSON.stringify({ name: pluginName, private: true }))
     }
   }

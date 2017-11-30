@@ -167,7 +167,7 @@ function transpile(flows) {
 
     for (const pluginName of plugins || []) {
       if (!(pluginName in loadedPlugins)) {
-        nodeCode += `const ${pluginName} = plugin('${pluginName}')`
+        nodeCode += `const ${pluginName} = require('@makestack/${pluginName}')`
         loadedPlugins.push(pluginName)
       }
     }

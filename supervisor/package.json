@@ -1,5 +1,5 @@
 {
-  "name": "makestack-supervisor",
+  "name": "@makestack/supervisor",
   "version": "0.0.1",
   "description": "MakeStack Linux Supervisor.",
   "private": true,
