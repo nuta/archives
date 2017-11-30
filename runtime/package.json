@@ -1,26 +1,32 @@
 {
-  "name": "makestack-runtime",
+  "name": "@makestack/runtime",
   "version": "0.0.1",
   "description": "MakeStack Node.js app runtime environment.",
   "gypfile": true,
   "private": true,
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "cov": "istanbul cover _mocha",
     "test": "mocha",
     "test:live": "mocha -w",
     "prepublish": "npm run build",
-    "build": "node-gyp rebuild --arch x64 && mkdir -p native/x64 && mv build/Release/*.node native/x64 && rm -rf build"
+    "build": "npm run transpile && ARCH=x64 npm run build-native",
+    "build-native": "node-gyp rebuild --arch $ARCH && mkdir -p native/$ARCH && mv build/Release/*.node native/$ARCH",
+    "transpile": "tsc --pretty",
+    "build:live": "tsc --pretty -w"
   },
   "dependencies": {
     "nan": "^2.7.0"
   },
   "devDependencies": {
+    "@types/node": "^8.0.53",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "mock-fs": "^4.4.2",
     "nan": "^2.7.0",
     "power-assert": "^1.4.4",
-    "sinon": "^4.1.2"
+    "sinon": "^4.1.2",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.2"
   }
 }
