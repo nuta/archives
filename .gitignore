@@ -12,6 +12,7 @@ coverage
 
 # runtime
 /runtime/build
+/runtime/dist
 
 # supervisor
 /supervisor/dist
