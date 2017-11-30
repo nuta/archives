@@ -9,6 +9,6 @@ if (process.env.IMAGE_WRITER !== undefined) {
     process.exit(1)
   })
 } else {
-  const cli = require('../lib/cli')
+  const cli = require('../dist/cli')
   cli.run(process.argv)
 }
