@@ -1,17 +1,37 @@
-Node.js API
-============
+API
+====
 
-## Global
-There functions are definied as global one. You don't have to `require()` to use.
+Your MakeStack app is executed on [Node.js](https://nodejs.org) version 8.9.0. You
+can use [all modules bundled in Node.js](https://nodejs.org/api/).
 
-### plugin
-- **Definition:** `(name: string) => any`
-- **Description:** A `require()` wrapper function to load the specified plugin.
-- **Usage:**
-  ```js
-  const HDC1000 = plugin('HDC1000')
-  const TemperatureSensor = new HDC1000()
-  ```
+## Using plugin
+Plugins provide a Node.js package such as device drivers. Currenly MakeStack does
+not support npm packages and it ignores `package.json`.
+
+### Using a official plugin
+To use a plugin add its name to `app.yaml`:
+
+```yaml
+# app.yaml
+name: my-app
+plugins: ['hdc1000']
+```
+
+### Using a third-party plugin hosted on GitHub
+To use a plugin on GitHub add its name with `<github-username>/` prefix to `app.yaml`:
+
+```yaml
+# app.yaml
+name: my-app
+plugins: ['seiyanuta/hdc1000']
+```
+
+### Loading a plugin
+To load a plugin use `require()` with the `@makestack/` prefix:
+```js
+const HDC1000 = require('@makestack/HDC1000')
+const TemperatureSensor = new HDC1000()
+```
 
 ## Logging
 You don't have to `require` to use. This API is defined as a global `Logging` object.
@@ -95,6 +115,66 @@ You don't have to `require` to use. This API is defined as a global `Timer` obje
   })
   ```
 
+### sleep
+- **Definition:** `async (duration: number /* seconds */) => void`
+- **Usage:**
+  ```js
+  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  Timer.loop(async () => {
+    led.write(true)
+    await Timer.sleep(0.3)
+    led.write(false)
+    await Timer.sleep(0.3)
+  })
+  ```
+
+### busywait
+- **Definition:** `(usec: number /* microseconds */) => void`
+- **Warning:** As its name implies it halts the app event loop. Avoid to use this API.
+- **Usage:**
+  ```js
+  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  Timer.interval(1, () => {
+    led.write(true)
+    Timer.busywait(1000)
+    led.write(false)
+    Timer.busywait(1000)
+  })
+  ```
+
+## App
+You don't have to `require` to use. This API is defined as a global `App` object.
+
+### onExit
+- **Definition:** `(callback: () => void): void`
+- **Description:** Enable OS/app update (enabled by default).
+- **Usage:**
+  ```js
+  App.onExit(() => {
+    console.log("I'll be back.")
+  })
+  ```
+
+### enableUpdate
+- **Definition:** `(): void`
+- **Description:** Enable OS/app update (enabled by default).
+
+### disableUpdate
+- **Definition:** `(): void`
+- **Description:** Disable OS/app update.
+- **Warning:** Don't forget to re-enable update!
+- **Usage:**
+  ```js
+  Timer.interval(3 () => {
+    App.disableUpdate()
+    try {
+      // Do important stuff.
+    } finally {
+      App.enableUpdate()
+    }
+  })
+  ```
+
 ## Subprocess
 You don't have to `require` to use. This API is defined as a global `SubProcess` object.
 
@@ -120,6 +200,13 @@ interface SubProcessResult {
 
 ## GPIO
 You don't have to `require` to use. This API is defined as a global `GPIO` object.
+
+## Constructor
+- **Definition:** `({ pin: number, mode: GPIO.INPUT | GPIO.OUTPUT })`
+- **Usage:**
+  ```js
+  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  ```
 
 ### INPUT
 - **Definition:** `string`
@@ -188,7 +275,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
 You don't have to `require` to use. This API is defined as a global `I2C` class.
 
 ### Constructor
-- **Definition:** `({ address: number }) => I2C`
+- **Definition:** `({ address: number })`
 - **Usage:**
   ```js
   const device = new I2C({ address: 0x40 })
@@ -202,7 +289,7 @@ You don't have to `require` to use. This API is defined as a global `I2C` class.
   ```
 
 ### write
-- **Definition:** `(data: Buffer) => void`
+- **Definition:** `(data: number[] | Buffer) => void`
 - **Usage:**
   ```js
   device.write([0x01, 0x00, 0x00])
@@ -214,7 +301,7 @@ You don't have to `require` to use. This API is defined as a global `I2C` class.
 You don't have to `require` to use. This API is defined as a global `Serial` class.
 
 ### Constructor
-- **Definition:** `({ path: string, baudrate: 9600 | 115200 }) => I2C`
+- **Definition:** `({ path: string, baudrate: 9600 | 115200 })`
 - **Usage:**
   ```js
   const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
@@ -267,14 +354,14 @@ You don't have to `require` to use. This API is defined as a global `Serial` cla
 You don't have to `require` to use. This API is defined as a global `SPI` class.
 
 ### Constructor
-- **Definition:** `({ slave: number, speed: number, mode: 'MODE0' | 'MODE1' | 'MODE2' | 'MODE3' }) => SPI`
+- **Definition:** `({ slave: number, speed: number, mode: 'MODE0' | 'MODE1' | 'MODE2' | 'MODE3' })`
 - **Usage:**
   ```js
   const device = new SPI({ slave: 0 /* depends on the device */, speed: 100000, mode: 'MODE3' })
   ```
 
 ### transfer
-- **Definition:** `(tx: Buffer) => Buffer`
+- **Definition:** `(tx: number[] | Buffer) => Buffer`
 - **Usage:**
   ```js
   console.log(device.transfer([0x30, 0x00, 0x00]))
