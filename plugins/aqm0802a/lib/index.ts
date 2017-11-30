@@ -1,4 +1,6 @@
-class AQM0802A {
+export class AQM0802A {
+  bus: I2C;
+
   constructor(address = 0x3e) {
     this.bus = new I2C({ address })
 
@@ -14,7 +16,7 @@ class AQM0802A {
     await Timer.busywait(5 * 1000)
   }
 
-  async update(text) {
+  async update(text: string) {
     const shortenedText = text.toString().substring(0, 16)
 
     this.clear()
@@ -26,5 +28,3 @@ class AQM0802A {
     }
   }
 }
-
-module.exports = AQM0802A
