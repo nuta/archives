@@ -22,6 +22,6 @@ Timer.loop(async() => {
 })
 
 Timer.interval(5, () => {
-  Event.publish('t', sensor.read_temperature())
-  Event.publish('h', sensor.read_humidity())
+  Event.publish('t', sensor.readTemperature())
+  Event.publish('h', sensor.readHumidity())
 })
