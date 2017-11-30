@@ -27,7 +27,7 @@ function find(basedir) {
 }
 
 function mkdirp(dir) {
-  const dirs = dir.split('/')
+  const dirs = path.resolve(dir).split('/')
   let dirpath = '/'
 
   for (const relpath of dirs) {
