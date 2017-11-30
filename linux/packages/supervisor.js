@@ -36,7 +36,8 @@ module.exports = {
     fs.writeFileSync('package.json', JSON.stringify(packageJSON))
 
     run(['yarn'])
-    run(['npm', 'run', 'build'], {
+    run(['npm', 'run', 'transpile'])
+    run(['npm', 'run', 'build-native'], {
       ARCH: config('target.node_gyp_arch'),
       AR: `${config('target.toolchain_prefix')}ar`,
       CC: `${config('target.toolchain_prefix')}gcc`,
