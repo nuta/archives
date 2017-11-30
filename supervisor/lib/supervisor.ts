@@ -10,6 +10,8 @@ import SakuraioAdapter from './adapters/sakuraio_adapter';
 import * as logger from './logger';
 import { serialize, deserialize } from './smms';
 import { verifyMessageHMAC, verifyImageHMAC } from './hmac';
+import * as fsutils from './fsutils';
+import * as unzip from './unzip';
 
 class Supervisor {
   app: any;
@@ -134,25 +136,8 @@ class Supervisor {
   }
 
   launchApp(appZip: Buffer) {
-    const appZipPath = path.join(this.appDir, 'app.zip')
-
-    fs.writeFileSync(appZipPath, appZip)
-    spawnSync('rm', ['-rf', this.currentAppDir], {
-      stdio: 'inherit'
-    })
-
-    spawnSync('mkdir', ['-p', this.currentAppDir], {
-      stdio: 'inherit'
-    })
-
-    spawnSync('unzip', ['-q', appZipPath, '-d', this.currentAppDir], {
-      stdio: 'inherit'
-    })
-
-    spawnSync('rm', ['-rf', appZipPath], {
-      stdio: 'inherit'
-    })
-
+    fsutils.removeFiles(this.currentAppDir)
+    unzip.extract(appZip, this.currentAppDir)
     this.spawnApp()
   }
 
