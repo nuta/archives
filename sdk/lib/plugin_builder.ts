@@ -4,10 +4,10 @@ import * as path from 'path';
 import { spawnSync } from 'child_process';
 
 export function buildPlugin(pluginDir, destPath) {
-  spawnSync('docker', ['build', '-t', 'makestack/plugin-builder', '-'], {
-    input: fs.readFileSync(path.resolve(__dirname, 'plugin_builder.Dockerfile')),
-    stdio: ['pipe', 'inherit', 'inherit'],
-    env: process.env // DOCKER_HOST, etc.
+  spawnSync('docker', ['build', '-t', 'makestack/plugin-builder', '.'], {
+    stdio: 'inherit',
+    env: process.env, // DOCKER_HOST, etc.
+    cwd: path.resolve(__dirname, '../plugin_builder')
   })
 
   // Note that docker-machine in macOS does not mounting volumes outside home directory.
