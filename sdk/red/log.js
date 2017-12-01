@@ -3,6 +3,6 @@ module.exports = config => {
     type: 'output',
     modules: ['util'],
     init: '',
-    oninput: `Logging.print(util.inspect(__input__.payload))`
+    oninput: `println(util.inspect(__input__.payload))`
   }
 }

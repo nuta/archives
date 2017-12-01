@@ -55,7 +55,7 @@ interface Serial {
   onNewLine(callback: (line: string) => void): void;
 }
 
-declare function print(message: string): void;
+declare function println(message: string): void;
 declare function error(message: string): void;
 declare function publish(event: string, data?: string | number): void;
 declare var Store: Store;

@@ -33,21 +33,30 @@ const HDC1000 = require('@makestack/HDC1000')
 const TemperatureSensor = new HDC1000()
 ```
 
-## Logging
-You don't have to `require` to use. This API is defined as a global `Logging` object.
+## Globals
+You don't have to `require` to use. These functions are defined as a global ones.
 
-### print
+### println
 - **Definition:** `(message: string) => void`
 - **Usage:**
   ```js
-  Logging.print("Hello World!")
+  println("Hello World!")
   ```
 
 ### error
 - **Definition:** `(message: string) => void`
 - **Usage:**
   ```js
-  Logging.error("Something went wrong :(")
+  error("Something went wrong :(")
+  ```
+
+### publish
+- **Definition:**
+  -  `(event: string, data: string | number) => void`
+  -  `(event: string) => void`
+- **Usage:**
+  ```js
+  publish('temperature', 25)
   ```
 
 ## Store
@@ -75,18 +84,6 @@ You don't have to `require` to use. This API is defined as a global `Store` obje
   })
   ```
 
-## Event
-You don't have to `require` to use. This API is defined as a global `Event` object.
-
-### publish
-- **Definition:**
-  -  `(event: string, data: string | number) => void`
-  -  `(event: string) => void`
-- **Usage:**
-  ```js
-  Event.publish('temperature', 25)
-  ```
-
 ## Timer
 You don't have to `require` to use. This API is defined as a global `Timer` object.
 
@@ -111,7 +108,7 @@ You don't have to `require` to use. This API is defined as a global `Timer` obje
   const HDC1000 = plugin('hdc1000')
   const sensor = new HDC1000()
   Timer.interval(15, async () => {
-    Event.publish("temperature", sensor.readTemperature())
+    publish("temperature", sensor.readTemperature())
   })
   ```
 
@@ -194,7 +191,7 @@ interface SubProcessResult {
   ```js
   const { stdout, stderr, status } = SubProcess.run(['./app-written-in-golang'])
   if (status != 0) {
-    Logging.error(`child process returned ${status}:\n${stderr}`)
+    error(`child process returned ${status}:\n${stderr}`)
   }
   ```
 
@@ -245,7 +242,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
   const button = new GPIO({ pin: 13, mode: GPIO.INPUT })
   Timer.interval(0.5, () => {
     const value = button.read()
-    Logging.print(`button: ${value}`)
+    println(`button: ${value}`)
   })
   ```
 
@@ -257,7 +254,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
   ```js
   const button = new GPIO({ pin: 13, mode: GPIO.INPUT })
   button.onInterrupt('rising', () => {
-    Event.publish('button-pressed')
+    publish('button-pressed')
   })
   ```
 
@@ -267,7 +264,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
   ```js
   const button = new GPIO({ pin: 13, mode: GPIO.INPUT })
   button.onChange(() => {
-    Event.publish('button', button.read())
+    publish('button', button.read())
   })
   ```
 
