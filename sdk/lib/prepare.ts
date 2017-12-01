@@ -44,11 +44,11 @@ export async function prepare(dir) {
 
   const { plugins } = yaml.safeLoad(fs.readFileSync(yamlPath))
   for (const plugin of plugins || []) {
-    if (fs.existsSync(path.join('dir, node_modules/@makestack', plugin))) {
+    if (fs.existsSync(path.join(dir, 'node_modules/@makestack', plugin))) {
+      logger.progress(`Download @makestack/${plugin} (alredy exists)`)
+    } else {
       logger.progress(`Download @makestack/${plugin}`)
       downloadAndExtractPlugin(plugin, dir)
-    } else {
-      logger.progress(`Download @makestack/${plugin} (alredy exists)`)
     }
   }
 
