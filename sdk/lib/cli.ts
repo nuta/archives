@@ -113,7 +113,7 @@ program
   .command('install', 'Install MakeStack OS/Linux to the device.')
   .option('--name <name>', 'The device name.', null, null, true)
   .option('--type <type>', 'The device type.', /^raspberrypi3|mock$/, null, true)
-  .option('--os <os>', 'The OS image.', /^linux$/, null, 'linux')
+  .option('--os <os>', 'The OS image.', /^linux$/, 'linux')
   .option('--drive <drive>', "The drive. Use `list-drives' command.", null, null, true)
   .option('--adapter <adapter>', 'The network adapter.', /^http|sakuraio$/, 'http')
   .option('--ignore-duplication', 'Ignore duplicated device name.', null, false)
@@ -142,7 +142,7 @@ program
   .command('red', 'Program the app with Node-RED.')
   .option('--port <port>', 'The port.', null, 31313)
   .option('--app-dir <app-dir>', 'The app directory.', null, process.cwd())
-  .option('--dev', 'Restart Node-RED automatically for Node-RED node development.', null, false)
+  .option('--dev', 'Restart Node-RED automatically for Node-RED node development.', false)
   .action(redCommand.main)
 
 export function run(argv) {
