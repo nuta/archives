@@ -11,6 +11,7 @@
     "test:live": "mocha -w",
     "prepublish": "npm run build",
     "build": "npm run transpile && ARCH=x64 npm run build-native",
+    "prepack": "npm run build",
     "build-native": "node-gyp rebuild --arch $ARCH && mkdir -p native/$ARCH && mv build/Release/*.node native/$ARCH",
     "transpile": "tsc --pretty",
     "build:live": "tsc --pretty -w"

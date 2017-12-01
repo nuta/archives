@@ -1,11 +1,14 @@
 .secrets
 *.log
+*.tgz
 node_modules
 coverage
 /dist
 
 # sdk
 /sdk/dist
+/sdk/runtime
+/sdk/supervisor
 /sdk/tests/tmp
 /sdk/installer/dist
 /sdk/installer/builds

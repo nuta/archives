@@ -1,0 +1,6 @@
+*.tgz
+installer
+lib
+coverage
+test
+node_modules
