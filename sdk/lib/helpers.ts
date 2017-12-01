@@ -1,10 +1,10 @@
-const crypto = require('crypto')
-const fs = require('fs')
-const os = require('os')
-const path = require('path')
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 
 export function mkdirp(dir) {
-  const dirs = dir.split('/')
+  const dirs = path.resolve(dir).split('/')
   let dirpath = '/'
 
   for (const relpath of dirs) {

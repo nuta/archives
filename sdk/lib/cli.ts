@@ -12,6 +12,7 @@ import * as listDrivesCommand from './commands/list_drives';
 import * as installCommand from './commands/install';
 import * as buildPluginCommand from './commands/build_plugin';
 import * as redCommand from './commands/red';
+import * as prepareCommand from './commands/prepare';
 
 program
   .command('login', 'Get an access credential for an MakeStack Server account.')
@@ -125,6 +126,10 @@ program
   .argument('path', 'The plugin directory.')
   .argument('dest', 'The destination.')
   .action(buildPluginCommand.main)
+
+program
+  .command('prepare', 'Prepare a app/plugin development.')
+  .action(prepareCommand.main)
 
 program
   .command('red', 'Program the app with Node-RED.')
