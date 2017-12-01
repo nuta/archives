@@ -19,7 +19,7 @@ async function downloadAndExtractPlugin(plugin: string, dir: string) {
 
   for (const filepath in pluginZip.files) {
     if (!filepath.endsWith('/')) {
-      const body = pluginZip.files[filepath].async('arraybuffer')
+      const body = await pluginZip.files[filepath].async('nodebuffer')
       createFile(path.join(dir, 'node_modules/@makestack', plugin, filepath), body)
     }
   }
@@ -48,7 +48,7 @@ export async function prepare(dir) {
       logger.progress(`Download @makestack/${plugin} (alredy exists)`)
     } else {
       logger.progress(`Download @makestack/${plugin}`)
-      downloadAndExtractPlugin(plugin, dir)
+      await downloadAndExtractPlugin(plugin, dir)
     }
   }
 
