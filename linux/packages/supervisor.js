@@ -36,7 +36,7 @@ module.exports = {
     fs.writeFileSync('package.json', JSON.stringify(packageJSON))
 
     run(['yarn'])
-    run(['npm', 'run', 'transpile'])
+    run(['npm', 'run', 'transpile'], {}, 'node_modules/@makestack/runtime')
     run(['npm', 'run', 'build-native'], {
       ARCH: config('target.node_gyp_arch'),
       AR: `${config('target.toolchain_prefix')}ar`,
