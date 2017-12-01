@@ -29,7 +29,7 @@ plugins: ['seiyanuta/hdc1000']
 ### Loading a plugin
 To load a plugin use `require()` with the `@makestack/` prefix:
 ```js
-const HDC1000 = require('@makestack/HDC1000')
+const { HDC1000 } = require('@makestack/HDC1000')
 const TemperatureSensor = new HDC1000()
 ```
 
