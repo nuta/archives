@@ -41,7 +41,7 @@ describe('Supervisor', function() {
       fs.mkdirSync(appDir)
     }
 
-    const Supervisor = require('..')
+    const { Supervisor } = require('..')
     this.instance = new Supervisor({
       appDir,
       adapter: {
