@@ -43,7 +43,7 @@ Timer.interval(3, () => {
   }
 ]
 
-export function main(args, opts) {
+export async function main(args, opts) {
   const appName = path.basename(args.dir)
   const plugins = opts.plugins.split(',')
   let templates = DEFAULT_TEMPLATES
@@ -56,5 +56,26 @@ export function main(args, opts) {
     createFile(path.join(args.dir, filepath), nunjuck.renderString(template, context))
   }
 
-  prepare(args.dir)
+  await prepare(args.dir)
+
+  let appJS = fs.readFileSync(path.join(args.dir, 'app.js'), {
+    encoding: 'utf-8'
+  })
+
+  for (const plugin of plugins) {
+    const scaffoldPath = path.resolve(args.dir, `node_modules/@makestack/${plugin}/scaffold.js`)
+    if (fs.existsSync(scaffoldPath)) {
+      logger.progress(`Scaffolding ${plugin}`)
+      const { scaffold } = require(scaffoldPath)
+      const { header = '', footer = '' } = scaffold(context)
+      appJS =
+        header.replace(/\n+$/, '') + "\n\n" +
+        appJS.replace(/\n+$/, '') + "\n\n" +
+        footer.replace(/\n+$/, '') + "\n"
+    }
+  }
+
+  if (appJS) {
+    fs.writeFileSync(path.join(args.dir, 'app.js'), appJS)
+  }
 }
