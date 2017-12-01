@@ -13,6 +13,7 @@ import * as installCommand from './commands/install';
 import * as buildPluginCommand from './commands/build_plugin';
 import * as redCommand from './commands/red';
 import * as prepareCommand from './commands/prepare';
+import * as newCommand from './commands/new';
 import * as newPluginCommand from './commands/new_plugin';
 
 program
@@ -131,6 +132,12 @@ program
 program
   .command('prepare', 'Prepare a app/plugin development.')
   .action(prepareCommand.main)
+
+program
+  .command('new', 'Create an app directory with template files.')
+  .argument('dir', 'The plugin directory.')
+  .option('--plugins <plugins>', 'A list of plugins separated by `,\'.', null, '')
+  .action(newCommand.main)
 
 program
   .command('new-plugin', 'Create a plugin directory with template files.')
