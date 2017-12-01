@@ -13,6 +13,7 @@ import * as installCommand from './commands/install';
 import * as buildPluginCommand from './commands/build_plugin';
 import * as redCommand from './commands/red';
 import * as prepareCommand from './commands/prepare';
+import * as newPluginCommand from './commands/new_plugin';
 
 program
   .command('login', 'Get an access credential for an MakeStack Server account.')
@@ -130,6 +131,12 @@ program
 program
   .command('prepare', 'Prepare a app/plugin development.')
   .action(prepareCommand.main)
+
+program
+  .command('new-plugin', 'Create a plugin directory with template files.')
+  .argument('dir', 'The plugin directory.')
+  .option('--lang <lang>', 'The programming language.', /^typescript|javascript$/, 'typescript')
+  .action(newPluginCommand.main)
 
 program
   .command('red', 'Program the app with Node-RED.')
