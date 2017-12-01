@@ -10,6 +10,7 @@ coverage
 /sdk/runtime
 /sdk/supervisor
 /sdk/tests/tmp
+/sdk/plugin_builder/makestack.d.ts
 /sdk/installer/dist
 /sdk/installer/builds
 

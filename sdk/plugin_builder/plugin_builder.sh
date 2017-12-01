@@ -18,6 +18,8 @@ if [ -f package.json ]; then
   yarn --ignore-scripts
 
   if [ -f tsconfig.json ]; then
+    mkdir -p node_modules/@types/makestack
+    cp /makestack.d.ts node_modules/@types/makestack/index.d.ts
     yarn transpile
   fi;
 
@@ -29,10 +31,6 @@ if [ -f package.json ]; then
 
   npm prune --production --loglevel=warn
 fi;
-
-rm -rf \
-  coverage test lib/native node_modules/nan node_modules/.yarn-integrity \
-  yarn.lock package-lock.json binding.gyp build
 
 if [ -f .makestackignore ]; then
   rm -rf $(cat .makestackignore)

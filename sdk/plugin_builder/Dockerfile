@@ -9,5 +9,6 @@ RUN npm install -g node-gyp yarn
 
 # Fill yarn cache.
 RUN cd /tmp && yarn add nan typescript ts-node mocha istanbul sinon power-assert
+ADD ./makestack.d.ts /makestack.d.ts
 ADD ./plugin_builder.sh /plugin_builder.sh
 CMD /plugin_builder.sh
