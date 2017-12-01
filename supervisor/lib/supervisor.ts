@@ -13,7 +13,7 @@ import { verifyMessageHMAC, verifyImageHMAC } from './hmac';
 import * as fsutils from './fsutils';
 import * as unzip from './unzip';
 
-class Supervisor {
+export class Supervisor {
   app: any;
   appDir: string;
   currentAppDir: string;
@@ -412,5 +412,3 @@ class Supervisor {
     }, this.heartbeatInterval * 1000)
   }
 }
-
-module.exports = { Supervisor }

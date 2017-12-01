@@ -1,1 +1,2 @@
-module.exports = require('./supervisor').Supervisor
+import { Supervisor } from './supervisor';
+export { Supervisor };
