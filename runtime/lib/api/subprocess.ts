@@ -1,6 +1,6 @@
-const { spawnSync } = require('child_process')
+import { spawnSync } from 'child_process';
 
-class SubProcessAPI {
+export class SubProcessAPI {
   run(argv) {
     if (!Array.isArray(argv)) {
       throw new Error(`argv must be an array`)
@@ -10,5 +10,3 @@ class SubProcessAPI {
     return { stdout, stderr, status }
   }
 }
-
-module.exports = SubProcessAPI

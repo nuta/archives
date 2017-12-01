@@ -1,6 +1,6 @@
-const { LinuxGPIOAPI } = require('../linux/gpio')
-const { LinuxI2CAPI } = require('../linux/i2c')
-const { LinuxSPIAPI } = require('../linux/spi')
+import { LinuxGPIOAPI } from '../linux/gpio';
+import { LinuxI2CAPI } from '../linux/i2c';
+import { LinuxSPIAPI } from '../linux/spi';
 
 class GPIO extends LinuxGPIOAPI {
 }
@@ -19,8 +19,6 @@ class SPI extends LinuxSPIAPI {
   }
 }
 
-function initialize() {
+export function initialize() {
   return { GPIO, I2C, SPI }
 }
-
-module.exports = { initialize }

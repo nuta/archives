@@ -1,4 +1,4 @@
-class TimerAPI {
+export class TimerAPI {
   interval(interval, callback) {
     setInterval(callback, interval * 1000)
   }
@@ -35,5 +35,3 @@ class TimerAPI {
     }
   }
 }
-
-module.exports = TimerAPI

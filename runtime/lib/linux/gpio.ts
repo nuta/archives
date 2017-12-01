@@ -1,6 +1,8 @@
 const fs = require('fs')
 
-class LinuxGPIOAPI {
+export class LinuxGPIOAPI {
+  pin: number;
+
   constructor({ pin, mode }) {
     if (typeof pin !== 'number') {
       throw new Error("`this.pin' must be a number")
@@ -61,5 +63,3 @@ class LinuxGPIOAPI {
     })
   }
 }
-
-module.exports = { LinuxGPIOAPI }

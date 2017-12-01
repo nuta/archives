@@ -1,21 +1,22 @@
-const path = require('path')
-const logger = require('./logger')
-const AppAPI = require('./api/app')
-const SubProcessAPI = require('./api/subprocess')
-const LoggingAPI = require('./api/logging')
-const TimerAPI = require('./api/timer')
-const StoreAPI = require('./api/store')
-const EventAPI = require('./api/event')
-const SerialAPI = require('./api/serial')
+import * as path from 'path';
+import { logger } from './logger';
+import { AppAPI } from './api/app';
+import { SubProcessAPI } from './api/subprocess';
+import { println, error } from './api/logging';
+import { TimerAPI } from './api/timer';
+import { StoreAPI } from './api/store';
+import { publish } from './api/event';
+import { SerialAPI } from './api/serial';
 
 let builtins = {
-  Logging: new LoggingAPI(),
   Timer: new TimerAPI(),
   Store: new StoreAPI(),
-  Event: new EventAPI(),
   App: new AppAPI(),
   SubProcess: new SubProcessAPI(),
-  Serial: SerialAPI
+  Serial: SerialAPI,
+  println,
+  error,
+  publish
 }
 
 if (process.env.MAKESTACK_DEVICE_TYPE) {

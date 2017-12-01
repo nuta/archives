@@ -1,4 +1,4 @@
-class AppAPI {
+export class AppAPI {
   enableUpdate() {
     process.send({ type: 'setUpdateEnabled', body: true })
   }
@@ -13,5 +13,3 @@ class AppAPI {
     })
   }
 }
-
-module.exports = AppAPI

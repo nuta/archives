@@ -1,4 +1,11 @@
-module.exports = class {
+type onChangeCallback = (value: string) => void
+type onCommandCallback = (value: string) => void
+
+export class StoreAPI {
+  stores: { [key: string]: string };
+  onChangeCallbacks: { [key: string]: onChangeCallback[] };
+  onCommandCallbacks: { [key: string]: onCommandCallback };
+
   constructor() {
     this.stores = {}
     this.onChangeCallbacks = {}

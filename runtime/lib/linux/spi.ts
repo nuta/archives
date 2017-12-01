@@ -1,5 +1,4 @@
-const fs = require('fs')
-const GPIO = require('./gpio')
+import * as fs from 'fs';
 const spi = require(`../../native/${process.arch}/spi.node`)
 
 const SPI_CPHA = 0x01
@@ -11,8 +10,15 @@ const SPI_MODES = {
   MODE3: SPI_CPHA | SPI_CPOL
 }
 
-class LinuxSPIAPI {
-  // abstract bus: string
+export abstract class LinuxSPIAPI {
+  abstract bus: string;
+  slave: number;
+  ss: GPIO;
+  fd: number;
+  mode: SPIMode;
+  bits: number;
+  speed: number;
+  order: SPIOrder;
 
   constructor({ path, ss, slave, speed, order, mode, bits }) {
     if (!path && !slave) {
@@ -78,5 +84,3 @@ class LinuxSPIAPI {
     return rx
   }
 }
-
-module.exports = { LinuxSPIAPI }

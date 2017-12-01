@@ -1,12 +1,17 @@
-const fs = require('fs')
+import * as fs from 'fs';
 const serial = require(`../../native/${process.arch}/serial.node`)
-const { O_RDWR, O_NOCTTY, O_CLOEXEC, O_SYNC } = fs.constants
+const { O_RDWR, O_NOCTTY, O_SYNC } = fs.constants
 
-class SerialAPI {
+export class SerialAPI {
+  path: string;
+  watching: boolean;
+  fd: number;
+  baudrate: number;
+
   constructor({ path, baudrate }) {
     this.path = path
     this.watching = false
-    this.fd = fs.openSync(path, O_RDWR | O_NOCTTY | O_CLOEXEC | O_SYNC)
+    this.fd = fs.openSync(path, O_RDWR | O_NOCTTY | O_SYNC)
     this.configure(baudrate)
   }
 
@@ -38,7 +43,7 @@ class SerialAPI {
       throw Error('The serial port is already being watched.')
     }
 
-    this.waching = true
+    this.watching = true
 
     // FIXME: use libuv
     setInterval(() => {
@@ -54,7 +59,7 @@ class SerialAPI {
       throw Error('The serial port is already being watched.')
     }
 
-    this.waching = true
+    this.watching = true
 
     // FIXME: use libuv
     let buf = ''
@@ -71,5 +76,3 @@ class SerialAPI {
     }, 100)
   }
 }
-
-module.exports = SerialAPI

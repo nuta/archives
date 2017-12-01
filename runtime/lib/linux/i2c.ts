@@ -1,10 +1,12 @@
-const fs = require('fs')
-const ioctl = require('../ioctl')
+import * as fs from 'fs';
+import { ioctl } from '../ioctl';
 
 const I2C_SLAVE = 0x0703
 
-class LinuxI2CAPI {
-  // abstract path: string
+export abstract class LinuxI2CAPI {
+  abstract path: string;
+  address: number;
+  fd: number;
 
   constructor({ address }) {
     this.address = address
@@ -18,7 +20,7 @@ class LinuxI2CAPI {
   read(length) {
     this.selectSlaveAddress(this.address)
     let buffer = Buffer.alloc(length)
-    fs.readSync(this.fd, buffer, 0, length)
+    fs.readSync(this.fd, buffer, 0, length, 0)
     return buffer
   }
 
@@ -33,5 +35,3 @@ class LinuxI2CAPI {
     }
   }
 }
-
-module.exports = { LinuxI2CAPI }
