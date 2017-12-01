@@ -14,7 +14,7 @@ import { deploy } from '../deploy';
 import { loadAppYAML } from '../appdir';
 import { mkdirp, createFile } from '../helpers';
 
-const NODE_RED_OFFICIAL_NODES_DIR = path.resolve(__dirname, '../red')
+const NODE_RED_OFFICIAL_NODES_DIR = path.resolve(__dirname, '../../red')
 const NODE_RED_DIR = path.resolve(os.homedir(), '.makestack/node-red/node-red')
 const NODE_RED_USER_DIR = path.resolve(os.homedir(), '.makestack/node-red')
 const NODE_RED_NODES_DIR = path.resolve(os.homedir(), '.makestack/node-red/nodes')
@@ -105,10 +105,9 @@ function loadTranspilers() {
   const transpilers = []
 
   // Official nodes.
-  const officialTranspilersDir = path.resolve(__dirname, '../red')
-  for (const filename of fs.readdirSync(officialTranspilersDir)) {
+  for (const filename of fs.readdirSync(NODE_RED_OFFICIAL_NODES_DIR)) {
     if (filename.match(/.js$/)) {
-      transpilers[path.parse(filename).name] = require(`${officialTranspilersDir}/${filename}`)
+      transpilers[path.parse(filename).name] = require(`${NODE_RED_OFFICIAL_NODES_DIR}/${filename}`)
     }
   }
 
