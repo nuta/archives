@@ -30,7 +30,7 @@ class PluginsController < ApplicationController
       FileUtils.mkdir_p(File.dirname(plugin_zip_path))
       FileUtils.rm_f(plugin_zip_path)
 
-      makestack_command = File.join(File.dirname(__FILE__), '../../../client/bin/makestack')
+      makestack_command = File.join(File.dirname(__FILE__), '../../../sdk/bin/makestack')
 
       if plugin == 'runtime'
         plugin_dir = File.join(File.dirname(__FILE__), '../../../runtime')
