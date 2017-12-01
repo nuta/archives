@@ -19,6 +19,14 @@ const DEFAULT_TEMPLATES = [
     template: `\
 name: {{ appName }}
 `
+  },
+  {
+    filepath: '.gitignore',
+    template: `\
+/dist
+/build
+/native
+`
   }
 ]
 
@@ -54,6 +62,23 @@ class {{ CamelAppName }} {
 }
 
 module.exports = { {{ CamelAppName }} }
+`
+  },
+  {
+    filepath: '.makestackignore',
+    template: `\
+coverage
+test
+lib/native
+node_modules/nan
+node_modules/.yarn-integrity
+binding.gyp
+build
+node_modules
+package.json
+jsconfig.json
+yarn.lock
+package-lock.json
 `
   }
 ]
@@ -98,7 +123,25 @@ export class {{ CamelAppName }} {
   }
 }
 `
-  }]
+  },
+  {
+    filepath: '.makestackignore',
+    template: `\
+coverage
+test
+lib
+node_modules/nan
+node_modules/.yarn-integrity
+binding.gyp
+build
+node_modules
+package.json
+tsconfig.json
+yarn.lock
+package-lock.json
+`
+  }
+]
 
 export function main(args, opts) {
   const appName = path.basename(args.dir)
