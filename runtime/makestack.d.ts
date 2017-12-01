@@ -1,15 +1,8 @@
+/// <reference types="node" />
+
 interface Store {
   onCommand(key: string, callback: (newValue: string) => void): void;
   onChange(key: string, callback: (newValue: string) => void): void;
-}
-
-interface Logging {
-  print(message: string): void;
-  error(message: string): void;
-}
-
-interface Event {
-  publish(event: string, data?: string | number): void;
 }
 
 interface Timer {
@@ -46,8 +39,10 @@ interface I2C {
   write(data: number[] | Buffer): void;
 }
 
+type SPIMode = 'MODE0' | 'MDOE1' | 'MODE2';
+type SPIOrder = 'LSBFIRST' | 'MSBFIRST';
 interface SPI {
-  new(args: { slave: number, speed: number, mode: string });
+  new(args: { slave: number, speed: number, mode: SPIMode, order: SPIOrder, bits: number });
   transfer(tx: number[] | Buffer): Buffer;
 }
 
@@ -60,9 +55,10 @@ interface Serial {
   onNewLine(callback: (line: string) => void): void;
 }
 
+declare function print(message: string): void;
+declare function error(message: string): void;
+declare function publish(event: string, data?: string | number): void;
 declare var Store: Store;
-declare var Logging: Logging;
-// declare var Event: Event;
 declare var Timer: Timer;
 declare var Subprocess: Subprocess;
 declare var GPIO: GPIO;
