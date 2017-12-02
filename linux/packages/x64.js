@@ -47,6 +47,5 @@ module.exports = {
     sudo(['mount', imageFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
     run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
     sudo(['umount', mountPoint])
-    run(['VBoxManage', 'convertdd', imageFile, imageFile + '.vdi', '--format', 'VDI', '--variant', 'Standard'])
   }
 }
