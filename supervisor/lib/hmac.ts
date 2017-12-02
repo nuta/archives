@@ -1,44 +1,44 @@
-import * as crypto from 'crypto';
+import * as crypto from "crypto";
 
 export function computeHMAC(deviceSecret, data) {
-  const hmac = crypto.createHmac('sha256', deviceSecret)
-  hmac.update(data)
-  return hmac.digest('hex')
+  const hmac = crypto.createHmac("sha256", deviceSecret);
+  hmac.update(data);
+  return hmac.digest("hex");
 }
 
 export function verifyMessageHMAC(deviceSecret: string, payload: Buffer, hmac: string, timestamp: string) {
-  if (typeof timestamp !== 'string') {
-    console.error('timestamp is not set')
-    return false
+  if (typeof timestamp !== "string") {
+    console.error("timestamp is not set");
+    return false;
   }
 
-  const diffFromTimestamp = Math.abs(((new Date()).getTime() - (new Date(timestamp)).getTime()))
+  const diffFromTimestamp = Math.abs(((new Date()).getTime() - (new Date(timestamp)).getTime()));
   if (diffFromTimestamp > 5 * 60 * 1000 /* msec */) {
-    console.error('invalid timestamp')
-    return false
+    console.error("invalid timestamp");
+    return false;
   }
 
-  if (typeof hmac !== 'string') {
-    console.error('hmac is not set')
-    return false
+  if (typeof hmac !== "string") {
+    console.error("hmac is not set");
+    return false;
   }
 
   if (hmac !== computeHMAC(deviceSecret, payload)) {
-    console.error('invalid hmac')
-    return false
+    console.error("invalid hmac");
+    return false;
   }
 
-  return true
+  return true;
 }
 
 export function verifyImageHMAC(deviceSecret, hmac, image) {
   if (!hmac) {
-    return false
+    return false;
   }
 
-  const hash = crypto.createHash('sha256')
-  hash.update(image)
-  const shasum = hash.digest('hex')
+  const hash = crypto.createHash("sha256");
+  hash.update(image);
+  const shasum = hash.digest("hex");
 
-  return (hmac === computeHMAC(deviceSecret, shasum))
+  return (hmac === computeHMAC(deviceSecret, shasum));
 }

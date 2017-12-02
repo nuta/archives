@@ -1,8 +1,8 @@
-import * as fs from 'fs';
-import { DeviceBase } from './device_base';
+import * as fs from "fs";
+import { DeviceBase } from "./device_base";
 
 export class Device extends DeviceBase {
-  updateOS(imagePath) {
-    fs.renameSync(imagePath, '/boot/vmlinuz')
+  public updateOS(imagePath) {
+    fs.renameSync(imagePath, "/boot/vmlinuz");
   }
 }

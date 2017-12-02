@@ -1,15 +1,15 @@
 export class AppAPI {
-  enableUpdate() {
-    process.send({ type: 'setUpdateEnabled', body: true })
+  public enableUpdate() {
+    process.send({ type: "setUpdateEnabled", body: true });
   }
 
-  disableUpdate() {
-    process.send({ type: 'setUpdateEnabled', body: false })
+  public disableUpdate() {
+    process.send({ type: "setUpdateEnabled", body: false });
   }
 
-  onExit(callback) {
-    process.on('SIGTERM', () => {
-      callback()
-    })
+  public onExit(callback) {
+    process.on("SIGTERM", () => {
+      callback();
+    });
   }
 }

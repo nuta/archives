@@ -1,37 +1,37 @@
-import * as fs from 'fs';
-import { ioctl } from '../ioctl';
+import * as fs from "fs";
+import { ioctl } from "../ioctl";
 
-const I2C_SLAVE = 0x0703
+const I2C_SLAVE = 0x0703;
 
 export abstract class LinuxI2CAPI {
-  abstract path: string;
-  address: number;
-  fd: number;
+  public abstract path: string;
+  public address: number;
+  public fd: number;
 
   constructor({ address }) {
-    this.address = address
-    this.fd = fs.openSync(this.path, 'rs+')
+    this.address = address;
+    this.fd = fs.openSync(this.path, "rs+");
   }
 
-  reset() {
-    fs.closeSync(this.fd)
+  public reset() {
+    fs.closeSync(this.fd);
   }
 
-  read(length) {
-    this.selectSlaveAddress(this.address)
-    let buffer = Buffer.alloc(length)
-    fs.readSync(this.fd, buffer, 0, length, 0)
-    return buffer
+  public read(length) {
+    this.selectSlaveAddress(this.address);
+    const buffer = Buffer.alloc(length);
+    fs.readSync(this.fd, buffer, 0, length, 0);
+    return buffer;
   }
 
-  write(data) {
-    this.selectSlaveAddress(this.address)
-    fs.writeSync(this.fd, Buffer.from(data))
+  public write(data) {
+    this.selectSlaveAddress(this.address);
+    fs.writeSync(this.fd, Buffer.from(data));
   }
 
-  selectSlaveAddress(address) {
+  public selectSlaveAddress(address) {
     if (ioctl(this.fd, I2C_SLAVE, address) !== 0) {
-      throw new Error('failed to set I2C_SLAVE')
+      throw new Error("failed to set I2C_SLAVE");
     }
   }
 }

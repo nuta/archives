@@ -1,5 +1,5 @@
 {
-  "name": "@makestack/aqm0802a",
+  "name": "@makestack/hdc1000",
   "main": "dist/index.js",
   "scripts": {
     "transpile": "tsc --pretty"

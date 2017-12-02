@@ -1,205 +1,205 @@
-import * as fs from 'fs';
-import * as util from 'util';
-import * as FormData from 'form-data';
-import * as fetch from 'node-fetch';
-import { loadCredentials, saveCredentials } from './config';
+import * as FormData from "form-data";
+import * as fs from "fs";
+import * as fetch from "node-fetch";
+import * as util from "util";
+import { loadCredentials, saveCredentials } from "./config";
 
 class API {
-  invoke(method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH', path: string, body?: any): Promise<any> {
-    const headers = {}
+  public invoke(method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: any): Promise<any> {
+    const headers = {};
 
     return new Promise((resolve, reject) => {
-      const credentials = loadCredentials()
+      const credentials = loadCredentials();
       if (!credentials) {
-        reject(new Error('login first'))
+        reject(new Error("login first"));
       }
 
       if (!(body instanceof FormData)) {
-        body = JSON.stringify(body)
+        body = JSON.stringify(body);
         Object.assign(headers, {
-          'Content-Type': 'application/json'
-        })
+          "Content-Type": "application/json",
+        });
       }
 
-      let status
+      let status;
       fetch(`${credentials.url}/api/v1${path}`, {
-        method: method,
+        method,
         headers: Object.assign(headers, credentials),
-        body
-      }).then(response => {
-        status = response.status
-        return (status === 204) ? Promise.resolve({}) : response.json()
-      }).then(json => {
+        body,
+      }).then((response) => {
+        status = response.status;
+        return (status === 204) ? Promise.resolve({}) : response.json();
+      }).then((json) => {
         if (!(status >= 200 && status <= 300)) {
-          const msg = util.inspect(json)
-          reject(Error(`Error: server returned ${status}: \`${msg}'`))
+          const msg = util.inspect(json);
+          reject(Error(`Error: server returned ${status}: \`${msg}'`));
         }
 
-        resolve(json)
-      })
-    })
+        resolve(json);
+      });
+    });
   }
 
   get serverURL() {
-    return loadCredentials().url
+    return loadCredentials().url;
   }
 
-  login(url, username, password) {
-    let status, headers
+  public login(url, username, password) {
+    let status, headers;
     return fetch(`${url}/api/v1/auth/sign_in`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
     }).then((response) => {
-      status = response.status
-      headers = response.headers
-      return response.json()
-    }).then(json => {
+      status = response.status;
+      headers = response.headers;
+      return response.json();
+    }).then((json) => {
       if (status !== 200) {
-        throw new Error(`Error: failed to login: \`${json.errors}'`)
+        throw new Error(`Error: failed to login: \`${json.errors}'`);
       }
 
       saveCredentials({
         url,
         username,
-        email: json['data']['email'],
-        uid: headers.get('uid'),
-        'access-token': headers.get('access-token'),
-        'access-token-secret': headers.get('access-token-secret')
-      })
-    })
+        "email": json.data.email,
+        "uid": headers.get("uid"),
+        "access-token": headers.get("access-token"),
+        "access-token-secret": headers.get("access-token-secret"),
+      });
+    });
   }
 
-  getApps() {
-    return this.invoke('GET', `/apps`)
+  public getApps() {
+    return this.invoke("GET", `/apps`);
   }
 
-  createApp(appName, api) {
-    return this.invoke('POST', `/apps`, {
-      app: { name: appName, api: api }
-    })
+  public createApp(appName, api) {
+    return this.invoke("POST", `/apps`, {
+      app: { name: appName, api },
+    });
   }
 
-  getFiles(appName) {
-    return this.invoke('GET', `/apps/${appName}/files`)
+  public getFiles(appName) {
+    return this.invoke("GET", `/apps/${appName}/files`);
   }
 
-  saveFile(appName, path, body) {
-    return this.invoke('PUT', `/apps/${appName}/files/${path}`, { body })
+  public saveFile(appName, path, body) {
+    return this.invoke("PUT", `/apps/${appName}/files/${path}`, { body });
   }
 
-  getApp(appName) {
-    return this.invoke('GET', `/apps/${appName}`)
+  public getApp(appName) {
+    return this.invoke("GET", `/apps/${appName}`);
   }
 
-  editApp(appName, attrs) {
-    return this.invoke('PUT', `/apps/${appName}`, attrs)
+  public editApp(appName, attrs) {
+    return this.invoke("PUT", `/apps/${appName}`, attrs);
   }
 
-  getDeployments(appName) {
-    return this.invoke('GET', `/apps/${appName}/deployments`)
+  public getDeployments(appName) {
+    return this.invoke("GET", `/apps/${appName}/deployments`);
   }
 
-  getDeployment(appName, version) {
-    return this.invoke('GET', `/apps/${appName}/deployments/${version}`)
+  public getDeployment(appName, version) {
+    return this.invoke("GET", `/apps/${appName}/deployments/${version}`);
   }
 
-  deploy(appName: string, image: Buffer, debug?: Buffer, comment?: string, tag?: string) {
-    const form = new FormData()
-    form.append('deployment[deployed_at]', 'client')
-    form.append('deployment[image]', image)
-    return this.invoke('POST', `/apps/${appName}/deployments`, form)
+  public deploy(appName: string, image: Buffer, debug?: Buffer, comment?: string, tag?: string) {
+    const form = new FormData();
+    form.append("deployment[deployed_at]", "client");
+    form.append("deployment[image]", image);
+    return this.invoke("POST", `/apps/${appName}/deployments`, form);
   }
 
-  deleteApp(appName) {
-    return this.invoke('DELETE', `/apps/${appName}`)
+  public deleteApp(appName) {
+    return this.invoke("DELETE", `/apps/${appName}`);
   }
 
-  getDevices() {
-    return this.invoke('GET', `/devices`)
+  public getDevices() {
+    return this.invoke("GET", `/devices`);
   }
 
-  getDevice(deviceName) {
-    return this.invoke('GET', `/devices/${deviceName}`)
+  public getDevice(deviceName) {
+    return this.invoke("GET", `/devices/${deviceName}`);
   }
 
-  updateDevice(deviceName, attrs) {
-    return this.invoke('PATCH', `/devices/${deviceName}`, { device: attrs })
+  public updateDevice(deviceName, attrs) {
+    return this.invoke("PATCH", `/devices/${deviceName}`, { device: attrs });
   }
 
-  getDeviceLog(deviceName) {
-    return this.invoke('GET', `/devices/${deviceName}/log`)
+  public getDeviceLog(deviceName) {
+    return this.invoke("GET", `/devices/${deviceName}/log`);
   }
 
-  getDeviceStores(deviceName) {
-    return this.invoke('GET', `/devices/${deviceName}/stores`)
+  public getDeviceStores(deviceName) {
+    return this.invoke("GET", `/devices/${deviceName}/stores`);
   }
 
-  setDeviceStore(deviceName, key, value) {
-    return this.invoke('PUT', `/devices/${deviceName}/stores/${key}`, { value })
+  public setDeviceStore(deviceName, key, value) {
+    return this.invoke("PUT", `/devices/${deviceName}/stores/${key}`, { value });
   }
 
-  registerDevice(name, deviceType, tag?) {
-    return this.invoke('POST', '/devices', { device: { name, device_type: deviceType, tag } })
+  public registerDevice(name, deviceType, tag?) {
+    return this.invoke("POST", "/devices", { device: { name, device_type: deviceType, tag } });
   }
 
-  deleteDevice(deviceName) {
-    return this.invoke('DELETE', `/devices/${deviceName}`)
+  public deleteDevice(deviceName) {
+    return this.invoke("DELETE", `/devices/${deviceName}`);
   }
 
-  getAppStores(appName) {
-    return this.invoke('GET', `/apps/${appName}/stores`)
+  public getAppStores(appName) {
+    return this.invoke("GET", `/apps/${appName}/stores`);
   }
 
-  setAppStore(appName, key, value) {
-    return this.invoke('PUT', `/apps/${appName}/stores/${key}`, { value })
+  public setAppStore(appName, key, value) {
+    return this.invoke("PUT", `/apps/${appName}/stores/${key}`, { value });
   }
 
-  downloadPlugin(name) {
-    let repo
-    if (name.includes('/')) {
+  public downloadPlugin(name) {
+    let repo;
+    if (name.includes("/")) {
       // A third-party plugin on GitHub.
-      repo = name
-      name = 'nodejs-' + name.split('/').pop()
+      repo = name;
+      name = "nodejs-" + name.split("/").pop();
     } else {
-      repo = '_/_'
+      repo = "_/_";
     }
 
     return new Promise((resolve, reject) => {
       fetch(`${this.serverURL}/api/v1/plugins/${repo}/${name}`, {
-        headers: loadCredentials()
-      }).then(response => {
-        response.buffer().then(resolve, reject)
-      })
-    })
+        headers: loadCredentials(),
+      }).then((response) => {
+        response.buffer().then(resolve, reject);
+      });
+    });
   }
 
-  getAppLog(appName, since?): Promise<{lines: [string]}> {
-    const unixtime = since ? Math.floor(since.getTime() / 1000) : 0
-    return this.invoke('GET', `/apps/${appName}/log?since=${unixtime}`)
+  public getAppLog(appName, since?): Promise<{lines: [string]}> {
+    const unixtime = since ? Math.floor(since.getTime() / 1000) : 0;
+    return this.invoke("GET", `/apps/${appName}/log?since=${unixtime}`);
   }
 
-  async streamAppLog(appName, callback) {
-    callback((await this.getAppLog(appName)).lines)
+  public async streamAppLog(appName, callback) {
+    callback((await this.getAppLog(appName)).lines);
 
-    let lastFetchedAt = null
+    let lastFetchedAt = null;
     setInterval(async () => {
-      callback((await this.getAppLog(appName, lastFetchedAt)).lines)
-      lastFetchedAt = new Date()
-    }, 5000)
+      callback((await this.getAppLog(appName, lastFetchedAt)).lines);
+      lastFetchedAt = new Date();
+    }, 5000);
   }
 
-  getOSReleases() {
-    return this.invoke('GET', '/os/releases')
+  public getOSReleases() {
+    return this.invoke("GET", "/os/releases");
   }
 
-  invokeCommand(deviceName, command, arg) {
-    return this.invoke('POST', `/devices/${deviceName}/commands`, { command, arg })
+  public invokeCommand(deviceName, command, arg) {
+    return this.invoke("POST", `/devices/${deviceName}/commands`, { command, arg });
   }
 
-  getCommandResults(deviceName) {
-    return this.invoke('GET', `/devices/${deviceName}/commands`)
+  public getCommandResults(deviceName) {
+    return this.invoke("GET", `/devices/${deviceName}/commands`);
   }
 }
 
-export const api = new API()
+export const api = new API();

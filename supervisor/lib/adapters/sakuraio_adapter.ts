@@ -6,277 +6,277 @@
  */
 const { builtins } = require(process.env.RUNTIME_MODULE);
 const { I2C, Timer } = builtins;
-import { AdapterBase } from './adapter_base';
-import * as logger from '../logger';
+import * as logger from "../logger";
+import { AdapterBase } from "./adapter_base";
 
 // 1 - 19999 are reserved for OS images.
-const APP_IMAGE_FILEID = 1
+const APP_IMAGE_FILEID = 1;
 // sakura.io allows to send 16 channels at a time. 16th one is used
 // for CHANNEL_COMMIT.
-const CHANNELS_MAX = 15
-const CHANNEL_COMMIT = 16
-const BYTES_PER_CHANNEL = 8
-const CH_TYPE_8BYTES = 0x62
-const PACKET_LEN_MAX = CHANNELS_MAX * BYTES_PER_CHANNEL
-const CONNECTION_READY = 0x80
-const CMD_RESULT_SUCCESS = 0x01
-const CMD_RESULT_PROCESSING = 0x07
-const CMD_GET_CONNECTION_STATUS = 0x01
-const CMD_START_FILE_DOWNLOAD = 0x40
-const CMD_GET_FILE_METADATA = 0x41
-const CMD_GET_FILE_DATA = 0x44
-const CMD_TX_ENQUEUE = 0x20
-const CMD_TX_SEND = 0x24
-const CMD_RX_DEQUEUE = 0x30
-const CMD_RX_LENGTH = 0x32
-const FILE_CHUNK_SIZE = 16
+const CHANNELS_MAX = 15;
+const CHANNEL_COMMIT = 16;
+const BYTES_PER_CHANNEL = 8;
+const CH_TYPE_8BYTES = 0x62;
+const PACKET_LEN_MAX = CHANNELS_MAX * BYTES_PER_CHANNEL;
+const CONNECTION_READY = 0x80;
+const CMD_RESULT_SUCCESS = 0x01;
+const CMD_RESULT_PROCESSING = 0x07;
+const CMD_GET_CONNECTION_STATUS = 0x01;
+const CMD_START_FILE_DOWNLOAD = 0x40;
+const CMD_GET_FILE_METADATA = 0x41;
+const CMD_GET_FILE_DATA = 0x44;
+const CMD_TX_ENQUEUE = 0x20;
+const CMD_TX_SEND = 0x24;
+const CMD_RX_DEQUEUE = 0x30;
+const CMD_RX_LENGTH = 0x32;
+const FILE_CHUNK_SIZE = 16;
 
 abstract class SakuraIODriverBase {
-  abstract command(command: number, data: Buffer): Promise<[number, Buffer]>;
+  public abstract command(command: number, data: Buffer): Promise<[number, Buffer]>;
 
-  computeParity(firstByte, data) {
-    let parity = firstByte ^ data.length
+  public computeParity(firstByte, data) {
+    let parity = firstByte ^ data.length;
     for (const byte of data) {
-      parity ^= byte
+      parity ^= byte;
     }
 
-    return parity
+    return parity;
   }
 
-  async enqueueTx(channel, type, value) {
+  public async enqueueTx(channel, type, value) {
     if (value.length > BYTES_PER_CHANNEL) {
-      throw new Error('BUG: sakura.io: enqueue value must be equal to or less than 8 bytes')
+      throw new Error("BUG: sakura.io: enqueue value must be equal to or less than 8 bytes");
     }
 
-    let request = Buffer.alloc(BYTES_PER_CHANNEL + 2)
-    request.writeUInt8(channel, 0)
-    request.writeUInt8(type, 1)
-    value.copy(request, 2)
+    const request = Buffer.alloc(BYTES_PER_CHANNEL + 2);
+    request.writeUInt8(channel, 0);
+    request.writeUInt8(type, 1);
+    value.copy(request, 2);
 
-    await this.command(CMD_TX_ENQUEUE, request)
+    await this.command(CMD_TX_ENQUEUE, request);
   }
 
-  async flushTx() {
-    await this.command(CMD_TX_SEND, Buffer.alloc(0))
+  public async flushTx() {
+    await this.command(CMD_TX_SEND, Buffer.alloc(0));
   }
 
-  async dequeueRx(): Promise<[number, Buffer]> {
-    const [, resp] = await this.command(CMD_RX_DEQUEUE, Buffer.alloc(0))
-    let channel = resp.readUInt8(0)
+  public async dequeueRx(): Promise<[number, Buffer]> {
+    const [, resp] = await this.command(CMD_RX_DEQUEUE, Buffer.alloc(0));
+    const channel = resp.readUInt8(0);
 
-    let data = Buffer.alloc(BYTES_PER_CHANNEL)
+    const data = Buffer.alloc(BYTES_PER_CHANNEL);
     for (let i = 0; i < BYTES_PER_CHANNEL; i++) {
-      data[i] = resp.readUInt8(2 + i)
+      data[i] = resp.readUInt8(2 + i);
     }
 
-    return [channel, data]
+    return [channel, data];
   }
 
-  async getRxQueueLength() {
-    const [, resp] = await this.command(CMD_RX_LENGTH, Buffer.alloc(0))
-    let available = resp.readUInt8(0)
-    let queued = resp.readUInt8(1)
+  public async getRxQueueLength() {
+    const [, resp] = await this.command(CMD_RX_LENGTH, Buffer.alloc(0));
+    const available = resp.readUInt8(0);
+    const queued = resp.readUInt8(1);
 
-    return [available, queued]
+    return [available, queued];
   }
 
-  async requestFileDownload(fileId) {
-    let buf = Buffer.alloc(2)
-    buf.writeUInt16LE(fileId, 0)
-    await this.command(CMD_START_FILE_DOWNLOAD, buf)
+  public async requestFileDownload(fileId) {
+    const buf = Buffer.alloc(2);
+    buf.writeUInt16LE(fileId, 0);
+    await this.command(CMD_START_FILE_DOWNLOAD, buf);
   }
 
-  async isDownloadingFile() {
-    const [result] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
-    return (result !== CMD_RESULT_SUCCESS)
+  public async isDownloadingFile() {
+    const [result] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0));
+    return (result !== CMD_RESULT_SUCCESS);
   }
 
-  async getFileMetadata() {
-    const [, response] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0))
-    const status = response.readUInt8(0)
-    const size = response.readUInt32LE(1)
-    const timestamp = response.readUInt32LE(5)
-    const crc = response.readUInt8(13)
-    return [status, size, timestamp, crc]
+  public async getFileMetadata() {
+    const [, response] = await this.command(CMD_GET_FILE_METADATA, Buffer.alloc(0));
+    const status = response.readUInt8(0);
+    const size = response.readUInt32LE(1);
+    const timestamp = response.readUInt32LE(5);
+    const crc = response.readUInt8(13);
+    return [status, size, timestamp, crc];
   }
 
-  async getFileData(chunkSize) {
-    return this.command(CMD_GET_FILE_DATA, Buffer.from([chunkSize]))
+  public async getFileData(chunkSize) {
+    return this.command(CMD_GET_FILE_DATA, Buffer.from([chunkSize]));
   }
 
-  async getFileDownloadStatus() {
-    return this.command(0x42, Buffer.alloc(0))
+  public async getFileDownloadStatus() {
+    return this.command(0x42, Buffer.alloc(0));
   }
 
-  async getConnectionStatus() {
-    const [result, resp] = await this.command(CMD_GET_CONNECTION_STATUS, Buffer.alloc(0))
-    return (result === CMD_RESULT_SUCCESS) ? resp.readUInt8(0) : 0x7f
+  public async getConnectionStatus() {
+    const [result, resp] = await this.command(CMD_GET_CONNECTION_STATUS, Buffer.alloc(0));
+    return (result === CMD_RESULT_SUCCESS) ? resp.readUInt8(0) : 0x7f;
   }
 }
 
 class I2CSakuraIODriver extends SakuraIODriverBase {
-  i2c: any;
+  public i2c: any;
 
   constructor() {
-    super()
-    this.i2c = new I2C({ address: 0x4f })
+    super();
+    this.i2c = new I2C({ address: 0x4f });
   }
 
-  async command(command: number, data: Buffer): Promise<[number, Buffer]> {
+  public async command(command: number, data: Buffer): Promise<[number, Buffer]> {
     // Send a request.
-    let request = Buffer.alloc(2 + data.length + 1)
-    request.writeUInt8(command, 0)
-    request.writeUInt8(data.length, 1)
-    data.copy(request, 2)
-    request.writeUInt8(this.computeParity(command, data), 2 + data.length)
+    const request = Buffer.alloc(2 + data.length + 1);
+    request.writeUInt8(command, 0);
+    request.writeUInt8(data.length, 1);
+    data.copy(request, 2);
+    request.writeUInt8(this.computeParity(command, data), 2 + data.length);
 
-    this.i2c.write(request)
+    this.i2c.write(request);
 
-    Timer.busywait(10 * 1000)
+    Timer.busywait(10 * 1000);
 
     // Receive a response from the module.
-    let buf            = (await this.i2c.read(32))
-    let result         = buf.readUInt8(0)
-    let responseLength = buf.readUInt8(1)
-    let parity         = buf.readUInt8(responseLength + 2)
-    let response       = buf.slice(2, responseLength + 2)
+    const buf            = (await this.i2c.read(32));
+    const result         = buf.readUInt8(0);
+    const responseLength = buf.readUInt8(1);
+    const parity         = buf.readUInt8(responseLength + 2);
+    const response       = buf.slice(2, responseLength + 2);
 
     if (result !== CMD_RESULT_SUCCESS) {
-      logger.warn(`sakura.io: module returned ${result}`)
-      return [result, Buffer.alloc(0)]
+      logger.warn(`sakura.io: module returned ${result}`);
+      return [result, Buffer.alloc(0)];
     }
 
     if (parity !== this.computeParity(result, response)) {
-      logger.error('sakura.io: parity mismatch')
-      return [result, Buffer.alloc(0)] // FIXME
+      logger.error("sakura.io: parity mismatch");
+      return [result, Buffer.alloc(0)]; // FIXME
     }
 
-    return [result, response]
+    return [result, response];
   }
 }
 
 export class SakuraIOAdapter extends AdapterBase {
-  sakuraio: I2CSakuraIODriver;
-  received: Buffer[];
+  public sakuraio: I2CSakuraIODriver;
+  public received: Buffer[];
 
   constructor() {
-    super()
-    this.sakuraio = new I2CSakuraIODriver()
-    this.received = []
+    super();
+    this.sakuraio = new I2CSakuraIODriver();
+    this.received = [];
   }
 
-  async connect() {
+  public async connect() {
     // Wait until the module gets connected.
     while (true) {
-      logger.debug('sakuraio: connecting...')
+      logger.debug("sakuraio: connecting...");
       if ((await this.sakuraio.getConnectionStatus()) & CONNECTION_READY) {
-        break
+        break;
       }
 
-      await Timer.sleep(1)
+      await Timer.sleep(1);
     }
 
-    logger.debug('sakuraio: connected!')
+    logger.debug("sakuraio: connected!");
   }
 
-  async receive() {
+  public async receive() {
     // Receive payloads from sakura.io.
-    let [, queued] = await this.sakuraio.getRxQueueLength()
+    const [, queued] = await this.sakuraio.getRxQueueLength();
     if (queued > 0) {
-      let commited = false
+      let commited = false;
       for (let i = 0; i < queued; i++) {
-        let [channel, data] = await this.sakuraio.dequeueRx()
+        const [channel, data] = await this.sakuraio.dequeueRx();
         if (channel === CHANNEL_COMMIT) {
-          commited = true
-          break
+          commited = true;
+          break;
         }
 
-        this.received[channel] = data
+        this.received[channel] = data;
       }
 
       // Received whole payload.
       if (commited) {
-        let payload = Buffer.alloc(PACKET_LEN_MAX)
+        const payload = Buffer.alloc(PACKET_LEN_MAX);
         for (let i = 0; i < CHANNELS_MAX; i++) {
           if (this.received[i]) {
             if (i < 0 && this.received[i - 1] === undefined && this.received[i]) {
-              logger.error('sakuraio: detected a loss of channel')
-              return
+              logger.error("sakuraio: detected a loss of channel");
+              return;
             }
 
-            this.received[i].copy(payload, i * BYTES_PER_CHANNEL)
+            this.received[i].copy(payload, i * BYTES_PER_CHANNEL);
           }
         }
 
-        this.received = []
-        logger.debug('sakuraio: received payload', payload)
-        this.onReceiveCallback(payload)
+        this.received = [];
+        logger.debug("sakuraio: received payload", payload);
+        this.onReceiveCallback(payload);
       }
     }
   }
 
-  doSend(payload) {
+  public doSend(payload) {
     // Split the payload into 8 bytes (BYTES_PER_CHANNEL) arrays.
-    let channels = []
+    const channels = [];
     for (let i = 0; i < payload.length; i += BYTES_PER_CHANNEL) {
-      channels.push(payload.slice(i, i + BYTES_PER_CHANNEL))
+      channels.push(payload.slice(i, i + BYTES_PER_CHANNEL));
     }
 
     if (channels.length > CHANNELS_MAX) {
-      throw new Error('sakura.io: # of channel must be less than 16')
+      throw new Error("sakura.io: # of channel must be less than 16");
     }
 
     for (const [i, ch] of channels.entries()) {
-      this.sakuraio.enqueueTx(i, CH_TYPE_8BYTES, ch)
+      this.sakuraio.enqueueTx(i, CH_TYPE_8BYTES, ch);
     }
 
-    this.sakuraio.flushTx()
+    this.sakuraio.flushTx();
   }
 
-  async send(payload) {
-    this.doSend(payload)
-    this.receive()
+  public async send(payload) {
+    this.doSend(payload);
+    this.receive();
   }
 
-  async getAppImage(version) {
-    logger.info('sakura.io: requesting a file download....')
-    await this.sakuraio.requestFileDownload(APP_IMAGE_FILEID)
+  public async getAppImage(version) {
+    logger.info("sakura.io: requesting a file download....");
+    await this.sakuraio.requestFileDownload(APP_IMAGE_FILEID);
 
     // Wait until the module finish downloading the app image file.
     while (true) {
       if (!(await this.sakuraio.isDownloadingFile())) {
-        break
+        break;
       }
 
-      await Timer.sleep(1)
+      await Timer.sleep(1);
     }
 
-    const [, fileSize] = await this.sakuraio.getFileMetadata()
+    const [, fileSize] = await this.sakuraio.getFileMetadata();
     if (fileSize === 0) {
-      throw new Error('sakura.io: failed to download a file')
+      throw new Error("sakura.io: failed to download a file");
     }
 
-    let appImage = Buffer.alloc(fileSize)
-    let offset = 0
+    const appImage = Buffer.alloc(fileSize);
+    let offset = 0;
     while (offset < fileSize) {
-      const [result, data] = await this.sakuraio.getFileData(FILE_CHUNK_SIZE)
+      const [result, data] = await this.sakuraio.getFileData(FILE_CHUNK_SIZE);
       if (result !== CMD_RESULT_SUCCESS) {
-        logger.debug('sakura.io: getFileData returned an error, retrying in a sec....')
-        await Timer.sleep(1)
-        continue
+        logger.debug("sakura.io: getFileData returned an error, retrying in a sec....");
+        await Timer.sleep(1);
+        continue;
       }
 
-      data.copy(appImage, offset)
-      offset += data.length
-      const perc = ((offset / fileSize) * 100).toFixed(2)
-      logger.debug(`sakura.io: received ${offset} bytes ${perc}%`)
+      data.copy(appImage, offset);
+      offset += data.length;
+      const perc = ((offset / fileSize) * 100).toFixed(2);
+      logger.debug(`sakura.io: received ${offset} bytes ${perc}%`);
     }
 
-    logger.debug('sakura.io: Hooray! You got a new app image!')
-    return Promise.resolve(appImage)
+    logger.debug("sakura.io: Hooray! You got a new app image!");
+    return Promise.resolve(appImage);
   }
 
-  getOSImage(version) {
-    return Promise.reject('sakura.io: getOSImage is not supported yet')
+  public getOSImage(version) {
+    return Promise.reject("sakura.io: getOSImage is not supported yet");
   }
 }

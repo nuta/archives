@@ -1,14 +1,14 @@
 export abstract class AdapterBase {
-  onReceiveCallback: (Buffer) => void;
-  abstract async send(payload: Buffer);
-  abstract getAppImage(version: string): Promise<Buffer>;
-  abstract getOSImage(version: string): Promise<Buffer>;
+  public onReceiveCallback: (Buffer) => void;
+  public abstract async send(payload: Buffer);
+  public abstract getAppImage(version: string): Promise<Buffer>;
+  public abstract getOSImage(version: string): Promise<Buffer>;
 
   constructor() {
-    this.onReceiveCallback = () => { }
+    this.onReceiveCallback = () => { };
   }
 
-  onReceive(callback) {
-    this.onReceiveCallback = callback
+  public onReceive(callback) {
+    this.onReceiveCallback = callback;
   }
 }

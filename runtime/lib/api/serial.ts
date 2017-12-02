@@ -1,78 +1,78 @@
-import * as fs from 'fs';
-const serial = require(`../../native/${process.arch}/serial.node`)
-const { O_RDWR, O_NOCTTY, O_SYNC } = fs.constants
+import * as fs from "fs";
+const serial = require(`../../native/${process.arch}/serial.node`);
+const { O_RDWR, O_NOCTTY, O_SYNC } = fs.constants;
 
 export class SerialAPI {
-  path: string;
-  watching: boolean;
-  fd: number;
-  baudrate: number;
+  public path: string;
+  public watching: boolean;
+  public fd: number;
+  public baudrate: number;
 
   constructor({ path, baudrate }) {
-    this.path = path
-    this.watching = false
-    this.fd = fs.openSync(path, O_RDWR | O_NOCTTY | O_SYNC)
-    this.configure(baudrate)
+    this.path = path;
+    this.watching = false;
+    this.fd = fs.openSync(path, O_RDWR | O_NOCTTY | O_SYNC);
+    this.configure(baudrate);
   }
 
-  static list() {
-    return fs.readdirSync('/dev')
-      .filter(filepath => filepath.match(/^(ttyAMA0|ttyUSB)/))
-      .map(filepath => `/dev/${filepath}`)
+  public static list() {
+    return fs.readdirSync("/dev")
+      .filter((filepath) => filepath.match(/^(ttyAMA0|ttyUSB)/))
+      .map((filepath) => `/dev/${filepath}`);
   }
 
-  configure(baudrate) {
+  public configure(baudrate) {
     if (!baudrate) {
-      throw new Error("`baudrate' is not speicified")
+      throw new Error("`baudrate' is not speicified");
     }
 
-    this.baudrate = baudrate
-    serial.configure(this.fd, baudrate, 0, 0)
+    this.baudrate = baudrate;
+    serial.configure(this.fd, baudrate, 0, 0);
   }
 
-  write(data) {
-    fs.writeSync(this.fd, data)
+  public write(data) {
+    fs.writeSync(this.fd, data);
   }
 
-  read() {
-    return fs.readFileSync(this.fd)
+  public read() {
+    return fs.readFileSync(this.fd);
   }
 
-  onData(callback) {
+  public onData(callback) {
     if (this.watching) {
-      throw Error('The serial port is already being watched.')
+      throw Error("The serial port is already being watched.");
     }
 
-    this.watching = true
+    this.watching = true;
 
     // FIXME: use libuv
     setInterval(() => {
-      const chunk = this.read()
+      const chunk = this.read();
       if (chunk.length > 0) {
-        callback(chunk)
+        callback(chunk);
       }
-    }, 100)
+    }, 100);
   }
 
-  onNewLine(callback) {
+  public onNewLine(callback) {
     if (this.watching) {
-      throw Error('The serial port is already being watched.')
+      throw Error("The serial port is already being watched.");
     }
 
-    this.watching = true
+    this.watching = true;
 
     // FIXME: use libuv
-    let buf = ''
+    let buf = "";
     setInterval(() => {
-      const chunk = this.read().toString('utf-8')
+      const chunk = this.read().toString("utf-8");
       if (chunk.length > 0) {
-        buf += chunk
-        while (buf.includes('\n')) {
-          const line = buf.split('\n')[0].replace('\r$', '')
-          buf = buf.slice(buf.indexOf('\n') + 1)
-          callback(line)
+        buf += chunk;
+        while (buf.includes("\n")) {
+          const line = buf.split("\n")[0].replace("\r$", "");
+          buf = buf.slice(buf.indexOf("\n") + 1);
+          callback(line);
         }
       }
-    }, 100)
+    }, 100);
   }
 }

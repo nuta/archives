@@ -1,37 +1,37 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
 
 export function removeFiles(filepath: string): void {
   if (!fs.existsSync(filepath)) {
-    return
+    return;
   }
 
-  let remaining = [filepath]
+  const remaining = [filepath];
   while (remaining.length > 0) {
-    const target = remaining.pop()
+    const target = remaining.pop();
     if (fs.statSync(target).isDirectory) {
-      const innerFiles = fs.readdirSync(target).map(name => path.join(target, name))
+      const innerFiles = fs.readdirSync(target).map((name) => path.join(target, name));
       if (innerFiles.length === 0) {
-        fs.rmdirSync(target)
+        fs.rmdirSync(target);
       } else {
-        remaining.concat(innerFiles)
+        remaining.concat(innerFiles);
       }
     } else {
       // A normal file.
-      fs.unlinkSync(target)
+      fs.unlinkSync(target);
     }
   }
 }
 
 export function makedirs(dir: string): void {
-  const dirs = path.resolve(dir).split('/')
-  let dirpath = '/'
+  const dirs = path.resolve(dir).split("/");
+  let dirpath = "/";
 
   for (const relpath of dirs) {
-    dirpath = path.join(dirpath, relpath)
+    dirpath = path.join(dirpath, relpath);
 
     if (!fs.existsSync(dirpath)) {
-      fs.mkdirSync(dirpath)
+      fs.mkdirSync(dirpath);
     }
   }
 }

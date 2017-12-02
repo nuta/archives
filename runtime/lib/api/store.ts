@@ -1,51 +1,51 @@
-type onChangeCallback = (value: string) => void
-type onCommandCallback = (value: string) => void
+type onChangeCallback = (value: string) => void;
+type onCommandCallback = (value: string) => void;
 
 export class StoreAPI {
-  stores: { [key: string]: string };
-  onChangeCallbacks: { [key: string]: onChangeCallback[] };
-  onCommandCallbacks: { [key: string]: onCommandCallback };
+  public stores: { [key: string]: string };
+  public onChangeCallbacks: { [key: string]: onChangeCallback[] };
+  public onCommandCallbacks: { [key: string]: onCommandCallback };
 
   constructor() {
-    this.stores = {}
-    this.onChangeCallbacks = {}
-    this.onCommandCallbacks = {}
+    this.stores = {};
+    this.onChangeCallbacks = {};
+    this.onCommandCallbacks = {};
   }
 
-  onCommand(key, callback) {
-    this.onCommandCallbacks[key] = callback
+  public onCommand(key, callback) {
+    this.onCommandCallbacks[key] = callback;
   }
 
-  onChange(key, callback) {
+  public onChange(key, callback) {
     if (this.stores[key] !== undefined) {
-      callback(this.stores[key])
+      callback(this.stores[key]);
     }
 
     if (key in this.onChangeCallbacks) {
-      this.onChangeCallbacks[key].push(callback)
+      this.onChangeCallbacks[key].push(callback);
     } else {
-      this.onChangeCallbacks[key] = [callback]
+      this.onChangeCallbacks[key] = [callback];
     }
   }
 
-  async update(newStores) {
+  public async update(newStores) {
     for (const key in newStores) {
-      if (key.startsWith('>')) {
+      if (key.startsWith(">")) {
         // Command
-        const [commandId, commandKey] = key.substring(1).split(' ')
+        const [commandId, commandKey] = key.substring(1).split(" ");
         if (this.onCommandCallbacks[commandKey]) {
-          const returnValue = await this.onCommandCallbacks[commandKey](newStores[key])
-          process.send({ type: 'log', body: `<${commandId} ${returnValue}` })
+          const returnValue = await this.onCommandCallbacks[commandKey](newStores[key]);
+          process.send({ type: "log", body: `<${commandId} ${returnValue}` });
         }
       } else {
         // Store
-        const oldValue = this.stores[key]
-        const newValue = newStores[key]
-        this.stores[key] = newValue
+        const oldValue = this.stores[key];
+        const newValue = newStores[key];
+        this.stores[key] = newValue;
 
         if (this.onChangeCallbacks[key] && oldValue !== newValue) {
           for (const callback of this.onChangeCallbacks[key]) {
-            callback(newValue)
+            callback(newValue);
           }
         }
       }
