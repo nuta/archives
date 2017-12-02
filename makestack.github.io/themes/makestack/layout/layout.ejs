@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title><%- page.title ? page.title + ' — ' : '' %>Vue.js</title>
+  <meta charset="utf-8">
+  <meta name="description" content="<%- theme.site_description %>">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+</head>
+<body>
+  <header>
+    <h1>MakeStack</h1>
+  </header>
+
+  <% if (page.path === 'index.html') { %>
+    <%- partial('index') %>
+  <% } else { %>
+    <%- body %>
+  <% } %>
+</body>
+</html>

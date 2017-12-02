@@ -39,3 +39,7 @@ coverage
 # linux
 /linux/build
 /linux/disk
+
+# makestack.github.io
+/makestack.github.io/db.json
+/makestack.github.io/source
