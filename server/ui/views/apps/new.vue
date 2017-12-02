@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       appName: '',
-      appAPI: 'linux'
+      appAPI: 'nodejs'
     };
   },
   methods: {
