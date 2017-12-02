@@ -110,8 +110,8 @@ matrix:
       osx_image: xcode9.1
       node_js: "8"
       cache:
+        yarn: true
         directories:
-          - sdk/installer/node_modules
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
@@ -125,8 +125,10 @@ matrix:
       node_js: "8"
       env: M=installer:linux
       cache:
+        yarn: true
         directories:
-          - sdk/installer/node_modules
+          - "$HOME/.electron"
+          - "$HOME/.cache"
       install:
         - cd sdk/installer
         - yarn
