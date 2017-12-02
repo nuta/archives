@@ -1,9 +1,10 @@
-const assert = require('power-assert')
-const mockfs = require('mock-fs')
-const fs = require('fs')
+import { } from 'mocha';
+import * as mockfs from 'mock-fs';
+import { expect } from 'chai';
+import * as fs from 'fs';
 
-process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3'
-const { builtins } = require('..')
+process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
+const { builtins } = require('..');
 
 function readFile(path) {
   return fs.readFileSync(path, { encoding: 'utf-8' })
@@ -29,23 +30,23 @@ describe('GPIO API', function() {
 
   describe('setMode', function() {
     it('changes the direction', function() {
-      this.instance.setMode(builtins.GPIO.INPUT)
-      assert.strictEqual(readFile('/sys/class/gpio/export'), '1')
-      assert.strictEqual(readFile('/sys/class/gpio/gpio1/direction'), 'in')
+      this.instance.setMode(builtins.GPIO.INPUT);
+      expect(readFile('/sys/class/gpio/export')).to.equal('1');
+      expect(readFile('/sys/class/gpio/gpio1/direction')).to.equal('in');
     })
   })
 
   describe('write', function() {
     it('changes the value', function() {
-      this.instance.write(true)
-      assert.strictEqual(readFile('/sys/class/gpio/gpio1/value'), '1')
+      this.instance.write(true);
+      expect(readFile('/sys/class/gpio/gpio1/value')).to.equal('1');
     })
   })
 
   describe('read', function() {
     it('reads the value', function() {
-      this.instance.write(false)
-      assert.strictEqual(this.instance.read(), false)
+      this.instance.write(false);
+      expect(this.instance.read()).to.equal(false);
     })
   })
 })

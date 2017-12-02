@@ -7,9 +7,9 @@
   "main": "dist/index.js",
   "typings": "./makestack.d.ts",
   "scripts": {
-    "cov": "istanbul cover _mocha",
-    "test": "mocha",
-    "test:live": "mocha -w",
+    "cov": "istanbul cover _mocha test/*.spec.ts",
+    "test": "mocha test/*.spec.ts",
+    "test:live": "mocha -w test/*.spec.ts",
     "prepublish": "npm run build",
     "build": "npm run transpile && ARCH=x64 npm run build-native",
     "prepack": "npm run build",
@@ -21,13 +21,16 @@
     "nan": "^2.7.0"
   },
   "devDependencies": {
+    "@types/chai": "^4.0.6",
+    "@types/mocha": "^2.2.44",
     "@types/node": "^8.0.53",
+    "chai": "^4.1.2",
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "mock-fs": "^4.4.2",
     "nan": "^2.7.0",
-    "power-assert": "^1.4.4",
     "sinon": "^4.1.2",
+    "source-map-support": "^0.5.0",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.2"
   }
