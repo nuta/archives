@@ -11,20 +11,13 @@ class Apps::IntegrationsController < Apps::ApplicationController
 
   def create
     @integration = @app.integrations.new(integration_params)
-
-    if @integration.save
-      render :show, status: :created, location: app_integration_url(@app.name, @integration.name)
-    else
-      render json: @integration.errors, status: :unprocessable_entity
-    end
+    @integration.save!
+    render :show, status: :created, location: app_integration_url(@app.name, @integration.name)
   end
 
   def update
-    if @integration.update(integration_params)
-      render :show, status: :ok, location: app_integration_url(@app.name, @integration.name)
-    else
-      render json: @integration.errors, status: :unprocessable_entity
-    end
+    @integration.update!(integration_params)
+    render :show, status: :ok, location: app_integration_url(@app.name, @integration.name)
   end
 
   def destroy

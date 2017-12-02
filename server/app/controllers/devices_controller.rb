@@ -10,12 +10,8 @@ class DevicesController < ApplicationController
 
   def create
     @device = @user.devices.new(device_params)
-
-    if @device.save
-      render :show, status: :created, location: @device
-    else
-      render json: @device.errors, status: :unprocessable_entity
-    end
+    @device.save!
+    render :show, status: :created, location: @device
   end
 
   def update
@@ -24,11 +20,8 @@ class DevicesController < ApplicationController
       @device.app = @user.apps.find_by_name!(app)
     end
 
-    if @device.update(device_params)
-      render :show, status: :ok, location: @device
-    else
-      render json: @device.errors, status: :unprocessable_entity
-    end
+    @device.update!(device_params)
+    render :show, status: :ok, location: @device
   end
 
   def destroy

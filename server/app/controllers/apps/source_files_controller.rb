@@ -11,12 +11,8 @@ class Apps::SourceFilesController < Apps::ApplicationController
 
   def update
     @source_file = @app.source_files.find_or_initialize_by(path: params[:path])
-
-    if @source_file.update(source_file_params)
-      render :show, status: :ok, location: app_source_file_url(@app.name, @source_file.path)
-    else
-      render json: @source_file.errors, status: :unprocessable_entity
-    end
+    @source_file.update!(source_file_params)
+    render :show, status: :ok, location: app_source_file_url(@app.name, @source_file.path)
   end
 
   def destroy

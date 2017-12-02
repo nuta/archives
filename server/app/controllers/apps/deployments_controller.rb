@@ -11,12 +11,8 @@ class Apps::DeploymentsController < Apps::ApplicationController
 
   def create
     @deployment = @app.deployments.new(deployment_params)
-
-    if @deployment.save
-      render :show, status: :created, location: app_deployment_url(@app.name, @deployment.version)
-    else
-      render json: @deployment.errors, status: :unprocessable_entity
-    end
+    @deployment.save!
+    render :show, status: :created, location: app_deployment_url(@app.name, @deployment.version)
   end
 
   private

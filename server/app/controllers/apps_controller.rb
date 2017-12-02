@@ -11,20 +11,13 @@ class AppsController < ApplicationController
   def create
     @app = App.new(app_params)
     @app.user = @user
-
-    if @app.save
-      render :show, status: :created, location: @app
-    else
-      render json: @app.errors, status: :unprocessable_entity
-    end
+    @app.save!
+    render :show, status: :created, location: @app
   end
 
   def update
-    if @app.update(app_params)
-      render :show, status: :ok, location: @app
-    else
-      render json: @app.errors, status: :unprocessable_entity
-    end
+    @app.update!(app_params)
+    render :show, status: :ok, location: @app
   end
 
   def destroy

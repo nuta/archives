@@ -18,4 +18,9 @@ class ApplicationController < ActionController::API
     devise_parameter_sanitizer.permit(:account_update, keys: [:email])
     devise_parameter_sanitizer.permit(:sign_up, keys: [:email, :username])
   end
+
+  rescue_from ActiveRecord::RecordInvalid do |exception|
+    render json: { errors: exception.record.errors.full_messages },
+      status: :unprocessable_entity
+  end
 end

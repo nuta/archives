@@ -11,20 +11,13 @@ class Devices::StoresController < Devices::ApplicationController
 
   def create
     @store = @device.stores.new(store_params)
-
-    if @store.save
-      render :show, status: :created, location: device_store_url(@device.name, @store.key)
-    else
-      render json: @store.errors, status: :unprocessable_entity
-    end
+    @store.save!
+    render :show, status: :created, location: device_store_url(@device.name, @store.key)
   end
 
   def update
-    if @store.update(store_params)
-      render :show, status: :ok, location: device_store_url(@device.name, @store.key)
-    else
-      render json: @store.errors, status: :unprocessable_entity
-    end
+    @store.update!(store_params)
+    render :show, status: :ok, location: device_store_url(@device.name, @store.key)
   end
 
   def destroy
