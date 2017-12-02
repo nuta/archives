@@ -120,7 +120,7 @@ module SMMSService
 
     # store
     device.formatted_stores.each_with_index do |(key, store), index|
-      data = generate_variable_length(key).first + key + store[:value]
+      data = generate_variable_length(key) + key + store[:value]
       payload += generate_message(SMMS_STORE_MSG, data)
     end
 
