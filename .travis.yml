@@ -25,7 +25,6 @@ matrix:
       install:
         - npm install -g yarn node-gyp
         - cd linux
-        - make prepare
       script:
         - BUILD=release ./pkgbuilder/pkgbuilder x64
 
@@ -60,7 +59,6 @@ matrix:
         - make -j2
         - sudo make install
         - cd ../../linux
-        - make prepare
       script:
         - BUILD=release ./pkgbuilder/pkgbuilder raspberrypi3
 
