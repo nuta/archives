@@ -43,3 +43,5 @@ coverage
 # makestack.github.io
 /makestack.github.io/db.json
 /makestack.github.io/source
+/makestack.github.io/public
+/makestack.github.io/.deploy_git
