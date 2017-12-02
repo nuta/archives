@@ -147,6 +147,7 @@ matrix:
       install:
         - cd sdk
         - yarn
+        - yarn build
       script:
         - yarn run cov
 
