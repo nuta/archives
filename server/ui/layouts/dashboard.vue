@@ -160,5 +160,11 @@ main {
       }
     }
   }
+
+  form {
+    input[readonly]:hover {
+      cursor: not-allowed;
+    }
+  }
 }
 </style>

@@ -2,35 +2,55 @@
 <device-layout :title="deviceName" :device-name="deviceName">
 
   <remote-content :loading="loading" :content="device">
-    <form slot="content" @submit.prevent="update" class="uk-form-horizontal">
-      <div class="uk-margin">
-        <label class="uk-form-label">Associated app</label>
-        <div class="uk-form-controls">
-          <select v-model="associatedTo" class="uk-select">
-            <option value="" disabled selected>Not associated</option>
-            <template v-for="app in apps">
-              <option :value="app.name">{{ app.name }}</option>
-            </template>
-          </select>
+    <div slot="content">
+      <form @submit.prevent="update" class="uk-form-horizontal">
+        <div class="uk-margin">
+          <label class="uk-form-label">Associated app</label>
+          <div class="uk-form-controls">
+            <select v-model="associatedTo" class="uk-select">
+              <option value="" disabled selected>Not associated</option>
+              <template v-for="app in apps">
+                <option :value="app.name">{{ app.name }}</option>
+              </template>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div class="uk-margin">
-        <label class="uk-form-label">Tag</label>
-        <div class="uk-form-controls">
-          <input type="text" v-model="tag" class="uk-input" placeholder="e.g. staging, group1, palo_alto">
+        <div class="uk-margin">
+          <label class="uk-form-label">Tag</label>
+          <div class="uk-form-controls">
+            <input type="text" v-model="tag" class="uk-input" placeholder="e.g. staging, group1, palo_alto">
+          </div>
         </div>
-      </div>
 
-      <div class="uk-margin">
-        <label class="uk-form-label">sakura.io integration</label>
-        <div class="uk-form-controls">
-          <input type="text" v-model="sakuraio_module_token" class="uk-input" placeholder="The sakura.io communication module ID.">
+        <div class="uk-margin">
+          <label class="uk-form-label">sakura.io integration</label>
+          <div class="uk-form-controls">
+            <input type="text" v-model="sakuraio_module_token" class="uk-input" placeholder="The sakura.io communication module ID.">
+          </div>
         </div>
-      </div>
 
-      <input type="submit" value="Save" class="uk-button uk-button-primary uk-align-right">
-    </form>
+        <input type="submit" value="Save" class="uk-button uk-button-primary uk-align-right">
+      </form>
+
+      <div class="uk-margin-xlarge-top">
+        <h3>Credentials</h3>
+
+
+        <table slot="content" class="uk-table">
+          <tbody>
+            <tr>
+              <td>Device ID</td>
+              <td><code>{{ device.device_id }}</code></td>
+            </tr>
+            <tr>
+              <td>Device Secret</td>
+              <td><code>{{ device.device_secret }}</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </remote-content>
 
 
