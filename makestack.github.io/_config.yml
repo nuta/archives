@@ -78,7 +78,7 @@ deploy:
   type: git
   repo: git@github.com:makestack/makestack.github.io
   branch: master
-  message: deployed manually at {{ now('YYYY-MM-DD HH:mm:ss') }}
+  message: deployed at {{ now('YYYY-MM-DD HH:mm:ss') }}
 
 server:
   port: 4000
