@@ -1,6 +1,6 @@
 const { config, assetPath } = require('../pkgbuilder').pkg
 
-const version = '2.24-11+deb9u1'
+const version = '2.26-0ubuntu2'
 
 module.exports = {
   name: 'glibc',
@@ -8,7 +8,7 @@ module.exports = {
   version,
 
   url() {
-    return `http://http.us.debian.org/debian/pool/main/g/glibc/libc6_${version}_${config('target.deb_arch')}.deb`
+    return `${config('target.ubuntu_pkg_url')}/pool/main/g/glibc/libc6_${version}_${config('target.deb_arch')}.deb`
   },
 
   sha256() {

@@ -1,6 +1,6 @@
 const { config } = require('../pkgbuilder').pkg
 
-const version = '6.3.0-18'
+const version = '6_6.3.0-12ubuntu2'
 
 module.exports = {
   name: 'libstdc++',
@@ -8,7 +8,7 @@ module.exports = {
   version,
 
   url() {
-    return `http://http.us.debian.org/debian/pool/main/g/gcc-6/libstdc++6_${version}_${config('target.deb_arch')}.deb`
+    return `${config('target.ubuntu_pkg_url')}/pool/main/g/gcc-6/libstdc++6_${version}_${config('target.deb_arch')}.deb`
   },
 
   sha256() {
