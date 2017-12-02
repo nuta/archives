@@ -44,38 +44,45 @@ Timer.interval(3, () => {
 ];
 
 export async function main(args, opts) {
-  const appName = path.basename(args.dir);
+  const appDir = args.dir
+  const appName = path.basename(appDir);
   const plugins = opts.plugins.split(",");
   const templates = DEFAULT_TEMPLATES;
   const context = {
-    appName, plugins,
+    appName, plugins, appDir
   };
 
   for (const { filepath, template } of templates) {
     logger.progress(`Creating ${filepath}`);
-    createFile(path.join(args.dir, filepath), nunjuck.renderString(template, context));
+    createFile(path.join(appDir, filepath), nunjuck.renderString(template, context));
   }
 
-  await prepare(args.dir);
+  await prepare(appDir);
 
-  let appJS = fs.readFileSync(path.join(args.dir, "app.js"), {
+  let appJS = fs.readFileSync(path.join(appDir, "app.js"), {
     encoding: "utf-8",
   });
 
   for (const plugin of plugins) {
-    const scaffoldPath = path.resolve(args.dir, `node_modules/@makestack/${plugin}/scaffold.js`);
+    const scaffoldPath = path.resolve(appDir, `node_modules/@makestack/${plugin}/scaffold.js`);
     if (fs.existsSync(scaffoldPath)) {
       logger.progress(`Scaffolding ${plugin}`);
-      const { scaffold } = require(scaffoldPath);
-      const { header = "", footer = "" } = scaffold(context);
-      appJS =
-        header.replace(/\n+$/, "") + "\n\n" +
-        appJS.replace(/\n+$/, "") + "\n\n" +
-        footer.replace(/\n+$/, "") + "\n";
+      const { generateCodeHeader, generateCodeFooter, generateFiles } = require(scaffoldPath);
+      if (generateCodeHeader) {
+        appJS = generateCodeHeader(context).replace(/\n+$/, "") + "\n\n" + appJS
+      }
+
+      if (generateCodeFooter) {
+        appJS = appJS.replace(/\n+$/, "") + "\n\n" + generateCodeFooter(context).replace(/\n+$/, "") + "\n"
+      }
+
+      if (generateFiles) {
+        generateFiles(context)
+      }
     }
   }
 
   if (appJS) {
-    fs.writeFileSync(path.join(args.dir, "app.js"), appJS);
+    fs.writeFileSync(path.join(appDir, "app.js"), appJS);
   }
 }
