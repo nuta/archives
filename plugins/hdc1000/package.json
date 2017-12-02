@@ -1,0 +1,14 @@
+{
+  "name": "@makestack/aqm0802a",
+  "main": "dist/index.js",
+  "scripts": {
+    "transpile": "tsc --pretty"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.53",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.2"
+  }
+}

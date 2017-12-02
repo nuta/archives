@@ -3,7 +3,7 @@ const HDC1000_TEMP_REG = 0x00
 const HDC1000_HUMID_REG = 0x01
 const HDC1000_CONFIG_REG = 0x02
 
-class HDC1000 {
+export class HDC1000 {
   constructor(address = 0x40) {
     this.bus = new I2C({ address })
 
@@ -11,7 +11,7 @@ class HDC1000 {
     Timer.busywait(500 * 1000)
   }
 
-  read(reg) {
+  read(reg: number) {
     this.bus.write([reg])
 
     Timer.busywait(500 * 1000)
@@ -26,13 +26,12 @@ class HDC1000 {
     return data
   }
 
-  readTemperature() {
+  readTemperature(): number {
     return ((this.read(HDC1000_TEMP_REG) / 65536) * 165) - 40
   }
 
-  readHumidity() {
+  readHumidity(): number {
     return (this.read(HDC1000_HUMID_REG) / 65536) * 100
   }
 }
 
-module.exports = HDC1000
