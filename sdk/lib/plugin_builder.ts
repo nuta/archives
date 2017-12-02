@@ -4,8 +4,13 @@ import * as os from "os";
 import * as path from "path";
 
 export function buildPlugin(pluginDir, destPath) {
+  const makestackTypePath = path.resolve(__dirname, "../runtime/makestack.d.ts")
+  if (!fs.existsSync(makestackTypePath)) {
+    throw new Error(`${makestackTypePath} not found: run \`yarn run prepack\` in the sdk directory`)
+  }
+
   fs.copyFileSync(
-    path.resolve(__dirname, "../runtime/makestack.d.ts"),
+    makestackTypePath,
     path.resolve(__dirname, "../plugin_builder/makestack.d.ts"),
   );
 
