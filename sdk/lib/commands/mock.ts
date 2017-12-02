@@ -15,8 +15,6 @@ export function create(args, opts, logger) {
 export function run(args, opts, logger) {
   let mock = loadMocks()[args.name]
 
-  process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../runtime')
-  process.env.MAKESTACK_DEVICE_TYPE = mock.device_type // FIXME: used by runtime
   const Supervisor = require('../../supervisor')
   const supervisor = new Supervisor({
     appDir: path.resolve(os.homedir(), '.makestack/mock-app'),

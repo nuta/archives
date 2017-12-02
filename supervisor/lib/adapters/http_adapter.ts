@@ -39,7 +39,7 @@ function request(method: string, url: string, body?: Buffer): Promise<Buffer> {
   })
 }
 
-export default class HTTPAdapter extends AdapterBase {
+export class HTTPAdapter extends AdapterBase {
   osType: string;
   deviceType: string;
   deviceId: string;

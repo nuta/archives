@@ -6,8 +6,6 @@ export async function main(args, opts, logger) {
     throw new Error('--server is missing')
   }
 
-  process.env.RUNTIME_MODULE = path.resolve(__dirname, '../../../runtime')
-  process.env.MAKESTACK_DEVICE_TYPE = 'sdk'
   const Supervisor = require('../../../supervisor')
   const supervisor = new Supervisor({
     appDir: path.resolve(os.homedir(), '.makestack/app'),
@@ -21,7 +19,8 @@ export async function main(args, opts, logger) {
     deviceSecret: opts.deviceSecret,
     debugMode: true,
     osVersion: null,
-    heartbeatInterval: opts.heartbeatInterval
+    heartbeatInterval: opts.heartbeatInterval,
+    runtimeModulePath: path.resolve(__dirname, '../../../runtime')
   })
 
   supervisor.start()

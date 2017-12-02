@@ -4,7 +4,7 @@
  * Refer: https://sakura.io/docs (Google Translate is your friend)
  *
  */
-const { builtins } = require(process.env.RUNTIME_MODULE || '@makestack/runtime');
+const { builtins } = require(process.env.RUNTIME_MODULE);
 const { I2C, Timer } = builtins;
 import { AdapterBase } from './adapter_base';
 import * as logger from '../logger';
@@ -155,7 +155,7 @@ class I2CSakuraIODriver extends SakuraIODriverBase {
   }
 }
 
-export default class SakuraIOAdapter extends AdapterBase {
+export class SakuraIOAdapter extends AdapterBase {
   sakuraio: I2CSakuraIODriver;
   received: Buffer[];
 

@@ -12,8 +12,8 @@ const debugMode = process.env['MAKESTACK_DEBUG_MODE'] !== undefined
 const osVersion = process.env['MAKESTACK_OS_VERSION']
 const deviceId = process.env['MAKESTACK_DEVICE_ID']
 const deviceSecret = process.env['MAKESTACK_DEVICE_SECRET']
-const appUID = process.env['MAKESTACK_APP_UID']
-const appGID = process.env['MAKESTACK_APP_GID']
+const appUID = parseInt(process.env['MAKESTACK_APP_UID']) || undefined
+const appGID = parseInt(process.env['MAKESTACK_APP_GID']) || undefined
 const heartbeatInterval = process.env['MAKESTACK_HEARTBEAT_INTERVAL']
 
 const supervisor = new Supervisor({

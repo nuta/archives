@@ -5,14 +5,30 @@ import * as crypto from 'crypto';
 import * as path from 'path';
 import * as util from 'util';
 import * as vm from 'vm';
-import HTTPAdapter from './adapters/http_adapter';
-import SakuraioAdapter from './adapters/sakuraio_adapter';
 import * as logger from './logger';
 import { serialize, deserialize } from './smms';
 import { verifyMessageHMAC, verifyImageHMAC } from './hmac';
 import * as fsutils from './fsutils';
 import * as unzip from './unzip';
 
+interface SupervisorConstructorArgs {
+  adapter: {
+    name: string,
+    url?: string
+  };
+  appDir: string;
+  deviceType: string;
+  osType: string;
+  osVersion: string;
+  deviceId: string;
+  deviceSecret: string;
+  debugMode: boolean;
+  testMode: boolean;
+  appUID?: number;
+  appGID?: number;
+  heartbeatInterval: number;
+  runtimeModulePath: string;
+}
 export class Supervisor {
   app: any;
   appDir: string;
@@ -43,9 +59,7 @@ export class Supervisor {
   replVM?: any;
   rebooting: boolean;
 
-  constructor({ adapter, appDir, deviceType, osType, osVersion, deviceId,
-    deviceSecret, debugMode, testMode, appUID, appGID, heartbeatInterval }) {
-
+  constructor(args: SupervisorConstructorArgs) {
     process.on('unhandledRejection', (reason, p) => {
       console.log('supervisor: unhandled rejection:', reason)
       console.log('supervisor: exiting...')
@@ -53,48 +67,57 @@ export class Supervisor {
     })
 
     this.app = null
-    this.appDir = appDir
-    this.currentAppDir = path.join(appDir, 'current')
-    this.osType = osType
-    this.osVersion = osVersion
-    this.debugMode = debugMode
-    this.testMode = testMode
-    this.appUID = parseInt(appUID) || undefined
-    this.appGID = parseInt(appGID) || undefined
-    this.heartbeatInterval = heartbeatInterval || 15
-    this.deviceId = deviceId
-    this.deviceSecret = deviceSecret
-    this.deviceType = deviceType
-    const { Device } = require(`./devices/${deviceType}`)
+    this.appDir = args.appDir
+    this.currentAppDir = path.join(args.appDir, 'current')
+    this.osType = args.osType
+    this.osVersion = args.osVersion
+    this.debugMode = args.debugMode
+    this.testMode = args.testMode
+    this.appUID = args.appUID
+    this.appGID = args.appGID
+    this.heartbeatInterval = args.heartbeatInterval || 15
+    this.deviceId = args.deviceId
+    this.deviceSecret = args.deviceSecret
+    this.deviceType = args.deviceType
+    const { Device } = require(`./devices/${args.deviceType}`)
     this.device = new Device()
     this.appVersion = 'X'
     this.log = ''
     this.allLog = ''
     this.stores = {}
-    this.adapterName = adapter.name
+    this.adapterName = args.adapter.name
     this.updateEnabled = true
     this.downloading = false
-    this.replEnabled = debugMode;
+    this.replEnabled = args.debugMode;
     this.rebooting = false;
 
+    process.env.RUNTIME_MODULE = args.runtimeModulePath || '@makestack/runtime'
+
+    // Used in runtime. This must be set before require it.
+    process.env.MAKESTACK_DEVICE_TYPE = args.deviceType
+
     if (this.replEnabled) {
-      const { builtins } = require(process.env.RUNTIME_MODULE || '@makestack/runtime');
+      const { builtins } = require(args.runtimeModulePath);
       this.replVM = vm.createContext(builtins);
     }
 
     switch (this.adapterName) {
-      case 'http':
-        this.adapter = new HTTPAdapter(this.osType, this.deviceType, this.deviceId, adapter.url)
+      case 'http': {
+        const { HTTPAdapter } = require('./adapters/http_adapter')
+        this.adapter = new HTTPAdapter(this.osType, this.deviceType, this.deviceId, args.adapter.url)
         this.verifyHMAC = true
         this.includeHMAC = true
         this.includeDeviceId = true
         break
-      case 'sakuraio':
-        this.adapter = new SakuraioAdapter()
+      }
+      case 'sakuraio': {
+        const { SakuraIOAdapter } = require('./adapters/sakuraio_adapter')
+        this.adapter = new SakuraIOAdapter()
         this.verifyHMAC = false
         this.includeHMAC = false
         this.includeDeviceId = false
         break
+      }
       default:
         throw new Error(`unknown adapter \`${this.adapterName}'`)
     }

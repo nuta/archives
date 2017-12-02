@@ -95,10 +95,33 @@ export function serialize(messages, { includeDeviceId, includeHMAC, deviceSecret
     payload = Buffer.concat([payload, appVersionMsg])
   }
 
+  if (messages.stores) {
+    for (const key in messages.stores) {
+      console.log()
+      const storeMsg = generateMessage(SMMS_STORE_MSG, Buffer.concat([
+        generateVariableLength(Buffer.from(key)),
+        Buffer.from(key),
+        Buffer.from(messages.stores[key].toString())
+      ]))
+
+      payload = Buffer.concat([payload, storeMsg])
+    }
+  }
+
   let header = Buffer.alloc(1)
   header.writeUInt8(SMMS_VERSION << 4, 0)
 
   if (includeHMAC) {
+    if (messages.appImageHMAC) {
+      const appImageHMACMsg = generateMessage(SMMS_APP_IMAGE_HMAC_MSG, messages.appImageHMAC)
+      payload = Buffer.concat([payload, appImageHMACMsg])
+    }
+
+    if (messages.osImageHMAC) {
+      const osImageHMACMsg = generateMessage(SMMS_OS_IMAGE_HMAC_MSG, messages.osImageHMAC)
+      payload = Buffer.concat([payload, osImageHMACMsg])
+    }
+
     const timestamp = (new Date()).toISOString()
     const timestampMsg = generateMessage(SMMS_TIMESTAMP_MSG, timestamp)
     payload = Buffer.concat([payload, timestampMsg])
@@ -150,6 +173,7 @@ export function deserialize(payload: Buffer) {
         const valueLength = length - (valueOffset - keyLengthOffset)
         const key = payload.slice(keyOffset, keyOffset + keyLength)
         const value = payload.slice(valueOffset, valueOffset + valueLength)
+        console.log('parsing:', key, value)
 
         if (!('stores' in messages)) {
           messages.stores = {}
