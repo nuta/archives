@@ -4,6 +4,6 @@ module.exports = {
   name: 'bootfs-files',
 
   bootfs: {
-    '/config.sh': assetPath('bootfs-files', 'config.sh')
+    '/makestack.config': assetPath('bootfs-files', 'makestack.config')
   }
 }

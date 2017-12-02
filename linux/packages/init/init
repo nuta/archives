@@ -55,8 +55,8 @@ banner() {
 EOF
 }
 
-load_config_sh() {
-  . /boot/config.sh
+load_makestack_config() {
+  . /boot/makestack.config
 }
 
 set_hostname() {
@@ -113,7 +113,7 @@ init() {
   init_busybox
   mount_filesystems
   banner
-  load_config_sh
+  load_makestack_config
   set_hostname
   init_apparmor
   init_urandom
