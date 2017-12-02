@@ -20,6 +20,7 @@ class API {
     }
 
     return new Promise((resolve, reject) => {
+      let status
       fetch(`/api/v1${path}`, { method, headers, body })
         .then(response => {
           const currentRoute = app.$router.currentRoute.name
@@ -29,15 +30,25 @@ class API {
           return response
         })
         .then(response => {
-          if (!(response.status >= 200 && response.status < 300)) {
+          if (response.status !== 422 && !(response.status >= 200 && response.status < 300)) {
             throw new Error(`server returned ${response.status}`)
           }
           return response
         })
         .then(response => {
+          status = response.status
           return (response.status === 204) ? Promise.resolve({}) : response.json()
         })
-        .then(resolve)
+        .then(json => {
+          if (status === 422) {
+            for (const message of json.errors) {
+              UIkit.notification(message, { status: 'warning' })
+              reject(new Error('validation error'))
+            }
+          } else {
+            resolve(json)
+          }
+        })
         .catch(e => {
           UIkit.notification(e.toString(), { status: 'danger' })
           console.error(e)
