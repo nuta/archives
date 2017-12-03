@@ -96,7 +96,21 @@ init_networking() {
 
       echo "*** Initializing $interface"
       ip link set $interface up
-      start_daemon "udhcpc -f -i $interface -s /etc/udhcpc.script" &
+
+      # TODO: We should use NetworkManager or something.
+      if [ "$interface" = "wlan0" -a ! "$WIFI_SSID" = "" ]; then
+        echo "" > /etc/wpa_supplicant.conf
+        echo "country=$WIFI_COUNTRY"  >> /etc/wpa_supplicant.conf
+        echo "network={"              >> /etc/wpa_supplicant.conf
+        echo "  ssid=\"$WIFI_SSID\""  >> /etc/wpa_supplicant.conf
+        echo "  psk=$WIFI_PSK"        >> /etc/wpa_supplicant.conf
+        echo "}"                      >> /etc/wpa_supplicant.conf
+
+        echo "** Starting wpa_supplicant on $interface"
+        start_daemon "wpa_supplicant -B -i$interface -c/etc/wpa_supplicant.conf" &
+      fi
+
+      start_daemon "udhcpc -i $interface -s /etc/udhcpc.script" &
     done
 
     start_daemon "ntpd -n -p 1.pool.ntp.org" &
