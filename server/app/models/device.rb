@@ -9,6 +9,7 @@ class Device < ApplicationRecord
   value :status, expiration: 45.minutes
   value :debug_mode, expiration: 45.minutes
   value :last_heartbeated_at, expiration: 3.days
+  value :current_os, expiration: 45.minutes
   value :current_os_version, expiration: 45.minutes
   value :current_app_version, expiration: 45.minutes
   value :last_command_id, expiration: 3.hours

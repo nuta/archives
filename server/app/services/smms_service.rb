@@ -107,7 +107,7 @@ module SMMSService
       # FIXME: use device.os instead of device.app.api
       payload += generate_message(SMMS_OS_VERSION_MSG, app_os_version)
       if include_hmac
-        os_image_shasum = MakeStack.os_releases.dig(app_os_version, device.app.api,
+        os_image_shasum = MakeStack.os_releases.dig(app_os_version, device.current_os.value,
           :assets, device.device_type, :shasum)
 
         unless os_image_shasum
