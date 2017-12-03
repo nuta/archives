@@ -1,5 +1,5 @@
 #!/bin/node
-const Supervisor = require('.')
+const { Supervisor } = require('.')
 
 const appDir = '/app'
 const adapter = {

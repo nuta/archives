@@ -8,16 +8,19 @@
     "cov": "istanbul cover _mocha test/*.spec.ts",
     "test": "mocha test/*.spec.ts",
     "test:live": "mocha -w test/*.spec.ts",
-    "pretest": "tsc --pretty",
+    "pretest": "tsc",
     "prepublish": "npm run build",
-    "build": "tsc --pretty",
-    "build:live": "tsc --pretty -w"
+    "build": "tsc",
+    "build:live": "tsc -w"
   },
   "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.0.6",
+    "@types/jszip": "^3.1.2",
     "@types/mocha": "^2.2.44",
+    "@types/nock": "^8.2.1",
     "@types/node": "^8.0.53",
+    "@types/sinon": "^4.0.0",
     "chai": "^4.1.2",
     "istanbul": "^1.1.0-alpha.1",
     "jszip": "^3.1.5",

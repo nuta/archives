@@ -45,7 +45,7 @@ export class HTTPAdapter extends AdapterBase {
   public deviceId: string;
   public serverURL: string;
 
-  constructor(osType, deviceType, deviceId, serverURL) {
+  constructor(osType: string, deviceType: string, deviceId: string, serverURL: string) {
     super();
 
     this.osType = osType;
@@ -58,18 +58,18 @@ export class HTTPAdapter extends AdapterBase {
     // Nothing to do.
   }
 
-  public send(payload) {
+  public send(payload: Buffer) {
     return request("POST", `${this.serverURL}/api/v1/smms`, payload)
       .then(this.onReceiveCallback)
       .catch(logger.error);
   }
 
-  public getAppImage(version) {
+  public getAppImage(version: string) {
     const url = `${this.serverURL}/api/v1/images/app/${this.deviceId}/${version}`;
     return request("GET", url);
   }
 
-  public getOSImage(version) {
+  public getOSImage(version: string) {
     const url = `${this.serverURL}/api/v1/images/os/${this.deviceId}/${version}/${this.osType}/${this.deviceType}`;
     return request("GET", url);
   }

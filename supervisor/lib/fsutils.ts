@@ -7,8 +7,12 @@ export function removeFiles(filepath: string): void {
   }
 
   const remaining = [filepath];
-  while (remaining.length > 0) {
+  while (true) {
     const target = remaining.pop();
+    if (!target) {
+      break
+    }
+
     if (fs.statSync(target).isDirectory) {
       const innerFiles = fs.readdirSync(target).map((name) => path.join(target, name));
       if (innerFiles.length === 0) {

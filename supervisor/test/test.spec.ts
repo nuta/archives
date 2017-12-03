@@ -42,7 +42,7 @@ describe('Supervisor', function () {
 
   it('downloads and run an app', function (done) {
     this.instance.start().then(() => {
-      this.instance.waitForApp().then(log => {
+      this.instance.waitForApp().then((log: string) => {
         expect(log).to.include('I am your app, Luke.')
         done()
       })
@@ -63,7 +63,7 @@ describe('Supervisor', function () {
       // Invoke a heartbeating.
       this.clock.tick(this.instance.heartbeatInterval * 1000 + 1)
 
-      this.instance.waitForApp().then(log => {
+      this.instance.waitForApp().then((log: string) => {
         expect(this.heartbeatRequest2.isDone()).to.be.true
         expect(log).to.include('I am your app, Luke.')
         done()

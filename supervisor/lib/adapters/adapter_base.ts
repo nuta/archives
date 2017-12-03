@@ -1,6 +1,8 @@
+type TOnReceiveCallback = (payload: Buffer) => void;
+
 export abstract class AdapterBase {
-  public onReceiveCallback: (Buffer) => void;
-  public abstract async send(payload: Buffer);
+  public onReceiveCallback: TOnReceiveCallback;
+  public abstract async send(payload: Buffer): Promise<void>;
   public abstract getAppImage(version: string): Promise<Buffer>;
   public abstract getOSImage(version: string): Promise<Buffer>;
 
@@ -8,7 +10,7 @@ export abstract class AdapterBase {
     this.onReceiveCallback = () => { };
   }
 
-  public onReceive(callback) {
+  public onReceive(callback: TOnReceiveCallback) {
     this.onReceiveCallback = callback;
   }
 }

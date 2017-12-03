@@ -10,8 +10,9 @@ import { verifyImageHMAC, verifyMessageHMAC } from "./hmac";
 import * as logger from "./logger";
 import { deserialize, serialize } from "./smms";
 import * as unzip from "./unzip";
+import { TStores, TDeviceState, IPayloadMessages } from "./types";
 
-interface SupervisorConstructorArgs {
+interface ISupervisorConstructorArgs {
   adapter: {
     name: string,
     url?: string,
@@ -29,37 +30,38 @@ interface SupervisorConstructorArgs {
   heartbeatInterval: number;
   runtimeModulePath: string;
 }
-export class Supervisor {
-  public app: any;
-  public appDir: string;
-  public currentAppDir: string;
-  public osType: string;
-  public osVersion: string;
-  public debugMode: boolean;
-  public testMode: boolean;
-  public appUID: number;
-  public appGID: number;
-  public heartbeatInterval: number;
-  public deviceId: string;
-  public deviceSecret: string;
-  public deviceType: string;
-  public device: any;
-  public appVersion: string;
-  public log: string;
-  public allLog: string;
-  public stores: any;
-  public adapterName: string;
-  public updateEnabled: boolean;
-  public downloading: boolean;
-  public adapter: any;
-  public verifyHMAC: boolean;
-  public includeHMAC: boolean;
-  public includeDeviceId: boolean;
-  public replEnabled: boolean;
-  public replVM?: any;
-  public rebooting: boolean;
 
-  constructor(args: SupervisorConstructorArgs) {
+export class Supervisor {
+  private app: any;
+  private appDir: string;
+  private currentAppDir: string;
+  private osType: string;
+  private osVersion: string;
+  private debugMode: boolean;
+  private testMode: boolean;
+  private appUID?: number;
+  private appGID?: number;
+  private heartbeatInterval: number;
+  private deviceId: string;
+  private deviceSecret: string;
+  private deviceType: string;
+  private device: any;
+  private appVersion: string;
+  private log: string;
+  private allLog: string;
+  private stores: any;
+  private adapterName: string;
+  private updateEnabled: boolean;
+  private downloading: boolean;
+  private adapter: any;
+  private verifyHMAC: boolean;
+  private includeHMAC: boolean;
+  private includeDeviceId: boolean;
+  private replEnabled: boolean;
+  private replVM?: any;
+  private rebooting: boolean;
+
+  constructor(args: ISupervisorConstructorArgs) {
     process.on("unhandledRejection", (reason, p) => {
       console.log("supervisor: unhandled rejection:", reason);
       console.log("supervisor: exiting...");
@@ -123,13 +125,13 @@ export class Supervisor {
     }
   }
 
-  public popLog() {
+  private popLog() {
     const log = this.log;
     this.log = "";
     return log;
   }
 
-  public updateOS(image: Buffer) {
+  private updateOS(image: Buffer) {
     logger.info("saving os image...");
     const tmpFilePath = path.join(os.tmpdir(), "kernel.img");
     fs.writeFileSync(tmpFilePath, image);
@@ -146,7 +148,7 @@ export class Supervisor {
         deviceId: this.deviceId,
         debugMode: this.debugMode,
         osVersion: this.osVersion,
-        appVersion: 0,
+        appVersion: "0",
         log: "os updated",
       }, {
         includeDeviceId: this.includeDeviceId,
@@ -156,20 +158,20 @@ export class Supervisor {
     }, 5000);
   }
 
-  public killApp() {
+  private killApp() {
     if (this.app) {
       logger.warn("sending SIGTERM to the app...");
       this.app.kill();
     }
   }
 
-  public launchApp(appZip: Buffer) {
+  private launchApp(appZip: Buffer) {
     fsutils.removeFiles(this.currentAppDir);
     unzip.extract(appZip, this.currentAppDir);
     this.spawnApp();
   }
 
-  public spawnApp() {
+  private spawnApp() {
     if (this.app) {
       logger.info("killing the app");
 
@@ -199,7 +201,7 @@ export class Supervisor {
     }
   }
 
-  public doSpawnApp() {
+  private doSpawnApp() {
     logger.info("starting an app");
     this.app = fork("./start", [], {
       cwd: this.currentAppDir,
@@ -212,21 +214,21 @@ export class Supervisor {
     } as any);
     this.sendToApp("initialize", { stores: this.stores });
 
-    this.app.on("message", (data) => {
-      logger.info("message", data);
+    this.app.on("message", (data: { type: string, body: string }) => {
+      logger.debug("message", data);
       switch (data.type) {
         case "log":
-          logger.info("log:", data.body.trimRight());
-          this.log += data.body.trimRight() + "\n";
+          logger.debug("log:", data.body.replace(/[ \t\n]+$/, ''));
+          this.log += data.body.replace(/[ \t\n]+$/, '') + "\n";
           if (this.testMode) {
-            this.allLog += data.body.trimRight() + "\n";
+            this.allLog += data.body.replace(/[ \t\n]+$/, '') + "\n";
           }
           break;
-        case "setUpdateEnabled":
-          this.updateEnabled = (data.body !== false);
+        case "setUpdateLock":
+          this.updateEnabled = (data.body !== 'lock');
           break;
         default:
-          logger.info("unknown message", data.type);
+          logger.warn("unknown message", data.type);
       }
     });
 
@@ -243,7 +245,7 @@ export class Supervisor {
     });
   }
 
-  public waitForApp() {
+  private waitForApp() {
     return new Promise((resolve, reject) => {
       if (!this.app) {
         resolve(this.allLog);
@@ -255,7 +257,7 @@ export class Supervisor {
     });
   }
 
-  public sendToApp(type: string, data: Object) {
+  private sendToApp(type: string, data: Object) {
     if (!this.app) {
       // The app is being killed.
       return;
@@ -264,7 +266,7 @@ export class Supervisor {
     this.app.send(Object.assign({ type }, data));
   }
 
-  public async sendHeartbeat(state) {
+  private async sendHeartbeat(state: TDeviceState) {
     if (this.downloading) {
       return;
     }
@@ -286,7 +288,7 @@ export class Supervisor {
     }));
   }
 
-  public async handleUpdateAppMessage(appVersion: string, appImageHMAC: string) {
+  private async handleUpdateAppMessage(appVersion: string, appImageHMAC: string) {
     logger.info(`updating ${this.appVersion} -> ${appVersion}`);
     this.appVersion = appVersion;
 
@@ -310,11 +312,11 @@ export class Supervisor {
     this.launchApp(appZip);
   }
 
-  public handleUpdateOSMessage(osVersion, osImageHMAC) {
+  private handleUpdateOSMessage(osVersion: string, osImageHMAC: string) {
     this.downloading = true;
     logger.info(`updating os ${this.osVersion} -> ${osVersion}`);
 
-    this.adapter.getOSImage(this.deviceType, this.osVersion).then((image) => {
+    this.adapter.getOSImage(this.deviceType, this.osVersion).then((image: Buffer) => {
       this.downloading = false;
 
       if (this.verifyHMAC && !verifyImageHMAC(this.deviceSecret, osImageHMAC, image)) {
@@ -329,7 +331,7 @@ export class Supervisor {
     });
   }
 
-  public handleREPLCommand(commandId: string, code: string): void {
+  private handleREPLCommand(commandId: string, code: string): void {
     logger.debug(`REPL: eval id=${commandId} code='${code}'`);
     const result = JSON.stringify(
       util.inspect(
@@ -341,7 +343,7 @@ export class Supervisor {
     this.log += `>${commandId} __repl__ ${result}\n`;
   }
 
-  public tryBuiltinCommand(name: string, key: string, callback: (string) => void): boolean {
+  private tryBuiltinCommand(name: string, key: string, callback: (id: string) => void): boolean {
     const regex = new RegExp("^<([0-9]+) __" + name + "__$");
     const m = regex.exec(key);
     if (m) {
@@ -352,7 +354,7 @@ export class Supervisor {
     return false;
   }
 
-  public reboot() {
+  private reboot() {
     this.rebooting = true;
     if (this.app) {
       setTimeout(() => {
@@ -366,14 +368,14 @@ export class Supervisor {
     }
   }
 
-  public doReboot() {
+  private doReboot() {
     // /init script reboots the system if Supervisor exit with 0.
     logger.info("Received a reboot command. Exiting with 0...");
     process.exit(0);
   }
 
-  public handleStoreMessage(stores: [string]) {
-    const storesToApp = {};
+  private handleStoreMessage(stores: [string]) {
+    const storesToApp: TStores = {};
     for (const key in stores) {
       const isBuiltinCommand = [
         this.replEnabled &&
@@ -390,15 +392,21 @@ export class Supervisor {
     this.sendToApp("stores", { storesToApp });
   }
 
-  public isOSUpdateRequired(messages): boolean {
-    return this.updateEnabled && this.osVersion && !this.downloading && messages.osVersion && messages.osVersion !== this.osVersion;
+  private isOSUpdateRequired(messages: IPayloadMessages): boolean {
+    return this.updateEnabled &&
+      !this.downloading &&
+      messages.osVersion !== undefined &&
+      messages.osVersion !== this.osVersion;
   }
 
-  public isAppUpdateRequired(messages): boolean {
-    return this.updateEnabled && !this.downloading && messages.appVersion && messages.appVersion !== this.appVersion;
+  private isAppUpdateRequired(messages: IPayloadMessages): boolean {
+    return this.updateEnabled &&
+      !this.downloading &&
+      messages.appVersion !== undefined &&
+      messages.appVersion !== this.appVersion;
   }
 
-  public async onSMMSReceive(payload) {
+  private async onSMMSReceive(payload: Buffer) {
     const [messages, hmacProtectedEnd] = deserialize(payload);
     const hmacProtectedPayload = payload.slice(0, hmacProtectedEnd);
 
@@ -425,7 +433,7 @@ export class Supervisor {
   }
 
   public async start() {
-    this.adapter.onReceive((payload) => this.onSMMSReceive(payload));
+    this.adapter.onReceive((payload: Buffer) => this.onSMMSReceive(payload));
     await this.adapter.connect();
     await this.sendHeartbeat("ready");
 

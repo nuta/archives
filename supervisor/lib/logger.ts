@@ -1,7 +1,7 @@
 import * as util from "util";
 
 function log(level: string, ...messages: string[]): void {
-  const colors = {
+  const colors: { [key: string]: string } = {
     " DBG": "35",
     "INFO": "34",
     " ERR": "31",

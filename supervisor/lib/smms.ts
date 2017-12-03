@@ -1,5 +1,6 @@
 import * as assert from "assert";
 import { computeHMAC } from "./hmac";
+import { IPayloadMessages } from "./types";
 
 const SMMS_VERSION = 1;
 const SMMS_HMAC_MSG = 0x06;
@@ -59,16 +60,22 @@ export function generateMessage(type: number, payload: any) {
   return msg;
 }
 
-export function serialize(messages, { includeDeviceId, includeHMAC, deviceSecret }) {
+interface ISerializeOptions {
+  includeDeviceId: boolean;
+  includeHMAC: boolean;
+  deviceSecret: string;
+};
+
+export function serialize(messages: IPayloadMessages, options: ISerializeOptions) {
   let payload = Buffer.alloc(0);
 
-  if (includeDeviceId && messages.deviceId) {
+  if (options.includeDeviceId && messages.deviceId) {
     const deviceIdMsg = generateMessage(SMMS_DEVICE_ID_MSG, messages.deviceId);
     payload = Buffer.concat([payload, deviceIdMsg]);
   }
 
   if (messages.state) {
-    const states = { booting: 1, ready: 2, running: 3 };
+    const states: { [key: string]: number } = { booting: 1, ready: 2, running: 3 };
 
     if (!states[messages.state]) {
       throw new Error(`Invalid device state: \`${messages.state}'`);
@@ -115,7 +122,7 @@ export function serialize(messages, { includeDeviceId, includeHMAC, deviceSecret
   let header = Buffer.alloc(1);
   header.writeUInt8(SMMS_VERSION << 4, 0);
 
-  if (includeHMAC) {
+  if (options.includeHMAC) {
     if (messages.appImageHMAC) {
       const appImageHMACMsg = generateMessage(SMMS_APP_IMAGE_HMAC_MSG, messages.appImageHMAC);
       payload = Buffer.concat([payload, appImageHMACMsg]);
@@ -134,7 +141,7 @@ export function serialize(messages, { includeDeviceId, includeHMAC, deviceSecret
     const dummy = Buffer.concat([payload, Buffer.alloc(hmacMsgLength)]);
     header = Buffer.concat([header, generateVariableLength(dummy)]);
 
-    const hmac = computeHMAC(deviceSecret, Buffer.concat([header, payload]));
+    const hmac = computeHMAC(options.deviceSecret, Buffer.concat([header, payload]));
     const hmacMsg = generateMessage(SMMS_HMAC_MSG, hmac);
 
     assert.equal(hmacMsgLength, hmacMsg.length);

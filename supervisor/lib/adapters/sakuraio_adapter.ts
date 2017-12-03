@@ -4,7 +4,7 @@
  * Refer: https://sakura.io/docs (Google Translate is your friend)
  *
  */
-const { builtins } = require(process.env.RUNTIME_MODULE);
+const { builtins } = require(process.env.RUNTIME_MODULE as string);
 const { I2C, Timer } = builtins;
 import * as logger from "../logger";
 import { AdapterBase } from "./adapter_base";
@@ -31,10 +31,13 @@ const CMD_RX_DEQUEUE = 0x30;
 const CMD_RX_LENGTH = 0x32;
 const FILE_CHUNK_SIZE = 16;
 
+type TChannel = number;
+type TChannelType = 0x62 /* CH_TYPE_8BYTES */;
+
 abstract class SakuraIODriverBase {
   public abstract command(command: number, data: Buffer): Promise<[number, Buffer]>;
 
-  public computeParity(firstByte, data) {
+  public computeParity(firstByte: number, data: Buffer) {
     let parity = firstByte ^ data.length;
     for (const byte of data) {
       parity ^= byte;
@@ -43,7 +46,7 @@ abstract class SakuraIODriverBase {
     return parity;
   }
 
-  public async enqueueTx(channel, type, value) {
+  public async enqueueTx(channel: TChannel, type: TChannelType, value: Buffer) {
     if (value.length > BYTES_PER_CHANNEL) {
       throw new Error("BUG: sakura.io: enqueue value must be equal to or less than 8 bytes");
     }
@@ -80,7 +83,7 @@ abstract class SakuraIODriverBase {
     return [available, queued];
   }
 
-  public async requestFileDownload(fileId) {
+  public async requestFileDownload(fileId: number) {
     const buf = Buffer.alloc(2);
     buf.writeUInt16LE(fileId, 0);
     await this.command(CMD_START_FILE_DOWNLOAD, buf);
@@ -100,7 +103,7 @@ abstract class SakuraIODriverBase {
     return [status, size, timestamp, crc];
   }
 
-  public async getFileData(chunkSize) {
+  public async getFileData(chunkSize: number) {
     return this.command(CMD_GET_FILE_DATA, Buffer.from([chunkSize]));
   }
 
@@ -215,7 +218,7 @@ export class SakuraIOAdapter extends AdapterBase {
     }
   }
 
-  public doSend(payload) {
+  public doSend(payload: Buffer) {
     // Split the payload into 8 bytes (BYTES_PER_CHANNEL) arrays.
     const channels = [];
     for (let i = 0; i < payload.length; i += BYTES_PER_CHANNEL) {
@@ -233,12 +236,12 @@ export class SakuraIOAdapter extends AdapterBase {
     this.sakuraio.flushTx();
   }
 
-  public async send(payload) {
+  public async send(payload: Buffer) {
     this.doSend(payload);
     this.receive();
   }
 
-  public async getAppImage(version) {
+  public async getAppImage(version: string) {
     logger.info("sakura.io: requesting a file download....");
     await this.sakuraio.requestFileDownload(APP_IMAGE_FILEID);
 
@@ -276,7 +279,7 @@ export class SakuraIOAdapter extends AdapterBase {
     return Promise.resolve(appImage);
   }
 
-  public getOSImage(version) {
+  public getOSImage(version: string) {
     return Promise.reject("sakura.io: getOSImage is not supported yet");
   }
 }

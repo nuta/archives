@@ -1,6 +1,6 @@
 import * as crypto from "crypto";
 
-export function computeHMAC(deviceSecret, data) {
+export function computeHMAC(deviceSecret: string, data: Buffer | string) {
   const hmac = crypto.createHmac("sha256", deviceSecret);
   hmac.update(data);
   return hmac.digest("hex");
@@ -31,7 +31,7 @@ export function verifyMessageHMAC(deviceSecret: string, payload: Buffer, hmac: s
   return true;
 }
 
-export function verifyImageHMAC(deviceSecret, hmac, image) {
+export function verifyImageHMAC(deviceSecret: string, hmac: string, image: Buffer) {
   if (!hmac) {
     return false;
   }
