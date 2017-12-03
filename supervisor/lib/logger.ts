@@ -13,9 +13,13 @@ function log(level: string, ...messages: string[]): void {
         body += ((typeof message === "string") ? message : util.inspect(message)) + " ";
     }
 
-    const time = (new Date()).toTimeString().split(" ")[0];
-    const color = colors[level] || "";
-    console.log(`[\x1b[1;34msupervisor\x1b[0m ${time} \x1b[${color}m${level}\x1b[0m] ${body}`);
+    if (process.stdout.isTTY) {
+        const time = (new Date()).toTimeString().split(" ")[0];
+        const color = colors[level] || "";
+        console.log(`[\x1b[1;34msupervisor\x1b[0m ${time} \x1b[${color}m${level}\x1b[0m] ${body}`);
+    } else {
+        console.log(`[supervisor] ${level}: ${body}`);
+    }
 }
 
 export function debug(...messages: any[]): void {
