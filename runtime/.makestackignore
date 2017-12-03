@@ -1,0 +1,8 @@
+*.tgz
+lib
+test
+node_modules
+package.json
+tsconfig.json
+yarn.lock
+makestack.d.ts
