@@ -20,9 +20,13 @@ function log(level: "DEBUG" |  "INFO" | "ERROR" | "WARN", ...messages: string[])
         body += fragment + " ";
     }
 
-    const time = (new Date()).toTimeString().split(" ")[0];
-    const color = colors[level] || "";
-    console.log(`[\x1b[1;32mruntime\x1b[0m ${time} \x1b[${color}m${level}\x1b[0m] ${body}`);
+    if (process.stdout.isTTY) {
+        const time = (new Date()).toTimeString().split(" ")[0];
+        const color = colors[level] || "";
+        console.log(`[\x1b[1;32mruntime\x1b[0m ${time} \x1b[${color}m${level}\x1b[0m] ${body}`);
+    } else {
+        console.log(`[runtime] ${level}: ${body}`);
+    }
 }
 
 function debug(...messages) {
