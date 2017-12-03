@@ -76,14 +76,16 @@ function shasum(filepath) {
   return cp.stdout.split(' ')[0]
 }
 
-function download(url, sha256) {
-  const filepath = path.resolve(build.downloadsDir, path.basename(url))
+function download(pkg, sha256) {
+  const filepath = path.resolve(build.downloadsDir, pkg.name, path.basename(pkg.url))
+  mkdirp(path.dirname(filepath))
+
   if (fs.existsSync(filepath)) {
     // TODO: compare SHASUM
     return filepath
   }
 
-  spawnSync('curl', ['-fSLo', filepath, url], { stdio: 'inherit' })
+  spawnSync('curl', ['-fSLo', filepath, pkg.url], { stdio: 'inherit' })
   return filepath
 }
 
