@@ -13,8 +13,8 @@ module.exports = {
 
   sha256() {
     switch (config('target.deb_arch')) {
-      case 'amd64': return '555d63f1d9f479db23f75a420401ea7298a684ce2acdb48e5d5eca6e22f54ac5'
-      case 'armhf': return '888cfa54e273526a3d34c879dea91992954e6a822bec0702984930d30e98f7d2'
+      case 'amd64': return '56890482f7c86d31d5c3883dff0174bfa3a1822253d9cee75e6399e71425b61a'
+      case 'armhf': return '6c4f79c1c10b11e93480b8a288e15f16196174ebf5c2f87d2a9503361defb067'
       default: throw new Error(`unknown target.deb_arch: \`${config('deb_arch')}'`)
     }
   },
