@@ -3,7 +3,7 @@ set -ue
 
 run_node_gyp(){
   arch=$1
-  cross_compile=$1
+  cross_compile=$2
 
   AR=${cross_compile}ar CC=${cross_compile}gcc CXX=${cross_compile}g++ LINK=${cross_compile}g++ \
     node-gyp rebuild --arch $arch
@@ -24,12 +24,10 @@ if [ -f package.json ]; then
   fi;
 
   if [ -f binding.gyp ]; then
-    run_node_gyp x64
-    run_node_gyp arm arm-linux-gnueabihf-
+    run_node_gyp x64   ''
+    run_node_gyp arm   arm-linux-gnueabihf-
     run_node_gyp arm64 aarch64-linux-gnu-
   fi
-
-  npm prune --production --loglevel=warn
 fi;
 
 if [ -f .makestackignore ]; then
