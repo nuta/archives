@@ -17,7 +17,7 @@ raspberrypi3:
 ifeq ($(DOCKER),)
 
 build:
-	./pkgbuilder/pkgbuilder $TARGET
+	./pkgbuilder/pkgbuilder $(TARGET)
 
 else
 
