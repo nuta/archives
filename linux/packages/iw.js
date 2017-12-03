@@ -24,7 +24,8 @@ module.exports = {
     })
 
     run(['make', 'install'], {
-      PREFIX: config('target.build_prefix')
+      PREFIX: config('target.build_prefix'),
+      PKG_CONFIG_PATH: `${config('target.build_prefix')}/lib/pkgconfig`,
     })
   },
 
