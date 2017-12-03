@@ -6,7 +6,8 @@ RUN apt-get update -qy && apt-get install -qy curl && \
   apt-get update -qy && \
   apt-get install -qy nodejs build-essential bc dosfstools cpio yarn \
     binutils-arm-linux-gnueabihf gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf \
-    binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu  g++-aarch64-linux-gnu
+    binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu  g++-aarch64-linux-gnu \
+    pkg-config bison flex unzip
 
 RUN npm install -g node-gyp
 RUN yarn config set cache-folder /makestack/linux/build/downloads/yarn-cache
