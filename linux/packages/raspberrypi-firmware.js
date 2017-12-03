@@ -10,7 +10,7 @@ module.exports = {
   sha256: 'a25f6281d64732892a2e838cc2346f1a88505b5c77a57a6540755362ea64043a',
 
   bootfs() {
-    const binaryBlobs = [
+    const srcFiles = [
       'LICENCE.broadcom',
       'COPYING.linux',
       'bootcode.bin',
@@ -149,16 +149,11 @@ module.exports = {
       'overlays/qca7000.dtbo'
     ]
 
-    const blobFiles = {}
-    for (const relpath of binaryBlobs) {
-      blobFiles[`/${relpath}`] = `boot/${relpath}`
+    const files = {}
+    for (const relpath of srcFiles) {
+      files[`/${relpath}`] = `boot/${relpath}`
     }
 
-    const configFiles = {
-      '/cmdline.txt': assetPath('raspberrypi-firmware', 'cmdline.txt'),
-      '/config.txt': assetPath('raspberrypi-firmware', 'config.txt')
-    }
-
-    return Object.assign(configFiles, blobFiles)
+    return files
   }
 }

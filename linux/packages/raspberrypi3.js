@@ -1,4 +1,4 @@
-const { isRebuilt, bootfsPath, buildPath, run, sudo, mkdirp } = require('../pkgbuilder').pkg
+const { isRebuilt, bootfsPath, assetPath, buildPath, run, sudo, mkdirp } = require('../pkgbuilder').pkg
 const { spawnSync } = require('child_process')
 
 const linuxVersion = '1.20170811-1'
@@ -52,5 +52,10 @@ module.exports = {
     sudo(['mount', imageFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
     run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
     sudo(['umount', mountPoint])
+  },
+
+  bootfs: {
+    '/cmdline.txt': assetPath('raspberrypi3', 'cmdline.txt'),
+    '/config.txt': assetPath('raspberrypi3', 'config.txt')
   }
 }
