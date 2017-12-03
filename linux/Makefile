@@ -17,15 +17,15 @@ raspberrypi3:
 ifeq ($(DOCKER),)
 
 build:
+	./pkgbuilder/pkgbuilder $TARGET
+
+else
+
+build:
 	docker run --rm \
 	  -e TARGET=$(TARGET) \
 	  -e MAKEFLAGS="-j$(shell getconf _NPROCESSORS_ONLN)" \
 	  -e BUILD=$(BUILD) \
 	  -v $(shell realpath ..):/makestack -it makestack/linux
-
-else
-
-build:
-	./pkgbuilder/pkgbuilder $TARGET
 
 endif
