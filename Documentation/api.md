@@ -1,5 +1,6 @@
-API
-====
+---
+title: API
+---
 
 Your MakeStack app is executed on [Node.js](https://nodejs.org) version 8.9.0. You
 can use [all modules bundled in Node.js](https://nodejs.org/api/).

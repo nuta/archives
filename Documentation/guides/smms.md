@@ -1,9 +1,6 @@
 ---
-layout: documentation
+title: SMMS
 ---
-
-Simple Management/Messaging System
-===================================
 
 **ID** | **name**
 :-----:|:-----:

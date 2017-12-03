@@ -1,9 +1,6 @@
 ---
-layout: documentation
+title: Deploying to Heroku
 ---
-
-Deploying to Heroku
-===================
 
 [Heroku](https://heroku.com) is a fabulous Platform-as-a-Service that
 allows you to deploy your own MakeStack Server easily.

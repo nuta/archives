@@ -1,5 +1,6 @@
-sakura.io
-==========
+---
+title: sakura.io
+---
 
 MakeStack supports [sakura.io](https://sakura.io) as a network adapter. sakura.io enables you to deploy
 new app version and, change configration, collect device log remotely over LTE without modifying

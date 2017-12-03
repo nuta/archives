@@ -1,5 +1,6 @@
-Quickstart
-===========
+---
+title: Quickstart
+---
 
 **Currently MakeStack is severly unstable. You will have to debug MakeStack to try. Good luck!**
 

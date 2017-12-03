@@ -1,5 +1,6 @@
-Change Log
-===========
+---
+title: Change Log
+---
 
 - v0.0.2
   - Node.js runtime: support Serial and SPI API
