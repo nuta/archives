@@ -24,6 +24,7 @@ module.exports = {
 
   rootfs: {
     '/etc/udhcpc.script': assetPath('busybox', 'udhcpc.script'),
+    '/etc/mdev.conf': assetPath('busybox', 'mdev.conf'),
     '/bin/busybox': 'busybox'
   }
 }

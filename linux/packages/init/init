@@ -44,6 +44,11 @@ mount_filesystems() {
   dmesg > /boot/boot.log
 }
 
+init_mdev() {
+  echo /sbin/mdev > /proc/sys/kernel/hotplug
+  mdev -s
+}
+
 banner() {
   cat <<"EOF"
  __  __       _        ____  _             _       _     _
@@ -112,6 +117,7 @@ init() {
 
   init_busybox
   mount_filesystems
+  init_mdev
   banner
   load_makestack_config
   set_hostname
