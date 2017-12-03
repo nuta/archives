@@ -37,6 +37,10 @@ function loadPackages(target) {
 
     Object.assign(build.config, addConfigPrefix(pkg.name, pkg.config))
 
+    if (pkg.dependencies instanceof Function) {
+      pkg.dependencies = pkg.dependencies()
+    }
+
     if (pkg.dependencies && pkg.dependencies.length > 0) {
       const unloadedDependencies = pkg.dependencies.filter(name => !(name in packages))
       if (unloadedDependencies.length > 0) {
