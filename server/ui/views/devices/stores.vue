@@ -39,7 +39,7 @@
 
           <td class="uk-table-expand">
             <input v-if="store.editing" type="text" v-model="store.value" class="uk-input" placeholder="Value (e.g. 123, true, hello world!)">
-            <span v-else>{{ store.value }}</span>
+            <code v-else>{{ store.value }}</code>
           </td>
 
           <td class="actions">
