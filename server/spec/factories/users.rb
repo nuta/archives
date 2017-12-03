@@ -8,7 +8,7 @@ FactoryBot.define do
 
   factory :heavy_user, class: 'User' do
     sequence(:username) {|n| "user#{n}" }
-    email    { "#{username}@example.com" }
+    sequence(:email)    {|n| "email#{n}@example.com" }
     password { FFaker::InternetSE.password }
     confirmed_at { Time.now }
 
