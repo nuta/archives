@@ -1,3 +1,3 @@
 export abstract class DeviceBase {
-  public abstract updateOS(imagePath: string): void;
+  public abstract updateOS(image: Buffer): void;
 }

@@ -322,8 +322,8 @@ export class Supervisor {
         return;
       }
 
-      this.updateOS(osVersion);
-    }).catch((e) => {
+      this.updateOS(image);
+    }).catch((e: Error) => {
       logger.error("failed to download app image:", e);
       this.downloading = false;
     });
