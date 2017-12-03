@@ -28,7 +28,7 @@ function loadPackages(target) {
     let pkg = require(`../packages/${remainingPackages.pop()}`)
 
     if (pkg.name in packages) {
-      throw new Error(`BUG: duplicated package loading: \`${pkg.name}'`)
+      continue
     }
 
     if (pkg.config instanceof Function) {
