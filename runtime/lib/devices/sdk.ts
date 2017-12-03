@@ -1,3 +1,3 @@
 export function initialize() {
-  return {};
+    return {};
 }

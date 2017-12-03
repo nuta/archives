@@ -4,8 +4,8 @@ import { install } from "./install";
 import { login } from "./login";
 
 module.exports = {
-  install,
-  drive,
-  imageWriter,
-  login,
+    install,
+    drive,
+    imageWriter,
+    login,
 };

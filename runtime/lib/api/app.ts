@@ -7,9 +7,9 @@ export class AppAPI {
     process.send({ type: "setUpdateEnabled", body: false });
   }
 
-  public onExit(callback) {
-    process.on("SIGTERM", () => {
-      callback();
-    });
-  }
+    public onExit(callback) {
+        process.on("SIGTERM", () => {
+            callback();
+        });
+    }
 }

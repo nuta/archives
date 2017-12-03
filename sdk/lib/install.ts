@@ -9,58 +9,58 @@ import * as sudo from "sudo-prompt";
 import { api } from "./api";
 import { getDriveSize } from "./drive";
 import {
-  createFile, generateRandomString,
-  generateTempPath,
+    createFile, generateRandomString,
+    generateTempPath,
 } from "./helpers";
 
 function replaceBuffer(buf, value, id) {
-  const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`;
+    const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`;
 
-  const index = buf.indexOf(Buffer.from(needle));
-  if (index === -1) {
-    throw new Error(`replaceBuffer: failed to replace ${id}`);
-  }
+    const index = buf.indexOf(Buffer.from(needle));
+    if (index === -1) {
+        throw new Error(`replaceBuffer: failed to replace ${id}`);
+    }
 
-  const paddedValue = Buffer.alloc(needle.length, " ");
-  const valueBuf = Buffer.from(value);
-  valueBuf.copy(paddedValue);
-  paddedValue.copy(buf, index);
-  return buf;
+    const paddedValue = Buffer.alloc(needle.length, " ");
+    const valueBuf = Buffer.from(value);
+    valueBuf.copy(paddedValue);
+    paddedValue.copy(buf, index);
+    return buf;
 }
 
 async function registerOrGetDevice(name, type, ignoreDuplication) {
-  let device;
-  try {
-    device = await api.registerDevice(name, type);
-  } catch (e) {
-    // FIXME: add an option to accept 4xx errors
-    if (ignoreDuplication && e.message.includes("name: [ 'has already been taken' ]")) {
-      // There is already a device with same name.
-      device = await api.getDevice(name);
-    } else {
-      throw new Error("failed to register/fetch the device");
+    let device;
+    try {
+        device = await api.registerDevice(name, type);
+    } catch (e) {
+        // FIXME: add an option to accept 4xx errors
+        if (ignoreDuplication && e.message.includes("name: [ 'has already been taken' ]")) {
+            // There is already a device with same name.
+            device = await api.getDevice(name);
+        } else {
+            throw new Error("failed to register/fetch the device");
+        }
     }
-  }
 
-  return device;
+    return device;
 }
 
 function getLatestOSRelease(osType, deviceType): Promise<{ version: string, osImageURL: string }> {
-  return new Promise((resolve, reject) => {
-    api.getOSReleases().then(({ releases }) => {
-      const version = Object.keys(releases).pop();
-      const osImageURL = releases[version][osType].assets[deviceType].url;
-      resolve({ version, osImageURL });
-    }).catch(reject);
-  });
+    return new Promise((resolve, reject) => {
+        api.getOSReleases().then(({ releases }) => {
+            const version = Object.keys(releases).pop();
+            const osImageURL = releases[version][osType].assets[deviceType].url;
+            resolve({ version, osImageURL });
+        }).catch(reject);
+    });
 }
 
 async function downloadDiskImage(osType, deviceType) {
-  const { version, osImageURL } = await getLatestOSRelease(osType, deviceType);
-  const basename = path.basename(osImageURL);
-  const orignalImage = path.join(process.env.HOME, `.makestack/caches/${basename}`);
-  createFile(orignalImage, await (await fetch(osImageURL)).buffer());
-  return [version, orignalImage];
+    const { version, osImageURL } = await getLatestOSRelease(osType, deviceType);
+    const basename = path.basename(osImageURL);
+    const orignalImage = path.join(process.env.HOME, `.makestack/caches/${basename}`);
+    createFile(orignalImage, await (await fetch(osImageURL)).buffer());
+    return [version, orignalImage];
 }
 
 function writeConfigToDiskIamge({ osVersion, deviceType, orignalImage, device, adapter, wifiSSID, wifiPassword, wifiCountry }) {
@@ -85,64 +85,64 @@ function writeConfigToDiskIamge({ osVersion, deviceType, orignalImage, device, a
 }
 
 function prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath) {
-  let prefix = "env ";
-  const env = {
-    DRIVE: drive,
-    IMAGE_WRITER: "y",
-    DRIVE_SIZE: driveSize,
-    IMAGE_PATH: imagePath,
-    IPC_PATH: ipcPath,
-    ELECTRON_RUN_AS_NODE: "1",
-  };
+    let prefix = "env ";
+    const env = {
+        DRIVE: drive,
+        IMAGE_WRITER: "y",
+        DRIVE_SIZE: driveSize,
+        IMAGE_PATH: imagePath,
+        IPC_PATH: ipcPath,
+        ELECTRON_RUN_AS_NODE: "1",
+    };
 
-  for (const name in env) {
-    prefix += `${name}=${quote([env[name]])} `;
-  }
+    for (const name in env) {
+        prefix += `${name}=${quote([env[name]])} `;
+    }
 
-  return prefix + quote(flashCommand);
+    return prefix + quote(flashCommand);
 }
 
 function flash(flashCommand, drive, driveSize, imagePath, progress) {
-  return new Promise((resolve, reject) => {
-    const ipcPath = path.join(os.tmpdir(),
-      "makestack-installer" + generateRandomString(32));
+    return new Promise((resolve, reject) => {
+        const ipcPath = path.join(os.tmpdir(),
+        "makestack-installer" + generateRandomString(32));
 
-    ipc.config.logger = () => { };
-    ipc.serve(ipcPath, () => {
-      ipc.server.on("progress", (data) => {
-        progress("flashing", JSON.parse(data));
-      });
+        ipc.config.logger = () => { };
+        ipc.serve(ipcPath, () => {
+            ipc.server.on("progress", (data) => {
+                progress("flashing", JSON.parse(data));
+            });
+        });
+        ipc.server.start();
+
+        const command = prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath);
+        const options = { name: "MakeStack Installer" };
+        sudo.exec(command, options, (error, stdout, stderr) => {
+            if (error) { reject(error); }
+
+            ipc.server.stop();
+            resolve();
+        });
     });
-    ipc.server.start();
-
-    const command = prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath);
-    const options = { name: "MakeStack Installer" };
-    sudo.exec(command, options, (error, stdout, stderr) => {
-      if (error) { reject(error); }
-
-      ipc.server.stop();
-      resolve();
-    });
-  });
 }
 
 export async function install({
-  deviceName, deviceType, osType, adapter, wifiSSID, wifiPassword, wifiCountry,
-  drive, ignoreDuplication, flashCommand,
+    deviceName, deviceType, osType, adapter, wifiSSID, wifiPassword, wifiCountry,
+    drive, ignoreDuplication, flashCommand,
 },                            progress) {
 
-  progress("look-for-drive");
-  const driveSize = await getDriveSize(drive);
-  progress("register");
-  const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication);
-  progress("download");
-  const [osVersion, orignalImage] = await downloadDiskImage(osType, deviceType);
-  progress("config");
-  const imagePath = writeConfigToDiskIamge({
-    osVersion, orignalImage, deviceType, device, adapter,
-    wifiSSID, wifiPassword, wifiCountry,
-  });
-  progress("flash");
-  await flash(flashCommand, drive, driveSize, imagePath, progress);
-  progress("success");
+    progress("look-for-drive");
+    const driveSize = await getDriveSize(drive);
+    progress("register");
+    const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication);
+    progress("download");
+    const [osVersion, orignalImage] = await downloadDiskImage(osType, deviceType);
+    progress("config");
+    const imagePath = writeConfigToDiskIamge({
+        osVersion, deviceType, orignalImage, device, adapter,
+        wifiSSID, wifiPassword, wifiCountry
+    })
+    progress('flash')
+    await flash(flashCommand, drive, driveSize, imagePath, progress)
+    progress('success')
 }
