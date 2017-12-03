@@ -11,7 +11,7 @@ allows you to deploy your own MakeStack Server easily.
 Just click this button to save yor time
 ---------------------------------------
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/seiyanuta/makestack)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/seiyanuta/makestack-on-heroku)
 
 
 Prepare for deploy
