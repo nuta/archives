@@ -95,6 +95,12 @@ function extract(filepath, dest) {
   if (filepath.match(/\.tar\.(xz|bz2?|gz)$/)) {
     mkdirp(dest)
     spawnSync('tar', ['xf', filepath, '-C', dest, '--strip-components', '1'], { stdio: 'inherit' })
+  } else if (filepath.match(/\.zip$/)) {
+    const tempDest = dest + '-tmp'
+    spawnSync('unzip', [filepath, '-d', tempDest], { stdio: 'inherit' })
+
+    // --strip-components 1.
+    spawnSync('mv', [path.join(tempDest, fs.readdirSync(tempDest)[0]), dest], { stdio: 'inherit' })
   } else if (filepath.match(/\.deb$/)) {
     mkdirp(dest)
     const cwd = process.cwd()
