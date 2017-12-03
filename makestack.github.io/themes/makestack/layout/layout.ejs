@@ -1,20 +1,43 @@
-<!DOCTYPE html>
+<% if (page.path === 'index.html') { %><%- partial('index') %><% } else { %><!DOCTYPE html>
 <html lang="en">
 <head>
-  <title><%- page.title ? page.title + ' — ' : '' %>Vue.js</title>
+  <title><%- page.title ? page.title + ' — ' : '' %>MakeStack</title>
   <meta charset="utf-8">
   <meta name="description" content="<%- theme.site_description %>">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.31/css/uikit.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.31/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-beta.31/js/uikit-icons.min.js"></script>
+  <%- css('css/main') %>
 </head>
 <body>
-  <header>
+  <header class="navbar">
     <h1>MakeStack</h1>
   </header>
 
-  <% if (page.path === 'index.html') { %>
-    <%- partial('index') %>
-  <% } else { %>
-    <%- body %>
-  <% } %>
+  <div class="container">
+    <ul class="uk-nav uk-nav-default">
+      <% site.pages.filter(page => page.path.match(/^[a-zA-Z0-9-]+\.html$/)).forEach(page => { %>
+        <li><a href="/<%- page.path %>"><%- page.title %></a></li>
+      <% }) %>
+
+      <li class="uk-parent">
+        <span>Guides</span>
+        <ul class="uk-nav-sub">
+          <% site.pages.filter(page => page.path.match(/^guides\//)).forEach(page => { %>
+            <li><a href="/<%- page.path %>"><%- page.title %></a></li>
+          <% }) %>
+        </ul>
+      </li>
+    </ul>
+
+    <div class="content">
+      <%- body %>
+    </div>
+
+    <!-- This <div> is for cetering .content -->
+    <div></div>
+  </div>
 </body>
 </html>
+<% } %>
