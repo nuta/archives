@@ -7,7 +7,7 @@ title: Change Log
   - add makestack.github.io website files
   - sdk: add new/new-plugin command
   - migrate some components to TypeScript
-  - fixes bunch of bugs and problematic stuffs
+  - bunch of bug fixes and improvements
 - v0.0.2
   - Node.js runtime: support Serial and SPI API
   - linux: use UEFI in x86_64 target
