@@ -12,15 +12,19 @@ module.exports = {
   config() {
     return {
       'target.name': 'x64',
+      'target.initramfs_dependencies': [],
       'target.linux_arch': 'x86',
       'target.deb_arch': 'amd64',
       'target.node_arch': 'x64',
       'target.node_gyp_arch': 'x64',
       'target.libTriplet': 'x86_64-linux-gnu',
+      'target.configure_host': 'x86_64-linux-gnu',
       'target.ubuntu_pkg_url': 'http://us.archive.ubuntu.com/ubuntu',
+      'target.build_prefix': `${buildPath('usr')}`,
       'glibc.ldDestPath': '/lib64/ld-linux-x86-64.so.2',
       'glibc.ldSourcePath': 'lib/x86_64-linux-gnu/ld-linux-x86-64.so.2',
       'target.toolchain_prefix': '', // This assumes that the x86_64 build machine.
+      'openssl.configure_target': 'linux-x86_64',
       'linux.version': version,
       'linux.url': `https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${version}.tar.xz`,
       'linux.sha256': '32915a33bb0b993b779257748f89f31418992edba53acbe1160cb0f8ef3cb324',
