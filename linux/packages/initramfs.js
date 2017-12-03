@@ -1,11 +1,24 @@
 const { isRebuilt, run, config, rootfsPath, buildPath } = require('../pkgbuilder').pkg
 
-const dependencies = ['busybox', 'apparmor', 'glibc', 'libstdc++', 'libgcc', 'node', 'supervisor', 'init']
+const commonDependencies = [
+  'init',
+  'node',
+  'supervisor',
+  'busybox',
+  'apparmor',
+  'wpa_supplicant',
+  'iw',
+  'glibc',
+  'libstdc++',
+  'libgcc'
+]
 
 module.exports = {
   name: 'initramfs',
   type: 'diskimage',
-  dependencies,
+  dependencies() {
+    return commonDependencies.concat(config('target.initramfs_dependencies'))
+  },
 
   config() {
     return {
@@ -14,7 +27,7 @@ module.exports = {
   },
 
   changed() {
-    return dependencies.some(isRebuilt)
+    return commonDependencies.concat(config('target.initramfs_dependencies')).some(isRebuilt)
   },
 
   build() {
