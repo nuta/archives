@@ -10,4 +10,4 @@ RUN apt-get update -qy && apt-get install -qy curl && \
 
 RUN npm install -g node-gyp
 RUN yarn config set cache-folder /makestack/linux/build/downloads/yarn-cache
-CMD cd /makestack/linux && ./pkgbuilder/pkgbuilder $TARGET && cp build/$TARGET/*.img /dist
+CMD cd /makestack/linux && make $TARGET && cp build/$TARGET/*.img /dist

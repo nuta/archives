@@ -26,7 +26,7 @@ matrix:
         - npm install -g yarn node-gyp
         - cd linux
       script:
-        - BUILD=release ./pkgbuilder/pkgbuilder x64
+        - BUILD=release make x64
 
     - language: node_js
       node_js: "8"
@@ -60,7 +60,7 @@ matrix:
         - sudo make install
         - cd ../../linux
       script:
-        - BUILD=release ./pkgbuilder/pkgbuilder raspberrypi3
+        - BUILD=release make raspberrypi3
 
     - language: ruby
       env: M=server:backend:sqlite3
