@@ -7,14 +7,14 @@ start_daemon() {
   script=$1
   backoff=1
   while :; do
-    sh -c "$script"
+    sh -c "$script" 2>&1 | logger
     exitcode=$?
     if [ $exitcode -eq 0 ] ;then
-      echo "'$script' exited with $exitcode. Stopping the daemon..."
+      logger "'$script' exited with $exitcode. Stopping the daemon..."
       break
     fi
 
-    echo "*** '$script' exited with $exitcode. Restarting in $backoff seconds..."
+    logger "'$script' exited with $exitcode. Restarting in $backoff seconds..."
     sleep $backoff
     backoff=$(($backoff << 1))
   done
@@ -45,8 +45,6 @@ mount_filesystems() {
 
   mkdir /boot
   mount $root /boot
-
-  dmesg > /boot/boot.log
 }
 
 init_mdev() {
@@ -63,6 +61,14 @@ banner() {
 |_|  |_|\__,_|_|\_\___|____/ \__\__,_|\___|_|\_\  |_____|_|_| |_|\__,_/_/\_\
 
 EOF
+}
+
+start_syslogd() {
+  syslogd -n -O /boot/system.log -s 1024 -b 1 &
+}
+
+start_klogd() {
+  start_daemon "klogd -n" &
 }
 
 load_makestack_config() {
@@ -83,7 +89,7 @@ init_apparmor() {
 
 init_urandom() {
   if [ -f "$RANDSEED_FILE" ]; then
-    echo "*** Feeding random seed"
+    logger "Feeding random seed"
     cat "$RANDSEED_FILE" > /dev/urandom
   fi
 }
@@ -94,7 +100,7 @@ init_networking() {
       [ "$interface" = "lo" ] && continue
       [ "$interface" = "irlan0" ] && continue
 
-      echo "*** Initializing $interface"
+      logger "Initializing $interface"
       ip link set $interface up
 
       # TODO: We should use NetworkManager or something.
@@ -120,14 +126,14 @@ init_networking() {
 start_supervisor() {
   export MAKESTACK_APP_UID=0
   export MAKESTACK_APP_GID=0
-  echo "*** Starting MakeStack Supervisor..."
+  logger "Starting MakeStack Supervisor..."
 
   # Don't append `&'. `start_daemon`` must return if the supervisor exited with 0 to reboot.
   start_daemon "node /supervisor/supervisor"
 }
 
 save_urandom_seed() {
-  echo "*** Saving random seed..."
+  logger "Saving random seed..."
   dd if=/dev/urandom of=$RANDSEED_FILE bs=$RANDSEED_SIZE count=1
 }
 
@@ -138,18 +144,20 @@ init() {
   mount_filesystems
   init_mdev
   banner
+  start_syslogd
+  start_klogd
   load_makestack_config
   set_hostname
   init_apparmor
   init_urandom
   init_networking
 
-  echo "*** Boot time: $(awk '{print $1}' /proc/uptime) secs"
+  logger "Boot time: $(awk '{print $1}' /proc/uptime) secs"
   start_supervisor
 
   # Supervisor exited with 0. Do some work and reboot.
   save_urandom_seed
-  echo "*** Rebooting in 10 seconds..."
+  logger "Rebooting in 10 seconds..."
   sleep 10
   reboot -f
 }
