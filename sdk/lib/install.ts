@@ -66,7 +66,7 @@ async function downloadDiskImage(osType, deviceType) {
 function writeConfigToDiskIamge({ osVersion, deviceType, orignalImage, device, adapter, wifiSSID, wifiPassword, wifiCountry }) {
   const imagePath = generateTempPath();
 
-  const wifiPsk = crypto.pbkdf2Sync(wifiPassword, wifiSSID, 4096, 256, "sha1");
+  const wifiPsk = crypto.pbkdf2Sync(wifiPassword, wifiSSID, 4096, 256, "sha1").toString('hex').substring(0, 64);
 
   // TODO: What if the image is large?
   let image = fs.readFileSync(orignalImage);
