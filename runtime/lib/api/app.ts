@@ -1,10 +1,10 @@
 export class AppAPI {
   public enableUpdate() {
-    process.send({ type: "setUpdateEnabled", body: true });
+    process.send({ type: "setUpdateLock", body: 'lock' });
   }
 
   public disableUpdate() {
-    process.send({ type: "setUpdateEnabled", body: false });
+    process.send({ type: "setUpdateLock", body: 'unlock' });
   }
 
     public onExit(callback) {
