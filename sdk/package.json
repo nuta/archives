@@ -1,6 +1,6 @@
 {
   "name": "makestack",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "MakeStack SDK with CLI Developer Tools.",
   "main": "dist/index.js",
   "bin": {
