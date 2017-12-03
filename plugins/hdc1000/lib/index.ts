@@ -4,6 +4,8 @@ const HDC1000_HUMID_REG = 0x01;
 const HDC1000_CONFIG_REG = 0x02;
 
 export class HDC1000 {
+    private bus: I2C;
+
     constructor(address = 0x40) {
         this.bus = new I2C({ address });
 
