@@ -12,8 +12,8 @@
     "test:live": "mocha -w",
     "pretest": "tsc --pretty",
     "prepack": "npm run build-runtime && npm run build-supervisor && npm run build",
-    "build-runtime": "rm -rf runtime && mkdirp runtime && cd ../runtime && yarn pack && cd ../sdk && tar xf ../runtime/makestack-runtime-*.tgz -C runtime --strip-components=1",
-    "build-supervisor": "rm -rf supervisor && mkdirp supervisor && cd ../supervisor && yarn pack && cd ../sdk && tar xf ../supervisor/makestack-supervisor-*.tgz -C supervisor --strip-components=1",
+    "build-runtime": "rm -rf runtime && mkdir -p runtime && cd ../runtime && yarn pack && cd ../sdk && tar xf ../runtime/makestack-runtime-*.tgz -C runtime --strip-components=1",
+    "build-supervisor": "rm -rf supervisor && mkdir -p supervisor && cd ../supervisor && yarn pack && cd ../sdk && tar xf ../supervisor/makestack-supervisor-*.tgz -C supervisor --strip-components=1",
     "build": "tsc --pretty",
     "build:live": "tsc --pretty -w"
   },
