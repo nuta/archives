@@ -74,9 +74,13 @@ export function serialize(messages, { includeDeviceId, includeHMAC, deviceSecret
       throw new Error(`Invalid device state: \`${messages.state}'`);
     }
 
-    const data = [states[messages.state]];
-    const deviceInfoMsg = generateMessage(SMMS_DEVICE_INFO_MSG, data);
+    const byte = [
+      states[messages.state]
+      | (((messages.debugMode) ? 1 : 0) << 3) // debug mode
+      | (1 << 4) // os type: 1 for MakeStack Linux
+    ];
 
+    const deviceInfoMsg = generateMessage(SMMS_DEVICE_INFO_MSG, [byte]);
     payload = Buffer.concat([payload, deviceInfoMsg]);
   }
 

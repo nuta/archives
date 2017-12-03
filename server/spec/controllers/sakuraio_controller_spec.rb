@@ -14,7 +14,7 @@ RSpec.describe SakuraioController, type: :controller do
             {
                 "channel": 0,
                 "type": "b",
-                "value": "10240b0102100676",
+                "value": "10240b0112100676",
                 "datetime": "2017-10-30T01:50:10.151406408Z"
             },
             {

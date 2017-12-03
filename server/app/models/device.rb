@@ -14,6 +14,7 @@ class Device < ApplicationRecord
   value :last_command_id, expiration: 3.hours
   hash_key :command_results, expiration: 5.minutes
 
+  SUPPORTED_OS = %w(linux)
   SUPPORTED_TYPES = %w(sdk raspberrypi3)
   DEVICE_STATES = %w(new booting ready running relaunch reboot down)
   RESERVED_DEVICE_NAMES = %w(new)

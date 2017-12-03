@@ -1,3 +1,6 @@
+#
+#  TODO: needs refactoring and tests
+#
 module SMMSService
   extend self
 
@@ -60,14 +63,20 @@ module SMMSService
     if messages[:device_info]
       device_info = messages[:device_info].unpack('C')[0]
       state = %w[_ booting ready running][device_info & 0x07]
+      os = %w[_ linux][(device_info >> 4) & 0x03]
       debug_mode = (device_info & 0x08) != 0
 
       unless Device::DEVICE_STATES.include?(state)
         raise ActionController::BadRequest.new(), "invalid `device_info.state'"
       end
 
+      unless Device::SUPPORTED_OS.include?(os)
+        raise ActionController::BadRequest.new(), "invalid `device_info.os'"
+      end
+
       device.status = state
       device.debug_mode = debug_mode
+      device.current_os = os
     end
 
     if messages[:os_version]
