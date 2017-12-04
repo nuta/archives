@@ -152,6 +152,9 @@ program
 .option("--dev", "Restart Node-RED automatically for Node-RED node development.", false)
 .action(redCommand.main);
 
-export function run(argv) {
-    program.parse(argv);
+export async function run(argv): Promise<{}> {
+    return new Promise((resolve, reject) => {
+        program.fatalError = reject;
+        program.parse(argv).then(resolve);
+    });
 }

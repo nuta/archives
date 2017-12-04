@@ -9,6 +9,15 @@ if (process.env.IMAGE_WRITER !== undefined) {
     process.exit(1)
   })
 } else {
+  const chalk = require('chalk')
   const cli = require('../dist/cli')
-  cli.run(process.argv)
+
+  cli.run(process.argv).catch(error => {
+    const format = (process.stderr.isTTY) ? chalk.bold.red : x => x
+    if (error.constructor.name === 'FatalError') {
+      process.stderr.write(format('error: ' + error.message) + '\n')
+    } else {
+      process.stderr.write(format('error: ' + error.stack) + '\n')
+    }
+  })
 }
