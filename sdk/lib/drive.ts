@@ -1,4 +1,5 @@
-const drivelist = require("drivelist");
+import * as drivelist from "drivelist";
+import { FatalError } from "./types";
 
 export function getDriveSize(devfile) {
     return new Promise((resolve, reject) => {
@@ -11,7 +12,7 @@ export function getDriveSize(devfile) {
                 }
             }
 
-            reject(new Error(`No such a drive: ${devfile}`));
+            reject(new FatalError(`No such a drive: ${devfile}`));
         });
     });
 }

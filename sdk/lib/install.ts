@@ -12,13 +12,14 @@ import {
     createFile, generateRandomString,
     generateTempPath,
 } from "./helpers";
+import { FatalError } from "./types";
 
 function replaceBuffer(buf, value, id) {
     const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`;
 
     const index = buf.indexOf(Buffer.from(needle));
     if (index === -1) {
-        throw new Error(`replaceBuffer: failed to replace ${id}`);
+        throw new FatalError(`replaceBuffer: failed to replace ${id}`);
     }
 
     const paddedValue = Buffer.alloc(needle.length, " ");
@@ -38,7 +39,7 @@ async function registerOrGetDevice(name, type, ignoreDuplication) {
             // There is already a device with same name.
             device = await api.getDevice(name);
         } else {
-            throw new Error("failed to register/fetch the device");
+            throw new FatalError("failed to register/fetch the device");
         }
     }
 

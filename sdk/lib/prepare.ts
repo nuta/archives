@@ -6,11 +6,12 @@ import * as path from "path";
 import { api } from "./api";
 import { createFile } from "./helpers";
 import { logger } from "./logger";
+import { FatalError } from "./types";
 
 function installDevDependencies(dir: string) {
     const { status, stdout, stderr } = spawnSync("yarn", [], { encoding: "utf-8", cwd: dir });
     if (status !== 0) {
-        throw new Error(`yarn exited with ${status}:\n${stdout}\n${stderr}`);
+        throw new FatalError(`yarn exited with ${status}:\n${stdout}\n${stderr}`);
     }
 }
 
@@ -34,7 +35,7 @@ export async function prepare(dir) {
     } else if (fs.existsSync(path.join(dir, "plugin.yaml"))) {
         yamlPath = path.join(dir, "plugin.yaml");
     } else {
-        throw new Error("The current directory is not an app nor a plugin.");
+        throw new FatalError("The current directory is not an app nor a plugin.");
     }
 
     if (fs.existsSync(path.join(dir, "package.json"))) {

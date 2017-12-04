@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as fetch from "node-fetch";
 import * as util from "util";
 import { loadCredentials, saveCredentials } from "./config";
+import { FatalError } from "./types";
 
 class API {
     public invoke(method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: any): Promise<any> {
@@ -11,7 +12,7 @@ class API {
         return new Promise((resolve, reject) => {
             const credentials = loadCredentials();
             if (!credentials) {
-                reject(new Error("login first"));
+                reject(new FatalError("login first"));
             }
 
             if (!(body instanceof FormData)) {

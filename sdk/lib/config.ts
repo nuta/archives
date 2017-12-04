@@ -8,7 +8,11 @@ function getConfigPath(name) {
     return `${CONFIG_DIR}/${name}.json`;
 }
 
-function load(name) {
+function load(name): any | null {
+    if (!fs.existsSync(getConfigPath(name))) {
+        return null
+    }
+
     return JSON.parse(fs.readFileSync(getConfigPath(name), { encoding: "utf-8" }));
 }
 

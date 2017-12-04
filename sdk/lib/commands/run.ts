@@ -3,7 +3,7 @@ import * as path from "path";
 
 export async function main(args, opts, logger) {
     if (opts.adapter === "http" && !opts.server) {
-        throw new Error("--server is missing");
+        throw new FatalError("Specify `server' option.");
     }
 
     const Supervisor = require("../../../supervisor");
