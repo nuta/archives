@@ -1,5 +1,6 @@
 import * as os from "os";
 import * as path from "path";
+import { FatalError } from "../types";
 
 export async function main(args, opts, logger) {
     if (opts.adapter === "http" && !opts.server) {
