@@ -80,12 +80,17 @@ function download(pkg, sha256) {
   const filepath = path.resolve(build.downloadsDir, pkg.name, path.basename(pkg.url))
   mkdirp(path.dirname(filepath))
 
-  if (fs.existsSync(filepath)) {
-    // TODO: compare SHASUM
+  if (fs.existsSync(filepath) && shasum(filepath) === sha256) {
+    // Use the already downloaded file
     return filepath
   }
 
   spawnSync('curl', ['-fSLo', filepath, pkg.url], { stdio: 'inherit' })
+
+  if (shasum(filepath) !== sha256) {
+    throw new Error(`shasum mismatch: ${filepath}`)
+  }
+
   return filepath
 }
 

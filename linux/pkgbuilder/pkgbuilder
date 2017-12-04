@@ -104,12 +104,7 @@ function buildPackage(pkg) {
   const pkgBuildDir = path.resolve(build.buildDir, pkg.name)
 
   if (pkg.url) {
-    const dlpath = download(pkg)
-
-    if (shasum(dlpath) !== pkg.sha256) {
-      throw new Error(`shasum mismatch: ${dlpath}`)
-    }
-
+    const dlpath = download(pkg, pkg.sha256)
     extract(dlpath, pkgBuildDir)
   } else if (pkg.path) {
     if (isNewerDirContent(pkg.path, pkgBuildDir, pkg.ignore)) {
