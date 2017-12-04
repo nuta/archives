@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "hexo server",
     "build:live": "supervisor -n exit -w themes,../Documentation -e 'html,md' -x yarn prebuild",
-    "prebuild": "rm -rf source && cp -r ../Documentation source && echo \"index: true\n---\" > source/index.md",
+    "prebuild": "rm -rf source && mkdir -p source && cp -r ../Documentation source/documentation && echo \"index: true\n---\" > source/index.md",
     "build": "hexo generate",
     "deploy": "npm run build && hexo deploy"
   },
