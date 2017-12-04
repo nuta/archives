@@ -67,6 +67,8 @@ const JAVASCRIPT_TEMPLATES = [
     {
         filepath: ".makestackignore",
         template: `\
+        dist/*.map
+        scaffold.js
         coverage
         test
         lib/native

@@ -6,3 +6,7 @@ package.json
 tsconfig.json
 yarn.lock
 makestack.d.ts
+build
+dist/*.map
+dist/*/*.map
+scaffold.js
