@@ -10,36 +10,36 @@ const DEFAULT_TEMPLATES = [
     {
         filepath: "README.md",
         template: `\
-        {{ appName }}
-        =============
-        `,
+{{ appName }}
+=============
+`
     },
     {
         filepath: "app.yaml",
         template: `\
-        name: {{ appName }}
-        plugins: [ {{ plugins | join(", ") }} ]
-        `,
+name: {{ appName }}
+plugins: [ {{ plugins | join(", ") }} ]
+`
     },
     {
         filepath: "jsconfig.json",
         template: `\
-        {
-            "compilerOptions": {
-                "target": "es2017",
-                "module": "commonjs",
-                "lib": ["es2017"]
-            }
-        }
-        `,
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "module": "commonjs",
+        "lib": ["es2017"]
+    }
+}
+`
     },
     {
         filepath: "app.js",
         template: `\
-        Timer.interval(3, () => {
-            println('Hello World!')
-        })
-        `,
+Timer.interval(3, () => {
+    println('Hello World!')
+})
+`
     },
 ];
 

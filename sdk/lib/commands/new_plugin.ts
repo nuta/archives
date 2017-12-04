@@ -10,23 +10,23 @@ const DEFAULT_TEMPLATES = [
     {
         filepath: "README.md",
         template: `\
-        {{ appName }}
-        =============
-        `,
+{{ appName }}
+=============
+`,
     },
     {
         filepath: "plugin.yaml",
         template: `\
-        name: {{ appName }}
-        `,
+name: {{ appName }}
+`,
     },
     {
         filepath: ".gitignore",
         template: `\
-        /dist
-        /build
-        /native
-        `,
+/dist
+/build
+/native
+`,
     },
 ];
 
@@ -34,54 +34,54 @@ const JAVASCRIPT_TEMPLATES = [
     {
         filepath: "package.json",
         template: `\
-        {
-            "private": true,
-            "main": "lib/index.js"
-        }
-        `,
+{
+    "private": true,
+    "main": "lib/index.js"
+}
+`,
     },
     {
         filepath: "jsconfig.json",
         template: `\
-        {
-            "compilerOptions": {
-                "target": "es2017",
-                "module": "commonjs",
-                "lib": ["es2017"]
-            }
-        }
-        `,
+{
+    "compilerOptions": {
+        "target": "es2017",
+        "module": "commonjs",
+        "lib": ["es2017"]
+    }
+}
+`,
     },
     {
         filepath: "lib/index.js",
         template: `\
-        class {{ CamelAppName }} {
-            constructor() {
-                print('Hello form {{ CamelAppName }}!')
-            }
-        }
+class {{ CamelAppName }} {
+    constructor() {
+        print('Hello form {{ CamelAppName }}!')
+    }
+}
 
-        module.exports = { {{ CamelAppName }} }
-        `,
+ module.exports = { {{ CamelAppName }} }
+`,
     },
     {
         filepath: ".makestackignore",
         template: `\
-        dist/*.map
-        scaffold.js
-        coverage
-        test
-        lib/native
-        node_modules/nan
-        node_modules/.yarn-integrity
-        binding.gyp
-        build
-        node_modules
-        package.json
-        jsconfig.json
-        yarn.lock
-        package-lock.json
-        `,
+dist/*.map
+scaffold.js
+coverage
+test
+lib/native
+node_modules/nan
+node_modules/.yarn-integrity
+binding.gyp
+build
+node_modules
+package.json
+jsconfig.json
+yarn.lock
+package-lock.json
+`,
     },
 ];
 
@@ -89,59 +89,61 @@ const TYPESCRIPT_TEMPLATES = [
     {
         filepath: "package.json",
         template: `\
-        {
-            "private": true,
-            "main": "dist/index.js",
-            "scripts": {
-                "transpile": "tsc --pretty"
-            }
-        }
-        `,
+{
+    "private": true,
+    "main": "dist/index.js",
+    "scripts": {
+        "transpile": "tsc --pretty"
+    }
+}
+`,
     },
     {
         filepath: "tsconfig.json",
         template: `\
-        {
-            "compilerOptions": {
-                "outDir": "./dist",
-                "allowJs": true,
-                "target": "es2017",
-                "module": "commonjs",
-                "sourceMap": true,
-                "types": ["node", "makestack"]
-            },
-            "include": [
-                "./lib/**/*"
-            ]
-        }
-        `,
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "allowJs": true,
+        "target": "es2017",
+        "module": "commonjs",
+        "sourceMap": true,
+        "types": ["node", "makestack"]
+    },
+    "include": [
+        "./lib/**/*"
+    ]
+}
+`,
     },
     {
         filepath: "lib/index.ts",
         template: `\
-        export class {{ CamelAppName }} {
-            constructor() {
-                print('Hello form {{ CamelAppName }}!')
-            }
-        }
-        `,
+export class {{ CamelAppName }} {
+    constructor() {
+        print('Hello form {{ CamelAppName }}!')
+    }
+}
+`,
     },
     {
         filepath: ".makestackignore",
         template: `\
-        coverage
-        test
-        lib
-        node_modules/nan
-        node_modules/.yarn-integrity
-        binding.gyp
-        build
-        node_modules
-        package.json
-        tsconfig.json
-        yarn.lock
-        package-lock.json
-        `,
+dist/*.map
+scaffold.js
+coverage
+test
+lib
+node_modules/nan
+node_modules/.yarn-integrity
+binding.gyp
+build
+node_modules
+package.json
+tsconfig.json
+yarn.lock
+package-lock.json
+`,
     },
 ];
 
