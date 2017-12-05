@@ -28,7 +28,7 @@ export abstract class LinuxSPIAPI {
         const path = (args.slave === undefined) ? args.path : `/dev/spidev${this.bus}.${args.slave}`;
 
         if (args.ss !== undefined) {
-            this.ss = new GPIO({ pin: args.ss, mode: GPIO.OUTPUT });
+            this.ss = new GPIO({ pin: args.ss, mode: 'out' });
             this.deselectSlave();
         } else {
             // Chip Select (or Slave Select) is controlled by the kernel

@@ -67,7 +67,7 @@ You don't have to `require` to use. This API is defined as a global `Store` obje
 - **Definition:** `(key: string, callback: (newValue: string) => void) => void`
 - **Usage:**
   ```js
-  const pumpRelay = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  const pumpRelay = new GPIO({ pin: 13, mode: 'out' })
   Store.onCommand('water-the-plant', duration => {
     pumpRelay.write(true)
     setTimeout(pumpRelay.write(false), parseInt(duration))
@@ -93,7 +93,7 @@ You don't have to `require` to use. This API is defined as a global `Timer` obje
 - **Warning:** Use `Timer.sleep()` in the callback or it becomes a busy loop.
 - **Usage:**
   ```js
-  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  const led = new GPIO({ pin: 13, mode: 'out' })
   Timer.loop(async () => {
     led.write(true)
     await Timer.sleep(1)
@@ -117,7 +117,7 @@ You don't have to `require` to use. This API is defined as a global `Timer` obje
 - **Definition:** `async (duration: number /* seconds */) => void`
 - **Usage:**
   ```js
-  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  const led = new GPIO({ pin: 13, mode: 'out' })
   Timer.loop(async () => {
     led.write(true)
     await Timer.sleep(0.3)
@@ -131,7 +131,7 @@ You don't have to `require` to use. This API is defined as a global `Timer` obje
 - **Warning:** As its name implies it halts the app event loop. Avoid to use this API.
 - **Usage:**
   ```js
-  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  const led = new GPIO({ pin: 13, mode: 'out' })
   Timer.interval(1, () => {
     led.write(true)
     Timer.busywait(1000)
@@ -200,31 +200,17 @@ interface SubProcessResult {
 You don't have to `require` to use. This API is defined as a global `GPIO` object.
 
 ## Constructor
-- **Definition:** `({ pin: number, mode: GPIO.INPUT | GPIO.OUTPUT })`
+- **Definition:** `({ pin: number, mode: 'in' | 'out' })`
 - **Usage:**
   ```js
-  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
-  ```
-
-### INPUT
-- **Definition:** `string`
-- **Usage:**
-  ```js
-  GPIO.INPUT
-  ```
-
-### OUTPUT
-- **Definition:** `string`
-- **Usage:**
-  ```js
-  GPIO.OUTPUT
+  const led = new GPIO({ pin: 13, mode: 'out' })
   ```
 
 ### setMode
-- **Definition:** `(mode: GPIO.INPUT | GPIO.OUTPUT) => void`
+- **Definition:** `(mode: 'in' | 'out') => void`
 - **Usage:**
   ```js
-  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  const led = new GPIO({ pin: 13, mode: 'out' })
   led.setMode(GPIO.INTPUT)
   ```
 
@@ -232,7 +218,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
 - **Definition:** `(value: boolean) => void`
 - **Usage:**
   ```js
-  const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+  const led = new GPIO({ pin: 13, mode: 'out' })
   led.write(true)
   ```
 
@@ -240,7 +226,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
 - **Definition:** `() => boolean`
 - **Usage:**
   ```js
-  const button = new GPIO({ pin: 13, mode: GPIO.INPUT })
+  const button = new GPIO({ pin: 13, mode: 'in' })
   Timer.interval(0.5, () => {
     const value = button.read()
     println(`button: ${value}`)
@@ -253,7 +239,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
   - `(/* mode = 'rising' */ callback: () => void) => void`
 - **Usage:**
   ```js
-  const button = new GPIO({ pin: 13, mode: GPIO.INPUT })
+  const button = new GPIO({ pin: 13, mode: 'in' })
   button.onInterrupt('rising', () => {
     publish('button-pressed')
   })
@@ -263,7 +249,7 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
 - **Definition:** `(callback: () => void)`
 - **Usage:**
   ```js
-  const button = new GPIO({ pin: 13, mode: GPIO.INPUT })
+  const button = new GPIO({ pin: 13, mode: 'in' })
   button.onChange(() => {
     publish('button', button.read())
   })

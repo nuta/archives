@@ -12,16 +12,8 @@ export class LinuxGPIOAPI {
         this.setMode(args.mode);
     }
 
-    static get OUTPUT() {
-        return "out";
-    }
-
-    static get INPUT() {
-        return "in";
-    }
-
     public setMode(mode: GPIOPinMode) {
-        if (mode !== LinuxGPIOAPI.INPUT && mode !== LinuxGPIOAPI.OUTPUT) {
+        if (mode !== 'in' && mode !== 'out') {
             throw new Error(`invalid pin mode \`${mode}'`);
         }
 
@@ -31,7 +23,7 @@ export class LinuxGPIOAPI {
 
         fs.writeFileSync(`/sys/class/gpio/export`, `${this.pin}`);
         fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/direction`,
-        (mode === LinuxGPIOAPI.INPUT) ? "in" : "out");
+        (mode === "in") ? "in" : "out");
     }
 
     public write(value: boolean) {
@@ -48,7 +40,7 @@ export class LinuxGPIOAPI {
             mode = "rising";
         }
 
-        this.setMode(GPIO.INPUT);
+        this.setMode('in');
         fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/edge`, mode);
         fs.watch(`/sys/class/gpio/gpio${this.pin}/value`, () => {
             callback();
@@ -56,7 +48,7 @@ export class LinuxGPIOAPI {
     }
 
     public onChange(callback: () => void) {
-        this.setMode(GPIO.INPUT);
+        this.setMode('in');
         fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/edge`, "both");
         fs.watch(`/sys/class/gpio/gpio${this.pin}/value`, () => {
             callback();

@@ -20,7 +20,7 @@ describe('GPIO API', function() {
 
         this.instance = new builtins.GPIO({
             pin: this.pin,
-            mode: builtins.GPIO.OUTPUT
+            mode: 'out'
         })
     })
 
@@ -30,7 +30,7 @@ describe('GPIO API', function() {
 
     describe('setMode', function() {
         it('changes the direction', function() {
-            this.instance.setMode(builtins.GPIO.INPUT);
+            this.instance.setMode('in');
             expect(readFile('/sys/class/gpio/export')).to.equal('1');
             expect(readFile('/sys/class/gpio/gpio1/direction')).to.equal('in');
         })

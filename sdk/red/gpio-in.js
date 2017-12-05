@@ -7,7 +7,7 @@ module.exports = config => {
   return {
     type: 'input',
     init: `
-const ${instance} = new GPIO({ pin: ${config.pin}, mode: GPIO.INPUT })
+const ${instance} = new GPIO({ pin: ${config.pin}, mode: 'in' })
 ${instance}.onChange(() => {
   const value = ${instance}.read()
   __outputs__([{ payload: value ? 1 : 0 }])

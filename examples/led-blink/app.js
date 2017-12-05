@@ -1,4 +1,4 @@
-const led = new GPIO({ pin: 13, mode: GPIO.OUTPUT })
+const led = new GPIO({ pin: 13, mode: 'out' })
 
 let state = false
 Timer.interval(1, () => {

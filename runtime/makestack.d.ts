@@ -26,8 +26,6 @@ interface Subprocess {
 type GPIOPinMode = 'in' | 'out'
 type GPIOInterruptMode = 'rising' | 'falling' | 'both'
 interface GPIO {
-  INPUT: GPIOPinMode;
-  OUTPUT: GPIOPinMode;
   new(args: { pin: number, mode: GPIOPinMode }): GPIO;
   setMode(mode: GPIOPinMode): void;
   write(value: boolean): void;
@@ -58,7 +56,7 @@ interface Serial {
   onNewLine(callback: (line: string) => void): void;
 }
 
-declare function println(message: any): void;
+declare function println(message: string): void;
 declare function error(message: string): void;
 declare function publish(event: string, data?: string | number): void;
 declare var Store: Store;
