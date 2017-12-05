@@ -9,9 +9,9 @@ import {
     CONFIG_FILES, login, createApp, createApiRequest, createZip
 } from '../helpers';
 
-const deployCommand = require('../../dist/commands/deploy').main
+const deployImageCommand = require('../../dist/commands/deploy_image').main
 
-describe('deploy command', function() {
+describe('deploy-image command', function() {
     beforeEach(function () {
         mockfs(Object.assign({}, CONFIG_FILES));
         this.appName = 'hello-world';
@@ -31,10 +31,13 @@ describe('deploy command', function() {
 
         const deployRequest = createApiRequest()
             .post(`/apps/${this.appName}/deployments`)
-            .reply(200, { version: 1 })
+            .reply(200, {})
 
-        await deployCommand({}, { appDir: this.appDir });
-        expect(runtimeDownloadRequest.isDone()).to.be.true;
+        const imageFilepath = '/user/app.zip'
+        fs.writeFileSync(imageFilepath, await createZip({}))
+
+        await deployImageCommand({ image: imageFilepath }, { app: this.appName, appDir: this.appDir });
+        expect(runtimeDownloadRequest.isDone()).to.be.false;
         expect(deployRequest.isDone()).to.be.true;
     })
 })

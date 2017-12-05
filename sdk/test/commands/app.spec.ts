@@ -1,3 +1,4 @@
+import { } from 'mocha';
 import { expect } from 'chai';
 import * as child_process from 'child_process';
 import * as fs from 'fs';
@@ -17,6 +18,7 @@ describe('app * commands', function() {
 
     afterEach(function () {
         mockfs.restore()
+        nock.cleanAll()
     })
 
     describe('app create command', function () {

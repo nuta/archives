@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import * as mockfs from 'mock-fs';
+import { CONFIG_FILES } from '../helpers';
 
 const CONFIG_DIR = '/user/.makestack'
 process.env.CONFIG_DIR = CONFIG_DIR
@@ -14,16 +15,13 @@ describe('new-plugin command', function() {
     beforeEach(function() {
         this.spawnSync = sinon.stub(child_process, 'spawnSync').returns({ status: 0 })
         this.pluginDir = '/user/plugin';
-        const makestackDTSPath = path.resolve(__dirname, '../../runtime/makestack.d.ts');
-        mockfs({
-            '/user': {},
-            [makestackDTSPath]: fs.readFileSync(makestackDTSPath)
-        })
+        mockfs(CONFIG_FILES)
     })
 
     afterEach(function () {
         this.spawnSync.restore()
         mockfs.restore()
+        nock.cleanAll()
     })
 
     it('creates a new plugin directory', async function() {

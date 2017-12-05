@@ -21,6 +21,7 @@ describe('new command', function() {
 
     afterEach(function() {
         mockfs.restore()
+        nock.cleanAll()
     })
 
     it('creates a new app directoy', async function() {
