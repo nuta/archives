@@ -49,5 +49,5 @@ export const logger = {
     debug,
     info,
     error,
-    warn,
+    warn
 };
