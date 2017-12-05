@@ -161,7 +161,7 @@ class API {
         if (name.includes("/")) {
             // A third-party plugin on GitHub.
             repo = name;
-            name = "nodejs-" + name.split("/").pop();
+            name = name.split("/").pop();
         } else {
             repo = "_/_";
         }
