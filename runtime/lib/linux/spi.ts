@@ -61,13 +61,13 @@ export abstract class LinuxSPIAPI {
         );
     }
 
-    public selectSlave() {
+    private selectSlave() {
         if (this.ss) {
             this.ss.write(false);
         }
     }
 
-    public deselectSlave() {
+    private deselectSlave() {
         if (this.ss) {
             this.ss.write(true);
         }

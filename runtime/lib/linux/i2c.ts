@@ -25,7 +25,7 @@ export abstract class LinuxI2CAPI {
         fs.writeSync(this.fd, Buffer.from(data));
     }
 
-    public selectSlaveAddress(address) {
+    private selectSlaveAddress(address) {
         if (ioctl(this.fd, I2C_SLAVE, address) !== 0) {
             throw new Error("failed to set I2C_SLAVE");
         }
