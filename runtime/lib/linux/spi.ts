@@ -1,5 +1,5 @@
 import * as fs from "fs";
-const spi = require(`../../native/${process.arch}/spi.node`);
+import { spiConfigure, spiTransfer } from "../native";
 
 const SPI_CPHA = 0x01;
 const SPI_CPOL = 0x02;
@@ -52,7 +52,7 @@ export abstract class LinuxSPIAPI {
             throw new Error("invalid spi mode");
         }
 
-        spi.configure(
+        spiConfigure(
             this.fd,
             modeNumber,
             this.bits,
@@ -77,7 +77,7 @@ export abstract class LinuxSPIAPI {
         const rx = Buffer.alloc(tx.length);
         this.selectSlave();
         try {
-            spi.transfer(this.fd, this.speed, Buffer.from(tx), rx);
+            spiTransfer(this.fd, this.speed, Buffer.from(tx), rx);
         } finally {
             this.deselectSlave();
         }

@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { ioctl } from "../ioctl";
+import { ioctl } from "../native";
 
 const I2C_SLAVE = 0x0703;
 
