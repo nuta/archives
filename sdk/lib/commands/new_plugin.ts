@@ -154,11 +154,11 @@ export function main(args, opts) {
     let templates = DEFAULT_TEMPLATES;
     switch (opts.lang) {
         case "javascript":
-        templates = templates.concat(JAVASCRIPT_TEMPLATES);
-        break;
+            templates = templates.concat(JAVASCRIPT_TEMPLATES);
+            break;
         case "typescript":
-        templates = templates.concat(TYPESCRIPT_TEMPLATES);
-        break;
+            templates = templates.concat(TYPESCRIPT_TEMPLATES);
+            break;
     }
 
     const context = {
