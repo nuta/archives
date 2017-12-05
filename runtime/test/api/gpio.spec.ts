@@ -1,5 +1,6 @@
 import { } from 'mocha';
 import * as mockfs from 'mock-fs';
+import * as sinon from 'sinon';
 import { expect } from 'chai';
 import * as fs from 'fs';
 
@@ -18,6 +19,7 @@ describe('GPIO API', function() {
             '/sys/class/gpio/gpio1/direction': ''
         })
 
+        this.fsWatch = sinon.stub(fs, 'watch')
         this.instance = new builtins.GPIO({
             pin: this.pin,
             mode: 'out'
@@ -26,6 +28,7 @@ describe('GPIO API', function() {
 
     afterEach(function() {
         mockfs.restore()
+        this.fsWatch.restore()
     })
 
     describe('setMode', function() {
@@ -47,6 +50,22 @@ describe('GPIO API', function() {
         it('reads the value', function() {
             this.instance.write(false);
             expect(this.instance.read()).to.equal(false);
+        })
+    })
+
+    describe('onInterrupt', function() {
+        it('calls fs.watch', function () {
+            const callback = sinon.stub()
+            this.instance.onInterrupt(callback);
+            expect(this.fsWatch.called).to.be.true;
+        })
+    })
+
+    describe('onChange', function() {
+        it('calls fs.watch', function () {
+            const callback = sinon.stub()
+            this.instance.onChange(callback);
+            expect(this.fsWatch.called).to.be.true;
         })
     })
 })
