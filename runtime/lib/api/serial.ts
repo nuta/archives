@@ -17,8 +17,8 @@ export class SerialAPI {
 
     public static list() {
         return fs.readdirSync("/dev")
-        .filter((filepath) => filepath.match(/^(ttyAMA0|ttyUSB)/))
-        .map((filepath) => `/dev/${filepath}`);
+            .filter((filepath) => filepath.match(/^(ttyAMA0|ttyUSB)/))
+            .map((filepath) => `/dev/${filepath}`);
     }
 
     public configure(baudrate: number) {
