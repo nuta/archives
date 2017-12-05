@@ -44,7 +44,7 @@ export async function deploy(appYAML, files) {
 
     // Copy start.js to the top level.
     logger.progress(`copying start.js from \`${runtime}'`);
-    const startJsRelPath = `node_modules/${runtime}/start.js`;
+    const startJsRelPath = `node_modules/@makestack/${runtime}/start.js`;
     zip.file("start.js", zip.files[startJsRelPath].async("arraybuffer"));
 
     // Copy app files.
