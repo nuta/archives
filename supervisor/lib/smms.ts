@@ -184,7 +184,6 @@ export function deserialize(payload: Buffer) {
                 const valueLength = length - (valueOffset - keyLengthOffset);
                 const key = payload.slice(keyOffset, keyOffset + keyLength);
                 const value = payload.slice(valueOffset, valueOffset + valueLength);
-                console.log("parsing:", key, value);
 
                 if (!("stores" in messages)) {
                     messages.stores = {};
