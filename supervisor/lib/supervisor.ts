@@ -142,19 +142,8 @@ export class Supervisor {
         setTimeout(() => {
             logger.info("updating os image...");
             this.device.updateOS(tmpFilePath);
-            logger.info("updateOS returned!");
-            this.adapter.send(serialize({
-                state: "ready",
-                deviceId: this.deviceId,
-                debugMode: this.debugMode,
-                osVersion: this.osVersion,
-                appVersion: "0",
-                log: "os updated",
-            }, {
-                includeDeviceId: this.includeDeviceId,
-                includeHMAC: this.includeHMAC,
-                deviceSecret: this.deviceSecret,
-            }));
+            logger.warn("updated the os, rebooting...")
+            this.reboot();
         }, 5000);
     }
 
