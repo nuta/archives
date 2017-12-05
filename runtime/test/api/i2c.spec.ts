@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('..');
+const { builtins } = require('../..');
 
 describe('I2C API', function() {
     beforeEach(function() {
@@ -17,7 +17,7 @@ describe('I2C API', function() {
             '/dev/i2c-1': mockfs.file({ content: '', atime: this.atime })
         })
 
-        this.ioctl = sinon.spy(require('../dist/native'), 'ioctl')
+        this.ioctl = sinon.stub(require('../../dist/native'), 'ioctl').returns(0)
         this.instance = new builtins.I2C({ address: this.address })
     })
 
