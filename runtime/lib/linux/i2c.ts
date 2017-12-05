@@ -13,10 +13,6 @@ export abstract class LinuxI2CAPI {
         this.fd = fs.openSync(this.path, "rs+");
     }
 
-    public reset() {
-        fs.closeSync(this.fd);
-    }
-
     public read(length) {
         this.selectSlaveAddress(this.address);
         const buffer = Buffer.alloc(length);
