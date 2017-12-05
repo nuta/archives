@@ -147,7 +147,7 @@ package-lock.json
     },
 ];
 
-export function main(args, opts) {
+export async function main(args, opts) {
     const appName = path.basename(args.dir);
     const CamelAppName = appName.replace(/\-[a-z]/g, (m) => m[1].toUpperCase());
 
@@ -179,5 +179,5 @@ export function main(args, opts) {
         });
     }
 
-    prepare(args.dir);
+    await prepare(args.dir);
 }
