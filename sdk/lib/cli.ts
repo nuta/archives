@@ -131,6 +131,7 @@ program
 
 program
 .command("prepare", "Prepare a app/plugin development.")
+.option("--app-dir <app-dir>", "The app directory.", null, process.cwd())
 .action(prepareCommand.main);
 
 program
