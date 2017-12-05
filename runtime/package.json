@@ -7,9 +7,9 @@
   "main": "dist/index.js",
   "typings": "./makestack.d.ts",
   "scripts": {
-    "cov": "istanbul cover _mocha test/*.spec.ts",
-    "test": "mocha test/*.spec.ts",
-    "test:live": "mocha -w test/*.spec.ts",
+    "cov": "istanbul cover _mocha",
+    "test": "mocha",
+    "test:live": "mocha -w",
     "prepublish": "npm run build",
     "build": "npm run transpile && ARCH=x64 npm run build-native",
     "prepack": "npm run build",
