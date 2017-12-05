@@ -7,7 +7,7 @@ export async function main(args, opts, logger) {
         throw new FatalError("Specify `server' option.");
     }
 
-    const Supervisor = require("../../../supervisor");
+    const { Supervisor } = require(path.resolve(__dirname, "../../supervisor"));
     const supervisor = new Supervisor({
         appDir: path.resolve(os.homedir(), ".makestack/app"),
         adapter: {
