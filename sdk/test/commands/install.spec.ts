@@ -97,6 +97,7 @@ export MAKESTACK_HEARTBEAT_INTERVAL=15
     })
 
     it("works", async function () {
+        /* TODO: replace node-ipc with child_process.fork
         await installCommand({}, {
             name: this.device.name,
             type: this.device.device_type,
@@ -105,5 +106,6 @@ export MAKESTACK_HEARTBEAT_INTERVAL=15
             drive: "/dev/disk2s1",
             ignoreDuplication: false
         })
+        */
     })
 })
