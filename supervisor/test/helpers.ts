@@ -6,8 +6,8 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 import * as JSZip from 'jszip';
 import * as smms from '../lib/smms';
-import { Supervisor } from '../lib';
 import { IPayloadMessages } from '../lib/types';
+const { Supervisor } = require('..');
 
 const APP_DIR = path.resolve(os.tmpdir(), 'makestack-supervisor-test-app')
 const DEVICE_ID = 'Uz3GDcfqQ0axGQ70p5x30asCzjT0bLOumk-YdeG0'
@@ -24,7 +24,7 @@ async function createZip(files: { [key: string]: string }): Promise<Buffer> {
     return zip.generateAsync({ type: 'nodebuffer' }) as Promise<Buffer>
 }
 
-function computeImageHMAC(image: Buffer): string {
+export function computeImageHMAC(image: Buffer): string {
     const shasum = crypto.createHash('sha256').update(image).digest('hex')
     return crypto.createHmac('sha256', DEVICE_SECRET).update(shasum).digest('hex')
 }
@@ -48,14 +48,20 @@ export function createHeartbeatResponse(messages: IPayloadMessages) {
     }
 
     return nock(SERVER_URL)
-    .post('/api/v1/smms', () => true)
-    .reply(200, smms.serialize(messages, serializeOptions))
+         .post('/api/v1/smms', () => true)
+         .reply(200, smms.serialize(messages, serializeOptions))
 }
 
-export function createImageResponse(version: string, image: Buffer) {
+export function createAppImageResponse(version: string, image: Buffer) {
     return nock(SERVER_URL)
-    .get(`/api/v1/images/app/${DEVICE_ID}/${version}`)
-    .reply(200, image)
+        .get(`/api/v1/images/app/${DEVICE_ID}/${version}`)
+        .reply(200, image)
+}
+
+export function createOSImageResponse(osType: string, deviceType: string, version: string, image: Buffer) {
+    return nock(SERVER_URL)
+        .get(`/api/v1/images/os/${DEVICE_ID}/${version}/${osType}/${deviceType}`)
+        .reply(200, image)
 }
 
 export function prepareAppDir() {
@@ -78,7 +84,7 @@ export function createSupervisor() {
         debugMode: true,
         testMode: true,
         osVersion: OS_VERSION,
-        heartbeatInterval: 5,
+        heartbeatInterval: 60,
         runtimeModulePath: path.resolve(__dirname, '../../runtime')
     })
 }

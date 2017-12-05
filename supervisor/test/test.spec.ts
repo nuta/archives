@@ -1,9 +1,12 @@
 import { } from 'mocha';
 import { expect } from 'chai';
+import * as nock from 'nock';
+import * as mockfs from 'mock-fs';
+import * as fs from 'fs';
 import { useFakeTimers } from 'sinon';
 import {
-    createAppImage,
-    createHeartbeatResponse, createImageResponse,
+    createAppImage, computeImageHMAC,
+    createHeartbeatResponse, createAppImageResponse, createOSImageResponse,
     prepareAppDir, createSupervisor,
 } from './helpers';
 
@@ -23,14 +26,20 @@ describe('Supervisor', function () {
             stores: {}
         })
 
-        createImageResponse(this.appVersion, appZip)
+        createAppImageResponse(this.appVersion, appZip)
         prepareAppDir()
         this.clock = useFakeTimers(Date.now())
         this.instance = createSupervisor()
+
+        mockfs({
+            '/boot/kernel7.img': ''
+        })
     })
 
     afterEach(function () {
-        this.clock.restore()
+        nock.cleanAll();
+        this.clock.restore();
+        mockfs.restore();
     })
 
     it('generates a heartbeat request', function (done) {
@@ -46,6 +55,27 @@ describe('Supervisor', function () {
                 expect(log).to.include('I am your app, Luke.')
                 done()
             })
+        })
+    })
+
+    it('downloads and updates the OS', function (done) {
+        this.instance.start().then(async () => {
+            const osVersion = 'v20.1.2'
+            const osImage = Buffer.from('This is a new os image!')
+            const osImageHMAC = computeImageHMAC(osImage)
+            this.heartbeatRequest2 = createHeartbeatResponse({ osVersion, osImageHMAC })
+            this.osImageRequest = createOSImageResponse(
+                this.instance.osType, this.instance.deviceType, osVersion, osImage)
+
+            // FIXME: This calls an internal method because setInterval in
+            // start() won't work well. Refer https://github.com/sinonjs/lolex/pull/105
+            await this.instance.doIntervalJob()
+            this.clock.next()
+
+            expect(this.heartbeatRequest2.isDone()).to.be.true
+            expect(this.osImageRequest.isDone()).to.be.true
+            expect(osImage.equals(fs.readFileSync('/boot/kernel7.img'))).to.be.true
+            done()
         })
     })
 

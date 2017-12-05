@@ -54,14 +54,14 @@ export class HTTPAdapter extends AdapterBase {
         this.serverURL = serverURL;
     }
 
-    public connect() {
+    public async connect() {
         // Nothing to do.
     }
 
     public send(payload: Buffer) {
         return request("POST", `${this.serverURL}/api/v1/smms`, payload)
-        .then(this.onReceiveCallback)
-        .catch(logger.error);
+            .then(this.onReceiveCallback)
+            .catch(logger.error);
     }
 
     public getAppImage(version: string) {

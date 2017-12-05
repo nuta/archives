@@ -11,6 +11,7 @@ import * as logger from "./logger";
 import { deserialize, serialize } from "./smms";
 import * as unzip from "./unzip";
 import { TStores, TDeviceState, IPayloadMessages } from "./types";
+import { AdapterBase } from "./adapters/adapter_base";
 
 interface ISupervisorConstructorArgs {
     adapter: {
@@ -53,7 +54,7 @@ export class Supervisor {
     private adapterName: string;
     private updateEnabled: boolean;
     private downloading: boolean;
-    private adapter: any;
+    private adapter: AdapterBase;
     private verifyHMAC: boolean;
     private includeHMAC: boolean;
     private includeDeviceId: boolean;
@@ -132,16 +133,12 @@ export class Supervisor {
     }
 
     private updateOS(image: Buffer) {
-        logger.info("saving os image...");
-        const tmpFilePath = path.join(os.tmpdir(), "kernel.img");
-        fs.writeFileSync(tmpFilePath, image);
-        this.killApp();
+        logger.warn("OS will be updated soon!");
 
         // Wait the app to exit.
-        logger.warn("OS will be updated soon!");
         setTimeout(() => {
             logger.info("updating os image...");
-            this.device.updateOS(tmpFilePath);
+            this.device.updateOS(image);
             logger.warn("updated the os, rebooting...")
             this.reboot();
         }, 5000);
@@ -301,23 +298,27 @@ export class Supervisor {
         this.launchApp(appZip);
     }
 
-    private handleUpdateOSMessage(osVersion: string, osImageHMAC: string) {
-        this.downloading = true;
+    private async handleUpdateOSMessage(osVersion: string, osImageHMAC: string) {
         logger.info(`updating os ${this.osVersion} -> ${osVersion}`);
+        this.downloading = true;
 
-        this.adapter.getOSImage(this.deviceType, this.osVersion).then((image: Buffer) => {
+        let image
+        try {
+            image = await this.adapter.getOSImage(osVersion)
+        } catch (e) {
+            logger.error("failed to download os image:", e);
             this.downloading = false;
-
-            if (this.verifyHMAC && !verifyImageHMAC(this.deviceSecret, osImageHMAC, image)) {
-                logger.warn("invalid os image HMAC, aborting update");
-                return;
-            }
-
-            this.updateOS(image);
-        }).catch((e: Error) => {
-            logger.error("failed to download app image:", e);
+            return;
+        } finally {
             this.downloading = false;
-        });
+        }
+
+        if (this.verifyHMAC && !verifyImageHMAC(this.deviceSecret, osImageHMAC, image)) {
+            logger.warn("invalid os image HMAC, aborting update");
+            return;
+        }
+
+        this.updateOS(image);
     }
 
     private handleREPLCommand(commandId: string, code: string): void {
@@ -406,7 +407,7 @@ export class Supervisor {
 
         // Update OS.
         if (this.isOSUpdateRequired(messages)) {
-            this.handleUpdateOSMessage(messages.osVersion, messages.osImageHMAC);
+            await this.handleUpdateOSMessage(messages.osVersion, messages.osImageHMAC);
         }
 
         // Update App
@@ -421,13 +422,15 @@ export class Supervisor {
         }
     }
 
+    public async doIntervalJob() {
+        await this.sendHeartbeat("running");
+    }
+
     public async start() {
         this.adapter.onReceive((payload: Buffer) => this.onSMMSReceive(payload));
         await this.adapter.connect();
         await this.sendHeartbeat("ready");
 
-        setInterval(() => {
-            this.sendHeartbeat("running");
-        }, this.heartbeatInterval * 1000);
+        setInterval(() => { this.doIntervalJob() }, this.heartbeatInterval * 1000)
     }
 }
