@@ -8,7 +8,7 @@ import { SubProcessAPI } from "./api/subprocess";
 import { TimerAPI } from "./api/timer";
 import { logger } from "./logger";
 
-const builtins = {
+export const builtins = {
     Timer: new TimerAPI(),
     Store: new StoreAPI(),
     App: new AppAPI(),
@@ -25,7 +25,7 @@ if (process.env.MAKESTACK_DEVICE_TYPE) {
     Object.assign(builtins, device.initialize());
 }
 
-function start(appDir) {
+export function start(appDir) {
     process.on("unhandledRejection", (reason, p) => {
         console.log("runtime: unhandled rejection:\n", reason, "\n\n", p);
         console.log("runtime: exiting...");
@@ -59,8 +59,3 @@ function start(appDir) {
 
     logger.info("waiting for `initialize' message from Supervisor...");
 }
-
-module.exports = {
-    builtins,
-    start,
-};
