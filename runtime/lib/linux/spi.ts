@@ -25,11 +25,11 @@ export abstract class LinuxSPIAPI {
             throw new Error("Specify `path' or `slave'.");
         }
 
-        if (this.slave) {
+        if (slave !== undefined) {
             path = `/dev/spidev${this.bus}.${slave}`;
         }
 
-        if (this.ss) {
+        if (ss !== undefined) {
             this.ss = new GPIO({ pin: ss, mode: GPIO.OUTPUT });
             this.deselectSlave();
         } else {
