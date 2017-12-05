@@ -15,7 +15,7 @@ describe('SPI API', function() {
         this.deviceFile = '/dev/spidev0.1'
 
         mockfs({
-            '/dev/spidev0.1': mockfs.file({ atime: this.atime })
+            '/dev/spidev0.1': mockfs.file({ content: '', atime: this.atime })
         })
 
         this.spiConfigure = sinon.spy(require('../dist/native'), 'spiConfigure')

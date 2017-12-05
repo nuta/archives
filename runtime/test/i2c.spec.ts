@@ -14,7 +14,7 @@ describe('I2C API', function() {
         this.deviceFile = '/dev/i2c-1'
 
         mockfs({
-            '/dev/i2c-1': mockfs.file({ atime: this.atime })
+            '/dev/i2c-1': mockfs.file({ content: '', atime: this.atime })
         })
 
         this.ioctl = sinon.spy(require('../dist/native'), 'ioctl')
