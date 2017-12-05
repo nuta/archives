@@ -27,7 +27,7 @@ async function downloadAndExtractPlugin(plugin: string, dir: string) {
 }
 
 export async function prepare(dir) {
-    const makestackTypeFile = path.resolve(__dirname, "../../runtime/makestack.d.ts");
+    const makestackTypeFile = path.resolve(__dirname, "../runtime/makestack.d.ts");
 
     let yamlPath;
     if (fs.existsSync(path.join(dir, "app.yaml"))) {

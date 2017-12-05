@@ -7,7 +7,7 @@ import * as mockfs from 'mock-fs';
 
 const CONFIG_DIR = '/user/.makestack'
 process.env.CONFIG_DIR = CONFIG_DIR
-const makestack = require('..')
+const makestack = require('../..')
 
 const server = 'http://test-server'
 const username = 'test-user'
@@ -18,14 +18,14 @@ const accessToken = 'qwerty'
 const accessTokenSecret = 'asdfg'
 
 nock(server)
-.post('/api/v1/auth/sign_in', { username, password })
-.reply(200, {
-    data: { username, email }
-}, {
-    uid,
-    'access-token': accessToken,
-    'access-token-secret': accessTokenSecret
-})
+    .post('/api/v1/auth/sign_in', { username, password })
+    .reply(200, {
+        data: { username, email }
+    }, {
+        uid,
+        'access-token': accessToken,
+        'access-token-secret': accessTokenSecret
+    })
 
 function loadJSON(filepath) {
     return JSON.parse(fs.readFileSync(filepath, { encoding: 'utf-8' }))
