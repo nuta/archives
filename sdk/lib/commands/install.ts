@@ -1,6 +1,6 @@
 const path = require("path");
 const chalk = require("chalk");
-const install = require("../install");
+const { install } = require("../install");
 
 function progress(stage, state) {
     switch (stage) {
@@ -35,6 +35,9 @@ export async function main(args, opts, logger) {
         drive: opts.drive,
         ignoreDuplication: opts.ignoreDuplication,
         flashCommand: [process.argv0, path.resolve(__dirname, "../../bin/makestack")],
+        wifiSSID: opts.wifiSsid,
+        wifiPassword: opts.wifiPassword,
+        wifiCountry: opts.wifiCountry
     }, progress);
 
     console.info(chalk.bold.green("Done!"));
