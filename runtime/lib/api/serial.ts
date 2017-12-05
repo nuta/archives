@@ -8,11 +8,11 @@ export class SerialAPI {
     public fd: number;
     public baudrate: number;
 
-    constructor({ path, baudrate }) {
-        this.path = path;
+    constructor(args: { path: string, baudrate: number }) {
+        this.path = args.path;
         this.watching = false;
-        this.fd = fs.openSync(path, O_RDWR | O_NOCTTY | O_SYNC);
-        this.configure(baudrate);
+        this.fd = fs.openSync(args.path, O_RDWR | O_NOCTTY | O_SYNC);
+        this.configure(args.baudrate);
     }
 
     public static list() {
@@ -21,7 +21,7 @@ export class SerialAPI {
         .map((filepath) => `/dev/${filepath}`);
     }
 
-    public configure(baudrate) {
+    public configure(baudrate: number) {
         if (!baudrate) {
             throw new Error("`baudrate' is not speicified");
         }
@@ -30,7 +30,7 @@ export class SerialAPI {
         serial.configure(this.fd, baudrate, 0, 0);
     }
 
-    public write(data) {
+    public write(data: Buffer) {
         fs.writeSync(this.fd, data);
     }
 
@@ -38,7 +38,7 @@ export class SerialAPI {
         return fs.readFileSync(this.fd);
     }
 
-    public onData(callback) {
+    public onData(callback: (chunk: Buffer) => void) {
         if (this.watching) {
             throw Error("The serial port is already being watched.");
         }
@@ -54,7 +54,7 @@ export class SerialAPI {
         }, 100);
     }
 
-    public onNewLine(callback) {
+    public onNewLine(callback: (line: string) => void) {
         if (this.watching) {
             throw Error("The serial port is already being watched.");
         }

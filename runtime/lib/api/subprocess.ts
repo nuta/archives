@@ -1,7 +1,7 @@
 import { spawnSync } from "child_process";
 
 export class SubProcessAPI {
-    public run(argv) {
+    public run(argv: string[]) {
         if (!Array.isArray(argv)) {
             throw new Error(`argv must be an array`);
         }

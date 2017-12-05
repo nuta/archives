@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "allowJs": true,
     "target": "es2017",
     "module": "commonjs",
     "sourceMap": true,
-    "types": ["node"]
+    "strict": true,
+    "alwaysStrict": true,
+    "pretty": true
   },
   "include": [
     "./lib/**/*",

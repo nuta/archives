@@ -1,8 +1,11 @@
+import { sendToSupervisor } from '../helpers';
+
+type Stores = { [key: string]: string }
 type onChangeCallback = (value: string) => void;
 type onCommandCallback = (value: string) => void;
 
 export class StoreAPI {
-    public stores: { [key: string]: string };
+    public stores: Stores;
     public onChangeCallbacks: { [key: string]: onChangeCallback[] };
     public onCommandCallbacks: { [key: string]: onCommandCallback };
 
@@ -12,11 +15,11 @@ export class StoreAPI {
         this.onCommandCallbacks = {};
     }
 
-    public onCommand(key, callback) {
+    public onCommand(key: string, callback: (value: string) => void) {
         this.onCommandCallbacks[key] = callback;
     }
 
-    public onChange(key, callback) {
+    public onChange(key: string, callback: (value: string) => void) {
         if (this.stores[key] !== undefined) {
             callback(this.stores[key]);
         }
@@ -28,14 +31,14 @@ export class StoreAPI {
         }
     }
 
-    public async update(newStores) {
+    public async update(newStores: Stores) {
         for (const key in newStores) {
             if (key.startsWith(">")) {
                 // Command
                 const [commandId, commandKey] = key.substring(1).split(" ");
                 if (this.onCommandCallbacks[commandKey]) {
                     const returnValue = await this.onCommandCallbacks[commandKey](newStores[key]);
-                    process.send({ type: "log", body: `<${commandId} ${returnValue}` });
+                    sendToSupervisor("log", { body: `<${commandId} ${returnValue}` });
                 }
             } else {
                 // Store

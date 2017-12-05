@@ -3,13 +3,13 @@ const fs = require("fs");
 export class LinuxGPIOAPI {
     public pin: number;
 
-    constructor({ pin, mode }) {
-        if (typeof pin !== "number") {
+    constructor(args: { pin: number, mode: GPIOPinMode }) {
+        if (typeof args.pin !== "number") {
             throw new Error("`this.pin' must be a number");
         }
 
-        this.pin = pin;
-        this.setMode(mode);
+        this.pin = args.pin;
+        this.setMode(args.mode);
     }
 
     static get OUTPUT() {
@@ -20,7 +20,7 @@ export class LinuxGPIOAPI {
         return "in";
     }
 
-    public setMode(mode) {
+    public setMode(mode: GPIOPinMode) {
         if (mode !== LinuxGPIOAPI.INPUT && mode !== LinuxGPIOAPI.OUTPUT) {
             throw new Error(`invalid pin mode \`${mode}'`);
         }
@@ -34,7 +34,7 @@ export class LinuxGPIOAPI {
         (mode === LinuxGPIOAPI.INPUT) ? "in" : "out");
     }
 
-    public write(value) {
+    public write(value: boolean) {
         fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/value`, value ? "1" : "0");
     }
 
@@ -42,7 +42,7 @@ export class LinuxGPIOAPI {
         return fs.readFileSync(`/sys/class/gpio/gpio${this.pin}/value`, "utf-8") === "1\n";
     }
 
-    public onInterrupt(mode, callback) {
+    public onInterrupt(mode: GPIOInterruptMode, callback: () => void) {
         if (typeof mode === "function") {
             callback = mode;
             mode = "rising";
@@ -55,7 +55,7 @@ export class LinuxGPIOAPI {
         });
     }
 
-    public onChange(callback) {
+    public onChange(callback: () => void) {
         this.setMode(GPIO.INPUT);
         fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/edge`, "both");
         fs.watch(`/sys/class/gpio/gpio${this.pin}/value`, () => {

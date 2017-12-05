@@ -29,19 +29,19 @@ function log(level: "DEBUG" |  "INFO" | "ERROR" | "WARN", ...messages: string[])
     }
 }
 
-function debug(...messages) {
+function debug(...messages: any[]) {
     log("DEBUG", ...messages);
 }
 
-function info(...messages) {
+function info(...messages: any[]) {
     log("INFO", ...messages);
 }
 
-function error(...messages) {
+function error(...messages: any[]) {
     log("ERROR", ...messages);
 }
 
-function warn(...messages) {
+function warn(...messages: any[]) {
     log("WARN", ...messages);
 }
 

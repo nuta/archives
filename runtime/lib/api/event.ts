@@ -1,3 +1,5 @@
-export function publish(event, data) {
-    process.send({ type: "log", body: `@${event} ${data}` });
+import { sendToSupervisor } from '../helpers';
+
+export function publish(event: string, data?: string | number) {
+    sendToSupervisor("log", { body: `@${event} ${data}` });
 }

@@ -1,13 +1,15 @@
+import { sendToSupervisor } from '../helpers';
+
 export class AppAPI {
     public enableUpdate() {
-        process.send({ type: "setUpdateLock", body: 'unlock' });
+        sendToSupervisor("setUpdateLock", { body: 'unlock' });
     }
 
     public disableUpdate() {
-        process.send({ type: "setUpdateLock", body: 'lock' });
+        sendToSupervisor("setUpdateLock", { body: 'lock' });
     }
 
-    public onExit(callback) {
+    public onExit(callback: () => void) {
         process.on("SIGTERM", () => {
             callback();
         });

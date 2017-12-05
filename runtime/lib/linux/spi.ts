@@ -3,7 +3,7 @@ import { spiConfigure, spiTransfer } from "../native";
 
 const SPI_CPHA = 0x01;
 const SPI_CPOL = 0x02;
-const SPI_MODES = {
+const SPI_MODES: { [key: string]: number } = {
     MODE0: 0x00,
     MODE1: SPI_CPHA,
     MODE2: SPI_CPOL,
@@ -13,24 +13,22 @@ const SPI_MODES = {
 export abstract class LinuxSPIAPI {
     public abstract bus: string;
     public slave: number;
-    public ss: GPIO;
+    public ss?: GPIO;
     public fd: number;
     public mode: SPIMode;
     public bits: number;
     public speed: number;
     public order: SPIOrder;
 
-    constructor({ path, ss, slave, speed, order, mode, bits }) {
-        if (!path && !slave) {
+    constructor(args: { slave: number, speed: number, mode: SPIMode, order: SPIOrder, bits: number, ss: number, path: string }) {
+        if (!args.path && !args.slave) {
             throw new Error("Specify `path' or `slave'.");
         }
 
-        if (slave !== undefined) {
-            path = `/dev/spidev${this.bus}.${slave}`;
-        }
+        const path = (args.slave === undefined) ? args.path : `/dev/spidev${this.bus}.${args.slave}`;
 
-        if (ss !== undefined) {
-            this.ss = new GPIO({ pin: ss, mode: GPIO.OUTPUT });
+        if (args.ss !== undefined) {
+            this.ss = new GPIO({ pin: args.ss, mode: GPIO.OUTPUT });
             this.deselectSlave();
         } else {
             // Chip Select (or Slave Select) is controlled by the kernel
@@ -38,10 +36,10 @@ export abstract class LinuxSPIAPI {
         }
 
         this.fd = fs.openSync(path, "rs+");
-        this.configure(mode, bits, speed, order);
+        this.configure(args.mode, args.bits, args.speed, args.order);
     }
 
-    public configure(mode, bits, speed, order) {
+    public configure(mode: SPIMode, bits: number, speed: number, order: SPIOrder) {
         this.mode = mode || "MODE0";
         this.bits = bits || 8;
         this.speed = speed || 500000;
@@ -73,7 +71,7 @@ export abstract class LinuxSPIAPI {
         }
     }
 
-    public transfer(tx) {
+    public transfer(tx: Buffer) {
         const rx = Buffer.alloc(tx.length);
         this.selectSlave();
         try {

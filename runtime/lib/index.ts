@@ -25,7 +25,7 @@ if (process.env.MAKESTACK_DEVICE_TYPE) {
     Object.assign(builtins, device.initialize());
 }
 
-export function start(appDir) {
+export function start(appDir: string) {
     process.on("unhandledRejection", (reason, p) => {
         console.log("runtime: unhandled rejection:\n", reason, "\n\n", p);
         console.log("runtime: exiting...");
