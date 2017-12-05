@@ -64,7 +64,7 @@ async function downloadDiskImage(osType, deviceType) {
     return [version, orignalImage];
 }
 
-function writeConfigToDiskIamge({ osVersion, deviceType, orignalImage, device, adapter, wifiSSID, wifiPassword, wifiCountry }) {
+function writeConfigToDiskIamge({ osVersion, deviceType, orignalImage, device, adapter, wifiSSID = '', wifiPassword = '', wifiCountry = '' }) {
   const imagePath = generateTempPath();
 
   const wifiPsk = crypto.pbkdf2Sync(wifiPassword, wifiSSID, 4096, 256, "sha1").toString('hex').substring(0, 64);
@@ -119,9 +119,14 @@ function flash(flashCommand, drive, driveSize, imagePath, progress) {
         const command = prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath);
         const options = { name: "MakeStack Installer" };
         sudo.exec(command, options, (error, stdout, stderr) => {
-            if (error) { reject(error); }
+            if (error) {
+                reject(error);
+            }
 
-            ipc.server.stop();
+            if (ipc.server && ipc.server.close /*  ipc.server.close is not defined in test env. */) {
+                ipc.server.stop();
+            }
+
             resolve();
         });
     });
