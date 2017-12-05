@@ -3,5 +3,5 @@ export function println(message) {
 }
 
 export function error(message) {
-    this.print(`!${message}`);
+    println(`!${message}`);
 }
