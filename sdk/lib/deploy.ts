@@ -3,8 +3,11 @@ import * as JSZip from "jszip";
 import * as path from "path";
 import { api } from "./api";
 import { loadAppYAML } from "./appdir";
-import { find } from "./helpers";
+import {
+    find, generateTempPath, run, readTextFile, createFile, removeFiles
+} from "./helpers";
 import { logger } from "./logger";
+import { spawnSync } from "child_process";
 
 async function mergeZipFiles(basepath: string, destZip: JSZip, srcZip: JSZip) {
     for (const filepath in srcZip.files) {
@@ -29,6 +32,7 @@ export async function deploy(appYAML: any, files: any[]) {
     const runtime = "runtime";
     const plugins = appYAML.plugins || [];
     let zip = new JSZip();
+    let tempDir;
 
     // Download the runtime.
     zip = await downloadAndExtractPackage(runtime, zip, `node_modules/@makestack/${runtime}`);
@@ -48,9 +52,9 @@ export async function deploy(appYAML: any, files: any[]) {
     zip.file("start.js", zip.files[startJsRelPath].async("arraybuffer"));
 
     // Copy app files.
-    logger.progress(`copying files from \`${appName}'`);
+    logger.progress(`copying files from \`${appName}' (${files.length} files including npm packages)`);
     for (const file of files) {
-        logger.debug(`adding \`${file}'`);
+        logger.debug(`adding \`${file.path}' (${file.body.length} bytes)`);
         zip.file(file.path, file.body);
     }
 
@@ -63,21 +67,44 @@ export async function deploy(appYAML: any, files: any[]) {
         },
     }) as Buffer;
 
-    logger.progress("deploying");
+    logger.progress(`deploying (${(appImage.length / 1024).toFixed(0)} KB)`);
     const deployment = await api.deploy(appName, appImage);
     logger.success(`Successfully deployed version #${deployment.version}!`);
 }
 
 export async function deployAppDir(appDir: string) {
+    const EXCLUDED_FILES_PATTERN = /(node_modules|yarn\.lock|app\.yaml|jsconfig.json|yarn-error.log|README\.md)/
     const appYAML = loadAppYAML(appDir);
     const files = [];
 
     for (const filepath of find(appDir)) {
-        files.push({
-            filepath,
-            body: fs.readFileSync(path.join(appDir, filepath)),
-        });
+        if (!filepath.match(EXCLUDED_FILES_PATTERN)) {
+            files.push({
+                path: filepath,
+                body: readTextFile(filepath),
+            });
+        }
+    }
+
+    // Download npm dependencies.
+    let tempDir;
+    if (path.join(appDir, "package.json") && path.join(appDir, "yarn.lock")) {
+        tempDir = generateTempPath()
+        fs.mkdirSync(tempDir)
+        fs.copyFileSync(path.join(appDir, "package.json"), path.join(tempDir, "package.json"))
+        fs.copyFileSync(path.join(appDir, "yarn.lock"), path.join(tempDir, "yarn.lock"))
+
+        logger.progress("downloading npm dependencies...")
+        run(["yarn", "install", "--production"], { cwd: tempDir })
+
+        for (const filepath of find(path.join())) {
+            files.push({ path: filepath, body: fs.readFileSync(filepath) });
+        }
     }
 
     await deploy(appYAML, files);
+
+    if (tempDir) {
+        removeFiles(tempDir);
+    }
 }

@@ -2,6 +2,34 @@ import * as crypto from "crypto";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
+import { spawnSync, SpawnSyncOptions } from "child_process";
+import { FatalError } from "./types";
+
+export function removeFiles(filepath: string): void {
+    if (!fs.existsSync(filepath)) {
+        return;
+    }
+
+    const remaining = [filepath];
+    while (true) {
+        const target = remaining.pop();
+        if (!target) {
+            break
+        }
+
+        if (fs.statSync(target).isDirectory) {
+            const innerFiles = fs.readdirSync(target).map((name) => path.join(target, name));
+            if (innerFiles.length === 0) {
+                fs.rmdirSync(target);
+            } else {
+                remaining.concat(innerFiles);
+            }
+        } else {
+            // A normal file.
+            fs.unlinkSync(target);
+        }
+    }
+}
 
 export function mkdirp(dir: string) {
     const dirs = path.resolve(dir).split("/");
@@ -42,7 +70,7 @@ export function find(basedir: string) {
             if (fs.statSync(filepath).isDirectory()) {
                 dirs.push(filepath);
             } else {
-                files.push(path.relative(basedir, filepath));
+                files.push(path.join(basedir, path.relative(basedir, filepath)));
             }
         }
     }
@@ -66,4 +94,21 @@ export function getenv(name: string): string {
     }
 
     return value;
+}
+
+export function run(argv: string[], options: SpawnSyncOptions = {}) {
+    const exe = argv[0]
+    const args = argv.slice(1)
+    const { status } = spawnSync(exe, args, Object.assign({}, options, {
+        stdio: "inherit",
+        env: process.env,
+    }));
+
+    if (status !== 0) {
+        throw new FatalError(`docker build exited with ${status}`)
+    }
+}
+
+export function readTextFile(path: string) {
+    return fs.readFileSync(path, { encoding: 'utf-8' });
 }
