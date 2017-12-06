@@ -34,5 +34,8 @@ if [ -f .makestackignore ]; then
   rm -rf $(cat .makestackignore)
 fi
 
-rm /dist/plugin.zip
+if [ -f /dist/plugin.zip ]; then
+  rm /dist/plugin.zip
+fi
+
 zip -FSr /dist/plugin.zip *
