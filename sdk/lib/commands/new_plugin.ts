@@ -147,9 +147,14 @@ package-lock.json
     },
 ];
 
+function toCamelCase(str: string) {
+    str = str.replace(/(\-[a-z])/g, (m) => m[1].toUpperCase());
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export async function main(args: any, opts: any) {
     const appName = path.basename(args.dir);
-    const CamelAppName = appName.replace(/\-[a-z]/g, (m) => m[1].toUpperCase());
+    const CamelAppName = toCamelCase(appName);
 
     let templates = DEFAULT_TEMPLATES;
     switch (opts.lang) {
