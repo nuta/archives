@@ -55,8 +55,8 @@ export function createFile(filepath: string, body: Buffer | string) {
     fs.writeFileSync(filepath, body);
 }
 
-export function generateTempPath(): string {
-    return path.join(os.tmpdir(), generateRandomString(32) + ".img");
+export function generateTempPath(prefix = '', suffix = ''): string {
+    return path.join(os.tmpdir(), 'makestack-' + prefix + generateRandomString(32) + suffix);
 }
 
 export function getenv(name: string): string {

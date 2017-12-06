@@ -91,7 +91,7 @@ function writeConfigToDiskIamge(args: {
         wifiCountry = ''
     } = args
 
-    const imagePath = generateTempPath();
+    const imagePath = generateTempPath('installer', '.img');
     const wifiPsk = crypto.pbkdf2Sync(wifiPassword, wifiSSID, 4096, 256, "sha1").toString('hex').substring(0, 64);
 
     // TODO: What if the image is large?
