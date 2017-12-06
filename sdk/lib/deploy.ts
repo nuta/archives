@@ -88,7 +88,8 @@ export async function deployAppDir(appDir: string) {
 
     // Download npm dependencies.
     let tempDir;
-    if (path.join(appDir, "package.json") && path.join(appDir, "yarn.lock")) {
+    if (fs.existsSync(path.join(appDir, "package.json")) &&
+        fs.existsSync((path.join(appDir, "yarn.lock")))) {
         tempDir = generateTempPath()
         fs.mkdirSync(tempDir)
         fs.copyFileSync(path.join(appDir, "package.json"), path.join(tempDir, "package.json"))
