@@ -30,16 +30,11 @@ describe('Supervisor', function () {
         prepareAppDir()
         this.clock = useFakeTimers(Date.now())
         this.instance = createSupervisor()
-
-        mockfs({
-            '/boot/kernel7.img': ''
-        })
     })
 
     afterEach(function () {
         nock.cleanAll();
         this.clock.restore();
-        mockfs.restore();
     })
 
     it('generates a heartbeat request', function (done) {
@@ -59,6 +54,10 @@ describe('Supervisor', function () {
     })
 
     it('downloads and updates the OS', function (done) {
+        mockfs({
+            '/boot/kernel7.img': ''
+        })
+
         this.instance.start().then(async () => {
             const osVersion = 'v20.1.2'
             const osImage = Buffer.from('This is a new os image!')
@@ -75,6 +74,7 @@ describe('Supervisor', function () {
             expect(this.heartbeatRequest2.isDone()).to.be.true
             expect(this.osImageRequest.isDone()).to.be.true
             expect(osImage.equals(fs.readFileSync('/boot/kernel7.img'))).to.be.true
+            mockfs.restore();
             done()
         })
     })
