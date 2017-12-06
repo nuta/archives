@@ -9,7 +9,6 @@
     "pretty": true
   },
   "include": [
-    "./lib/**/*",
-    "./makestack.d.ts"
+    "./lib/**/*"
   ]
 }
