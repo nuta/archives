@@ -51,5 +51,5 @@ export async function createZip(files: { [path: string]: string }): Promise<Buff
         zip.file(filepath, files[filepath])
     }
 
-    return zip.generateAsync({ type: 'nodebuffer' })
+    return zip.generateAsync({ type: 'nodebuffer' }) as Promise<Buffer>
 }

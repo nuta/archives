@@ -1,7 +1,7 @@
 import * as inquirer from "inquirer";
 import { login } from "../login";
 
-export async function main(args, opts, logger) {
+export async function main(args: any, opts: any, logger: any) {
     const answers = await inquirer.prompt([
         { message: "Server URL", name: "url", type: "input" },
         { message: "Username", name: "username", type: "input" },

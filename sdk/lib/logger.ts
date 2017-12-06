@@ -1,5 +1,5 @@
-import * as chalk from "chalk";
-import { addColors, createLogger, format, transports } from "winston";
+const chalk = require("chalk");
+const { addColors, createLogger, format, transports } = require("winston");
 
 const levels = {
     error: 1,
@@ -29,7 +29,7 @@ export const logger = createLogger({
         new transports.Console(),
     ],
     format: format.combine(
-        format.printf((info) => {
+        format.printf((info: any) => {
             return `${chalk.blue.bold(info.level.padStart(10) + ":")} ${info.message}`;
         }),
     ),

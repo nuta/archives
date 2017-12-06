@@ -6,7 +6,7 @@ import { loadAppYAML } from "./appdir";
 import { find } from "./helpers";
 import { logger } from "./logger";
 
-async function mergeZipFiles(basepath, destZip, srcZip) {
+async function mergeZipFiles(basepath: string, destZip: JSZip, srcZip: JSZip) {
     for (const filepath in srcZip.files) {
         const file = srcZip.files[filepath].async("arraybuffer");
         destZip.file(path.join(basepath, filepath), file);
@@ -15,7 +15,7 @@ async function mergeZipFiles(basepath, destZip, srcZip) {
     return destZip;
 }
 
-async function downloadAndExtractPackage(name, zip, basepath) {
+async function downloadAndExtractPackage(name: string, zip: JSZip, basepath: string) {
     logger.progress(`downloading \`${name}'`);
     const pluginZip = await api.downloadPlugin(name);
 
@@ -24,7 +24,7 @@ async function downloadAndExtractPackage(name, zip, basepath) {
     return zip;
 }
 
-export async function deploy(appYAML, files) {
+export async function deploy(appYAML: any, files: any[]) {
     const appName = appYAML.name;
     const runtime = "runtime";
     const plugins = appYAML.plugins || [];
@@ -55,20 +55,20 @@ export async function deploy(appYAML, files) {
     }
 
     logger.progress("generating zip file");
-    const appImage = Buffer.from(await zip.generateAsync({
-        type: "arraybuffer",
+    const appImage = await zip.generateAsync({
+        type: "nodebuffer",
         compression: "DEFLATE",
         compressionOptions: {
             level: 9,
         },
-    }));
+    }) as Buffer;
 
     logger.progress("deploying");
     const deployment = await api.deploy(appName, appImage);
     logger.success(`Successfully deployed version #${deployment.version}!`);
 }
 
-export async function deployAppDir(appDir) {
+export async function deployAppDir(appDir: string) {
     const appYAML = loadAppYAML(appDir);
     const files = [];
 

@@ -3,16 +3,16 @@ import * as path from "path";
 import { api } from "../api";
 import { loadMocks, updateMocks } from "../config";
 
-export function create(args, opts, logger) {
+export function create(args: any, opts: any, logger: any) {
     const deviceName = args.name;
-    api.registerDevice(deviceName, "sdk", null).then((device) => {
+    api.registerDevice(deviceName, "sdk").then((device) => {
         updateMocks({ [deviceName]: device });
     }).catch((e) => {
         logger.error("failed to create a mock device", e);
     });
 }
 
-export function run(args, opts, logger) {
+export function run(args: any, opts: any, logger: any) {
     const mock = loadMocks()[args.name];
 
     const Supervisor = require("../../supervisor");

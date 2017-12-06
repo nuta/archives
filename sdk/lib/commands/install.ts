@@ -2,7 +2,7 @@ const path = require("path");
 const chalk = require("chalk");
 const { install } = require("../install");
 
-function progress(stage, state) {
+function progress(stage: string, state: { type: string, percentage: number }) {
     switch (stage) {
         case "look-for-drive":
         console.info(chalk.bold.blue("==> (1/5) Looking for the drive"));
@@ -20,13 +20,15 @@ function progress(stage, state) {
         console.info(chalk.bold.blue("==> (5/5) Flashing"));
         break;
         case "flashing":
-        const message = { write: "Writing", check: "Verifying" }[state.type];
+        const messages: { [name: string]: string } = { write: "Writing", check: "Verifying" };
+        const message = messages[state.type];
+        [state.type];
         console.info(`${message}...(${state.percentage}%)`);
         break;
     }
 }
 
-export async function main(args, opts, logger) {
+export async function main(args: any, opts: any, logger: any) {
     await install({
         deviceName: opts.name,
         deviceType: opts.type,

@@ -26,7 +26,7 @@ async function downloadAndExtractPlugin(plugin: string, dir: string) {
     }
 }
 
-export async function prepare(dir) {
+export async function prepare(dir: string) {
     const makestackTypeFile = path.resolve(__dirname, "../runtime/makestack.d.ts");
 
     let yamlPath;
@@ -43,7 +43,7 @@ export async function prepare(dir) {
         installDevDependencies(dir);
     }
 
-    const { plugins } = yaml.safeLoad(fs.readFileSync(yamlPath));
+    const { plugins } = yaml.safeLoad(fs.readFileSync(yamlPath, { encoding: 'utf-8' }));
     for (const plugin of plugins || []) {
         if (fs.existsSync(path.join(dir, "node_modules/@makestack", plugin))) {
             logger.progress(`Download @makestack/${plugin} (alredy exists)`);

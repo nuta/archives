@@ -1,10 +1,10 @@
 import { spawnSync } from "child_process";
 import * as fs from "fs";
-import * as nunjuck from "nunjucks";
 import * as path from "path";
 import { createFile } from "../helpers";
 import { logger } from "../logger";
 import { prepare } from "../prepare";
+const nunjuck = require("nunjucks");
 
 const DEFAULT_TEMPLATES = [
     {
@@ -147,7 +147,7 @@ package-lock.json
     },
 ];
 
-export async function main(args, opts) {
+export async function main(args: any, opts: any) {
     const appName = path.basename(args.dir);
     const CamelAppName = appName.replace(/\-[a-z]/g, (m) => m[1].toUpperCase());
 

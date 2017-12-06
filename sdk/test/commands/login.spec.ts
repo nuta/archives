@@ -1,3 +1,4 @@
+import {} from 'mocha';
 import { expect } from 'chai';
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';
@@ -9,7 +10,7 @@ const CONFIG_DIR = '/user/.makestack'
 process.env.CONFIG_DIR = CONFIG_DIR
 const makestack = require('../..')
 
-function loadJSON(filepath) {
+function loadJSON(filepath: string) {
     return JSON.parse(fs.readFileSync(filepath, { encoding: 'utf-8' }))
 }
 

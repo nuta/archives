@@ -1,4 +1,3 @@
-import * as program from "caporal";
 import * as addDeviceCommand from "./commands/add_device";
 import * as appCommand from "./commands/app";
 import * as buildPluginCommand from "./commands/build_plugin";
@@ -15,6 +14,7 @@ import * as prepareCommand from "./commands/prepare";
 import * as redCommand from "./commands/red";
 import * as replCommand from "./commands/repl";
 import * as runCommand from "./commands/run";
+const program = require("caporal");
 
 program
 .command("login", "Get an access credential for an MakeStack Server account.")
@@ -91,7 +91,7 @@ program
 .command("list-drives", "List available drives to install MakeStack OS/Linux.")
 .action(listDrivesCommand.main);
 
-function wifiCountryNameValidator(code) {
+function wifiCountryNameValidator(code: string) {
     return code in [
         "AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD",
         "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BA", "BW", "BV", "BR", "IO", "BN", "BG", "BF", "BI", "KH", "CM", "CA",
@@ -153,7 +153,7 @@ program
 .option("--dev", "Restart Node-RED automatically for Node-RED node development.", false)
 .action(redCommand.main);
 
-export async function run(argv): Promise<{}> {
+export async function run(argv: string[]): Promise<{}> {
     return new Promise((resolve, reject) => {
         program.fatalError = reject;
         program.parse(argv).then(resolve);

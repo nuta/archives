@@ -1,10 +1,10 @@
 import { spawnSync } from "child_process";
 import * as fs from "fs";
-import * as nunjuck from "nunjucks";
 import * as path from "path";
 import { createFile } from "../helpers";
 import { logger } from "../logger";
 import { prepare } from "../prepare";
+const nunjuck = require("nunjucks");
 
 const DEFAULT_TEMPLATES = [
     {
@@ -43,7 +43,7 @@ Timer.interval(3, () => {
     },
 ];
 
-export async function main(args, opts) {
+export async function main(args: any, opts: any) {
     const appDir = args.dir
     const appName = path.basename(appDir);
     const plugins = opts.plugins.split(",");

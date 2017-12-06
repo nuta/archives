@@ -1,3 +1,4 @@
+import {} from 'mocha';
 import { expect } from "chai";
 import * as child_process from "child_process";
 import * as fs from "fs";

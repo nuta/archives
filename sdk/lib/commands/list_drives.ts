@@ -1,7 +1,7 @@
-import * as chalk from "chalk";
 import { getAvailableDrives } from "../drive";
+const chalk = require("chalk");
 
-export async function main(args, opts, logger) {
+export async function main(args: any, opts: any, logger: any) {
     const drives = await getAvailableDrives();
     let i = 0;
     for (const drive of Object.values(drives)) {

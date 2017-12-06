@@ -1,5 +1,4 @@
 import * as bodyParser from "body-parser";
-import * as chalk from "chalk";
 import { fork, spawnSync } from "child_process";
 import * as crypto from "crypto";
 import * as express from "express";
@@ -8,11 +7,12 @@ import * as proxy from "http-proxy-middleware";
 import * as JSZip from "jszip";
 import * as os from "os";
 import * as path from "path";
-import * as supervisor from "supervisor";
 import { api } from "../api";
 import { loadAppYAML } from "../appdir";
 import { deploy } from "../deploy";
 import { createFile, mkdirp } from "../helpers";
+const chalk = require("chalk");
+const supervisor = require("supervisor");
 
 const NODE_RED_OFFICIAL_NODES_DIR = path.resolve(__dirname, "../../red");
 const NODE_RED_DIR = path.resolve(os.homedir(), ".makestack/node-red/node-red");
@@ -51,7 +51,7 @@ module.exports = {
 }
 `;
 
-function generateNodeScript(filepath) {
+function generateNodeScript(filepath: string) {
     const id = path.parse(filepath).name;
     const camelcase = id.replace(/-([a-z])/, (m, s) => s.toUpperCase());
     return `
@@ -96,13 +96,13 @@ function spawnNodeRED() {
     return nodeRedProcess;
 }
 
-function loadFlows(nodeRedJSON) {
+function loadFlows(nodeRedJSON: string) {
     const app = JSON.parse(fs.readFileSync(nodeRedJSON, { encoding: "utf-8" }) || "{}");
     return { flows: app.flows };
 }
 
 function loadTranspilers() {
-    const transpilers = [];
+    const transpilers: {[name: string]: any } = [];
 
     // Official nodes.
     for (const filename of fs.readdirSync(NODE_RED_OFFICIAL_NODES_DIR)) {
@@ -119,12 +119,12 @@ function loadTranspilers() {
     return transpilers;
 }
 
-function generateNodeId(id) {
+function generateNodeId(id: string) {
     const hash = crypto.createHash("sha1").update(id).digest("hex").substring(0, 16);
     return `__${hash}__`;
 }
 
-function transpile(flows) {
+function transpile(flows: any[]) {
     const transpilers = loadTranspilers();
     const loadedModules = ["events"];
     const loadedPlugins = [];
@@ -154,7 +154,7 @@ function transpile(flows) {
             const nodeId = generateNodeId(flow.id);
             flow.nodeId = nodeId;
             const { type: nodeType, init, oninput, modules, plugins } = transpilers[flow.type](flow);
-            const outputs = JSON.stringify(flow.wires.map((wire) => wire.map(generateNodeId)));
+            const outputs = JSON.stringify(flow.wires.map((wire: any) => wire.map(generateNodeId)));
 
             let nodeCode = "";
             for (const moduleName of modules || []) {
@@ -201,9 +201,9 @@ function transpile(flows) {
     return code;
 }
 
-async function deployFlows(appDir, nodeRedJSON, body) {
+async function deployFlows(appDir: string, nodeRedJSON: any, body: any) {
     const nodeREDJSON = {
-        flows: body.flows,
+        flows: body.flows
     };
 
     fs.writeFileSync(nodeRedJSON, JSON.stringify(nodeREDJSON, null, 2));
@@ -211,7 +211,7 @@ async function deployFlows(appDir, nodeRedJSON, body) {
     await deploy(loadAppYAML(appDir), [{ path: "app.js", body: script }]);
 }
 
-function spawnProxyServer(port, appDir, nodeRedJSON) {
+function spawnProxyServer(port: number, appDir: string, nodeRedJSON: any) {
     const server = express();
     server.use(bodyParser.json());
 
@@ -246,15 +246,15 @@ function spawnProxyServer(port, appDir, nodeRedJSON) {
     });
 }
 
-function streamAppLog(appName, nodeRedProcess) {
-    api.streamAppLog(appName, (lines) => {
+function streamAppLog(appName: string, nodeRedProcess: any) {
+    api.streamAppLog(appName, (lines: string[]) => {
         for (const line of lines) {
             nodeRedProcess.send({ type: "log", log: line });
         }
     });
 }
 
-export async function main(args, opts, logger) {
+export async function main(args: any, opts: any, logger: any) {
     if (opts.dev) {
         const argv = process.argv.slice(1).filter((arg) => arg !== "--dev");
 
@@ -293,12 +293,12 @@ export async function main(args, opts, logger) {
         for (const filepath in pluginZip.files) {
             if (filepath.startsWith("red/") && filepath.match(/\.js$/)) {
                 createFile(`${NODE_RED_TRANSPILERS_DIR}/${path.basename(filepath)}`,
-                await pluginZip.files[filepath].async("string"));
+                await pluginZip.files[filepath].async("text"));
             }
 
             if (filepath.startsWith("red/") && filepath.match(/\.html$/)) {
                 createFile(`${NODE_RED_NODES_DIR}/${path.basename(filepath)}`,
-                await pluginZip.files[filepath].async("string"));
+                await pluginZip.files[filepath].async("text"));
                 createFile(`${NODE_RED_NODES_DIR}/${path.parse(filepath).name}.js`,
                 generateNodeScript(path.basename(filepath)));
             }

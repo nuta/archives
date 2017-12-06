@@ -2,24 +2,24 @@ import * as readline from "readline";
 import * as util from "util";
 import { api } from "../api";
 
-async function input(rl) {
+async function input(rl: any): Promise<string> {
     return new Promise((resolve, reject) => {
         rl.question(">>> ", resolve);
-    });
+    }) as Promise<string>;
 }
 
-async function sleep(sec) {
+async function sleep(sec: number) {
     return new Promise((resolve, reject) => setTimeout(resolve, sec * 1000));
 }
 
-export async function main(args, opts, logger) {
+export async function main(args: any, opts: any, logger: any) {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
 
     while (true) {
-        const line = await input(rl);
+        const line: string = await input(rl);
         const { id } = await api.invokeCommand(args.name, "__repl__", line);
         while (true) {
             const results = (await api.getCommandResults(args.name)).results;

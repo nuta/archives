@@ -1,9 +1,9 @@
-import * as drivelist from "drivelist";
+const drivelist = require("drivelist");
 import { FatalError } from "./types";
 
-export function getDriveSize(devfile) {
+export function getDriveSize(devfile: string): Promise<number> {
     return new Promise((resolve, reject) => {
-        drivelist.list((error, drives) => {
+        drivelist.list((error: Error, drives: any[]) => {
             if (error) { reject(error); }
 
             for (const drive of drives) {
@@ -19,7 +19,7 @@ export function getDriveSize(devfile) {
 
 export function getAvailableDrives() {
     return new Promise((resolve, reject) => {
-        drivelist.list((error, drives) => {
+        drivelist.list((error: Error, drives: any[]) => {
             if (error) { reject(error); }
 
             const availableDrives = drives.filter((drive) => !drive.system);

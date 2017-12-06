@@ -2,12 +2,13 @@ const fs = require("fs");
 const imageWrite = require("etcher-image-write");
 const mountutils = require("mountutils");
 const ipc = require("node-ipc");
+import { getenv } from './helpers';
 
 /*
 *  Be careful! This command will be executed in root!!!
 */
 
-function connectIPC(ipcPath) {
+function connectIPC(ipcPath: string) {
     return new Promise((resolve, reject) => {
         ipc.config.retry = 5;
         ipc.config.maxRetries = 3;
@@ -18,9 +19,9 @@ function connectIPC(ipcPath) {
     });
 }
 
-function umount(drive) {
+function umount(drive: string) {
     return new Promise((resolve, reject) => {
-        mountutils.unmountDisk(drive, (error) => {
+        mountutils.unmountDisk(drive, (error: Error) => {
             if (error) {
                 reject(error);
             } else {
@@ -33,7 +34,7 @@ function umount(drive) {
 export async function imageWriter() {
     const ipcPath = process.env.IPC_PATH;
     const drive = process.env.DRIVE;
-    const driveSize = parseInt(process.env.DRIVE_SIZE);
+    const driveSize = parseInt(getenv('DRIVE_SIZE'));
     const imagePath = process.env.IMAGE_PATH;
 
     if (ipcPath === undefined || drive === undefined ||
@@ -62,18 +63,18 @@ export async function imageWriter() {
             check: true,
         });
 
-        writer.on("progress", (state) => {
+        writer.on("progress", (state: any) => {
             server.emit("progress", JSON.stringify(state));
             console.log("image-writer:", `${state.type} ${state.percentage}%`);
         });
 
-        writer.on("done", (results) => {
+        writer.on("done", (results: any[]) => {
             server.emit("success", JSON.stringify(results));
             console.log("image-writer:", "done");
             ipc.disconnect("server");
         });
 
-        writer.on("error", (error) => {
+        writer.on("error", (error: Error) => {
             server.emit("error", error);
             console.error("image-writer:", "error:", error);
             ipc.disconnect("server");

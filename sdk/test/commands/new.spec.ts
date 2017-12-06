@@ -1,3 +1,4 @@
+import {} from 'mocha';
 import { expect } from 'chai';
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';

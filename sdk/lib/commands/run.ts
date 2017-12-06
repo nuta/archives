@@ -2,7 +2,7 @@ import * as os from "os";
 import * as path from "path";
 import { FatalError } from "../types";
 
-export async function main(args, opts, logger) {
+export async function main(args: any, opts: any, logger: any) {
     if (opts.adapter === "http" && !opts.server) {
         throw new FatalError("Specify `server' option.");
     }

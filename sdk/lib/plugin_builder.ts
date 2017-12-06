@@ -16,7 +16,7 @@ function buildDockerImage() {
     }
 }
 
-function runContainer(pluginDir) {
+function runContainer(pluginDir: string) {
     const tempdir = path.join(os.homedir(), ".makestack", "plugin-builder");
 
     // Note that docker-machine in macOS does not support mounting volumes
@@ -35,7 +35,7 @@ function runContainer(pluginDir) {
     return path.resolve(tempdir, "plugin.zip")
 }
 
-export function buildPlugin(pluginDir, destPath) {
+export function buildPlugin(pluginDir: string, destPath: string) {
     const makestackTypePath = path.resolve(__dirname, "../runtime/makestack.d.ts")
     if (!fs.existsSync(makestackTypePath)) {
         throw new Error(`${makestackTypePath} not found: run \`yarn run prepack\` in the sdk directory`)

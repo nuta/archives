@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 
-export function mkdirp(dir) {
+export function mkdirp(dir: string) {
     const dirs = path.resolve(dir).split("/");
     let dirpath = "/";
 
@@ -16,13 +16,13 @@ export function mkdirp(dir) {
     }
 }
 
-export function generateRandomString(n) {
+export function generateRandomString(n: number) {
     const buf = Buffer.alloc((n / 2) + 1);
     crypto.randomFillSync(buf);
     return buf.toString("hex").substring(0, n);
 }
 
-export function find(basedir) {
+export function find(basedir: string) {
     const files = [];
     const dirs = [basedir];
 
@@ -30,8 +30,12 @@ export function find(basedir) {
         return [basedir];
     }
 
-    do {
+    while (true) {
         const currentDir = dirs.pop();
+        if (!currentDir) {
+            break;
+        }
+
         const ls = fs.readdirSync(currentDir);
         for (const relpath of ls) {
             const filepath = path.join(currentDir, relpath);
@@ -41,16 +45,25 @@ export function find(basedir) {
                 files.push(path.relative(basedir, filepath));
             }
         }
-    } while (dirs.length > 0);
+    }
 
     return files;
 }
 
-export function createFile(filepath, body) {
+export function createFile(filepath: string, body: Buffer | string) {
     mkdirp(path.dirname(filepath));
     fs.writeFileSync(filepath, body);
 }
 
-export function generateTempPath() {
+export function generateTempPath(): string {
     return path.join(os.tmpdir(), generateRandomString(32) + ".img");
+}
+
+export function getenv(name: string): string {
+    const value = process.env[name]
+    if (!value) {
+        throw new Error(`process.env[${name}] is not defined`)
+    }
+
+    return value;
 }
