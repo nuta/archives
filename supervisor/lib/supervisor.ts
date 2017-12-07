@@ -12,6 +12,7 @@ import { deserialize, serialize } from "./smms";
 import * as unzip from "./unzip";
 import { TStores, TDeviceState, IPayloadMessages } from "./types";
 import { AdapterBase } from "./adapters/adapter_base";
+import { clearInterval } from "timers";
 
 interface ISupervisorConstructorArgs {
     adapter: {
@@ -61,6 +62,7 @@ export class Supervisor {
     private replEnabled: boolean;
     private replVM?: any;
     private rebooting: boolean;
+    private heartbeatTimer?: any;
 
     constructor(args: ISupervisorConstructorArgs) {
         process.on("unhandledRejection", (reason, p) => {
@@ -123,6 +125,12 @@ export class Supervisor {
             }
             default:
             throw new Error(`unknown adapter \`${this.adapterName}'`);
+        }
+    }
+
+    public destroy() {
+        if (this.heartbeatTimer) {
+            clearInterval(this.heartbeatTimer);
         }
     }
 
@@ -431,6 +439,8 @@ export class Supervisor {
         await this.adapter.connect();
         await this.sendHeartbeat("ready");
 
-        setInterval(() => { this.doIntervalJob() }, this.heartbeatInterval * 1000)
+        this.heartbeatTimer = setInterval(() => {
+            this.doIntervalJob()
+        }, this.heartbeatInterval * 1000)
     }
 }

@@ -33,6 +33,7 @@ describe('Supervisor', function () {
     })
 
     afterEach(function () {
+        this.instance.destroy();
         nock.cleanAll();
         this.clock.restore();
     })
