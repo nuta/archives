@@ -49,7 +49,7 @@ static int do_configure(int fd, int baudrate, int databits, int parity) {
     return 0;
 }
 
-NAN_METHOD(Configure) {
+NAN_METHOD(SerialConfigure) {
     int argc = info.Length();
     if (argc != 4) {
         Nan::ThrowError("Too few arguemnts.");
@@ -88,9 +88,3 @@ NAN_METHOD(Configure) {
 
     info.GetReturnValue().SetUndefined();
 }
-
-NAN_MODULE_INIT(init) {
-    Nan::SetMethod(target, "configure", Configure);
-}
-
-NODE_MODULE(serial, init);

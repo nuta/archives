@@ -72,7 +72,7 @@ int configure(int fd, int mode, int bits, int speed, int order) {
 //
 //  transfer(fd: number, speed: number, tx: Buffer, rx: Buffer): Buffer
 //
-NAN_METHOD(Transfer) {
+NAN_METHOD(SpiTransfer) {
     int argc = info.Length();
     if (argc != 4) {
         Nan::ThrowError("Too few arguemnts.");
@@ -116,7 +116,7 @@ NAN_METHOD(Transfer) {
 //
 //  configure(fd: number, mode: number, bits: number, speed: number, order: number): void
 //
-NAN_METHOD(Configure) {
+NAN_METHOD(SpiConfigure) {
     int argc = info.Length();
     if (argc != 5) {
         Nan::ThrowError("Too few arguemnts.");
@@ -157,10 +157,3 @@ NAN_METHOD(Configure) {
     configure(fd, mode, bits, speed, order);
     info.GetReturnValue().SetUndefined();
 }
-
-NAN_MODULE_INIT(init) {
-    Nan::SetMethod(target, "configure", Configure);
-    Nan::SetMethod(target, "transfer", Transfer);
-}
-
-NODE_MODULE(spi, init);

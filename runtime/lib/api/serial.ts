@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { serialConfigure } from '../native';
+import { functions as native } from "../native";
 const { O_RDWR, O_NOCTTY, O_SYNC } = fs.constants;
 
 export class SerialAPI {
@@ -27,7 +27,7 @@ export class SerialAPI {
         }
 
         this.baudrate = baudrate;
-        serialConfigure(this.fd, baudrate, 0, 0);
+        native.serialConfigure(this.fd, baudrate, 0, 0);
     }
 
     public write(data: Buffer) {

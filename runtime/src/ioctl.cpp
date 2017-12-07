@@ -14,7 +14,6 @@ int ioctl(int fd, unsigned long request, ...) {
 using namespace v8;
 using namespace node;
 
-#include <stdio.h>
 NAN_METHOD(Ioctl) {
     int argc = info.Length();
     if (argc != 2 && argc != 3) {
@@ -56,8 +55,3 @@ NAN_METHOD(Ioctl) {
     info.GetReturnValue().Set(r);
 }
 
-NAN_MODULE_INIT(init) {
-    Nan::SetMethod(target, "ioctl", Ioctl);
-}
-
-NODE_MODULE(ioctl, init);

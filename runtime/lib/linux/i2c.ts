@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { ioctl } from "../native";
+import { functions as native } from "../native";
 
 const I2C_SLAVE = 0x0703;
 
@@ -31,7 +31,7 @@ export abstract class LinuxI2CAPI {
     }
 
     private selectSlaveAddress(address: number) {
-        if (ioctl(this.fd, I2C_SLAVE, address) !== 0) {
+        if (native.ioctl(this.fd, I2C_SLAVE, address) !== 0) {
             throw new Error("failed to set I2C_SLAVE");
         }
     }
