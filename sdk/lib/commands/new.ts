@@ -1,12 +1,18 @@
 import { spawnSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import { createFile } from "../helpers";
+import { createFile, run } from "../helpers";
 import { logger } from "../logger";
 import { prepare } from "../prepare";
 const nunjuck = require("nunjucks");
 
 const DEFAULT_TEMPLATES = [
+    {
+        filepath: ".gitignore",
+        template: `\
+node_modules
+`
+    },
     {
         filepath: "README.md",
         template: `\
@@ -85,4 +91,7 @@ export async function main(args: any, opts: any) {
     if (appJS) {
         fs.writeFileSync(path.join(appDir, "app.js"), appJS);
     }
+
+    logger.progress('Initializing a Git repository');
+    run(['git', 'init'], { cwd: appDir });
 }
