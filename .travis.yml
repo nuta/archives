@@ -143,9 +143,9 @@ matrix:
           - sdk/node_modules
       install:
         - cd sdk
-        - yarn
+        - yarn --ignore-scripts
         - yarn prepack
-        - yarn build
+        - yarn
       script:
         - yarn run cov
 
