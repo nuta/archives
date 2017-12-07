@@ -19,7 +19,7 @@ describe('Serial API', function() {
             '/dev/ttyUSB0': ''
         })
 
-        this.serialConfigure = sinon.stub(require('../../dist/native'), 'serialConfigure')
+        this.serialConfigure = sinon.stub(require('../../dist/native').functions, 'serialConfigure')
         this.clock = sinon.useFakeTimers()
         this.instance = new builtins.Serial({ path: this.deviceFile, baudrate: 115200 })
     })

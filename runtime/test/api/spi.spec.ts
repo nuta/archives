@@ -18,8 +18,8 @@ describe('SPI API', function() {
             '/dev/spidev0.1': mockfs.file({ content: '', atime: this.atime })
         })
 
-        this.spiConfigure = sinon.stub(require('../../dist/native'), 'spiConfigure')
-        this.spiTransfer = sinon.stub(require('../../dist/native'), 'spiTransfer')
+        this.spiConfigure = sinon.stub(require('../../dist/native').functions, 'spiConfigure')
+        this.spiTransfer = sinon.stub(require('../../dist/native').functions, 'spiTransfer')
         this.instance = new builtins.SPI({ slave: this.slave })
     })
 

@@ -17,7 +17,7 @@ describe('I2C API', function() {
             '/dev/i2c-1': mockfs.file({ content: '', atime: this.atime })
         })
 
-        this.ioctl = sinon.stub(require('../../dist/native'), 'ioctl').returns(0)
+        this.ioctl = sinon.stub(require('../../dist/native').functions, 'ioctl').returns(0)
         this.instance = new builtins.I2C({ address: this.address })
     })
 
