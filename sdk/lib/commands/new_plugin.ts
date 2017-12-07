@@ -1,7 +1,7 @@
 import { spawnSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import { createFile } from "../helpers";
+import { createFile, run } from "../helpers";
 import { logger } from "../logger";
 import { prepare } from "../prepare";
 const nunjuck = require("nunjucks");
@@ -127,6 +127,15 @@ export class {{ CamelAppName }} {
 `,
     },
     {
+        filepath: ".gitignore",
+        template: `\
+node_modules
+build
+native
+coverage
+`
+    },
+    {
         filepath: ".makestackignore",
         template: `\
 dist/*.map
@@ -183,6 +192,9 @@ export async function main(args: any, opts: any) {
             cwd: args.dir,
         });
     }
+
+    logger.progress('Initializing a Git repository');
+    run(['git', 'init'], { cwd: args.dir });
 
     await prepare(args.dir);
 }
