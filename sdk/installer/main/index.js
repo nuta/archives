@@ -45,15 +45,21 @@ ipcMain.on('getAvailableDrives', (event, args) => {
 
 ipcMain.on('install', async(event, args) => {
   const flashCommand = [process.argv0, path.resolve(__dirname, 'flasher.js')]
-  await makestack.install({
-    deviceName: args.deviceName,
-    deviceType: args.deviceType,
-    osType: args.os,
-    adapter: args.adapter,
-    drive: args.drive,
-    ignoreDuplication: args.ignoreDuplication,
-    flashCommand
-  }, (stage, state) => {
-    event.sender.send('progress', stage, state)
-  })
+
+  try {
+    await makestack.install({
+      deviceName: args.deviceName,
+      deviceType: args.deviceType,
+      osType: args.os,
+      adapter: args.adapter,
+      drive: args.drive,
+      ignoreDuplication: args.ignoreDuplication,
+      flashCommand
+    }, (stage, state) => {
+      event.sender.send('progress', stage, state)
+    })
+  } catch (e) {
+    const message = (e.constructor.name === 'FatalError') ? e.message : e.stack
+    event.sender.send('error', message)
+  }
 })

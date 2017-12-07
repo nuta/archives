@@ -48,7 +48,7 @@
       </section>
 
       <section>
-        <label><input type="checkbox" :value="ignoreDuplication">Ignore a device name duplication.</label>
+        <label><input type="checkbox" v-model="ignoreDuplication">Ignore a device name duplication.</label>
       </section>
 
       <section>
@@ -80,7 +80,6 @@ export default {
         { name: 'ethernet', description: 'Ethernet (DHCP)' }
       ],
       availableDrives: [],
-      percentage: 0,
       ignoreDuplication: false
     }
   },
@@ -94,32 +93,49 @@ export default {
       }
     },
     install() {
-      const component = this
-      ipcRenderer.on('progress', (event, stage) => {
+      ipcRenderer.on('progress', (event, stage, state) => {
         switch (stage) {
           case 'look-for-drive':
-            component.installButtonMessage = '(1/5) Looking for the drive'
+            this.installButtonMessage = '(1/5) Looking for the drive'
             break
           case 'register':
-            component.installButtonMessage = '(2/5) Registering the device'
+            this.installButtonMessage = '(2/5) Registering the device'
             break
           case 'download':
-            component.installButtonMessage = 'Downloading the disk image'
+            this.installButtonMessage = '(3/5) Downloading the disk image'
             break
           case 'config':
-            component.installButtonMessage = '(4/5) Writing config'
+            this.installButtonMessage = '(4/5) Writing config'
             break
           case 'flash':
-            component.installButtonMessage = '(5/5) Flashing'
+            this.installButtonMessage = '(5/5) Flashing'
+            break
+          case 'flashing':
+            switch (state.type) {
+              case 'write':
+                this.installButtonMessage = `Flashing (${Math.floor(state.percentage)}%)`
+                break;
+              case 'check':
+                this.installButtonMessage = `Verifying (${Math.floor(state.percentage)}%)`
+                break;
+            }
             break
           case 'success':
             new Notification('Successfully installed MakeStack', {
-              body: `${component.deviceName} is now ready to use. Have fun!`
+              body: `${this.deviceName} is now ready to use. Have fun!`
             })
 
-            component.installButtonMessage = 'Install'
+            this.installButtonMessage = 'Done!'
+            setTimeout(() => {
+              this.installButtonMessage = 'Install'
+            }, 3000)
             break
         }
+      })
+
+      ipcRenderer.on('error', (event, message) => {
+        this.installButtonMessage = 'Install'
+        alert(message)
       })
 
       ipcRenderer.send('install', {

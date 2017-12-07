@@ -20,7 +20,7 @@
       </section>
 
       <section>
-        <input type="submit" value="Login">
+        <input type="submit" :value="loginButtonMsg">
       </section>
     </form>
   </main>
@@ -38,17 +38,20 @@ export default {
     return {
       url: "http://localhost:8080",
       username: "",
-      password: ""
+      password: "",
+      loginButtonMsg: "Login"
     };
   },
   methods: {
     login() {
+      this.loginButtonMsg = "Logging in..."
       api.login(this.url, this.username, this.password).then(() => {
         this.$router.push({ name: 'installer' })
-      }).catch((r) => {
-        console.error(r)
-        alert('something went wrong!')
-      });
+      }).catch(e => {
+        console.log(e)
+        this.loginButtonMsg = "Login"
+        alert(e.stack)
+      })
     }
   }
 };
