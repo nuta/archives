@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe ImagesController, type: :controller do
   describe '#os_image' do
     let!(:device) { create(:device) }
-    let(:os_version) { 'a' }
+    let(:os_version) { 'v0.1.0' }
     let(:image_url) { MakeStack.os_releases[os_version][:linux][:assets][device.device_type][:url] }
 
     it 'returns os image' do
