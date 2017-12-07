@@ -14,7 +14,16 @@ import * as prepareCommand from "./commands/prepare";
 import * as redCommand from "./commands/red";
 import * as replCommand from "./commands/repl";
 import * as runCommand from "./commands/run";
+import * as fs from "fs";
+import * as path from "path";
 const program = require("caporal");
+
+program
+.version(
+    fs.readFileSync(path.resolve(__dirname, '../VERSION'),
+        { encoding: 'utf-8' }).replace(/\n+$/, '')
+    )
+.description('A MakeStack CLI Developer Tools.');
 
 program
 .command("login", "Get an access credential for an MakeStack Server account.")
