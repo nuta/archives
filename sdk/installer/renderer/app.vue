@@ -12,12 +12,9 @@ export default {
 <style lang="scss">
 $default-font-color: #183f18;
 
-html, body {
-  height: 100%;
-}
-
 body {
   margin: 0;
+  height: 100%;
   font-size: 15px;
   font-family: -apple-system, BlinkMacSystemFont, Ubuntu, Cantarell, sans-serif;
   color: $default-font-color;
@@ -25,5 +22,6 @@ body {
 }
 
 #app {
+  height: 100%;
 }
 </style>

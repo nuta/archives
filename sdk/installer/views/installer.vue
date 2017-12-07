@@ -47,6 +47,26 @@
         </select>
       </section>
 
+      <section v-if="adapter == 'http'">
+        <details>
+          <summary>Wi-Fi (Optional)</summary>
+          <div>
+            <label>Wi-Fi SSID</label>
+            <input type="text" v-model="wifiSSID" placeholder="SSID">
+
+            <label>Wi-Fi Password</label>
+            <input type="password" v-model="wifiPassword" placeholder="Password (WPA2-PSK)">
+
+            <label>Wi-Fi Country</label>
+            <select v-model="wifiCountry">
+              <template v-for="(name, code) in wifiCountries">
+                <option :value="code">{{ name }}</option>
+              </template>
+            </select>
+          </div>
+        </details>
+      </section>
+
       <section>
         <label><input type="checkbox" v-model="ignoreDuplication">Ignore a device name duplication.</label>
       </section>
@@ -77,11 +97,27 @@ export default {
       drive: null,
       adapter: null,
       availableAdapters: [
-        { name: 'http', description: 'HTTP/HTTPS' },
+        { name: 'http', description: 'HTTP/HTTPS (over Ethernet / Wi-Fi)' },
         { name: 'sakuraio', description: 'sakura.io' }
       ],
       availableDrives: [],
-      ignoreDuplication: false
+      ignoreDuplication: false,
+      wifiSSID: '',
+      wifiPassword: '',
+      wifiCountry: 'US',
+      /* TODO: add all countries */
+      wifiCountries: {
+        'US': 'United States of America',
+        'UK': 'United Kingdom',
+        'JP': 'Japan',
+        'CN': 'China',
+        'IN': 'India',
+        'ID': 'Indonesia',
+        'IL': 'Israel',
+        'DE': 'Germany',
+        'FR': 'France',
+        'RU': 'Russia'
+      }
     }
   },
   methods: {
@@ -145,7 +181,10 @@ export default {
         os: this.os,
         adapter: this.adapter,
         drive: this.drive,
-        ignoreDuplication: this.ignoreDuplication
+        ignoreDuplication: this.ignoreDuplication,
+        wifiSSID: this.wifiSSID,
+        wifiPassword: this.wifiPassword,
+        wifiCountry: this.wifiCountry
       })
     }
   },

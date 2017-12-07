@@ -5,7 +5,7 @@ const makestack = require('makestack')
 let mainWindow
 function createWindow() {
   mainWindow = new BrowserWindow({
-    height: 570,
+    height: 620,
     width: 450
   })
 
@@ -54,7 +54,10 @@ ipcMain.on('install', async(event, args) => {
       adapter: args.adapter,
       drive: args.drive,
       ignoreDuplication: args.ignoreDuplication,
-      flashCommand
+      flashCommand,
+      wifiSSID: args.wifiSSID,
+      wifiPassword: args.wifiPassword,
+      wifiCountry: args.wifiCountry
     }, (stage, state) => {
       event.sender.send('progress', stage, state)
     })

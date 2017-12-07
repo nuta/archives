@@ -25,13 +25,16 @@ header {
 }
 
 .main-wrapper {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: #f6f6f6;
 }
 
 main {
-  margin-top: 10px;
+  min-height: 100vh;
+  height: 100%;
+  padding-top: 10px;
+  padding-bottom: 30px;
   margin-left: auto;
   margin-right: auto;
   width: 300px;
@@ -76,6 +79,16 @@ section {
     &:hover {
       background: #0f7ae5;
       cursor: pointer;
+    }
+  }
+
+  details {
+    margin-top: 10px;
+    margin-bottom: 20px;
+
+    summary {
+      margin-top: 10px;
+      margin-bottom: 10px;
     }
   }
 }
