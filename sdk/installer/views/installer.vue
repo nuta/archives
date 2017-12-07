@@ -77,7 +77,8 @@ export default {
       drive: null,
       adapter: null,
       availableAdapters: [
-        { name: 'ethernet', description: 'Ethernet (DHCP)' }
+        { name: 'http', description: 'HTTP/HTTPS' },
+        { name: 'sakuraio', description: 'sakura.io' }
       ],
       availableDrives: [],
       ignoreDuplication: false
