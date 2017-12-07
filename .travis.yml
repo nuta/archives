@@ -115,7 +115,11 @@ matrix:
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
-        - cd sdk/installer
+        - cd sdk
+        - yarn --ignore-scripts
+        - yarn prepack
+        - yarn
+        - cd installer
         - npm install -g yarn
         - yarn
       script:
@@ -130,7 +134,11 @@ matrix:
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
-        - cd sdk/installer
+        - cd sdk
+        - yarn --ignore-scripts
+        - yarn prepack
+        - yarn
+        - cd installer
         - yarn
       script:
         - yarn run build:linux
@@ -158,6 +166,7 @@ matrix:
       install:
         - cd runtime
         - yarn
+        - yarn run build-host-native
         - cd ../supervisor
         - yarn
       script:
@@ -172,6 +181,7 @@ matrix:
       install:
         - cd runtime
         - yarn
+        - yarn run build-host-native
       script:
         - yarn run cov
 
