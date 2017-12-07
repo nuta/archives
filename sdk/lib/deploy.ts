@@ -72,13 +72,36 @@ export async function deploy(appYAML: any, files: any[]) {
     logger.success(`Successfully deployed version #${deployment.version}!`);
 }
 
+function shouldBePruned(filepath: string) {
+    const EXCLUDED_EXTS = [
+        '.md', '.cpp', '.ts', '.tgz', '.log'
+    ]
+
+    const EXCLUDED_FILENAMES = [
+        'LICENSE', 'LICENSE.md', '.travis.yml', '.eslintrc.js', 'eslintignore',
+        '.editorconfig', '.yarn-integrity', '.yarnclean', '.npmignore', '.gitignore',
+        'Makefile', '.gitattributes', 'appveyor.yml', 'tsconfig.json', 'jsconfig.json'
+    ]
+
+    const EXCLUDED_DIRS = [
+        'test', 'tests', 'docs', 'doc', 'Documentation', 'examples', 'example',
+        'coverage', '.vscode', '.idea', '.github'
+    ]
+
+    const { base, ext, dir } = path.parse(filepath);
+    const parentDir = path.basename(dir);
+
+    return EXCLUDED_EXTS.includes(ext) ||
+        EXCLUDED_FILENAMES.includes(base) ||
+        EXCLUDED_DIRS.includes(parentDir);
+}
+
 export async function deployAppDir(appDir: string) {
-    const EXCLUDED_FILES_PATTERN = /(node_modules|yarn\.lock|app\.yaml|jsconfig.json|yarn-error.log|README\.md)/
     const appYAML = loadAppYAML(appDir);
     const files = [];
 
     for (const filepath of find(appDir)) {
-        if (!filepath.match(EXCLUDED_FILES_PATTERN)) {
+        if (!shouldBePruned(filepath) && !filepath.includes("node_modules")) {
             files.push({
                 path: filepath,
                 body: readTextFile(filepath),
@@ -99,7 +122,9 @@ export async function deployAppDir(appDir: string) {
         run(["yarn", "install", "--production"], { cwd: tempDir })
 
         for (const filepath of find(path.join())) {
-            files.push({ path: filepath, body: fs.readFileSync(filepath) });
+            if (!shouldBePruned(filepath)) {
+                files.push({ path: filepath, body: fs.readFileSync(filepath) });
+            }
         }
     }
 
