@@ -10,7 +10,7 @@ import { api } from "./api";
 import { getDriveSize } from "./drive";
 import {
     createFile, generateRandomString,
-    generateTempPath, getenv
+    generateTempPath, getenv, shasum
 } from "./helpers";
 import { FatalError } from "./types";
 
@@ -37,18 +37,28 @@ async function registerOrGetDevice(name: string, type: string, ignoreDuplication
         device = await api.registerDevice(name, type);
     } catch (e) {
         // FIXME: add an option to accept 4xx errors
-        if (ignoreDuplication && e.message.includes("name: [ 'has already been taken' ]")) {
+        if (e.message.includes('Name has already been taken')) {
             // There is already a device with same name.
-            device = await api.getDevice(name);
+            if (ignoreDuplication) {
+                try {
+                    device = await api.getDevice(name);
+                } catch (e) {
+                    throw new FatalError("Failed to fetch the device metadata.");
+                }
+            } else {
+                throw new FatalError("The device name has already been taken.");
+            }
         } else {
-            throw new FatalError("failed to register/fetch the device");
+            throw e;
         }
     }
 
     return device;
 }
 
-function getLatestOSRelease(osType: string, deviceType: string): Promise<{ version: string, osImageURL: string }> {
+function getLatestOSRelease(osType: string, deviceType: string):
+    Promise<{ version: string, url: string, shasum: string }>
+{
     return new Promise((resolve, reject) => {
         api.getOSReleases().then(({ releases }) => {
             const version = Object.keys(releases).pop();
@@ -56,24 +66,31 @@ function getLatestOSRelease(osType: string, deviceType: string): Promise<{ versi
                 throw new Error('no os releases');
             }
 
-            const osImageURL = releases[version][osType].assets[deviceType].url;
-            resolve({ version, osImageURL });
+            const asset = releases[version][osType].assets[deviceType];
+            resolve({
+                version,
+                url: asset.url,
+                shasum: asset.shasum
+            });
         }).catch(reject);
     });
 }
 
 async function downloadDiskImage(osType: string, deviceType: string) {
-    const { version, osImageURL } = await getLatestOSRelease(osType, deviceType);
+    const { version, url: osImageURL, shasum: imageShasum } =
+        await getLatestOSRelease(osType, deviceType);
     const basename = path.basename(osImageURL);
-    const orignalImage = path.join(getenv('HOME'), `.makestack/caches/${basename}`);
-    createFile(orignalImage, await (await fetch(osImageURL)).buffer());
-    return [version, orignalImage];
+    const originalImage = path.join(getenv('HOME'), `.makestack/caches/${basename}`);
+    if (!fs.existsSync(originalImage) || shasum(originalImage) !== imageShasum) {
+        createFile(originalImage, await (await fetch(osImageURL)).buffer());
+    }
+    return [version, originalImage];
 }
 
 function writeConfigToDiskIamge(args: {
     osVersion: string,
     deviceType: string,
-    orignalImage: string,
+    originalImage: string,
     device: any,
     adapter: string,
     wifiSSID?: string,
@@ -83,7 +100,7 @@ function writeConfigToDiskIamge(args: {
     const {
         osVersion,
         deviceType,
-        orignalImage,
+        originalImage,
         device,
         adapter,
         wifiSSID = '',
@@ -95,7 +112,7 @@ function writeConfigToDiskIamge(args: {
     const wifiPsk = crypto.pbkdf2Sync(wifiPassword, wifiSSID, 4096, 256, "sha1").toString('hex').substring(0, 64);
 
     // TODO: What if the image is large?
-    let image = fs.readFileSync(orignalImage);
+    let image = fs.readFileSync(originalImage);
     image = replaceBuffer(image, deviceType, "DEVICE_TYPE");
     image = replaceBuffer(image, osVersion, "OS_VERSION");
     image = replaceBuffer(image, device.device_id, "DEVICE_ID");
@@ -180,10 +197,10 @@ export async function install(args: {
     progress("register");
     const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication);
     progress("download");
-    const [osVersion, orignalImage] = await downloadDiskImage(osType, deviceType);
+    const [osVersion, originalImage] = await downloadDiskImage(osType, deviceType);
     progress("config");
     const imagePath = writeConfigToDiskIamge({
-        osVersion, deviceType, orignalImage, device, adapter,
+        osVersion, deviceType, originalImage, device, adapter,
         wifiSSID, wifiPassword, wifiCountry
     })
     progress('flash')

@@ -31,6 +31,11 @@ export function removeFiles(filepath: string): void {
     }
 }
 
+export function shasum(filepath: string): string {
+    const { stdout } = runWithPipe(['shasum', '-a', '256', filepath])
+    return stdout.split(' ')[0]
+}
+
 export function mkdirp(dir: string) {
     const dirs = path.resolve(dir).split("/");
     let dirpath = "/";
@@ -97,15 +102,39 @@ export function getenv(name: string): string {
 }
 
 export function run(argv: string[], options: SpawnSyncOptions = {}) {
+
     const exe = argv[0]
     const args = argv.slice(1)
-    const { status } = spawnSync(exe, args, Object.assign({}, options, {
+    const r = spawnSync(exe, args, Object.assign({}, {
         stdio: "inherit",
         env: process.env,
-    }));
+        encoding: 'utf-8'
+    }, options));
 
-    if (status !== 0) {
-        throw new FatalError(`docker build exited with ${status}`)
+    if (r.status !== 0) {
+        throw new FatalError(`docker build exited with ${r.status}`)
+    }
+}
+
+export function runWithPipe(argv: string[], options: SpawnSyncOptions = {}):
+    { stdout: string, stderr: string }
+{
+
+    const exe = argv[0]
+    const args = argv.slice(1)
+    const r = spawnSync(exe, args, Object.assign({}, {
+        stdio: "pipe",
+        env: process.env,
+        encoding: 'utf-8'
+    }, options));
+
+    if (r.status !== 0) {
+        throw new FatalError(`docker build exited with ${r.status}`)
+    }
+
+    return {
+        stdout: r.stdout.toString('utf-8'),
+        stderr: r.stderr.toString('utf-8')
     }
 }
 
