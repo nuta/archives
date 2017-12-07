@@ -11,10 +11,13 @@
     "test": "mocha",
     "test:live": "mocha -w",
     "pretest": "tsc --pretty",
-    "prepack": "npm run build-runtime && npm run build-supervisor && npm run build",
-    "build-runtime": "rm -rf runtime && mkdir -p runtime && cd ../runtime && yarn && yarn pack && cd ../sdk && tar xf ../runtime/makestack-runtime-*.tgz -C runtime --strip-components=1",
-    "build-supervisor": "rm -rf supervisor && mkdir -p supervisor && cd ../supervisor && yarn && yarn pack && cd ../sdk && tar xf ../supervisor/makestack-supervisor-*.tgz -C supervisor --strip-components=1",
-    "build": "tsc --pretty",
+    "prepack": "npm run copy-runtime && npm run copy-supervisor && npm run build-sdk",
+    "preinstall": "npm run build-runtime",
+    "copy-runtime": "rm -rf runtime && mkdir -p runtime && cd ../runtime && yarn && yarn pack && cd ../sdk && tar xf ../runtime/makestack-runtime-*.tgz -C runtime --strip-components=1",
+    "copy-supervisor": "rm -rf supervisor && mkdir -p supervisor && cd ../supervisor && yarn && yarn pack && cd ../sdk && tar xf ../supervisor/makestack-supervisor-*.tgz -C supervisor --strip-components=1",
+    "build-runtime": "cd runtime && yarn run build-host-native",
+    "build-sdk": "tsc --pretty",
+    "build": "npm run prepack && npm run build-runtime",
     "build:live": "tsc --pretty -w"
   },
   "repository": {
@@ -45,6 +48,7 @@
     "nunjucks": "^3.0.1",
     "shell-quote": "^1.6.1",
     "sudo-prompt": "^7.1.1",
+    "supervisor": "^0.12.0",
     "winston": "next"
   },
   "devDependencies": {
@@ -71,7 +75,6 @@
     "nock": "^9.0.27",
     "sinon": "^4.1.2",
     "source-map-support": "^0.5.0",
-    "supervisor": "^0.12.0",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.2"
   }
