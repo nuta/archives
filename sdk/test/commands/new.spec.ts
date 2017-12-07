@@ -1,6 +1,7 @@
 import {} from 'mocha';
 import { expect } from 'chai';
-import { spawnSync } from 'child_process';
+import * as sinon from 'sinon';
+import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as nock from 'nock';
@@ -14,6 +15,7 @@ describe('new command', function() {
     beforeEach(function() {
         this.appDir = '/user/app'
         const makestackDTSPath = path.resolve(__dirname, '../../runtime/makestack.d.ts')
+        this.spawnSync = sinon.stub(childProcess, 'spawnSync').returns({ status: 0 })
         mockfs({
             '/user': {},
             [makestackDTSPath]: fs.readFileSync(makestackDTSPath)
@@ -23,6 +25,7 @@ describe('new command', function() {
     afterEach(function() {
         mockfs.restore()
         nock.cleanAll()
+        this.spawnSync.restore()
     })
 
     it('creates a new app directoy', async function() {
