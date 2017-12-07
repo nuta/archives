@@ -1,8 +1,0 @@
-v0.0.1:
-  linux:
-    title: 'MakeStack Linux v0.0.1'
-    assets:
-      x64:
-        url: https://github.com/seiyanuta/makestack/releases/download/v0.0.1/makestack-linux-v0.0.1-x64.img
-      raspberrypi3:
-        url: https://github.com/seiyanuta/makestack/releases/download/v0.0.1/makestack-linux-v0.0.1-raspberrypi3.img
