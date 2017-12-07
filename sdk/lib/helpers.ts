@@ -112,7 +112,7 @@ export function run(argv: string[], options: SpawnSyncOptions = {}) {
     }, options));
 
     if (r.status !== 0) {
-        throw new FatalError(`docker build exited with ${r.status}`)
+        throw new FatalError(`${exe} exited with ${r.status}`)
     }
 }
 
@@ -129,7 +129,7 @@ export function runWithPipe(argv: string[], options: SpawnSyncOptions = {}):
     }, options));
 
     if (r.status !== 0) {
-        throw new FatalError(`docker build exited with ${r.status}`)
+        throw new FatalError(`${exe} exited with ${r.status}`)
     }
 
     return {
