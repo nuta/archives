@@ -1,4 +1,4 @@
-const { isRebuilt, bootfsPath, assetPath, buildPath, run, sudo, mkdirp } = require('../pkgbuilder').pkg
+const { isRebuilt, bootfsPath, assetPath, buildPath, run, sudo, mkdirp, runWithPipe } = require('../pkgbuilder').pkg
 const { spawnSync } = require('child_process')
 
 const linuxVersion = '1.20170811-1'
@@ -47,11 +47,17 @@ module.exports = {
 
     mkdirp(mountPoint)
     run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
-    run(['mkfs.fat', '-n', 'MAKESTACK', imageFile])
+    spawnSync('fdisk', imageFile, { input: 'n\np\n\n\n\na\nw' })
+
+    const devFile = runWithPipe(['sudo', 'losetup', '--partscan', '--show', '--find', imageFile])
+      .replace(/\n+$/, '') + 'p1'
+
+    run(['mkfs.fat', '-n', 'MAKESTACK', devFile])
     run(['mkdir', '-p', mountPoint])
-    sudo(['mount', imageFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
+    sudo(['mount', devFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
     run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
     sudo(['umount', mountPoint])
+    run(['sudo', 'losetup', '-d', devFile])
   },
 
   bootfs: {

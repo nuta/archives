@@ -91,6 +91,27 @@ function run(argv, env, cwd) {
   }
 }
 
+function runWithPipe(argv, env, cwd) {
+  console.log(`+++ ${argv.join(' ')}`)
+  const cp = spawnSync(argv[0], argv.slice(1), {
+    cwd: cwd || process.cwd(),
+    env: Object.assign({
+      PATH: process.env.PATH,
+      MAKEFLAGS: `-j${os.cpus().length}`
+    }, env)
+  })
+
+  if (cp.error) {
+    throw new Error(`error: failed to run ${argv[0]}: ${cp.error}`)
+  }
+
+  if (cp.status !== 0) {
+    throw new Error(`error: \`${argv[0]}' exited with ${cp.status}.`)
+  }
+
+  return cp.stdout
+}
+
 function sudo(argv, env) {
   console.log(`+++ sudo ${argv.join(' ')}`)
   spawnSync('sudo', argv, {
@@ -113,6 +134,7 @@ module.exports = {
   rootfsPath,
   isRebuilt,
   run,
+  runWithPipe,
   sudo,
   mkdirp
 }
