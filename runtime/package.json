@@ -15,12 +15,10 @@
     "prepack": "npm run build",
     "build-native": "./build-native $ARCH",
     "build-host-native": "./build-native host",
-    "transpile": "tsc --pretty",
-    "build:live": "tsc --pretty -w"
+    "transpile": "tsc",
+    "build:live": "tsc -w"
   },
-  "dependencies": {
-    "nan": "^2.7.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.0.6",
     "@types/mocha": "^2.2.44",
@@ -31,6 +29,7 @@
     "istanbul": "^1.1.0-alpha.1",
     "mocha": "^4.0.1",
     "mock-fs": "^4.4.2",
+    "nan": "^2.7.0",
     "sinon": "^4.1.2",
     "source-map-support": "^0.5.0",
     "ts-node": "^3.3.0",
