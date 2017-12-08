@@ -3,10 +3,13 @@ lib
 test
 node_modules
 package.json
+binding.gyp
 tsconfig.json
 yarn.lock
 makestack.d.ts
 build
+src
 dist/*.map
 dist/*/*.map
 scaffold.js
+build-native
