@@ -115,12 +115,12 @@ matrix:
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
+        - npm install -g yarn
         - cd sdk
         - yarn --ignore-scripts
         - yarn prepack
         - yarn
         - cd installer
-        - npm install -g yarn
         - yarn
       script:
         - yarn run build:macos
