@@ -15,7 +15,7 @@ module.exports = {
 
   check() {
     if (spawnSync('which', ['node-gyp']).status !== 0) {
-      throw new Error('Install node-gyp first!')
+      throw new Error('Install node-gyp and nan first!')
     }
   },
 
