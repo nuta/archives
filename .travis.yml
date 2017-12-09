@@ -20,13 +20,11 @@ matrix:
             - nodejs
       cache:
         apt: true
+        yarn: true
         directories:
           - linux/build/downloads
-      install:
-        - npm install -g yarn node-gyp nan
-        - cd linux
-      script:
-        - BUILD=release make x64
+      install: npm install -g yarn
+      script: BUILD=release make -C linux x64
 
     - language: node_js
       node_js: "8"
@@ -46,22 +44,11 @@ matrix:
             - nodejs
       cache:
         apt: true
+        yarn: true
         directories:
           - linux/build/downloads
-          - qemu
-      install:
-        - npm install -g yarn node-gyp nan
-        - mkdir -p qemu
-        - cd qemu
-        - wget https://download.qemu.org/qemu-2.10.1.tar.xz
-        - tar xf qemu-2.10.1.tar.xz
-        - cd qemu-2.10.1
-        - ./configure --target-list=arm-softmmu
-        - make -j2
-        - sudo make install
-        - cd ../../linux
-      script:
-        - BUILD=release make raspberrypi3
+      install: npm install -g yarn
+      script: BUILD=release make -C linux raspberrypi3
 
     - language: ruby
       env: M=server:backend:sqlite3
