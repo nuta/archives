@@ -7,6 +7,8 @@ import {
     find, generateTempPath, run, readTextFile, createFile, removeFiles
 } from "./helpers";
 import { logger } from "./logger";
+import { FatalError } from "./types";
+import { buildPlugin } from "./plugin_builder";
 import { spawnSync } from "child_process";
 
 async function mergeZipFiles(basepath: string, destZip: JSZip, srcZip: JSZip) {
@@ -18,12 +20,59 @@ async function mergeZipFiles(basepath: string, destZip: JSZip, srcZip: JSZip) {
     return destZip;
 }
 
+async function loadZipData(zip: Buffer): Promise<JSZip> {
+    return (new JSZip()).loadAsync(zip);
+}
+
 async function downloadAndExtractPackage(name: string, zip: JSZip, basepath: string) {
     logger.progress(`downloading \`${name}'`);
     const pluginZip = await api.downloadPlugin(name);
 
     logger.progress(`extracting \`${name}'`);
-    zip = await mergeZipFiles(basepath, zip, await (new JSZip()).loadAsync(pluginZip));
+    zip = await mergeZipFiles(basepath, zip, await loadZipData(pluginZip));
+    return zip;
+}
+
+async function populatePlugins(zip: JSZip, runtime: string,
+    plugins: string[] | { [name: string]: string }): Promise<JSZip>
+{
+    zip = await downloadAndExtractPackage(runtime, zip, `node_modules/@makestack/${runtime}`);
+
+    if (Array.isArray(plugins)) {
+        const _plugins: {[name: string]: string} = {}
+        for (const name of plugins) {
+            _plugins[name] = 'latest';
+        }
+        plugins = _plugins;
+    }
+
+    for (const pluginName in plugins) {
+        const url = plugins[pluginName];
+        const basedir = `node_modules/@makestack/${pluginName}`;
+
+        if (url.startsWith('file:')) {
+            // Plugins in the local directory.
+            const pluginZipPath = generateTempPath();
+
+            logger.progress(`building \`${pluginName}'`);
+            buildPlugin(url.split('file:')[1], pluginZipPath);
+
+            logger.progress(`extracting \`${pluginName}'`);
+            zip = await mergeZipFiles(`node_modules/@makestack/${pluginName}`, zip,
+                await loadZipData(fs.readFileSync(pluginZipPath)));
+            fs.unlinkSync(pluginZipPath);
+        } else if (url === 'latest') {
+            // Plugins on the GitHub.
+            zip = await downloadAndExtractPackage(pluginName, zip, basedir);
+            if (!zip.files[`node_modules/@makestack/${pluginName}/package.json`]) {
+                zip.file(`node_modules/@makestack/${pluginName}/package.json`,
+                    JSON.stringify({ name: pluginName, private: true }));
+            }
+        } else {
+            throw new FatalError(`Unknown plugin version or url of \`${pluginName}': \`${url}'`)
+        }
+    }
+
     return zip;
 }
 
@@ -34,21 +83,15 @@ export async function deploy(appYAML: any, files: any[]) {
     let zip = new JSZip();
     let tempDir;
 
-    // Download the runtime.
-    zip = await downloadAndExtractPackage(runtime, zip, `node_modules/@makestack/${runtime}`);
-
     // Populate plugin files.
-    for (const pluginName of plugins) {
-        zip = await downloadAndExtractPackage(pluginName, zip, `node_modules/@makestack/${pluginName}`);
-        if (!zip.files[`node_modules/@makestack/${pluginName}/package.json`]) {
-            zip.file(`node_modules/@makestack/${pluginName}/package.json`,
-            JSON.stringify({ name: pluginName, private: true }));
-        }
-    }
+    zip = await populatePlugins(zip, runtime, appYAML.plugins);
 
     // Copy start.js to the top level.
     logger.progress(`copying start.js from \`${runtime}'`);
     const startJsRelPath = `node_modules/@makestack/${runtime}/start.js`;
+    if (!zip.files[startJsRelPath]) {
+        throw new FatalError(`BUG: start.js is not found in \`${runtime}'.`);
+    }
     zip.file("start.js", zip.files[startJsRelPath].async("arraybuffer"));
 
     // Copy app files.
@@ -80,20 +123,21 @@ function shouldBePruned(filepath: string) {
     const EXCLUDED_FILENAMES = [
         'LICENSE', 'LICENSE.md', '.travis.yml', '.eslintrc.js', 'eslintignore',
         '.editorconfig', '.yarn-integrity', '.yarnclean', '.npmignore', '.gitignore',
-        'Makefile', '.gitattributes', 'appveyor.yml', 'tsconfig.json', 'jsconfig.json'
+        'Makefile', '.gitattributes', 'appveyor.yml', 'tsconfig.json', 'jsconfig.json',
+        '.makestackignore', 'yarn.lock', 'license', '.eslintjsonrc.json', 'README.md',
+        'CONTRIBUTING.md'
     ]
 
     const EXCLUDED_DIRS = [
         'test', 'tests', 'docs', 'doc', 'Documentation', 'examples', 'example',
-        'coverage', '.vscode', '.idea', '.github'
+        'coverage', '.vscode', '.idea', '.github', '.git'
     ]
 
     const { base, ext, dir } = path.parse(filepath);
-    const parentDir = path.basename(dir);
 
     return EXCLUDED_EXTS.includes(ext) ||
         EXCLUDED_FILENAMES.includes(base) ||
-        EXCLUDED_DIRS.includes(parentDir);
+        EXCLUDED_DIRS.some(name => filepath.match(`(node_modules\\/.+\\/)?${name}\\/`) !== null);
 }
 
 export async function deployAppDir(appDir: string) {
@@ -103,7 +147,7 @@ export async function deployAppDir(appDir: string) {
     for (const filepath of find(appDir)) {
         if (!shouldBePruned(filepath) && !filepath.includes("node_modules")) {
             files.push({
-                path: filepath,
+                path: path.relative(appDir, filepath),
                 body: readTextFile(filepath),
             });
         }
@@ -121,9 +165,12 @@ export async function deployAppDir(appDir: string) {
         logger.progress("downloading npm dependencies...")
         run(["yarn", "install", "--production"], { cwd: tempDir })
 
-        for (const filepath of find(path.join())) {
+        for (const filepath of find(path.join(tempDir, 'node_modules'))) {
             if (!shouldBePruned(filepath)) {
-                files.push({ path: filepath, body: fs.readFileSync(filepath) });
+                files.push({
+                    path: path.relative(tempDir, filepath),
+                    body: fs.readFileSync(filepath)
+                });
             }
         }
     }
