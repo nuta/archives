@@ -3,10 +3,10 @@ set -ue
 ARCH=$1
 
 if [ "$ARCH" = "host" ]; then
-  node-gyp rebuild
+  yarn node-gyp rebuild
   ARCH=$(node -e "console.log(process.arch)")
 else
-  node-gyp rebuild --arch $ARCH
+  yarn node-gyp rebuild --arch $ARCH
 fi
 
 mkdir -p native/$ARCH
