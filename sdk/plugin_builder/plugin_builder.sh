@@ -5,12 +5,28 @@ run_node_gyp(){
   arch=$1
   cross_compile=$2
 
-  AR=${cross_compile}ar CC=${cross_compile}gcc CXX=${cross_compile}g++ LINK=${cross_compile}g++ \
+  CC=${cross_compile}gcc CXX=${cross_compile}g++ LINK=${cross_compile}g++ \
     node-gyp rebuild --loglevel=warn --release --arch $arch
 
   mkdir -p native/$arch
   mv build/Release/*.node native/$arch
   ${cross_compile}strip -s native/$arch/*.node
+}
+
+install_npm_dependencies() {
+  arch=$1
+  cross_compile=$2
+
+  yarn --production --ignore-scripts
+  CC=${cross_compile}gcc CXX=${cross_compile}g++ LINK=${cross_compile}g++ \
+    npm rebuild --arch=$arch
+
+  BUILD_DEPS="$(node -e "console.log((JSON.parse(fs.readFileSync('package.json')).buildDependencies || []).join(' '))")"
+  for dep in $BUILD_DEPS; do
+    rm -rf node_modules/$dep
+  done
+
+  mv node_modules deps/$arch
 }
 
 cp -r /plugin /build
@@ -38,6 +54,11 @@ if [ -f package.json ]; then
     run_node_gyp arm   arm-linux-gnueabihf-
     run_node_gyp arm64 aarch64-linux-gnu-
   fi
+
+  mkdir deps
+  install_npm_dependencies x64   ''
+  install_npm_dependencies arm   arm-linux-gnueabihf-
+  install_npm_dependencies arm64 aarch64-linux-gnu-
 fi;
 
 if [ -f .makestackignore ]; then
