@@ -13,12 +13,6 @@ module.exports = {
   path: supervisorPath,
   ignore,
 
-  check() {
-    if (spawnSync('which', ['node-gyp']).status !== 0) {
-      throw new Error('Install node-gyp and nan first!')
-    }
-  },
-
   changed() {
     const isChanged = isNewerDirContent(supervisorPath, buildPath('supervisor'), ignore)
     if (isChanged) {
@@ -35,7 +29,11 @@ module.exports = {
     packageJSON.dependencies['@makestack/runtime'] = 'file:' + runtimePath
     fs.writeFileSync('package.json', JSON.stringify(packageJSON))
 
+    // Build Supervisor.
     run(['yarn'])
+
+    // Build Runtime.
+    run(['yarn', 'install'], {}, 'node_modules/@makestack/runtime')
     run(['npm', 'run', 'transpile'], {}, 'node_modules/@makestack/runtime')
     run(['npm', 'run', 'build-native'], {
       ARCH: config('target.node_gyp_arch'),
