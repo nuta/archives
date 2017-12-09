@@ -187,9 +187,7 @@ function main() {
   }
 
   const imageFile = path.resolve(build.buildDir, `makestack-linux-${target}.img`)
-  if (!fs.existsSync(imageFile)) {
-    packages[build.target].buildImage(imageFile)
-  }
+  packages[build.target].buildImage(imageFile)
 }
 
 main()

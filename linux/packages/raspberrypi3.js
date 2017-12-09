@@ -47,17 +47,19 @@ module.exports = {
 
     mkdirp(mountPoint)
     run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
-    spawnSync('fdisk', imageFile, { input: 'n\np\n\n\n\na\nw' })
+    spawnSync('fdisk', [imageFile], { input: 'n\np\n\n\n\na\nw' })
 
-    const devFile = runWithPipe(['sudo', 'losetup', '--partscan', '--show', '--find', imageFile])
-      .replace(/\n+$/, '') + 'p1'
+    const loopFile = runWithPipe(
+      ['sudo', 'losetup', '--partscan', '--show', '--find', imageFile]
+    ).replace(/\n+$/, '')
+    const devFile = loopFile + 'p1'
 
-    run(['mkfs.fat', '-n', 'MAKESTACK', devFile])
+    sudo(['mkfs.fat', '-n', 'MAKESTACK', devFile])
     run(['mkdir', '-p', mountPoint])
     sudo(['mount', devFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
     run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
     sudo(['umount', mountPoint])
-    run(['sudo', 'losetup', '-d', devFile])
+    run(['sudo', 'losetup', '-d', loopFile])
   },
 
   bootfs: {

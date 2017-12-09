@@ -95,6 +95,7 @@ function runWithPipe(argv, env, cwd) {
   console.log(`+++ ${argv.join(' ')}`)
   const cp = spawnSync(argv[0], argv.slice(1), {
     cwd: cwd || process.cwd(),
+    encoding: 'utf-8',
     env: Object.assign({
       PATH: process.env.PATH,
       MAKEFLAGS: `-j${os.cpus().length}`
