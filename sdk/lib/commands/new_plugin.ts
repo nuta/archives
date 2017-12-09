@@ -121,7 +121,7 @@ const TYPESCRIPT_TEMPLATES = [
         template: `\
 export class {{ CamelAppName }} {
     constructor() {
-        print('Hello form {{ CamelAppName }}!')
+        println('Hello form {{ CamelAppName }}!')
     }
 }
 `,
