@@ -107,7 +107,10 @@ function runWithPipe(argv, env, cwd) {
   }
 
   if (cp.status !== 0) {
-    throw new Error(`error: \`${argv[0]}' exited with ${cp.status}.`)
+    throw new Error(
+      `error: \`${argv[0]}' exited with ${cp.status}.\n` +
+      `stdout:${cp.stdout}\n\nstderr:${cp.stderr}`
+    )
   }
 
   return cp.stdout
