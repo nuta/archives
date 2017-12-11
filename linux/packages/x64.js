@@ -1,5 +1,7 @@
 const { spawnSync } = require('child_process')
-const { isRebuilt, bootfsPath, buildPath, run, sudo } = require('../pkgbuilder').pkg
+const {
+   isRebuilt, bootfsPath, buildPath, run, sudo, buildFatImage
+} = require('../pkgbuilder').pkg
 
 const version = '4.9.53'
 const dependencies = ['linux', 'bootfs-files']
@@ -41,15 +43,6 @@ module.exports = {
   },
 
   buildImage(imageFile) {
-    const mountPoint = buildPath('image')
-    const username = spawnSync('whoami', { encoding: 'utf-8' })
-      .stdout.replace('\n', '')
-
-    run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
-    run(['mkfs.fat', '-n', 'MAKESTACK', imageFile])
-    run(['mkdir', '-p', mountPoint])
-    sudo(['mount', imageFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
-    run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
-    sudo(['umount', mountPoint])
+    buildFatImage(imageFile)
   }
 }
