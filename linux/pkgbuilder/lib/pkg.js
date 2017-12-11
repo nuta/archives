@@ -131,7 +131,7 @@ function sudo(argv, env) {
 function buildFatImage(imageFile) {
 
   const mountPoint = buildPath('image')
-  const username = runWithPipe(['whoami']).stdout.replace('\n', '')
+  const username = runWithPipe(['whoami']).replace('\n', '')
 
   mkdirp(mountPoint)
   run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
