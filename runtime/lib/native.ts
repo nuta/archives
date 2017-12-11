@@ -1,3 +1,5 @@
+import { getDeviceType } from "./helpers";
+
 export interface NativeFunctions {
     ioctl: (fd: number, request: number, data: Buffer | number) => number;
     spiConfigure: (fd: number, mode: number, bits: number, speed: number, order: number) => void;
@@ -5,4 +7,8 @@ export interface NativeFunctions {
     serialConfigure: (fd: number, baudrate: number, databits: number, parity: number) => void;
 };
 
-export const functions: NativeFunctions = require(`../native/${process.arch}/native.node`);
+const nativeModulePath =
+    (getDeviceType() === 'sdk') ?
+        '../build/Release/native' : `../native/${process.arch}/native.node`;
+
+export const functions: NativeFunctions = require(nativeModulePath);
