@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import * as fs from 'fs';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { GPIO } = require('../..');
+import { GPIO } from '../..';
 
 function readFile(path: string) {
     return fs.readFileSync(path, { encoding: 'utf-8' })

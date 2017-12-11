@@ -17,13 +17,13 @@ export type SPIMode = 'MODE0' | 'MDOE1' | 'MODE2';
 export type SPIOrder = 'LSBFIRST' | 'MSBFIRST';
 export interface SPIConstructor {
     new(args: {
-        slave: number,
-        speed: number,
+        slave?: number,
         mode: SPIMode,
-        order: SPIOrder,
-        bits: number,
-        ss: number,
-        path: string
+        speed?: number,
+        order?: SPIOrder,
+        bits?: number,
+        ss?: number,
+        path?: string
     }): SPIInterface;
 }
 

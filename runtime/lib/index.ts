@@ -11,8 +11,8 @@ import { dummyGPIO, dummyI2C, dummySPI } from "./dummy";
 import { GPIOConstructor, I2CConstructor, SPIConstructor, DeviceType } from "./types";
 
 function detectDeviceType(): DeviceType {
-    if (process.env.DEVICE_TYPE) {
-        return process.env.DEVICE_TYPE as DeviceType;
+    if (process.env.MAKESTACK_DEVICE_TYPE) {
+        return process.env.MAKESTACK_DEVICE_TYPE as DeviceType;
     }
 
     if (fs.existsSync("/proc/cpuinfo")) {

@@ -23,14 +23,19 @@ export abstract class LinuxSPIAPI {
     public order: SPIOrder;
 
     constructor(args: {
-        slave: number, speed: number, mode: SPIMode, order: SPIOrder,
-        bits: number, ss: number, path: string
+        slave?: number, speed?: number, mode: SPIMode, order?: SPIOrder,
+        bits?: number, ss?: number, path?: string
     }) {
-        if (!args.path && !args.slave) {
-            throw new Error("Specify `path' or `slave'.");
-        }
+        let path;
+        if (args.slave) {
+            path = `/dev/spidev${this.bus}.${args.slave}`;
+        } else {
+            if (!args.path) {
+                throw new Error("Specify `path' or `slave'.");
+            }
 
-        const path = (args.slave === undefined) ? args.path : `/dev/spidev${this.bus}.${args.slave}`;
+            path = args.path;
+        }
 
         if (args.ss !== undefined) {
             if (!GPIO) {
@@ -45,14 +50,14 @@ export abstract class LinuxSPIAPI {
         }
 
         this.fd = fs.openSync(path, "rs+");
-        this.configure(args.mode, args.bits, args.speed, args.order);
+        this.configure(args.mode, args.bits || 8, args.speed || 500000, args.order || "MSBFIRST");
     }
 
     public configure(mode: SPIMode, bits: number, speed: number, order: SPIOrder) {
         this.mode = mode || "MODE0";
         this.bits = bits || 8;
-        this.speed = speed || 500000;
-        this.order = order || "MSBFIRST";
+        this.speed = speed;
+        this.order = order;
 
         const modeNumber = SPI_MODES[this.mode];
         if (typeof modeNumber !== "number") {

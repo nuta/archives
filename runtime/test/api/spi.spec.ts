@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { SPI } = require('../..');
+import { SPI } from '../..';
 
 
 describe('SPI API', function() {
@@ -20,7 +20,7 @@ describe('SPI API', function() {
 
         this.spiConfigure = sinon.stub(require('../../dist/native').functions, 'spiConfigure')
         this.spiTransfer = sinon.stub(require('../../dist/native').functions, 'spiTransfer')
-        this.instance = new SPI({ slave: this.slave })
+        this.instance = new SPI({ slave: this.slave, speed: 10000, mode: 'MODE2' })
     })
 
     afterEach(function() {
@@ -31,7 +31,6 @@ describe('SPI API', function() {
 
     describe('transfer', function() {
         it('access the device file', function () {
-            this.instance.configure('MODE3', 8, 100000);
             this.instance.transfer([0x11, 0x22, 0x33]);
             expect(fs.statSync(this.deviceFile).atime).to.not.equal(this.atime)
             expect(this.spiConfigure.called).to.be.true
