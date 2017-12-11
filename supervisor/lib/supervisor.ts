@@ -10,25 +10,23 @@ import { verifyImageHMAC, verifyMessageHMAC } from "./hmac";
 import * as logger from "./logger";
 import { deserialize, serialize } from "./smms";
 import * as unzip from "./unzip";
-import { TConfigs, TDeviceState, IPayloadMessages } from "./types";
+import { Configs, DeviceState, PayloadMessages } from "./types";
 import { AdapterBase } from "./adapters/adapter_base";
 import * as apis from "@makestack/runtime";
 import { HTTPAdapter } from "./adapters/http_adapter";
 import { SakuraIOAdapter } from "./adapters/sakuraio_adapter";
 
-interface ISupervisorConstructorArgs {
+export interface SupervisorConstructorArgs {
     adapter: {
         name: string,
         url?: string,
     };
+    mode: 'production' | 'debug' | 'test';
     appDir: string;
-    deviceType: string;
     osType: string;
     osVersion: string;
     deviceId: string;
     deviceSecret: string;
-    debugMode: boolean;
-    testMode: boolean;
     appUID?: number;
     appGID?: number;
     heartbeatInterval: number;
@@ -41,6 +39,7 @@ export class Supervisor {
     private currentAppDir: string;
     private osType: string;
     private osVersion: string;
+    private mode: string;
     private debugMode: boolean;
     private testMode: boolean;
     private appUID?: number;
@@ -66,8 +65,8 @@ export class Supervisor {
     private rebooting: boolean;
     private heartbeatTimer?: any;
 
-    constructor(args: ISupervisorConstructorArgs) {
-        process.on("unhandledRejection", (reason, p) => {
+    constructor(args: SupervisorConstructorArgs) {
+        process.on("unhandledRejection", (reason: any) => {
             console.log("supervisor: unhandled rejection:", reason);
             console.log("supervisor: exiting...");
             process.exit(1);
@@ -78,15 +77,15 @@ export class Supervisor {
         this.currentAppDir = path.join(args.appDir, "current");
         this.osType = args.osType;
         this.osVersion = args.osVersion;
-        this.debugMode = args.debugMode;
-        this.testMode = args.testMode;
+        this.mode = args.mode;
+        this.debugMode = args.mode === 'debug';
+        this.testMode = args.mode === 'test';
         this.appUID = args.appUID;
         this.appGID = args.appGID;
         this.heartbeatInterval = args.heartbeatInterval || 15;
         this.deviceId = args.deviceId;
         this.deviceSecret = args.deviceSecret;
-        this.deviceType = args.deviceType;
-        const { Device } = require(`./devices/${args.deviceType}`);
+        const { Device } = require(`./devices/${apis.Device.getDeviceType()}`);
         this.device = new Device();
         this.appVersion = "X";
         this.log = "";
@@ -95,13 +94,8 @@ export class Supervisor {
         this.adapterName = args.adapter.name;
         this.updateEnabled = true;
         this.downloading = false;
-        this.replEnabled = args.debugMode;
+        this.replEnabled = args.mode === 'debug';
         this.rebooting = false;
-
-        process.env.RUNTIME_MODULE = args.runtimeModulePath || "@makestack/runtime";
-
-        // Used in runtime. This must be set before require it.
-        process.env.MAKESTACK_DEVICE_TYPE = args.deviceType;
 
         if (this.replEnabled) {
             this.replVM = vm.createContext(apis);
@@ -264,13 +258,13 @@ export class Supervisor {
         this.app.send(Object.assign({ type }, data));
     }
 
-    private async sendHeartbeat(state: TDeviceState) {
+    private async sendHeartbeat(state: DeviceState) {
         if (this.downloading) {
             return;
         }
 
         logger.info(`heartbeating (state=running, os_ver="${this.osVersion}", ` +
-        `app_ver="${this.appVersion}", debug=${this.debugMode})`);
+        `app_ver="${this.appVersion}", mode=${this.mode})`);
 
         await this.adapter.send(serialize({
             state,
@@ -377,7 +371,7 @@ export class Supervisor {
     }
 
     private handleConfigMessage(configs: [string]) {
-        const configsToApp: TConfigs = {};
+        const configsToApp: Configs = {};
         for (const key in configs) {
             const isBuiltinCommand = [
                 this.replEnabled &&
@@ -394,14 +388,14 @@ export class Supervisor {
         this.sendToApp("configs", { configsToApp });
     }
 
-    private isOSUpdateRequired(messages: IPayloadMessages): boolean {
+    private isOSUpdateRequired(messages: PayloadMessages): boolean {
         return this.updateEnabled &&
         !this.downloading &&
         messages.osVersion !== undefined &&
         messages.osVersion !== this.osVersion;
     }
 
-    private isAppUpdateRequired(messages: IPayloadMessages): boolean {
+    private isAppUpdateRequired(messages: PayloadMessages): boolean {
         return this.updateEnabled &&
         !this.downloading &&
         messages.appVersion !== undefined &&

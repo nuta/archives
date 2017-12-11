@@ -3,6 +3,7 @@
     "outDir": "./dist",
     "target": "es2017",
     "module": "commonjs",
+    "declaration": true,
     "sourceMap": true,
     "strict": true,
     "alwaysStrict": true,

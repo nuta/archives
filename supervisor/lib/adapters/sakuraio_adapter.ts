@@ -30,10 +30,10 @@ const CMD_RX_DEQUEUE = 0x30;
 const CMD_RX_LENGTH = 0x32;
 const FILE_CHUNK_SIZE = 16;
 
-type TChannel = number;
-type TChannelType = 0x62 /* CH_TYPE_8BYTES */;
+export type TChannel = number;
+export type TChannelType = 0x62 /* CH_TYPE_8BYTES */;
 
-abstract class SakuraIODriverBase {
+export abstract class SakuraIODriverBase {
     public abstract command(command: number, data: Buffer): Promise<[number, Buffer]>;
 
     public computeParity(firstByte: number, data: Buffer) {
@@ -116,7 +116,7 @@ abstract class SakuraIODriverBase {
     }
 }
 
-class I2CSakuraIODriver extends SakuraIODriverBase {
+export class I2CSakuraIODriver extends SakuraIODriverBase {
     public i2c: any;
 
     constructor() {

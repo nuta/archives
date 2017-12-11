@@ -1,6 +1,6 @@
 import * as assert from "assert";
 import { computeHMAC } from "./hmac";
-import { IPayloadMessages } from "./types";
+import { PayloadMessages } from "./types";
 
 const SMMS_VERSION = 1;
 const SMMS_HMAC_MSG = 0x06;
@@ -60,13 +60,13 @@ export function generateMessage(type: number, payload: any) {
     return msg;
 }
 
-interface ISerializeOptions {
+export interface SerializeOptions {
     includeDeviceId: boolean;
     includeHMAC: boolean;
     deviceSecret: string;
 };
 
-export function serialize(messages: IPayloadMessages, options: ISerializeOptions) {
+export function serialize(messages: PayloadMessages, options: SerializeOptions) {
     let payload = Buffer.alloc(0);
 
     if (options.includeDeviceId && messages.deviceId) {
