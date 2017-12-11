@@ -238,7 +238,6 @@ interface SubProcessResult {
 ### onInterrupt
 - **Definition:**
   - `(mode: 'rising' | 'falling' | 'both', callback: () => void) => void`
-  - `(/* mode = 'rising' */ callback: () => void) => void`
 - **Usage:**
   ```js
   const button = new GPIO({ pin: 13, mode: 'in' })

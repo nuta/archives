@@ -35,11 +35,6 @@ export class LinuxGPIOAPI {
     }
 
     public onInterrupt(mode: GPIOInterruptMode, callback: () => void) {
-        if (typeof mode === "function") {
-            callback = mode;
-            mode = "rising";
-        }
-
         this.setMode('in');
         fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/edge`, mode);
         fs.watch(`/sys/class/gpio/gpio${this.pin}/value`, () => {
