@@ -6,7 +6,7 @@ const sensor = new HDC1000()
 
 let displayMessages = []
 
-Store.onChange('messages', newMessages => {
+Config.onChange('messages', newMessages => {
   displayMessages = JSON.parse(newMessages)
 })
 

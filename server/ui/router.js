@@ -8,14 +8,14 @@ import SettingsView from './views/settings'
 import AppsView from './views/apps'
 import NewAppView from './views/apps/new'
 import AppLogView from './views/apps/log'
-import AppStoresView from './views/apps/stores'
+import AppConfigsView from './views/apps/configs'
 import AppSettingsView from './views/apps/settings'
 import CodeView from './views/apps/code'
 import IntegrationsView from './views/apps/integrations'
 import NewIntegrationView from './views/apps/new_integration'
 import DeploymentsView from './views/apps/deployments'
 import DevicesView from './views/devices'
-import DeviceStoresView from './views/devices/stores'
+import DeviceConfigsView from './views/devices/configs'
 import DeviceLogView from './views/devices/log'
 import DeviceSettingsView from './views/devices/settings'
 
@@ -34,10 +34,10 @@ let routes = [
   { name: 'appLog', path: '/apps/:appName/log', component: AppLogView },
   { name: 'integrations', path: '/apps/:appName/integrations', component: IntegrationsView },
   { name: 'newIntegration', path: '/apps/:appName/integrations/new', component: NewIntegrationView },
-  { name: 'appStores', path: '/apps/:appName/stores', component: AppStoresView },
+  { name: 'appConfigs', path: '/apps/:appName/configs', component: AppConfigsView },
   { name: 'appSettings', path: '/apps/:appName/settings', component: AppSettingsView },
   { name: 'devices', path: '/devices', component: DevicesView },
-  { name: 'deviceStores', path: '/devices/:deviceName/stores', component: DeviceStoresView },
+  { name: 'deviceConfigs', path: '/devices/:deviceName/configs', component: DeviceConfigsView },
   { name: 'deviceLog', path: '/devices/:deviceName/log', component: DeviceLogView },
   { name: 'deviceSettings', path: '/devices/:deviceName/settings', component: DeviceSettingsView }
 ]

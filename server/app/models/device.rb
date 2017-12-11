@@ -4,7 +4,7 @@ class Device < ApplicationRecord
 
   belongs_to :user
   belongs_to :app, optional: true
-  has_many :stores, as: :owner, dependent: :destroy
+  has_many :configs, as: :owner, dependent: :destroy
 
   value :status, expiration: 45.minutes
   value :debug_mode, expiration: 45.minutes
@@ -80,22 +80,22 @@ class Device < ApplicationRecord
     end
   end
 
-  def formatted_stores
-    stores = {}
+  def formatted_configs
+    configs = {}
 
-    Store.where(owner_type: 'App', owner_id: self.app_id).find_each do |store|
-      stores[store.key] = { value: store.value }
+    Config.where(owner_type: 'App', owner_id: self.app_id).find_each do |config|
+      configs[config.key] = { value: config.value }
     end
 
-    Store.where(owner_type: 'Device', owner_id: self.id).find_each do |store|
-      stores[store.key] = { value: store.value }
+    Config.where(owner_type: 'Device', owner_id: self.id).find_each do |config|
+      configs[config.key] = { value: config.value }
 
-      if store.is_command?
-        store.destroy
+      if config.is_command?
+        config.destroy
       end
     end
 
-    Hash[stores.sort]
+    Hash[configs.sort]
   end
 
   def formatted_command_results
@@ -147,7 +147,7 @@ class Device < ApplicationRecord
 
   def invoke_command!(command, arg)
     command_id = (self.last_command_id.value.to_i || 0) + 1
-    Store.create!(
+    Config.create!(
       owner_type: 'Device',
       owner_id: self.id,
       key: "<#{command_id} #{command}",

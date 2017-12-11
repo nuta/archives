@@ -4,12 +4,12 @@ RSpec.describe Device, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:app) }
-    it { is_expected.to have_many(:stores).dependent(:destroy) }
+    it { is_expected.to have_many(:configs).dependent(:destroy) }
   end
 
   describe 'destroy' do
     subject { create(:device) }
-    it_should_behave_like 'a removable model', [Store]
+    it_should_behave_like 'a removable model', [Config]
   end
 
   describe 'validations' do

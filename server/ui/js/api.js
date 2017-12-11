@@ -183,22 +183,22 @@ class API {
     return this.invoke('GET', `/devices/${deviceName}/log`)
   }
 
-  createDeviceStore(deviceName, key, type, value) {
-    return this.invoke('POST', `/devices/${deviceName}/stores`, {
-      store: { key, data_type: type, value }
+  createDeviceConfig(deviceName, key, type, value) {
+    return this.invoke('POST', `/devices/${deviceName}/configs`, {
+      config: { key, data_type: type, value }
     })
   }
 
-  deleteDeviceStore(deviceName, key) {
-    return this.invoke('DELETE', `/devices/${deviceName}/stores/${key}`)
+  deleteDeviceConfig(deviceName, key) {
+    return this.invoke('DELETE', `/devices/${deviceName}/configs/${key}`)
   }
 
-  getDeviceStores(deviceName) {
-    return this.invoke('GET', `/devices/${deviceName}/stores`)
+  getDeviceConfigs(deviceName) {
+    return this.invoke('GET', `/devices/${deviceName}/configs`)
   }
 
-  updateDeviceStore(deviceName, key, value) {
-    return this.invoke('PUT', `/devices/${deviceName}/stores/${key}`,
+  updateDeviceConfig(deviceName, key, value) {
+    return this.invoke('PUT', `/devices/${deviceName}/configs/${key}`,
       { value })
   }
 
@@ -256,23 +256,23 @@ class API {
     return this.invoke('PUT', `/apps/${appName}/files/${path}`, { body })
   }
 
-  getAppStores(appName) {
-    return this.invoke('GET', `/apps/${appName}/stores`)
+  getAppConfigs(appName) {
+    return this.invoke('GET', `/apps/${appName}/configs`)
   }
 
-  createAppStore(appName, key, type, value) {
-    return this.invoke('POST', `/apps/${appName}/stores`, {
-      store: { key, data_type: type, value }
+  createAppConfig(appName, key, type, value) {
+    return this.invoke('POST', `/apps/${appName}/configs`, {
+      config: { key, data_type: type, value }
     })
   }
 
-  updateAppStore(appName, key, type, value) {
-    return this.invoke('PUT', `/apps/${appName}/stores/${key}`,
-      { store: { data_type: type, value } })
+  updateAppConfig(appName, key, type, value) {
+    return this.invoke('PUT', `/apps/${appName}/configs/${key}`,
+      { config: { data_type: type, value } })
   }
 
-  deleteAppStore(appName, key) {
-    return this.invoke('DELETE', `/apps/${appName}/stores/${key}`)
+  deleteAppConfig(appName, key) {
+    return this.invoke('DELETE', `/apps/${appName}/configs/${key}`)
   }
 
   getOSReleases() {

@@ -1,4 +1,4 @@
-class Store < ApplicationRecord
+class Config < ApplicationRecord
   include Quota
 
   belongs_to :owner, polymorphic: true

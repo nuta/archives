@@ -3,14 +3,14 @@ import { AppAPI } from "./api/app";
 import { publish } from "./api/event";
 import { error, println } from "./api/logging";
 import { SerialAPI } from "./api/serial";
-import { StoreAPI } from "./api/store";
+import { ConfigAPI } from "./api/config";
 import { SubProcessAPI } from "./api/subprocess";
 import { TimerAPI } from "./api/timer";
 import { logger } from "./logger";
 
 export const builtins = {
     Timer: new TimerAPI(),
-    Store: new StoreAPI(),
+    Config: new ConfigAPI(),
     App: new AppAPI(),
     SubProcess: new SubProcessAPI(),
     Serial: SerialAPI,
@@ -37,8 +37,8 @@ export function start(appDir: string) {
     process.on("message", (data) => {
         switch (data.type) {
             case "initialize":
-            logger.info(`initialize message: stores=${JSON.stringify(data.stores)}`);
-            builtins.Store.update(data.stores);
+            logger.info(`initialize message: configs=${JSON.stringify(data.configs)}`);
+            builtins.Config.update(data.configs);
 
             // Start the app.
             logger.info("staring the app");
@@ -47,9 +47,9 @@ export function start(appDir: string) {
             logger.info("started the app");
             break;
 
-            case "stores":
-            logger.info(`stores message: stores=${JSON.stringify(data.stores)}`);
-            builtins.Store.update(data.stores);
+            case "configs":
+            logger.info(`configs message: configs=${JSON.stringify(data.configs)}`);
+            builtins.Config.update(data.configs);
             break;
 
             default:

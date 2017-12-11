@@ -36,10 +36,10 @@
                 Code
               </button>
             </router-link>
-            <router-link :to="{ name: 'appStores', params: { appName: app.name }}">
+            <router-link :to="{ name: 'appConfigs', params: { appName: app.name }}">
               <button class="uk-button">
                 <span uk-icon="icon: database"></span>
-                Stores
+                Configs
               </button>
             </router-link>
             <router-link :to="{ name: 'appLog', params: { appName: app.name }}">

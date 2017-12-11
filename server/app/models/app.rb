@@ -5,7 +5,7 @@ class App < ApplicationRecord
 
   belongs_to :user
   has_many :deployments, dependent: :destroy
-  has_many :stores, as: :owner, dependent: :destroy
+  has_many :configs, as: :owner, dependent: :destroy
   has_many :source_files, dependent: :destroy
   has_many :integrations, dependent: :destroy
   has_many :devices # nullified in disassociate_devices on destroy

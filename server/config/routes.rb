@@ -13,8 +13,8 @@ Rails.application.routes.draw do
         resources :deployments,  controller: 'apps/deployments',
           param: :version, only: %i(index show create)
 
-        resources :app_stores, controller: 'apps/stores',
-          param: :key, path: 'stores', as: :stores, constraints: { key: /.+/ }
+        resources :app_configs, controller: 'apps/configs',
+          param: :key, path: 'configs', as: :configs, constraints: { key: /.+/ }
 
         resources :integrations, controller: 'apps/integrations', param: :name
 
@@ -26,8 +26,8 @@ Rails.application.routes.draw do
       end
 
       resources :devices, param: :name do
-        resources :device_stores, controller: 'devices/stores',
-          param: :key, path: 'stores', as: :store, constraints: { key: /.+/ }
+        resources :device_configs, controller: 'devices/configs',
+          param: :key, path: 'configs', as: :config, constraints: { key: /.+/ }
 
         resources :log, controller: 'devices/log', only: [:index]
         resources :commands, controller: 'devices/commands', only: [:index, :create]

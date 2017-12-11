@@ -31,8 +31,8 @@ export default {
           params: { deviceName: this.deviceName }
         },
         {
-          title: 'Stores',
-          path: 'deviceStores',
+          title: 'Configs',
+          path: 'deviceConfigs',
           icon: 'icon: database',
           params: { deviceName: this.deviceName }
         },

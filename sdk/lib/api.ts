@@ -132,12 +132,12 @@ class API {
         return this.invoke("GET", `/devices/${deviceName}/log`);
     }
 
-    public getDeviceStores(deviceName: string) {
-        return this.invoke("GET", `/devices/${deviceName}/stores`);
+    public getDeviceConfigs(deviceName: string) {
+        return this.invoke("GET", `/devices/${deviceName}/configs`);
     }
 
-    public setDeviceStore(deviceName: string, key: string, value: string) {
-        return this.invoke("PUT", `/devices/${deviceName}/stores/${key}`, { value });
+    public setDeviceConfig(deviceName: string, key: string, value: string) {
+        return this.invoke("PUT", `/devices/${deviceName}/configs/${key}`, { value });
     }
 
     public registerDevice(name: string, deviceType: string, tag?: string) {
@@ -148,12 +148,12 @@ class API {
         return this.invoke("DELETE", `/devices/${deviceName}`);
     }
 
-    public getAppStores(appName: string) {
-        return this.invoke("GET", `/apps/${appName}/stores`);
+    public getAppConfigs(appName: string) {
+        return this.invoke("GET", `/apps/${appName}/configs`);
     }
 
-    public setAppStore(appName: string, key: string, value: string) {
-        return this.invoke("PUT", `/apps/${appName}/stores/${key}`, { value });
+    public setAppConfig(appName: string, key: string, value: string) {
+        return this.invoke("PUT", `/apps/${appName}/configs/${key}`, { value });
     }
 
     public downloadPlugin(name: string): Promise<Buffer> {

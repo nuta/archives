@@ -15,8 +15,8 @@ FactoryBot.define do
     after(:create) do |user, evaluator|
       app = create(:app, user: user)
       device = create(:device, user: user)
-      5.times { create(:store, owner: device) }
-      5.times { create(:store, owner: app) }
+      5.times { create(:config, owner: device) }
+      5.times { create(:config, owner: app) }
       5.times { create(:integration, app: app) }
       5.times { create(:deployment, app: app) }
       5.times { create(:source_file, app: app) }

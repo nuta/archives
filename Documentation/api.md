@@ -60,15 +60,15 @@ You don't have to `require` to use. These functions are defined as a global ones
   publish('temperature', 25)
   ```
 
-## Store
-You don't have to `require` to use. This API is defined as a global `Store` object.
+## Config
+You don't have to `require` to use. This API is defined as a global `Config` object.
 
 ### onCommand
 - **Definition:** `(key: string, callback: (newValue: string) => void) => void`
 - **Usage:**
   ```js
   const pumpRelay = new GPIO({ pin: 13, mode: 'out' })
-  Store.onCommand('water-the-plant', duration => {
+  Config.onCommand('water-the-plant', duration => {
     pumpRelay.write(true)
     setTimeout(pumpRelay.write(false), parseInt(duration))
   })
@@ -80,7 +80,7 @@ You don't have to `require` to use. This API is defined as a global `Store` obje
   ```js
   const AQM0802A = plugin('aqm0802a')
   const display = new AQM0802A()
-  Store.onCHange('displayMessage', dislayMessage => {
+  Config.onCHange('displayMessage', dislayMessage => {
     display.update(displayMessage)
   })
   ```

@@ -24,6 +24,6 @@ exports.webhook = functions.https.onRequest((req, res) => {
         `weather: ${weather}`
       ])
 
-      res.send(JSON.stringify({ stores: { messages } }))
+      res.send(JSON.stringify({ configs: { messages } }))
     })
 })

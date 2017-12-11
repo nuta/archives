@@ -1,6 +1,6 @@
 /// <reference types="node" />
 
-interface Store {
+interface Config {
   onCommand(key: string, callback: (newValue: string) => void): void;
   onChange(key: string, callback: (newValue: string) => void): void;
 }
@@ -59,7 +59,7 @@ interface Serial {
 declare function println(message: string): void;
 declare function error(message: string): void;
 declare function publish(event: string, data?: string | number): void;
-declare var Store: Store;
+declare var Config: Config;
 declare var Timer: Timer;
 declare var Subprocess: Subprocess;
 declare var GPIO: GPIO;

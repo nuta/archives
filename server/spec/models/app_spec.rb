@@ -4,7 +4,7 @@ RSpec.describe App, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:user) }
     it { is_expected.to have_many(:deployments).dependent(:destroy) }
-    it { is_expected.to have_many(:stores).dependent(:destroy) }
+    it { is_expected.to have_many(:configs).dependent(:destroy) }
     it { is_expected.to have_many(:source_files).dependent(:destroy) }
     it { is_expected.to have_many(:integrations).dependent(:destroy) }
     it { is_expected.to have_many(:devices) }
@@ -12,7 +12,7 @@ RSpec.describe App, type: :model do
 
   describe 'destroy' do
     subject { create(:app) }
-    it_should_behave_like 'a removable model', [Store, SourceFile, Integration]
+    it_should_behave_like 'a removable model', [Config, SourceFile, Integration]
   end
 
   describe '#disassociate_devices' do

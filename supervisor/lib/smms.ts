@@ -106,16 +106,16 @@ export function serialize(messages: IPayloadMessages, options: ISerializeOptions
         payload = Buffer.concat([payload, appVersionMsg]);
     }
 
-    if (messages.stores) {
-        for (const key in messages.stores) {
+    if (messages.configs) {
+        for (const key in messages.configs) {
             console.log();
-            const storeMsg = generateMessage(SMMS_STORE_MSG, Buffer.concat([
+            const configMsg = generateMessage(SMMS_STORE_MSG, Buffer.concat([
                 generateVariableLength(Buffer.from(key)),
                 Buffer.from(key),
-                Buffer.from(messages.stores[key].toString()),
+                Buffer.from(messages.configs[key].toString()),
             ]));
 
-            payload = Buffer.concat([payload, storeMsg]);
+            payload = Buffer.concat([payload, configMsg]);
         }
     }
 
@@ -185,11 +185,11 @@ export function deserialize(payload: Buffer) {
                 const key = payload.slice(keyOffset, keyOffset + keyLength);
                 const value = payload.slice(valueOffset, valueOffset + valueLength);
 
-                if (!("stores" in messages)) {
-                    messages.stores = {};
+                if (!("configs" in messages)) {
+                    messages.configs = {};
                 }
 
-                messages.stores[key.toString("utf-8")] = value.toString("utf-8");
+                messages.configs[key.toString("utf-8")] = value.toString("utf-8");
                 break;
             }
             case SMMS_OS_VERSION_MSG:

@@ -1,16 +1,16 @@
 import { sendToSupervisor } from '../helpers';
 
-type Stores = { [key: string]: string }
+type Configs = { [key: string]: string }
 type onChangeCallback = (value: string) => void;
 type onCommandCallback = (value: string) => void;
 
-export class StoreAPI {
-    public stores: Stores;
+export class ConfigAPI {
+    public configs: Configs;
     public onChangeCallbacks: { [key: string]: onChangeCallback[] };
     public onCommandCallbacks: { [key: string]: onCommandCallback };
 
     constructor() {
-        this.stores = {};
+        this.configs = {};
         this.onChangeCallbacks = {};
         this.onCommandCallbacks = {};
     }
@@ -20,8 +20,8 @@ export class StoreAPI {
     }
 
     public onChange(key: string, callback: (value: string) => void) {
-        if (this.stores[key] !== undefined) {
-            callback(this.stores[key]);
+        if (this.configs[key] !== undefined) {
+            callback(this.configs[key]);
         }
 
         if (key in this.onChangeCallbacks) {
@@ -31,20 +31,20 @@ export class StoreAPI {
         }
     }
 
-    public async update(newStores: Stores) {
-        for (const key in newStores) {
+    public async update(newConfigs: Configs) {
+        for (const key in newConfigs) {
             if (key.startsWith(">")) {
                 // Command
                 const [commandId, commandKey] = key.substring(1).split(" ");
                 if (this.onCommandCallbacks[commandKey]) {
-                    const returnValue = await this.onCommandCallbacks[commandKey](newStores[key]);
+                    const returnValue = await this.onCommandCallbacks[commandKey](newConfigs[key]);
                     sendToSupervisor("log", { body: `<${commandId} ${returnValue}` });
                 }
             } else {
-                // Store
-                const oldValue = this.stores[key];
-                const newValue = newStores[key];
-                this.stores[key] = newValue;
+                // Config
+                const oldValue = this.configs[key];
+                const newValue = newConfigs[key];
+                this.configs[key] = newValue;
 
                 if (this.onChangeCallbacks[key] && oldValue !== newValue) {
                     for (const callback of this.onChangeCallbacks[key]) {

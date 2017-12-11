@@ -126,9 +126,9 @@ module SMMSService
       end
     end
 
-    # store
-    device.formatted_stores.each_with_index do |(key, store), index|
-      data = generate_variable_length(key) + key + store[:value]
+    # config
+    device.formatted_configs.each_with_index do |(key, config), index|
+      data = generate_variable_length(key) + key + config[:value]
       payload += generate_message(SMMS_STORE_MSG, data)
     end
 
@@ -205,8 +205,8 @@ module SMMSService
         key_length, key_length_length = parse_variable_length(data)
         key = data[key_length_length,key_length]
         value = data[(key_length_length + key_length)..-1]
-        messages[:stores] ||= []
-        messages[:stores] << { key: key, value: value }
+        messages[:configs] ||= []
+        messages[:configs] << { key: key, value: value }
       end
 
       offset += 1 + length_length + length

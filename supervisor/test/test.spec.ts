@@ -23,7 +23,7 @@ describe('Supervisor', function () {
         this.heartbeatRequest1 = createHeartbeatResponse({
             appVersion: this.appVersion,
             appImageHMAC: this.appImageHMAC,
-            stores: {}
+            configs: {}
         })
 
         createAppImageResponse(this.appVersion, appZip)
@@ -86,7 +86,7 @@ describe('Supervisor', function () {
             this.heartbeatRequest2 = createHeartbeatResponse({
                 appVersion: this.appVersion,
                 appImageHMAC: this.appImageHMAC,
-                stores: {
+                configs: {
                     'display-message': 'ALIVE!'
                 }
             })

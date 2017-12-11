@@ -8,7 +8,7 @@ module.exports = {
     Timer: false,
     Logging: false,
     Event: false,
-    Store: false,
+    Config: false,
     plugin: false
   },
   "env": {

@@ -1,14 +1,14 @@
 FactoryBot.define do
-  factory :store do
+  factory :config do
     data_type { "string" }
     sequence(:key) {|n| "key#{n}" }
     value { FFaker::DizzleIpsum.words.join(' ') }
 
-    factory :app_store do
+    factory :app_config do
       association :owner, factory: :app
     end
 
-    factory :device_store do
+    factory :device_config do
       association :owner, factory: :app
     end
   end

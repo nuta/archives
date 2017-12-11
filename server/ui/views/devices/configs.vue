@@ -1,5 +1,5 @@
 <template>
-<device-layout path="deviceStores" :device-name="deviceName">
+<device-layout path="deviceConfigs" :device-name="deviceName">
   <div class="uk-container">
     <button class="uk-button uk-button-primary uk-align-right" uk-toggle="target: #create-store-modal">
       <span uk-icon="icon: plus"></span>
@@ -43,7 +43,7 @@
           </td>
 
           <td class="actions">
-            <button v-if="store.editing" @click="updateStore(store)" class="uk-button uk-button-primary">
+            <button v-if="store.editing" @click="updateConfig(store)" class="uk-button uk-button-primary">
               <i class="fa fa-check" aria-hidden="true"></i>
               Save
             </button>
@@ -58,7 +58,7 @@
               Cancel
             </button>
 
-            <button v-else @click="deleteStore(store)" class="uk-button uk-button-danger">
+            <button v-else @click="deleteConfig(store)" class="uk-button uk-button-danger">
               <i class="fa fa-trash" aria-hidden="true"></i>
             </button>
           </td>
@@ -74,19 +74,19 @@
         <h2 class="uk-modal-title">Add a new store</h2>
       </div>
 
-      <form @submit.prevent="createStore(newStore)">
+      <form @submit.prevent="createConfig(newStore)">
         <div class="uk-modal-body">
           <div class="uk-margin">
             <label class="uk-form-label">Key</label>
             <div class="uk-form-controls">
-              <input type="text" v-model="newStore.key" class="uk-input uk-form-width-large" placeholder="Key (e.g. message)">
+              <input type="text" v-model="newConfig.key" class="uk-input uk-form-width-large" placeholder="Key (e.g. message)">
             </div>
           </div>
 
           <div class="uk-margin">
             <label class="uk-form-label">Type</label>
             <div class="uk-form-controls">
-              <select v-model="newStore.dataType" class="uk-select uk-form-width-large">
+              <select v-model="newConfig.dataType" class="uk-select uk-form-width-large">
                 <option value="string">String</option>
                 <option value="integer">Integer</option>
                 <option value="float">Float</option>
@@ -98,7 +98,7 @@
           <div class="uk-margin">
             <label class="uk-form-label">Value</label>
             <div class="uk-form-controls">
-              <input type="text" v-model="newStore.value" class="uk-input uk-form-width-large" placeholder="Value (e.g. 123, true, hello world!)">
+              <input type="text" v-model="newConfig.value" class="uk-input uk-form-width-large" placeholder="Value (e.g. 123, true, hello world!)">
             </div>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default {
       deviceName: app.$router.currentRoute.params.deviceName,
       stores: [],
       loading: true,
-      newStore: {
+      newConfig: {
         key: "",
         dataType: "string",
         value: ""
@@ -132,40 +132,40 @@ export default {
     };
   },
   methods: {
-    async createStore() {
-      await api.createDeviceStore(
+    async createConfig() {
+      await api.createDeviceConfig(
               this.deviceName,
-              this.newStore.key,
-              this.newStore.dataType,
-              this.newStore.value)
+              this.newConfig.key,
+              this.newConfig.dataType,
+              this.newConfig.value)
 
-      await this.refreshDeviceStores()
+      await this.refreshDeviceConfigs()
       this.$Notification.success('Created a store.')
     },
-    async updateStore(store) {
-      await api.updateDeviceStore(
+    async updateConfig(store) {
+      await api.updateDeviceConfig(
               this.deviceName,
               store.key,
               store.data_type,
               store.value)
 
-      await this.refreshDeviceStores()
+      await this.refreshDeviceConfigs()
       this.$Notification.success('Updated a store.')
     },
-    async deleteStore(store) {
-      await api.deleteDeviceStore(this.deviceName, store.key)
-      await this.refreshDeviceStores()
+    async deleteConfig(store) {
+      await api.deleteDeviceConfig(this.deviceName, store.key)
+      await this.refreshDeviceConfigs()
       this.$Notification.success('Deleted a store.')
     },
-    async refreshDeviceStores() {
-      this.stores = (await api.getDeviceStores(this.deviceName)).map(store => {
+    async refreshDeviceConfigs() {
+      this.stores = (await api.getDeviceConfigs(this.deviceName)).map(store => {
         store.editing = false
         return store
       })
     }
   },
   async beforeMount() {
-    await this.refreshDeviceStores()
+    await this.refreshDeviceConfigs()
     this.$Progress.finish()
     this.loading = false
   }

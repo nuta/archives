@@ -6,11 +6,11 @@ class IncomingWebhooksController < ApplicationController
 
   def invoke
     case params[:command]
-    when 'update_app_stores'
-      update_stores('App', @app.id, params[:stores].permit!.to_h)
-    when 'update_device_stores'
+    when 'update_app_configs'
+      update_configs('App', @app.id, params[:configs].permit!.to_h)
+    when 'update_device_configs'
       device = @user.devices.find_by_name!(params[:device])
-      update_stores('Device', device.id, params[:stores].permit!.to_h)
+      update_configs('Device', device.id, params[:configs].permit!.to_h)
     else
       raise ActionController::BadRequest.new(), "unknown command"
     end
@@ -36,17 +36,17 @@ class IncomingWebhooksController < ApplicationController
     @user ||= @app.user
   end
 
-  def update_stores(owner_type, owner_id, stores)
-    unless stores.is_a?(Hash)
-      raise ActionController::BadRequest.new(), "`stores' must be a object'"
+  def update_configs(owner_type, owner_id, configs)
+    unless configs.is_a?(Hash)
+      raise ActionController::BadRequest.new(), "`configs' must be a object'"
     end
 
     ActiveRecord::Base.transaction do
-      stores.each do |key, value|
-        store = Store.where(owner_type: owner_type, owner_id: owner_id, key: key).first_or_create
-        store.data_type = determine_data_type(value)
-        store.value = value
-        store.save!
+      configs.each do |key, value|
+        config = Config.where(owner_type: owner_type, owner_id: owner_id, key: key).first_or_create
+        config.data_type = determine_data_type(value)
+        config.value = value
+        config.save!
       end
     end
   end

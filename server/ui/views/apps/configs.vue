@@ -1,5 +1,5 @@
 <template>
-<app-layout path="appStores" :app-name="appName">
+<app-layout path="appConfigs" :app-name="appName">
   <div class="uk-container">
     <button class="uk-button uk-button-primary uk-align-right" uk-toggle="target: #create-store-modal">
       <span uk-icon="icon: plus"></span>
@@ -43,7 +43,7 @@
           </td>
 
           <td class="actions">
-            <button v-if="store.editing" @click="updateStore(store)" class="uk-button uk-button-primary">
+            <button v-if="store.editing" @click="updateConfig(store)" class="uk-button uk-button-primary">
               <i class="fa fa-check" aria-hidden="true"></i>
               Save
             </button>
@@ -58,7 +58,7 @@
               Cancel
             </button>
 
-            <button v-else @click="deleteStore(store)" class="uk-button uk-button-danger">
+            <button v-else @click="deleteConfig(store)" class="uk-button uk-button-danger">
               <i class="fa fa-trash" aria-hidden="true"></i>
             </button>
           </td>
@@ -74,19 +74,19 @@
         <h2 class="uk-modal-title">Add a new store</h2>
       </div>
 
-      <form @submit.prevent="createStore(newStore)">
+      <form @submit.prevent="createConfig(newStore)">
         <div class="uk-modal-body">
           <div class="uk-margin">
             <label class="uk-form-label">Key</label>
             <div class="uk-form-controls">
-              <input type="text" v-model="newStore.key" class="uk-input uk-form-width-large" placeholder="Key (e.g. message)">
+              <input type="text" v-model="newConfig.key" class="uk-input uk-form-width-large" placeholder="Key (e.g. message)">
             </div>
           </div>
 
           <div class="uk-margin">
             <label class="uk-form-label">Type</label>
             <div class="uk-form-controls">
-              <select v-model="newStore.dataType" class="uk-select uk-form-width-large">
+              <select v-model="newConfig.dataType" class="uk-select uk-form-width-large">
                 <option value="string">String</option>
                 <option value="integer">Integer</option>
                 <option value="float">Float</option>
@@ -98,7 +98,7 @@
           <div class="uk-margin">
             <label class="uk-form-label">Value</label>
             <div class="uk-form-controls">
-              <input type="text" v-model="newStore.value" class="uk-input uk-form-width-large" placeholder="Value (e.g. 123, true, hello world!)">
+              <input type="text" v-model="newConfig.value" class="uk-input uk-form-width-large" placeholder="Value (e.g. 123, true, hello world!)">
             </div>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default {
       appName: app.$router.currentRoute.params.appName,
       stores: [],
       loading: true,
-      newStore: {
+      newConfig: {
         key: "",
         dataType: "string",
         value: ""
@@ -132,40 +132,40 @@ export default {
     }
   },
   methods: {
-    async createStore() {
-      await api.createAppStore(
+    async createConfig() {
+      await api.createAppConfig(
               this.appName,
-              this.newStore.key,
-              this.newStore.dataType,
-              this.newStore.value)
+              this.newConfig.key,
+              this.newConfig.dataType,
+              this.newConfig.value)
 
-      await this.refreshAppStores()
+      await this.refreshAppConfigs()
       this.$Notification.success('Created a store.')
     },
-    async updateStore(store) {
-      await api.updateAppStore(
+    async updateConfig(store) {
+      await api.updateAppConfig(
               this.appName,
               store.key,
               store.data_type,
               store.value)
 
-      await this.refreshAppStores()
+      await this.refreshAppConfigs()
       this.$Notification.success('Updated a store.')
     },
-    async deleteStore(store) {
-      await api.deleteAppStore(this.appName, store.key)
-      await this.refreshAppStores()
+    async deleteConfig(store) {
+      await api.deleteAppConfig(this.appName, store.key)
+      await this.refreshAppConfigs()
       this.$Notification.success('Deleted a store.')
     },
-    async refreshAppStores() {
-      this.stores = (await api.getAppStores(this.appName)).map(store => {
+    async refreshAppConfigs() {
+      this.stores = (await api.getAppConfigs(this.appName)).map(store => {
         store.editing = false
         return store
       })
     }
   },
   async beforeMount() {
-    await this.refreshAppStores()
+    await this.refreshAppConfigs()
     this.$Progress.finish()
     this.loading = false
   }

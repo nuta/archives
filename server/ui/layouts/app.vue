@@ -31,8 +31,8 @@ export default {
           params: { appName: this.appName }
         },
         {
-          title: 'Stores',
-          path: 'appStores',
+          title: 'Configs',
+          path: 'appConfigs',
           icon: 'icon: database',
           params: { appName: this.appName }
         },

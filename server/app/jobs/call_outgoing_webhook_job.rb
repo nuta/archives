@@ -2,23 +2,23 @@ class CallOutgoingWebhookJob < ApplicationJob
   queue_as :default
   throttle limit: MakeStack.settings[:outgoing_webhook_limit_per_hour], period: 1.hour
 
-  def execute(url:, params: {}, body:, accept_stores: false, device: nil)
+  def execute(url:, params: {}, body:, accept_configs: false, device: nil)
     resp = RestClient.post(url, body.to_json, params: params, content_type: :json)
 
-    # Update device stores.
-    if accept_stores
+    # Update device configs.
+    if accept_configs
       ActiveRecord::Base.transaction do
-        stores = JSON.parse(resp.body).fetch("stores", {})
-        unless stores.is_a?(Hash)
-          raise "`stores' received from a webhook is not Hash"
+        configs = JSON.parse(resp.body).fetch("configs", {})
+        unless configs.is_a?(Hash)
+          raise "`configs' received from a webhook is not Hash"
         end
 
-        stores.each do |key, value|
+        configs.each do |key, value|
           data_type = determine_data_type(value)
-          store = device.stores.where(key: key).first_or_initialize
-          store.value = value.to_s
-          store.data_type = data_type
-          store.save!
+          config = device.configs.where(key: key).first_or_initialize
+          config.value = value.to_s
+          config.data_type = data_type
+          config.save!
         end
       end
     end

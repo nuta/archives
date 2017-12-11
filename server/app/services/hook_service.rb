@@ -27,7 +27,7 @@ module HookService
         CallOutgoingWebhookJob.perform_later(
           url: config['webhook_url'],
           body: { type: 'event_published', device: device.name, event: event, body: body },
-          accept_stores: true,
+          accept_configs: true,
           device: device
         )
 
@@ -65,7 +65,7 @@ module HookService
         CallOutgoingWebhookJob.perform_later(
           url: config['webhook_url'],
           body: { type: 'command_invoked', device: device.name, command_id: command_id, return_value: return_value },
-          accept_stores: true,
+          accept_configs: true,
           device: device
         )
 

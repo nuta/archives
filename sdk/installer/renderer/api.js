@@ -98,8 +98,8 @@ module.exports = new class {
     return this.reloadCredentials() !== null
   }
 
-  updateDeviceStore(deviceName, key, value) {
-    return this.invoke('PUT', `/devices/${deviceName}/stores/${key}`, { value })
+  updateDeviceConfig(deviceName, key, value) {
+    return this.invoke('PUT', `/devices/${deviceName}/configs/${key}`, { value })
   }
 
   registerDevice(name, deviceType, tag) {

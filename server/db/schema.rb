@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027000001) do
+ActiveRecord::Schema.define(version: 20171210015058) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,6 +23,18 @@ ActiveRecord::Schema.define(version: 20171027000001) do
     t.string "api", null: false
     t.string "os_version", null: false
     t.index ["user_id"], name: "index_apps_on_user_id"
+  end
+
+  create_table "configs", id: :serial, force: :cascade do |t|
+    t.string "key", null: false
+    t.string "value"
+    t.bigint "owner_id"
+    t.string "owner_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "data_type", null: false
+    t.index ["owner_type", "owner_id", "key"], name: "index_configs_on_owner_type_and_owner_id_and_key", unique: true
+    t.index ["owner_type", "owner_id"], name: "index_configs_on_owner_type_and_owner_id"
   end
 
   create_table "deployments", id: :serial, force: :cascade do |t|
@@ -90,18 +102,6 @@ ActiveRecord::Schema.define(version: 20171027000001) do
     t.datetime "updated_at", null: false
     t.index ["app_id", "path"], name: "index_source_files_on_app_id_and_path"
     t.index ["app_id"], name: "index_source_files_on_app_id"
-  end
-
-  create_table "stores", id: :serial, force: :cascade do |t|
-    t.string "key", null: false
-    t.string "value"
-    t.bigint "owner_id"
-    t.string "owner_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "data_type", null: false
-    t.index ["owner_type", "owner_id", "key"], name: "index_stores_on_owner_type_and_owner_id_and_key", unique: true
-    t.index ["owner_type", "owner_id"], name: "index_stores_on_owner_type_and_owner_id"
   end
 
   create_table "users", id: :serial, force: :cascade do |t|

@@ -13,9 +13,9 @@ RSpec.describe Devices::CommandsController, type: :controller do
       it "creates a new store" do
         expect {
           post :create, params: { device_name: device.name, command: command, arg: arg }
-        }.to change(Store, :count).by(1)
+        }.to change(Config, :count).by(1)
 
-        command_store = Store.where(owner_type: 'Device', owner_id: device.id).last
+        command_store = Config.where(owner_type: 'Device', owner_id: device.id).last
         expect(command_store.key).to start_with('<')
         expect(command_store.value).to start_with(arg)
       end

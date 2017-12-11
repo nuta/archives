@@ -1,5 +1,5 @@
 export type TDeviceState = 'ready' | 'running'
-export type TStores = { [key: string]: string };
+export type TConfigs = { [key: string]: string };
 
 export interface IPayloadMessages {
     appVersion?: string;
@@ -8,7 +8,7 @@ export interface IPayloadMessages {
     osImageHMAC?: string;
     hmac?: string;
     timestamp?: string;
-    stores?: TStores;
+    configs?: TConfigs;
     deviceId?: string;
     state?: string;
     log?: string;

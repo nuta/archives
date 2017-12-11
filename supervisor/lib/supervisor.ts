@@ -10,7 +10,7 @@ import { verifyImageHMAC, verifyMessageHMAC } from "./hmac";
 import * as logger from "./logger";
 import { deserialize, serialize } from "./smms";
 import * as unzip from "./unzip";
-import { TStores, TDeviceState, IPayloadMessages } from "./types";
+import { TConfigs, TDeviceState, IPayloadMessages } from "./types";
 import { AdapterBase } from "./adapters/adapter_base";
 import { clearInterval } from "timers";
 
@@ -51,7 +51,7 @@ export class Supervisor {
     private appVersion: string;
     private log: string;
     private allLog: string;
-    private stores: any;
+    private configs: any;
     private adapterName: string;
     private updateEnabled: boolean;
     private downloading: boolean;
@@ -89,7 +89,7 @@ export class Supervisor {
         this.appVersion = "X";
         this.log = "";
         this.allLog = "";
-        this.stores = {};
+        this.configs = {};
         this.adapterName = args.adapter.name;
         this.updateEnabled = true;
         this.downloading = false;
@@ -206,7 +206,7 @@ export class Supervisor {
                 MAKESTACK_DEVICE_TYPE: this.deviceType,
             },
         } as any);
-        this.sendToApp("initialize", { stores: this.stores });
+        this.sendToApp("initialize", { configs: this.configs });
 
         this.app.on("message", (data: { type: string, body: string }) => {
             logger.debug("message", data);
@@ -372,22 +372,22 @@ export class Supervisor {
         process.exit(0);
     }
 
-    private handleStoreMessage(stores: [string]) {
-        const storesToApp: TStores = {};
-        for (const key in stores) {
+    private handleConfigMessage(configs: [string]) {
+        const configsToApp: TConfigs = {};
+        for (const key in configs) {
             const isBuiltinCommand = [
                 this.replEnabled &&
-                this.tryBuiltinCommand("repl", key, (id) => this.handleREPLCommand(id, stores[key])),
+                this.tryBuiltinCommand("repl", key, (id) => this.handleREPLCommand(id, configs[key])),
                 this.tryBuiltinCommand("reboot", key, (id) => this.reboot()),
             ].some((x) => x);
 
             if (!isBuiltinCommand) {
-                storesToApp[key] = stores[key];
+                configsToApp[key] = configs[key];
             }
         }
 
-        this.stores = storesToApp;
-        this.sendToApp("stores", { storesToApp });
+        this.configs = configsToApp;
+        this.sendToApp("configs", { configsToApp });
     }
 
     private isOSUpdateRequired(messages: IPayloadMessages): boolean {
@@ -424,9 +424,9 @@ export class Supervisor {
             return;
         }
 
-        // Send new stores to the app.
-        if (messages.stores) {
-            this.handleStoreMessage(messages.stores);
+        // Send new configs to the app.
+        if (messages.configs) {
+            this.handleConfigMessage(messages.configs);
         }
     }
 
