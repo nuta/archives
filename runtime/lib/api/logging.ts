@@ -4,6 +4,6 @@ export function println(message: string) {
     sendToSupervisor("log", { body: message });
 }
 
-export function error(message: string) {
+export function eprintln(message: string) {
     println(`!${message}`);
 }

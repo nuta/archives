@@ -34,8 +34,15 @@ const { HDC1000 } = require('@makestack/HDC1000')
 const TemperatureSensor = new HDC1000()
 ```
 
-## Globals
-You don't have to `require` to use. These functions are defined as a global ones.
+## Using APIs
+Use `require()` from `@makestack/runtime`:
+
+```js
+const { println, GPIO, I2C } = require('@makestack/runtime')
+println('Hello, World!')
+```
+
+## Functions
 
 ### println
 - **Definition:** `(message: string) => void`
@@ -61,7 +68,6 @@ You don't have to `require` to use. These functions are defined as a global ones
   ```
 
 ## Config
-You don't have to `require` to use. This API is defined as a global `Config` object.
 
 ### onCommand
 - **Definition:** `(key: string, callback: (newValue: string) => void) => void`
@@ -86,7 +92,6 @@ You don't have to `require` to use. This API is defined as a global `Config` obj
   ```
 
 ## Timer
-You don't have to `require` to use. This API is defined as a global `Timer` object.
 
 ### loop
 - **Definition:** `(callback: () => void) => void`
@@ -141,7 +146,6 @@ You don't have to `require` to use. This API is defined as a global `Timer` obje
   ```
 
 ## App
-You don't have to `require` to use. This API is defined as a global `App` object.
 
 ### onExit
 - **Definition:** `(callback: () => void): void`
@@ -174,7 +178,6 @@ You don't have to `require` to use. This API is defined as a global `App` object
   ```
 
 ## Subprocess
-You don't have to `require` to use. This API is defined as a global `SubProcess` object.
 
 **Definitions:**
 ```typescript
@@ -197,7 +200,6 @@ interface SubProcessResult {
   ```
 
 ## GPIO
-You don't have to `require` to use. This API is defined as a global `GPIO` object.
 
 ## Constructor
 - **Definition:** `({ pin: number, mode: 'in' | 'out' })`
@@ -256,7 +258,6 @@ You don't have to `require` to use. This API is defined as a global `GPIO` objec
   ```
 
 ## I2C
-You don't have to `require` to use. This API is defined as a global `I2C` class.
 
 ### Constructor
 - **Definition:** `({ address: number })`
@@ -282,7 +283,6 @@ You don't have to `require` to use. This API is defined as a global `I2C` class.
 ## Serial
 **CAUTION: Serial API may not work. Its implementation is still buggy.**
 
-You don't have to `require` to use. This API is defined as a global `Serial` class.
 
 ### Constructor
 - **Definition:** `({ path: string, baudrate: 9600 | 115200 })`
@@ -335,7 +335,6 @@ You don't have to `require` to use. This API is defined as a global `Serial` cla
 ## SPI
 **CAUTION: SPI API may not work. Its implementation is still buggy.**
 
-You don't have to `require` to use. This API is defined as a global `SPI` class.
 
 ### Constructor
 - **Definition:** `({ slave: number, speed: number, mode: 'MODE0' | 'MODE1' | 'MODE2' | 'MODE3' })`

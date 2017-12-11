@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { println, eprintln } = require('../..');
 
 describe('Logging API', function() {
     beforeEach(function () {
@@ -15,18 +15,18 @@ describe('Logging API', function() {
         this.processSend.restore()
     })
 
-    describe('publish', function() {
+    describe('println', function() {
         it('calls process.send', function () {
             const message = 'Hello, World!'
-            builtins.println(message);
+            println(message);
             expect(this.processSend.calledWith({ type: "log", body: message })).to.be.true;
         })
     })
 
-    describe('error', function() {
+    describe('eprintln', function() {
         it('calls process.send', function () {
             const message = 'Something went wrong!'
-            builtins.error(message);
+            eprintln(message);
             expect(this.processSend.calledWith({ type: "log", body: `!${message}` })).to.be.true;
         })
     })

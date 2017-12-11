@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { Timer } = require('../..');
 
 describe('Timer API', function() {
     beforeEach(function () {
@@ -17,7 +17,7 @@ describe('Timer API', function() {
     describe('interval', function() {
         it('calls setInterval', function () {
             const callback = sinon.stub();
-            builtins.Timer.interval(3, callback);
+            Timer.interval(3, callback);
             this.timers.tick(3 * 1000 + 1);
             expect(callback.calledOnce).to.be.true;
         })
@@ -25,14 +25,14 @@ describe('Timer API', function() {
 
     describe('sleep', function() {
         it('resolves a promise after the duration', function (done) {
-            builtins.Timer.sleep(3).then(done)
+            Timer.sleep(3).then(done)
             this.timers.tick(3 * 1000 + 1);
         })
     })
 
     describe('delay', function() {
         it('calls a callback after the duration', function (done) {
-            builtins.Timer.delay(3, done)
+            Timer.delay(3, done)
             this.timers.tick(3 * 1000 + 1);
         })
     })
@@ -41,7 +41,7 @@ describe('Timer API', function() {
 describe('Timer API (without fake timers)', function () {
     describe('busywait', function() {
         it('returns after the duration', function () {
-            builtins.Timer.busywait(10)
+            Timer.busywait(10)
         })
     })
 })

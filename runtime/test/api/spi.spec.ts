@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { SPI } = require('../..');
 
 
 describe('SPI API', function() {
@@ -20,7 +20,7 @@ describe('SPI API', function() {
 
         this.spiConfigure = sinon.stub(require('../../dist/native').functions, 'spiConfigure')
         this.spiTransfer = sinon.stub(require('../../dist/native').functions, 'spiTransfer')
-        this.instance = new builtins.SPI({ slave: this.slave })
+        this.instance = new SPI({ slave: this.slave })
     })
 
     afterEach(function() {

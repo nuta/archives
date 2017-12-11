@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { publish } = require('../..');
 
 describe('Event API', function() {
     beforeEach(function () {
@@ -19,7 +19,7 @@ describe('Event API', function() {
         it('calls process.send', function () {
             const event = 'sensing'
             const data = 'button=pressed temp=22.12 humid=80.23'
-            builtins.publish(event, data);
+            publish(event, data);
             expect(this.processSend.calledWith({ type: "log", body: `@${event} ${data}` })).to.be.true;
         })
     })

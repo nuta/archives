@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { Serial } = require('../..');
 
 describe('Serial API', function() {
     beforeEach(function() {
@@ -21,7 +21,7 @@ describe('Serial API', function() {
 
         this.serialConfigure = sinon.stub(require('../../dist/native').functions, 'serialConfigure')
         this.clock = sinon.useFakeTimers()
-        this.instance = new builtins.Serial({ path: this.deviceFile, baudrate: 115200 })
+        this.instance = new Serial({ path: this.deviceFile, baudrate: 115200 })
     })
 
     afterEach(function() {
@@ -32,7 +32,7 @@ describe('Serial API', function() {
 
     describe('list', function() {
         it('returns a list of available device files', function() {
-            expect(builtins.Serial.list()).to.deep.equal([this.deviceFile, '/dev/ttyUSB0']);
+            expect(Serial.list()).to.deep.equal([this.deviceFile, '/dev/ttyUSB0']);
         })
     })
 

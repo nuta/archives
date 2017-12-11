@@ -5,7 +5,7 @@ import { expect } from 'chai';
 import * as fs from 'fs';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { GPIO } = require('../..');
 
 function readFile(path: string) {
     return fs.readFileSync(path, { encoding: 'utf-8' })
@@ -20,7 +20,7 @@ describe('GPIO API', function() {
         })
 
         this.fsWatch = sinon.stub(fs, 'watch')
-        this.instance = new builtins.GPIO({
+        this.instance = new GPIO({
             pin: this.pin,
             mode: 'out'
         })

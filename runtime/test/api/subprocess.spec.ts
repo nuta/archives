@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import * as child_process from 'child_process';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { SubProcess } = require('../..');
 
 describe('Subprocess API', function() {
     beforeEach(function () {
@@ -20,7 +20,7 @@ describe('Subprocess API', function() {
         it('calls child_process.SpawnSync', function () {
             const exe = './gopher';
             const args = ['go', 'Gopher!']
-            builtins.SubProcess.run([exe, ...args]);
+            SubProcess.run([exe, ...args]);
             expect(this.spawnSync.calledWith(exe, args)).to.be.true;
         })
     })

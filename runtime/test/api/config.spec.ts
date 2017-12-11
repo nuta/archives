@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { builtins } = require('../..');
+const { Config } = require('../..');
 
 describe('Config API', function() {
     beforeEach(function () {
@@ -20,8 +20,8 @@ describe('Config API', function() {
             const cmd = 'move_forward'
             const arg = '5'
             const callback = sinon.stub()
-            builtins.Config.onCommand(cmd, callback)
-            await builtins.Config.update({ [`>1 ${cmd}`]: arg })
+            Config.onCommand(cmd, callback)
+            await Config.update({ [`>1 ${cmd}`]: arg })
 
             expect(callback.calledWith(arg)).to.be.true
         })
@@ -32,9 +32,9 @@ describe('Config API', function() {
             const key = 'display_message'
             const data = "Today's high will be 13 degrees."
             const callback = sinon.stub()
-            await builtins.Config.update({ [key]: '' })
-            builtins.Config.onChange(key, callback)
-            await builtins.Config.update({ [key]: data })
+            await Config.update({ [key]: '' })
+            Config.onChange(key, callback)
+            await Config.update({ [key]: data })
 
             expect(callback.calledWith(data)).to.be.true
         })

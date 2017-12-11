@@ -19,6 +19,4 @@ class SPI extends LinuxSPIAPI {
     }
 }
 
-export function initialize() {
-    return { GPIO, I2C, SPI };
-}
+export { GPIO, I2C, SPI };
