@@ -3,6 +3,7 @@ const os = require('os')
 const path = require('path')
 const { spawnSync } = require('child_process')
 const { find, mkdirp } = require('./helpers')
+const chalk = require('chalk')
 
 function config(key) {
   if (!(key in build.config)) {
@@ -72,7 +73,7 @@ function isRebuilt(pkg) {
 }
 
 function run(argv, env, cwd) {
-  console.log(`+++ ${argv.join(' ')}`)
+  console.log(chalk.bold(`${argv.join(' ')}`))
   const cp = spawnSync(argv[0], argv.slice(1), {
     stdio: 'inherit',
     cwd: cwd || process.cwd(),
@@ -92,7 +93,7 @@ function run(argv, env, cwd) {
 }
 
 function runWithPipe(argv, env, cwd) {
-  console.log(`+++ ${argv.join(' ')}`)
+  console.log(chalk.bold(`${argv.join(' ')}`))
   const cp = spawnSync(argv[0], argv.slice(1), {
     cwd: cwd || process.cwd(),
     encoding: 'utf-8',
@@ -117,7 +118,7 @@ function runWithPipe(argv, env, cwd) {
 }
 
 function sudo(argv, env) {
-  console.log(`+++ sudo ${argv.join(' ')}`)
+  console.log(chalk.bold(`sudo ${argv.join(' ')}`))
   spawnSync('sudo', argv, {
     stdio: 'inherit',
     env: Object.assign({

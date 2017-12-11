@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const path = require('path')
 const fs = require('fs')
+const chalk = require('chalk')
 const { isNewerDirContent } = require('.').pkg
 const { find, mkdirp, copyFiles, shasum, download, extract } = require('./lib/helpers')
 
@@ -161,8 +162,9 @@ function main() {
     }
 
     if (isBuildRequired(pkg)) {
-      console.log(`==> (${i + 1}/${buildOrder.length}) Building ${pkgName}...`)
-      buildPackage(pkg)
+      console.log(chalk.bold.blue('==> ') +
+      chalk.bold(`(${i + 1}/${buildOrder.length}) Building ${pkgName}...`))
+    buildPackage(pkg)
       build.rebuiltPackages.push(pkgName)
     } else {
       const filesToBootFS = getPkgFilesToCopy(pkg.name, pkg.bootfs, build.bootfsDir)
@@ -179,14 +181,18 @@ function main() {
 
         build.rebuiltPackages.push(pkgName)
         const num = filesToBootFS.length + filesToRootFS.length
-        console.log(`==> (${i + 1}/${buildOrder.length}) Copying ${num} files from ${pkgName}...`)
+        console.log(chalk.bold.megenta('==> ') +
+          chalk.bold(`(${i + 1}/${buildOrder.length}) Copying ${num} files from ${pkgName}...`))
       } else {
-        console.log(`==> (${i + 1}/${buildOrder.length}) Skipping ${pkgName}`)
-      }
+        console.log(chalk.bold.yellow('==> ') +
+        chalk.bold(`(${i + 1}/${buildOrder.length}) Skipping ${pkgName}`))
+    }
     }
   }
 
   const imageFile = path.resolve(build.buildDir, `makestack-linux-${target}.img`)
+  console.log(chalk.bold.blue('==> ') +
+    chalk.bold('Buliding the disk image'))
   packages[build.target].buildImage(imageFile)
 }
 

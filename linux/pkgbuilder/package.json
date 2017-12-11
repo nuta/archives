@@ -16,5 +16,7 @@
     "url": "https://github.com/makestack/makestack/issues"
   },
   "homepage": "http://makestack.org",
-  "dependencies": {}
+  "dependencies": {
+    "chalk": "^2.3.0"
+  }
 }
