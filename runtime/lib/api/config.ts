@@ -1,8 +1,8 @@
 import { sendToSupervisor } from '../helpers';
 
-type Configs = { [key: string]: string }
-type onChangeCallback = (value: string) => void;
-type onCommandCallback = (value: string) => void;
+export type Configs = { [key: string]: string }
+export type onChangeCallback = (value: string) => void;
+export type onCommandCallback = (value: string) => void;
 
 export class ConfigAPI {
     public configs: Configs;

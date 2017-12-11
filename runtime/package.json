@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "MakeStack Node.js app runtime environment.",
   "gypfile": true,
-  "main": "dist/index.js",
-  "typings": "./index.d.ts",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
   "scripts": {
     "cov": "istanbul cover _mocha",
     "test": "mocha",

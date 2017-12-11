@@ -1,4 +1,4 @@
-interface NativeFunctions {
+export interface NativeFunctions {
     ioctl: (fd: number, request: number, data: Buffer | number) => number;
     spiConfigure: (fd: number, mode: number, bits: number, speed: number, order: number) => void;
     spiTransfer: (fd: number, speed: number, tx: Buffer, rx: Buffer) => number;
