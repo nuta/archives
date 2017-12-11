@@ -9,17 +9,15 @@ export async function main(args: any, opts: any, logger: any) {
     }
 
     const supervisor = new Supervisor({
+        mode: 'production',
         appDir: path.resolve(os.homedir(), ".makestack/app"),
         adapter: {
             name: opts.adapter,
             url: opts.server,
         },
         osType: "sdk",
-        deviceType: "sdk",
         deviceId: opts.deviceId,
         deviceSecret: opts.deviceSecret,
-        debugMode: true,
-        osVersion: null,
         heartbeatInterval: opts.heartbeatInterval,
         runtimeModulePath: path.resolve(__dirname, "../../../runtime"),
     });
