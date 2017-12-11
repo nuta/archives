@@ -1,5 +1,6 @@
 import * as os from "os";
 import * as path from "path";
+import { Supervisor } from "@makestack/supervisor";
 import { FatalError } from "../types";
 
 export async function main(args: any, opts: any, logger: any) {
@@ -7,7 +8,6 @@ export async function main(args: any, opts: any, logger: any) {
         throw new FatalError("Specify `server' option.");
     }
 
-    const { Supervisor } = require(path.resolve(__dirname, "../../supervisor"));
     const supervisor = new Supervisor({
         appDir: path.resolve(os.homedir(), ".makestack/app"),
         adapter: {

@@ -14,7 +14,7 @@ const runCommand = require('../../dist/commands/run').main
 
 describe('run command', function() {
     beforeEach(function() {
-        this.supervisor = sinon.stub(require('../../supervisor'), 'Supervisor')
+        this.supervisor = sinon.stub(require('@makestack/supervisor'), 'Supervisor')
             .returns({
                 start() { }
             })

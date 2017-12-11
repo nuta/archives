@@ -36,17 +36,6 @@ function runContainer(pluginDir: string) {
 }
 
 export function buildPlugin(pluginDir: string, destPath: string) {
-    const makestackTypePath = path.resolve(__dirname, "../runtime/makestack.d.ts")
-    if (!fs.existsSync(makestackTypePath)) {
-        throw new Error(`${makestackTypePath} not found: run \`yarn run prepack\` in the sdk directory`)
-    }
-
-    fs.copyFileSync(
-        makestackTypePath,
-        path.resolve(__dirname, "../plugin_builder/makestack.d.ts"),
-    );
-
-
     buildDockerImage();
     const pluginZip = runContainer(pluginDir);
     fs.copyFileSync(pluginZip, destPath);

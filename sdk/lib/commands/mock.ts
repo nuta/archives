@@ -1,6 +1,7 @@
 import * as os from "os";
 import * as path from "path";
 import { api } from "../api";
+import { Supervisor } from "@makestack/supervisor";
 import { loadMocks, updateMocks } from "../config";
 
 export function create(args: any, opts: any, logger: any) {
@@ -15,7 +16,6 @@ export function create(args: any, opts: any, logger: any) {
 export function run(args: any, opts: any, logger: any) {
     const mock = loadMocks()[args.name];
 
-    const Supervisor = require("../../supervisor");
     const supervisor = new Supervisor({
         appDir: path.resolve(os.homedir(), ".makestack/mock-app"),
         adapter: {

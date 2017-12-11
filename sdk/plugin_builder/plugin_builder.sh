@@ -40,12 +40,6 @@ if [ -f package.json ]; then
   yarn --ignore-scripts
 
   if [ -f tsconfig.json ]; then
-    if [ ! -f makestack.d.ts ]; then
-      # Plugins excluding runtime requires makestack.d.ts.
-      mkdir -p node_modules/@types/makestack
-      cp /makestack.d.ts node_modules/@types/makestack/index.d.ts
-    fi
-
     yarn transpile
   fi;
 

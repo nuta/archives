@@ -14,11 +14,9 @@ const newCommand = require('../../dist/commands/new').main
 describe('new command', function() {
     beforeEach(function() {
         this.appDir = '/user/app'
-        const makestackDTSPath = path.resolve(__dirname, '../../runtime/makestack.d.ts')
         this.spawnSync = sinon.stub(childProcess, 'spawnSync').returns({ status: 0 })
         mockfs({
-            '/user': {},
-            [makestackDTSPath]: fs.readFileSync(makestackDTSPath)
+            '/user': {}
         })
     })
 

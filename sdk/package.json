@@ -10,15 +10,9 @@
     "cov": "istanbul cover _mocha",
     "test": "mocha",
     "test:live": "mocha -w",
-    "pretest": "tsc --pretty",
-    "prepack": "npm run copy-runtime && npm run copy-supervisor && npm run build-sdk",
-    "preinstall": "npm run build-runtime",
-    "copy-runtime": "rm -rf runtime && mkdir -p runtime && cd ../runtime && yarn && yarn pack && cd ../sdk && tar xf ../runtime/makestack-runtime-*.tgz -C runtime --strip-components=1",
-    "copy-supervisor": "rm -rf supervisor && mkdir -p supervisor && cd ../supervisor && yarn && yarn pack && cd ../sdk && tar xf ../supervisor/makestack-supervisor-*.tgz -C supervisor --strip-components=1",
-    "build-runtime": "cd runtime && yarn && yarn run build-host-native",
-    "build-sdk": "tsc --pretty",
-    "build": "npm run prepack && npm run build-runtime",
-    "build:live": "tsc --pretty -w"
+    "pretest": "tsc",
+    "build": "tsc",
+    "build:live": "tsc -w"
   },
   "repository": {
     "type": "git",

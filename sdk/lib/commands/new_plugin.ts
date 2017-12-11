@@ -119,6 +119,8 @@ const TYPESCRIPT_TEMPLATES = [
     {
         filepath: "lib/index.ts",
         template: `\
+const { println } = require('makestack/@runtime)
+
 export class {{ CamelAppName }} {
     constructor() {
         println('Hello form {{ CamelAppName }}!')

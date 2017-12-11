@@ -24,8 +24,7 @@ describe('prepare command', function() {
         nock.cleanAll()
     })
 
-    it('adds @types/makestack', async function () {
+    it('works', async function () {
         await prepareCommand({}, { appDir: this.appDir });
-        expect(fs.existsSync(path.join(this.appDir, 'node_modules/@types/makestack/index.d.ts'))).to.be.true;
     })
 })

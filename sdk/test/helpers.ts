@@ -19,11 +19,9 @@ export function createApiRequest() {
     return nock(`${url}/api/v1`);
 }
 
-const makestackDTSPath = path.resolve(__dirname, '../runtime/makestack.d.ts');
 export const CONFIG_FILES = {
     [path.join(CONFIG_DIR, 'credentials.json')]: '',
-    '/user': {},
-    [makestackDTSPath]: fs.readFileSync(makestackDTSPath)
+    '/user': {}
 }
 
 export function login() {
