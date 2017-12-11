@@ -151,8 +151,6 @@ matrix:
           - sdk/node_modules
       install:
         - cd sdk
-        - yarn --ignore-scripts
-        - yarn prepack
         - yarn
       script:
         - yarn run cov
@@ -164,10 +162,7 @@ matrix:
         directories:
           - supervisor/node_modules
       install:
-        - cd runtime
-        - yarn
-        - yarn run build-host-native
-        - cd ../supervisor
+        - cd supervisor
         - yarn
       script:
         - yarn run cov
@@ -181,7 +176,6 @@ matrix:
       install:
         - cd runtime
         - yarn
-        - yarn run build-host-native
       script:
         - yarn run cov
 
