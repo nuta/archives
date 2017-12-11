@@ -4,8 +4,7 @@
 * Refer: https://sakura.io/docs (Google Translate is your friend)
 *
 */
-const { builtins } = require(process.env.RUNTIME_MODULE as string);
-const { I2C, Timer } = builtins;
+import { I2C, Timer } from "@makestack/runtime";
 import * as logger from "../logger";
 import { AdapterBase } from "./adapter_base";
 

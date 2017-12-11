@@ -12,7 +12,9 @@ import { deserialize, serialize } from "./smms";
 import * as unzip from "./unzip";
 import { TConfigs, TDeviceState, IPayloadMessages } from "./types";
 import { AdapterBase } from "./adapters/adapter_base";
-import { clearInterval } from "timers";
+import * as apis from "@makestack/runtime";
+import { HTTPAdapter } from "./adapters/http_adapter";
+import { SakuraIOAdapter } from "./adapters/sakuraio_adapter";
 
 interface ISupervisorConstructorArgs {
     adapter: {
@@ -102,21 +104,23 @@ export class Supervisor {
         process.env.MAKESTACK_DEVICE_TYPE = args.deviceType;
 
         if (this.replEnabled) {
-            const { builtins } = require(args.runtimeModulePath);
-            this.replVM = vm.createContext(builtins);
+            this.replVM = vm.createContext(apis);
         }
 
         switch (this.adapterName) {
             case "http": {
-                const { HTTPAdapter } = require("./adapters/http_adapter");
-                this.adapter = new HTTPAdapter(this.osType, this.deviceType, this.deviceId, args.adapter.url);
+                if (!args.adapter.url) {
+                    throw new Error('adapter.url is not specified')
+                }
+
+                this.adapter = new HTTPAdapter(this.osType, this.deviceType,
+                    this.deviceId, args.adapter.url);
                 this.verifyHMAC = true;
                 this.includeHMAC = true;
                 this.includeDeviceId = true;
                 break;
             }
             case "sakuraio": {
-                const { SakuraIOAdapter } = require("./adapters/sakuraio_adapter");
                 this.adapter = new SakuraIOAdapter();
                 this.verifyHMAC = false;
                 this.includeHMAC = false;
