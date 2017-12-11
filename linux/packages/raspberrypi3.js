@@ -1,4 +1,7 @@
-const { isRebuilt, bootfsPath, assetPath, buildPath, run, sudo, mkdirp, runWithPipe } = require('../pkgbuilder').pkg
+const {
+  isRebuilt, bootfsPath, assetPath, buildPath, run, sudo, mkdirp, runWithPipe,
+  buildFatImage
+} = require('../pkgbuilder').pkg
 const { spawnSync } = require('child_process')
 
 const linuxVersion = '1.20170811-1'
@@ -41,25 +44,7 @@ module.exports = {
   },
 
   buildImage(imageFile) {
-    const mountPoint = buildPath('image')
-    const username = spawnSync('whoami', { encoding: 'utf-8' })
-      .stdout.replace('\n', '')
-
-    mkdirp(mountPoint)
-    run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
-    spawnSync('fdisk', [imageFile], { input: 'n\np\n\n\n\na\nw' })
-
-    const loopFile = runWithPipe(
-      ['sudo', 'losetup', '--partscan', '--show', '--find', imageFile]
-    ).replace(/\n+$/, '')
-    const devFile = loopFile + 'p1'
-
-    sudo(['mkfs.fat', '-n', 'MAKESTACK', devFile])
-    run(['mkdir', '-p', mountPoint])
-    sudo(['mount', devFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
-    run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
-    sudo(['umount', mountPoint])
-    run(['sudo', 'losetup', '-d', loopFile])
+    buildFatImage(imageFile)
   },
 
   bootfs: {

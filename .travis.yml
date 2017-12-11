@@ -23,8 +23,14 @@ matrix:
         yarn: true
         directories:
           - linux/build/downloads
-      install: npm install -g yarn
-      script: BUILD=release make -C linux x64
+      install:
+        - npm install -g yarn
+        - cd linux/pkgbuilder
+        - yarn
+        - cd ..
+      script:
+        - BUILD=release make x64
+
 
     - language: node_js
       node_js: "8"
@@ -47,8 +53,13 @@ matrix:
         yarn: true
         directories:
           - linux/build/downloads
-      install: npm install -g yarn
-      script: BUILD=release make -C linux raspberrypi3
+      install:
+        - npm install -g yarn
+        - cd linux/pkgbuilder
+        - yarn
+        - cd ..
+      script:
+        - BUILD=release make raspberrypi3
 
     - language: ruby
       env: M=server:backend:sqlite3

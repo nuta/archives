@@ -127,6 +127,40 @@ function sudo(argv, env) {
   })
 }
 
+function buildFatImage(imageFile) {
+
+  const mountPoint = buildPath('image')
+  const username = spawnSync('whoami', { encoding: 'utf-8' })
+  .stdout.replace('\n', '')
+
+  mkdirp(mountPoint)
+  run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
+  spawnSync('fdisk', [imageFile], { input: 'n\np\n\n\n\na\nw' })
+
+  const partedOutput = runWithPipe(
+    ['parted', '-s', imageFile, 'unit', 'b', 'print']
+  ).split('\n').filter(line => line.includes('boot'))[0]
+
+  if (!partedOutput) {
+    throw new Error('failed to get the partiton layout by parted(8');
+  }
+
+  const partOffset = partedOutput.split(/\s+/)[1].replace(/B$/, '')
+  const partLength = partedOutput.split(/\s+/)[3].replace(/B$/, '')
+
+  const loopFile = runWithPipe(
+    ['sudo', 'losetup', '-o', partOffset, '--sizelimit', partLength,
+    '--show', '-f', imageFile]
+  ).replace(/\n+$/, '')
+
+  sudo(['mkfs.fat', '-n', 'MAKESTACK', loopFile])
+  run(['mkdir', '-p', mountPoint])
+  sudo(['mount', loopFile, mountPoint, '-o', `uid=${username}`, '-o', `gid=${username}`])
+  run(['sh', '-c', `cp -r ${bootfsPath('.')}/* ${mountPoint}`])
+  sudo(['umount', mountPoint])
+  run(['sudo', 'losetup', '-d', loopFile])
+}
+
 module.exports = {
   config,
   isNewerFile,
@@ -140,5 +174,6 @@ module.exports = {
   run,
   runWithPipe,
   sudo,
-  mkdirp
+  mkdirp,
+  buildFatImage
 }
