@@ -8,6 +8,7 @@ matrix:
   include:
     - language: node_js
       node_js: "8"
+      sudo: true # because of losetup(8)
       env: M=linux:x64
       addons:
         apt:
