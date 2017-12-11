@@ -1,7 +1,7 @@
 import * as fs from "fs";
-import { functions as native } from "../native";
-import { GPIOInterface, SPIMode, SPIOrder } from "../types";
-import { GPIO } from "..";
+import { functions as native } from "../../native";
+import { GPIOInterface, SPIMode, SPIOrder } from "../../types";
+import { GPIO } from "../..";
 
 const SPI_CPHA = 0x01;
 const SPI_CPOL = 0x02;

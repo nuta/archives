@@ -1,6 +1,6 @@
-import { LinuxGPIOAPI } from "../linux/gpio";
-import { LinuxI2CAPI } from "../linux/i2c";
-import { LinuxSPIAPI } from "../linux/spi";
+import { LinuxGPIOAPI } from "./linux/gpio";
+import { LinuxI2CAPI } from "./linux/i2c";
+import { LinuxSPIAPI } from "./linux/spi";
 import { I2CInterface, SPIInterface } from "../types";
 
 class GPIO extends LinuxGPIOAPI {

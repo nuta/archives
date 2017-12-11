@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import { functions as native } from "../native";
+import { functions as native } from "../../native";
 
 const I2C_SLAVE = 0x0703;
 

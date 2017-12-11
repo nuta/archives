@@ -1,4 +1,4 @@
-import { GPIOInterface, GPIOPinMode, GPIOInterruptMode } from "../types";
+import { GPIOInterface, GPIOPinMode, GPIOInterruptMode } from "../../types";
 const fs = require("fs");
 
 export class LinuxGPIOAPI implements GPIOInterface {
