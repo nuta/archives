@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "MakeStack Node.js app runtime environment.",
   "gypfile": true,
-  "private": true,
   "main": "dist/index.js",
   "typings": "./index.d.ts",
   "scripts": {
