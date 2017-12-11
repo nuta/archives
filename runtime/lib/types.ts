@@ -1,4 +1,3 @@
-export type DeviceType = 'sdk' | 'raspberrypi3';
 export type GPIOPinMode = 'in' | 'out'
 export type GPIOInterruptMode = 'rising' | 'falling' | 'both'
 

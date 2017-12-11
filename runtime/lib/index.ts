@@ -1,6 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
 import { AppAPI } from "./api/app";
+import { DeviceAPI } from "./api/device";
 import { publish } from "./api/event";
 import { eprintln, println } from "./api/logging";
 import { SerialAPI } from "./api/serial";
@@ -8,24 +7,11 @@ import { ConfigAPI } from "./api/config";
 import { SubProcessAPI } from "./api/subprocess";
 import { TimerAPI } from "./api/timer";
 import { dummyGPIO, dummyI2C, dummySPI } from "./dummy";
-import { GPIOConstructor, I2CConstructor, SPIConstructor, DeviceType } from "./types";
+import { GPIOConstructor, I2CConstructor, SPIConstructor } from "./types";
 
-function detectDeviceType(): DeviceType {
-    if (process.env.MAKESTACK_DEVICE_TYPE) {
-        return process.env.MAKESTACK_DEVICE_TYPE as DeviceType;
-    }
+export const Device = new DeviceAPI();
 
-    if (fs.existsSync("/proc/cpuinfo")) {
-        const cpuinfo = fs.readFileSync("/proc/cpuinfo", { encoding: 'utf-8' });
-        if (cpuinfo.match(/BCM2837/)) {
-            return 'raspberrypi3';
-        }
-    }
-
-    return 'sdk';
-}
-
-const device = require(`./devices/${detectDeviceType()}`);
+const device = require(`./devices/${Device.getDeviceType()}`);
 export { println, eprintln, publish };
 export const GPIO: GPIOConstructor = device.GPIO || dummyGPIO;
 export const I2C: I2CConstructor = device.I2C || dummyI2C;
