@@ -2,6 +2,7 @@ import { } from 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
+process.env.MAKESTACK_ENV = 'test';
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
 const { Config } = require('../..');
 

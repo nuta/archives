@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as fs from 'fs';
 
+process.env.MAKESTACK_ENV = 'test';
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
 const { I2C } = require('../..');
 

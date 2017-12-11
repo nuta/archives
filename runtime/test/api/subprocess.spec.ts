@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import * as child_process from 'child_process';
 
+process.env.MAKESTACK_ENV = 'test';
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
 const { SubProcess } = require('../..');
 

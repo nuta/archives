@@ -7,8 +7,9 @@ export interface NativeFunctions {
     serialConfigure: (fd: number, baudrate: number, databits: number, parity: number) => void;
 };
 
+console.log(process.env.MAKESTACK_ENV)
 const nativeModulePath =
-    (getDeviceType() === 'sdk') ?
+    (getDeviceType() === 'sdk' || process.env.MAKESTACK_ENV === 'test') ?
         '../build/Release/native' : `../native/${process.arch}/native.node`;
 
 export const functions: NativeFunctions = require(nativeModulePath);
