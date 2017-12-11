@@ -1,5 +1,7 @@
 import * as fs from "fs";
 import { functions as native } from "../native";
+import { GPIOInterface, SPIMode, SPIOrder } from "../types";
+import { GPIO } from "..";
 
 const SPI_CPHA = 0x01;
 const SPI_CPOL = 0x02;
@@ -13,14 +15,17 @@ const SPI_MODES: { [key: string]: number } = {
 export abstract class LinuxSPIAPI {
     public abstract bus: string;
     public slave: number;
-    public ss?: GPIO;
+    public ss?: any;
     public fd: number;
     public mode: SPIMode;
     public bits: number;
     public speed: number;
     public order: SPIOrder;
 
-    constructor(args: { slave: number, speed: number, mode: SPIMode, order: SPIOrder, bits: number, ss: number, path: string }) {
+    constructor(args: {
+        slave: number, speed: number, mode: SPIMode, order: SPIOrder,
+        bits: number, ss: number, path: string
+    }) {
         if (!args.path && !args.slave) {
             throw new Error("Specify `path' or `slave'.");
         }
@@ -28,6 +33,10 @@ export abstract class LinuxSPIAPI {
         const path = (args.slave === undefined) ? args.path : `/dev/spidev${this.bus}.${args.slave}`;
 
         if (args.ss !== undefined) {
+            if (!GPIO) {
+                throw new Error("GPIO API is unavailable.");
+            }
+
             this.ss = new GPIO({ pin: args.ss, mode: 'out' });
             this.deselectSlave();
         } else {

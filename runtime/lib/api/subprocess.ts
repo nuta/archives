@@ -1,5 +1,11 @@
 import { spawnSync } from "child_process";
 
+interface SubProcessResult {
+    stdout: string;
+    stderr: string;
+    status: number;
+}
+
 export class SubProcessAPI {
     public run(argv: string[]) {
         if (!Array.isArray(argv)) {

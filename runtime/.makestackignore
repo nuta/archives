@@ -6,7 +6,7 @@ package.json
 binding.gyp
 tsconfig.json
 yarn.lock
-makestack.d.ts
+index.d.ts
 build
 src
 dist/*.map

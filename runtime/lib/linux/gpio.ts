@@ -1,6 +1,7 @@
+import { GPIOInterface, GPIOPinMode, GPIOInterruptMode } from "../types";
 const fs = require("fs");
 
-export class LinuxGPIOAPI {
+export class LinuxGPIOAPI implements GPIOInterface {
     public pin: number;
 
     constructor(args: { pin: number, mode: GPIOPinMode }) {
