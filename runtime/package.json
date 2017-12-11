@@ -9,11 +9,8 @@
     "cov": "istanbul cover _mocha",
     "test": "mocha",
     "test:live": "mocha -w",
-    "prepublish": "npm run build",
+    "prepare": "npm run build",
     "build": "npm run transpile",
-    "prepack": "npm run build",
-    "build-native": "./build-native $ARCH",
-    "build-host-native": "./build-native host",
     "transpile": "tsc",
     "build:live": "tsc -w"
   },
