@@ -92,16 +92,16 @@ function run(argv, env, cwd) {
   }
 }
 
-function runWithPipe(argv, env, cwd) {
+function runWithPipe(argv, env = {}, cwd = process.cwd(), options = {}) {
   console.log(chalk.bold(`${argv.join(' ')}`))
-  const cp = spawnSync(argv[0], argv.slice(1), {
-    cwd: cwd || process.cwd(),
+  const cp = spawnSync(argv[0], argv.slice(1), Object.assign({
+    cwd,
     encoding: 'utf-8',
     env: Object.assign({
       PATH: process.env.PATH,
       MAKEFLAGS: `-j${os.cpus().length}`
     }, env)
-  })
+  }, options))
 
   if (cp.error) {
     throw new Error(`error: failed to run ${argv[0]}: ${cp.error}`)
@@ -131,12 +131,11 @@ function sudo(argv, env) {
 function buildFatImage(imageFile) {
 
   const mountPoint = buildPath('image')
-  const username = spawnSync('whoami', { encoding: 'utf-8' })
-  .stdout.replace('\n', '')
+  const username = runWithPipe(['whoami']).stdout.replace('\n', '')
 
   mkdirp(mountPoint)
   run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
-  spawnSync('fdisk', [imageFile], { input: 'n\np\n\n\n\na\nw' })
+  runWithPipe(['fdisk', imageFile], null, null, { input: 'n\np\n\n\n\na\n1\nw\n' })
 
   const partedOutput = runWithPipe(
     ['parted', '-s', imageFile, 'unit', 'b', 'print']
