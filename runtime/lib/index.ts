@@ -27,9 +27,9 @@ function detectDeviceType(): DeviceType {
 
 const device = require(`./devices/${detectDeviceType()}`);
 export { println, eprintln, publish };
-export const GPIO: GPIOConstructor | undefined = device.GPIO || dummyGPIO;
-export const I2C: I2CConstructor | undefined = device.I2C || dummyI2C;
-export const SPI: SPIConstructor | undefined = device.SPI || dummySPI;
+export const GPIO: GPIOConstructor = device.GPIO || dummyGPIO;
+export const I2C: I2CConstructor = device.I2C || dummyI2C;
+export const SPI: SPIConstructor = device.SPI || dummySPI;
 export const Timer = new TimerAPI();
 export const Config = new ConfigAPI();
 export const App = new AppAPI();
