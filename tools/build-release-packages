@@ -5,6 +5,7 @@ set -ue
 VERSION=$1
 DIST_DIR=$(realpath dist)
 
+rm -rf $DIST_DIR
 mkdir -p $DIST_DIR
 
 echo "==> Packaging SDK..."
@@ -44,3 +45,6 @@ for target in raspberrypi3; do
   mv build/$target/makestack-linux-$target.img $DIST_DIR/makestack-linux-$VERSION-$target.img
   rm -rf $DIST_DIR/linux
 done
+
+SHASUM="$(cd $DEST_DIR && shasum -a 256 *)"
+echo $SHASUM > $DEST_DIR/SHASUM
