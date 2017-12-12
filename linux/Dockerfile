@@ -9,6 +9,10 @@ RUN apt-get update -qy && apt-get install -qy curl && \
     binutils-aarch64-linux-gnu gcc-aarch64-linux-gnu  g++-aarch64-linux-gnu \
     pkg-config bison flex unzip
 
-RUN npm install -g node-gyp
 RUN yarn config set cache-folder /makestack/linux/build/downloads/yarn-cache
+
+# Fill yarn cache.
+ADD pkgbuilder/package.json /tmp/package.json
+RUN cd /tmp && yarn
+
 CMD cd /makestack/linux && make $TARGET && cp build/$TARGET/*.img /dist

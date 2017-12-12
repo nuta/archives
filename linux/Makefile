@@ -21,7 +21,10 @@ build:
 
 else
 
-build:
+pkgbuilder/node_modules:
+	cd $(@D) && yarn
+
+build: pkgbuilder/node_modules
 	docker run --rm \
 	  -e TARGET=$(TARGET) \
 	  -e MAKEFLAGS="-j$(shell getconf _NPROCESSORS_ONLN)" \
