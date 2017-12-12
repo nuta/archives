@@ -166,6 +166,13 @@ export async function deployAppDir(appDir: string) {
         run(["yarn", "install", "--production"], { cwd: tempDir })
 
         for (const filepath of find(path.join(tempDir, 'node_modules'))) {
+            if (filepath.includes("/binding.gyp")) {
+                const module = path.dirname(filepath);
+                throw new FatalError(
+                    `Deploying npm packages including native modules is not supported: ${module}`
+                );
+            }
+
             if (!shouldBePruned(filepath)) {
                 files.push({
                     path: path.relative(tempDir, filepath),
