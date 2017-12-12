@@ -130,7 +130,7 @@ function rmrf(filepath) {
           break
       }
 
-      if (fs.statSync(target).isDirectory) {
+    if (fs.statSync(target).isDirectory()) {
           const innerFiles = fs.readdirSync(target).map((name) => path.join(target, name));
           if (innerFiles.length === 0) {
               fs.rmdirSync(target);
