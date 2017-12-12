@@ -134,8 +134,8 @@ program
 
 program
 .command("build-plugin", "Build a plugin using Docker.")
-.argument("path", "The plugin directory.")
-.argument("dest", "The destination.")
+.option("--plugin-dir", "The plugin directory.", null, process.cwd(), false)
+.option("--outfile", "The output zip file path.", null, path.basename(process.cwd()) + ".zip", false)
 .action(buildPluginCommand.main);
 
 program
