@@ -138,8 +138,14 @@ class API {
         return this.invoke("GET", `/devices/${deviceName}/configs`);
     }
 
-    public setDeviceConfig(deviceName: string, key: string, value: string) {
-        return this.invoke("PUT", `/devices/${deviceName}/configs/${key}`, { value });
+    public setDeviceConfig(deviceName: string, key: string, data_type: ConfigType, value: string) {
+        return this.invoke("PUT", `/devices/${deviceName}/configs/${key}`,
+            { config: { data_type, value } }
+        );
+    }
+
+    public deleteDeviceConfig(deviceName: string, key: string) {
+        return this.invoke("DELETE", `/devices/${deviceName}/configs/${key}`);
     }
 
     public registerDevice(name: string, deviceType: string, tag?: string) {

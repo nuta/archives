@@ -5,6 +5,7 @@ import * as buildPluginCommand from "./commands/build_plugin";
 import * as deployCommand from "./commands/deploy";
 import * as deployImageCommand from "./commands/deploy_image";
 import * as deviceCommand from "./commands/device";
+import * as deviceConfigCommand from "./commands/device_config";
 import * as installCommand from "./commands/install";
 import * as listDrivesCommand from "./commands/list_drives";
 import * as loginCommand from "./commands/login";
@@ -73,6 +74,25 @@ program
 .command("device delete", "Delete an device.")
 .argument("name", "The device name.")
 .action(deviceCommand.delete_);
+
+program
+.command("device-config list", "List device-local configs.")
+.argument("--device-name <device-name>", "The device name.")
+.action(deviceConfigCommand.list);
+
+program
+.command("device-config set", "Create/Update an device-local config.")
+.option("--device-name <device-name>", "The device name.", null, null, true)
+.option("--type <type>", "The value data type. (string, integer, float, or bool)", /string|integer|float|bool/, null, true)
+.argument("name", "The config name.")
+.argument("value", "The value.")
+.action(deviceConfigCommand.set);
+
+program
+.command("device-config delete", "Delete an device-local config.")
+.argument("--device-name <device-name>", "The device name.")
+.argument("name", "The config name.")
+.action(deviceConfigCommand.delete_);
 
 program
 .command("deploy", "Deploy the app.")
