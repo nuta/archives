@@ -8,13 +8,13 @@ import { logger } from "./logger";
 function buildDockerImage() {
     logger.progress('building a Docker image');
 
-    const { error, status } = spawnSync("dockers", ["build", "-t", "makestack/plugin-builder", "."], {
+    const { error, status } = spawnSync("docker", ["build", "-t", "makestack/plugin-builder", "."], {
         stdio: "inherit",
         env: process.env, // DOCKER_HOST, etc.
         cwd: path.resolve(__dirname, "../plugin_builder"),
     });
 
-    if ((error as any).code === 'ENOENT') {
+    if (error && (error as any).code === 'ENOENT') {
         throw new FatalError("`docker' command is not installed.");
     }
 
