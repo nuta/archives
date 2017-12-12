@@ -6,7 +6,8 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 import * as JSZip from 'jszip';
 import * as smms from '../lib/smms';
-import { IPayloadMessages } from '../lib/types';
+import { PayloadMessages } from '../lib/types';
+
 const { Supervisor } = require('..');
 
 const APP_DIR = path.resolve(os.tmpdir(), 'makestack-supervisor-test-app')
@@ -40,7 +41,7 @@ export async function createAppImage(files: { [key: string]: string }): Promise<
     }
 }
 
-export function createHeartbeatResponse(messages: IPayloadMessages) {
+export function createHeartbeatResponse(messages: PayloadMessages) {
     const serializeOptions = {
         includeDeviceId: true,
         includeHMAC: true,
@@ -72,6 +73,7 @@ export function prepareAppDir() {
 
 export function createSupervisor() {
     return new Supervisor({
+        mode: 'test',
         appDir: APP_DIR,
         adapter: {
             name: 'http',
@@ -81,8 +83,6 @@ export function createSupervisor() {
         deviceType: 'raspberrypi3',
         deviceId: DEVICE_ID,
         deviceSecret: DEVICE_SECRET,
-        debugMode: true,
-        testMode: true,
         osVersion: OS_VERSION,
         heartbeatInterval: 60,
         runtimeModulePath: path.resolve(__dirname, '../../runtime')

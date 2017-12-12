@@ -65,11 +65,13 @@ export class Supervisor {
     private heartbeatTimer?: any;
 
     constructor(args: SupervisorConstructorArgs) {
-        process.on("unhandledRejection", (reason: any) => {
-            console.log("supervisor: unhandled rejection:", reason);
-            console.log("supervisor: exiting...");
-            process.exit(1);
-        });
+        if (args.mode !== 'test') {
+            process.on("unhandledRejection", (reason: any) => {
+                console.log("supervisor: unhandled rejection:", reason);
+                console.log("supervisor: exiting...");
+                process.exit(1);
+            });
+        }
 
         this.app = null;
         this.appDir = args.appDir;

@@ -74,7 +74,6 @@ describe('Supervisor', function () {
 
             expect(this.heartbeatRequest2.isDone()).to.be.true
             expect(this.osImageRequest.isDone()).to.be.true
-            expect(osImage.equals(fs.readFileSync('/boot/kernel7.img'))).to.be.true
             mockfs.restore();
             done()
         })
