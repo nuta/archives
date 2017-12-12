@@ -2,6 +2,19 @@
 # yarn lockfile v1
 
 
+"@makestack/runtime@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@makestack/runtime/-/runtime-0.1.1.tgz#26c7278c1727d7f548a5742b514c575d4b874c2b"
+  dependencies:
+    nan "^2.8.0"
+    node-gyp "^3.6.2"
+
+"@makestack/supervisor@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@makestack/supervisor/-/supervisor-0.1.1.tgz#71e6bdffa1cd08a67a13638188744d89b5eb859e"
+  dependencies:
+    "@makestack/runtime" "^0.1.1"
+
 "@types/node@^8.0.24":
   version "8.0.34"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.34.tgz#55f801fa2ddb2a40dd6dfc15ecfe1dde9c129fe9"
@@ -3158,9 +3171,11 @@ make-dir@^1.0.0:
   dependencies:
     pify "^2.3.0"
 
-"makestack@file:..":
-  version "0.1.0"
+makestack@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/makestack/-/makestack-0.1.1.tgz#4f42a61cfc2bd0eb70dcbe3cc5736891579c7618"
   dependencies:
+    "@makestack/supervisor" "^0.1.1"
     body-parser "^1.18.2"
     caporal "^0.7.0"
     chalk "^2.1.0"
@@ -3376,6 +3391,10 @@ nan@^2.3.0, nan@^2.3.2, nan@^2.5.1, nan@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.7.0.tgz#d95bf721ec877e08db276ed3fc6eb78f9083ad46"
 
+nan@^2.8.0:
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
+
 ncname@1.0.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/ncname/-/ncname-1.0.0.tgz#5b57ad18b1ca092864ef62b0b1ed8194f383b71c"
@@ -3413,7 +3432,7 @@ node-forge@0.6.33:
   version "0.6.33"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.6.33.tgz#463811879f573d45155ad6a9f43dc296e8e85ebc"
 
-node-gyp@^3.3.1:
+node-gyp@^3.3.1, node-gyp@^3.6.2:
   version "3.6.2"
   resolved "https://registry.yarnpkg.com/node-gyp/-/node-gyp-3.6.2.tgz#9bfbe54562286284838e750eac05295853fa1c60"
   dependencies:
