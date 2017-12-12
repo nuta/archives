@@ -1,5 +1,6 @@
 import * as addDeviceCommand from "./commands/add_device";
 import * as appCommand from "./commands/app";
+import * as configCommand from "./commands/config";
 import * as buildPluginCommand from "./commands/build_plugin";
 import * as deployCommand from "./commands/deploy";
 import * as deployImageCommand from "./commands/deploy_image";
@@ -44,6 +45,25 @@ program
 .command("app delete", "Delete an app.")
 .argument("name", "The app name.")
 .action(appCommand.delete_);
+
+program
+.command("config list", "List app configs.")
+.option("--app-dir <app-dir>", "The app directory.", null, process.cwd())
+.action(configCommand.list);
+
+program
+.command("config set", "Create/Update an app config.")
+.argument("name", "The config name.")
+.argument("value", "The value.")
+.option("--type <type>", "The value data type. (string, integer, float, or bool)", /string|integer|float|bool/, null, true)
+.option("--app-dir <app-dir>", "The app directory.", null, process.cwd())
+.action(configCommand.set);
+
+program
+.command("config delete", "Delete an app config.")
+.argument("name", "The config name.")
+.option("--app-dir <app-dir>", "The app directory.", null, process.cwd())
+.action(configCommand.delete_);
 
 program
 .command("device list", "List devices.")

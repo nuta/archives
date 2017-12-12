@@ -5,6 +5,8 @@ import { loadCredentials, saveCredentials } from "./config";
 import { FatalError } from "./types";
 const fetch = require("node-fetch");
 
+export type ConfigType = 'string' | 'integer' | 'float' | 'bool';
+
 class API {
     public invoke(method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: any): Promise<any> {
         const headers = {};
@@ -152,8 +154,14 @@ class API {
         return this.invoke("GET", `/apps/${appName}/configs`);
     }
 
-    public setAppConfig(appName: string, key: string, value: string) {
-        return this.invoke("PUT", `/apps/${appName}/configs/${key}`, { value });
+    public setAppConfig(appName: string, key: string, data_type: ConfigType, value: string) {
+        return this.invoke("PUT", `/apps/${appName}/configs/${key}`,
+            { config: { data_type, value } }
+        );
+    }
+
+    public deleteAppConfig(appName: string, key: string) {
+        return this.invoke("DELETE", `/apps/${appName}/configs/${key}`);
     }
 
     public downloadPlugin(name: string): Promise<Buffer> {
