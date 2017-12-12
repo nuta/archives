@@ -20,6 +20,8 @@
     "node-gyp": "^3.6.2",
     "nan": "^2.8.0"
   },
+  "runtimeDependencies": {
+  },
   "devDependencies": {
     "@types/chai": "^4.0.6",
     "@types/mocha": "^2.2.44",
