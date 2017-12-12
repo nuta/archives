@@ -20,12 +20,6 @@ install_npm_dependencies() {
   yarn --production --ignore-scripts
   CC=${cross_compile}gcc CXX=${cross_compile}g++ LINK=${cross_compile}g++ \
     npm rebuild --arch=$arch
-
-  BUILD_DEPS="$(node -e "console.log((JSON.parse(fs.readFileSync('package.json')).buildDependencies || []).join(' '))")"
-  for dep in $BUILD_DEPS; do
-    rm -rf node_modules/$dep
-  done
-
   mv node_modules deps/$arch
 }
 
