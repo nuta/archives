@@ -14,7 +14,8 @@ Rails.application.routes.draw do
           param: :version, only: %i(index show create)
 
         resources :app_configs, controller: 'apps/configs',
-          param: :key, path: 'configs', as: :configs, constraints: { key: /.+/ }
+          param: :key, path: 'configs', as: :configs, constraints: { key: /.+/ },
+          only: %i(index show update destroy)
 
         resources :integrations, controller: 'apps/integrations', param: :name
 
@@ -27,7 +28,8 @@ Rails.application.routes.draw do
 
       resources :devices, param: :name do
         resources :device_configs, controller: 'devices/configs',
-          param: :key, path: 'configs', as: :config, constraints: { key: /.+/ }
+          param: :key, path: 'configs', as: :config, constraints: { key: /.+/ },
+          only: %i(index show update destroy)
 
         resources :log, controller: 'devices/log', only: [:index]
         resources :commands, controller: 'devices/commands', only: [:index, :create]

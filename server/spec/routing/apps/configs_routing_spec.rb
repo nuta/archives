@@ -15,12 +15,6 @@ RSpec.describe Apps::ConfigsController, type: :routing do
         route_to("apps/configs#show", app_name: app.name, key: config.key)
     end
 
-    it "routes to #create" do
-
-      expect(:post => "#{api_prefix}/apps/#{app.name}/configs").to \
-        route_to("apps/configs#create", app_name: app.name)
-    end
-
     it "routes to #update via PUT" do
       expect(:put => "#{api_prefix}/apps/#{app.name}/configs/#{config.key}").to \
         route_to("apps/configs#update", app_name: app.name, key: config.key)

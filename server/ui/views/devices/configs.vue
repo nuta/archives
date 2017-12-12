@@ -133,7 +133,7 @@ export default {
   },
   methods: {
     async createConfig() {
-      await api.createDeviceConfig(
+      await api.updateDeviceConfig(
               this.deviceName,
               this.newConfig.key,
               this.newConfig.dataType,

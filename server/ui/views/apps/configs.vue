@@ -133,7 +133,7 @@ export default {
   },
   methods: {
     async createConfig() {
-      await api.createAppConfig(
+      await api.updateAppConfig(
               this.appName,
               this.newConfig.key,
               this.newConfig.dataType,

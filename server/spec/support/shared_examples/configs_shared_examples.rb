@@ -26,34 +26,15 @@ RSpec.shared_examples 'config controller' do
     end
   end
 
-  describe "POST #create" do
+  describe "PUT #update" do
     context "with valid params" do
       it "creates a new config" do
+        config = attributes_for(model_name)
         expect {
-          post :create, params: { path_name => owner.name, config: attributes_for(model_name) }
+          put :update, params: { path_name => owner.name, key: config[:key], config: config }
         }.to change(model, :count).by(1)
       end
 
-      it "renders a JSON response with the new config" do
-        post :create, params: { path_name => owner.name, config: attributes_for(model_name) }
-        expect(response).to have_http_status(:created)
-        expect(response.content_type).to eq('application/json')
-      end
-    end
-
-    context "with invalid params" do
-      it "renders a JSON response with errors for the new config" do
-        config = attributes_for(model_name)
-        config[:data_type] = "invalid"
-        post :create, params: { path_name => owner.name, config: config }
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq('application/json')
-      end
-    end
-  end
-
-  describe "PUT #update" do
-    context "with valid params" do
       it "updates the requested config" do
         config = create(:config, owner: owner)
         valid = { comment: "this is comment :D" }
@@ -73,6 +54,14 @@ RSpec.shared_examples 'config controller' do
     end
 
     context "with invalid params" do
+      it "renders a JSON response with errors for the new config" do
+        config = attributes_for(model_name)
+        config[:data_type] = "invalid"
+        put :update, params: { path_name => owner.name, key: config[:key], config: config }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to eq('application/json')
+      end
+
       it "renders a JSON response with errors for the config" do
         config = create(:config, owner: owner)
         invalid = { data_type: 'good morning' }

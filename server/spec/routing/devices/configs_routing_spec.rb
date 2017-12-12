@@ -15,11 +15,6 @@ RSpec.describe Devices::ConfigsController, type: :routing do
         route_to("devices/configs#show", device_name: device.name, key: config.key)
     end
 
-    it "routes to #create" do
-      expect(:post => "#{api_prefix}/devices/#{device.name}/configs").to \
-        route_to("devices/configs#create", device_name: device.name)
-    end
-
     it "routes to #update via PUT" do
       expect(:put => "#{api_prefix}/devices/#{device.name}/configs/#{config.key}").to \
         route_to("devices/configs#update", device_name: device.name, key: config.key)

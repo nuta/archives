@@ -1,6 +1,6 @@
-class Apps::ConfigsController < Apps::ApplicationController
+  class Apps::ConfigsController < Apps::ApplicationController
   before_action :set_app
-  before_action :set_config, only: [:show, :update, :destroy]
+  before_action :set_config, only: [:show, :destroy]
 
   def index
     @configs = @app.configs.all
@@ -9,14 +9,10 @@ class Apps::ConfigsController < Apps::ApplicationController
   def show
   end
 
-  def create
-    @config = @app.configs.new(config_params)
-    @config.save!
-    render :show, status: :created, location: app_config_url(@app.name, @config.key)
-  end
-
   def update
-    @config.update!(config_params)
+    @config = @app.configs.find_or_initialize_by(key: params[:key])
+    @config.update(config_params)
+    @config.save!
     render :show, status: :ok, location: app_config_url(@app.name, @config.key)
   end
 
