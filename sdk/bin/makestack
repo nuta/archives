@@ -14,10 +14,14 @@ if (process.env.IMAGE_WRITER !== undefined) {
 
   cli.run(process.argv).catch(error => {
     const format = (process.stderr.isTTY) ? chalk.bold.red : x => x
-    if (error.constructor.name === 'FatalError') {
-      process.stderr.write(format('error: ' + error.message) + '\n')
+    const cmdlineParseErrors = ['WrongNumberOfArgumentError', 'InvalidOptionValueError']
+
+    if (cmdlineParseErrors.includes(error.constructor.name)) {
+      process.stderr.write(format(error.message))
+    } else if (error.constructor.name === 'FatalError') {
+      process.stderr.write(format('Error: ' + error.message) + '\n')
     } else {
-      process.stderr.write(format('error: ' + error.stack) + '\n')
+      process.stderr.write(format('Error: ' + error.stack) + '\n')
     }
   })
 }
