@@ -1,12 +1,14 @@
 {
   "name": "@makestack/hdc1000",
   "main": "dist/index.js",
+  "license": "(CC0-1.0 OR MIT)",
   "scripts": {
-    "transpile": "tsc --pretty"
+    "transpile": "tsc"
   },
   "dependencies": {
   },
   "devDependencies": {
+    "@makestack/runtime": "^0.1.0",
     "@types/node": "^8.0.53",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.2"

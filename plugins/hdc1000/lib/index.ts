@@ -1,3 +1,4 @@
+import { I2C, Timer } from '@makestack/runtime';
 const HDC1000_ERROR = 65535;
 const HDC1000_TEMP_REG = 0x00;
 const HDC1000_HUMID_REG = 0x01;
