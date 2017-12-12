@@ -1,13 +1,20 @@
 class PluginsController < ApplicationController
   def download
+    github_repo = (official?) ? 'seiyanuta/makestack' : "#{params[:org]}/#{params[:name]}"
     plugin = params[:name]
 
     if Rails.env.development? && official?
       plugin_zip_path = build_plugin_locally(plugin)
       send_file plugin_zip_path, content_type: 'application/zip'
     else
-      repo = (official?) ? 'seiyanuta/makestack' : "#{params[:org]}/#{params[:repo]}"
-      download_from_github(repo, params[:name])
+      r = RestClient.get "https://github.com/#{github_repo}/releases/latest",
+        accept: 'application/json'
+
+      latest_tag = JSON.parse(r.body)['tag_name']
+      plugin_url = "https://github.com/#{github_repo}/releases/download/#{latest_tag}/#{plugin}-#{latest_tag}.plugin.zip"
+      r = RestClient.get plugin_url
+
+      render body: r.body
     end
   end
 
@@ -15,32 +22,6 @@ class PluginsController < ApplicationController
 
   def official?
     (params[:org] == '_')
-  end
-
-  def download_from_github(repo, name)
-    r = RestClient.get "https://api.github.com/repos/#{repo}/releases/latest",
-      accept: 'application/json'
-
-    latest_tag = JSON.parse(r.body)['tag_name']
-    plugin_url = "https://github.com/#{repo}/releases/download/#{latest_tag}/#{name}-#{latest_tag}.plugin.zip"
-
-    downloaded = 0
-    self.response_body = Enumerator.new do |data|
-      downloader = proc { |r|
-        r.read_body do |chunk|
-          downloaded += chunk.length
-          if downloaded > 1 * 1024 * 1024 # 1MB
-            raise "too large plugin zip: #{plugin_url}"
-          end
-
-          data << chunk
-        end
-      }
-
-      RestClient::Request.execute(method: :get,
-                                  url: plugin_url,
-                                  block_response: downloader)
-    end
   end
 
   if Rails.env.development?
