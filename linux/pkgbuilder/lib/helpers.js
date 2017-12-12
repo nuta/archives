@@ -118,4 +118,30 @@ function extract(filepath, dest) {
   }
 }
 
-module.exports = { find, mkdirp, copyFiles, shasum, download, extract }
+function rmrf(filepath) {
+  if (!fs.existsSync(filepath)) {
+      return;
+  }
+
+  const remaining = [filepath];
+  while (true) {
+      const target = remaining.pop();
+      if (!target) {
+          break
+      }
+
+      if (fs.statSync(target).isDirectory) {
+          const innerFiles = fs.readdirSync(target).map((name) => path.join(target, name));
+          if (innerFiles.length === 0) {
+              fs.rmdirSync(target);
+          } else {
+              remaining.concat(innerFiles);
+          }
+      } else {
+          // A normal file.
+          fs.unlinkSync(target);
+      }
+  }
+}
+
+module.exports = { find, mkdirp, copyFiles, shasum, download, extract, rmrf }

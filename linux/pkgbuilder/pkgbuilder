@@ -3,7 +3,9 @@ const path = require('path')
 const fs = require('fs')
 const chalk = require('chalk')
 const { isNewerDirContent } = require('.').pkg
-const { find, mkdirp, copyFiles, shasum, download, extract } = require('./lib/helpers')
+const {
+  find, mkdirp, copyFiles, shasum, download, extract, rmrf
+} = require('./lib/helpers')
 
 global.build = {
   config: {}
@@ -108,9 +110,8 @@ function buildPackage(pkg) {
     const dlpath = download(pkg, pkg.sha256)
     extract(dlpath, pkgBuildDir)
   } else if (pkg.path) {
-    if (isNewerDirContent(pkg.path, pkgBuildDir, pkg.ignore)) {
-      copyFiles(pkg.path, pkgBuildDir, pkg.ignore)
-    }
+    rmrf(pkgBuildDir)
+    copyFiles(pkg.path, pkgBuildDir, pkg.ignore)
   } else {
     mkdirp(pkgBuildDir)
   }
@@ -164,7 +165,7 @@ function main() {
     if (isBuildRequired(pkg)) {
       console.log(chalk.bold.blue('==> ') +
       chalk.bold(`(${i + 1}/${buildOrder.length}) Building ${pkgName}...`))
-    buildPackage(pkg)
+      buildPackage(pkg)
       build.rebuiltPackages.push(pkgName)
     } else {
       const filesToBootFS = getPkgFilesToCopy(pkg.name, pkg.bootfs, build.bootfsDir)
@@ -172,16 +173,18 @@ function main() {
 
       if (filesToBootFS.length > 0 || filesToRootFS.length > 0) {
         for (const [src, dest] of filesToBootFS) {
+          rmrf(dest)
           copyFiles(src, dest)
         }
 
         for (const [src, dest] of filesToRootFS) {
+          rmrf(dest)
           copyFiles(src, dest)
         }
 
         build.rebuiltPackages.push(pkgName)
         const num = filesToBootFS.length + filesToRootFS.length
-        console.log(chalk.bold.megenta('==> ') +
+        console.log(chalk.bold.magenta('==> ') +
           chalk.bold(`(${i + 1}/${buildOrder.length}) Copying ${num} files from ${pkgName}...`))
       } else {
         console.log(chalk.bold.yellow('==> ') +

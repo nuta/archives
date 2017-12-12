@@ -14,26 +14,19 @@ module.exports = {
   ignore,
 
   changed() {
-    const isChanged = isNewerDirContent(supervisorPath, buildPath('supervisor'), ignore)
-    if (isChanged) {
-      // TODO: do this in pkgbuilder
-      run([ 'rm', '-r', buildPath('supervisor') ])
-      run([ 'cp', '-r', supervisorPath, buildPath('supervisor') ])
-    }
-
-    return isChanged
+    return isNewerDirContent(supervisorPath, buildPath('supervisor'), ignore)
   },
 
   build() {
-    let packageJSON = JSON.parse(fs.readFileSync('package.json'))
-    packageJSON.dependencies['@makestack/runtime'] = 'file:' + runtimePath
-    fs.writeFileSync('package.json', JSON.stringify(packageJSON))
+    let supervisorPackageJSON = JSON.parse(fs.readFileSync('./package.json'))
+    supervisorPackageJSON.dependencies['@makestack/runtime'] = 'file:' + runtimePath
+    fs.writeFileSync('package.json', JSON.stringify(supervisorPackageJSON))
 
-    // Build Supervisor.
-    run(['yarn'])
+    // Install dependencies to build.
+    run(['yarn', '--ignore-scripts'])
 
-    // Build Runtime.
-    run(['yarn', 'install'], {}, 'node_modules/@makestack/runtime')
+    // Build Runtime.```
+    run(['yarn', '--ignore-scripts'], {}, 'node_modules/@makestack/runtime')
     run(['npm', 'run', 'transpile'], {}, 'node_modules/@makestack/runtime')
     run(['npm', 'run', 'build-native'], {
       ARCH: config('target.node_gyp_arch'),
@@ -43,15 +36,20 @@ module.exports = {
       LINK: `${config('target.toolchain_prefix')}g++`
     }, 'node_modules/@makestack/runtime')
 
-    run(['rm', '-rf', 'node_modules/@makestack/runtime/node_modules'])
+    // Build Supervisor after the runtime build since `prepare' hook of
+    // runtime is not invoked if we simply run `yarn --production'.
+    run(['yarn', 'build'])
   },
 
   rootfs() {
+    const runtime = '/supervisor/node_modules/@makestack/runtime'
     return {
       '/supervisor/package.json': 'package.json',
       '/supervisor/supervisor': 'supervisor',
       '/supervisor/dist': 'dist',
-      '/supervisor/node_modules/@makestack/runtime': 'node_modules/@makestack/runtime'
+      [`${runtime}/package.json`]: 'node_modules/@makestack/runtime/package.json',
+      [`${runtime}/dist`]: 'node_modules/@makestack/runtime/dist',
+      [`${runtime}/native`]: 'node_modules/@makestack/runtime/native'
     }
   }
 }

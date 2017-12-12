@@ -161,6 +161,7 @@ function buildFatImage(imageFile) {
   run(['sudo', 'losetup', '-d', loopFile])
 }
 
+
 module.exports = {
   config,
   isNewerFile,
