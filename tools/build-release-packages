@@ -9,12 +9,14 @@ mkdir -p $DIST_DIR
 
 echo "==> Packaging SDK..."
 pushd sdk
-npm pack
+yarn
+yarn pack
 mv makestack-*.tgz $DIST_DIR/makestack-sdk-$VERSION.tar.gz
 popd
 
 echo "==> Packaging installer..."
-pushd sdk/installer
+pushd installer
+yarn
 yarn build:macos
 yarn build:linux
 
@@ -30,7 +32,7 @@ popd
 
 echo "==> Packaging Plugins..."
 for plugin in runtime plugins/*; do
-  ./sdk/bin/makestack build-plugin $plugin $DIST_DIR/$(basename $plugin)-$VERSION.plugin.zip
+  ./sdk/bin/makestack build-plugin --plugin-dir $plugin --outfile $DIST_DIR/$(basename $plugin)-$VERSION.plugin.zip
 echo
 done
 
