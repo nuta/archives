@@ -20,9 +20,10 @@ const program = require("caporal");
 
 program
 .version(
-    fs.readFileSync(path.resolve(__dirname, '../VERSION'),
-        { encoding: 'utf-8' }).replace(/\n+$/, '')
-    )
+    JSON.parse(fs.readFileSync(
+        path.resolve(__dirname, '../package.json'), { encoding: 'utf-8' }
+    )).version,
+)
 .description('A MakeStack CLI Developer Tools.');
 
 program
