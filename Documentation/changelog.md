@@ -2,6 +2,9 @@
 title: Change Log
 ---
 
+- v0.1.1
+  - apps now have to `require('@makestack/runtime')` to use APIs
+  - rename Store to Config
 - v0.1.0
   - linux: support Raspberry Pi 3 built-in Wi-Fi chip
   - add makestack.github.io website files

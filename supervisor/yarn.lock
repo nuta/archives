@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@makestack/runtime@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@makestack/runtime/-/runtime-0.1.0.tgz#0ec3e47616ed7d1ff448adfcffc5972e56f1d52f"
+"@makestack/runtime@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@makestack/runtime/-/runtime-0.1.1.tgz#26c7278c1727d7f548a5742b514c575d4b874c2b"
   dependencies:
     nan "^2.8.0"
     node-gyp "^3.6.2"

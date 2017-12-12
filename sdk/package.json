@@ -1,6 +1,6 @@
 {
   "name": "makestack",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "(CC0-1.0 OR MIT)",
   "description": "MakeStack SDK with CLI Developer Tools.",
   "main": "dist/index.js",
@@ -21,13 +21,12 @@
     "url": "git+https://github.com/seiyanuta/makestack.git"
   },
   "author": "Seiya Nuta <nuta@seiya.me>",
-  "license": "SEE LICENSE IN LICENSE.md",
   "bugs": {
     "url": "https://github.com/seiyanuta/makestack/issues"
   },
   "homepage": "http://makestack.org",
   "dependencies": {
-    "@makestack/supervisor": "^0.1.0",
+    "@makestack/supervisor": "^0.1.1",
     "body-parser": "^1.18.2",
     "caporal": "^0.7.0",
     "chalk": "^2.1.0",
