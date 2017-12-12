@@ -117,8 +117,6 @@ matrix:
       install:
         - npm install -g yarn
         - cd sdk
-        - yarn --ignore-scripts
-        - yarn prepack
         - yarn
         - cd installer
         - yarn
@@ -135,8 +133,6 @@ matrix:
           - "$HOME/.cache"
       install:
         - cd sdk
-        - yarn --ignore-scripts
-        - yarn prepack
         - yarn
         - cd installer
         - yarn
