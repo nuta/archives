@@ -20,6 +20,17 @@ install_npm_dependencies() {
   yarn --production --ignore-scripts
   CC=${cross_compile}gcc CXX=${cross_compile}g++ LINK=${cross_compile}g++ \
     npm rebuild --arch=$arch
+
+  cat <<EOS | node
+    const fs = require('fs');
+    const pkg = JSON.parse(fs.readFileSync('package.json'));
+    pkg['dependencies'] = pkg.runtimeDependencies;
+    fs.writeFileSync('package.json', JSON.stringify(pkg));
+EOS
+
+  # remove unused dependencies
+  yarn --production --ignore-scripts
+
   mv node_modules deps/$arch
 }
 
