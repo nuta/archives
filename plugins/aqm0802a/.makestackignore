@@ -1,3 +1,4 @@
+*.zip
 dist/*.map
 scaffold.js
 lib
@@ -5,3 +6,4 @@ node_modules
 package.json
 tsconfig.json
 yarn.lock
+deps/*/.yarn-integrity
