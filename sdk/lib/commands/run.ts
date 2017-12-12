@@ -16,10 +16,10 @@ export async function main(args: any, opts: any, logger: any) {
             url: opts.server,
         },
         osType: "sdk",
+        osVersion: "dev",
         deviceId: opts.deviceId,
         deviceSecret: opts.deviceSecret,
-        heartbeatInterval: opts.heartbeatInterval,
-        runtimeModulePath: path.resolve(__dirname, "../../../runtime"),
+        heartbeatInterval: opts.heartbeatInterval
     });
 
     supervisor.start();

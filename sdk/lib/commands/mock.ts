@@ -24,9 +24,9 @@ export function run(args: any, opts: any, logger: any) {
             url: api.serverURL,
         },
         osType: "sdk",
+        osVersion: "dev",
         deviceId: mock.device_id,
         deviceSecret: mock.device_secret,
-        osVersion: null,
         heartbeatInterval: 2
     });
 

@@ -30,7 +30,6 @@ export interface SupervisorConstructorArgs {
     appUID?: number;
     appGID?: number;
     heartbeatInterval: number;
-    runtimeModulePath: string;
 }
 
 export class Supervisor {
