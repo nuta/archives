@@ -1,6 +1,6 @@
 const { config } = require('../pkgbuilder').pkg
 
-const version = '8.9.0'
+const version = '8.9.3'
 
 module.exports = {
   name: 'node',
@@ -14,8 +14,8 @@ module.exports = {
 
   sha256() {
     switch (config('target.node_arch')) {
-      case 'x64': return 'e92b91fa473f9ad805a1241907b6f1bd3f8ceac8426a8b4cb05428e62e243bdd'
-      case 'armv7l': return '36edb836120a68ab9a660e869e5ca3073f5cee880621d9ea4233d671632c33f5'
+      case 'x64': return '86f3aa593315f0503d069e3f4805019583ab8d86c0244a83c795d1942e3f99b7'
+      case 'armv7l': return '4ca2b9a5b46c22353233365944c2df7f1566a298bf25f57be8c863bf1bd4e0f8'
       default: throw new Error(`unknown target.node_arch: \`${config('node_arch')}'`)
     }
   },
