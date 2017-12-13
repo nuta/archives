@@ -1,9 +1,11 @@
 import { spawnSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
+import { api } from "../api";
 import { createFile, run } from "../helpers";
 import { logger } from "../logger";
 import { prepare } from "../prepare";
+import { FatalError } from "../types";
 const nunjuck = require("nunjucks");
 
 const DEFAULT_TEMPLATES = [
@@ -60,9 +62,14 @@ export async function main(args: any, opts: any) {
         appName, plugins, appDir
     };
 
+    if (fs.existsSync(appDir)) {
+        throw new FatalError(`The file or directory with the same name already exists: \`${appDir}'`)
+    }
+
     for (const { filepath, template } of templates) {
-        logger.progress(`Creating ${filepath}`);
-        createFile(path.join(appDir, filepath), nunjuck.renderString(template, context));
+        const dest = path.join(appDir, filepath);
+        logger.progress(`Creating ${dest}`);
+        createFile(dest, nunjuck.renderString(template, context));
     }
 
     await prepare(appDir);
@@ -96,4 +103,9 @@ export async function main(args: any, opts: any) {
 
     logger.progress('Initializing a Git repository');
     run(['git', 'init'], { cwd: appDir });
+
+    if (opts.register) {
+        logger.progress('Registering the app');
+        api.createApp(appName, opts.api);
+    }
 }

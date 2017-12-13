@@ -187,7 +187,9 @@ program
 program
 .command("new", "Create an app directory with template files.")
 .argument("dir", "The plugin directory.")
+.option("--register", "Register the app on server.")
 .option("--plugins <plugins>", "A list of plugins separated by `,'.", null, "")
+.option("--api <api>", "The API.", /^nodejs$/, 'nodejs')
 .action(newCommand.main);
 
 program
