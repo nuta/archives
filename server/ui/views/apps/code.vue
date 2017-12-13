@@ -60,7 +60,7 @@
         <div>
           <label class="uk-form-label">Misc.</label>
           <div class="uk-from-controls">
-            <a href="/documentation">
+            <a href="/documentation" target="_blank">
               <button class="uk-button uk-button-small uk-button-default">
                 <i class="fa fa-question-circle" aria-hidden="true"></i>
               </button>
@@ -342,7 +342,21 @@ export default {
     }
   },
   async beforeMount() {
-    this.files = (await api.getFiles(this.appName)).map((file, i) => {
+     let remoteFiles = await api.getFiles(this.appName)
+
+    if (remoteFiles.length === 0) {
+      remoteFiles = [
+        {
+          path: 'app.yaml',
+          body: `name: ${this.appName}\nplugins: []`
+        }, {
+          path: 'app.js',
+          body: `Timer.interval(1, () => {\n  println('Hello!')\n})`
+        }
+      ]
+    }
+
+    this.files = remoteFiles.map((file, i) => {
       this.prevFileContents[file.path] = file.body
       return {
         id: `editor${i}`,
