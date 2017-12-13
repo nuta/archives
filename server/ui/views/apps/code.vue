@@ -40,6 +40,7 @@
           </div>
         </div>
 
+        <!--
         <div>
           <label class="uk-form-label">Panels</label>
           <div class="uk-from-controls">
@@ -54,6 +55,7 @@
             </button>
           </div>
         </div>
+        -->
 
         <div>
           <label class="uk-form-label">Misc.</label>
