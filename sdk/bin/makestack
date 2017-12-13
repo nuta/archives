@@ -1,5 +1,26 @@
 #!/usr/bin/env node
 
+function handleError(error) {
+  const chalk = require('chalk')
+  const format = (process.stderr.isTTY) ? chalk.bold.red : x => x
+  const cmdlineParseErrors = ['WrongNumberOfArgumentError', 'InvalidOptionValueError']
+
+  if (cmdlineParseErrors.includes(error.constructor.name)) {
+    process.stderr.write(format(error.message))
+  } else if (error.constructor.name === 'FatalError') {
+    process.stderr.write(format('Error: ' + error.message) + '\n')
+  } else if (error.constructor.name === 'APIError') {
+    if (error.status === 422) {
+      const msg = error.response.errors.map(e => `  - ${e}`).join('\n')
+      process.stderr.write(format(`Validation Error:\n${msg}`) + '\n')
+    } else {
+      process.stderr.write(format('Error: ' + error.message) + '\n')
+    }
+  } else {
+    process.stderr.write(format('Error: ' + error.stack) + '\n')
+  }
+}
+
 /* The image writer would be executed in sudo. Avoid
 requiring other stuffs for security. */
 if (process.env.IMAGE_WRITER !== undefined) {
@@ -9,19 +30,7 @@ if (process.env.IMAGE_WRITER !== undefined) {
     process.exit(1)
   })
 } else {
-  const chalk = require('chalk')
   const cli = require('../dist/cli')
-
-  cli.run(process.argv).catch(error => {
-    const format = (process.stderr.isTTY) ? chalk.bold.red : x => x
-    const cmdlineParseErrors = ['WrongNumberOfArgumentError', 'InvalidOptionValueError']
-
-    if (cmdlineParseErrors.includes(error.constructor.name)) {
-      process.stderr.write(format(error.message))
-    } else if (error.constructor.name === 'FatalError') {
-      process.stderr.write(format('Error: ' + error.message) + '\n')
-    } else {
-      process.stderr.write(format('Error: ' + error.stack) + '\n')
-    }
-  })
+  process.on('unhandledRejection', (e) => handleError(e))
+  cli.run(process.argv).catch(handleError)
 }

@@ -2,7 +2,7 @@ import * as FormData from "form-data";
 import * as fs from "fs";
 import * as util from "util";
 import { loadCredentials, saveCredentials } from "./config";
-import { FatalError } from "./types";
+import { FatalError, APIError } from "./types";
 const fetch = require("node-fetch");
 
 export type ConfigType = 'string' | 'integer' | 'float' | 'bool';
@@ -34,8 +34,7 @@ class API {
                 return (status === 204) ? Promise.resolve({}) : response.json();
             }).then((json: any) => {
                 if (!(status >= 200 && status <= 300)) {
-                    const msg = util.inspect(json);
-                    reject(Error(`Error: server returned ${status}: \`${msg}'`));
+                    reject(new APIError(`server returned ${status}`, status, json));
                 }
 
                 resolve(json);
