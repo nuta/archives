@@ -25,7 +25,7 @@ module.exports = {
     // Install dependencies to build.
     run(['yarn', '--ignore-scripts'])
 
-    // Build Runtime.```
+    // Build Runtime.
     run(['yarn', '--ignore-scripts'], {}, 'node_modules/@makestack/runtime')
     run(['npm', 'run', 'transpile'], {}, 'node_modules/@makestack/runtime')
     run(['npm', 'run', 'build-native'], {
