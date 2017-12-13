@@ -1,0 +1,12 @@
+#!/bin/sh
+set -ue
+[ "$1" = "" ] && echo "Usage: $0 url" && exit 1
+
+url=$1
+tmp=$(mktemp)
+
+curl -fSLo $tmp $url
+echo
+file $tmp
+shasum -a 256 $tmp
+rm $tmp
