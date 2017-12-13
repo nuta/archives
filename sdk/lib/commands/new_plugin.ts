@@ -182,8 +182,9 @@ export async function main(args: any, opts: any) {
     };
 
     for (const { filepath, template } of templates) {
-        logger.progress(`Creating ${filepath}`);
-        createFile(path.join(args.dir, filepath), nunjuck.renderString(template, context));
+        const dest = path.join(args.dir, filepath);
+        logger.progress(`Creating ${dest}`);
+        createFile(dest, nunjuck.renderString(template, context));
     }
 
     if (opts.lang === "typescript") {
