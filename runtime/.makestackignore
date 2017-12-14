@@ -2,7 +2,6 @@
 lib
 test
 node_modules
-package.json
 binding.gyp
 tsconfig.json
 yarn.lock
