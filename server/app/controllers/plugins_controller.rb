@@ -41,7 +41,7 @@ class PluginsController < ApplicationController
         end
       end
 
-      system("#{makestack_command} build-plugin #{plugin_dir} #{plugin_zip_path}")
+      system("#{makestack_command} build-plugin --plugin-dir #{plugin_dir} --outfile #{plugin_zip_path}")
 
       plugin_zip_path
     end
