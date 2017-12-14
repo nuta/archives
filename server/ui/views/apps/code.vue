@@ -257,8 +257,8 @@ export default {
       }
 
       // Copy start.js to the top level.
-      this.logOutput(`Copying start.js from \`${runtime}'`)
-      const startJsRelPath = `node_modules/${runtime}/start.js`
+      this.logOutput(`Copying start.js from \`@makestack/${runtime}'`)
+      const startJsRelPath = `node_modules/@makestack/${runtime}/start.js`
       zip.file('start.js', zip.files[startJsRelPath].async('arraybuffer'))
 
       // Copy app files.
