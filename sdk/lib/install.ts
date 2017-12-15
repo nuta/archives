@@ -12,7 +12,7 @@ import {
     createFile, generateRandomString,
     generateTempPath, getenv, shasum
 } from "./helpers";
-import { FatalError } from "./types";
+import { FatalError, APIError } from "./types";
 
 type Progress = (stage: string, meta?: any) => void
 
@@ -36,8 +36,7 @@ async function registerOrGetDevice(name: string, type: string, ignoreDuplication
     try {
         device = await api.registerDevice(name, type);
     } catch (e) {
-        // FIXME: add an option to accept 4xx errors
-        if (e.message.includes('Name has already been taken')) {
+        if (e instanceof APIError && e.response.errors[0] === 'Name has already been taken') {
             // There is already a device with same name.
             if (ignoreDuplication) {
                 try {
@@ -162,10 +161,7 @@ function flash(flashCommand: string, drive: string, driveSize: number, imagePath
                 reject(error);
             }
 
-            if (ipc.server && ipc.server.close /*  ipc.server.close is not defined in test env. */) {
-                ipc.server.stop();
-            }
-
+            ipc.server.stop();
             resolve();
         });
     });
