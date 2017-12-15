@@ -45,8 +45,12 @@ makestack list-drives
 ```bash
 DEVICE_NAME="my-raspi3"
 makestack install --name $DEVICE_NAME --type raspberrypi3 --drive <DRIVE_NAME> \
-  --wifi-ssid <WIFI_SSID> --wifi-password <WIFI_PASSWORD>
+  --wifi-ssid <WIFI_SSID> --wifi-password <WIFI_PASSWORD> --wifi-country <WIFI_COUNTRY>
 ```
+
+`<WIFI_COUNTRY>` is a [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) contry
+code. `US` for the United States, for example.
+
 
 You don't have to specify the Wi-Fi credential if you want to use Ethernet instead:
 ```bash
