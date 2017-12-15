@@ -103,7 +103,7 @@ module SMMSService
     app_version = deployment.try(:version).try(:to_s)
     app_os_version = device.try(:app).try(:os_version)
 
-    if app_os_version && device.current_os_version.value != app_os_version
+    if app_os_version && app_os_version != 'dev' && device.current_os_version.value != app_os_version
       payload += generate_message(SMMS_OS_VERSION_MSG, app_os_version)
       if include_hmac
         os_image_shasum = MakeStack.os_releases.dig(app_os_version, device.current_os.value,
