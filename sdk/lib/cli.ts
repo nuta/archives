@@ -174,9 +174,10 @@ program
 .option("--drive <drive>", "The drive. Use `list-drives' command.", null, null, true)
 .option("--adapter <adapter>", "The network adapter.", /^http|sakuraio$/, "http")
 .option("--ignore-duplication", "Ignore duplicated device name.", null, false)
-.option("--wifi-ssid", "The Wi-Fi SSID.", null, null, false)
-.option("--wifi-password", "The Wi-Fi password. (WPA/WPA2 Personal)", null, null, false)
-.option("--wifi-country", "The Wi-Fii country code. (ISO/IEC alpha2 country code)", wifiCountryNameValidator, null, false)
+.option("--wifi-ssid <wifi-ssid>", "The Wi-Fi SSID.")
+.option("--wifi-password <wifi-password>", "The Wi-Fi password. (WPA/WPA2 Personal)")
+.option("--wifi-country <wifi-country>", "The Wi-Fii country code. (ISO/IEC alpha2 country code)", wifiCountryNameValidator)
+.option("--image <image>", "The path to disk image.")
 .action(installCommand.main);
 
 program

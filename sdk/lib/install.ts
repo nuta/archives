@@ -177,12 +177,13 @@ export async function install(args: {
     wifiCountry: string,
     drive: string,
     ignoreDuplication: boolean,
-    flashCommand: string
+    flashCommand: string,
+    diskImagePath?: string
 }, progress: Progress) {
 
     const {
         deviceName, deviceType, osType, adapter, wifiSSID, wifiPassword, wifiCountry,
-        drive, ignoreDuplication, flashCommand,
+        drive, ignoreDuplication, flashCommand, diskImagePath
     } = args;
 
     progress("look-for-drive");
@@ -190,7 +191,14 @@ export async function install(args: {
     progress("register");
     const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication);
     progress("download");
-    const originalImage = await downloadDiskImage(osType, deviceType);
+
+    let originalImage
+    if (diskImagePath) {
+        originalImage = diskImagePath;
+    } else {
+        originalImage = await downloadDiskImage(osType, deviceType);
+    }
+
     progress("config");
     const imagePath = writeConfigToDiskIamge({
         deviceType, originalImage, device, adapter,

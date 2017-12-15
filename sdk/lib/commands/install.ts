@@ -1,6 +1,7 @@
 const path = require("path");
 const chalk = require("chalk");
 const { install } = require("../install");
+import { FatalError } from "../types";
 
 function progress(stage: string, state: { type: string, percentage: number }) {
     switch (stage) {
@@ -29,6 +30,10 @@ function progress(stage: string, state: { type: string, percentage: number }) {
 }
 
 export async function main(args: any, opts: any, logger: any) {
+    if (opts.wifiSsid && (!opts.wifiPassword || !opts.wifiCountry)) {
+        throw new FatalError('--wifi-password and/or --wifi-country are missing.');
+    }
+
     await install({
         deviceName: opts.name,
         deviceType: opts.type,
@@ -39,7 +44,8 @@ export async function main(args: any, opts: any, logger: any) {
         flashCommand: [process.argv0, path.resolve(__dirname, "../../bin/makestack")],
         wifiSSID: opts.wifiSsid,
         wifiPassword: opts.wifiPassword,
-        wifiCountry: opts.wifiCountry
+        wifiCountry: opts.wifiCountry,
+        diskImagePath: opts.image
     }, progress);
 
     console.info(chalk.bold.green("Done!"));
