@@ -5,8 +5,8 @@ title: Deploying to Heroku
 [Heroku](https://heroku.com) is a fabulous Platform-as-a-Service that
 allows you to deploy your own MakeStack Server easily.
 
-Just click this button to save yor time
----------------------------------------
+Just click this button to save your time
+----------------------------------------
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/seiyanuta/makestack-on-heroku)
 

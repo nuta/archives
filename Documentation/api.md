@@ -2,12 +2,22 @@
 title: API
 ---
 
+## Runtime environment
 Your MakeStack app is executed on [Node.js](https://nodejs.org) version 8.9.0. You
 can use [all modules bundled in Node.js](https://nodejs.org/api/).
 
+## Using npm dependencies
+To bundle npm pacakges into the app, use [yarn](https://yarnpkg.com/). MakeStack detects `yarn.lock` and build & install npm packages automatically. In a nutshell:
+
+```bash
+yarn init
+yarn add express lodash package-what-you-want
+```
+
+You have to deploy the app from `makestack deploy` command. Web UI does not support npm dependencies.
+
 ## Using plugin
-Plugins provide a Node.js package such as device drivers. Currenly MakeStack does
-not support npm packages and it ignores `package.json`.
+Plugins provide a Node.js package such as device drivers.
 
 ### Using a official plugin
 To use a plugin add its name to `app.yaml`:
@@ -43,6 +53,10 @@ println('Hello, World!')
 ```
 
 ## Functions
+### How to use
+```js
+const { println, error, publish } = require('@makestack/runtime')
+```
 
 ### println
 - **Definition:** `(message: string) => void`
@@ -68,6 +82,10 @@ println('Hello, World!')
   ```
 
 ## Config
+### How to use
+```js
+const { Config } = require('@makestack/runtime')
+```
 
 ### onCommand
 - **Definition:** `(key: string, callback: (newValue: string) => void) => void`
@@ -92,6 +110,10 @@ println('Hello, World!')
   ```
 
 ## Timer
+### How to use
+```js
+const { Timer } = require('@makestack/runtime')
+```
 
 ### loop
 - **Definition:** `(callback: () => void) => void`
@@ -146,6 +168,10 @@ println('Hello, World!')
   ```
 
 ## App
+### How to use
+```js
+const { App } = require('@makestack/runtime')
+```
 
 ### onExit
 - **Definition:** `(callback: () => void): void`
@@ -178,6 +204,10 @@ println('Hello, World!')
   ```
 
 ## Subprocess
+### How to use
+```js
+const { SubProcess } = require('@makestack/runtime')
+```
 
 **Definitions:**
 ```typescript
@@ -200,6 +230,10 @@ interface SubProcessResult {
   ```
 
 ## GPIO
+### How to use
+```js
+const { GPIO } = require('@makestack/runtime')
+```
 
 ## Constructor
 - **Definition:** `({ pin: number, mode: 'in' | 'out' })`
@@ -257,6 +291,10 @@ interface SubProcessResult {
   ```
 
 ## I2C
+### How to use
+```js
+const { I2C } = require('@makestack/runtime')
+```
 
 ### Constructor
 - **Definition:** `({ address: number })`
@@ -282,6 +320,10 @@ interface SubProcessResult {
 ## Serial
 **CAUTION: Serial API may not work. Its implementation is still buggy.**
 
+### How to use
+```js
+const { Serial } = require('@makestack/runtime')
+```
 
 ### Constructor
 - **Definition:** `({ path: string, baudrate: 9600 | 115200 })`
@@ -334,6 +376,10 @@ interface SubProcessResult {
 ## SPI
 **CAUTION: SPI API may not work. Its implementation is still buggy.**
 
+### How to use
+```js
+const { SPI } = require('@makestack/runtime')
+```
 
 ### Constructor
 - **Definition:** `({ slave: number, speed: number, mode: 'MODE0' | 'MODE1' | 'MODE2' | 'MODE3' })`
