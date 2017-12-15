@@ -88,7 +88,7 @@ You'll see there files in the directory:
    Load MakeStack APIs.
    Refer: https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md
 */
-const { Timer, println } = require('makestack/@runtime')
+const { Timer, println } = require('@makestack/runtime')
 
 /* Timer.interval(n, callback) calls `callback` every `n` seconds. */
 Timer.interval(3, () => {
