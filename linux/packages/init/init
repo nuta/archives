@@ -124,6 +124,7 @@ init_networking() {
 }
 
 start_supervisor() {
+  export MAKESTACK_OS_VERSION="$(cat /VERSION | awk '{ printf "%s", $0 }')"
   export MAKESTACK_APP_UID=0
   export MAKESTACK_APP_GID=0
   logger "Starting MakeStack Supervisor..."

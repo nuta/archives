@@ -41,7 +41,7 @@ echo "==> Building linux..."
 cd linux
 make prepare
 for target in raspberrypi3; do
-  make TARGET=$target BUILD=release DOCKER=1
+  make TARGET=$target BUILD=release DOCKER=1 VERSION=$VERSION
   mv build/$target/makestack-linux-$target.img $DIST_DIR/makestack-linux-$VERSION-$target.img
   rm -rf $DIST_DIR/linux
 done

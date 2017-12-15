@@ -84,11 +84,10 @@ async function downloadDiskImage(osType: string, deviceType: string) {
     if (!fs.existsSync(originalImage) || shasum(originalImage) !== imageShasum) {
         createFile(originalImage, await (await fetch(osImageURL)).buffer());
     }
-    return [version, originalImage];
+    return originalImage;
 }
 
 function writeConfigToDiskIamge(args: {
-    osVersion: string,
     deviceType: string,
     originalImage: string,
     device: any,
@@ -98,7 +97,6 @@ function writeConfigToDiskIamge(args: {
     wifiCountry?: string
 }) {
     const {
-        osVersion,
         deviceType,
         originalImage,
         device,
@@ -114,7 +112,6 @@ function writeConfigToDiskIamge(args: {
     // TODO: What if the image is large?
     let image = fs.readFileSync(originalImage);
     image = replaceBuffer(image, deviceType, "DEVICE_TYPE");
-    image = replaceBuffer(image, osVersion, "OS_VERSION");
     image = replaceBuffer(image, device.device_id, "DEVICE_ID");
     image = replaceBuffer(image, device.device_secret, "DEVICE_SECRET");
     image = replaceBuffer(image, api.serverURL, "SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890");
@@ -197,10 +194,10 @@ export async function install(args: {
     progress("register");
     const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication);
     progress("download");
-    const [osVersion, originalImage] = await downloadDiskImage(osType, deviceType);
+    const originalImage = await downloadDiskImage(osType, deviceType);
     progress("config");
     const imagePath = writeConfigToDiskIamge({
-        osVersion, deviceType, originalImage, device, adapter,
+        deviceType, originalImage, device, adapter,
         wifiSSID, wifiPassword, wifiCountry
     })
     progress('flash')

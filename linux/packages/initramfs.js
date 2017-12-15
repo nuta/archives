@@ -1,6 +1,7 @@
 const { isRebuilt, run, config, rootfsPath, buildPath } = require('../pkgbuilder').pkg
 
 const commonDependencies = [
+  'rootfs-files',
   'init',
   'node',
   'supervisor',

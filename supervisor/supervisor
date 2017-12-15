@@ -1,33 +1,21 @@
 #!/bin/node
 const { Supervisor } = require('.')
 
-const appDir = '/app'
-const adapter = {
-  name: process.env['MAKESTACK_NETWORK_ADAPTER'],
-  url: process.env['MAKESTACK_SERVER_URL']
-}
-const osType = process.env['MAKESTACK_OS_TYPE']
-const deviceType = process.env['MAKESTACK_DEVICE_TYPE']
-const debugMode = process.env['MAKESTACK_DEBUG_MODE'] !== undefined
-const osVersion = process.env['MAKESTACK_OS_VERSION']
-const deviceId = process.env['MAKESTACK_DEVICE_ID']
-const deviceSecret = process.env['MAKESTACK_DEVICE_SECRET']
-const appUID = parseInt(process.env['MAKESTACK_APP_UID']) || undefined
-const appGID = parseInt(process.env['MAKESTACK_APP_GID']) || undefined
-const heartbeatInterval = process.env['MAKESTACK_HEARTBEAT_INTERVAL']
-
 const supervisor = new Supervisor({
-  appDir,
-  adapter,
-  deviceType,
-  osType,
-  osVersion,
-  deviceId,
-  deviceSecret,
-  debugMode,
-  appUID,
-  appGID,
-  heartbeatInterval
+  appDir: '/app',
+  adapter: {
+    name: process.env['MAKESTACK_NETWORK_ADAPTER'],
+    url: process.env['MAKESTACK_SERVER_URL']
+  },
+  mode: process.env['MAKESTACK_MODE'],
+  osType: process.env['MAKESTACK_OS_TYPE'],
+  osVersion: process.env['MAKESTACK_OS_VERSION'],
+  deviceType: process.env['MAKESTACK_DEVICE_TYPE'],
+  deviceId: process.env['MAKESTACK_DEVICE_ID'],
+  deviceSecret: process.env['MAKESTACK_DEVICE_SECRET'],
+  appUID: parseInt(process.env['MAKESTACK_APP_UID']) || undefined,
+  appGID: parseInt(process.env['MAKESTACK_APP_GID']) || undefined,
+  heartbeatInterval: process.env['MAKESTACK_HEARTBEAT_INTERVAL']
 })
 
 supervisor.start()
