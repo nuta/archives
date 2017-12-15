@@ -44,7 +44,7 @@ plugins: [ {{ plugins | join(", ") }} ]
     {
         filepath: "app.js",
         template: `\
-const { Timer, println } = require('makestack/@runtime)
+const { Timer, println } = require('makestack/@runtime')
 
 Timer.interval(3, () => {
     println('Hello World!')
