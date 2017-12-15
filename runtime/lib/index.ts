@@ -9,10 +9,10 @@ import { TimerAPI } from "./api/timer";
 import { dummyGPIO, dummyI2C, dummySPI } from "./dummy";
 import { getDeviceType } from "./helpers";
 import { GPIOConstructor, I2CConstructor, SPIConstructor } from "./types";
-
+import { logger } from "./logger";
 
 const device = require(`./devices/${getDeviceType()}`);
-export { println, eprintln, publish };
+export { println, eprintln, publish, logger };
 export const GPIO: GPIOConstructor = device.GPIO || dummyGPIO;
 export const I2C: I2CConstructor = device.I2C || dummyI2C;
 export const SPI: SPIConstructor = device.SPI || dummySPI;
