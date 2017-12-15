@@ -14,7 +14,8 @@ Requirements
 Creating an account
 -------------------
 
-You need an user account on MakeStack Server. You can use [a demo server](https://try-makestack.herokuapp.com/) for free or [deploy your own MakeStack Server](https://github.com/seiyanuta/makestack/blob/master/Documentation/guides/heroku.md).
+You need an user account on MakeStack Server. You can use [a demo server](https://try-makestack.herokuapp.com/)
+for free or [deploy your own MakeStack Server](https://github.com/seiyanuta/makestack/blob/master/Documentation/guides/heroku.md).
 
 Installing SDK
 --------------
@@ -43,6 +44,13 @@ makestack list-drives
 3. Install the OS to the drive.
 ```bash
 DEVICE_NAME="my-raspi3"
+makestack install --name $DEVICE_NAME --type raspberrypi3 --drive <DRIVE_NAME> \
+  --wifi-ssid <WIFI_SSID> --wifi-password <WIFI_PASSWORD>
+```
+
+You don't have to specify the Wi-Fi credential if you want to use Ethernet instead:
+```bash
+DEVICE_NAME="my-raspi3"
 makestack install --name $DEVICE_NAME --type raspberrypi3 --drive <drive-name>
 ```
 
@@ -59,6 +67,7 @@ From now on the device is managed completely remotely by MakeStack Server!
 
 Creating the your first app
 ---------------------------
+**In this document we use CLI tools. You can do same things by Web UI If you prefer.**
 
 1. Create an app and `cd(1)` into the generated directory.
 
@@ -104,4 +113,90 @@ makestack deploy
 makestack log
 ```
 
-That's it!
+Integrating with Slack
+----------------------
+To send a data to server, simply use `publish()` API:
+
+```js
+// app.js
+const { publish } = require('@makestack/runtime')
+Timer.interval(3, () => {
+  /* publish(event_name, value) */
+  publish('random number', Math.random())
+})
+```
+
+Sent *events* by `publish()` are forwarded to integrated services such as IFTTT,
+Slack, and webhooks. Let's add a new integration with Slack!
+
+```bash
+makestack integration add --service slack --webhook-url <SLACK_INCOMING_WEBHOOK_URL>
+```
+
+Control a light remotely
+-------------------------
+Config API provides remote configuration system. *Config* is a readonly value stored
+in MakeStack Server and automatically sent to devices. There are two scopes of config: device
+config and app config. If same config name exists in either device config and app config, device
+config is sent to the device.
+
+
+To watch changes to a config, use `Config.onChange(config_name, callback)`:
+
+```js
+// app.js
+
+/* The pin number depends on the device. If you are using Raspberry Pi3, refer:
+   https://github.com/seiyanuta/makestack/blob/master/Documentation/guides/raspberrypi3.md
+*/
+const light = new GPIO({ pin: 23, mode: 'out' })
+
+Config.onChange('state', state => {
+  light.write(state === 'on')
+})
+```
+
+To update config, use `maketack config` command to change app config or `makestack device-config` to
+change device config:
+
+```bash
+makestack device-config set state on
+```
+
+Using a plugin
+--------------
+
+Plugins make it easier to create an app. In this section, we learn how to use plugin and
+create a temperature sensor using [HDC1008](https://www.adafruit.com/product/2635) and its
+device driver plugin.
+
+To use plugin simply add its name to `plugins` in `app.yaml` and `require()` it in `app.js`:
+
+```yaml
+# app.yaml
+name: your-app-name
+plugins:
+  # Add HDC1000 plugin. Plugins without `<github-username>/` prefix like this are builtin ones
+  # in the makestack repository: https://github.com/seiyanuta/makestack/tree/master/plugins
+  - hdc1000
+
+  # To use third-party plugins on GitHub, plugin name must be `<github-username>/<repo-name>` form.
+  # - seiyanuta/another-hdc1000
+```
+
+```js
+/* require('@makestack/<plugin-name or repo-name>') */
+const { HDC1000 } = require('@makestack/hdc1000')
+
+/* Send temperature and humidity every 5 seconds */
+const sensor = new HDC1000()
+Timer.interval(5, () => {
+  publish('t', sensor.readTemperature())
+  publish('h', sensor.readHumidity())
+})
+```
+
+References
+-----------
+- [API Reference](https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md)
+- [Writing a Plugin](https://github.com/seiyanuta/makestack/blob/master/Documentation/guides/writing-plugin.md)

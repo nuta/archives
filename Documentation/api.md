@@ -230,6 +230,8 @@ interface SubProcessResult {
   ```
 
 ## GPIO
+The pin number depends on the device.
+
 ### How to use
 ```js
 const { GPIO } = require('@makestack/runtime')
