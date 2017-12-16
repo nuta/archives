@@ -64,7 +64,7 @@ EOF
 }
 
 start_syslogd() {
-  syslogd -n -O /boot/system.log -s 1024 -b 1 &
+  syslogd -n -s 1024 -b 1 &
 }
 
 start_klogd() {
