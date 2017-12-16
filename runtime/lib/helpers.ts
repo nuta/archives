@@ -12,6 +12,10 @@ export function sendToSupervisor(type: string, meta: { [key: string]: string }) 
 
 export type DeviceType = 'sdk' | 'raspberrypi3';
 export function getDeviceType(): DeviceType {
+    if (process.env.MAKESTACK_DEVICE_TYPE) {
+        return process.env.MAKESTACK_DEVICE_TYPE as DeviceType;
+    }
+
     if (fs.existsSync("/proc/cpuinfo")) {
         const cpuinfo = fs.readFileSync("/proc/cpuinfo", { encoding: 'utf-8' });
         if (cpuinfo.match(/BCM2835/)) {
