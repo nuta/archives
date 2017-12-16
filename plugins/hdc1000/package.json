@@ -1,9 +1,10 @@
 {
   "name": "@makestack/hdc1000",
   "main": "dist/index.js",
+  "version": "0.1.1",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
-    "transpile": "tsc"
+    "prepare": "tsc"
   },
   "dependencies": {
   },

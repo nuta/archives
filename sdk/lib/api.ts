@@ -169,25 +169,6 @@ class API {
         return this.invoke("DELETE", `/apps/${appName}/configs/${key}`);
     }
 
-    public downloadPlugin(name: string): Promise<Buffer> {
-        let repo: string;
-        if (name.includes("/")) {
-            // A third-party plugin on GitHub.
-            repo = name;
-            name = name.split("/").pop() as string;
-        } else {
-            repo = "_/_";
-        }
-
-        return new Promise((resolve, reject) => {
-            fetch(`${this.serverURL}/api/v1/plugins/${repo}/${name}`, {
-                headers: loadCredentials(),
-            }).then((response: any) => {
-                response.buffer().then(resolve, reject);
-            });
-        });
-    }
-
     public getAppLog(appName: string, since?: Date): Promise<{lines: [string]}> {
         const unixtime = since ? Math.floor(since.getTime() / 1000) : 0;
         return this.invoke("GET", `/apps/${appName}/log?since=${unixtime}`);

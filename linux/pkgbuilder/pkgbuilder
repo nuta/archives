@@ -2,9 +2,9 @@
 const path = require('path')
 const fs = require('fs')
 const chalk = require('chalk')
-const { isNewerDirContent } = require('.').pkg
+const { isRebuilt } = require('.').pkg
 const {
-  find, mkdirp, copyFiles, shasum, download, extract, rmrf
+  mkdirp, copyFiles, download, extract, rmrf
 } = require('./lib/helpers')
 
 global.build = {
@@ -42,10 +42,22 @@ function loadPackages(target) {
 
     if (pkg.dependencies instanceof Function) {
       pkg.dependencies = pkg.dependencies()
+    } else if (!pkg.dependencies) {
+      pkg.dependencies = []
     }
 
-    if (pkg.dependencies && pkg.dependencies.length > 0) {
-      const unloadedDependencies = pkg.dependencies.filter(name => !(name in packages))
+    if (pkg.dependencies.length > 0) {
+      const unloadedDependencies = []
+      for (const name of pkg.dependencies) {
+        if (!fs.existsSync(path.resolve(__dirname, `../packages/${name}.js`))) {
+          throw new Error(`Unknown package: \`${name}' (typo?)`)
+        }
+
+        if (!(name in packages)) {
+          unloadedDependencies.push(name)
+        }
+      }
+
       if (unloadedDependencies.length > 0) {
         // Resolve dependencies first.
         remainingPackages.push(pkg.name)
@@ -96,9 +108,9 @@ function getPkgFilesToCopy(pkgName, files, destDir) {
   return filesToCopy
 }
 
-function copyFilesInPkg(pkgName, files, destDir) {
+function copyFilesInPkg(pkgName, files, destDir, ignorePatterns) {
   for (const [src, dst] of getPkgFilesToCopy(pkgName, files, destDir)) {
-    copyFiles(src, dst)
+    copyFiles(src, dst, ignorePatterns)
   }
 }
 
@@ -122,14 +134,18 @@ function buildPackage(pkg) {
     pkg.build()
   }
 
-  copyFilesInPkg(pkg.name, pkg.bootfs, build.bootfsDir)
-  copyFilesInPkg(pkg.name, pkg.rootfs, build.rootfsDir)
+  copyFilesInPkg(pkg.name, pkg.bootfs, build.bootfsDir, pkg.bootfsIgnore)
+  copyFilesInPkg(pkg.name, pkg.rootfs, build.rootfsDir, pkg.rootfsIgnore)
 
   process.chdir(cwd)
 }
 
 function isBuildRequired(pkg) {
   const installed = isInstalled('bootfs', pkg) && isInstalled('rootfs', pkg)
+
+  if (pkg.dependencies.some(isRebuilt)) {
+    return true
+  }
 
   if (pkg.changed === undefined) {
     return !installed
@@ -190,7 +206,7 @@ function main() {
       } else {
         console.log(chalk.bold.yellow('==> ') +
         chalk.bold(`(${i + 1}/${buildOrder.length}) Skipping ${pkgName}`))
-    }
+      }
     }
   }
 

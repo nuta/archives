@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import { AppAPI } from "./api/app";
 import { DeviceAPI } from "./api/device";
 import { publish } from "./api/event";
@@ -22,3 +23,30 @@ export const App = new AppAPI();
 export const Device = new DeviceAPI();
 export const SubProcess = new SubProcessAPI();
 export const Serial = SerialAPI;
+
+if (process.env.MAKESTACK_APP) {
+    process.on('unhandledRejection', (reason, p) => {
+        console.log('runtime: unhandled rejection:\n', reason, '\n\n', p)
+        console.log('runtime: exiting...')
+        process.exit(1)
+    })
+
+    process.on('message', (data) => {
+        switch (data.type) {
+            case 'initialize':
+                logger.info(`initialize message: configs=${JSON.stringify(data.configs)}`)
+                Config.update(data.configs)
+                break
+
+            case 'configs':
+                logger.info(`configs message: configs=${JSON.stringify(data.configs)}`)
+                Config.update(data.configs)
+                break
+
+            default:
+                logger.info('unknown ipc message: ', data)
+        }
+    })
+
+    logger.info("waiting for `initialize' message from Supervisor...");
+}

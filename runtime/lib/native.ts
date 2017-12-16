@@ -9,14 +9,6 @@ export interface NativeFunctions {
     serialConfigure: (fd: number, baudrate: number, databits: number, parity: number) => void;
 };
 
-const nativeModulePaths = [
-    path.resolve(__dirname, '../build/Release/native.node'),
-    path.resolve(__dirname, `../native/${process.arch}/native.node`)
-]
-
-const nativeModulePath = nativeModulePaths.filter(modulePath => fs.existsSync(modulePath))[0];
-if (!nativeModulePath) {
-    throw new Error('Native moudle not found.')
-}
-
-export const functions: NativeFunctions = require(nativeModulePath);
+export const functions: NativeFunctions = require(
+    path.resolve(__dirname, '../build/Release/native.node')
+);

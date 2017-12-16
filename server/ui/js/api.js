@@ -278,25 +278,6 @@ class API {
   getOSReleases() {
     return this.invoke('GET', '/os/releases')
   }
-
-  downloadPlugin(name) {
-    let repo
-    if (name.includes('/')) {
-      // A third-party plugin on GitHub.
-      repo = name
-      name = name.split('/').pop()
-    } else {
-      repo = '_/_'
-    }
-
-    return new Promise((resolve, reject) => {
-      fetch(`/api/v1/plugins/${repo}/${name}`, {
-        headers: this.credentials
-      }).then(response => {
-        response.blob().then(resolve, reject)
-      })
-    })
-  }
 }
 
 export default new API()

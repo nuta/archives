@@ -2,7 +2,7 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const { spawnSync } = require('child_process')
-const { find, mkdirp } = require('./helpers')
+const { find, mkdirp, copyFiles } = require('./helpers')
 const chalk = require('chalk')
 
 function config(key) {
@@ -52,7 +52,7 @@ function copyFile(src, dest) {
   return fs.copyFileSync(src, dest)
 }
 
-function assetPath(pkgName, filepath) {
+function assetPath(pkgName, filepath = '') {
   return path.resolve(__dirname, '../../packages', pkgName, filepath)
 }
 
@@ -161,12 +161,24 @@ function buildFatImage(imageFile) {
   run(['sudo', 'losetup', '-d', loopFile])
 }
 
+function loadJsonFile(filepath) {
+  return JSON.parse(fs.readFileSync(filepath))
+}
+
+function saveJsonFile(filepath, obj) {
+  fs.writeFileSync(filepath, JSON.stringify(obj))
+}
+
+function progress(message) {
+  console.log(chalk.bold.magenta(message))
+}
 
 module.exports = {
   config,
   isNewerFile,
   isNewerDirContent,
   copyFile,
+  copyFiles,
   assetPath,
   buildPath,
   bootfsPath,
@@ -176,5 +188,9 @@ module.exports = {
   runWithPipe,
   sudo,
   mkdirp,
-  buildFatImage
+  buildFatImage,
+  loadJsonFile,
+  saveJsonFile,
+  progress,
+  find
 }

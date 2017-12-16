@@ -8,94 +8,16 @@ import {
 } from "./helpers";
 import { logger } from "./logger";
 import { FatalError } from "./types";
-import { buildPlugin } from "./plugin_builder";
 import { spawnSync } from "child_process";
-
-async function mergeZipFiles(basepath: string, destZip: JSZip, srcZip: JSZip) {
-    for (const filepath in srcZip.files) {
-        const file = srcZip.files[filepath].async("arraybuffer");
-        destZip.file(path.join(basepath, filepath), file);
-    }
-
-    return destZip;
-}
-
-async function loadZipData(zip: Buffer): Promise<JSZip> {
-    return (new JSZip()).loadAsync(zip);
-}
-
-async function downloadAndExtractPackage(name: string, zip: JSZip, basepath: string) {
-    logger.progress(`downloading \`${name}'`);
-    const pluginZip = await api.downloadPlugin(name);
-
-    logger.progress(`extracting \`${name}'`);
-    zip = await mergeZipFiles(basepath, zip, await loadZipData(pluginZip));
-    return zip;
-}
-
-async function populatePlugins(zip: JSZip, runtime: string,
-    plugins: string[] | { [name: string]: string }): Promise<JSZip>
-{
-    zip = await downloadAndExtractPackage(runtime, zip, `node_modules/@makestack/${runtime}`);
-
-    if (Array.isArray(plugins)) {
-        const _plugins: {[name: string]: string} = {}
-        for (const name of plugins) {
-            _plugins[name] = 'latest';
-        }
-        plugins = _plugins;
-    }
-
-    for (const pluginName in plugins) {
-        const url = plugins[pluginName];
-        const basedir = `node_modules/@makestack/${pluginName}`;
-
-        if (url.startsWith('file:')) {
-            // Plugins in the local directory.
-            const pluginZipPath = generateTempPath();
-
-            logger.progress(`building \`${pluginName}'`);
-            buildPlugin(url.split('file:')[1], pluginZipPath);
-
-            logger.progress(`extracting \`${pluginName}'`);
-            zip = await mergeZipFiles(`node_modules/@makestack/${pluginName}`, zip,
-                await loadZipData(fs.readFileSync(pluginZipPath)));
-            fs.unlinkSync(pluginZipPath);
-        } else if (url === 'latest') {
-            // Plugins on the GitHub.
-            zip = await downloadAndExtractPackage(pluginName, zip, basedir);
-            if (!zip.files[`node_modules/@makestack/${pluginName}/package.json`]) {
-                zip.file(`node_modules/@makestack/${pluginName}/package.json`,
-                    JSON.stringify({ name: pluginName, private: true }));
-            }
-        } else {
-            throw new FatalError(`Unknown plugin version or url of \`${pluginName}': \`${url}'`)
-        }
-    }
-
-    return zip;
-}
 
 export async function deploy(appYAML: any, files: any[]) {
     const appName = appYAML.name;
     const runtime = "runtime";
-    const plugins = appYAML.plugins || [];
     let zip = new JSZip();
     let tempDir;
 
-    // Populate plugin files.
-    zip = await populatePlugins(zip, runtime, appYAML.plugins);
-
-    // Copy start.js to the top level.
-    logger.progress(`copying start.js from \`${runtime}'`);
-    const startJsRelPath = `node_modules/@makestack/${runtime}/start.js`;
-    if (!zip.files[startJsRelPath]) {
-        throw new FatalError(`BUG: start.js is not found in \`${runtime}'.`);
-    }
-    zip.file("start.js", zip.files[startJsRelPath].async("arraybuffer"));
-
     // Copy app files.
-    logger.progress(`copying files from \`${appName}' (${files.length} files including npm packages)`);
+    logger.progress(`copying files from \`${appName}' (${files.length} files)`);
     for (const file of files) {
         logger.debug(`adding \`${file.path}' (${file.body.length} bytes)`);
         zip.file(file.path, file.body);

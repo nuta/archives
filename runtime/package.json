@@ -10,17 +10,14 @@
     "cov": "istanbul cover _mocha",
     "test": "mocha",
     "test:live": "mocha -w",
-    "prepare": "npm run build",
-    "build": "npm run transpile",
-    "build-native": "yarn node-gyp rebuild --arch $ARCH && mkdir -p native/$ARCH && mv build/Release/*.node native/$ARCH",
-    "transpile": "tsc",
+    "prepare": "tsc",
     "build:live": "tsc -w"
+  },
+  "runtimeDependencies": {
   },
   "dependencies": {
     "node-gyp": "^3.6.2",
     "nan": "^2.8.0"
-  },
-  "runtimeDependencies": {
   },
   "devDependencies": {
     "@types/chai": "^4.0.6",

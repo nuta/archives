@@ -1,124 +1,40 @@
 <template>
-<app-layout path="code" :app-name="appName">
-  <remote-content :loading="loading"></remote-content>
-  <div>
-    <section>
-      <div class="uk-grid">
-        <div>
-          <label class="uk-form-label">Edit</label>
-          <div class="uk-from-controls">
-            <button v-on:click="saveAll" class="save-button uk-button uk-button-small uk-button-default">
-              <i class="fa fa-upload" aria-hidden="true"></i>
-              {{ saveButton }}
-            </button>
-
-            <button v-on:click="undo" class="uk-button uk-button-small uk-button-default">
-              <i class="fa fa-undo" aria-hidden="true"></i>
-            </button>
-
-            <button v-on:click="redo" class="uk-button uk-button-small uk-button-default">
-              <i class="fa fa-repeat" aria-hidden="true"></i>
-            </button>
-
-            <button v-on:click="search" class="uk-button uk-button-small uk-button-default">
-              <i class="fa fa-binoculars" aria-hidden="true"></i>
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label class="uk-form-label">Deploy</label>
-          <div class="uk-from-controls">
-            <select class="uk-select uk-form-small uk-form-width-medium">
-              <option>associated devices</option>
-            </select>
-
-            <button v-on:click="deploy" class="deploy-button uk-button uk-button-small uk-button-primary">
-              <i class="fa fa-rocket" aria-hidden="true"></i>
-              {{ deployButton }}
-            </button>
-          </div>
-        </div>
-
-        <!--
-        <div>
-          <label class="uk-form-label">Panels</label>
-          <div class="uk-from-controls">
-            <button v-on:click="showOutput" class="uk-button uk-button-small uk-button-default">
-              <i class="fa fa-align-left" aria-hidden="true"></i>
-              Output
-            </button>
-
-            <button v-on:click="showLog" class="uk-button uk-button-small uk-button-default">
-              <i class="fa fa-list" aria-hidden="true"></i>
-              Log
-            </button>
-          </div>
-        </div>
-        -->
-
-        <div>
-          <label class="uk-form-label">Misc.</label>
-          <div class="uk-from-controls">
-            <a href="/documentation" target="_blank">
-              <button class="uk-button uk-button-small uk-button-default">
-                <i class="fa fa-question-circle" aria-hidden="true"></i>
-              </button>
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="editor-wrapper" @dragover.prevent="showUploadNavi = true" >
-      <div class="upload-navi" v-show="showUploadNavi" @dragleave.prevent="showUploadNavi = false" @drop.prevent="uploadFile">
-        <i class="fa fa-lg fa-cloud-upload" aria-hidden="true"></i>
-        &nbsp;
-        Drag & drop your source file here!
-      </div>
-
-      <div class="uk-flex-top" uk-modal id="add-new-file-modal">
-        <div class="uk-modal-dialog">
-          <div class="uk-modal-header">
-            <button class="uk-modal-close-default" type="button" uk-close></button>
-            <h2 class="uk-modal-title">Add a new file</h2>
-          </div>
-
-          <form @submit.prevent="addNewFile">
-            <div class="uk-modal-body">
-                <input type="text" class="uk-input" v-model="newFileName" placeholder="Filename">
+  <app-layout path="code" :app-name="appName">
+    <remote-content :loading="loading">
+      <div slot="content">
+        <section>
+          <div class="uk-grid">
+            <div>
+              <div class="uk-from-controls">
+                <button v-on:click="save" class="save-button uk-button uk-button-small uk-button-default">
+                  <i class="fa fa-upload" aria-hidden="true"></i>
+                  {{ saveButton }}
+                </button>
+              </div>
             </div>
-            <div class="uk-modal-footer">
-              <input type="submit" class="uk-button uk-button-primary" value="Add a new file">
+
+            <div>
+              <div class="uk-from-controls">
+                <button v-on:click="deploy" class="deploy-button uk-button uk-button-small uk-button-primary">
+                  <i class="fa fa-rocket" aria-hidden="true"></i>
+                  {{ deployButton }}
+                </button>
+              </div>
             </div>
-          </form>
+          </div>
+        </section>
+
+        <div class="editor-wrapper" @dragover.prevent="showUploadNavi = true" >
+          <div class="editor" ref="editor"></div>
+          <div class="upload-navi" v-show="showUploadNavi" @dragleave.prevent="showUploadNavi = false" @drop.prevent="uploadFile">
+            <i class="fa fa-lg fa-cloud-upload" aria-hidden="true"></i>
+            &nbsp;
+            Drag & drop your source file here!
+          </div>
         </div>
       </div>
-
-      <div class="tabs">
-        <div v-for="file in files" class="tab" @click="editing = file.id" :class="{ active: editing === file.id }">{{ file.path }}</div>
-        <div class="tab new-file-button" uk-toggle="target: #add-new-file-modal">
-          <i class="fa fa-plus" aria-hidden="true"></i>
-        </div>
-      </div>
-
-      <div v-for="file in files" class="editors">
-        <div class="editor" v-show="editing == file.id" :id="file.id" :ref="file.id"></div>
-      </div>
-
-      <div v-if="showOutputPanel" class="output-panel">
-        <div class="header">
-          <span class="title">Deploy Log</span>
-          <span class="close" @click="showOutputPanel = false">
-            <i class="fa fa-window-close" aria-hidden="true"></i>
-          </span>
-        </div>
-
-        <div class="body">{{ output }}</div>
-      </div>
-    </div>
-  </div>
-</app-layout>
+    </remote-content>
+  </app-layout>
 </template>
 
 <script>
@@ -137,61 +53,14 @@ export default {
       appName: app.$router.currentRoute.params.appName,
       loading: true,
       devices: [],
-      files: [],
-      prevFileContents: {},
+      code: '',
       autosaveAfter: 1000,
       deployButton: "Deploy",
       saveButton: "Save",
       showUploadNavi: false,
-      editing: '',
-      output: '',
-      showOutputPanel: true,
-      newFileName: ''
     };
   },
   methods: {
-    undo() {
-
-    },
-
-    redo() {
-
-    },
-
-    search() {
-
-    },
-
-    showOutput() {
-
-    },
-
-    showLog() {
-
-    },
-
-    addNewFile() {
-      UIkit.modal(document.querySelector('#add-new-file-modal')).hide()
-
-      const id = `editor${this.files.length}`
-      const path = this.newFileName
-      const body = ''
-
-      this.files.push({
-        id,
-        path,
-        body,
-        editing: false
-      })
-
-      this.newFileName = ''
-      this.prevFileContents[path] = body
-
-      this.$nextTick(() => {
-        this.addEditor(id, path, '')
-        this.editing = id
-      })
-    },
     uploadFile(event) {
       const reader = new FileReader()
       reader.onload = (event) => {
@@ -203,69 +72,14 @@ export default {
       reader.readAsText(event.dataTransfer.files[0])
       this.showUploadNavi = false
     },
-    clearOutput() {
-      this.output = ""
-    },
-    logOutput(line) {
-      this.output += `${line}\n`
-    },
-    fetchLatestGitHubRelease(url, name) {
-      return new Promise((resolve, reject) => {
-        fetch(`${url}/repos/${name}/releases/latest`).then(resp => {
-          return resp.json()
-        }).then(json => {
-          resolve(json.assets)
-        }).catch(reject)
-      })
-    },
-    loadAppYAML() {
-      const appYAMLFile = this.files.filter(file => file.path === 'app.yaml')[0]
-      const appYAML = (appYAMLFile) ? yaml.safeLoad(ace.edit(appYAMLFile.id).getValue()) : {}
-      return appYAML || {}
-    },
-    async downloadAndExtractPackage(name, zip, basepath) {
-      this.logOutput(`Downloading \`${name}'`)
-      const pluginZip = await api.downloadPlugin(name)
 
-      this.logOutput(`Extracting \`${name}'`)
-      zip = await this.mergeZipFiles(basepath, zip, await (new JSZip()).loadAsync(pluginZip))
-      return zip
-    },
-    async mergeZipFiles(basepath, destZip, srcZip) {
-      for (const filepath in srcZip.files) {
-        destZip.file(`${basepath}/${filepath}`,
-          srcZip.files[filepath].async('arraybuffer'))
-      }
-
-      return destZip
-    },
-    async buildApp (files) {
+    async packApp (code) {
       let runtime = 'runtime'
-      let plugins = this.loadAppYAML().plugins || []
       let zip = new JSZip()
 
-      // Download the runtime.
-      zip = await this.downloadAndExtractPackage(runtime, zip, `node_modules/@makestack/${runtime}`)
-
-      // Populate plugin files.
-      for (const pluginName of plugins) {
-        zip = await this.downloadAndExtractPackage(pluginName, zip, `node_modules/@makestack/${pluginName}`)
-        if (!zip.files[`node_modules/@makestack/${pluginName}/package.json`]) {
-          zip.file(`node_modules/@makestack/${pluginName}/package.json`,
-            JSON.stringify({ name: pluginName, private: true }))
-        }
-      }
-
-      // Copy start.js to the top level.
-      this.logOutput(`Copying start.js from \`@makestack/${runtime}'`)
-      const startJsRelPath = `node_modules/@makestack/${runtime}/start.js`
-      zip.file('start.js', zip.files[startJsRelPath].async('arraybuffer'))
-
       // Copy app files.
-      for (const file of files) {
-        this.logOutput(`Adding \`${file.path}'`)
-        zip.file(file.path, file.body)
-      }
+      zip.file('app.js', code)
+      zip.file('app.yaml', `name: ${this.appName}`)
 
       const zipImage = await zip.generateAsync({
         type: 'arraybuffer',
@@ -277,119 +91,72 @@ export default {
 
       return new Blob([zipImage], { type: 'application/zip' })
     },
-    getFiles() {
-      let files = []
-      for (const file of this.files) {
-        files.push({
-          path: file.path,
-          body: ace.edit(file.id).getValue()
-        })
-      }
 
-      return files
-    },
     async deploy() {
-      const timeStarted = new Date()
-      this.clearOutput()
       this.deployButton = "Building..."
+      const image = await this.packApp(this.getEditorBody())
 
-      this.logOutput('Building the app...')
-      const image = await this.buildApp(this.getFiles())
-
-      this.logOutput('Generated a .zip file, deploying...')
-      let comment = "Deployment at " + (new Date()).toString(); // TODO
       this.deployButton = "Deploying...";
-
+      let comment = "Deployment at " + (new Date()).toString(); // TODO
       const r = await api.deploy(this.appName, image, "", comment, null)
-      const took = (((new Date()) - timeStarted) / 1000).toPrecision(3)
-      this.deployButton = "Done!"
-      this.logOutput(`Deployed #${r.version}, took ${took} seconds`)
-      setTimeout(() => { this.deployButton = "Deploy"; }, 1500);
+
+      this.$Notification.success(`Deplyed version ${r.version}.`)
+      this.deployButton = "Deploy";
     },
-    async saveAll() {
-      for (const file of this.files) {
-        let body = ace.edit(file.id).getValue()
-        this.saveButton = "Saving"
-        await api.saveFile(this.appName, file.path, body)
-        this.prevFileContents[file.path] = body
-        this.saveButton = "Done"
-        setTimeout(() => { this.saveButton = "Save" }, 1500)
-      }
+
+    async save() {
+      let body = this.getEditorBody()
+
+      this.saveButton = "Saving"
+      await api.saveFile(this.appName, 'app.js', body)
+
+      this.saveButton = "Saved"
+      this.prevEditorBody = body
+      setTimeout(() => { this.saveButton = "Save" }, 1500)
     },
-    addEditor(id, path, body) {
-      const editor = ace.edit(id)
-      const ext = path.split('.').pop()
-      this.configureAceEditor(editor, ext)
-      this.setEditorBody(id, body)
+
+    getEditorBody() {
+      return ace.edit(this.$refs.editor).getValue()
     },
-    setEditorBody(id, body) {
-      const editor = ace.edit(id)
+    setEditorBody(body) {
+      const editor = ace.edit(this.$refs.editor)
       editor.setValue(body)
       editor.selection.moveCursorFileStart()
-    },
-    configureAceEditor(editor, ext) {
-      editor.$blockScrolling = Infinity
-      editor.setTheme('ace/theme/xcode')
-      editor.setShowPrintMargin(false)
-
-      const session = editor.getSession()
-      const modes = {
-        js: 'javascript',
-        yaml: 'yaml'
-      }
-      session.setMode('ace/mode/' + (modes[ext] || 'text'))
-      session.setUseSoftTabs(true)
     }
   },
-  async beforeMount() {
-     let remoteFiles = await api.getFiles(this.appName)
 
-    if (remoteFiles.length === 0) {
-      remoteFiles = [
-        {
-          path: 'app.yaml',
-          body: `name: ${this.appName}\nplugins: []`
-        }, {
-          path: 'app.js',
-          body: `\
+  async beforeMount() {
+    const appJsTemplate = `\
 const { Timer, println } = require('@makestack/runtime')
 
 Timer.interval(1, () => {
   println('Hello!')
 })`
-        }
-      ]
-    }
 
-    this.files = remoteFiles.map((file, i) => {
-      this.prevFileContents[file.path] = file.body
-      return {
-        id: `editor${i}`,
-        path: file.path,
-        body: file.body,
-        editing: i === 0
-      }
-    })
+    const remoteFiles = await api.getFiles(this.appName)
+    this.code = remoteFiles['app.js'] || appJsTemplate
+    this.prevEditorBody = this.code
 
-    this.editing = this.files[0].id
-    this.$nextTick(() => {
-      for (const file of this.files) {
-        this.addEditor(file.id, file.path, file.body)
-      }
+    const editor = ace.edit(this.$refs.editor)
+    editor.$blockScrolling = Infinity
+    editor.setTheme('ace/theme/xcode')
+    editor.setShowPrintMargin(false)
 
-      this.loading = false
-      this.$Progress.finish()
-    })
+    const session = editor.getSession()
+    session.setMode('ace/mode/javascript')
+    session.setUseSoftTabs(true)
+    this.setEditorBody(this.code)
+
+    this.loading = false
+    this.$Progress.finish()
   },
   mounted() {
     // autosave
     setInterval(() => {
-      for (const file of this.files) {
-        let body = ace.edit(file.id).getValue()
-        if (body !== this.prevFileContents[file.path]) {
-          this.saveAll()
-          return
-        }
+      let body = this.getEditorBody();
+      if (body !== this.prevEditorBody) {
+        this.save()
+        return
       }
     }, 3000)
   }
@@ -405,70 +172,15 @@ $editor-border-color: #a6a6ac;
   min-height: 300px;
   margin-top: 20px;
   position: relative;
+}
 
-  .tabs {
-    .tab {
-      background: #f3f3f3;
-      display: inline-block;
-      border: solid $editor-border-color;
-      border-width: 1px 1px 0px 1px;
-      font-size: 15px;
-      padding: 5px 10px;
-      opacity: 0.7;
-      vertical-align: bottom;
-      margin-right: 2px;
-      box-sizing: border-box;
-
-      &.active {
-        background: #ffffff;
-        opacity: 1;
-      }
-
-      &:hover {
-        cursor: pointer;
-      }
-
-      &.new-file-button {
-        background: #ffffff;
-        padding: 5px 7px;
-      }
-    }
-  }
-
-  .editor {
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 300px;
-    height: 40vh;
-    font-size: 14px;
-    border: $editor-border-width solid $editor-border-color;
-  }
-
-  .output-panel {
-    color: #fcfcfa;
-    background: #2c292d;
-    height: 200px;
-    font-family: "Source Code Pro", monospace;
-    font-size: 13px;
-    overflow: scroll;
-
-    .header {
-      background: #cfcfcf;
-      color: #2c292d;
-      padding: 5px 5px 5px 10px;
-      display: flex;
-      justify-content: space-between;
-
-      .close:hover {
-        cursor: pointer;
-      }
-    }
-
-    .body {
-      padding: 7px;
-      white-space: pre;
-    }
-  }
+.editor {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 300px;
+  height: 40vh;
+  font-size: 14px;
+  border: $editor-border-width solid $editor-border-color;
 }
 
 .upload-navi {
@@ -492,6 +204,6 @@ $editor-border-color: #a6a6ac;
 }
 
 .deploy-button {
-  width: 120px;
+  width: 140px;
 }
 </style>

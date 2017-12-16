@@ -51,10 +51,6 @@ Rails.application.routes.draw do
       scope :os do
         get 'releases', to: "os#index"
       end
-
-      scope :plugins do
-        get '/:org/:repo/:name', to: "plugins#download"
-      end
     end
   end
 end

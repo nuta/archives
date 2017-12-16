@@ -202,7 +202,7 @@ export class Supervisor {
             uid: this.appUID,
             gid: this.appGID,
             env: {
-                MAKESTACK_DEVICE_TYPE: this.deviceType,
+                MAKESTACK_APP: '1'
             },
         } as any);
         this.sendToApp("initialize", { configs: this.configs });

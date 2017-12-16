@@ -10,8 +10,7 @@
     "test": "mocha",
     "test:live": "mocha -w",
     "pretest": "tsc",
-    "prepublish": "npm run build",
-    "build": "tsc",
+    "prepare": "tsc",
     "build:live": "tsc -w"
   },
   "dependencies": {

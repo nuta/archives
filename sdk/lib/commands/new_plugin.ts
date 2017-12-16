@@ -3,7 +3,6 @@ import * as fs from "fs";
 import * as path from "path";
 import { createFile, run } from "../helpers";
 import { logger } from "../logger";
-import { prepare } from "../prepare";
 const nunjuck = require("nunjucks");
 
 const DEFAULT_TEMPLATES = [
@@ -198,6 +197,4 @@ export async function main(args: any, opts: any) {
 
     logger.progress('Initializing a Git repository');
     run(['git', 'init'], { cwd: args.dir });
-
-    await prepare(args.dir);
 }

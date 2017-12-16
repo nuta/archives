@@ -26,16 +26,11 @@ describe('deploy command', function() {
     })
 
     it('invokes POST /apps/:name/deployments', async function () {
-        const runtimeDownloadRequest = createApiRequest()
-            .get("/plugins/_/_/runtime")
-            .reply(200, await createZip({ 'start.js': '' }))
-
         const deployRequest = createApiRequest()
             .post(`/apps/${this.appName}/deployments`)
             .reply(200, { version: 1 })
 
         await deployCommand({}, { appDir: this.appDir });
-        expect(runtimeDownloadRequest.isDone()).to.be.true;
         expect(deployRequest.isDone()).to.be.true;
     })
 })

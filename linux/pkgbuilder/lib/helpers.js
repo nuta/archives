@@ -53,7 +53,7 @@ function copyFiles(srcDir, destDir, ignorePatterns = []) {
   }
 
   for (const filepath of files) {
-    if (ignorePatterns.some(pattern => filepath.match(pattern))) {
+    if (ignorePatterns.some(pattern => path.join(srcDir, filepath).match(pattern))) {
       continue
     }
 

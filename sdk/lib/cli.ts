@@ -1,7 +1,6 @@
 import * as addDeviceCommand from "./commands/add_device";
 import * as appCommand from "./commands/app";
 import * as configCommand from "./commands/config";
-import * as buildPluginCommand from "./commands/build_plugin";
 import * as deployCommand from "./commands/deploy";
 import * as deployImageCommand from "./commands/deploy_image";
 import * as deviceCommand from "./commands/device";
@@ -12,7 +11,6 @@ import * as loginCommand from "./commands/login";
 import * as mockCommand from "./commands/mock";
 import * as newCommand from "./commands/new";
 import * as newPluginCommand from "./commands/new_plugin";
-import * as prepareCommand from "./commands/prepare";
 import * as redCommand from "./commands/red";
 import * as replCommand from "./commands/repl";
 import * as runCommand from "./commands/run";
@@ -181,21 +179,9 @@ program
 .action(installCommand.main);
 
 program
-.command("build-plugin", "Build a plugin using Docker.")
-.option("--plugin-dir", "The plugin directory.", null, process.cwd(), false)
-.option("--outfile", "The output zip file path.", null, path.basename(process.cwd()) + ".zip", false)
-.action(buildPluginCommand.main);
-
-program
-.command("prepare", "Prepare a app/plugin development.")
-.option("--app-dir <app-dir>", "The app directory.", null, process.cwd())
-.action(prepareCommand.main);
-
-program
 .command("new", "Create an app directory with template files.")
 .argument("dir", "The plugin directory.")
 .option("--register", "Register the app on server.")
-.option("--plugins <plugins>", "A list of plugins separated by `,'.", null, "")
 .option("--api <api>", "The API.", /^nodejs$/, 'nodejs')
 .action(newCommand.main);
 

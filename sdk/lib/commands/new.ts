@@ -4,7 +4,6 @@ import * as path from "path";
 import { api } from "../api";
 import { createFile, run } from "../helpers";
 import { logger } from "../logger";
-import { prepare } from "../prepare";
 import { FatalError } from "../types";
 const nunjuck = require("nunjucks");
 
@@ -26,7 +25,6 @@ node_modules
         filepath: "app.yaml",
         template: `\
 name: {{ appName }}
-plugins: [ {{ plugins | join(", ") }} ]
 `
     },
     {
@@ -56,11 +54,8 @@ Timer.interval(3, () => {
 export async function main(args: any, opts: any) {
     const appDir = args.dir
     const appName = path.basename(appDir);
-    const plugins = opts.plugins.split(",");
     const templates = DEFAULT_TEMPLATES;
-    const context = {
-        appName, plugins, appDir
-    };
+    const context = { appName, appDir };
 
     if (fs.existsSync(appDir)) {
         throw new FatalError(`The file or directory with the same name already exists: \`${appDir}'`)
@@ -70,35 +65,6 @@ export async function main(args: any, opts: any) {
         const dest = path.join(appDir, filepath);
         logger.progress(`Creating ${dest}`);
         createFile(dest, nunjuck.renderString(template, context));
-    }
-
-    await prepare(appDir);
-
-    let appJS = fs.readFileSync(path.join(appDir, "app.js"), {
-        encoding: "utf-8",
-    });
-
-    for (const plugin of plugins) {
-        const scaffoldPath = path.resolve(appDir, `node_modules/@makestack/${plugin}/scaffold.js`);
-        if (fs.existsSync(scaffoldPath)) {
-            logger.progress(`Scaffolding ${plugin}`);
-            const { generateCodeHeader, generateCodeFooter, generateFiles } = require(scaffoldPath);
-            if (generateCodeHeader) {
-                appJS = generateCodeHeader(context).replace(/\n+$/, "") + "\n\n" + appJS
-            }
-
-            if (generateCodeFooter) {
-                appJS = appJS.replace(/\n+$/, "") + "\n\n" + generateCodeFooter(context).replace(/\n+$/, "") + "\n"
-            }
-
-            if (generateFiles) {
-                generateFiles(context)
-            }
-        }
-    }
-
-    if (appJS) {
-        fs.writeFileSync(path.join(appDir, "app.js"), appJS);
     }
 
     logger.progress('Initializing a Git repository');
