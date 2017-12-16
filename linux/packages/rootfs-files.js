@@ -4,7 +4,7 @@ module.exports = {
   name: 'rootfs-files',
 
   build() {
-    fs.writeFileSync('VERSION', process.env.VERSION)
+    fs.writeFileSync('VERSION', build.version)
   },
 
   rootfs: {

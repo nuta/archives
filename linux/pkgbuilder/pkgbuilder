@@ -141,6 +141,7 @@ function isBuildRequired(pkg) {
 function main() {
   const target = process.argv[2]
 
+  build.version = process.argv[3]
   build.target = target
   build.rebuiltPackages = []
   build.buildDir = path.resolve(__dirname, `../build/${target}`)

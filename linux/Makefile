@@ -5,21 +5,20 @@ default: build
 TARGET ?= x64
 BUILD ?= debug
 VERSION ?= dev
-export VERSION
 
 prepare:
 	docker build -t makestack/linux .
 
 x64:
-	$(MAKE) TARGET=x64 VERSION=$(VERSION)
+	$(MAKE) TARGET=x64
 
 raspberrypi3:
-	$(MAKE) TARGET=raspberrypi3 VERSION=$(VERSION)
+	$(MAKE) TARGET=raspberrypi3
 
 ifeq ($(DOCKER),)
 
 build:
-	./pkgbuilder/pkgbuilder $(TARGET)
+	./pkgbuilder/pkgbuilder $(TARGET) $(VERSION)
 
 else
 
