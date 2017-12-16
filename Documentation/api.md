@@ -17,32 +17,15 @@ yarn add express lodash package-what-you-want
 You have to deploy the app from `makestack deploy` command. Web UI does not support npm dependencies.
 
 ## Using plugin
-Plugins provide a Node.js package such as device drivers.
+Plugins provide a Node.js package such as device drivers. Plugins are bundled in the OS so you don't
+have to install them. To use a plugin use `require()` with the `@makestack/` prefix:
 
-### Using a official plugin
-To use a plugin add its name to `app.yaml`:
-
-```yaml
-# app.yaml
-name: my-app
-plugins: ['hdc1000']
-```
-
-### Using a third-party plugin hosted on GitHub
-To use a plugin on GitHub add its name with `<github-username>/` prefix to `app.yaml`:
-
-```yaml
-# app.yaml
-name: my-app
-plugins: ['seiyanuta/hdc1000']
-```
-
-### Loading a plugin
-To load a plugin use `require()` with the `@makestack/` prefix:
 ```js
-const { HDC1000 } = require('@makestack/HDC1000')
+const { HDC1000 } = require('@makestack/hdc1000')
 const TemperatureSensor = new HDC1000()
 ```
+
+Available plugins are listed on: https://github.com/seiyanuta/makestack/tree/master/plugins
 
 ## Using APIs
 Use `require()` from `@makestack/runtime`:

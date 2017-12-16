@@ -2,11 +2,12 @@
 title: Writing a Plugin
 ---
 
+**TODO: This documention is out-of-date.**
+
 Requirements
 -------------
 
 - A macOS or Linux machine with Node.js version 8.x or higher
-- Docker (or Docker for Mac)
 
 Installing SDK
 --------------
@@ -82,26 +83,7 @@ blinker.start()
 cd example && makestack deploy
 ```
 
-Make sure that Docker is available before deploying. A plugin is built in a Docker
-container.
-
 Publishing a plugin
 -------------------
-MakeStack SDK and Web Editor downloads plugins from GitHub throught MakeStack Server. To
-publish a plugin simply [create a repository and its release](https://help.github.com/articles/about-releases/). The file name must be `<repo-name>-<release-git-tag-name>.plugin.zip`.
 
-Using the published plugin
---------------------------
-To use a plugin on GitHub add its name with `<github-username>/` prefix to `app.yaml`:
-
-```yaml
-# app.yaml
-name: my-app
-plugins: ['seiyanuta/led-blinker']
-```
-
-In `app.js`, `require()` with the `@makestack/` prefix:
-```js
-// app.js
-const { LEDBlinker } = require('@makestack/led-blinker')
-```
+Add it
