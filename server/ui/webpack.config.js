@@ -39,10 +39,6 @@ module.exports = {
         loader: 'html-loader'
       },
       {
-        test: /.d.ts$/,
-        loader: 'raw-loader'
-      },
-      {
         test: /\.scss$/,
         use: [
           'style-loader',
