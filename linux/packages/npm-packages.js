@@ -1,12 +1,20 @@
+const fs = require('fs')
 const path = require('path')
 const {
   config, run, assetPath, isNewerFile, loadJsonFile, saveJsonFile,
-  copyFiles, progress, find
+  copyFiles, progress
 } = require('../pkgbuilder').pkg
 
 const localPackages = {
-  '@makestack/runtime': path.resolve(__dirname, '../../runtime'),
-  '@makestack/hdc1000': path.resolve(__dirname, '../../plugins/hdc1000')
+  '@makestack/runtime': path.resolve(__dirname, '../../runtime')
+}
+
+const pluginsDir = path.resolve(__dirname, '../../plugins')
+for (const pluginName of fs.readdirSync(pluginsDir)) {
+  const pluginDir = path.join(pluginsDir, pluginName)
+  if (fs.statSync(pluginDir).isDirectory()) {
+    localPackages[`@makestack/${pluginName}`] = pluginDir
+  }
 }
 
 module.exports = {
