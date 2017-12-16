@@ -2,35 +2,18 @@ $(V).SILENT:
 .PHONY: default build prepare
 default: build
 
+REMOTE ?= local
+REMOTE_PATH ?= makestack
 TARGET ?= x64
 BUILD ?= debug
 VERSION ?= dev
-
-prepare:
-	docker build -t makestack/linux .
-
-x64:
-	$(MAKE) TARGET=x64
-
-raspberrypi3:
-	$(MAKE) TARGET=raspberrypi3
-
-ifeq ($(DOCKER),)
-
-build:
-	./pkgbuilder/pkgbuilder $(TARGET) $(VERSION)
-
-else
 
 pkgbuilder/node_modules:
 	cd $(@D) && yarn
 
 build: pkgbuilder/node_modules
-	docker run --rm \
-	  -e TARGET=$(TARGET) \
-	  -e MAKEFLAGS="-j$(shell getconf _NPROCESSORS_ONLN)" \
-	  -e BUILD=$(BUILD) \
-	  -e VERSION=$(VERSION) \
-	  -v $(shell realpath ..):/makestack -it makestack/linux
+	./pkgbuilder/pkgbuilder $(TARGET) $(VERSION)
 
-endif
+remote-build:
+	rsync -avh --exclude-from=rsyncignore --delete .. local:$(REMOTE_PATH)
+	ssh -t $(REMOTE) 'cd $(REMOTE_PATH)/linux && make build TARGET=$(TARGET)'

@@ -1,3 +1,13 @@
+#
+#  How to use:
+#
+#    docker run \
+#      -e TARGET=$TARGET \
+#	     -e MAKEFLAGS="-j$(getconf _NPROCESSORS_ONLN)" \
+#	     -e BUILD=$BUILD \
+#	     -e VERSION=$VERSION \
+#	     -v $(realpath ..):/makestack -it makestack/linux
+#
 FROM ubuntu:16.04
 RUN apt-get update -qy && apt-get install -qy curl && \
   curl -sL https://deb.nodesource.com/setup_8.x | bash - && \
