@@ -351,7 +351,12 @@ export default {
           body: `name: ${this.appName}\nplugins: []`
         }, {
           path: 'app.js',
-          body: `Timer.interval(1, () => {\n  println('Hello!')\n})`
+          body: `\
+const { Timer, println } = require('@makestack/runtime')
+
+Timer.interval(1, () => {
+  println('Hello!')
+})`
         }
       ]
     }
