@@ -58,15 +58,14 @@ export default {
       deployButton: "Deploy",
       saveButton: "Save",
       showUploadNavi: false,
+      editor: null
     };
   },
   methods: {
     uploadFile(event) {
       const reader = new FileReader()
       reader.onload = (event) => {
-        const editor = ace.edit("editor")
-        editor.setValue(event.target.result)
-        editor.selection.moveCursorFileStart()
+        debugger
       }
 
       reader.readAsText(event.dataTransfer.files[0])
@@ -116,40 +115,57 @@ export default {
     },
 
     getEditorBody() {
-      return ace.edit(this.$refs.editor).getValue()
+      return this.editor.getModel().getValue()
     },
+
     setEditorBody(body) {
-      const editor = ace.edit(this.$refs.editor)
-      editor.setValue(body)
-      editor.selection.moveCursorFileStart()
+      this.editor.getModel().setValue(body)
+    },
+
+    initializeMonacoEditor() {
+      return new Promise((resolve, reject) => {
+        window.require.config({ paths: { 'vs': '/monaco-editor/vs' }});
+    	  window.require(['vs/editor/editor.main'], () => {
+          monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+            allowJs: true,
+            target: monaco.languages.typescript.ScriptTarget.ES2017,
+            moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+            module: monaco.languages.typescript.ModuleKind.CommonJS,
+            typeRoots: ["node_modules/@types"]
+          });
+
+          this.editor = monaco.editor.create(this.$refs.editor, {
+            theme: 'vs-dark',
+            automaticLayout: true,
+            autoIndent: true,
+    	  		value: this.code,
+    	  		language: 'javascript'
+          });
+
+          resolve()
+    	  });
+      })
     }
   },
 
   async beforeMount() {
-    const appJsTemplate = `\
-const { Timer, println } = require('@makestack/runtime')
-
-Timer.interval(1, () => {
-  println('Hello!')
-})`
+    const appJsTemplate = [
+      "const { Timer, println } = require('@makestack/runtime')",
+      "",
+      "Timer.interval(1, () => {",
+      "  println('Hello!')",
+      "})"
+    ].join('\n')
 
     const remoteFiles = await api.getFiles(this.appName)
     this.code = remoteFiles['app.js'] || appJsTemplate
     this.prevEditorBody = this.code
 
-    const editor = ace.edit(this.$refs.editor)
-    editor.$blockScrolling = Infinity
-    editor.setTheme('ace/theme/xcode')
-    editor.setShowPrintMargin(false)
-
-    const session = editor.getSession()
-    session.setMode('ace/mode/javascript')
-    session.setUseSoftTabs(true)
-    this.setEditorBody(this.code)
-
+    await this.initializeMonacoEditor()
     this.loading = false
     this.$Progress.finish()
   },
+
   mounted() {
     // autosave
     setInterval(() => {
@@ -176,11 +192,8 @@ $editor-border-color: #a6a6ac;
 
 .editor {
   width: 100%;
-  box-sizing: border-box;
-  min-height: 300px;
-  height: 40vh;
-  font-size: 14px;
-  border: $editor-border-width solid $editor-border-color;
+  height: 70vh;
+  border: 1px solid #cacaca;
 }
 
 .upload-navi {

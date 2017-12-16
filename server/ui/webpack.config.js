@@ -1,6 +1,7 @@
 const path = require('path')
 const { DefinePlugin } = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const config = require('./config')
 
 module.exports = {
@@ -38,6 +39,10 @@ module.exports = {
         loader: 'html-loader'
       },
       {
+        test: /.d.ts$/,
+        loader: 'raw-loader'
+      },
+      {
         test: /\.scss$/,
         use: [
           'style-loader',
@@ -54,6 +59,12 @@ module.exports = {
     ]
   },
   plugins: [
+    new CopyWebpackPlugin([
+      {
+        from: 'node_modules/monaco-editor/min/vs',
+        to: 'monaco-editor/vs'
+      }
+    ]),
     new DefinePlugin({
       ROUTER_MODE: JSON.stringify(config.ROUTER_MODE),
       WELCOME_MESSAGE: JSON.stringify(config.WELCOME_MESSAGE),
