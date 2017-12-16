@@ -111,7 +111,7 @@ function extract(filepath, dest) {
     const cwd = process.cwd()
     process.chdir(dest)
     spawnSync('ar', ['x', filepath], { stdio: 'inherit' })
-    spawnSync('tar', ['vxf', 'data.tar.xz'], { stdio: 'inherit' })
+    spawnSync('tar', ['xf', 'data.tar.xz'], { stdio: 'inherit' })
     process.chdir(cwd)
   } else {
     throw new Error(`unsupported file type: ${filepath}`)
