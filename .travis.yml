@@ -30,7 +30,7 @@ matrix:
         - yarn
         - cd ..
       script:
-        - BUILD=release make x64
+        - BUILD=release make TARGET=x64
 
 
     - language: node_js
@@ -60,7 +60,7 @@ matrix:
         - yarn
         - cd ..
       script:
-        - BUILD=release make raspberrypi3
+        - BUILD=release make TARGET=raspberrypi3
 
     - language: ruby
       env: M=server:backend:sqlite3
