@@ -287,24 +287,6 @@ export async function main(args: any, opts: any, logger: any) {
         }
     }
 
-    // Download plugins.
-    for (const pluginName of appYAML.plugins || []) {
-        const pluginZip = await (new JSZip()).loadAsync(await api.downloadPlugin(`nodejs-${pluginName}`));
-        for (const filepath in pluginZip.files) {
-            if (filepath.startsWith("red/") && filepath.match(/\.js$/)) {
-                createFile(`${NODE_RED_TRANSPILERS_DIR}/${path.basename(filepath)}`,
-                await pluginZip.files[filepath].async("text"));
-            }
-
-            if (filepath.startsWith("red/") && filepath.match(/\.html$/)) {
-                createFile(`${NODE_RED_NODES_DIR}/${path.basename(filepath)}`,
-                await pluginZip.files[filepath].async("text"));
-                createFile(`${NODE_RED_NODES_DIR}/${path.parse(filepath).name}.js`,
-                generateNodeScript(path.basename(filepath)));
-            }
-        }
-    }
-
     const nodeRedJSON = path.resolve(opts.appDir, "red.json");
     if (!fs.existsSync(nodeRedJSON)) {
         fs.writeFileSync(nodeRedJSON, JSON.stringify({
