@@ -145,8 +145,8 @@ function buildFatImage(imageFile) {
     throw new Error('failed to get the partiton layout by parted(8');
   }
 
-  const partOffset = partedOutput.split(/\s+/)[1].replace(/B$/, '')
-  const partLength = partedOutput.split(/\s+/)[3].replace(/B$/, '')
+  const partOffset = partedOutput.replace(/^\s+/, '').split(/\s+/)[1].replace(/B$/, '')
+  const partLength = partedOutput.replace(/^\s+/, '').split(/\s+/)[3].replace(/B$/, '')
 
   const loopFile = runWithPipe(
     ['sudo', 'losetup', '-o', partOffset, '--sizelimit', partLength,
