@@ -1,0 +1,5 @@
+/dist
+/build
+/native
+/deps
+/node_modules
