@@ -25,4 +25,4 @@ RUN yarn config set cache-folder /makestack/linux/build/downloads/yarn-cache
 ADD pkgbuilder/package.json /tmp/package.json
 RUN cd /tmp && yarn
 
-CMD cd /makestack/linux && make $TARGET && cp build/$TARGET/*.img /dist
+CMD cd /makestack/linux && make && cp build/$TARGET/*.img /dist
