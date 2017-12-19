@@ -1,0 +1,23 @@
+#!/bin/bash
+set -ue
+version=$1
+
+echo "Publishing npm packages..."
+cd dist
+for pkg in makestack*${version}.tgz; do
+  npm publish --access public $pkg
+done
+cd ..
+
+echo ""
+echo "Checklist!"
+read -p "Updated changelog.md [y]: "
+read -p "git tag ${version} [y]: "
+read -p "git push --tags [y]: "
+read -p "Created a new release on GitHub [y]: "
+read -p "  Uploaded an os disk image for Raspberry Pi 3 [y]: "
+read -p "  Uploaded an installer for macOS [y]: "
+read -p "  Uploaded an installer for Linux [y]: "
+echo ""
+echo "Well done, $(whoami)"'!' "Really good for you"'!'
+echo ""

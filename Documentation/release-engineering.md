@@ -4,11 +4,11 @@ title: Release Engineering
 
 Checklist
 ---------
-- [ ] Runtime: Update version in package.json and `yarn publish`.
-- [ ] Supervisor: Update `version` and `dependencies` in package.json and `yarn publish`.
-- [ ] SDK: Update `version` and `dependencies` in package.json and `yarn publish`.
-- [ ] Build MakeStack Linux, installer, plugins by `./tools/build-release-packages`.
+**Don't forget to update `tools/publish`!
+
+- [ ] Run `./tools/release`.
 - [ ] Update `changelog.md`.
 - [ ] `git tag`
 - [ ] `git push --tags`
+- [ ] Run `./tools/publish`.
 - [ ] [Create a Release on GitHub](https://github.com/seiyanuta/makestack/releases/new).

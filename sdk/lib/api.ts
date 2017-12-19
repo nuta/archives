@@ -7,7 +7,7 @@ const fetch = require("node-fetch");
 
 export type ConfigType = 'string' | 'integer' | 'float' | 'bool';
 
-class API {
+export class API {
     public invoke(method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: any): Promise<any> {
         const headers = {};
 

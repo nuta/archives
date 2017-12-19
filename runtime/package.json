@@ -1,6 +1,6 @@
 {
   "name": "@makestack/runtime",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "license": "(CC0-1.0 OR MIT)",
   "description": "MakeStack Node.js app runtime environment.",
   "gypfile": true,
@@ -14,8 +14,7 @@
     "prepack": "tsc",
     "build:live": "tsc -w"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.0.6",
     "@types/mocha": "^2.2.44",

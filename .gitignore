@@ -1,47 +1,5 @@
-.secrets
 *.log
 *.tgz
 node_modules
 coverage
 /dist
-
-# sdk
-/sdk/dist
-/sdk/runtime
-/sdk/supervisor
-/sdk/tests/tmp
-/sdk/plugin_builder/makestack.d.ts
-/installer/dist
-/installer/builds
-
-# runtime
-/runtime/build
-/runtime/dist
-
-# supervisor
-/supervisor/dist
-
-# server
-/server/config/settings.production.yml
-/server/ui/config.js
-/server/ui/config.json
-/server/.bundle
-/server/vendor
-/server/db/*.sqlite3
-/server/tmp/pids
-/server/tmp/cache/downloads
-/server/public/index.html
-/server/public/app.*.js
-/server/public/vendor.*.js
-/server/public/documentation
-!/server/public/documentation/.gitkeep
-
-# linux
-/linux/build
-/linux/disk
-
-# makestack.github.io
-/makestack.github.io/db.json
-/makestack.github.io/source
-/makestack.github.io/public
-/makestack.github.io/.deploy_git

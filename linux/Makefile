@@ -16,4 +16,4 @@ build: pkgbuilder/node_modules
 
 remote-build:
 	rsync -avh --exclude-from=rsyncignore .. local:$(REMOTE_PATH)
-	ssh -t $(REMOTE) 'cd $(REMOTE_PATH)/linux && make build TARGET=$(TARGET)'
+	ssh -t $(REMOTE) 'cd $(REMOTE_PATH)/linux && make build TARGET=$(TARGET) VERSION=$(VERSION)'

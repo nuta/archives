@@ -1,14 +1,13 @@
 {
   "name": "@makestack/hdc1000",
   "main": "dist/index.js",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
     "prepack": "tsc",
     "prepare": "tsc"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "@makestack/runtime": "^0.1.0",
     "@types/node": "^8.0.53",

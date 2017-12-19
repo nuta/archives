@@ -1,17 +1,17 @@
 {
-    "name": "@makestack/homekit",
-    "version": "0.1.1",
-    "license": "(CC0-1.0 OR MIT)",
-    "main": "dist/index.js",
-    "scripts": {
-      "prepack": "tsc",
-      "prepare": "tsc"
-    },
-    "dependencies": {
-        "hap-nodejs": "^0.4.36"
-    },
-    "devDependencies": {
-        "@types/node": "^8.0.57",
-        "typescript": "^2.6.2"
-    }
+  "name": "@makestack/homekit",
+  "version": "0.2.0",
+  "license": "(CC0-1.0 OR MIT)",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepack": "tsc",
+    "prepare": "tsc"
+  },
+  "dependencies": {
+    "hap-nodejs": "^0.4.36"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.57",
+    "typescript": "^2.6.2"
+  }
 }

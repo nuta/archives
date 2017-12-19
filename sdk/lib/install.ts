@@ -14,7 +14,7 @@ import {
 } from "./helpers";
 import { FatalError, APIError } from "./types";
 
-type Progress = (stage: string, meta?: any) => void
+export type ProgressCallback = (stage: string, meta?: any) => void
 
 function replaceBuffer(buf: Buffer, value: string, id: string): Buffer {
     const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`;
@@ -141,15 +141,15 @@ function prepareFlashCommand(flashCommand: string, ipcPath: string, drive: strin
     return prefix + quote(flashCommand);
 }
 
-function flash(flashCommand: string, drive: string, driveSize: number, imagePath: string, progress: Progress) {
+function flash(flashCommand: string, drive: string, driveSize: number, imagePath: string, progressCallback: ProgressCallback) {
     return new Promise((resolve, reject) => {
         const ipcPath = path.join(os.tmpdir(),
         "makestack-installer" + generateRandomString(32));
 
         ipc.config.logger = () => { };
         ipc.serve(ipcPath, () => {
-            ipc.server.on("progress", (data: any) => {
-                progress("flashing", JSON.parse(data));
+            ipc.server.on("progressCallback", (data: any) => {
+                progressCallback("flashing", JSON.parse(data));
             });
         });
         ipc.server.start();
@@ -179,18 +179,18 @@ export async function install(args: {
     ignoreDuplication: boolean,
     flashCommand: string,
     diskImagePath?: string
-}, progress: Progress) {
+}, progressCallback: ProgressCallback) {
 
     const {
         deviceName, deviceType, osType, adapter, wifiSSID, wifiPassword, wifiCountry,
         drive, ignoreDuplication, flashCommand, diskImagePath
     } = args;
 
-    progress("look-for-drive");
+    progressCallback("look-for-drive");
     const driveSize = await getDriveSize(drive);
-    progress("register");
+    progressCallback("register");
     const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication);
-    progress("download");
+    progressCallback("download");
 
     let originalImage
     if (diskImagePath) {
@@ -199,12 +199,12 @@ export async function install(args: {
         originalImage = await downloadDiskImage(osType, deviceType);
     }
 
-    progress("config");
+    progressCallback("config");
     const imagePath = writeConfigToDiskIamge({
         deviceType, originalImage, device, adapter,
         wifiSSID, wifiPassword, wifiCountry
     })
-    progress('flash')
-    await flash(flashCommand, drive, driveSize, imagePath, progress)
-    progress('success')
+    progressCallback('flash')
+    await flash(flashCommand, drive, driveSize, imagePath, progressCallback)
+    progressCallback('success')
 }
