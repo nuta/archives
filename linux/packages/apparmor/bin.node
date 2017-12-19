@@ -22,8 +22,9 @@
   network inet6 dgram,
 
   /bin/busybox ix,
-  /supervisor/**        r,
-  /supervisor/**/*.node mr,
+  /lib/node/**        r,
+  /lib/node/**/*.node mr,
+  /supervisor/** r,
   /app/**        rw,
   /app/**/*.node mr,
   /disk/data/*   rw,

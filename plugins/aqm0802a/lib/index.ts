@@ -1,7 +1,7 @@
 import { I2C, Timer } from '@makestack/runtime';
 
 export class AQM0802A {
-    public bus: I2C;
+    public bus: any;
 
     constructor(address = 0x3e) {
         this.bus = new I2C({ address });

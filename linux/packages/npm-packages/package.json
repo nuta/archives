@@ -1,4 +1,9 @@
 {
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/node": "^8.5.1",
+    "nan": "^2.8.0"
+  }
 }

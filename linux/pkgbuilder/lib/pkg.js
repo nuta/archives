@@ -79,7 +79,8 @@ function run(argv, env, cwd) {
     cwd: cwd || process.cwd(),
     env: Object.assign({
       PATH: process.env.PATH,
-      MAKEFLAGS: `-j${os.cpus().length}`
+      MAKEFLAGS: `-j${os.cpus().length}`,
+      JOBS: os.cpus().length // Used by node-gyp.
     }, env)
   })
 
@@ -173,6 +174,16 @@ function progress(message) {
   console.log(chalk.bold.magenta(message))
 }
 
+function modifyJsonFile(filepath, obj) {
+  const packageJson = loadJsonFile(filepath)
+
+  for (const [k, v] of Object.entries(obj)) {
+    Object.assign(packageJson[k], v)
+  }
+
+  saveJsonFile(filepath, packageJson)
+}
+
 module.exports = {
   config,
   isNewerFile,
@@ -192,5 +203,6 @@ module.exports = {
   loadJsonFile,
   saveJsonFile,
   progress,
-  find
+  find,
+  modifyJsonFile
 }

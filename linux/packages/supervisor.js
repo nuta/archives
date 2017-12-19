@@ -1,11 +1,10 @@
 const path = require('path')
 const {
-  run, buildPath, isNewerDirContent, loadJsonFile, saveJsonFile
+  run, buildPath, isNewerDirContent, modifyJsonFile
 } = require('../pkgbuilder').pkg
 
 const ignore = [/^node_modules/]
 const supervisorPath = path.resolve(__dirname, '../../supervisor')
-const runtimePath = path.resolve(__dirname, '../../runtime')
 
 module.exports = {
   name: 'supervisor',
@@ -19,11 +18,15 @@ module.exports = {
   },
 
   build() {
-    let packageJson = loadJsonFile('./package.json')
-    packageJson.dependencies['@makestack/runtime'] = 'file:' + runtimePath
-    saveJsonFile('package.json', packageJson)
+    modifyJsonFile('package.json', {
+      dependencies: {
+        '@makestack/runtime': buildPath('npm-packages/node_modules/@makestack/runtime')
+      }
+    })
 
-    run(['yarn', '--no-progress'])
+    run(['yarn', '--no-progress', '--ignore-scripts'])
+    run(['yarn', 'run', 'tsc'])
+    run(['yarn', '--no-progress', '--ignore-scripts', '--production'])
   },
 
   rootfs() {
