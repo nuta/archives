@@ -3,42 +3,21 @@ const path = require('path')
 const {
   config, run, assetPath, isNewerFile, find,
   progress, isNewerDirContent, loadJsonFile,
-  saveJsonFile, rootfsPath
+  rootfsPath
 } = require('../pkgbuilder').pkg
 
 const binPath = path.resolve(__dirname, '../pkgbuilder/node_modules/.bin')
 const PATH = `${process.env.PATH}:${binPath}`
-
-// Npm packages in this repository.
-const localPackages = {
-  '@makestack/runtime': {
-    srcDir: path.resolve(__dirname, '../../runtime'),
+const packageJson = loadJsonFile(assetPath('npm-packages', 'package.json'))
+const localPackages = {}
+for (const [name, dep] of Object.entries(packageJson.dependencies)) {
+  if (dep.startsWith('file:')) {
+    localPackages[name] = path.resolve(__dirname, dep.replace('file:../../', ''))
   }
-}
-
-// Look for plugins in this repository and add them to `localPackages`.
-const pluginsDir = path.resolve(__dirname, '../../plugins')
-for (const pluginName of fs.readdirSync(pluginsDir)) {
-  const srcDir = path.join(pluginsDir, pluginName)
-
-  if (fs.statSync(srcDir).isDirectory()) {
-    localPackages[`@makestack/${pluginName}`] = { srcDir }
-  }
-}
-
-function generatePackageJson() {
-  const packageJson = loadJsonFile('package.json')
-
-  for (const [name, { srcDir }] of Object.entries(localPackages)) {
-    packageJson.dependencies[name] = `file:${srcDir}`
-  }
-
-  saveJsonFile('package.json', packageJson)
 }
 
 function transpilePackages() {
   for (const name of Object.keys(localPackages)) {
-    progress(`Transpiling ${name}`)
     run(['tsc'], { PATH }, path.join('node_modules', name))
   }
 }
@@ -48,7 +27,6 @@ function buildPackages() {
     if (filepath.match(/node_modules\/.+\/package.json$/)) {
       const packageJson = loadJsonFile(filepath)
       if (packageJson.gypfile) {
-        progress(`Building ${packageJson.name}`)
         run(['node-gyp', 'rebuild', '--loglevel=warn', '--arch', config('target.node_gyp_arch')], {
           PATH,
           CC: `${config('target.toolchain_prefix')}gcc`,
@@ -64,7 +42,6 @@ function removeUnnecessaryPackages() {
   const npmDependencies = ['@makestack']
   for (const name of fs.readdirSync('node_modules')) {
     if (!npmDependencies.includes(name)) {
-      progress(`Removing node_modules/${name}`)
       run(['rm', '-rf', path.join('node_modules', name)])
     }
   }
@@ -80,8 +57,8 @@ module.exports = {
       return true
     }
 
-    for (const [name, { srcDir }] of Object.entries(localPackages)) {
-      if (isNewerDirContent(srcDir, rootfsPath(`lib/node/${name}`), [/(node_modules|dist|build)/])) {
+    for (const [name, dir] of Object.entries(localPackages)) {
+      if (isNewerDirContent(dir, rootfsPath(`lib/node/${name}`), [/(node_modules|dist|build)/])) {
         return true
       }
     }
@@ -90,20 +67,25 @@ module.exports = {
   },
 
   build() {
+    // `node_modules' in local packages in this repository will be copied by yarn
+    // and it could be accidentally bundled to the rootfs since yarn creates node_modules
+    // unless --flat option.
     progress('Removing node_modules from local packages')
-    for (const { srcDir } of Object.values(localPackages)) {
-      progress(`Removing ${srcDir}/node_modules`)
-      run(['rm', '-rf', path.join(srcDir, 'node_modules')])
+    for (const dir of Object.values(localPackages)) {
+      progress(`Removing ${dir}/node_modules`)
+      run(['rm', '-rf', path.join(dir, 'node_modules')])
     }
-
-    progress('Generating package.json')
-    generatePackageJson()
 
     progress('Installing npm packages')
     run(['yarn', '--no-progress', '--ignore-scripts'])
 
+    progress('Transpling local packages')
     transpilePackages()
+
+    progress('Building native modules')
     buildPackages()
+
+    progress('Removing unnecessary packages')
     removeUnnecessaryPackages()
   },
 

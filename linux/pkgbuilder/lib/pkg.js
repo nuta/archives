@@ -72,11 +72,16 @@ function isRebuilt(pkg) {
   return build.rebuiltPackages.includes(pkg)
 }
 
-function run(argv, env, cwd) {
-  console.log(chalk.bold(`${argv.join(' ')}`))
+function run(argv, env, cwd = process.cwd()) {
+  if (cwd === process.cwd()) {
+    console.log(chalk.bold(`${argv.join(' ')}`))
+  } else {
+    console.log(chalk.bold(`${argv.join(' ')}` + ` (in ${cwd})`))
+  }
+
   const cp = spawnSync(argv[0], argv.slice(1), {
     stdio: 'inherit',
-    cwd: cwd || process.cwd(),
+    cwd,
     env: Object.assign({
       PATH: process.env.PATH,
       MAKEFLAGS: `-j${os.cpus().length}`,
@@ -94,7 +99,12 @@ function run(argv, env, cwd) {
 }
 
 function runWithPipe(argv, env = {}, cwd = process.cwd(), options = {}) {
-  console.log(chalk.bold(`${argv.join(' ')}`))
+  if (cwd === process.cwd()) {
+    console.log(chalk.bold(`${argv.join(' ')}`))
+  } else {
+    console.log(chalk.bold(`${argv.join(' ')}` + ` (in ${cwd})`))
+  }
+
   const cp = spawnSync(argv[0], argv.slice(1), Object.assign({
     cwd,
     encoding: 'utf-8',
