@@ -18,7 +18,11 @@ describe('run command', function() {
             .returns({
                 start() { }
             })
-        mockfs({});
+        mockfs({
+            [`${process.env.CONFIG_DIR}/device.json`]: JSON.stringify({
+              deviceId: '123', deviceSecret: 'abc', serverURL: 'http://server'
+          })
+        });
     })
 
     afterEach(function () {
@@ -27,8 +31,7 @@ describe('run command', function() {
     })
 
     it('uses Supervisor', async function () {
-        const server = 'http://makestack-server'
-        await runCommand({}, { adapter: 'http', server })
+        await runCommand({}, { adapter: 'http' })
         expect(this.supervisor.calledOnce).to.be.true
     })
 })
