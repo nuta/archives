@@ -11,6 +11,7 @@
     "test:live": "mocha -w",
     "pretest": "tsc",
     "prepare": "tsc",
+    "prepack": "tsc",
     "build:live": "tsc -w"
   },
   "dependencies": {

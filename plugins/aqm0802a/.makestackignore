@@ -1,8 +1,0 @@
-*.zip
-dist/*.map
-scaffold.js
-lib
-node_modules
-tsconfig.json
-yarn.lock
-deps/*/.yarn-integrity

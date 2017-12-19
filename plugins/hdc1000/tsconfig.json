@@ -4,6 +4,7 @@
     "allowJs": true,
     "target": "es2017",
     "module": "commonjs",
+    "moduleResolution": "node",
     "sourceMap": true,
     "pretty": true
   },

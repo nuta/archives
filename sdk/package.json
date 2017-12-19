@@ -11,6 +11,7 @@
     "cov": "istanbul cover _mocha",
     "test": "mocha",
     "test:live": "mocha -w",
+    "prepack": "npm run build",
     "prepare": "npm run build",
     "pretest": "tsc",
     "build": "tsc",

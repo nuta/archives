@@ -4,6 +4,7 @@
   "version": "0.1.1",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
+    "prepack": "tsc",
     "prepare": "tsc"
   },
   "dependencies": {

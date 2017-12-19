@@ -4,7 +4,8 @@
     "license": "(CC0-1.0 OR MIT)",
     "main": "dist/index.js",
     "scripts": {
-        "prepare": "tsc"
+      "prepack": "tsc",
+      "prepare": "tsc"
     },
     "dependencies": {
         "hap-nodejs": "^0.4.36"
