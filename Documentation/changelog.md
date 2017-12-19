@@ -2,6 +2,14 @@
 title: Change Log
 ---
 
+- v0.2.0
+  - Breaking changes to the plugin system: plugins are no longer built as a
+    `*.plugin.zip` file. Instead, they are now pure npm packages.
+  - Official plugins are bundled in the os image (in `/lib/node`).
+  - Add documentation.
+  - New plugin: homekit
+  - **webui:** Introdue Monaco Editor
+  - **sdk:** Remove/replace some commands
 - v0.1.1
   - apps now have to `require('@makestack/runtime')` to use APIs
   - rename Store to Config
