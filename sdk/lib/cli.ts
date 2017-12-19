@@ -8,12 +8,12 @@ import * as deviceConfigCommand from "./commands/device_config";
 import * as installCommand from "./commands/install";
 import * as listDrivesCommand from "./commands/list_drives";
 import * as loginCommand from "./commands/login";
-import * as mockCommand from "./commands/mock";
 import * as newCommand from "./commands/new";
 import * as newPluginCommand from "./commands/new_plugin";
 import * as redCommand from "./commands/red";
 import * as replCommand from "./commands/repl";
 import * as runCommand from "./commands/run";
+import * as registerCommand from "./commands/register";
 import * as fs from "fs";
 import * as path from "path";
 const program = require("caporal");
@@ -110,25 +110,15 @@ program
 .action(addDeviceCommand.main);
 
 program
+.command("register", "Register as a device.")
+.argument("name", "The mock device name.")
+.action(registerCommand.main);
+
+program
 .command("run", "Run as a device.")
-.option("--device-id <device-id>", "The device ID.", null, null, true)
-.option("--device-secret <device-secret>", "The device secret.", null, null, true)
 .option("--adapter <adapter>", "The network adapter.", /^http|sakuraio$/, "http")
-.option("--server <url>", "The server url.", /^(http|https):\/\//, null, true)
-.option("--heartbeat-interval <seconds>", "The interval of heartbeats.", null, 15)
+.option("--heartbeat-interval <seconds>", "The interval of heartbeats.", null, 5)
 .action(runCommand.main);
-
-program
-.command("mock create", "Create a mock device.")
-.argument("name", "The mock device name.")
-.option("--device-type <device-type>", "The device type.", /^raspberrypi3|sdk$/, "sdk")
-.action(mockCommand.create);
-
-program
-.command("mock run", "Run a mock device.")
-.argument("name", "The mock device name.")
-.option("--adapter <adapter>", "The network adapter.", /^http|sakuraio$/, "http")
-.action(mockCommand.run);
 
 program
 .command("repl", "A Read-Eval-Print-Loop (REPL) console.")

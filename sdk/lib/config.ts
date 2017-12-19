@@ -29,15 +29,10 @@ export function saveCredentials(data: any) {
     return save("credentials", data);
 }
 
-export function loadMocks() {
-    return load("mocks");
+export function loadDeviceConfig() {
+    return load("device");
 }
 
-export function updateMocks(data: any) {
-    const mocks = (fs.existsSync(getConfigPath("mocks"))) ? loadMocks() : {};
-    save("mocks", Object.assign(mocks, data));
-}
-
-export function saveMocks(data: any) {
-    return save("mocks", data);
+export function saveDeviceConfig(data: any) {
+    return save("device", data);
 }

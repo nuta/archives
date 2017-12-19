@@ -2,10 +2,12 @@ import * as os from "os";
 import * as path from "path";
 import { Supervisor } from "@makestack/supervisor";
 import { FatalError } from "../types";
+import { loadDeviceConfig } from "../config";
 
 export async function main(args: any, opts: any, logger: any) {
-    if (opts.adapter === "http" && !opts.server) {
-        throw new FatalError("Specify `server' option.");
+    const device = loadDeviceConfig();
+    if (!device) {
+        throw new FatalError(`Run register command first!`)
     }
 
     const supervisor = new Supervisor({
@@ -13,12 +15,12 @@ export async function main(args: any, opts: any, logger: any) {
         appDir: path.resolve(os.homedir(), ".makestack/app"),
         adapter: {
             name: opts.adapter,
-            url: opts.server,
+            url: device.serverURL,
         },
         osType: "sdk",
         osVersion: "dev",
-        deviceId: opts.deviceId,
-        deviceSecret: opts.deviceSecret,
+        deviceId: device.device_id,
+        deviceSecret: device.device_secret,
         heartbeatInterval: opts.heartbeatInterval
     });
 
