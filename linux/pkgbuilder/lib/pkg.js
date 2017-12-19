@@ -146,7 +146,7 @@ function buildFatImage(imageFile) {
 
   mkdirp(mountPoint)
   run(['dd', 'if=/dev/zero', `of=${imageFile}`, 'bs=1M', 'count=64'])
-  runWithPipe(['fdisk', imageFile], null, null, { input: 'n\np\n\n\n\na\n1\nw\n' })
+  runWithPipe(['fdisk', imageFile], null, null, { input: 'n\np\n\n\n\na\n1\nt\n6\nw\n' })
 
   const partedOutput = runWithPipe(
     ['parted', '-s', imageFile, 'unit', 'b', 'print']
