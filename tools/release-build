@@ -35,6 +35,27 @@ function updatePackageJsons(version) {
   for (const filepath of publicNpmPackages.map(d => path.join(d, 'package.json'))) {
     const packageJson = JSON.parse(fs.readFileSync(filepath))
     packageJson.version = version.replace(/^v/, '')
+
+    fs.writeFileSync(filepath, JSON.stringify(packageJson, null, 2) + '\n')
+  }
+}
+
+function updatePackageJsonDependencies(version) {
+  const ver = `^${version.replace(/^v/, '')}`
+  for (const filepath of publicNpmPackages.map(d => path.join(d, 'package.json'))) {
+    const packageJson = JSON.parse(fs.readFileSync(filepath))
+
+    for (const name of Object.keys(packageJson.dependencies || {})) {
+      if (name === 'makestack' || name.startsWith('@makestack/')) {
+        packageJson.dependencies[name] = ver
+      }
+    }
+
+    for (const name of Object.keys(packageJson.devDependencies || {})) {
+      if (name === 'makestack' || name.startsWith('@makestack/')) {
+        packageJson.devDependencies[name] = ver
+      }
+    }
     fs.writeFileSync(filepath, JSON.stringify(packageJson, null, 2) + '\n')
   }
 }
@@ -43,6 +64,7 @@ function buildNpmPackages(distDir, version) {
   for (const relpath of publicNpmPackages) {
     const pkgDir = path.resolve(__dirname, '..', relpath)
     run(['yarn'], {}, pkgDir)
+    updatePackageJsonDependencies(version)
     run(['yarn', 'pack'], {}, pkgDir)
 
     for (const filepath of fs.readdirSync(pkgDir)) {
@@ -93,9 +115,9 @@ function main() {
 
   updatePackageJsons(version)
   buildNpmPackages(distDir, version)
-  buildInstaller(distDir, version)
-  buildLinux(distDir, version)
-  console.log(`Hooray! You have built MakeStack in ${path.resolve(__dirname, '../dist')}!`)
+  // buildInstaller(distDir, version)
+  // buildLinux(distDir, version)
+  // console.log(`Hooray! You have built MakeStack in ${path.resolve(__dirname, '../dist')}!`)
 }
 
 main()

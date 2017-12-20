@@ -27,7 +27,7 @@
   },
   "homepage": "http://makestack.org",
   "dependencies": {
-    "@makestack/supervisor": "^0.1.1",
+    "@makestack/supervisor": "^0.2.0",
     "body-parser": "^1.18.2",
     "caporal": "^0.7.0",
     "chalk": "^2.1.0",
