@@ -1,6 +1,6 @@
 {
   "name": "@makestack/aqm0802a",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "dist/index.js",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@makestack/runtime": "^0.2.0",
+    "@makestack/runtime": "^0.2.1",
     "@types/node": "^8.0.53",
     "ts-node": "^3.3.0",
     "typescript": "^2.6.2"

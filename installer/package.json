@@ -1,6 +1,6 @@
 {
   "name": "makestack-installer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "license": "(CC0-1.0 OR MIT)",
   "main": "./main/index.js",
   "description": "",
@@ -12,7 +12,7 @@
     "renderer": "NODE_ENV=development webpack-dev-server --hot --inline --port 9080"
   },
   "dependencies": {
-    "makestack": "^0.2.0",
+    "makestack": "^0.2.1",
     "node-fetch": "^1.7.3",
     "vue": "^2.5.13",
     "vue-router": "^3.0.1",

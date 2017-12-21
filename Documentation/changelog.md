@@ -2,6 +2,9 @@
 title: Change Log
 ---
 
+- v0.2.1
+  - Remove `app.yaml`
+  - **SDK:** `add-plugin` command
 - v0.2.0
   - Breaking changes to the plugin system: plugins are no longer built as a
     `*.plugin.zip` file. Instead, they are now pure npm packages.
