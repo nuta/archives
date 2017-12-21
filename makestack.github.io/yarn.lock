@@ -3,8 +3,8 @@
 
 
 JSONStream@^1.0.7:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-1.3.1.tgz#707f761e01dae9e16f1bcf93703b78c70966579a"
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-1.3.2.tgz#c102371b6ec3a7cf3b847ca00c20bb0fce4c6dea"
   dependencies:
     jsonparse "^1.2.0"
     through ">=2.2.7 <3"
@@ -42,8 +42,8 @@ ajv@^4.9.1:
     json-stable-stringify "^1.0.1"
 
 ajv@^5.1.0:
-  version "5.5.0"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.5.0.tgz#eb2840746e9dc48bd5e063a36e3fd400c5eab5a9"
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.5.2.tgz#73b5eeca3fab653e3d3f9422b341ad42205dc965"
   dependencies:
     co "^4.6.0"
     fast-deep-equal "^1.0.0"
@@ -398,8 +398,8 @@ core-js@^1.1.1:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-1.2.7.tgz#652294c14651db28fa93bd2d5ff2983a4f08c636"
 
 core-js@^2.4.0:
-  version "2.5.1"
-  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.1.tgz#ae6874dc66937789b80754ff5428df66819ca50b"
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.5.3.tgz#8acc38345824f16d8365b7c9b4259168e8ed603e"
 
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
@@ -984,9 +984,9 @@ hexo-renderer-stylus@^0.3.1:
     nib "^1.1.2"
     stylus "^0.54.5"
 
-hexo-server@^0.2.0:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/hexo-server/-/hexo-server-0.2.2.tgz#592686b554b8bfe09a19bc86c0f003ac3e8c19b9"
+hexo-server@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/hexo-server/-/hexo-server-0.3.0.tgz#95aa8958afdd1fefe87604c5e39d23f64cdc43a6"
   dependencies:
     bluebird "^3.0.6"
     chalk "^1.1.1"
@@ -1009,9 +1009,9 @@ hexo-util@^0.6.0:
     html-entities "^1.2.1"
     striptags "^2.2.1"
 
-hexo@^3.2.0:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/hexo/-/hexo-3.4.2.tgz#3d154a2e26b77d7bd9aa17065a503ec2ed1fa504"
+hexo@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/hexo/-/hexo-3.4.4.tgz#d761386ea3495079facf7bb896920974c6faefdb"
   dependencies:
     abbrev "^1.0.7"
     archy "^1.0.0"
@@ -1413,8 +1413,8 @@ moment-timezone@^0.5.14:
     moment ">= 2.9.0"
 
 "moment@>= 2.9.0", moment@^2.10.6, moment@^2.18.0, moment@^2.19.2:
-  version "2.19.3"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.19.3.tgz#bdb99d270d6d7fda78cc0fbace855e27fe7da69f"
+  version "2.20.1"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.20.1.tgz#d6eb1a46cbcc14a2b2f9434112c1ff8907f313fd"
 
 morgan@^1.6.1:
   version "1.9.0"
@@ -1735,8 +1735,8 @@ readdirp@^2.0.0:
     set-immediate-shim "^1.0.1"
 
 regenerator-runtime@^0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.0.tgz#7e54fe5b5ccd5d6624ea6255c3473be090b802e1"
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
 
 regex-cache@^0.4.2:
   version "0.4.4"
