@@ -82,7 +82,7 @@ cd helloworld
 
 You'll see there files in the directory:
 
-- **app.yaml:** A MakeStack app config file. Leave it as it is for now.
+- **package.json:** A MakeStack app config file. Leave it as it is for now.
 - **app.js:** A JavaScript (Node.js) script to be run on the device.
 
 2. Edit `app.js`.
@@ -174,22 +174,15 @@ Plugins make it easier to create an app. In this section, we learn how to use pl
 create a temperature sensor using [HDC1008](https://www.adafruit.com/product/2635) and its
 device driver plugin.
 
-To use plugin simply add its name to `plugins` in `app.yaml` and `require()` it in `app.js`:
+To use plugin simply run `add-plugin` and `require()` it in `app.js`:
 
-```yaml
-# app.yaml
-name: your-app-name
-plugins:
-  # Add HDC1000 plugin. Plugins without `<github-username>/` prefix like this are builtin ones
-  # in the makestack repository: https://github.com/seiyanuta/makestack/tree/master/plugins
-  - hdc1000
-
-  # To use third-party plugins on GitHub, plugin name must be `<github-username>/<repo-name>` form.
-  # - seiyanuta/another-hdc1000
+```
+makestack add-plugin @makestack/hdc1000
 ```
 
+In Web Editor third-party plugins (ones without `@makestack/` prefix) are not available.
+
 ```js
-/* require('@makestack/<plugin-name or repo-name>') */
 const { HDC1000 } = require('@makestack/hdc1000')
 
 /* Send temperature and humidity every 5 seconds */

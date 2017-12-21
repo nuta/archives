@@ -3,15 +3,16 @@ import * as yaml from "js-yaml";
 import * as path from "path";
 import { FatalError } from "./types";
 
-export function loadAppYAML(appDir: string) {
+export function loadPackageJson(appDir: string) {
   if (!fs.existsSync(appDir)) {
     throw new FatalError(`invalid app dir: ${appDir}`);
   }
 
-  const appYAMLPath = path.join(appDir, "app.yaml");
-  if (!fs.existsSync(appYAMLPath)) {
-    throw new FatalError(`app.yaml not found: ${appYAMLPath}`);
+  const packageJsonPath = path.join(appDir, "package.json");
+  if (!fs.existsSync(packageJsonPath)) {
+    throw new FatalError(`package.json not found: ${packageJsonPath}`);
   }
 
-  return yaml.safeLoad(fs.readFileSync(appYAMLPath, { encoding: 'utf-8' })) || {};
+  const body = fs.readFileSync(packageJsonPath, { encoding: 'utf-8' });
+  return JSON.parse(body) || {};
 }

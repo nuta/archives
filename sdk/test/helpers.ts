@@ -38,7 +38,7 @@ export function login() {
 export function createApp(name: string = 'app'): string {
     const appDir = `/user/${name}`
     fs.mkdirSync(appDir)
-    fs.writeFileSync(path.join(appDir, 'app.yaml'), `name: ${name}`)
+    fs.writeFileSync(path.join(appDir, 'package.json'), `{ "name": "${name}" }`)
     fs.writeFileSync(path.join(appDir, 'app.js'), 'print("Hi!")')
     return appDir
 }

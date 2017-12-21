@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as JSZip from "jszip";
 import * as path from "path";
 import { api } from "./api";
-import { loadAppYAML } from "./appdir";
+import { loadPackageJson } from "./appdir";
 import {
     find, generateTempPath, run, readTextFile, createFile, removeFiles
 } from "./helpers";
@@ -63,7 +63,7 @@ function shouldBePruned(filepath: string) {
 }
 
 export async function deployAppDir(appDir: string) {
-    const appYAML = loadAppYAML(appDir);
+    const appYAML = loadPackageJson(appDir);
     const files = [];
 
     for (const filepath of find(appDir)) {

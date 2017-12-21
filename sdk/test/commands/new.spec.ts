@@ -30,7 +30,7 @@ describe('new command', function() {
         await newCommand({ dir: this.appDir }, { plugins: '' });
         expect(fs.existsSync(path.join(this.appDir, 'README.md'))).to.be.true;
         expect(fs.existsSync(path.join(this.appDir, 'app.js'))).to.be.true;
-        expect(fs.existsSync(path.join(this.appDir, 'app.yaml'))).to.be.true;
+        expect(fs.existsSync(path.join(this.appDir, 'package.json'))).to.be.true;
         expect(fs.existsSync(path.join(this.appDir, 'jsconfig.json'))).to.be.true;
     })
 })

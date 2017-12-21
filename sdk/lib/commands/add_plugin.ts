@@ -5,17 +5,17 @@ import { api } from "../api";
 import { createFile, run } from "../helpers";
 import { logger } from "../logger";
 import { FatalError } from "../types";
-import { loadAppYAML } from "../appdir";
+import { loadPackageJson } from "../appdir";
 
 export async function main(args: any, opts: any) {
-    const appName = loadAppYAML(opts.appDir).name;
+    const appName = loadPackageJson(opts.appDir).name;
 
-    logger.progress(`Adding @makestack/${args.plugin} by yarn`)
-    run(['yarn', 'add', `@makestack/${args.plugin}`])
+    logger.progress(`Adding ${args.plugin} by yarn`)
+    run(['yarn', 'add', `${args.plugin}`])
 
 
     const scaffoldPath = path.resolve(
-        opts.appDir, `node_modules/@makestack/${args.plugin}/scaffold.js`
+        opts.appDir, `node_modules/${args.plugin}/scaffold.js`
     )
 
     if (fs.existsSync(scaffoldPath)) {

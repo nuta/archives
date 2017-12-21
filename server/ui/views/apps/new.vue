@@ -40,12 +40,12 @@ export default {
   },
   methods: {
     async createApp() {
+      await api.createApp(this.appName, this.appAPI)
+
       const templateFiles = [
         { path: 'app.js', body: '// app.js' },
-        { path: 'app.yaml', body:  '# app.yaml' }
+        { path: 'app.yaml', body:  `{ "name": "${this.appName}", "private": true }` }
       ]
-
-      await api.createApp(this.appName, this.appAPI)
 
       for (const file of templateFiles) {
         await api.saveFile(this.appName, file.path, file.body)

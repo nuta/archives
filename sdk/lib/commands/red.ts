@@ -8,7 +8,7 @@ import * as JSZip from "jszip";
 import * as os from "os";
 import * as path from "path";
 import { api } from "../api";
-import { loadAppYAML } from "../appdir";
+import { loadPackageJson } from "../appdir";
 import { deploy } from "../deploy";
 import { createFile, mkdirp } from "../helpers";
 const chalk = require("chalk");
@@ -208,7 +208,7 @@ async function deployFlows(appDir: string, nodeRedJSON: any, body: any) {
 
     fs.writeFileSync(nodeRedJSON, JSON.stringify(nodeREDJSON, null, 2));
     const script = transpile(body.flows);
-    await deploy(loadAppYAML(appDir), [{ path: "app.js", body: script }]);
+    await deploy(loadPackageJson(appDir), [{ path: "app.js", body: script }]);
 }
 
 function spawnProxyServer(port: number, appDir: string, nodeRedJSON: any) {
@@ -265,7 +265,7 @@ export async function main(args: any, opts: any, logger: any) {
         return;
     }
 
-    const appYAML = loadAppYAML(opts.appDir);
+    const appYAML = loadPackageJson(opts.appDir);
 
     mkdirp(NODE_RED_USER_DIR);
     mkdirp(NODE_RED_NODES_DIR);

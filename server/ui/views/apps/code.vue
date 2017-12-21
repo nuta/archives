@@ -78,7 +78,6 @@ export default {
 
       // Copy app files.
       zip.file('app.js', code)
-      zip.file('app.yaml', `name: ${this.appName}`)
 
       const zipImage = await zip.generateAsync({
         type: 'arraybuffer',
