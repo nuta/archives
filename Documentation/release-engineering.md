@@ -4,9 +4,9 @@ title: Release Engineering
 
 Checklist
 ---------
-**Don't forget to update `tools/publish`!
+**Don't forget to update `tools/publish`!**
 
-- [ ] Run `./tools/release`.
+- [ ] Run `./tools/release-build`.
 - [ ] Update `changelog.md`.
 - [ ] `git tag`
 - [ ] `git push --tags`
