@@ -19,6 +19,8 @@ env:
 
 install:
   - cp travis/database.yml config/database.yml
+  - echo -e "[server]\ncharacter-set-server=utf8" | sudo tee -a /etc/mysql/my.cnf
+  - sudo service mysql restart
   - mysql -e 'create database busybook_test'
   - psql -c 'create database busybook_test' -U postgres
   - bundle install --jobs 4 --path vendor/bundle
