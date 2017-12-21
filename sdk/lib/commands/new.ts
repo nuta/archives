@@ -22,20 +22,25 @@ node_modules
 `
     },
     {
-        filepath: "app.yaml",
+        filepath: "package.json",
         template: `\
-name: {{ appName }}
+{
+  "name": "{{ appName }}",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {}
+}
 `
     },
     {
         filepath: "jsconfig.json",
         template: `\
 {
-    "compilerOptions": {
-        "target": "es2017",
-        "module": "commonjs",
-        "lib": ["es2017"]
-    }
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "lib": ["es2017"]
+  }
 }
 `
     },
@@ -45,7 +50,7 @@ name: {{ appName }}
 const { Timer, println } = require('@makestack/runtime')
 
 Timer.interval(3, () => {
-    println('Hello World!')
+  println('Hello World!')
 })
 `
     },

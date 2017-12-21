@@ -89,11 +89,11 @@ const TYPESCRIPT_TEMPLATES = [
         filepath: "package.json",
         template: `\
 {
-    "private": true,
-    "main": "dist/index.js",
-    "scripts": {
-        "transpile": "tsc --pretty"
-    }
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "transpile": "tsc"
+  }
 }
 `,
     },
@@ -101,17 +101,17 @@ const TYPESCRIPT_TEMPLATES = [
         filepath: "tsconfig.json",
         template: `\
 {
-    "compilerOptions": {
-        "outDir": "./dist",
-        "allowJs": true,
-        "target": "es2017",
-        "module": "commonjs",
-        "sourceMap": true,
-        "types": ["node", "makestack"]
-    },
-    "include": [
-        "./lib/**/*"
-    ]
+  "compilerOptions": {
+    "outDir": "./dist",
+    "allowJs": true,
+    "target": "es2017",
+    "module": "commonjs",
+    "sourceMap": true,
+    "types": ["node", "makestack"]
+  },
+  "include": [
+      "./lib/**/*"
+  ]
 }
 `,
     },
