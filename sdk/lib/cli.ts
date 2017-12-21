@@ -9,6 +9,7 @@ import * as installCommand from "./commands/install";
 import * as listDrivesCommand from "./commands/list_drives";
 import * as loginCommand from "./commands/login";
 import * as newCommand from "./commands/new";
+import * as addPluginCommand from "./commands/add_plugin";
 import * as newPluginCommand from "./commands/new_plugin";
 import * as redCommand from "./commands/red";
 import * as replCommand from "./commands/repl";
@@ -174,6 +175,12 @@ program
 .option("--register", "Register the app on server.")
 .option("--api <api>", "The API.", /^nodejs$/, 'nodejs')
 .action(newCommand.main);
+
+program
+.command("add-plugin", "Add a plugin.")
+.argument("plugin", "The plugin name.")
+.option("--app-dir <app-dir>", "The app directory.", null, process.cwd())
+.action(addPluginCommand.main);
 
 program
 .command("new-plugin", "Create a plugin directory with template files.")
