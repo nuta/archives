@@ -8,7 +8,7 @@
     "makestack": "bin/makestack"
   },
   "scripts": {
-    "cov": "istanbul cover _mocha",
+    "coverage": "istanbul cover _mocha",
     "test": "mocha",
     "test:live": "mocha -w",
     "prepack": "npm run build",

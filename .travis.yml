@@ -145,7 +145,7 @@ matrix:
         - cd sdk
         - yarn
       script:
-        - yarn run cov
+        - yarn run coverage
 
     - language: node_js
       node_js: "8"
@@ -157,7 +157,7 @@ matrix:
         - cd supervisor
         - yarn
       script:
-        - yarn run cov
+        - yarn run coverage
 
     - language: node_js
       node_js: "8"
@@ -169,7 +169,7 @@ matrix:
         - cd runtime
         - yarn
       script:
-        - yarn run cov
+        - yarn run coverage
 
     - language: node_js
       node_js: "8"

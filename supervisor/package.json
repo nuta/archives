@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "cov": "istanbul cover _mocha",
+    "coverage": "istanbul cover _mocha",
     "test": "mocha",
     "test:live": "mocha -w",
     "pretest": "tsc",
