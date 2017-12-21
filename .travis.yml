@@ -144,7 +144,7 @@ matrix:
       install:
         - cd sdk
         - yarn
-        - ./tools/relink-local-packages
+        - ../tools/relink-local-packages
       script:
         - yarn run coverage
 
@@ -157,7 +157,7 @@ matrix:
       install:
         - cd supervisor
         - yarn
-        - ./tools/relink-local-packages
+        - ../tools/relink-local-packages
       script:
         - yarn run coverage
 

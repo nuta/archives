@@ -1,5 +1,6 @@
 #!/bin/sh
-ROOT=$PWD
+ROOT=$(git rev-parse --show-toplevel)
+cd $ROOT
 
 cd runtime
 yarn
