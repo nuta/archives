@@ -139,8 +139,7 @@ matrix:
       node_js: "8"
       env: M=SDK
       cache:
-        directories:
-          - sdk/node_modules
+        yarn: true
       install:
         - cd sdk
         - yarn
@@ -152,8 +151,7 @@ matrix:
       node_js: "8"
       env: M=supervisor
       cache:
-        directories:
-          - supervisor/node_modules
+        yarn: true
       install:
         - cd supervisor
         - yarn
@@ -165,8 +163,7 @@ matrix:
       node_js: "8"
       env: M=runtime
       cache:
-        directories:
-          - runtime/node_modules
+        yarn: true
       install:
         - cd runtime
         - yarn
@@ -177,8 +174,7 @@ matrix:
       node_js: "8"
       env: M=makestack.github.io
       cache:
-        directories:
-          - makestack.github.io/node_modules
+        yarn: true
       before_install:
         - cd makestack.github.io
         - >
