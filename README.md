@@ -1,6 +1,8 @@
 MakeStack
 =========
 
+**[Getting Started](https://github.com/seiyanuta/makestack/blob/master/Documentation/quickstart.md)** | **[API Refernce](https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md)** | **[Change Log](https://github.com/seiyanuta/makestack/blob/master/Documentation/changelog.md)** |**[Tryout Server](https://try-makestack.herokuapp.com/)** | **[CI](https://travis-ci.org/seiyanuta/makestack)**
+
 MakeStack is a software stack for connected devices for super-rapid prototyping that includes:
 
 - **Focus on Developer Experience:** Easy-to-use Node.js API.
@@ -13,6 +15,36 @@ MakeStack is a software stack for connected devices for super-rapid prototyping 
 - **Node-RED device side programming:** Enjoy physical computing without coding!
 - **Plugins:** Of course we have!
 - **Free from vendor lock-in:** Fully open sourced :)
+
+Sample Code
+-----------
+
+```javascript
+// Load APIs (https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md)
+const { Timer, Config, publish } = require('@makestack/runtime')
+
+// Plugins.
+const AQM0802A = require('@makestack/aqm0802a')
+const HDC1000 = require('@makestack/hdc1000')
+
+// Initialize device drivers.
+const display = new AQM0802A()
+const sensor = new HDC1000()
+
+Config.onChange('messages', msg => {
+  // print() sends a log message to the server.
+  print(`Updating the display message to ${msg}.`)
+
+  // Update the display.
+  display.update(msg)
+})
+
+// Send temperature and humidity sensed by HDC1000.
+Timer.interval(5, () => {
+  publish('t', sensor.readTemperature())
+  publish('h', sensor.readHumidity())
+})
+```
 
 Code Status
 -----------
