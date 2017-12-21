@@ -1,3 +1,4 @@
+const { Timer, Config, publish } = require('@makestack/runtime')
 const AQM0802A = require('@makestack/aqm0802a')
 const HDC1000 = require('@makestack/hdc1000')
 
