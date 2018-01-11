@@ -70,6 +70,9 @@ matrix:
       cache:
         directories:
           - server/vendor/bundle
+      # See https://github.com/travis-ci/travis-ci/issues/8978#issuecomment-354036443
+      before_install:
+        - gem update --system --no-doc
       install:
         - cd server
         - bundle install --jobs 2 --path vendor/bundle
@@ -87,6 +90,9 @@ matrix:
       cache:
         directories:
           - server/vendor/bundle
+      # See https://github.com/travis-ci/travis-ci/issues/8978#issuecomment-354036443
+      before_install:
+        - gem update --system --no-doc
       install:
         - cd server
         - psql -c 'create database travis_ci_test;' -U postgres
