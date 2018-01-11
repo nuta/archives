@@ -63,6 +63,7 @@ matrix:
         - BUILD=release make TARGET=raspberrypi3
 
     - language: ruby
+      rvm: 2.5
       env: M=server:backend:sqlite3
       services:
         - redis-server
@@ -78,6 +79,7 @@ matrix:
         - bundle exec rspec
 
     - language: ruby
+      rvm: 2.5
       env: M=server:backend:postgresql
       services:
         - postgresql
