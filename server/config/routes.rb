@@ -6,6 +6,8 @@ Rails.application.routes.draw do
     end
 
     scope :v1 do
+      get 'health', to: 'health#health'
+
       mount_devise_token_auth_for 'User', at: 'auth',
         controllers: { registrations: 'auth/registrations' }
 
