@@ -8,6 +8,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     height: 800,
     width: 1000,
+    titleBarStyle: 'hidden',
 
     /* Disable CORS. */
     webPreferences: {
