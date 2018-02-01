@@ -75,9 +75,11 @@ export default {
     async packApp (code) {
       let runtime = 'runtime'
       let zip = new JSZip()
+      const startJs = "require('./app')"
 
       // Copy app files.
       zip.file('app.js', code)
+      zip.file('start.js', startJs)
 
       const zipImage = await zip.generateAsync({
         type: 'arraybuffer',
