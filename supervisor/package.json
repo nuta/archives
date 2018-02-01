@@ -15,7 +15,7 @@
     "build:live": "tsc -w"
   },
   "dependencies": {
-    "@makestack/runtime": "^0.2.1"
+    "makestack": "^0.2.1"
   },
   "devDependencies": {
     "@types/chai": "^4.0.6",

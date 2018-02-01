@@ -47,7 +47,7 @@ node_modules
     {
         filepath: "app.js",
         template: `\
-const { Timer, println } = require('@makestack/runtime')
+const { Timer, println } = require('makestack')
 
 Timer.interval(3, () => {
   println('Hello World!')

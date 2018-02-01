@@ -2,7 +2,7 @@
   "private": true,
   "//": "yarn will be executed with this package.json in linux/build/<arch>/npm-packages",
   "dependencies": {
-    "@makestack/runtime": "file:../../../../runtime",
+    "makestack": "file:../../../../runtime",
     "@makestack/hdc1000": "file:../../../../plugins/hdc1000",
     "@makestack/aqm0802a": "file:../../../../plugins/aqm0802a"
   },

@@ -1,4 +1,4 @@
-import { I2C, Timer } from '@makestack/runtime';
+import { I2C, Timer } from 'makestack';
 
 export class AQM0802A {
     public bus: any;

@@ -21,7 +21,7 @@ Sample Code
 
 ```javascript
 // Load APIs (https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md)
-const { Timer, Config, publish } = require('@makestack/runtime')
+const { Timer, Config, publish } = require('makestack')
 
 // Plugins.
 const AQM0802A = require('@makestack/aqm0802a')

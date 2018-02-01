@@ -20,7 +20,7 @@ module.exports = {
   build() {
     modifyJsonFile('package.json', {
       dependencies: {
-        '@makestack/runtime': buildPath('npm-packages/node_modules/@makestack/runtime')
+        'makestack': buildPath('npm-packages/node_modules/makestack')
       }
     })
 

@@ -149,7 +149,7 @@ export default {
 
   async beforeMount() {
     const appJsTemplate = [
-      "const { Timer, println } = require('@makestack/runtime')",
+      "const { Timer, println } = require('makestack')",
       "",
       "Timer.interval(1, () => {",
       "  println('Hello!')",

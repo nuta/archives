@@ -4,7 +4,7 @@
 * Refer: https://sakura.io/docs (Google Translate is your friend)
 *
 */
-import { I2C, Timer } from "@makestack/runtime";
+import { I2C, Timer } from "makestack";
 import * as logger from "../logger";
 import { AdapterBase } from "./adapter_base";
 

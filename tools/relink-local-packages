@@ -15,14 +15,14 @@ yarn
 cd ..
 
 cd supervisor
-rm -rf node_modules/@makestack/runtime
-ln -s $ROOT/runtime node_modules/@makestack/runtime
+rm -rf node_modules/makestack
+ln -s $ROOT/runtime node_modules/makestack
 cd ..
 
 cd sdk
-rm -rf node_modules/@makestack/runtime
+rm -rf node_modules/makestack
 rm -rf node_modules/@makestack/supervisor
-ln -s $ROOT/runtime node_modules/@makestack/runtime
+ln -s $ROOT/runtime node_modules/makestack
 ln -s $ROOT/supervisor node_modules/@makestack/supervisor
 cd ..
 

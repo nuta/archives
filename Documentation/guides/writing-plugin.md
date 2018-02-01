@@ -42,7 +42,7 @@ You'll see there files in the directory:
 
 ```typescript
 // TypeScript
-import { GPIO } from '@makestack/runtime';
+import { GPIO } from 'makestack';
 
 export class LEDBlinker {
     private instance: GPIO;

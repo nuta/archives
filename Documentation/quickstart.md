@@ -92,7 +92,7 @@ You'll see there files in the directory:
    Load MakeStack APIs.
    Refer: https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md
 */
-const { Timer, println } = require('@makestack/runtime')
+const { Timer, println } = require('makestack')
 
 /* Timer.interval(n, callback) calls `callback` every `n` seconds. */
 Timer.interval(3, () => {
@@ -123,7 +123,7 @@ To send a data to server, simply use `publish()` API:
 
 ```js
 // app.js
-const { publish } = require('@makestack/runtime')
+const { publish } = require('makestack')
 Timer.interval(3, () => {
   /* publish(event_name, value) */
   publish('random number', Math.random())

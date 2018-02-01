@@ -28,17 +28,17 @@ const TemperatureSensor = new HDC1000()
 Available plugins are listed on: https://github.com/seiyanuta/makestack/tree/master/plugins
 
 ## Using APIs
-Use `require()` from `@makestack/runtime`:
+Use `require()` from `makestack`:
 
 ```js
-const { println, GPIO, I2C } = require('@makestack/runtime')
+const { println, GPIO, I2C } = require('makestack')
 println('Hello, World!')
 ```
 
 ## Functions
 ### How to use
 ```js
-const { println, error, publish } = require('@makestack/runtime')
+const { println, error, publish } = require('makestack')
 ```
 
 ### println
@@ -67,7 +67,7 @@ const { println, error, publish } = require('@makestack/runtime')
 ## Config
 ### How to use
 ```js
-const { Config } = require('@makestack/runtime')
+const { Config } = require('makestack')
 ```
 
 ### onCommand
@@ -95,7 +95,7 @@ const { Config } = require('@makestack/runtime')
 ## Timer
 ### How to use
 ```js
-const { Timer } = require('@makestack/runtime')
+const { Timer } = require('makestack')
 ```
 
 ### loop
@@ -153,7 +153,7 @@ const { Timer } = require('@makestack/runtime')
 ## App
 ### How to use
 ```js
-const { App } = require('@makestack/runtime')
+const { App } = require('makestack')
 ```
 
 ### onExit
@@ -189,7 +189,7 @@ const { App } = require('@makestack/runtime')
 ## Subprocess
 ### How to use
 ```js
-const { SubProcess } = require('@makestack/runtime')
+const { SubProcess } = require('makestack')
 ```
 
 **Definitions:**
@@ -217,7 +217,7 @@ The pin number depends on the device.
 
 ### How to use
 ```js
-const { GPIO } = require('@makestack/runtime')
+const { GPIO } = require('makestack')
 ```
 
 ## Constructor
@@ -278,7 +278,7 @@ const { GPIO } = require('@makestack/runtime')
 ## I2C
 ### How to use
 ```js
-const { I2C } = require('@makestack/runtime')
+const { I2C } = require('makestack')
 ```
 
 ### Constructor
@@ -307,7 +307,7 @@ const { I2C } = require('@makestack/runtime')
 
 ### How to use
 ```js
-const { Serial } = require('@makestack/runtime')
+const { Serial } = require('makestack')
 ```
 
 ### Constructor
@@ -363,7 +363,7 @@ const { Serial } = require('@makestack/runtime')
 
 ### How to use
 ```js
-const { SPI } = require('@makestack/runtime')
+const { SPI } = require('makestack')
 ```
 
 ### Constructor

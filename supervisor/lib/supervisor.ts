@@ -12,7 +12,7 @@ import { deserialize, serialize } from "./smms";
 import * as unzip from "./unzip";
 import { Configs, DeviceState, PayloadMessages } from "./types";
 import { AdapterBase } from "./adapters/adapter_base";
-import * as apis from "@makestack/runtime";
+import * as apis from "makestack";
 import { HTTPAdapter } from "./adapters/http_adapter";
 import { SakuraIOAdapter } from "./adapters/sakuraio_adapter";
 
