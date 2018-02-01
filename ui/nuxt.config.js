@@ -31,27 +31,12 @@ module.exports = {
         integrity: 'sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm',
         crossorigin: 'anonymous'
       }
-    ],
-    script: [
-      {
-        src: 'https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js',
-        integrity: 'sha256-0SGl1PJNDyJwcV5T+weg2zpEMrh7xvlwO4oXgvZCeZk=',
-        crossorigin: 'anonymous'
-      }
     ]
   },
   loading: { color: '#3B80f0' },
   modules: [ '@nuxtjs/proxy' ],
   build: {
-    vendor: ['whatwg-fetch', 'jszip', 'date-fns', 'chart.js', 'lodash'],
-    plugins: [
-      new CopyWebpackPlugin([
-        {
-          from: 'node_modules/monaco-editor/min/vs',
-          to: 'monaco-editor/vs'
-        }
-      ])
-    ],
+    vendor: ['whatwg-fetch', 'jszip', 'date-fns', 'lodash', 'bootstrap', 'jquery', 'popper.js'],
     extend(config) {
       config.module.rules.push({
         test: /\.d\.ts$/,

@@ -39,7 +39,7 @@ export default {
 .dashboard-layout {
   max-width: 1200px;
   margin: 5px auto;
-  padding: 10px;
+  padding: 10px 20px;
 
   header {
     width: 100%;

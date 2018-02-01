@@ -1,21 +1,34 @@
 <template>
   <dashboard-layout :title="appName">
-            <div class="log">
-              <p class="line" v-for="line in appLog">
-                <span class="time">{{ line.time | date("HH:mm") }}</span>
-                <span class="device">{{ line.device }}</span>
-                <span class="body">{{ line.body }}</span>
-              </p>
-            </div>
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" role="tab" href="#code">Code</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" role="tab" href="#config">Config</a>
+      </li>
+    </ul>
 
-            <section>
-              <h1>Code</h1>
-            </section>
-            <button @click="deploy" class="primary">
-              <i class="fa fa-rocket" aria-hidden="true"></i>
-              Deploy
-            </button>
+    <div class="tab-content main">
+      <div class="tab-pane show active" role="tabpanel" id="code">
+        <button @click="deploy" class="btn btn-primary">
+          <i class="fa fa-rocket" aria-hidden="true"></i>
+          Deploy
+        </button>
         <div class="editor" ref="editor"></div>
+      </div>
+      <div class="tab-pane" id="config">
+        config!
+      </div>
+    </div>
+
+    <div class="log">
+      <p class="line" v-for="line in log">
+        <span class="time">{{ line.time | date("HH:mm") }}</span>
+        <span class="device">{{ line.device }}</span>
+        <span class="body">{{ line.body }}</span>
+      </p>
+    </div>
   </dashboard-layout>
 </template>
 
@@ -47,7 +60,7 @@ export default {
       deployButton: "Deploy",
       saveButton: "Save",
       editor: null,
-      appLog: []
+      log: []
     }
   },
   methods: {
@@ -201,9 +214,9 @@ export default {
 
     this.prevEditorBody = this.code
 
-    this.appLog = await this.fetchNewLines()
-    this.appLogFetchTimer = setInterval(async () => {
-      this.appLog = this.appLog.concat(await this.fetchNewLines())
+    this.log = await this.fetchNewLines()
+    this.logFetchTimer = setInterval(async () => {
+      this.log = this.log.concat(await this.fetchNewLines())
     }, 5000)
 
     await this.initializeMonacoEditor()
@@ -228,65 +241,14 @@ export default {
       this.editor.dispose()
     }
 
-    clearInterval(this.appLogFetchTimer)
+    clearInterval(this.logFetchTimer)
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.app-card {
-  border: 1px solid #dadada;
-  border-radius: 5px;
-
-  & > div {
-    padding: 10px;
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-
-    h2 {
-      font-size: 15px;
-      margin: 0;
-    }
-
-    .status-text {
-      font-size: 13px;
-      color: #555;
-    }
-  }
-
-  .log-graph {
-    border-top: 1px solid #dadada;
-  }
-
-  .log {
-    padding: 5px;
-    border-top: 1px solid #dadada;
-    font-size: 13px;
-    height: 100px;
-    overflow: scroll;
-
-    p {
-      margin: 0;
-      padding: 3px 0;
-    }
-  }
-}
-
-.integration-tag {
-  display: inline-block;
-  padding: 4px;
-  border: 1px solid #adadad;
-  border-radius: 3px;
-
-  &:not(:first-child) {
-    margin-left: 7px;
-  }
-
-  &.sakuraio {
-  }
+.main {
+  padding: 10px 0px;
 }
 
 .editor {

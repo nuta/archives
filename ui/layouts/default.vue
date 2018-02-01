@@ -5,6 +5,7 @@
 </template>
 
 <style lang="scss">
-@import "~assets/css/defaults";
-@import "~assets/css/form";
+body {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif;
+}
 </style>
