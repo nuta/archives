@@ -1,0 +1,296 @@
+import 'whatwg-fetch'
+import {
+  getServerUrl,
+  loadCredentials,
+  saveCredentials,
+  removeCredentials
+} from 'platform'
+
+class API {
+  constructor() {
+    this.credentials = loadCredentials()
+    if (this.credentials) {
+      this.server = getServerUrl()
+    }
+  }
+
+  invoke(method, path, body, requiresCredentials = true) {
+    let headers = Object.assign({}, this.credentials)
+
+    if (requiresCredentials && !this.credentials) {
+      this.forceLogin()
+    }
+
+    if (typeof body !== 'string' && !(body instanceof FormData)) {
+      body = JSON.stringify(body)
+      Object.assign(headers, { 'Content-Type': 'application/json' })
+    }
+
+    return new Promise((resolve, reject) => {
+      let status
+      fetch(`${this.server}/api/v1${path}`, { method, headers, body })
+        .then(response => {
+          const currentRoute = 'hoge' // app.$router.currentRoute.name
+          if (response.status === 401 && currentRoute !== 'login') {
+            this.forceLogin((currentRoute === 'home') ? null : 'Login first.')
+          }
+          return response
+        })
+        .then(response => {
+          if (response.status !== 422 && !(response.status >= 200 && response.status < 300)) {
+            throw new Error(`server returned ${response.status}`)
+          }
+          return response
+        })
+        .then(response => {
+          status = response.status
+          return (response.status === 204) ? Promise.resolve({}) : response.json()
+        })
+        .then(json => {
+          if (status === 422) {
+            /*
+            for (const message of json.errors) {
+              // FIXME UIkit.notification(message, { status: 'warning' })
+              reject(new Error('validation error'))
+            }
+            */
+          } else {
+            resolve(json)
+          }
+        })
+        .catch(e => {
+          // FIXME UIkit.notification(e.toString(), { status: 'danger' })
+          console.error(e)
+        })
+    })
+  }
+
+  get email() {
+    return this.credentials.email
+  }
+
+  loggedIn() {
+    return this.credentials !== null
+  }
+
+  logout() {
+    removeCredentials()
+  }
+
+  forceLogin(errmsg) {
+    this.logout()
+    // FIXME    app.$router.push({name: 'login'})
+  }
+
+  login(username, password) {
+    let status, headers
+    return fetch(`/api/v1/auth/sign_in`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    }).then((response) => {
+      status = response.status
+      headers = response.headers
+      return response.json()
+    }).then(json => {
+      if (status !== 200) {
+        throw new Error(`Error: failed to login: \`${json.errors}'`)
+      }
+
+      this.credentials = {
+        url: this.server,
+        username: username,
+        email: json['data']['email'],
+        uid: headers.get('uid'),
+        'access-token': headers.get('access-token'),
+        'access-token-secret': headers.get('access-token-secret')
+      }
+
+      saveCredentials(this.credentials)
+    })
+  }
+
+  createUser({ username, email, password, passwordConfirmation, recaptcha, agreeTos }) {
+    return this.invoke('POST', '/auth', {
+      username,
+      email,
+      password,
+      password_confirmation: passwordConfirmation,
+      recaptcha,
+      agree_tos: agreeTos
+    }, false)
+  }
+
+  getUser(username) {
+    return this.invoke('GET', '/auth', {
+      name: username
+    }, false)
+  }
+
+  deleteUser() {
+    return this.invoke('DELETE', '/auth')
+  }
+
+  updateUser(attrs) {
+    // It is necessary to update credentials in local storage
+    // when the email address has been changed.
+    return this.invoke('PUT', '/auth', attrs)
+  }
+
+  resetPassword(email) {
+    return this.invoke('POST', '/auth/password', { email }, false)
+  }
+
+  getApps() {
+    return this.invoke('GET', `/apps`)
+  }
+
+  getApp(appName) {
+    return this.invoke('GET', `/apps/${appName}`)
+  }
+
+  getAppLog(appName, since) {
+    const unixtime = since ? Math.floor(since.getTime() / 1000) : 0
+    return this.invoke('GET', `/apps/${appName}/log?since=${unixtime}`)
+  }
+
+  updateApp(appName, attrs) {
+    return this.invoke('PUT', `/apps/${appName}`, { app: attrs })
+  }
+
+  deleteApp(appName) {
+    return this.invoke('DELETE', `/apps/${appName}`)
+  }
+
+  getIntegrations(appName) {
+    return this.invoke('GET', `/apps/${appName}/integrations`)
+  }
+
+  createIntegration(appName, service, config, comment) {
+    return this.invoke('POST', `/apps/${appName}/integrations`,
+      { service, config, comment })
+  }
+
+  updateIntegration(appName, name, service, config, comment) {
+    return this.invoke('PUT', `/apps/${appName}/integrations/${name}`,
+      { service, config, comment })
+  }
+
+  deleteIntegration(appName, name) {
+    return this.invoke('DELETE', `/apps/${appName}/integrations/${name}`)
+  }
+
+  getDevices() {
+    return this.invoke('GET', `/devices`)
+  }
+
+  getDevice(deviceName) {
+    return this.invoke('GET', `/devices/${deviceName}`)
+  }
+
+  updateDevice(deviceName, attrs) {
+    return this.invoke('PATCH', `/devices/${deviceName}`, { device: attrs })
+  }
+
+  getDeviceLog(deviceName) {
+    return this.invoke('GET', `/devices/${deviceName}/log`)
+  }
+
+  createDeviceConfig(deviceName, key, type, value) {
+    return this.invoke('POST', `/devices/${deviceName}/configs`, {
+      config: { key, data_type: type, value }
+    })
+  }
+
+  deleteDeviceConfig(deviceName, key) {
+    return this.invoke('DELETE', `/devices/${deviceName}/configs/${key}`)
+  }
+
+  getDeviceConfigs(deviceName) {
+    return this.invoke('GET', `/devices/${deviceName}/configs`)
+  }
+
+  updateDeviceConfig(deviceName, key, value) {
+    return this.invoke('PUT', `/devices/${deviceName}/configs/${key}`,
+      { value })
+  }
+
+  deleteDevice(deviceName) {
+    return this.invoke('DELETE', `/devices/${deviceName}`)
+  }
+
+  invokeCommand(deviceName, command, arg = []) {
+    return this.invoke('POST', `/devices/${deviceName}/commands`, { command, arg })
+  }
+
+  rebootDevice(deviceName) {
+    return this.invokeCommand(deviceName, '__reboot__')
+  }
+
+  getDeployments(appName) {
+    return this.invoke('GET', `/apps/${appName}/deployments`)
+  }
+
+  getDeployment(appName, version) {
+    return this.invoke('GET', `/apps/${appName}/deployments/${version}`)
+  }
+
+  deploy(appName, image, debug, comment, tag) {
+    let form = new FormData()
+    form.set('deployment[deployed_from]', 'web')
+    form.set('deployment[image]', image, 'app.zip')
+
+    if (debug) {
+      form.set('deployment[debug]', debug)
+    }
+
+    if (comment) {
+      form.set('deployment[comment]', comment)
+    }
+
+    if (tag) {
+      form.set('deployment[tag]', tag)
+    }
+
+    return this.invoke('POST', `/apps/${appName}/deployments`, form)
+  }
+
+  createApp(appName, api) {
+    return this.invoke('POST', `/apps`, {
+      app: { name: appName, api: api }
+    })
+  }
+
+  getFiles(appName) {
+    return this.invoke('GET', `/apps/${appName}/files`)
+  }
+
+  saveFile(appName, path, body) {
+    return this.invoke('PUT', `/apps/${appName}/files/${path}`, { body })
+  }
+
+  getAppConfigs(appName) {
+    return this.invoke('GET', `/apps/${appName}/configs`)
+  }
+
+  createAppConfig(appName, key, type, value) {
+    return this.invoke('POST', `/apps/${appName}/configs`, {
+      config: { key, data_type: type, value }
+    })
+  }
+
+  updateAppConfig(appName, key, type, value) {
+    return this.invoke('PUT', `/apps/${appName}/configs/${key}`,
+      { config: { data_type: type, value } })
+  }
+
+  deleteAppConfig(appName, key) {
+    return this.invoke('DELETE', `/apps/${appName}/configs/${key}`)
+  }
+
+  getOSReleases() {
+    return this.invoke('GET', '/os/releases')
+  }
+}
+
+export default new API()

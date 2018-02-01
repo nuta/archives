@@ -113,7 +113,7 @@ matrix:
       script: npm run build
 
     - language: node_js
-      env: M=installer:macos
+      env: M=desktop:macos
       os: osx
       osx_image: xcode9.1
       node_js: "8"
@@ -124,21 +124,21 @@ matrix:
           - "$HOME/.cache"
       install:
         - npm install -g yarn
-        - cd installer
+        - cd desktop
         - yarn
       script:
         - yarn run build:macos
 
     - language: node_js
       node_js: "8"
-      env: M=installer:linux
+      env: M=desktop:linux
       cache:
         yarn: true
         directories:
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
-        - cd installer
+        - cd desktop
         - yarn
       script:
         - yarn run build:linux

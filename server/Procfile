@@ -1,3 +1,3 @@
 server: source .secrets && PORT=3000 ./bin/rails server
-ui: cd ui && npm run dev
+ui: cd ../ui && PORT=8080 yarn dev
 sidekiq: bundle exec sidekiq -C ./config/sidekiq.yml

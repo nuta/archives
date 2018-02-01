@@ -6,7 +6,6 @@ const { spawnSync } = require('child_process')
 const publicNpmPackages = [
   'runtime',
   'supervisor',
-  'installer',
   'sdk',
   'plugins/homekit',
   'plugins/hdc1000',
@@ -76,16 +75,16 @@ function buildNpmPackages(distDir, version) {
 }
 
 function buildInstaller(distDir, version) {
-  run(['yarn', 'build:macos'], {}, path.resolve(__dirname, '../installer'))
-  run(['yarn', 'build:linux'], {}, path.resolve(__dirname, '../installer'))
+  run(['yarn', 'build:macos'], {}, path.resolve(__dirname, '../desktop'))
+  run(['yarn', 'build:linux'], {}, path.resolve(__dirname, '../desktop'))
 
-  run(['zip', '-r', path.join(distDir, `makestack-installer-${version}-macos.zip`),
-    'makestack-installer.app'], {},
-    path.resolve(__dirname, '../installer/app/makestack-installer-darwin-x64'))
+  run(['zip', '-r', path.join(distDir, `makestack-desktop-${version}-macos.zip`),
+    'makestack-desktop.app'], {},
+    path.resolve(__dirname, '../desktop/app/makestack-desktop-darwin-x64'))
 
-  run(['tar', 'Jcf', path.join(distDir, `makestack-installer-${version}-linux-x64.tar.xz`),
-    'makestack-installer-linux-x64'], {},
-    path.resolve(__dirname, '../installer/app'))
+  run(['tar', 'Jcf', path.join(distDir, `makestack-desktop-${version}-linux-x64.tar.xz`),
+    'makestack-desktop-linux-x64'], {},
+    path.resolve(__dirname, '../desktop/app'))
 }
 
 function buildLinux(distDir, version) {
