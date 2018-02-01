@@ -10,6 +10,7 @@ A payload of SMMS is an array of simple *Type-Length-Value* messages.
 
 ```c
 struct Payload {
+    header
     Message Messages[n];
 };
 
@@ -34,18 +35,9 @@ Messages
 | Type ID | name |
 :-----:|:-----:
  0x00  | (reserved)
- 0x01  | version (must be `1`)
- 0x02  | qos (unimplemented yet)
- 0x03  | qos_reply (unimplemented yet)
- 0x04  | nonce (unused)
- 0x06  | hmac (HMAC-SHA2)
- 0x07  | timestamp (ISO 8601)
- 0x0a  | device_id
- 0x0b  | device_info (0-2 bits: `state`, 3: `debug mode`, 4-5: `os type`)
- 0x0c  | log
- 0x0d  | crashdump (unimplemented yet)
- 0x10  | os_version
- 0x11  | app_version
- 0x12  | os_image_hmac
- 0x13  | app_image_hmac
- 0x20  | config (`key length`, `key`, and `config value`)
+ 0x03  | device_id
+ 0x04  | log
+ 0x05  | command (key length, key, and config value)
+ 0x07  | report (type and value)
+ 0x09  | config (key length, key, and config value)
+ 0x0a  | update (method, version)

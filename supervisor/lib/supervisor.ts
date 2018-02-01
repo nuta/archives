@@ -24,7 +24,7 @@ export interface SupervisorConstructorArgs {
     mode: 'production' | 'debug' | 'test';
     appDir: string;
     osType: string;
-    osVersion: string;
+    osVersion: number;
     deviceId: string;
     deviceSecret: string;
     appUID?: number;
@@ -37,7 +37,7 @@ export class Supervisor {
     private appDir: string;
     private currentAppDir: string;
     private osType: string;
-    private osVersion: string;
+    private osVersion: number;
     private mode: string;
     private debugMode: boolean;
     private testMode: boolean;
@@ -48,7 +48,7 @@ export class Supervisor {
     private deviceSecret: string;
     private deviceType: string;
     private device: any;
-    private appVersion: string;
+    private appVersion: number;
     private log: string;
     private allLog: string;
     private configs: any;
@@ -88,7 +88,7 @@ export class Supervisor {
         this.deviceSecret = args.deviceSecret;
         const { Device } = require(`./devices/${apis.Device.getDeviceType()}`);
         this.device = new Device();
-        this.appVersion = "X";
+        this.appVersion = 0;
         this.log = "";
         this.allLog = "";
         this.configs = {};
@@ -268,12 +268,11 @@ export class Supervisor {
         `app_ver="${this.appVersion}", mode=${this.mode})`);
 
         await this.adapter.send(serialize({
-            state,
             deviceId: this.deviceId,
-            debugMode: this.debugMode,
-            osVersion: this.osVersion,
-            appVersion: this.appVersion,
             log: this.popLog(),
+            reports: {
+                currentVersion: this.appVersion
+            }
         }, {
             includeDeviceId: this.includeDeviceId,
             includeHMAC: this.includeHMAC,
@@ -281,7 +280,11 @@ export class Supervisor {
         }));
     }
 
-    private async handleUpdateAppMessage(appVersion: string, appImageHMAC: string) {
+    private async handleUpdateAppMessage(appVersion: number) {
+        if (appVersion <= this.appVersion) {
+            return;
+        }
+
         logger.info(`updating ${this.appVersion} -> ${appVersion}`);
         this.appVersion = appVersion;
 
@@ -297,15 +300,10 @@ export class Supervisor {
             this.downloading = false;
         }
 
-        if (this.verifyHMAC && !verifyImageHMAC(this.deviceSecret, appImageHMAC, appZip)) {
-            logger.warn("invalid app image HMAC, aborting update");
-            return;
-        }
-
         this.launchApp(appZip);
     }
 
-    private async handleUpdateOSMessage(osVersion: string, osImageHMAC: string) {
+    private async handleUpdateOSMessage(osVersion: number) {
         logger.info(`updating os ${this.osVersion} -> ${osVersion}`);
         this.downloading = true;
 
@@ -318,11 +316,6 @@ export class Supervisor {
             return;
         } finally {
             this.downloading = false;
-        }
-
-        if (this.verifyHMAC && !verifyImageHMAC(this.deviceSecret, osImageHMAC, image)) {
-            logger.warn("invalid os image HMAC, aborting update");
-            return;
         }
 
         this.updateOS(image);
@@ -389,43 +382,18 @@ export class Supervisor {
         this.sendToApp("configs", { configsToApp });
     }
 
-    private isOSUpdateRequired(messages: PayloadMessages): boolean {
-        return this.updateEnabled &&
-        !this.downloading &&
-        messages.osVersion !== undefined &&
-        messages.osVersion !== this.osVersion;
-    }
-
-    private isAppUpdateRequired(messages: PayloadMessages): boolean {
-        return this.updateEnabled &&
-        !this.downloading &&
-        messages.appVersion !== undefined &&
-        messages.appVersion !== this.appVersion;
-    }
-
     private async onSMMSReceive(payload: Buffer) {
-        const [messages, hmacProtectedEnd] = deserialize(payload);
-        const hmacProtectedPayload = payload.slice(0, hmacProtectedEnd);
-
-        if (this.verifyHMAC && !verifyMessageHMAC(this.deviceSecret, hmacProtectedPayload, messages.hmac, messages.timestamp)) {
-            logger.warn("invalid message hmac, discarding...");
-            return;
-        }
-
-        // Update OS.
-        if (this.isOSUpdateRequired(messages)) {
-            await this.handleUpdateOSMessage(messages.osVersion, messages.osImageHMAC);
-        }
+        const { commands, update, configs } = deserialize(payload);
 
         // Update App
-        if (this.isAppUpdateRequired(messages)) {
-            await this.handleUpdateAppMessage(messages.appVersion, messages.appImageHMAC);
+        if (update && this.updateEnabled && !this.downloading) {
+            await this.handleUpdateAppMessage(update.version);
             return;
         }
 
         // Send new configs to the app.
-        if (messages.configs) {
-            this.handleConfigMessage(messages.configs);
+        if (configs) {
+            this.handleConfigMessage(configs);
         }
     }
 

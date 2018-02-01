@@ -240,7 +240,7 @@ export class SakuraIOAdapter extends AdapterBase {
         this.receive();
     }
 
-    public async getAppImage(version: string) {
+    public async getAppImage(version: number) {
         logger.info("sakura.io: requesting a file download....");
         await this.sakuraio.requestFileDownload(APP_IMAGE_FILEID);
 
@@ -278,7 +278,7 @@ export class SakuraIOAdapter extends AdapterBase {
         return Promise.resolve(appImage);
     }
 
-    public getOSImage(version: string) {
+    public getOSImage(version: number) {
         return Promise.reject("sakura.io: getOSImage is not supported yet");
     }
 }

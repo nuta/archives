@@ -55,7 +55,6 @@ EOS
         stub_request(:post, "https://api.sakura.io/incoming/v1/abc").to_return(status: 200)
 
         post :webhook, params: message
-        expect(device.status.value).to eq('ready')
         expect(device.last_heartbeated_at.value).not_to eq(nil)
       end
     end

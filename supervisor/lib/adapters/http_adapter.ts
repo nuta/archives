@@ -64,12 +64,12 @@ export class HTTPAdapter extends AdapterBase {
             .catch(logger.error);
     }
 
-    public getAppImage(version: string) {
+    public getAppImage(version: number) {
         const url = `${this.serverURL}/api/v1/images/app/${this.deviceId}/${version}`;
         return request("GET", url);
     }
 
-    public getOSImage(version: string) {
+    public getOSImage(version: number) {
         const url = `${this.serverURL}/api/v1/images/os/${this.deviceId}/${version}/${this.osType}/${this.deviceType}`;
         return request("GET", url);
     }

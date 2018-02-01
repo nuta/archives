@@ -1,16 +1,17 @@
-export type DeviceState = 'ready' | 'running'
+export type DeviceState = 'ready' | 'running';
+export type Reports = {
+    currentVersion?: number
+};
 export type Configs = { [key: string]: string };
+export type Commands = { [key: string]: string };
 
 export interface PayloadMessages {
-    appVersion?: string;
-    osVersion?: string;
-    appImageHMAC?: string;
-    osImageHMAC?: string;
-    hmac?: string;
-    timestamp?: string;
+    reports?: Reports;
     configs?: Configs;
+    commands?: Commands;
+    update?: {
+        version: number
+    };
     deviceId?: string;
-    state?: string;
     log?: string;
-    debugMode?: boolean;
 }

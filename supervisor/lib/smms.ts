@@ -3,16 +3,18 @@ import { computeHMAC } from "./hmac";
 import { PayloadMessages } from "./types";
 
 const SMMS_VERSION = 1;
-const SMMS_HMAC_MSG = 0x06;
-const SMMS_TIMESTAMP_MSG = 0x07;
-const SMMS_DEVICE_ID_MSG = 0x0a;
-const SMMS_DEVICE_INFO_MSG = 0x0b;
-const SMMS_LOG_MSG = 0x0c;
-const SMMS_OS_VERSION_MSG = 0x10;
-const SMMS_APP_VERSION_MSG = 0x11;
-const SMMS_OS_IMAGE_HMAC_MSG = 0x12;
-const SMMS_APP_IMAGE_HMAC_MSG = 0x13;
-const SMMS_STORE_MSG = 0x20;
+const SMMS_HMAC_MSG      = 0x01;
+const SMMS_CACHE_MSG     = 0x02;
+const SMMS_DEVICE_ID_MSG = 0x03;
+const SMMS_LOG_MSG       = 0x04;
+const SMMS_COMMAND_MSG   = 0x05;
+const SMMS_GET_MSG       = 0x06;
+const SMMS_OBSERVE_MSG   = 0x07;
+const SMMS_REPORT_MSG    = 0x08;
+const SMMS_CONFIG_MSG    = 0x09;
+const SMMS_UPDATE_MSG    = 0x0a;
+const SMMS_OSUPDATE_MSG  = 0x0b;
+const SMMS_CURRENT_VERSION_REPORT = 0x0001;
 
 export function generateVariableLength(buf: Buffer) {
     let len = buf.length;
@@ -66,53 +68,37 @@ export interface SerializeOptions {
     deviceSecret: string;
 };
 
-export function serialize(messages: PayloadMessages, options: SerializeOptions) {
+export function serialize({ deviceId, log, reports, configs }: PayloadMessages, options: SerializeOptions) {
     let payload = Buffer.alloc(0);
 
-    if (options.includeDeviceId && messages.deviceId) {
-        const deviceIdMsg = generateMessage(SMMS_DEVICE_ID_MSG, messages.deviceId);
+    if (options.includeDeviceId && deviceId) {
+        const deviceIdMsg = generateMessage(SMMS_DEVICE_ID_MSG, deviceId);
         payload = Buffer.concat([payload, deviceIdMsg]);
     }
 
-    if (messages.state) {
-        const states: { [key: string]: number } = { booting: 1, ready: 2, running: 3 };
-
-        if (!states[messages.state]) {
-            throw new Error(`Invalid device state: \`${messages.state}'`);
-        }
-
-        const byte = [
-            states[messages.state]
-            | (((messages.debugMode) ? 1 : 0) << 3) // debug mode
-            | (1 << 4) // os type: 1 for MakeStack Linux
-        ];
-
-        const deviceInfoMsg = generateMessage(SMMS_DEVICE_INFO_MSG, [byte]);
-        payload = Buffer.concat([payload, deviceInfoMsg]);
-    }
-
-    if (messages.log) {
-        const logMsg = generateMessage(SMMS_LOG_MSG, messages.log);
+    if (log) {
+        const logMsg = generateMessage(SMMS_LOG_MSG, log);
         payload = Buffer.concat([payload, logMsg]);
     }
 
-    if (messages.osVersion) {
-        const osVersionMsg = generateMessage(SMMS_OS_VERSION_MSG, messages.osVersion);
-        payload = Buffer.concat([payload, osVersionMsg]);
+    if (reports) {
+        if (reports.currentVersion) {
+            const idBuffer = Buffer.alloc(2)
+            idBuffer.writeUInt16BE(SMMS_CURRENT_VERSION_REPORT, 0)
+            const valueBuffer = Buffer.alloc(4)
+            valueBuffer.writeUInt32BE(reports.currentVersion, 0)
+            const data = Buffer.from([idBuffer, valueBuffer])
+            const reportMsg = generateMessage(SMMS_REPORT_MSG, data)
+            payload = Buffer.concat([payload, data])
+        }
     }
 
-    if (messages.appVersion) {
-        const appVersionMsg = generateMessage(SMMS_APP_VERSION_MSG, messages.appVersion);
-        payload = Buffer.concat([payload, appVersionMsg]);
-    }
-
-    if (messages.configs) {
-        for (const key in messages.configs) {
-            console.log();
-            const configMsg = generateMessage(SMMS_STORE_MSG, Buffer.concat([
+    if (configs) {
+        for (const key in configs) {
+            const configMsg = generateMessage(SMMS_CONFIG_MSG, Buffer.concat([
                 generateVariableLength(Buffer.from(key)),
                 Buffer.from(key),
-                Buffer.from(messages.configs[key].toString()),
+                Buffer.from(configs[key].toString()),
             ]));
 
             payload = Buffer.concat([payload, configMsg]);
@@ -121,36 +107,7 @@ export function serialize(messages: PayloadMessages, options: SerializeOptions) 
 
     let header = Buffer.alloc(1);
     header.writeUInt8(SMMS_VERSION << 4, 0);
-
-    if (options.includeHMAC) {
-        if (messages.appImageHMAC) {
-            const appImageHMACMsg = generateMessage(SMMS_APP_IMAGE_HMAC_MSG, messages.appImageHMAC);
-            payload = Buffer.concat([payload, appImageHMACMsg]);
-        }
-
-        if (messages.osImageHMAC) {
-            const osImageHMACMsg = generateMessage(SMMS_OS_IMAGE_HMAC_MSG, messages.osImageHMAC);
-            payload = Buffer.concat([payload, osImageHMACMsg]);
-        }
-
-        const timestamp = (new Date()).toISOString();
-        const timestampMsg = generateMessage(SMMS_TIMESTAMP_MSG, timestamp);
-        payload = Buffer.concat([payload, timestampMsg]);
-
-        const hmacMsgLength = 1 + 1 + 64; // type, length, sha256sum
-        const dummy = Buffer.concat([payload, Buffer.alloc(hmacMsgLength)]);
-        header = Buffer.concat([header, generateVariableLength(dummy)]);
-
-        const hmac = computeHMAC(options.deviceSecret, Buffer.concat([header, payload]));
-        const hmacMsg = generateMessage(SMMS_HMAC_MSG, hmac);
-
-        assert.equal(hmacMsgLength, hmacMsg.length);
-
-        payload = Buffer.concat([payload, hmacMsg]);
-    } else {
-        header = Buffer.concat([header, generateVariableLength(payload)]);
-    }
-
+    header = Buffer.concat([header, generateVariableLength(payload)]);
     return Buffer.concat([header, payload]);
 }
 
@@ -162,21 +119,16 @@ export function deserialize(payload: Buffer) {
 
     const [totalLength, totalLengthLength] = parseVariableLength(payload.slice(1));
     const headerLength = 1 + totalLengthLength;
-    const messages: any = {};
+    const messages: any = { commands: {}, configs: {} };
     let offset = headerLength;
-    let hmacProtectedEnd = null;
     while (offset < headerLength + totalLength) {
-        if (hmacProtectedEnd) {
-            throw new Error("invalid payload: hmac message must be the last one");
-        }
-
         const type = payload[offset];
         const [length, lengthLength] = parseVariableLength(payload.slice(offset + 1));
         const dataOffset = offset + 1 + lengthLength;
         const data = payload.slice(dataOffset, dataOffset + length);
 
         switch (type) {
-            case SMMS_STORE_MSG: {
+            case SMMS_CONFIG_MSG: {
                 const keyLengthOffset = dataOffset;
                 const [keyLength, keyLengthLength] = parseVariableLength(payload.slice(keyLengthOffset));
                 const keyOffset = keyLengthOffset + keyLengthLength;
@@ -184,36 +136,28 @@ export function deserialize(payload: Buffer) {
                 const valueLength = length - (valueOffset - keyLengthOffset);
                 const key = payload.slice(keyOffset, keyOffset + keyLength);
                 const value = payload.slice(valueOffset, valueOffset + valueLength);
-
-                if (!("configs" in messages)) {
-                    messages.configs = {};
-                }
-
                 messages.configs[key.toString("utf-8")] = value.toString("utf-8");
                 break;
             }
-            case SMMS_OS_VERSION_MSG:
-            messages.osVersion = data.toString("utf-8");
-            break;
-            case SMMS_APP_VERSION_MSG:
-            messages.appVersion = data.toString("utf-8");
-            break;
-            case SMMS_OS_IMAGE_HMAC_MSG:
-            messages.osImageHMAC = data.toString("utf-8");
-            break;
-            case SMMS_APP_IMAGE_HMAC_MSG:
-            messages.appImageHMAC = data.toString("utf-8");
-            break;
-            case SMMS_HMAC_MSG:
-            messages.hmac = data.toString("utf-8");
-            hmacProtectedEnd = offset;
-            break;
-            case SMMS_TIMESTAMP_MSG:
-            messages.timestamp = data.toString("utf-8");
-            break;
+            case SMMS_COMMAND_MSG: {
+                const keyLengthOffset = dataOffset;
+                const [keyLength, keyLengthLength] = parseVariableLength(payload.slice(keyLengthOffset));
+                const keyOffset = keyLengthOffset + keyLengthLength;
+                const valueOffset = keyOffset + keyLength;
+                const valueLength = length - (valueOffset - keyLengthOffset);
+                const key = payload.slice(keyOffset, keyOffset + keyLength);
+                const value = payload.slice(valueOffset, valueOffset + valueLength);
+                messages.commands[key.toString("utf-8")] = value.toString("utf-8");
+                break;
+            }
+            case SMMS_UPDATE_MSG:
+                messages.update = {
+                    version: data.readUInt32BE(1)
+                }
+                break;
         }
         offset += 1 + lengthLength + length;
     }
 
-    return [messages, hmacProtectedEnd];
+    return messages;
 }
