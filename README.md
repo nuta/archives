@@ -60,7 +60,7 @@ Code Status
 | Supervisor | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=supervisor)](https://david-dm.org/makestack/makestack?path=supervisor) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=supervisor&type=dev)](https://david-dm.org/makestack/makestack?path=supervisor&type=dev) |
 | SDK | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=sdk)](https://david-dm.org/makestack/makestack?path=sdk) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=sdk&type=dev)](https://david-dm.org/makestack/makestack?path=sdk&type=dev) |
 | Desktop | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=desktop)](https://david-dm.org/makestack/makestack?path=desktop) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=desktop&type=dev)](https://david-dm.org/makestack/makestack?path=desktop&type=dev) |
-| Web UI | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=server/ui)](https://david-dm.org/makestack/makestack?path=server/ui) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=server/ui&type=dev)](https://david-dm.org/makestack/makestack?path=server/ui&type=dev) |
+| UI | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=ui)](https://david-dm.org/makestack/makestack?path=ui) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=ui&type=dev)](https://david-dm.org/makestack/makestack?path=ui&type=dev) |
 
 
 License
