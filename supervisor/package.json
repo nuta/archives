@@ -1,6 +1,6 @@
 {
   "name": "@makestack/supervisor",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "(CC0-1.0 OR MIT)",
   "description": "MakeStack Linux Supervisor.",
   "main": "dist/index.js",
@@ -15,7 +15,7 @@
     "build:live": "tsc -w"
   },
   "dependencies": {
-    "makestack": "^0.2.1"
+    "makestack": "^0.2.2"
   },
   "devDependencies": {
     "@types/chai": "^4.0.6",
