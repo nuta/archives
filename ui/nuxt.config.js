@@ -1,5 +1,4 @@
 const path = require('path')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   mode: 'spa',
@@ -66,7 +65,6 @@ module.exports = {
         disableHostCheck: true
       }
 
-      config.node = false
       if (process.env.PLATFORM === 'desktop') {
         config.target = 'electron-renderer'
         config.resolve.alias['platform$'] = path.resolve(__dirname, 'desktop-platform.js')

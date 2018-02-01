@@ -66,7 +66,7 @@ class API {
   }
 
   get email() {
-    return this.credentials.email
+    return this.credentials ? this.credentials.email : null
   }
 
   loggedIn() {
@@ -79,12 +79,11 @@ class API {
 
   forceLogin(errmsg) {
     this.logout()
-    // FIXME    app.$router.push({name: 'login'})
   }
 
-  login(username, password) {
+  login(server, username, password) {
     let status, headers
-    return fetch(`/api/v1/auth/sign_in`, {
+    return fetch(`${server}/api/v1/auth/sign_in`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -97,6 +96,7 @@ class API {
         throw new Error(`Error: failed to login: \`${json.errors}'`)
       }
 
+      this.server = server
       this.credentials = {
         url: this.server,
         username: username,

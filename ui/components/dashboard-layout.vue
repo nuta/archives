@@ -23,6 +23,11 @@ export default {
       avatarUrl() {
         return "https://www.gravatar.com/avatar/" + md5(api.email) + "?s=30&d=mm";
     }
+  },
+  beforeCreate() {
+    if (!api.loggedIn()) {
+      this.$router.push({name: 'login'})
+    }
   }
 }
 </script>
