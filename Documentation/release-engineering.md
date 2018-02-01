@@ -11,4 +11,4 @@ Checklist
 - [ ] `git tag`
 - [ ] `git push --tags`
 - [ ] Run `./tools/publish`.
-- [ ] [Create a Release on GitHub](https://github.com/seiyanuta/makestack/releases/new).
+- [ ] [Create a Release on GitHub](https://github.com/makestack/makestack/releases/new).

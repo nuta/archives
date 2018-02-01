@@ -8,7 +8,7 @@ allows you to deploy your own MakeStack Server easily.
 Just click this button to save your time
 ----------------------------------------
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/seiyanuta/makestack-on-heroku)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/makestack/heroku)
 
 
 Prepare for deploy
@@ -24,7 +24,7 @@ You need these stuffs before deployment.
 
 Setting up the repository
 --------------------------
-We highly recommend you to fork [seiyanuta/makestack](https://github.com/seiyanuta/makestack) on
+We highly recommend you to fork [makestack/makestack](https://github.com/makestack/makestack) on
 to your own GitHub account.
 
 ```bash
@@ -72,7 +72,7 @@ Configuration (Heroku)
 ```bash
 cd path/to/makestack
 heroku addons:create heroku-redis:hobby-dev
-heroku buildpacks:set --index 1 https://github.com/seiyanuta/makestack-on-heroku.git
+heroku buildpacks:set --index 1 https://github.com/makestack/heroku.git
 heroku buildpacks:set --index 2 heroku/nodejs
 heroku buildpacks:set --index 3 heroku/ruby
 ```

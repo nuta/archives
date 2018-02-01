@@ -3,5 +3,5 @@ v0.1.0:
     title: 'MakeStack Linux v0.1.0'
     assets:
       raspberrypi3:
-        url: https://github.com/seiyanuta/makestack/releases/download/v0.1.0/makestack-linux-raspberrypi3.img
+        url: https://github.com/makestack/makestack/releases/download/v0.1.0/makestack-linux-raspberrypi3.img
         shasum: 270959e9f456224b9bf180501929c11d17e9454023c12c618332c463753f3ed3

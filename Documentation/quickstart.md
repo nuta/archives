@@ -15,7 +15,7 @@ Creating an account
 -------------------
 
 You need an user account on MakeStack Server. You can use [a demo server](https://try-makestack.herokuapp.com/)
-for free or [deploy your own MakeStack Server](https://github.com/seiyanuta/makestack/blob/master/Documentation/guides/heroku.md).
+for free or [deploy your own MakeStack Server](https://github.com/makestack/makestack/blob/master/Documentation/guides/heroku.md).
 
 Installing SDK
 --------------
@@ -90,7 +90,7 @@ You'll see there files in the directory:
 ```js
 /*
    Load MakeStack APIs.
-   Refer: https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md
+   Refer: https://github.com/makestack/makestack/blob/master/Documentation/api.md
 */
 const { Timer, println } = require('makestack')
 
@@ -151,7 +151,7 @@ To watch changes to a config, use `Config.onChange(config_name, callback)`:
 // app.js
 
 /* The pin number depends on the device. If you are using Raspberry Pi3, refer:
-   https://github.com/seiyanuta/makestack/blob/master/Documentation/guides/raspberrypi3.md
+   https://github.com/makestack/makestack/blob/master/Documentation/guides/raspberrypi3.md
 */
 const light = new GPIO({ pin: 23, mode: 'out' })
 
@@ -195,5 +195,5 @@ Timer.interval(5, () => {
 
 References
 -----------
-- [API Reference](https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md)
-- [Writing a Plugin](https://github.com/seiyanuta/makestack/blob/master/Documentation/guides/writing-plugin.md)
+- [API Reference](https://github.com/makestack/makestack/blob/master/Documentation/api.md)
+- [Writing a Plugin](https://github.com/makestack/makestack/blob/master/Documentation/guides/writing-plugin.md)

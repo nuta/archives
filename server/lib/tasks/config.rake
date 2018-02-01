@@ -28,7 +28,7 @@ How we use information we collect
 Read source code[1] for details. If you have any questions about privacy,
 please create an issue on GitHub[1].
 
-[1]: https://github.com/seiyanuta/makestack
+[1]: https://github.com/makestack/makestack
 EOS
 
 namespace :config do

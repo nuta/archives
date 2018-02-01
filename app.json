@@ -1,7 +1,7 @@
 {
   "name": "makestack",
   "description": "A Heroku app.json for MakeStack Server.",
-  "repository": "https://github.com/seiyanuta/makestack",
+  "repository": "https://github.com/makestack/makestack",
   "addons": [
     "heroku-postgresql:hobby-dev",
     "heroku-redis:hobby-dev"
@@ -9,7 +9,7 @@
   ],
   "buildpacks": [
     {
-      "url": "https://github.com/seiyanuta/makestack-on-heroku.git"
+      "url": "https://github.com/makestack/heroku.git"
     },
     {
       "url": "heroku/nodejs"

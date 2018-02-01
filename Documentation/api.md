@@ -25,7 +25,7 @@ const { HDC1000 } = require('@makestack/hdc1000')
 const TemperatureSensor = new HDC1000()
 ```
 
-Available plugins are listed on: https://github.com/seiyanuta/makestack/tree/master/plugins
+Available plugins are listed on: https://github.com/makestack/makestack/tree/master/plugins
 
 ## Using APIs
 Use `require()` from `makestack`:

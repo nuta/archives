@@ -1,7 +1,7 @@
 MakeStack
 =========
 
-**[Getting Started](https://github.com/seiyanuta/makestack/blob/master/Documentation/quickstart.md)** | **[API Refernce](https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md)** | **[Change Log](https://github.com/seiyanuta/makestack/blob/master/Documentation/changelog.md)** |**[Tryout Server](https://try-makestack.herokuapp.com/)** | **[CI](https://travis-ci.org/seiyanuta/makestack)**
+**[Getting Started](https://github.com/makestack/makestack/blob/master/Documentation/quickstart.md)** | **[API Refernce](https://github.com/makestack/makestack/blob/master/Documentation/api.md)** | **[Change Log](https://github.com/makestack/makestack/blob/master/Documentation/changelog.md)** |**[Tryout Server](https://try-makestack.herokuapp.com/)** | **[CI](https://travis-ci.org/makestack/makestack)**
 
 MakeStack is a software stack for connected devices for super-rapid prototyping that includes:
 
@@ -20,7 +20,7 @@ Sample Code
 -----------
 
 ```javascript
-// Load APIs (https://github.com/seiyanuta/makestack/blob/master/Documentation/api.md)
+// Load APIs (https://github.com/makestack/makestack/blob/master/Documentation/api.md)
 const { Timer, Config, publish } = require('makestack')
 
 // Plugins.
@@ -50,17 +50,17 @@ Code Status
 -----------
 
 ### CI
-[![Build Status](https://travis-ci.org/seiyanuta/makestack.svg?branch=master)](https://travis-ci.org/seiyanuta/makestack)
+[![Build Status](https://travis-ci.org/makestack/makestack.svg?branch=master)](https://travis-ci.org/makestack/makestack)
 
 ### Npm Dependencies
 
 | Component | Dependencies | devDependencies |
 | ---- | ---- | ---- |
-| Runtime | [![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=runtime)](https://david-dm.org/seiyanuta/makestack?path=runtime) |[![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=runtime&type=dev)](https://david-dm.org/seiyanuta/makestack?path=runtime&type=dev) |
-| Supervisor | [![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=supervisor)](https://david-dm.org/seiyanuta/makestack?path=supervisor) |[![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=supervisor&type=dev)](https://david-dm.org/seiyanuta/makestack?path=supervisor&type=dev) |
-| SDK | [![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=sdk)](https://david-dm.org/seiyanuta/makestack?path=sdk) |[![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=sdk&type=dev)](https://david-dm.org/seiyanuta/makestack?path=sdk&type=dev) |
-| Desktop | [![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=desktop)](https://david-dm.org/seiyanuta/makestack?path=desktop) |[![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=desktop&type=dev)](https://david-dm.org/seiyanuta/makestack?path=desktop&type=dev) |
-| Web UI | [![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=server/ui)](https://david-dm.org/seiyanuta/makestack?path=server/ui) |[![dependencies Status](https://david-dm.org/seiyanuta/makestack/status.svg?path=server/ui&type=dev)](https://david-dm.org/seiyanuta/makestack?path=server/ui&type=dev) |
+| Runtime | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=runtime)](https://david-dm.org/makestack/makestack?path=runtime) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=runtime&type=dev)](https://david-dm.org/makestack/makestack?path=runtime&type=dev) |
+| Supervisor | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=supervisor)](https://david-dm.org/makestack/makestack?path=supervisor) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=supervisor&type=dev)](https://david-dm.org/makestack/makestack?path=supervisor&type=dev) |
+| SDK | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=sdk)](https://david-dm.org/makestack/makestack?path=sdk) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=sdk&type=dev)](https://david-dm.org/makestack/makestack?path=sdk&type=dev) |
+| Desktop | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=desktop)](https://david-dm.org/makestack/makestack?path=desktop) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=desktop&type=dev)](https://david-dm.org/makestack/makestack?path=desktop&type=dev) |
+| Web UI | [![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=server/ui)](https://david-dm.org/makestack/makestack?path=server/ui) |[![dependencies Status](https://david-dm.org/makestack/makestack/status.svg?path=server/ui&type=dev)](https://david-dm.org/makestack/makestack?path=server/ui&type=dev) |
 
 
 License
