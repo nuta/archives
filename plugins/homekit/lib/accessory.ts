@@ -2,7 +2,7 @@ import * as crypto from 'crypto';
 const storage = require('node-persist');
 const hap = require('hap-nodejs');
 
-interface AccessoryArgs {
+export interface AccessoryArgs {
     id: string;
     pin: string;
     name: string;
