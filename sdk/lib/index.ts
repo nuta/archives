@@ -1,3 +1,4 @@
+import * as config from "./config";
 import * as drive from "./drive";
 import { imageWriter } from "./image_writer";
 import { install } from "./install";
@@ -8,4 +9,5 @@ module.exports = {
     drive,
     imageWriter,
     login,
+    config
 };
