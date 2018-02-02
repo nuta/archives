@@ -9,6 +9,7 @@ function createWindow() {
     height: 800,
     width: 1000,
     titleBarStyle: 'hidden',
+    title: 'MakeStack',
 
     /* Disable CORS. */
     webPreferences: {
