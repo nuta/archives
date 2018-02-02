@@ -3,7 +3,7 @@
   before_action :set_config, only: [:show, :destroy]
 
   def index
-    @configs = @app.configs.all
+    @configs = @app.configs.includes(:owner).all
   end
 
   def show
