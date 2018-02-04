@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>esptool.js</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/2.9.2/xterm.min.js" integrity="sha256-8rsVcpCnO6HdeJL84i0VdubjM42fjSmO8aONghdq3gc=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/2.9.2/xterm.min.css" integrity="sha256-w69o8Y6P5VZjfYFmn2KlqMU7TUi2I+oWObi8FLlVZZg=" crossorigin="anonymous" />
+</head>
+
+<body>
+  <h1>esptool.js</h1>
+  <button id="serial-button" style="padding: 30px; font-size: 40px">Open serial port</button>
+  <div id="serial"></div>
+
+  <script src="esptool.js"></script>
+  <script>
+    const term = new Terminal()
+    term.open(document.querySelector("#serial"))
+    document.querySelector("#serial-button").addEventListener("click", () => {
+      const esp = new Esptool()
+      esp.connect().then(() => {
+        const receive = () => {
+          esp.serial.read().then(data => {
+            const s = String.fromCharCode.apply(null, new Uint8Array(data))
+            term.write(s)
+            receive()
+          })
+        }
+
+        receive()
+      })
+    })
+  </script>
+</body>
+</html>
