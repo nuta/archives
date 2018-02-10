@@ -40,7 +40,6 @@ export async function main(args: any, opts: any, logger: any) {
         osType: opts.os,
         adapter: opts.adapter,
         drive: opts.drive,
-        ignoreDuplication: opts.ignoreDuplication,
         flashCommand: [process.argv0, path.resolve(__dirname, "../../bin/makestack")],
         wifiSSID: opts.wifiSsid,
         wifiPassword: opts.wifiPassword,

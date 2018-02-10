@@ -162,7 +162,6 @@ program
 .option("--os <os>", "The OS image.", /^linux$/, "linux")
 .option("--drive <drive>", "The drive. Use `list-drives' command.", null, null, true)
 .option("--adapter <adapter>", "The network adapter.", /^http|sakuraio$/, "http")
-.option("--ignore-duplication", "Ignore duplicated device name.", null, false)
 .option("--wifi-ssid <wifi-ssid>", "The Wi-Fi SSID.")
 .option("--wifi-password <wifi-password>", "The Wi-Fi password. (WPA/WPA2 Personal)")
 .option("--wifi-country <wifi-country>", "The Wi-Fii country code. (ISO/IEC alpha2 country code)", wifiCountryNameValidator)

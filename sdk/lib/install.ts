@@ -31,21 +31,17 @@ function replaceBuffer(buf: Buffer, value: string, id: string): Buffer {
     return buf;
 }
 
-async function registerOrGetDevice(name: string, type: string, ignoreDuplication: boolean): Promise<any> {
+async function registerOrGetDevice(name: string, type: string): Promise<any> {
     let device;
     try {
         device = await api.registerDevice(name, type);
     } catch (e) {
         if (e instanceof APIError && e.response.errors[0] === 'Name has already been taken') {
             // There is already a device with same name.
-            if (ignoreDuplication) {
-                try {
-                    device = await api.getDevice(name);
-                } catch (e) {
-                    throw new FatalError("Failed to fetch the device metadata.");
-                }
-            } else {
-                throw new FatalError("The device name has already been taken.");
+            try {
+                device = await api.getDevice(name);
+            } catch (e) {
+                throw new FatalError("Failed to fetch the device metadata.");
             }
         } else {
             throw e;
@@ -176,20 +172,19 @@ export async function install(args: {
     wifiPassword: string,
     wifiCountry: string,
     drive: string,
-    ignoreDuplication: boolean,
     flashCommand: string,
     diskImagePath?: string
 }, progressCallback: ProgressCallback) {
 
     const {
         deviceName, deviceType, osType, adapter, wifiSSID, wifiPassword, wifiCountry,
-        drive, ignoreDuplication, flashCommand, diskImagePath
+        drive, flashCommand, diskImagePath
     } = args;
 
     progressCallback("look-for-drive");
     const driveSize = await getDriveSize(drive);
     progressCallback("register");
-    const device = await registerOrGetDevice(deviceName, deviceType, ignoreDuplication);
+    const device = await registerOrGetDevice(deviceName, deviceType);
     progressCallback("download");
 
     let originalImage
