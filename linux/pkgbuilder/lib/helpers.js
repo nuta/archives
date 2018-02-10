@@ -86,9 +86,9 @@ function download(pkg, sha256) {
   }
 
   spawnSync('curl', ['-fSLo', filepath, pkg.url], { stdio: 'inherit' })
-
-  if (shasum(filepath) !== sha256) {
-    throw new Error(`shasum mismatch: ${filepath}`)
+  const computed = shasum(filepath)
+  if (computed !== sha256) {
+    throw new Error(`shasum mismatch: ${filepath} (${computed})`)
   }
 
   return filepath
