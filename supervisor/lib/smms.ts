@@ -53,8 +53,9 @@ export function parseVariableLength(buf: Buffer) {
 
 export function generateMessage(type: number, payload: any) {
     const buf = Buffer.from(payload);
+
     const lenbuf = generateVariableLength(buf);
-    const msg = Buffer.alloc(1 + buf.length + 1);
+    const msg = Buffer.alloc(1 + lenbuf.length + buf.length);
     msg.writeUInt8(type, 0);
     lenbuf.copy(msg, 1); // size
     buf.copy(msg, 1 + lenbuf.length);
