@@ -89,7 +89,7 @@ export function serialize({ deviceId, log, reports, configs }: PayloadMessages, 
             valueBuffer.writeUInt32BE(reports.currentVersion, 0)
             const data = Buffer.from([idBuffer, valueBuffer])
             const reportMsg = generateMessage(SMMS_REPORT_MSG, data)
-            payload = Buffer.concat([payload, data])
+            payload = Buffer.concat([payload, reportMsg])
         }
     }
 
