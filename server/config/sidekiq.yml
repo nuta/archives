@@ -4,3 +4,4 @@
 :concurrency: 4
 :queues:
   - default
+  - outgoing_webhook

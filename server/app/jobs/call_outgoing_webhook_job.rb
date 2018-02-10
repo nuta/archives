@@ -1,14 +1,29 @@
 class CallOutgoingWebhookJob < ApplicationJob
-  queue_as :default
+  queue_as :outgoing_webhook
   throttle limit: MakeStack.settings[:outgoing_webhook_limit_per_hour], period: 1.hour
 
-  def execute(url:, params: {}, body:, accept_configs: false, device: nil)
-    resp = RestClient.post(url, body.to_json, params: params, content_type: :json)
+  rescue_from(StandardError) do |e|
+    backtrace = e.backtrace.join("\n")
+    Rails.logger.error "Failed to invoke a webhook: #{e.to_s}\n#{backtrace}"
+  end
+
+  def execute(url:, params: {}, body: nil, accept_configs: false, device: nil)
+    if body
+      resp = RestClient.post(url, body.to_json, params: params, content_type: :json)
+    else
+      resp = RestClient.post(url, params: params)
+    end
 
     # Update device configs.
     if accept_configs
       ActiveRecord::Base.transaction do
-        configs = JSON.parse(resp.body).fetch("configs", {})
+        begin
+          configs = JSON.parse(resp.body).fetch("configs", {})
+        rescue
+          # The response body is not JSON.
+          return
+        end
+
         unless configs.is_a?(Hash)
           raise "`configs' received from a webhook is not Hash"
         end
@@ -22,9 +37,6 @@ class CallOutgoingWebhookJob < ApplicationJob
         end
       end
     end
-
-  rescue => e
-    logger.warn "failed to call webhook: #{e}"
   end
 
   private
