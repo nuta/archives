@@ -65,7 +65,6 @@ export function generateMessage(type: number, payload: any) {
 
 export interface SerializeOptions {
     includeDeviceId: boolean;
-    includeHMAC: boolean;
     deviceSecret: string;
 };
 

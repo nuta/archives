@@ -56,8 +56,6 @@ export class Supervisor {
     private updateEnabled: boolean;
     private downloading: boolean;
     private adapter: AdapterBase;
-    private verifyHMAC: boolean;
-    private includeHMAC: boolean;
     private includeDeviceId: boolean;
     private replEnabled: boolean;
     private replVM?: any;
@@ -110,15 +108,11 @@ export class Supervisor {
 
                 this.adapter = new HTTPAdapter(this.osType, this.deviceType,
                     this.deviceId, args.adapter.url);
-                this.verifyHMAC = true;
-                this.includeHMAC = true;
                 this.includeDeviceId = true;
                 break;
             }
             case "sakuraio": {
                 this.adapter = new SakuraIOAdapter();
-                this.verifyHMAC = false;
-                this.includeHMAC = false;
                 this.includeDeviceId = false;
                 break;
             }
@@ -275,8 +269,7 @@ export class Supervisor {
             }
         }, {
             includeDeviceId: this.includeDeviceId,
-            includeHMAC: this.includeHMAC,
-            deviceSecret: this.deviceSecret,
+            deviceSecret: this.deviceSecret
         }));
     }
 
@@ -321,29 +314,6 @@ export class Supervisor {
         this.updateOS(image);
     }
 
-    private handleREPLCommand(commandId: string, code: string): void {
-        logger.debug(`REPL: eval id=${commandId} code='${code}'`);
-        const result = JSON.stringify(
-            util.inspect(
-                vm.runInContext(code, this.replVM),
-            ),
-        );
-
-        // Event.publish()
-        this.log += `>${commandId} __repl__ ${result}\n`;
-    }
-
-    private tryBuiltinCommand(name: string, key: string, callback: (id: string) => void): boolean {
-        const regex = new RegExp("^<([0-9]+) __" + name + "__$");
-        const m = regex.exec(key);
-        if (m) {
-            callback(m[1]);
-            return true;
-        }
-
-        return false;
-    }
-
     private reboot() {
         this.rebooting = true;
         if (this.app) {
@@ -365,21 +335,8 @@ export class Supervisor {
     }
 
     private handleConfigMessage(configs: [string]) {
-        const configsToApp: Configs = {};
-        for (const key in configs) {
-            const isBuiltinCommand = [
-                this.replEnabled &&
-                this.tryBuiltinCommand("repl", key, (id) => this.handleREPLCommand(id, configs[key])),
-                this.tryBuiltinCommand("reboot", key, (id) => this.reboot()),
-            ].some((x) => x);
-
-            if (!isBuiltinCommand) {
-                configsToApp[key] = configs[key];
-            }
-        }
-
-        this.configs = configsToApp;
-        this.sendToApp("configs", { configsToApp });
+        this.configs = configs;
+        this.sendToApp("configs", { configs });
     }
 
     private async onSMMSReceive(payload: Buffer) {
