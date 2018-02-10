@@ -2,6 +2,8 @@
 title: Change Log
 ---
 
+- v0.2.3
+  - Fix Supervisor package published to npm
 - v0.2.2
   - Simpler, neater, better UI
   - Desktop app
