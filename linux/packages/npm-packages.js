@@ -1,3 +1,4 @@
+// TODO: Refactoring
 const fs = require('fs')
 const path = require('path')
 const {
@@ -9,6 +10,7 @@ const {
 const binPath = path.resolve(__dirname, '../pkgbuilder/node_modules/.bin')
 const PATH = `${process.env.PATH}:${binPath}`
 const packageJson = loadJsonFile(assetPath('npm-packages', 'package.json'))
+const unnecessaryDependencies = ['nan', '@types']
 const localPackages = {}
 for (const [name, dep] of Object.entries(packageJson.dependencies)) {
   if (dep.startsWith('file:')) {
@@ -39,9 +41,8 @@ function buildPackages() {
 }
 
 function removeUnnecessaryPackages() {
-  const npmDependencies = ['@makestack']
   for (const name of fs.readdirSync('node_modules')) {
-    if (!npmDependencies.includes(name)) {
+    if (unnecessaryDependencies.includes(name)) {
       run(['rm', '-rf', path.join('node_modules', name)])
     }
   }
