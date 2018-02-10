@@ -1,0 +1,6 @@
+#!/bin/sh
+set -ue
+REMOTE=$1
+REMOTE_PATH=$2
+
+rsync -avh --exclude-from=misc/rsyncignore $(git rev-parse --show-toplevel)/ $REMOTE:$REMOTE_PATH

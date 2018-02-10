@@ -6,7 +6,7 @@ server/log/*.log
 */coverage/*
 */dist/*
 */build/*
-desktop
+desktop/app
 */native/*
 .DS_Store
 server/public/*.*.js
