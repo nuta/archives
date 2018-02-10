@@ -35,13 +35,24 @@ module HookService
         CallOutgoingWebhookJob.perform_later(
           url: "https://maker.ifttt.com/trigger/#{event}/with/key/#{config['key']}",
           body: { value1: body }
-          )
+        )
+
+      when 'thing_speak'
+        return unless event =~ /\Afield[0-8]\z/
+        params = {}
+        params[:api_key] = config['write_api_key']
+        params[event] = body
+
+        CallOutgoingWebhookJob.perform_later(
+          url: "https://api.thingspeak.com/update",
+          params: params
+        )
 
       when 'slack'
         CallOutgoingWebhookJob.perform_later(
           url: config['webhook_url'],
           body: { text: "#{device.name} published event `#{event}`: `#{body}`" }
-          )
+        )
 
       when 'datadog'
         CallOutgoingWebhookJob.perform_later(

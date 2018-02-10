@@ -3,7 +3,7 @@ class Integration < ApplicationRecord
 
   belongs_to :app
 
-  SUPPORTED_SERVICES = %w(incoming_webhook outgoing_webhook ifttt slack datadog sakuraio)
+  SUPPORTED_SERVICES = %w(incoming_webhook outgoing_webhook ifttt thing_speak slack datadog sakuraio)
   INTEGRATION_TOKEN_LEN = 40
   INTEGRATION_TOKEN_PREFIX_LEN = 20
   INTEGRATIONS_MAX_NUM = 10
@@ -55,6 +55,10 @@ class Integration < ApplicationRecord
     when 'ifttt'
       unless config.dig('key')
         errors.add(:config, "does not contain `key''")
+      end
+    when 'thing_speak'
+      unless config.dig('write_api_key')
+        errors.add(:config, "does not contain `write_api_key''")
       end
     when 'datadog'
       unless config.dig('api_key')
