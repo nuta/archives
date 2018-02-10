@@ -2,9 +2,11 @@
 # yarn lockfile v1
 
 
-"@makestack/hdc1000@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@makestack/hdc1000/-/hdc1000-0.2.1.tgz#78c14daca4065686ab71f5177733308497bcf0b9"
+"@makestack/hdc1000@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/@makestack/hdc1000/-/hdc1000-0.2.2.tgz#00e719d41c0adfb14fbd52f942e6eee7ae74a94c"
+  dependencies:
+    makestack "^0.2.2"
 
 "@makestack/supervisor@^0.2.2":
   version "0.2.2"

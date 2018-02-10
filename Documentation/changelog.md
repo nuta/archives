@@ -2,6 +2,10 @@
 title: Change Log
 ---
 
+- v0.2.2
+  - Simpler, neater, better UI
+  - Desktop app
+  - Breaking changes to SMMS Protocol
 - v0.2.1
   - Remove `app.yaml`
   - **SDK:** `add-plugin` command
