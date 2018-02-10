@@ -18,7 +18,7 @@ export async function main(args: any, opts: any, logger: any) {
             url: device.serverURL,
         },
         osType: "sdk",
-        osVersion: "dev",
+        osVersion: 0,
         deviceId: device.device_id,
         deviceSecret: device.device_secret,
         heartbeatInterval: opts.heartbeatInterval,
