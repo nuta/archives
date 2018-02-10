@@ -270,7 +270,7 @@ export class Supervisor {
         }
 
         logger.info(`heartbeating (state=running, os_ver="${this.osVersion}", ` +
-        `app_ver="${this.appVersion}", mode=${this.mode})`);
+                    `app_ver="${this.appVersion}", mode=${this.mode})`);
 
         await this.adapter.send(serialize({
             deviceId: this.deviceId,
