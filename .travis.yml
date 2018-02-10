@@ -184,14 +184,19 @@ matrix:
       cache:
         yarn: true
       before_install:
-        - cd makestack.github.io
         - >
-          openssl aes-256-cbc -K $encrypted_35e7b7f33db9_key -iv $encrypted_35e7b7f33db9_iv
-          -in deploy.sshkey.enc -out ~/.ssh/id_rsa -d
-        - chmod 600 ~/.ssh/id_rsa
+          if [[ "${TRAVIS_BRANCH}" != "master" ]]; then
+            echo "This is not master branch, aborting..." > /dev/stderr;
+            exit 0;
+          fi
       install:
         - yarn
       script:
+        - cd makestack.github.io
+        - >
+          openssl aes-256-cbc -K $encrypted_35e7b7f33db9_key -iv $encrypted_35e7b7f33db9_iv
+          -in deploy-key.encrypted -out ~/.ssh/id_rsa -d
+        - chmod 600 ~/.ssh/id_rsa
         - yarn deploy
 
 notifications:
