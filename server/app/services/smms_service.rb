@@ -59,7 +59,10 @@ module SMMSService
     app_version = deployment.try(:version).try(:to_i)
 
     if app_version && device.current_app_version.value != app_version
-      data = [2, app_version].pack('CN')
+      data = [
+        2, # Download from adapter-specific way.
+        app_version
+      ].pack('CN')
       payload += generate_message(SMMS_UPDATE_MSG, data)
     end
 
@@ -106,13 +109,13 @@ module SMMSService
       data = payload[offset + 1 + length_length, length]
 
       case type
-      when SMMS_DEVICE_ID_MSG
-        messages[:device_id] = data
-      when SMMS_LOG_MSG
-        messages[:log] = data
-      when SMMS_REPORT_MSG
-        id, value = data.unpack('nN')
-        case id
+        when SMMS_DEVICE_ID_MSG
+          messages[:device_id] = data
+        when SMMS_LOG_MSG
+          messages[:log] = data
+        when SMMS_REPORT_MSG
+          id, value = data.unpack('nN')
+          case id
         when SMMS_CURRENT_VERSION_REPORT
           messages[:reports][:app_version] = value
         end
