@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@makestack/hdc1000@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@makestack/hdc1000/-/hdc1000-0.2.1.tgz#78c14daca4065686ab71f5177733308497bcf0b9"
+
 "@makestack/supervisor@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@makestack/supervisor/-/supervisor-0.2.2.tgz#814ab3a4569228fc8d4426c39912c1fe3fec0113"

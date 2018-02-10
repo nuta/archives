@@ -27,6 +27,7 @@
   },
   "homepage": "http://makestack.org",
   "dependencies": {
+    "@makestack/hdc1000": "^0.2.1",
     "@makestack/supervisor": "^0.2.2",
     "body-parser": "^1.18.2",
     "caporal": "^0.9.0",
