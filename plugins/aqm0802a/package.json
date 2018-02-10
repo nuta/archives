@@ -7,9 +7,10 @@
     "prepare": "tsc",
     "prepack": "tsc"
   },
-  "dependencies": {},
+  "dependencies": {
+    "makestack": "^0.2.1"
+  },
   "devDependencies": {
-    "makestack": "^0.2.1",
     "@types/node": "^8.5.2",
     "ts-node": "^4.0.2",
     "typescript": "^2.6.2"
