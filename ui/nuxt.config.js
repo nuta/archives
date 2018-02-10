@@ -1,3 +1,4 @@
+const webpack = require('webpack')
 const path = require('path')
 
 module.exports = {
@@ -11,41 +12,41 @@ module.exports = {
     link: [
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css?family=Open+Sans:400,600|Roboto:900|Lato:300i'
+        href: 'https://fonts.googleapis.com/css?family=Open+Sans:400,600|Roboto:600,900|Lato:300i'
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://use.fontawesome.com/releases/v5.0.6/css/all.css'
       },
       {
         rel: 'stylesheet',
         href: 'https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css',
         integrity: 'sha256-HxaKz5E/eBbvhGMNwhWRPrAR9i/lG1JeT4mD6hCQ7s4',
         crossorigin: 'anonymous'
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css',
-        integrity: 'sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0: ',
-        crossorigin: 'anonymous'
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
-        integrity: 'sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm',
-        crossorigin: 'anonymous'
       }
+    ],
+    script: [
+      { src: 'https://www.google.com/recaptcha/api.js' },
+      { src: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.10.1/min/vs/loader.js' }
     ]
   },
   loading: { color: '#3B80f0' },
-  modules: [ '@nuxtjs/proxy' ],
+  modules: ['@nuxtjs/proxy'],
+  buildDir: process.env.BUILD_DIR || 'dist',
   build: {
-    vendor: ['whatwg-fetch', 'jszip', 'date-fns', 'lodash', 'bootstrap', 'jquery', 'popper.js'],
-    extend(config) {
-      config.module.rules.push({
-        test: /\.d\.ts$/,
-        loader: 'raw-loader',
-        exclude: /node_modules/
+    vendor: ['whatwg-fetch', 'jszip'],
+    plugins: [
+      new webpack.DefinePlugin({
+        'PLATFORM': `'${process.env.PLATFORM}'`,
+        'RECAPTCHA_SITEKEY': `'${process.env.RECAPTCHA_SITEKEY}'`,
+        'DEFAULT_SERVER_URL': "'https://makestack.cloud'"
       })
-
-      config.resolve.alias['vs'] = path.resolve(__dirname, 'node_modules/monaco-editor/dev/vs')
-
+    ],
+    extend(config) {
       config.devServer = {
         disableHostCheck: true
       }
@@ -55,6 +56,7 @@ module.exports = {
         config.resolve.alias['platform$'] = path.resolve(__dirname, 'desktop-platform.js')
       } else {
         config.resolve.alias['platform$'] = path.resolve(__dirname, 'browser-platform.js')
+        config.resolve.alias['electron$'] = path.resolve(__dirname, 'web-electron-stub.js')
       }
     }
   },

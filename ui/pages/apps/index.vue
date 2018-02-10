@@ -1,31 +1,23 @@
 <template>
-  <dashboard-layout title="apps">
-    <div class="row form-group" v-for="app in apps">
-      <div class="col">
-        <div class="card">
-          <div class="card-body">
-            <h3 class="card-title">{{ app.name }}</h3>
-            <nuxt-link :to="{ name: 'apps-name', params: { name: app.name } }" class="btn btn-primary">Open</nuxt-link>
-          </div>
-        </div>
-      </div>
-    </div>
-  </dashboard-layout>
+  <div></div>
 </template>
 
 <script>
 import api from "~/assets/js/api"
-import DashboardLayout from "~/components/dashboard-layout"
+import { getLastUsedApp } from "~/assets/js/preferences"
 
 export default {
-  components: { DashboardLayout },
-  data() {
-    return {
-      apps: []
+  async beforeCreate() {
+    let appName = getLastUsedApp()
+    if (!appName) {
+      const app = (await api.getApps())[0]
+      if (!app) {
+        this.$router.push({ name: 'createApp' })
+      }
+      appName = app.name
     }
-  },
-  async beforeMount() {
-    this.apps = await api.getApps()
+
+    this.$router.push({ name: 'apps-appName', params: { name: appName } })
   }
 }
 </script>

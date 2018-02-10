@@ -1,0 +1,29 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  thead {
+
+    th {
+      border-bottom: 6px solid var(--bg1-color);
+      font-weight: 600;
+      padding: 0.75rem;
+    }
+  }
+
+  tbody {
+
+    td {
+      padding: 0.75rem;
+    }
+
+    tr:not(:last-child) {
+      border-bottom: 1px solid var(--bg1-color);
+    }
+
+    tr.secondary-row {
+      background: var(--bg1-color);
+    }
+  }
+}

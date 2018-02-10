@@ -1,0 +1,64 @@
+{
+  "monokai": {
+    "base": "vs-dark",
+    "inherit": true,
+    "colors": {
+      "editor.foreground": "#f8f8f2",
+      "editor.background": "#3b3a32",
+      "editorCursor.foreground": "#f8f8f0",
+      "editor.lineHighlightBorder": "#3e3d32",
+      "editor.lineHighlightBackground": "#3e3d32",
+      "editorLineNumber.foreground": "#aeaea0"
+    },
+    "rules": [
+      {
+        "token": "comment",
+        "foreground": "75715e"
+      },
+      {
+        "token": "number",
+        "foreground": "ae81ff"
+      },
+      {
+        "token": "string",
+        "foreground": "e6db74"
+      },
+      {
+        "token": "keyword",
+        "foreground": "f92672"
+      },
+      { "foreground": "f8f8f2" }
+    ]
+  },
+  "solarized-light": {
+    "base": "vs",
+    "inherit": true,
+    "colors": {
+      "editor.foreground": "#657b83",
+      "editor.background": "#fdf6e3",
+      "editorCursor.foreground": "#657b83",
+      "editor.lineHighlightBorder": "#eee8d5",
+      "editor.lineHighlightBackground": "#eee8d5",
+      "editorLineNumber.foreground": "#93a1a1"
+    },
+    "rules": [
+      {
+        "token": "comment",
+        "foreground": "93a1a1"
+      },
+      {
+        "token": "number",
+        "foreground": "657b83"
+      },
+      {
+        "token": "string",
+        "foreground": "859900"
+      },
+      {
+        "token": "keyword",
+        "foreground": "d33682"
+      },
+      { "foreground": "657b83" }
+    ]
+  }
+}

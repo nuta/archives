@@ -1,0 +1,129 @@
+@mixin button {
+  border: none;
+  border-radius: 5px;
+  padding: 9px 12px;
+  font-family: 'Open Sans';
+  font-weight: 600;
+  background: var(--bg1-color);
+  color: var(--fg0-color);
+  font-size: 15px;
+
+  i.fas {
+    position: relative;
+    bottom: 1px;
+    padding-right: 3px;
+    font-size: 16px;
+  }
+
+  &.danger {
+    color: #ffffff;
+    background: var(--negative-color);
+  }
+
+  &:hover {
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+  }
+
+  &.simple {
+    padding: 7px;
+
+    i.fa {
+      padding: 0;
+      margin: 0;
+      bottom: 0;
+    }
+  }
+
+
+  &.primary {
+    background: var(--positive-color);
+    color: #ffffff;
+
+    &:hover {
+      background: #21afff;
+    }
+  }
+
+  &:not(:first-child) {
+    margin-left: 5px;
+  }
+}
+
+button {
+  @include button;
+}
+
+form {
+  .field {
+    &:not(first-child) {
+      margin-top: 45px;
+    }
+  }
+
+  .action {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 30px;
+
+    p {
+      font-weight: 600;
+      line-height: 28px;
+    }
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-left: 2px;
+    margin-bottom: 10px;
+  }
+}
+
+input[type=text], input[type=password] {
+  color: var(--fg0-color);
+  background: var(--bg1-color);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  padding: 15px;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder {
+    font-weight: 600;
+    color: var(--fg1-color);
+  }
+
+  &.inverted {
+    background: var(--bg0-color);
+  }
+
+  &.small {
+    height: 40px;
+    font-size: 1rem;
+    padding: 7px 10px;
+  }
+}
+
+input[type=submit] {
+  @include button;
+  font-size: 22px;
+  margin-top: 30px;
+}
+
+select {
+  background: var(--bg1-color);
+  border: none;
+  width: 100%;
+  height: 55px;
+  padding: 15px;
+
+  &.inverted {
+    background: var(--bg0-color);
+  }
+
+  &.small {
+    height: 40px;
+  }
+}

@@ -1,28 +1,94 @@
 <template>
-  <div class="dashboard-layout container">
+  <div class="dashboard-layout">
     <header>
-      <h1>{{ title }}</h1>
+      <nav>
+        <dropdown :items="navItems" :title-style="navTitleStyle" :selected="navSelected"></dropdown>
+      </nav>
       <div class="hamburger">
+        <dropdown :items="appSwitcherItems" :selected="appName" :title-style="appSwitcherTitleStyle"></dropdown>
         <img class="avatar" :src="avatarUrl">
       </div>
     </header>
 
-    <main>
+    <main :class="{ 'no-padding': noPadding }">
       <slot></slot>
     </main>
   </div>
 </template>
 
 <script>
+import Dropdown from "~/components/dropdown"
 import api from "~/assets/js/api"
 import md5 from "blueimp-md5"
 
 export default {
-  props: ['title'],
-  computed: {
-      avatarUrl() {
-        return "https://www.gravatar.com/avatar/" + md5(api.email) + "?s=30&d=mm";
+  components: { Dropdown },
+  props: ['title', 'appName', 'no-padding'],
+  data() {
+    return {
+      navTitleStyle: {
+        'font-family': '"Roboto", sans-serif',
+        'font-weight': 600,
+        'font-size': '28px'
+      },
+      appSwitcherTitleStyle: {
+        'font-weight': 600
+      },
+      navItems: [
+        {
+          title: 'Code',
+          to: { name: 'apps-appName', params: { name: this.appName } }
+        },
+        {
+          title: 'Devices',
+          to: { name: 'apps-appName-devices', params: { name: this.appName } }
+        },
+        {
+          title: 'Setup a Device',
+          to: { name: 'apps-appName-setup-device', params: { name: this.appName } }
+        },
+        {
+          title: 'Settings',
+          to: { name: 'apps-appName-settings', params: { name: this.appName } },
+        },
+        {
+          title: 'User Settings',
+          to: { name: 'user-settings' },
+          divider: true
+        },
+        {
+          title: 'Logout',
+          to: { name: 'logout' },
+          divider: true
+        }
+      ],
+      navSelected: this.title,
+      appSwitcherItems: []
     }
+  },
+  computed: {
+    avatarUrl() {
+      return "https://www.gravatar.com/avatar/" + md5(api.email) + "?s=30&d=mm";
+    }
+  },
+  async beforeMount() {
+    const appItems = (await api.getApps()).map(app => {
+      return {
+        title: app.name,
+        to: { name: 'apps-appName', params: { name: app.name } }
+      }
+    })
+
+    this.appSwitcherItems = [
+      ...appItems,
+      {
+        title: 'Create a new app',
+        icon: 'plus',
+        divider: true,
+        bold: true,
+        to: { name: 'create-app' }
+      }
+    ]
   },
   beforeCreate() {
     if (!api.loggedIn()) {
@@ -34,93 +100,34 @@ export default {
 
 
 <style lang="scss" scoped>
-@import "~assets/css/theme";
-
 .dashboard-layout {
-  max-width: 1200px;
-  margin: 5px auto;
-  padding: 10px 20px;
+  height: 100vh;
+  background-color: var(--bg1-color);
+  color: var(--fg0-color);
 
-  header {
-    width: 100%;
+  & > header {
+    height: 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eaeaea;
-
-    & > * {
-      width: 300px;
-    }
-
-    h1 {
-      font-family: "Roboto", sans-serif;
-      font-weight: 900;
-      font-size: 25px;
-      display: inline-block;
-      margin: 0;
-      padding: 0;
-    }
-
-    .breadcrumbs {
-      text-align: center;
-      list-style-type: none;
-      margin: 0;
-      margin-bottom: 5px;
-      padding: 0;
-
-      li {
-        display: inline-block;
-
-        a {
-          color: $font-color;
-          margin: 0 6px;
-        }
-      }
-
-      &.with-slashes li:not(:last-child) {
-        &:after {
-          content: '/'
-        }
-      }
-    }
+    padding: 10px 8px;
+    background-color: var(--bg0-color);
 
     .hamburger {
-      text-align: right;
+      display: flex;
+      justify-content: space-between;
 
       .avatar {
         border-radius: 15px;
+        margin-left: 15px;
       }
     }
   }
 
   main {
-    margin-top: 50px;
-
-    .actions {
-      margin: 5px 0;
-
-      & > * {
-        &:not(:first-child) {
-          margin-left: 8px;
-        }
-      }
-    }
-
-    section {
-      &:not(:first-child) {
-        margin-top: 30px;
-      }
-
-      h1 {
-        font-family: 'Roboto';
-        font-size: 22px;
-        margin: 0;
-      }
-
-      .content {
-        margin-top: 20px;
-      }
+    padding: 15px 30px;
+    &.no-padding {
+      padding: 0;
     }
   }
 }

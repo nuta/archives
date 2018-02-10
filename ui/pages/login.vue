@@ -1,48 +1,90 @@
 <template>
-  <login-layout>
-    <form @submit.prevent="login">
-      <div class="field">
-        <label>Username</label>
-        <input type="text" v-model="username" placeholder="Username" required="required" autofocus>
-      </div>
+  <simple-layout :class="[theme + '-theme']">
+    <header>
+      <h1>MakeStack</h1>
+      <p>A "batteries-included" IoT PaaS for super-rapid prototyping.</p>
+    </header>
+    <main>
+      <form @submit.prevent="login">
 
-      <div class="field">
-        <label>Password</label>
-        <input type="password" v-model="password" placeholder="Password" required="required">
-      </div>
+        <div class="field">
+          <label>Username</label>
+          <input type="text" v-model="username" placeholder="Username" required="required" autofocus>
+        </div>
 
-      <div class="action">
-        <input type="submit" value="Login" class="primary">
-      </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" v-model="password" placeholder="Password" required="required">
+        </div>
 
-      <div class="action">
-        <p>
-          <nuxt-link to="/reset-password">Reset Password</nuxt-link>
-          <br>
-          <nuxt-link to="/create-account">New to MakeStack? Create your account!</nuxt-link>
-        </p>
-      </div>
-    </form>
-  </login-layout>
+        <details>
+          <summary>Server URL (defaults to {{ serverUrl }})</summary>
+          <div class="content">
+            <label>Server URL</label>
+            <input type="text" v-model="serverUrl" placeholder="Server URL" required="required" autofocus>
+          </div>
+        </details>
+
+        <div class="field">
+          <div class="theme-switcher">
+            <div :class="{ active: theme == 'simple' }" class="simple-theme theme-button"
+             @click="saveTheme('simple')"
+             @mouseover="previewTheme('simple')" @mouseleave="previewTheme(savedTheme)"></div>
+
+            <div :class="{ active: theme == 'monokai' }" class="monokai-theme theme-button"
+             @click="saveTheme('monokai')"
+             @mouseover="previewTheme('monokai')" @mouseleave="previewTheme(savedTheme)"></div>
+
+            <div :class="{ active: theme == 'solarized-light' }" class="solarized-light-theme theme-button"
+             @click="saveTheme('solarized-light')"
+             @mouseover="previewTheme('solarized-light')" @mouseleave="previewTheme(savedTheme)"></div>
+          </div>
+        </div>
+
+        <div class="action">
+          <input type="submit" value="Login" class="primary">
+        </div>
+
+        <div class="action">
+          <p>
+            <nuxt-link to="/reset-password">Reset Password</nuxt-link>
+            <br>
+            <nuxt-link to="/create-account">New to MakeStack? Create your account!</nuxt-link>
+          </p>
+        </div>
+      </form>
+    </main>
+  </simple-layout>
 </template>
 
 <script>
 import api from "~/assets/js/api";
-import LoginLayout from "~/components/login-layout";
+import { getCurrentTheme, setTheme } from "~/assets/js/preferences";
+import SimpleLayout from "~/components/simple-layout";
 
 export default {
-  components: { LoginLayout },
+  components: { SimpleLayout },
   data: () => {
     return {
+      serverUrl: DEFAULT_SERVER_URL,
       username: "",
-      password: ""
+      password: "",
+      theme: getCurrentTheme(),
+      savedTheme: getCurrentTheme()
     };
   },
   methods: {
     async login() {
-      await api.login('', this.username, this.password)
+      await api.login(this.serverUrl, this.username, this.password)
       this.$router.push({ path: 'apps' })
-      this.$Progress.finish()
+    },
+    previewTheme(theme) {
+      this.theme = theme
+    },
+    saveTheme(theme) {
+      this.theme = theme
+      this.savedTheme = theme
+      setTheme(theme)
     }
   },
   mounted() {
@@ -60,99 +102,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@mixin button {
-  border: none;
-  border-radius: 5px;
-  padding: 9px 12px;
-  font-family: 'Open Sans';
-  font-weight: 600;
-  background: #f3f3f3;
-  color: #434343;
-  border-bottom: 5px solid #cacaca;
-  font-size: 15px;
+@import "~assets/css/theme";
+.theme-switcher {
+  border-radius: 10px;
+  padding: 20px 30px;
+  width: 200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
 
-  i.fa {
-    position: relative;
-    bottom: 1px;
-    padding-right: 3px;
-    font-size: 16px;
-  }
-
-  &.simple {
-    background: #ffffff;
-    border: 1px solid #cacaca;
-    padding: 7px;
-
-    i.fa {
-      padding: 0;
-      margin: 0;
-      bottom: 0;
-    }
-  }
-
-  &:hover {
-    cursor: pointer;
-    transition: 0.2s ease-in-out;
-    background: #f7f7f7;
-  }
-
-  &.primary {
-    background: #1e9fe8;
-    border-bottom-color: #1678ac;
-    color: #ffffff;
+  .theme-button {
+    width: 30px;
+    height: 30px;
+    background: var(--bg0-color);
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
 
     &:hover {
-      background: #21afff;
+      cursor: pointer;
     }
-  }
-}
-
-button {
-  @include button;
-}
-
-form {
-  .field {
-    &:not(first-child) {
-      margin-top: 45px;
-    }
-  }
-
-  .action {
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    margin-top: 30px;
-
-    p {
-      font-weight: 600;
-      line-height: 28px;
-    }
-  }
-
-  label {
-    font-weight: 600;
-    display: block;
-    margin-left: 2px;
-    margin-bottom: 10px;
-  }
-
-  input {
-    font-family: 'Open Sans';
-  }
-
-  input[type=text], input[type=password] {
-    font-size: 18px;
-    border: 3px solid #efefef;
-    border-radius: 7px;
-    padding: 15px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  input[type=submit] {
-    @include button;
-    font-size: 22px;
   }
 }
 </style>
+

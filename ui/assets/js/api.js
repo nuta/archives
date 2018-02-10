@@ -14,10 +14,10 @@ class API {
     }
   }
 
-  invoke(method, path, body, requiresCredentials = true) {
+  invoke(method, path, body) {
     let headers = Object.assign({}, this.credentials)
 
-    if (requiresCredentials && !this.credentials) {
+    if (!this.credentials) {
       this.forceLogin()
     }
 
@@ -30,9 +30,8 @@ class API {
       let status
       fetch(`${this.server}/api/v1${path}`, { method, headers, body })
         .then(response => {
-          const currentRoute = 'hoge' // app.$router.currentRoute.name
-          if (response.status === 401 && currentRoute !== 'login') {
-            this.forceLogin((currentRoute === 'home') ? null : 'Login first.')
+          if (response.status === 401 && path !== '/login') {
+            this.forceLogin()
           }
           return response
         })
@@ -48,21 +47,19 @@ class API {
         })
         .then(json => {
           if (status === 422) {
-            /*
-            for (const message of json.errors) {
-              // FIXME UIkit.notification(message, { status: 'warning' })
-              reject(new Error('validation error'))
-            }
-            */
+            reject(new Error('validation error'))
           } else {
             resolve(json)
           }
         })
         .catch(e => {
-          // FIXME UIkit.notification(e.toString(), { status: 'danger' })
-          console.error(e)
+          reject(e)
         })
     })
+  }
+
+  get username() {
+    return this.credentials ? this.credentials.username : null
   }
 
   get email() {
@@ -78,6 +75,7 @@ class API {
   }
 
   forceLogin(errmsg) {
+    this.credentials = null
     this.logout()
   }
 
@@ -110,24 +108,63 @@ class API {
     })
   }
 
-  createUser({ username, email, password, passwordConfirmation, recaptcha, agreeTos }) {
-    return this.invoke('POST', '/auth', {
-      username,
-      email,
-      password,
-      password_confirmation: passwordConfirmation,
-      recaptcha,
-      agree_tos: agreeTos
-    }, false)
+  createUser({ server, username, email, password, passwordConfirmation, recaptcha, agreeTos }) {
+    let status, headers
+    return fetch(`${server}/api/v1/auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+        recaptcha,
+        agree_tos: agreeTos
+      })
+    }).then((response) => {
+      status = response.status
+      headers = response.headers
+      return response.json()
+    }).then(json => {
+      if (status !== 200) {
+        throw new Error(`Error: failed to login: \`${json.errors}'`)
+      }
+
+      this.server = server
+      this.credentials = {
+        url: this.server,
+        username: username,
+        email: json['data']['email'],
+        uid: headers.get('uid'),
+        'access-token': headers.get('access-token'),
+        'access-token-secret': headers.get('access-token-secret')
+      }
+
+      saveCredentials(this.credentials)
+    })
   }
 
-  getUser(username) {
-    return this.invoke('GET', '/auth', {
-      name: username
-    }, false)
+  resetPassword(server, email) {
+    let status
+    return fetch(`${server}/api/v1/auth/password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    }).then((response) => {
+      status = response.status
+      return response.json()
+    }).then(json => {
+      if (status !== 200) {
+        throw new Error(`Error: failed to reset password: \`${json.errors}'`)
+      }
+    })
   }
 
-  deleteUser() {
+  deleteUser(ensureThatCallerWantsToDeleteUser) {
+    if (ensureThatCallerWantsToDeleteUser !== 'Hey, please delete the user account!') {
+      throw new Error('BUG: api.deleteUser() has been accidentally called.')
+    }
+
     return this.invoke('DELETE', '/auth')
   }
 
@@ -135,10 +172,6 @@ class API {
     // It is necessary to update credentials in local storage
     // when the email address has been changed.
     return this.invoke('PUT', '/auth', attrs)
-  }
-
-  resetPassword(email) {
-    return this.invoke('POST', '/auth/password', { email }, false)
   }
 
   getApps() {
@@ -171,13 +204,21 @@ class API {
       { service, config, comment })
   }
 
-  updateIntegration(appName, name, service, config, comment) {
+  updateIntegration(appName, name, service, config) {
     return this.invoke('PUT', `/apps/${appName}/integrations/${name}`,
-      { service, config, comment })
+      { service, config: JSON.stringify(config), comment: '' })
   }
 
   deleteIntegration(appName, name) {
     return this.invoke('DELETE', `/apps/${appName}/integrations/${name}`)
+  }
+
+  getAppDevices(appName) {
+    return new Promise((resolve, reject) => {
+      this.getDevices().then(devices => {
+        resolve(devices.filter(device => device.app === appName))
+      })
+    })
   }
 
   getDevices() {
@@ -196,12 +237,6 @@ class API {
     return this.invoke('GET', `/devices/${deviceName}/log`)
   }
 
-  createDeviceConfig(deviceName, key, type, value) {
-    return this.invoke('POST', `/devices/${deviceName}/configs`, {
-      config: { key, data_type: type, value }
-    })
-  }
-
   deleteDeviceConfig(deviceName, key) {
     return this.invoke('DELETE', `/devices/${deviceName}/configs/${key}`)
   }
@@ -210,9 +245,9 @@ class API {
     return this.invoke('GET', `/devices/${deviceName}/configs`)
   }
 
-  updateDeviceConfig(deviceName, key, value) {
+  updateDeviceConfig(deviceName, key, type, value) {
     return this.invoke('PUT', `/devices/${deviceName}/configs/${key}`,
-      { value })
+      { data_type: type, value })
   }
 
   deleteDevice(deviceName) {

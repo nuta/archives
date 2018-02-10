@@ -1,0 +1,11 @@
+html {
+  font-size: 16px;
+}
+
+a {
+  color: var(--fg0-color);
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
