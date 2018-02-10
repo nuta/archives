@@ -107,8 +107,7 @@ matrix:
       env: M=server:frontend
       cache: yarn
       install:
-        - cd server/ui
-        - cp config.js.example config.js
+        - cd ui
         - yarn
       script: npm run build
 
@@ -124,6 +123,7 @@ matrix:
           - "$HOME/.cache"
       install:
         - npm install -g yarn
+        - cd ui && yarn && cd ..
         - cd desktop
         - yarn
       script:
@@ -138,6 +138,7 @@ matrix:
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
+        - cd ui && yarn && cd ..
         - cd desktop
         - yarn
       script:
