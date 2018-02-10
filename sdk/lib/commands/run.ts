@@ -21,7 +21,8 @@ export async function main(args: any, opts: any, logger: any) {
         osVersion: "dev",
         deviceId: device.device_id,
         deviceSecret: device.device_secret,
-        heartbeatInterval: opts.heartbeatInterval
+        heartbeatInterval: opts.heartbeatInterval,
+        appNodePath: path.resolve(__dirname, '../../node_modules')
     });
 
     supervisor.start();

@@ -30,6 +30,9 @@ export interface SupervisorConstructorArgs {
     appUID?: number;
     appGID?: number;
     heartbeatInterval: number;
+
+    // For those who run `./sdk/bin/makestack run` in the git repo.
+    appNodePath?: string;
 }
 
 export class Supervisor {
@@ -61,6 +64,7 @@ export class Supervisor {
     private replVM?: any;
     private rebooting: boolean;
     private heartbeatTimer?: any;
+    private appNodePath?: string;
 
     constructor(args: SupervisorConstructorArgs) {
         if (args.mode !== 'test') {
@@ -95,6 +99,7 @@ export class Supervisor {
         this.downloading = false;
         this.replEnabled = args.mode === 'debug';
         this.rebooting = false;
+        this.appNodePath = args.appNodePath
 
         if (this.replEnabled) {
             this.replVM = vm.createContext(apis);
@@ -190,14 +195,20 @@ export class Supervisor {
 
     private doSpawnApp() {
         logger.info("starting an app");
+        const env = {}
+
+        if (this.appNodePath) {
+            Object.assign(env, {
+                NODE_PATH: this.appNodePath
+            })
+        }
+
         this.app = fork("./start", [], {
             cwd: this.currentAppDir,
             stdio: "inherit",
             uid: this.appUID,
             gid: this.appGID,
-            env: {
-                MAKESTACK_APP: '1'
-            },
+            env
         } as any);
         this.sendToApp("initialize", { configs: this.configs });
 
