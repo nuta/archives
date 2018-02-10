@@ -68,7 +68,7 @@ export interface SerializeOptions {
     deviceSecret: string;
 };
 
-export function serialize({ deviceId, log, reports, configs }: PayloadMessages, options: SerializeOptions) {
+export function serialize({ deviceId, log, reports, configs, update }: PayloadMessages, options: SerializeOptions) {
     let payload = Buffer.alloc(0);
 
     if (options.includeDeviceId && deviceId) {
@@ -105,9 +105,19 @@ export function serialize({ deviceId, log, reports, configs }: PayloadMessages, 
         }
     }
 
+    if (update) {
+        // Used by tests.
+        const data = Buffer.alloc(5)
+        data.writeUInt8(2, 0) // Download method
+        data.writeUInt32BE(update.version, 1)
+        const updateMsg = generateMessage(SMMS_UPDATE_MSG, data);
+        payload = Buffer.concat([payload, updateMsg])
+    }
+
     let header = Buffer.alloc(1);
     header.writeUInt8(SMMS_VERSION << 4, 0);
     header = Buffer.concat([header, generateVariableLength(payload)]);
+
     return Buffer.concat([header, payload]);
 }
 

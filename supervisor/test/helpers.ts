@@ -25,26 +25,20 @@ async function createZip(files: { [key: string]: string }): Promise<Buffer> {
     return zip.generateAsync({ type: 'nodebuffer' }) as Promise<Buffer>
 }
 
-export function computeImageHMAC(image: Buffer): string {
-    const shasum = crypto.createHash('sha256').update(image).digest('hex')
-    return crypto.createHmac('sha256', DEVICE_SECRET).update(shasum).digest('hex')
-}
 
-export async function createAppImage(files: { [key: string]: string }): Promise<{ image: Buffer, hmac: string }> {
+export async function createAppImage(files: { [key: string]: string }): Promise<{ image: Buffer }> {
     const appZip = await createZip({
         '/start.js': 'process.send({ type: "log", body: "I am your app, Luke." })'
     })
 
     return {
-        image: appZip,
-        hmac: computeImageHMAC(appZip)
+        image: appZip
     }
 }
 
 export function createHeartbeatResponse(messages: PayloadMessages) {
     const serializeOptions = {
         includeDeviceId: true,
-        includeHMAC: true,
         deviceSecret: DEVICE_SECRET
     }
 
@@ -56,12 +50,6 @@ export function createHeartbeatResponse(messages: PayloadMessages) {
 export function createAppImageResponse(version: string, image: Buffer) {
     return nock(SERVER_URL)
         .get(`/api/v1/images/app/${DEVICE_ID}/${version}`)
-        .reply(200, image)
-}
-
-export function createOSImageResponse(osType: string, deviceType: string, version: string, image: Buffer) {
-    return nock(SERVER_URL)
-        .get(`/api/v1/images/os/${DEVICE_ID}/${version}/${osType}/${deviceType}`)
         .reply(200, image)
 }
 
@@ -85,6 +73,7 @@ export function createSupervisor() {
         deviceSecret: DEVICE_SECRET,
         osVersion: OS_VERSION,
         heartbeatInterval: 60,
-        runtimeModulePath: path.resolve(__dirname, '../../runtime')
+        runtimeModulePath: path.resolve(__dirname, '../../runtime'),
+        inheritNodePath: true
     })
 }
