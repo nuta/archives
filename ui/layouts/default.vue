@@ -6,8 +6,9 @@
 </template>
 
 <script>
-import { getCurrentTheme } from "~/assets/js/preferences"
-import Notifications from "~/components/notifications"
+import { appendToLog } from "platform";
+import { getCurrentTheme } from "~/assets/js/preferences";
+import Notifications from "~/components/notifications";
 import { setTimeout, clearTimeout } from 'timers';
 
 export default {
@@ -20,6 +21,8 @@ export default {
   },
   methods: {
     handleError(error) {
+      appendToLog(error.stack + '\n\n')
+
       if (this.clearTimer) {
         clearTimeout(this.clearTimer)
       }

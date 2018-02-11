@@ -13,3 +13,7 @@ export function removeCredentials() {
 export function getServerUrl() {
   return ''
 }
+
+export function appendToLog() {
+  // Do nothing.
+}

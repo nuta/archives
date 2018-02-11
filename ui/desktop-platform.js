@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+import os from 'os'
 import { ipcRenderer } from 'electron'
 
 export function loadCredentials() {
@@ -14,4 +17,11 @@ export function removeCredentials() {
 
 export function getServerUrl() {
   return ipcRenderer.sendSync('loadCredentials').url
+}
+
+export function appendToLog(message) {
+  fs.appendFileSync(
+    path.resolve(os.homedir(), '.makestack/desktop.log'),
+    message
+  )
 }
