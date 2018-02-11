@@ -17,7 +17,7 @@ export default {
       appName = app.name
     }
 
-    this.$router.push({ name: 'apps-appName', params: { name: appName } })
+    this.$router.push({ name: 'apps-appName', params: { appName: appName } })
   }
 }
 </script>
