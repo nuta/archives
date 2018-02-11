@@ -17,75 +17,77 @@
       </nuxt-link>
 
       <tabs>
-        <tab name="Install">
-          <section>
-            <label>Device Name</label>
-            <input type="text" v-model="deviceName" required="required" autofocus placeholder="Device Name">
-          </section>
+        <form class="small">
+          <tab name="Install">
+            <div class="field">
+              <label>Device Name</label>
+              <input type="text" v-model="deviceName" required="required" autofocus placeholder="Device Name">
+            </div>
 
-          <section>
-            <label>Device Type</label>
-            <select v-model="deviceType">
-              <template v-for="type in availableDeviceTypes">
-                <option :value="type.name" :key="type.name">{{ type.description }}</option>
-              </template>
-            </select>
-          </section>
+            <div class="field">
+              <label>Device Type</label>
+              <select v-model="deviceType">
+                <template v-for="type in availableDeviceTypes">
+                  <option :value="type.name" :key="type.name">{{ type.description }}</option>
+                </template>
+              </select>
+            </div>
 
-          <section>
-            <label>OS</label>
-            <select v-model="os">
-              <template v-for="os in availableOSes">
-                <option :value="os.name" :key="os.name">{{ os.description }}</option>
-              </template>
-            </select>
-          </section>
+            <div class="field">
+              <label>Install To</label>
+              <p v-if="availableDrives.length === 0">
+                No drives detected. Insert a SD Card!
+              </p>
+              <select v-model="drive" v-else>
+                <template v-for="drive in availableDrives">
+                  <option :value="drive.device" :key="drive.device">
+                    {{ drive.description }} ({{ drive.device }})
+                  </option>
+                </template>
+              </select>
+            </div>
 
-          <section>
-            <label>Network Adapter</label>
-            <select v-model="adapter">
-              <template v-for="adapter in availableAdapters">
-                <option :value="adapter.name" :key="adapter.name">
-                  {{ adapter.description }}
-                </option>
-              </template>
-            </select>
-          </section>
-
-          <section>
-            <label>Install To</label>
-            <select v-model="drive">
-              <template v-for="drive in availableDrives">
-                <option :value="drive.device" :key="drive.device">
-                  {{ drive.description }} ({{ drive.device }})
-                </option>
-              </template>
-            </select>
-          </section>
-
-         <section>
+            <div class="field">
               <button @click="install" class="primary">
-                {{ installButtonMessage }}
+                  {{ installButtonMessage }}
               </button>
-          </section>
-        </tab>
+            </div>
+          </tab>
 
-        <tab name="Wi-Fi">
-          <section>
-            <label>Wi-Fi SSID</label>
-            <input type="text" v-model="wifiSSID" placeholder="SSID">
+          <tab name="Network">
+            <div class="field">
+              <label>Network Adapter</label>
+              <select v-model="adapter">
+                <template v-for="adapter in availableAdapters">
+                  <option :value="adapter.name" :key="adapter.name">
+                    {{ adapter.description }}
+                  </option>
+                </template>
+              </select>
+            </div>
+          </tab>
 
-            <label>Wi-Fi Password</label>
-            <input type="password" v-model="wifiPassword" placeholder="Password (WPA2-PSK)">
+          <tab name="Wi-Fi">
+            <div class="field">
+              <label>Wi-Fi SSID</label>
+              <input type="text" v-model="wifiSSID" placeholder="SSID">
+            </div>
 
-            <label>Wi-Fi Country</label>
-            <select v-model="wifiCountry">
-              <template v-for="(name, code) in wifiCountries">
-                <option :value="code" :key="name">{{ name }}</option>
-              </template>
-            </select>
-          </section>
-        </tab>
+            <div class="field">
+              <label>Wi-Fi Password</label>
+              <input type="password" v-model="wifiPassword" placeholder="Password (WPA2-PSK)">
+            </div>
+
+            <div class="field">
+              <label>Wi-Fi Country</label>
+              <select v-model="wifiCountry">
+                <template v-for="(name, code) in wifiCountries">
+                  <option :value="code" :key="name">{{ name }}</option>
+                </template>
+              </select>
+            </div>
+          </tab>
+        </form>
       </tabs>
     </div>
   </dashboard-layout>
@@ -109,13 +111,10 @@ export default {
       installButtonMessage: 'Install',
       deviceName: '',
       availableDeviceTypes: [
-        { name: 'raspberrypi3', description: 'Raspberry Pi3' }
+        { name: 'raspberrypi3', description: 'Raspberry Pi3 (MakeStack Linux)' }
       ],
       deviceType: null,
-      availableOSes: [
-        { name: 'linux', description: 'MakeStack Linux' }
-      ],
-      os: null,
+      os: 'linux',
       drive: null,
       adapter: null,
       availableAdapters: [
@@ -213,7 +212,6 @@ export default {
       await this.refreshAvailableDrives()
       this.deviceType = this.availableDeviceTypes[0].name
       this.adapter = this.availableAdapters[0].name
-      this.os = this.availableOSes[0].name
     }
   },
   mounted() {
