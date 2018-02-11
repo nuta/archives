@@ -50,6 +50,11 @@ module.exports = {
       })
     ],
     extend(config) {
+      config.module.rules.push({
+        test: /\.d\.ts$/,
+        loader: 'raw-loader'
+      })
+
       config.devServer = {
         disableHostCheck: true
       }

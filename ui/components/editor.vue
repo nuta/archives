@@ -7,9 +7,6 @@ import bundledTypeDefs from "~/assets/dts.json"
 import colorSchemes from "~/assets/color-schemes.json"
 import { getCurrentTheme } from "~/assets/js/preferences";
 import * as monaco from '@timkendrick/monaco-editor';
-import 'whatwg-fetch'
-
-const DEFINITELY_TYPED_REV = 'ea2dc4dc2831c32fe96aa8bb225a42c7b2c9193a'
 
 export default {
   props: ['code'],
@@ -65,21 +62,12 @@ export default {
     },
 
     async downloadExternalTypeDefs() {
-      const packages = [
+      return [
         {
-           name: 'node',
-           path: 'node/v8/index.d.ts'
+          name: 'node',
+          body: require('~/node_modules/@types/node/index.d.ts')
         }
       ]
-
-      const types = []
-      for (const { name, path } of packages) {
-        const url = `https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/${DEFINITELY_TYPED_REV}/types/${path}`
-        const body = await (await fetch(url)).text()
-        types.push({ name, body })
-      }
-
-      return types
     },
     defineShortcuts() {
         this.editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S, () => {
