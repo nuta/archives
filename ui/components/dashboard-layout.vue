@@ -101,10 +101,17 @@ export default {
 }
 </script>
 
+<style>
+.desktop header {
+  -webkit-app-region: drag;
+}
+</style>
 
 <style lang="scss" scoped>
 .dashboard-layout {
   height: 100vh;
+  padding-top: 10px;
+  box-sizing: border-box;
   background-color: var(--bg1-color);
   color: var(--fg0-color);
 

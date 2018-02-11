@@ -56,7 +56,7 @@ button {
 
 form {
   .field {
-    &:not(first-child) {
+    &:not(:first-child) {
       margin-top: 45px;
     }
   }

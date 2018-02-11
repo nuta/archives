@@ -62,10 +62,5 @@ body {
 #app {
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif;
   box-sizing: border-box;
-
-  &.desktop {
-    padding-top: 18px;
-    -webkit-app-region: drag;
-  }
 }
 </style>
