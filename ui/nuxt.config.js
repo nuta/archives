@@ -34,8 +34,7 @@ module.exports = {
       }
     ],
     script: [
-      { src: 'https://www.google.com/recaptcha/api.js' },
-      { src: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.10.1/min/vs/loader.js' }
+      { src: 'https://www.google.com/recaptcha/api.js' }
     ]
   },
   loading: { color: '#3B80f0' },
