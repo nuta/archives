@@ -1,99 +1,110 @@
 <template>
   <dashboard-layout title="Setup a Device" :appName="appName">
-    <header>
-      <h2>Install MakeStack Linux</h2>
-    </header>
-    <nuxt-link :to="{ name: 'apps-appName-devices', params: { name: appName } }">
-      <i class="fas fa-chevron-left"></i>
-      Return to Setup a Device
-    </nuxt-link>
+    <guide-box v-if="platform !== 'desktop'">
+      <h1>Installing MakeStack Linux on your devices</h1>
+      <p>Use desktop app to install MakeStack Linux to a SD card:</p>
+      <a href="https://makestack.org">
+        <button class="primary">Download Desktop App</button>
+      </a>
+    </guide-box>
+    <div v-else>
+      <header>
+        <h2>Install MakeStack Linux</h2>
+      </header>
+      <nuxt-link :to="{ name: 'apps-appName-devices', params: { name: appName } }">
+        <i class="fas fa-chevron-left"></i>
+        Return to Setup a Device
+      </nuxt-link>
 
-    <tabs>
-      <tab name="Install">
-        <section>
-          <label>Device Name</label>
-          <input type="text" v-model="deviceName" required="required" autofocus placeholder="Device Name">
-        </section>
+      <tabs>
+        <tab name="Install">
+          <section>
+            <label>Device Name</label>
+            <input type="text" v-model="deviceName" required="required" autofocus placeholder="Device Name">
+          </section>
 
-        <section>
-          <label>Device Type</label>
-          <select v-model="deviceType">
-            <template v-for="type in availableDeviceTypes">
-              <option :value="type.name" :key="type.name">{{ type.description }}</option>
-            </template>
-          </select>
-        </section>
+          <section>
+            <label>Device Type</label>
+            <select v-model="deviceType">
+              <template v-for="type in availableDeviceTypes">
+                <option :value="type.name" :key="type.name">{{ type.description }}</option>
+              </template>
+            </select>
+          </section>
 
-        <section>
-          <label>OS</label>
-          <select v-model="os">
-            <template v-for="os in availableOSes">
-              <option :value="os.name" :key="os.name">{{ os.description }}</option>
-            </template>
-          </select>
-        </section>
+          <section>
+            <label>OS</label>
+            <select v-model="os">
+              <template v-for="os in availableOSes">
+                <option :value="os.name" :key="os.name">{{ os.description }}</option>
+              </template>
+            </select>
+          </section>
 
-        <section>
-          <label>Network Adapter</label>
-          <select v-model="adapter">
-            <template v-for="adapter in availableAdapters">
-              <option :value="adapter.name" :key="adapter.name">
-                {{ adapter.description }}
-              </option>
-            </template>
-          </select>
-        </section>
+          <section>
+            <label>Network Adapter</label>
+            <select v-model="adapter">
+              <template v-for="adapter in availableAdapters">
+                <option :value="adapter.name" :key="adapter.name">
+                  {{ adapter.description }}
+                </option>
+              </template>
+            </select>
+          </section>
 
-        <section>
-          <label>Install To</label>
-          <select v-model="drive">
-            <template v-for="drive in availableDrives">
-              <option :value="drive.device" :key="drive.device">
-                {{ drive.description }} ({{ drive.device }})
-              </option>
-            </template>
-          </select>
-        </section>
+          <section>
+            <label>Install To</label>
+            <select v-model="drive">
+              <template v-for="drive in availableDrives">
+                <option :value="drive.device" :key="drive.device">
+                  {{ drive.description }} ({{ drive.device }})
+                </option>
+              </template>
+            </select>
+          </section>
 
-       <section>
-            <button @click="install" class="primary">
-              {{ installButtonMessage }}
-            </button>
-        </section>
-      </tab>
+         <section>
+              <button @click="install" class="primary">
+                {{ installButtonMessage }}
+              </button>
+          </section>
+        </tab>
 
-      <tab name="Wi-Fi">
-        <section>
-          <label>Wi-Fi SSID</label>
-          <input type="text" v-model="wifiSSID" placeholder="SSID">
+        <tab name="Wi-Fi">
+          <section>
+            <label>Wi-Fi SSID</label>
+            <input type="text" v-model="wifiSSID" placeholder="SSID">
 
-          <label>Wi-Fi Password</label>
-          <input type="password" v-model="wifiPassword" placeholder="Password (WPA2-PSK)">
+            <label>Wi-Fi Password</label>
+            <input type="password" v-model="wifiPassword" placeholder="Password (WPA2-PSK)">
 
-          <label>Wi-Fi Country</label>
-          <select v-model="wifiCountry">
-            <template v-for="(name, code) in wifiCountries">
-              <option :value="code" :key="name">{{ name }}</option>
-            </template>
-          </select>
-        </section>
-      </tab>
-    </tabs>
+            <label>Wi-Fi Country</label>
+            <select v-model="wifiCountry">
+              <template v-for="(name, code) in wifiCountries">
+                <option :value="code" :key="name">{{ name }}</option>
+              </template>
+            </select>
+          </section>
+        </tab>
+      </tabs>
+    </div>
   </dashboard-layout>
 </template>
 
 <script>
 import api from "~/assets/js/api"
 import DashboardLayout from "~/components/dashboard-layout"
+import GuideBox from "~/components/guide-box"
 import Tabs from "~/components/tabs"
 import Tab from "~/components/fragments/tab"
 import { ipcRenderer } from "electron"
 import { setInterval, clearInterval } from 'timers';
 
 export default {
-  components: { DashboardLayout, Tabs, Tab },
+  components: { DashboardLayout, Tabs, Tab, GuideBox },
   data() {
     return {
+      platform: PLATFORM,
       appName: this.$route.params.appName,
       installButtonMessage: 'Install',
       deviceName: '',
@@ -198,15 +209,19 @@ export default {
     }
   },
   async beforeMount() {
-    await this.refreshAvailableDrives()
-    this.deviceType = this.availableDeviceTypes[0].name
-    this.adapter = this.availableAdapters[0].name
-    this.os = this.availableOSes[0].name
+    if (this.platform === 'desktop') {
+      await this.refreshAvailableDrives()
+      this.deviceType = this.availableDeviceTypes[0].name
+      this.adapter = this.availableAdapters[0].name
+      this.os = this.availableOSes[0].name
+    }
   },
   mounted() {
-    this.refreshAvailableDrivesTimer = setInterval(async () => {
-      this.refreshAvailableDrives()
-    }, 3000)
+    if (this.platform === 'desktop') {
+      this.refreshAvailableDrivesTimer = setInterval(async () => {
+        this.refreshAvailableDrives()
+      }, 3000)
+    }
   },
   beforeDestroy() {
     if (this.refreshAvailableDrivesTimer) {
