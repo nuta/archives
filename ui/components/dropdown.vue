@@ -45,6 +45,10 @@ export default {
       this.hide = !this.hide;
     },
     itemClicked(item) {
+      if (item.to.path === this.$route.path) {
+        this.hide = true
+      }
+
       this.$emit('select', item)
     }
   },
