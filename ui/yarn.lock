@@ -20,9 +20,9 @@
   version "0.16.0"
   resolved "https://registry.yarnpkg.com/@std/esm/-/esm-0.16.0.tgz#2a7a33ecb7f1701cebd4c87df6d0d945ed51f730"
 
-"@timkendrick/monaco-editor@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@timkendrick/monaco-editor/-/monaco-editor-0.0.7.tgz#3b8b5017da89c7ba3548dc69febbf1e9094d2210"
+"@timkendrick/monaco-editor@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@timkendrick/monaco-editor/-/monaco-editor-0.0.9.tgz#7b5b2cfb739727188179f2c7ec8c4b2a237063a7"
 
 "@types/detect-indent@0.1.30":
   version "0.1.30"
@@ -3747,10 +3747,6 @@ mkdirp@0.5.1, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdirp@~0.5.0, mkd
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
-
-monaco-editor@^0.10.1:
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/monaco-editor/-/monaco-editor-0.10.1.tgz#8c96c4f15b6b5258bf92cbde93cad8a7e3007e14"
 
 move-concurrently@^1.0.1:
   version "1.0.1"

@@ -6,9 +6,9 @@
 import bundledTypeDefs from "~/assets/dts.json"
 import colorSchemes from "~/assets/color-schemes.json"
 import { getCurrentTheme } from "~/assets/js/preferences";
+import * as monaco from '@timkendrick/monaco-editor';
 import 'whatwg-fetch'
 
-const CDN_URL = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.10.1/min'
 const DEFINITELY_TYPED_REV = 'ea2dc4dc2831c32fe96aa8bb225a42c7b2c9193a'
 
 export default {
@@ -63,25 +63,6 @@ export default {
         }
       })
     },
-    loadMonacoEditor() {
-      window.MonacoEnvironment = {
-    		getWorkerUrl(workerId, label) {
-          return '/monaco-editor-worker-loader.js'
-        }
-      }
-
-      window.require.config({
-        paths: {
-          vs: CDN_URL + '/vs'
-        }
-      })
-
-      return new Promise((resolve, reject) => {
-        window.require(['vs/editor/editor.main'], () => {
-          resolve()
-        })
-  	  });
-    },
 
     async downloadExternalTypeDefs() {
       const packages = [
@@ -128,7 +109,6 @@ export default {
         ...externalTypeDefs
       ]
 
-      await this.loadMonacoEditor()
       this.setupMonacoEditor(typeDefs, colorSchemes)
       this.defineShortcuts()
       this.editor.getModel().setValue(this.code)
