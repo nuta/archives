@@ -128,6 +128,22 @@ function runWithPipe(argv, env = {}, cwd = process.cwd(), options = {}) {
   return cp.stdout
 }
 
+function applyPatch(patchFile) {
+  console.log(chalk.bold(`Applying ${patchFile}`))
+
+  const cp = spawnSync('patch', ['-p1'], {
+    input: fs.readFileSync(patchFile)
+  })
+
+  if (cp.error) {
+    throw new Error(`error: failed to patch: ${cp.error}`)
+  }
+
+  if (cp.status !== 0) {
+    throw new Error(`error: \`patch' exited with ${cp.status}:\n${cp.stdoust}`)
+  }
+}
+
 function sudo(argv, env) {
   console.log(chalk.bold(`sudo ${argv.join(' ')}`))
   spawnSync('sudo', argv, {
@@ -207,6 +223,7 @@ module.exports = {
   isRebuilt,
   run,
   runWithPipe,
+  applyPatch,
   sudo,
   mkdirp,
   buildFatImage,

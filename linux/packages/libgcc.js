@@ -1,6 +1,6 @@
 const { config } = require('../pkgbuilder').pkg
 
-const version = '7.3.0-1ubuntu1'
+const version = '7.2.0-8ubuntu3.2'
 
 module.exports = {
   name: 'libgcc',
@@ -14,8 +14,8 @@ module.exports = {
 
   sha256() {
     switch (config('target.deb_arch')) {
-      case 'amd64': return '2edb81813e5131ac933d44076703d667cf755391a5870aeeb5fe186788a56e25'
-      case 'armhf': return '8bd1f776467bbad6de3eaebfdfafc401d0d7cdce555cee1b296fbac47259ca39'
+      case 'amd64': return '0c2ab67c2a031d11696c4bc3dc18ea77c16aa7c14a5d3b6694a1a5fa70275122'
+      case 'armhf': return 'b9a8237c6c2ed0497493e0be89326c82b947b9da083d9b3a75de6f680e76407c'
       default: throw new Error(`unknown target.deb_arch: \`${config('deb_arch')}'`)
     }
   },
