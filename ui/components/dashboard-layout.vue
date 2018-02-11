@@ -6,7 +6,9 @@
       </nav>
       <div class="hamburger">
         <dropdown :items="appSwitcherItems" :selected="appName" :title-style="appSwitcherTitleStyle"></dropdown>
-        <img class="avatar" :src="avatarUrl">
+        <div class="avatar-container" :data-balloon="avatarBalloon" data-balloon-pos="down-right">
+          <img class="avatar" :src="avatarUrl">
+        </div>
       </div>
     </header>
 
@@ -26,6 +28,7 @@ export default {
   props: ['title', 'appName', 'no-padding'],
   data() {
     return {
+      avatarBalloon: `Logged in as ${api.username}`,
       navTitleStyle: {
         'font-family': '"Roboto", sans-serif',
         'font-weight': 600,
@@ -117,14 +120,18 @@ export default {
       display: flex;
       justify-content: space-between;
 
-      .avatar {
-        border-radius: 15px;
+      .avatar-container {
+        width: fit-content;
         margin-left: 15px;
+        cursor: default;
+        .avatar {
+          border-radius: 15px;
+        }
       }
     }
   }
 
-  main {
+  & > main {
     padding: 15px 30px;
     &.no-padding {
       padding: 0;
