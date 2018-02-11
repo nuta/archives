@@ -7,7 +7,8 @@
       <code-box>
       $ npm install -g makestack-sdk
       $ makestack login
-      $ makestack register
+      $ makestack register {{ deviceName }}
+      $ makestack add-device --app {{ appName }} {{ deviceName }}
       $ makestack run
       </code-box>
       <a href="https://www.npmjs.com/package/makestack-sdk">
@@ -27,7 +28,8 @@ export default {
   components: { DashboardLayout, GuideBox, CodeBox },
   data() {
     return {
-      appName: this.$route.params.appName
+      appName: this.$route.params.appName,
+      deviceName: 'DEVICE_NAME'
     }
   }
 }
