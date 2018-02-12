@@ -1,19 +1,20 @@
 <template>
-  <div class="card" :class="{ clickable }" @click="onClick">
+  <div class="card" :class="{ clickable: clickable || to }" @click="onClick">
     <h4>{{ title }}</h4>
     <p class="subtitle">{{ subtitle }}</p>
-    <div class="content">
-      <slot></slot>
-    </div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['title', 'subtitle', 'clickable'],
+  props: ['title', 'subtitle', 'clickable', 'to'],
   methods: {
     onClick() {
-      this.$emit('click')
+      if (this.to) {
+        this.$router.push(this.to)
+      } else {
+        this.$emit('click')
+      }
     }
   }
 }
@@ -23,7 +24,7 @@ export default {
 .card {
   border-radius: 4px;
   box-shadow: 0px 1px 0px rgba(0, 0, 0, .20);
-  padding: 20px 15px;
+  padding: 20px 10px;
   background: var(--bg0-color);
   border: 1px solid var(--border-color);
 
@@ -32,21 +33,22 @@ export default {
 
     &:hover {
       cursor: pointer;
+      box-shadow: 0px 0px 3px 3px rgba(0, 150, 255, .30);
     }
   }
 
-  &:not(:first-child) {
-    margin-top: 15px;
-  }
-
   h4 {
+    color: var(--fg0-color);
     margin: 0;
     padding: 0;
-    font-size: 20px;
+    font-size: 18px;
+    margin-bottom: 10px;
   }
 
   .subtitle {
     color: var(--fg2-color);
+    margin: 0;
+    font-size: 15px;
   }
 
   .content {

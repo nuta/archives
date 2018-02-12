@@ -32,6 +32,11 @@ details {
   }
 }
 
+.grid {
+  display: flex;
+  justify-content: space-between;
+}
+
 .title-header-container {
   margin-bottom: 20px;
 

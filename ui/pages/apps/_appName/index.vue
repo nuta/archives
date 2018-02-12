@@ -91,8 +91,8 @@ export default {
       }
     }
 
-    this.app = await api.getApp(this.appName)
-    this.devices = await api.getAppDevices(this.appName)
+    // this.app = await api.getApp(this.appName)
+    // this.devices = await api.getAppDevices(this.appName)
     setLastUsedApp(this.appName)
   }
 };

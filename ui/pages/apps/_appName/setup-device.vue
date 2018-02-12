@@ -1,18 +1,15 @@
 <template>
   <dashboard-layout title="Setup a Device" :appName="appName">
-    <card>
-      <nuxt-link :to="{ name: 'apps-appName-install-agent', params: { name: appName } }">
-        <h4>Run MakeStack agent on your Linux environment like Raspbian</h4>
-      </nuxt-link>
-    </card>
-    <card>
-      <nuxt-link :to="{ name: 'apps-appName-install-os', params: { name: appName } }">
-        <h4>Install MakeStack Linux</h4>
-        <p v-if="platform === 'desktop'">
-          Use MakeStack Desktop app to install MakeStack Linux.
-        </p>
-      </nuxt-link>
-    </card>
+    <div class="grid">
+      <card title="Run agent on Linux/macOS"
+        subtitle="Run MakeStack agent on your Linux environment like Raspbian."
+       :to="{ name: 'apps-appName-install-agent', params: { name: appName } }">
+      </card>
+      <card title="Install MakeStack Linux"
+        subtitle="Install a minimalized Linux distribution made for MakeStack apps."
+       :to="{ name: 'apps-appName-install-osw', params: { name: appName } }">
+      </card>
+    </div>
   </dashboard-layout>
 </template>
 
