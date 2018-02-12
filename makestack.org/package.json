@@ -5,9 +5,7 @@
     "version": "3.4.4"
   },
   "scripts": {
-    "dev": "concurrently --kill-others 'yarn dev:docsify' 'yarn dev:static' 'yarn build:live'",
-    "dev:static": "yarn live-server --port=5000 htdocs",
-    "dev:docsify": "yarn docsify serve --port 5050 htdocs/documentation",
+    "dev": "yarn live-server --port=5000 htdocs",
     "build:live": "supervisor -n exit -w index.html,../Documentation -e 'html,md' -x yarn prebuild",
     "prebuild": "rm -rf htdocs/documentation && cp -r ../Documentation htdocs/documentation",
     "build": "yarn prebuild",
@@ -15,7 +13,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "concurrently": "^3.5.1",
     "docsify-cli": "^4.2.0",
     "live-server": "^1.2.0",
     "supervisor": "^0.12.0"
