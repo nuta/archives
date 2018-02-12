@@ -17,7 +17,7 @@
       </nuxt-link>
 
       <tabs>
-        <form class="small">
+        <form class="small" @submit.prevent="void(0)">
           <tab name="Install">
             <div class="field">
               <label>Device Name</label>
@@ -152,7 +152,7 @@ export default {
       }
     },
     install() {
-      ipcRenderer.on('progress', (event, stage, state) => {
+      ipcRenderer.on('installProgress', (event, stage, state) => {
         switch (stage) {
           case 'look-for-drive':
             this.installButtonMessage = '(1/5) Looking for the drive'
@@ -190,17 +190,18 @@ export default {
             break
         }
       })
-      ipcRenderer.on('error', (event, message) => {
+
+      ipcRenderer.on('installError', (event, message) => {
         this.installButtonMessage = 'Install'
         alert(message)
       })
+
       ipcRenderer.send('install', {
         deviceName: this.deviceName,
         deviceType: this.deviceType,
         os: this.os,
         adapter: this.adapter,
         drive: this.drive,
-        ignoreDuplication: this.ignoreDuplication,
         wifiSSID: this.wifiSSID,
         wifiPassword: this.wifiPassword,
         wifiCountry: this.wifiCountry
