@@ -50,6 +50,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import 'normalize.css';
+@import 'balloon-css/balloon.min.css';
 @import "~assets/css/default";
 @import "~assets/css/containers";
 @import "~assets/css/theme";

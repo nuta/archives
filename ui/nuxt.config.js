@@ -12,25 +12,11 @@ module.exports = {
     link: [
       {
         rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css?family=Open+Sans:400,600|Roboto:600,900|Lato:300i'
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css?family=Source+Code+Pro:400,600'
+        href: 'https://fonts.googleapis.com/css?family=Open+Sans:400,600|Roboto:600,900|Lato:300i|Source+Code+Pro:400,600'
       },
       {
         rel: 'stylesheet',
         href: 'https://use.fontawesome.com/releases/v5.0.6/css/all.css'
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css',
-        integrity: 'sha256-HxaKz5E/eBbvhGMNwhWRPrAR9i/lG1JeT4mD6hCQ7s4',
-        crossorigin: 'anonymous'
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://cdnjs.cloudflare.com/ajax/libs/balloon-css/0.5.0/balloon.min.css'
       }
     ],
     script: [
