@@ -2,7 +2,7 @@
 const path = require('path')
 const fs = require('fs')
 const chalk = require('chalk')
-const { isRebuilt } = require('.').pkg
+const { isRebuilt, runWithPipe } = require('.').pkg
 const {
   mkdirp, copyFiles, download, extract, rmrf
 } = require('./lib/helpers')
@@ -211,9 +211,17 @@ function main() {
   }
 
   const imageFile = path.resolve(build.buildDir, `makestack-linux-${target}.img`)
+  const shasumFile = path.resolve(build.buildDir, `makestack-linux-${target}.img.shasum`)
   console.log(chalk.bold.blue('==> ') +
     chalk.bold('Buliding the disk image'))
   packages[build.target].buildImage(imageFile)
+  fs.writeFileSync(
+    shasumFile,
+    runWithPipe(
+      ['shasum', '-a256', path.basename(imageFile)],
+      {}, path.dirname(imageFile)
+    )
+  )
 }
 
 main()
