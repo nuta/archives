@@ -48,9 +48,9 @@ a:hover {
 }
 
 .container > main {
-  width: 700px;
+  width: 900px;
   text-align: center;
-  margin: 80px auto 0 auto;
+  margin: 80px auto 150px auto;
 }
 
 .copywriting {
@@ -67,6 +67,16 @@ a:hover {
   width: fit-content;
   text-align: left;
   line-height: 1.5rem;
+}
+
+.video-container {
+  width: 800px;
+  margin: 0 auto;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.65);
+}
+
+video {
+  width: 100%;
 }
 
 .container footer {
