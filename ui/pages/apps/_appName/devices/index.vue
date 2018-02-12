@@ -8,21 +8,30 @@
       </nuxt-link>
     </guide-box>
 
-    <card v-for="device in devices" :key="device.name"
-     :title="device.name" :subtitle="`Registered at ${device.created_at}`"
-     clickable="true" @click="onSelect(device)">
-    </card>
+    <table v-else>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Registered at</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="device in devices" :key="device.name">
+          <td>{{ device.name }}</td>
+          <td>{{ device.created_at }}</td>
+        </tr>
+      </tbody>
+    </table>
   </dashboard-layout>
 </template>
 
 <script>
 import api from "~/assets/js/api"
 import DashboardLayout from "~/components/dashboard-layout"
-import Card from "~/components/card"
 import GuideBox from "~/components/guide-box"
 
 export default {
-  components: { DashboardLayout, Card, GuideBox },
+  components: { DashboardLayout, GuideBox },
   data() {
     return {
       appName: this.$route.params.appName,
