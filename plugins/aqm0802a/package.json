@@ -1,6 +1,6 @@
 {
   "name": "@makestack/aqm0802a",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "main": "dist/index.js",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
@@ -8,7 +8,7 @@
     "prepack": "tsc"
   },
   "dependencies": {
-    "makestack": "^0.2.3"
+    "makestack": "^0.2.4"
   },
   "devDependencies": {
     "@types/node": "^8.5.2",

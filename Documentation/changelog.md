@@ -2,6 +2,9 @@
 title: Change Log
 ---
 
+- v0.2.4
+  - A release for testing OS installer
+  - Improve UI
 - v0.2.3
   - Fix Supervisor package published to npm
 - v0.2.2
