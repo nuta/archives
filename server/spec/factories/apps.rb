@@ -3,6 +3,6 @@ FactoryBot.define do
     user
     sequence(:name) {|n| "app#{n}" }
     api  "nodejs"
-    os_version "v0.1.0"
+    os_version "v0.2.4"
   end
 end
