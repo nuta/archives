@@ -43,7 +43,7 @@ export async function imageWriter() {
         }
 
         console.log("image-writer:",
-        `drive=${drive}, drive_size=${driveSize}, image_path=${imagePath}`);
+            `drive=${drive}, drive_size=${driveSize}, image_path=${imagePath}`);
 
         console.log("image-writer:", `connecting to ${ipcPath}`);
         const server: any = await connectIPC(ipcPath);

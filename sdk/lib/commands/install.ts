@@ -6,26 +6,25 @@ import { FatalError } from "../types";
 function progress(stage: string, state: { type: string, percentage: number }) {
     switch (stage) {
         case "look-for-drive":
-        console.info(chalk.bold.blue("==> (1/5) Looking for the drive"));
-        break;
+            console.info(chalk.bold.blue("==> (1/5) Looking for the drive"));
+            break;
         case "register":
-        console.info(chalk.bold.blue("==> (2/5) Registering the device"));
-        break;
+            console.info(chalk.bold.blue("==> (2/5) Registering the device"));
+            break;
         case "download":
-        console.info(chalk.bold.blue("==> (3/5) Downloading the disk image"));
-        break;
+            console.info(chalk.bold.blue("==> (3/5) Downloading the disk image"));
+            break;
         case "config":
-        console.info(chalk.bold.blue("==> (4/5) Writing config"));
-        break;
+            console.info(chalk.bold.blue("==> (4/5) Writing config"));
+            break;
         case "flash":
-        console.info(chalk.bold.blue("==> (5/5) Flashing"));
-        break;
+            console.info(chalk.bold.blue("==> (5/5) Flashing"));
+            break;
         case "flashing":
-        const messages: { [name: string]: string } = { write: "Writing", check: "Verifying" };
-        const message = messages[state.type];
-        [state.type];
-        console.info(`${message}...(${state.percentage}%)`);
-        break;
+            const messages: { [name: string]: string } = { write: "Writing", check: "Verifying" };
+            const message = messages[state.type];
+            console.info(`${message}...(${state.percentage}%)`);
+            break;
     }
 }
 

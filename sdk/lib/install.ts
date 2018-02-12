@@ -119,7 +119,9 @@ function writeConfigToDiskIamge(args: {
     return imagePath;
 }
 
-function prepareFlashCommand(flashCommand: string, ipcPath: string, drive: string, driveSize: number, imagePath: string) {
+function prepareFlashCommand(flashCommand: string, ipcPath: string, drive: string,
+    driveSize: number, imagePath: string) {
+
     let prefix = "env ";
     const env: { [name: string]: string } = {
         DRIVE: drive,
@@ -137,10 +139,13 @@ function prepareFlashCommand(flashCommand: string, ipcPath: string, drive: strin
     return prefix + quote(flashCommand);
 }
 
-function flash(flashCommand: string, drive: string, driveSize: number, imagePath: string, progressCallback: ProgressCallback) {
+function flash(flashCommand: string, drive: string, driveSize: number,
+    imagePath: string, progressCallback: ProgressCallback) {
+
     return new Promise((resolve, reject) => {
         const ipcPath = path.join(os.tmpdir(),
-        "makestack-installer" + generateRandomString(32));
+            "makestack-installer" +
+            generateRandomString(32));
 
         ipc.config.logger = () => { };
         ipc.serve(ipcPath, () => {
@@ -150,7 +155,9 @@ function flash(flashCommand: string, drive: string, driveSize: number, imagePath
         });
         ipc.server.start();
 
-        const command = prepareFlashCommand(flashCommand, ipcPath, drive, driveSize, imagePath);
+        const command = prepareFlashCommand(
+            flashCommand, ipcPath, drive, driveSize, imagePath
+        );
         const options = { name: "MakeStack Installer" };
         sudo.exec(command, options, (error: Error, stdout: any, stderr: any) => {
             if (error) {
