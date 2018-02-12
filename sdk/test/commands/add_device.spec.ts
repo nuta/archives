@@ -31,7 +31,7 @@ describe('add-device command', function() {
             .patch(`/devices/${deviceName}`, { device: { app: this.appName } })
             .reply(200, {})
 
-        await addDeviceCommand({ deviceName }, { app: this.appName, appDir: this.appDir });
+        await addDeviceCommand({ name: deviceName }, { app: this.appName });
         expect(request.isDone()).to.be.true;
     })
 })
