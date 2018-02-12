@@ -10,7 +10,7 @@ author:
 language:
 timezone:
 
-url: http://makestack.github.io
+url: http://makestack.org
 root: /
 permalink: :title
 permalink_defaults:
@@ -85,7 +85,7 @@ theme: makestack
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:makestack/makestack.github.io
+  repo: git@github.com:makestack/makestack.org
   branch: master
   message: deployed at {{ now('YYYY-MM-DD HH:mm:ss') }}
 

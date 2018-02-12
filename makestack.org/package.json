@@ -1,8 +1,8 @@
 {
-  "name": "makestack.github.io",
+  "name": "makestack.org",
   "private": true,
   "hexo": {
-    "version": "3.4.2"
+    "version": "3.4.4"
   },
   "scripts": {
     "dev": "hexo server",

@@ -181,7 +181,7 @@ matrix:
 
     - language: node_js
       node_js: "8"
-      env: M=makestack.github.io
+      env: M=makestack.org
       cache:
         yarn: true
       before_install:
@@ -191,7 +191,7 @@ matrix:
             exit 0;
           fi
       install:
-        - cd makestack.github.io
+        - cd makestack.org
         - yarn
       script:
         - >
