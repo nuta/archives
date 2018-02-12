@@ -1,0 +1,24 @@
+#!/bin/zsh
+#
+#  Usage: ./tools/release vX.X.X
+#
+set -ue
+if [ ! -z "$(git status --porcelain)" ]; then
+  git status
+  echo "The repository is not clean!"
+  exit 1
+fi
+
+VERSION=$1
+
+for d in runtime supervisor sdk plugins/*(/); do
+  pushd $d
+  npm --no-git-tag-version version $VERSION
+  popd
+done
+
+$EDITOR Documentation/CHANGELOG.md
+git add .
+git commit -m "version $VERSION"
+git tag $VERSION
+tig

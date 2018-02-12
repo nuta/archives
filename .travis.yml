@@ -10,36 +10,6 @@ matrix:
     - language: node_js
       node_js: "8"
       sudo: true # because of losetup(8)
-      env: M=linux:raspberrypi0w
-      addons:
-        apt:
-          packages:
-            - binutils-arm-linux-gnueabihf
-            - gcc-arm-linux-gnueabihf
-            - g++-arm-linux-gnueabihf
-            - libc6-dev-armhf-cross
-            - build-essential
-            - wget
-            - zsh
-            - realpath
-            - nodejs
-      cache:
-        apt: true
-        yarn: true
-        directories:
-          - linux/build/downloads
-      install:
-        - npm install -g yarn
-        - cd linux/pkgbuilder
-        - yarn
-        - cd ..
-      script:
-        - BUILD=release make TARGET=raspberrypi0w
-
-
-    - language: node_js
-      node_js: "8"
-      sudo: true # because of losetup(8)
       env: M=linux:raspberrypi3
       addons:
         apt:
@@ -170,12 +140,10 @@ matrix:
         - ../tools/relink-local-packages
       script:
         - yarn run coverage
-      before_deploy:
       deploy:
         provider: npm
         email: nuta@seiya.me
         api_key: "$NPM_API_KEY"
-        file: desktop/app/MakeStack-darwin-x64/MakeStack-macos-$TRAVIS_TAG.app.zip
         skip_cleanup: true
         on:
           tags: true
