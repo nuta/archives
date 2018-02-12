@@ -27,17 +27,15 @@ function initIpc() {
         osType: arg.os,
         adapter: arg.adapter,
         drive: arg.drive,
-        ignoreDuplication: arg.ignoreDuplication,
         flashCommand,
         wifiSSID: arg.wifiSSID,
         wifiPassword: arg.wifiPassword,
         wifiCountry: arg.wifiCountry
       }, (stage, state) => {
-        event.sender.send('progress', stage, state)
+        event.sender.send('installProgress', stage, state)
       })
     } catch (e) {
-      const message = (e.constructor.name === 'FatalError') ? e.message : e.stack
-      event.sender.send('error', message)
+      event.sender.send('installError', e.stack)
     }
   })
 }
