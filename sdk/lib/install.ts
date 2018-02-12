@@ -77,7 +77,7 @@ async function downloadDiskImage(osType: string, deviceType: string) {
     const basename = path.basename(osImageURL);
     const originalImage = path.join(getenv('HOME'), `.makestack/caches/${basename}`);
     if (!fs.existsSync(originalImage) || shasum(originalImage) !== imageShasum) {
-        createFile(originalImage, await (await fetch(osImageURL)).buffer());
+        createFile(originalImage, await (await fetch(osImageURL, { redirect: 'follow' })).buffer());
     }
     return originalImage;
 }
@@ -149,7 +149,7 @@ function flash(flashCommand: string, drive: string, driveSize: number,
 
         ipc.config.logger = () => { };
         ipc.serve(ipcPath, () => {
-            ipc.server.on("progressCallback", (data: any) => {
+            ipc.server.on("progress", (data: any) => {
                 progressCallback("flashing", JSON.parse(data));
             });
         });
