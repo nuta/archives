@@ -1,3 +1,4 @@
+const path = require('path')
 const { app, BrowserWindow } = require('electron')
 const { initIpc } = require('./ipc')
 
@@ -10,10 +11,10 @@ function createWindow() {
     width: 1000,
     titleBarStyle: 'hidden',
     title: 'MakeStack',
-
-    /* Disable CORS. */
     webPreferences: {
-      webSecurity: false
+      // TODO: enable Context Isolation
+      nodeIntegration: false,
+      preload: path.resolve(__dirname, 'preload.js')
     }
   })
 
