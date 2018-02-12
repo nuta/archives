@@ -9,13 +9,16 @@ matrix:
     - language: node_js
       node_js: "8"
       sudo: true # because of losetup(8)
-      env: M=linux:x64
+      env: M=linux:raspberrypi0w
       addons:
         apt:
           packages:
+            - binutils-arm-linux-gnueabihf
+            - gcc-arm-linux-gnueabihf
+            - g++-arm-linux-gnueabihf
+            - libc6-dev-armhf-cross
             - build-essential
             - wget
-            - qemu
             - zsh
             - realpath
             - nodejs
@@ -30,7 +33,7 @@ matrix:
         - yarn
         - cd ..
       script:
-        - BUILD=release make TARGET=x64
+        - BUILD=release make TARGET=raspberrypi0w
 
 
     - language: node_js
