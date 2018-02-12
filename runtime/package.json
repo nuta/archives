@@ -1,6 +1,6 @@
 {
   "name": "makestack",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "license": "(CC0-1.0 OR MIT)",
   "description": "MakeStack Node.js app runtime environment.",
   "gypfile": true,
