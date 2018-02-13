@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "electron": "^1.8.2",
-    "makestack-sdk": "^0.2.4",
-    "node-fetch": "^1.7.3",
+    "makestack-sdk": "^0.2.10",
+    "node-fetch": "^2.0.0",
     "vue": "^2.5.13",
     "vue-router": "^3.0.1",
     "whatwg-fetch": "^2.0.3"
@@ -25,18 +25,18 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "concurrently": "^3.5.0",
-    "copy-webpack-plugin": "^4.1.1",
-    "css-loader": "^0.28.7",
+    "copy-webpack-plugin": "^4.4.1",
+    "css-loader": "^0.28.9",
     "electron-packager": "^11.0.0",
     "electron-rebuild": "^1.7.3",
-    "html-loader": "^0.5.1",
+    "html-loader": "^0.5.5",
     "html-webpack-plugin": "^2.30.1",
     "node-sass": "^4.5.3",
-    "postcss-loader": "^2.0.6",
+    "postcss-loader": "^2.1.0",
     "sass-loader": "^6.0.6",
     "vue-loader": "^14.1.1",
     "vue-template-compiler": "^2.5.13",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.9.1"
+    "webpack": "^3.11.0",
+    "webpack-dev-server": "^2.11.1"
   }
 }
