@@ -53,7 +53,7 @@ def bump_npmpkg_versions(version):
              cwd=dir, encoding="utf-8"
         ).rstrip()
 
-        if stdout == version:
+        if stdout != version:
             sys.exit("Error: something went wrong with npm versions:\n" + stdout)
 
 def main():
@@ -74,7 +74,6 @@ def main():
         sys.exit(f"{version} already exists.")
 
     print(f"Release {version}")
-    return
 
     print("Updating package.json...")
     bump_npmpkg_versions(version)
