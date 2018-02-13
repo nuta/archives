@@ -10,6 +10,7 @@ deploy_options: &deploy_options
   body: >
     ChangeLog: https://github.com/makestack/makestack/blob/master/Documentation/changelog.md
   draft: true
+  overwrite: true
 
 matrix:
   include:
@@ -44,6 +45,7 @@ matrix:
       deploy:
         <<: *deploy_options
         provider: releases
+        tag_name: "$TRAVIS_TAG"
         api_key: "$GITHUB_API_KEY"
         file:
           - build/raspberrypi3/makestack-linux-raspberrypi3.img
@@ -124,6 +126,7 @@ matrix:
       deploy:
         <<: *deploy_options
         provider: releases
+        tag_name: "$TRAVIS_TAG"
         api_key: "$GITHUB_API_KEY"
         file: app/MakeStack-darwin-x64/makestack-desktop-$TRAVIS_TAG-macos.app.zip
         skip_cleanup: true
@@ -145,10 +148,11 @@ matrix:
       script:
         - yarn run build:linux
       before_deploy:
-        - zip -r makestack-desktop-$TRAVIS_TAG-linux.zip app/MakeStack-linux-x64/MakeStack
+        - zip -r app/makestack-desktop-$TRAVIS_TAG-linux.zip app/MakeStack-linux-x64/MakeStack
       deploy:
         <<: *deploy_options
         provider: releases
+        tag_name: "$TRAVIS_TAG"
         api_key: "$GITHUB_API_KEY"
         file: app/MakeStack-linux-x64/makestack-desktop-$TRAVIS_TAG-linux.zip
         skip_cleanup: true
