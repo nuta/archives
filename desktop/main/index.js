@@ -1,5 +1,5 @@
 const path = require('path')
-const { app, BrowserWindow } = require('electron')
+const { app, protocol, BrowserWindow } = require('electron')
 const { initIpc } = require('./ipc')
 
 let mainWindow
@@ -18,10 +18,20 @@ function createWindow() {
     }
   })
 
-  const windowURL = (process.env.NODE_ENV === 'development')
-    ? 'http://localhost:9080' : `file://${__dirname}/../index.html`
+  // Allow absolute paths of file:// scheme.
+  protocol.interceptFileProtocol('file', function(req, callback) {
+    let abspath = req.url.substr(7)
+    if (abspath === '/') {
+      abspath = '/index.html'
+    }
 
-  if (process.env.NODE_ENV === 'development') {
+    callback(path.normalize(path.join(__dirname, '..', abspath)))
+  })
+
+  const windowURL = (process.env.NODE_ENV === 'development')
+    ? 'http://localhost:9080' : `file:///`
+
+  if (process.env.NODE_ENV === 'development' || process.env.ENABLE_DEV_TOOLS) {
     mainWindow.webContents.openDevTools({ mode: 'detach' })
   }
 
