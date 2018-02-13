@@ -33,7 +33,7 @@ export default {
 
     &:hover {
       cursor: pointer;
-      box-shadow: 0px 0px 3px 3px rgba(0, 150, 255, .30);
+      box-shadow: 0px 0px 3px 3px var(--link-color);
     }
   }
 

@@ -2,11 +2,12 @@ table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  --table-border-color: var(--border-color);
 
   thead {
 
     th {
-      border-bottom: 6px solid var(--bg1-color);
+      border-bottom: 2px solid var(--table-border-color);
       font-weight: 600;
       padding: 0.75rem;
     }
@@ -19,11 +20,11 @@ table {
     }
 
     tr:not(:last-child) {
-      border-bottom: 1px solid var(--bg1-color);
+      border-bottom: 1px solid var(--table-border-color);
     }
 
     tr.secondary-row {
-      background: var(--bg1-color);
+      background: var(--table-border-color);
     }
   }
 }

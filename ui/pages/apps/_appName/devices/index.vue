@@ -8,7 +8,7 @@
       </nuxt-link>
     </guide-box>
 
-    <table v-else>
+    <table v-else class="inverted">
       <thead>
         <tr>
           <th>Name</th>
@@ -17,7 +17,11 @@
       </thead>
       <tbody>
         <tr v-for="device in devices" :key="device.name">
-          <td>{{ device.name }}</td>
+          <td>
+            <nuxt-link :to="{ name: 'apps-appName-devices-deviceName', params: { appName, deviceName: device.name } }">
+              {{ device.name }}
+            </nuxt-link>
+          </td>
           <td>{{ device.created_at }}</td>
         </tr>
       </tbody>
