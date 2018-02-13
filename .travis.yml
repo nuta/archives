@@ -192,6 +192,13 @@ matrix:
         - ../tools/relink-local-packages
       script:
         - yarn run coverage
+      deploy:
+        provider: npm
+        email: nuta@seiya.me
+        api_key: "$NPM_API_KEY"
+        skip_cleanup: true
+        on:
+          tags: true
 
     - language: node_js
       node_js: "8"
@@ -203,6 +210,13 @@ matrix:
         - yarn
       script:
         - yarn run coverage
+      deploy:
+        provider: npm
+        email: nuta@seiya.me
+        api_key: "$NPM_API_KEY"
+        skip_cleanup: true
+        on:
+          tags: true
 
     - language: node_js
       node_js: "8"
