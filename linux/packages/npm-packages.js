@@ -41,10 +41,13 @@ function buildPackages() {
 }
 
 function removeUnnecessaryPackages() {
-  for (const name of fs.readdirSync('node_modules')) {
-    if (unnecessaryDependencies.includes(name)) {
-      run(['rm', '-rf', path.join('node_modules', name)])
-    }
+  const unnecessaryPackages = [
+    '@types',
+    'nan'
+  ]
+
+  for (const name of unnecessaryPackages) {
+    run(['rm', '-rf', path.join('node_modules', name)])
   }
 }
 
