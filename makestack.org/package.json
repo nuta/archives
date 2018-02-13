@@ -7,9 +7,7 @@
   "scripts": {
     "dev": "yarn live-server --port=5000 htdocs",
     "build:live": "supervisor -n exit -w index.html,../Documentation -e 'html,md' -x yarn prebuild",
-    "prebuild": "rm -rf htdocs/documentation && cp -r ../Documentation htdocs/documentation",
-    "build": "yarn prebuild",
-    "deploy": "./deploy.sh"
+    "build": "rm -rf htdocs/documentation && cp -r ../Documentation htdocs/documentation"
   },
   "dependencies": {},
   "devDependencies": {
