@@ -230,6 +230,7 @@ matrix:
         - yarn build
       deploy:
         provider: pages
+        fqdn: makestack.org
         repo: makestack/makestack.github.io
         target-branch: master
         local-dir: makestack.org/htdocs
