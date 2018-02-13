@@ -8,7 +8,7 @@
       </nuxt-link>
     </guide-box>
 
-    <table v-else class="inverted">
+    <table v-else>
       <thead>
         <tr>
           <th>Name</th>
@@ -40,17 +40,6 @@ export default {
     return {
       appName: this.$route.params.appName,
       devices: []
-    }
-  },
-  methods: {
-    onSelect(device) {
-      this.$router.push({
-        name: 'apps-appName-devices-deviceName',
-        params: {
-          name: this.appName,
-          deviceName: device.name
-          }
-      })
     }
   },
   async beforeMount() {
