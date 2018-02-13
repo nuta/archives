@@ -25,7 +25,6 @@ module.exports = {
   },
   loading: { color: '#3B80f0' },
   modules: ['@nuxtjs/proxy'],
-  buildDir: process.env.BUILD_DIR || 'dist',
   build: {
     vendor: ['whatwg-fetch', 'jszip'],
     plugins: [

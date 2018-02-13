@@ -19,7 +19,7 @@ function createWindow() {
   })
 
   const windowURL = (process.env.NODE_ENV === 'development')
-    ? 'http://localhost:9080' : `file://${__dirname}/../ui/index.html`
+    ? 'http://localhost:9080' : `file://${__dirname}/../index.html`
 
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools({ mode: 'detach' })

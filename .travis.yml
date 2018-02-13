@@ -123,7 +123,7 @@ matrix:
       script:
         - yarn run build:macos
       before_deploy:
-        - zip -r makestack-desktop-$TRAVIS_TAG-macos.app.zip app/MakeStack-darwin-x64/MakeStack.app
+        - zip -r makestack-desktop-$TRAVIS_TAG-macos.app.zip releases/MakeStack-darwin-x64/MakeStack.app
       deploy:
         <<: *deploy_options
         provider: releases
@@ -150,7 +150,7 @@ matrix:
       script:
         - yarn run build:linux
       before_deploy:
-        - zip -r makestack-desktop-$TRAVIS_TAG-linux.zip app/MakeStack-linux-x64/MakeStack
+        - zip -r makestack-desktop-$TRAVIS_TAG-linux.zip releases/MakeStack-linux-x64/MakeStack
       deploy:
         <<: *deploy_options
         provider: releases
