@@ -206,12 +206,6 @@ matrix:
       env: M=makestack.org
       cache:
         yarn: true
-      before_install:
-        - >
-          if [[ "${TRAVIS_BRANCH}" != "master" ]]; then
-            echo "This is not master branch, aborting..." > /dev/stderr;
-            exit 0;
-          fi
       install:
         - cd makestack.org
         - yarn
