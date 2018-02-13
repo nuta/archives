@@ -232,7 +232,7 @@ matrix:
         provider: pages
         repo: makesstack/makestack.github.io
         target-branch: master
-        local-dir: htdocs
+        local-dir: makestack.org/htdocs
         skip-cleanup: true
         keep-histroy: true
         github-token: "$GITHUB_API_KEY"
