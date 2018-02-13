@@ -1,6 +1,6 @@
 {
   "name": "@makestack/supervisor",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "license": "(CC0-1.0 OR MIT)",
   "description": "MakeStack Linux Supervisor.",
   "main": "dist/index.js",
