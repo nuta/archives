@@ -6,7 +6,7 @@
   "main": "./main/index.js",
   "description": "A MakeStack desktop app.",
   "scripts": {
-    "build:assets": "rm -rf build && cd ../ui && NODE_MODE=production PLATFORM=desktop yarn nuxt generate && cd ../desktop && mv ../ui/dist && cp -r package.json main build",
+    "build:assets": "rm -rf build && cd ../ui && NODE_MODE=production PLATFORM=desktop yarn nuxt generate && cd ../desktop && mv ../ui/dist build && cp -r package.json main build",
     "build:macos": "yarn build:assets && electron-packager build --platform darwin --asar --overwrite --out releases --arch x64 --icns assets/images/icon.icns",
     "build:linux": "yarn build:assets && electron-packager build --platform linux  --asar --overwrite --out releases --arch x64",
     "dev": "USE_LOCAL_MOCK_GITHUB_SERVER=1 concurrently --kill-others 'yarn run renderer' 'yarn run main'",
