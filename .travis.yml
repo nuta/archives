@@ -45,6 +45,7 @@ matrix:
       deploy:
         <<: *deploy_options
         provider: releases
+        name: "$TRAVIS_TAG"
         tag_name: "$TRAVIS_TAG"
         api_key: "$GITHUB_API_KEY"
         file:
@@ -126,6 +127,7 @@ matrix:
       deploy:
         <<: *deploy_options
         provider: releases
+        name: "$TRAVIS_TAG"
         tag_name: "$TRAVIS_TAG"
         api_key: "$GITHUB_API_KEY"
         file: makestack-desktop-$TRAVIS_TAG-macos.app.zip
@@ -152,6 +154,7 @@ matrix:
       deploy:
         <<: *deploy_options
         provider: releases
+        name: "$TRAVIS_TAG"
         tag_name: "$TRAVIS_TAG"
         api_key: "$GITHUB_API_KEY"
         file: makestack-desktop-$TRAVIS_TAG-linux.zip
