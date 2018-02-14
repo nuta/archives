@@ -31,10 +31,10 @@ function replaceBuffer(buf: Buffer, value: string, id: string): Buffer {
     return buf;
 }
 
-async function registerOrGetDevice(name: string, type: string): Promise<any> {
+async function registerOrGetDevice(name: string, type: string, app: string): Promise<any> {
     let device;
     try {
-        device = await api.registerDevice(name, type);
+        device = await api.registerDevice(name, type, app);
     } catch (e) {
         if (e instanceof APIError && e.response.errors[0] === 'Name has already been taken') {
             // There is already a device with same name.
@@ -174,6 +174,7 @@ export async function install(args: {
     deviceName: string,
     deviceType: string,
     osType: string,
+    app: string,
     adapter: string,
     wifiSSID: string,
     wifiPassword: string,
@@ -185,13 +186,13 @@ export async function install(args: {
 
     const {
         deviceName, deviceType, osType, adapter, wifiSSID, wifiPassword, wifiCountry,
-        drive, flashCommand, diskImagePath
+        drive, flashCommand, diskImagePath, app
     } = args;
 
     progressCallback("look-for-drive");
     const driveSize = await getDriveSize(drive);
     progressCallback("register");
-    const device = await registerOrGetDevice(deviceName, deviceType);
+    const device = await registerOrGetDevice(deviceName, deviceType, app);
     progressCallback("download");
 
     let originalImage

@@ -199,6 +199,7 @@ export default {
         deviceName: this.deviceName,
         deviceType: this.deviceType,
         os: this.os,
+        app: this.appName,
         adapter: this.adapter,
         drive: this.drive,
         wifiSSID: this.wifiSSID,

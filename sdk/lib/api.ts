@@ -147,8 +147,8 @@ export class API {
         return this.invoke("DELETE", `/devices/${deviceName}/configs/${key}`);
     }
 
-    public registerDevice(name: string, deviceType: string, tag?: string) {
-        return this.invoke("POST", "/devices", { device: { name, device_type: deviceType, tag } });
+    public registerDevice(name: string, deviceType: string, app?: string, tag?: string) {
+        return this.invoke("POST", "/devices", { device: { name, device_type: deviceType, tag, app } });
     }
 
     public deleteDevice(deviceName: string) {
