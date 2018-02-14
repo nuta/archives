@@ -101,12 +101,10 @@ export default {
 <style lang="scss" scoped>
 .dashboard-layout {
   background: var(--bg0-color) !important;
+//  background: red !important;
 }
 
 footer {
-  position: fixed;
-  bottom: 0;
-
   .bottom-bar {
     padding: 5px 10px;
     display: flex;

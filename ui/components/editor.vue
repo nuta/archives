@@ -121,6 +121,7 @@ export default {
 
 <style lang="scss" scoped>
 .editor {
-  height: 600px; // FIXME: auto grow
+  display: flex;
+  flex: 1;
 }
 </style>

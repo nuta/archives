@@ -114,6 +114,8 @@ export default {
   box-sizing: border-box;
   background-color: var(--bg1-color);
   color: var(--fg0-color);
+  display: flex;
+  flex-direction: column;
 
   & > header {
     height: 50px;
@@ -139,6 +141,10 @@ export default {
   }
 
   & > main {
+    display: flex;
+    flex: 3;
+    flex-direction: column;
+
     padding: 15px 30px;
     &.no-padding {
       padding: 0;
