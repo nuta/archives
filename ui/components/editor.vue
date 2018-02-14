@@ -87,7 +87,14 @@ export default {
             localStorage.setItem('backup', code)
           }
 
+          if (!this.prevCode) {
+            // Initial value is being set.
+            this.prevCode = code
+            return
+          }
+
           this.$emit('changed', code)
+          this.prevCode = code
         })
     },
     async initializeMonacoEditor() {

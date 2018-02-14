@@ -74,7 +74,9 @@ export default {
       }
 
       this.autosaveTimer = setTimeout(async () => {
-        if (this.code !== newCode) {
+        if (this.code === newCode) {
+          this.caption = 'Code will be automatically saved.'
+        } else {
           this.caption = 'Saving...'
           await api.saveFile(this.appName, 'app.js', newCode)
           this.caption = 'Saved'
