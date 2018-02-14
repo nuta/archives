@@ -1,6 +1,7 @@
 require_relative 'boot'
 
 require "rails"
+require "sentry-raven"
 # Pick the frameworks you want:
 require "active_model/railtie"
 require "active_job/railtie"
@@ -24,6 +25,11 @@ module MakeStackServer
     config.autoload_paths += ["#{config.root}/app/lib"]
     config.autoload_paths += ["#{config.root}/app/services"]
     config.filter_parameters += [:image]
+
+    # Dont' send filtered parmeters to Sentry.
+    Raven.configure do |config|
+      config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
+    end
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

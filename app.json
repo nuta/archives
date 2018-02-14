@@ -73,6 +73,10 @@
     "SKYLIGHT_AUTHENTICATION": {
       "description": "https://skylight.io authentication token (Optional)",
       "value": ""
+    },
+    "SENTRY_DSN": {
+      "description": "Sentry DSN (Optional)",
+      "value": ""
     }
   }
 }
