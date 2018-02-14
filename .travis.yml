@@ -57,7 +57,7 @@ matrix:
 
     - language: ruby
       rvm: 2.5
-      env: M=server:backend:sqlite3
+      env: M=server:sqlite3
       services:
         - redis-server
       cache:
@@ -76,7 +76,7 @@ matrix:
 
     - language: ruby
       rvm: 2.5
-      env: M=server:backend:postgresql
+      env: M=server:postgresql
       services:
         - postgresql
         - redis-server
@@ -97,12 +97,13 @@ matrix:
 
     - language: node_js
       node_js: "8"
-      env: M=server:frontend
+      env: M=ui
       cache: yarn
       install:
         - cd ui
         - yarn
-      script: npm run build
+      script:
+        - yarn generate
 
     - language: node_js
       env:
