@@ -21,6 +21,7 @@ gem 'rest-client'
 
 gem "skylight", group: :skylight
 gem "sentry-raven", group: :sentry
+gem "timber", group: :timber
 
 # TODO: enable this
 # gem 'strong_migrations'

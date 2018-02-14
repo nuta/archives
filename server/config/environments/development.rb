@@ -51,4 +51,11 @@ Rails.application.configure do
     Bullet.enable = true
     Bullet.rails_logger = true
   end
+
+  # Install the Timber.io logger, send logs over STDOUT. Actual log delivery
+  # to the Timber service is handled external of this application.
+  logger = Timber::Logger.new(STDOUT)
+  logger.level = config.log_level
+  config.logger = ActiveSupport::TaggedLogging.new(logger)
+
 end
