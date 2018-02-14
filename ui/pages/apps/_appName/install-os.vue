@@ -1,5 +1,5 @@
 <template>
-  <dashboard-layout title="Setup a Device" :appName="appName">
+  <dashboard-layout title="Setup a Device" :appName="appName" inverted-bg="true">
     <guide-box v-if="platform !== 'desktop'">
       <h1>Installing MakeStack Linux on your devices</h1>
       <p>Use desktop app to install MakeStack Linux to a SD card:</p>

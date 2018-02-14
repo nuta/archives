@@ -15,6 +15,7 @@
     max-width: 500px;
     padding-top: 30px;
     margin: 0px auto;
+    -webkit-app-region: drag;
 
     & > header {
       text-align: center;

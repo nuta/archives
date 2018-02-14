@@ -35,6 +35,9 @@ details {
 .grid {
   display: flex;
   justify-content: space-between;
+  & > * {
+    margin: 10px;
+  }
 }
 
 .title-header-container {
