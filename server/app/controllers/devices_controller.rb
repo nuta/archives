@@ -1,5 +1,6 @@
 class DevicesController < ApplicationController
   before_action :set_device, only: [:show, :log, :update, :destroy]
+  before_action :set_app, only: [:create, :update]
 
   def index
     @devices = @user.devices.includes(:app).all
@@ -10,16 +11,13 @@ class DevicesController < ApplicationController
 
   def create
     @device = @user.devices.new(device_params)
+    @device.app = @app
     @device.save!
     render :show, status: :created, location: @device
   end
 
   def update
-    app = params.dig(:device, :app)
-    if app
-      @device.app = @user.apps.find_by_name!(app)
-    end
-
+    @device.app = @app
     @device.update!(device_params)
     render :show, status: :ok, location: @device
   end
@@ -32,6 +30,11 @@ class DevicesController < ApplicationController
 
   def set_device
     @device = @user.devices.find_by_name!(params[:name])
+  end
+
+  def set_app
+    app_name = params.dig(:device, :app)
+    @app = app_name ? @user.apps.find_by_name!(app_name) : nil
   end
 
   def device_params
