@@ -1,5 +1,4 @@
 require 'timber'
-require 'skylight'
 
 Rails.application.configure do
   config.action_mailer.smtp_settings= {
