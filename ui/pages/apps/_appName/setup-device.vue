@@ -7,7 +7,7 @@
       </card>
       <card title="Install MakeStack Linux"
         subtitle="Install a minimalized Linux distribution made for MakeStack apps."
-       :to="{ name: 'apps-appName-install-osw', params: { name: appName } }">
+       :to="{ name: 'apps-appName-install-os', params: { name: appName } }">
       </card>
     </div>
   </dashboard-layout>

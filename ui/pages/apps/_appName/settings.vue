@@ -1,5 +1,5 @@
 <template>
-  <dashboard-layout title="Settings" :appName="appName">
+  <dashboard-layout title="Settings" :appName="appName" inverted-bg="true">
     <header>
       <h2>{{ appName }}</h2>
     </header>

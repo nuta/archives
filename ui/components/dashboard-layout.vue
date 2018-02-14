@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard-layout">
+  <div class="dashboard-layout" :class="{ 'inverted-bg': invertedBg }">
     <header>
       <nav>
         <dropdown :items="navItems" :title-style="navTitleStyle" :selected="navSelected"></dropdown>
@@ -25,7 +25,7 @@ import md5 from "blueimp-md5"
 
 export default {
   components: { Dropdown },
-  props: ['title', 'appName', 'no-padding'],
+  props: ['title', 'appName', 'no-padding', 'inverted-bg'],
   data() {
     return {
       avatarBalloon: `Logged in as ${api.username}`,
@@ -112,10 +112,13 @@ export default {
   height: 100vh;
   padding-top: 10px;
   box-sizing: border-box;
-  background-color: var(--bg1-color);
   color: var(--fg0-color);
   display: flex;
   flex-direction: column;
+
+  &.inverted-bg {
+    background-color: var(--bg1-color);
+  }
 
   & > header {
     height: 50px;
@@ -142,7 +145,7 @@ export default {
 
   & > main {
     display: flex;
-    flex: 3;
+    flex: 1;
     flex-direction: column;
 
     padding: 15px 30px;
