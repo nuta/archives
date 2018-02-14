@@ -69,6 +69,10 @@
     "WELCOME_MESSAGE": {
       "description": "A description in the top page.",
       "value": "This is a demonstration place to play with MakeStack."
+    },
+    "SKYLIGHT_AUTHENTICATION": {
+      "description": "https://skylight.io authentication token (Optional)",
+      "value": ""
     }
   }
 }

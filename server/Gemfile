@@ -19,6 +19,8 @@ gem 'redis-objects'
 gem 'redis-namespace'
 gem 'rest-client'
 
+gem "skylight", group: :skylight
+
 # TODO: enable this
 # gem 'strong_migrations'
 
