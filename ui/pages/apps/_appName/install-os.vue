@@ -99,7 +99,6 @@ import DashboardLayout from "~/components/dashboard-layout"
 import GuideBox from "~/components/guide-box"
 import Tabs from "~/components/tabs"
 import Tab from "~/components/fragments/tab"
-import { ipcRenderer } from "electron"
 import { setInterval, clearInterval } from 'timers';
 
 export default {
