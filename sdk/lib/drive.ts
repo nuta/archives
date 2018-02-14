@@ -22,7 +22,7 @@ export function getAvailableDrives() {
         drivelist.list((error: Error, drives: any[]) => {
             if (error) { reject(error); }
 
-            const availableDrives = drives.filter((drive) => !drive.system);
+            const availableDrives = drives.filter((drive) => !drive.isSystem);
             resolve(availableDrives);
         });
     });
