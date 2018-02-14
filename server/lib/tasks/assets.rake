@@ -5,7 +5,7 @@ namespace :assets do
       raise 'failed to generate config files' if $? != 0
     end
 
-    system('cd ui && yarn && yarn generate && cp -r ui/dist/* public')
+    system('cd ui && yarn && yarn generate && cp -r dist/* ../public')
     raise 'failed to compile assets' if $? != 0
   end
 
