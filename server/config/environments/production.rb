@@ -1,3 +1,5 @@
+require 'timber'
+
 Rails.application.configure do
   config.action_mailer.smtp_settings= {
     user_name: ENV['SMTP_USERNAME'],
