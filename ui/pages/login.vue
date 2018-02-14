@@ -1,5 +1,5 @@
 <template>
-  <simple-layout :class="[theme + '-theme']">
+  <simple-layout>
     <header>
       <h1>MakeStack</h1>
       <p>A "batteries-included" IoT PaaS for super-rapid prototyping.</p>
@@ -79,6 +79,8 @@ export default {
       this.$router.push({ path: 'apps' })
     },
     previewTheme(theme) {
+      document.body.classList.remove(this.theme + '-theme')
+      document.body.classList.add(theme + '-theme')
       this.theme = theme
     },
     saveTheme(theme) {
