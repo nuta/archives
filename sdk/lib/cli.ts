@@ -107,7 +107,7 @@ program
 program
 .command("add-device", "Add an device to the app.")
 .argument("name", "The device name.")
-.option("--app <app>", "The app directory.", null, path.basename(process.cwd()))
+.option("--app <app>", "The app name.", null, path.basename(process.cwd()))
 .action(addDeviceCommand.main);
 
 program
