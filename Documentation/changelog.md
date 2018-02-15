@@ -2,6 +2,8 @@
 title: Change Log
 ---
 
+- v0.3.0
+  - Bunch of bug fixes and improvements. MakeStack is now ready for use!
 - v0.2.4
   - A release for testing OS installer
   - Improve UI

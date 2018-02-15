@@ -1,6 +1,6 @@
 {
   "name": "makestack-sdk",
-  "version": "0.2.12",
+  "version": "0.3.0",
   "license": "(CC0-1.0 OR MIT)",
   "description": "MakeStack SDK with CLI Developer Tools.",
   "main": "dist/index.js",
@@ -27,8 +27,8 @@
   },
   "homepage": "http://makestack.org",
   "dependencies": {
-    "@makestack/hdc1000": "^0.2.4",
-    "@makestack/supervisor": "^0.2.4",
+    "@makestack/hdc1000": "^0.3.0",
+    "@makestack/supervisor": "^0.3.0",
     "body-parser": "^1.18.2",
     "caporal": "^0.9.0",
     "chalk": "^2.3.1",
