@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const { spawnSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 
@@ -11,10 +12,11 @@ for (const pluginDir of pluginDirs) {
   pluginPackages[`@makestack/${path.basename(pluginDir)}`] = pluginDir
 }
 
+// The packages will be built in this order.
 const npmPackages = {
   'makestack': path.resolve(__dirname, '../runtime'),
-  'makestack-sdk': path.resolve(__dirname, '../sdk'),
   '@makestack/supervisor': path.resolve(__dirname, '../supervisor'),
+  'makestack-sdk': path.resolve(__dirname, '../sdk'),
   'makestack-desktop': path.resolve(__dirname, '../desktop'),
   'makestack-ui': path.resolve(__dirname, '../ui'),
   ...pluginPackages
@@ -35,10 +37,19 @@ function updatePackageJson(pkgDir) {
   fs.writeFileSync(filepath, JSON.stringify(packageJson, null, 2) + '\n')
 }
 
+// Run `tsc'.
+function buildPackages() {
+  for (const pkgDir of Object.values(npmPackages)) {
+    spawnSync('yarn', { stdio: 'inherit', cwd: pkgDir })
+  }
+}
+
 function main() {
   for (const pkgDir of Object.values(npmPackages)) {
     updatePackageJson(pkgDir)
   }
+
+  buildPackages()
 }
 
 main()
