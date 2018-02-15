@@ -11,6 +11,11 @@ module.exports = {
     ],
     link: [
       {
+        rel: 'icon',
+        type: 'image/png',
+        href: '/favicon.png'
+      },
+      {
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css?family=Open+Sans:400,600|Roboto:600,900|Lato:300i|Source+Code+Pro:400,600'
       },
