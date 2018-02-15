@@ -65,6 +65,7 @@ module SMMSService
       unless last_heartbeated_at
         # The device has been started.
         log = "@__on #{device.name} is now online.\n" + log
+        device.status = 'running'
       end
 
       device.append_log(log)
