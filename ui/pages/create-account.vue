@@ -17,21 +17,13 @@
 
         <div class="field">
           <label>Password</label>
-          <input type="password" v-model="email" placeholder="Password" required="required">
+          <input type="password" v-model="password" placeholder="Password" required="required">
         </div>
 
         <div class="field">
           <label>Password (Confirmation)</label>
           <input type="password" v-model="passwordConfirmation" placeholder="Password (Confirmation)" required="required">
         </div>
-
-        <details>
-          <summary>Server URL (defaults to {{ serverUrl }})</summary>
-          <div class="content">
-            <label>Server URL</label>
-            <input type="text" v-model="serverUrl" placeholder="Server URL" required="required">
-          </div>
-        </details>
 
         <div class="field">
           <div ref="recaptcha"></div>
@@ -60,7 +52,6 @@ export default {
   components: { SimpleLayout },
   data: () => {
     return {
-      serverUrl: DEFAULT_SERVER_URL,
       buttonMsg: 'Create Account',
       username: '',
       email: '',
@@ -71,6 +62,7 @@ export default {
   methods: {
     async createAccount() {
       await api.createUser({
+        server: location.host,
         username: this.username,
         email: this.email,
         password: this.password,

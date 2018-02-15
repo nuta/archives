@@ -47,12 +47,12 @@
 
         <div class="action">
           <p>
-            <nuxt-link to="/reset-password">Reset Password</nuxt-link>
+            <nuxt-link :to="{ name: 'reset-password' }">Reset Password</nuxt-link>
             <br>
             <a href="#" v-if="platform === 'desktop'" @click.prevent="openMakeStackCloud">
               Create a account on MakeStack Cloud
             </a>
-            <nuxt-link to="{ name: 'create-account' }" v-else>
+            <nuxt-link :to="{ name: 'create-account' }" v-else>
               New to MakeStack? Create your account!
             </nuxt-link>
           </p>
