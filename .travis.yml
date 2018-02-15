@@ -7,8 +7,7 @@ env:
     - secure: "NGI9TLs1QtrzbUN2WOQz7Xl4+d7M3ahEjJ4xl1lJIogHXugZFrgNwL6PW+ROYwDpg1NAdX5B7qinwQuqXs/wL6FFJ+pGNZqWB7g2CqmZ2/OhnXKpm08De7DmAmIoGI0vCOMvx5//8sPnGJFJDQJduY9VYZMJjCVGJGndxl81tNBsipXSvZzV7jREFz3VdKvrf1L6xRJfpMEVr4aIN821J9Vj/mY+iJsTB+w0CZ++Z2S1WwLuzUxkJvhKvbzYPqeFg2ontPMhP9beD6oUV/8Hqp4Ip9Vem1bfvtXHSyzqlp00kcXDukfVHLaF77Vcb1WX6XgBvcg0hqsh45xlSWdjYoGK/EGCrm0m5hXWAmLTf22tCtKW0CGk2O9onQv9qzU3HjBpQYdgbZAY8Ho6EZdXu+fwvU9K+3A5E5Kx6l/055XebWZYGItuS03s1hWyTHpDurxLg4MBpgBJjq3J3l0llc3BZBJB6ePvVmRhq1IB7Ns6/SDN9S3BCA6UDT2FdDp/skBV2kX3ACHC8F87BimQwH8gBgwzQfJB8IJOqBo9/+FmA5T7JdM12uCIbHxaUOiYxvDCM6UV5yarVh+BWmS3fUi6yZ8xAtI0hTrVug2YEuRjzZFPn00GWFr7DtWMnJTSi9bMjRv/sn//WBGO+Ata1p2BwpqBDG6wYaaPe8Hms9A="
 
 deploy_options: &deploy_options
-  body: >
-    ChangeLog: https://github.com/makestack/makestack/blob/master/Documentation/changelog.md
+  body: "ChangeLog: https://makestack.org/documentation/#/changelog"
   draft: true
   overwrite: true
 
