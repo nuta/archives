@@ -6,7 +6,7 @@ import { loadDeviceConfig, saveDeviceConfig } from "../config";
 
 export function main(args: any, opts: any, logger: any) {
     const deviceName = args.name;
-    api.registerDevice(deviceName, "sdk").then((device) => {
+    api.registerDevice(deviceName, "sdk", opts.app).then((device) => {
         saveDeviceConfig(Object.assign(device, {
             serverURL: api.serverURL
         }));

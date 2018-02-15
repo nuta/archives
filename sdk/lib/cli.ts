@@ -113,6 +113,7 @@ program
 program
 .command("register", "Register as a device.")
 .argument("name", "The mock device name.")
+.option("--app <app>", "The app name.", null, path.basename(process.cwd()))
 .action(registerCommand.main);
 
 program

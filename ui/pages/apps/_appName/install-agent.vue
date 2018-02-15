@@ -7,8 +7,7 @@
       <code-box>
       $ npm install -g makestack-sdk
       $ makestack login
-      $ makestack register {{ deviceName }}
-      $ makestack add-device --app {{ appName }} {{ deviceName }}
+      $ makestack register --app {{ appName }} {{ deviceName }}
       $ makestack run
       </code-box>
       <a href="https://www.npmjs.com/package/makestack-sdk">
