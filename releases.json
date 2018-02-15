@@ -1,0 +1,12 @@
+{
+  "v0.2.12": {
+    "linux": {
+      "assets": {
+        "raspberrypi3": {
+          "url": "https://github.com/makestack/makestack/releases/download/v0.2.12/makestack-linux-raspberrypi3.img",
+          "shasum": "eee1a4ffaada2e09ccb21da4d0f4746d29021b9eebae00581513444c86415939"
+        }
+      }
+    }
+  }
+}
