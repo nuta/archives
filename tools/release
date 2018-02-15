@@ -67,7 +67,7 @@ def main():
 
     if not is_clean():
         subprocess.run(["git", "status", "-s"])
-#        sys.exit("The git repo is not clean.")
+        sys.exit("The git repo is not clean.")
 
     version = compute_version(current_version(), args.version)
     if version in RELEASED_TAGS:
@@ -86,7 +86,7 @@ def main():
     subprocess.run(["git", "commit", "-m", f"version {version}"])
     subprocess.run(["git", "tag", version])
 
-    print("Done!")
+    print("Done! Push the release commit and tags to GitHub!")
 
 if __name__ == "__main__":
     main()
