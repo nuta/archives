@@ -1,9 +1,9 @@
 import { sendToSupervisor } from '../helpers';
 
-export function println(message: string) {
+export function print(message: string) {
     sendToSupervisor("log", { body: message });
 }
 
-export function eprintln(message: string) {
-    println(`!${message}`);
+export function eprint(message: string) {
+    print(`!${message}`);
 }

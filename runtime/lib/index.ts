@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { AppAPI } from "./api/app";
 import { DeviceAPI } from "./api/device";
 import { publish } from "./api/event";
-import { eprintln, println } from "./api/logging";
+import { eprint, print } from "./api/logging";
 import { SerialAPI } from "./api/serial";
 import { ConfigAPI } from "./api/config";
 import { SubProcessAPI } from "./api/subprocess";
@@ -13,7 +13,7 @@ import { GPIOConstructor, I2CConstructor, SPIConstructor } from "./types";
 import { logger } from "./logger";
 
 const device = require(`./devices/${getDeviceType()}`);
-export { println, eprintln, publish, logger };
+export { print, eprint, publish, logger };
 export const GPIO: GPIOConstructor = device.GPIO || dummyGPIO;
 export const I2C: I2CConstructor = device.I2C || dummyI2C;
 export const SPI: SPIConstructor = device.SPI || dummySPI;

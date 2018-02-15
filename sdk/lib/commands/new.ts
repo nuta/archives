@@ -47,10 +47,10 @@ node_modules
     {
         filepath: "app.js",
         template: `\
-const { Timer, println } = require('makestack')
+const { Timer, print } = require('makestack')
 
 Timer.interval(3, () => {
-  println('Hello World!')
+  print('Hello World!')
 })
 `
     },

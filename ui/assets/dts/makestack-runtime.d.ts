@@ -4,14 +4,14 @@ declare module '@makestack/runtime' {
     import { AppAPI } from "@makestack/runtime/dist/api/app";
     import { DeviceAPI } from "@makestack/runtime/dist/api/device";
     import { publish } from "@makestack/runtime/dist/api/event";
-    import { eprintln, println } from "@makestack/runtime/dist/api/logging";
+    import { eprint, print } from "@makestack/runtime/dist/api/logging";
     import { SerialAPI } from "@makestack/runtime/dist/api/serial";
     import { ConfigAPI } from "@makestack/runtime/dist/api/config";
     import { SubProcessAPI } from "@makestack/runtime/dist/api/subprocess";
     import { TimerAPI } from "@makestack/runtime/dist/api/timer";
     import { GPIOConstructor, I2CConstructor, SPIConstructor } from "@makestack/runtime/dist/types";
     import { logger } from "@makestack/runtime/dist/logger";
-    export { println, eprintln, publish, logger };
+    export { print, eprint, publish, logger };
     export const GPIO: GPIOConstructor;
     export const I2C: I2CConstructor;
     export const SPI: SPIConstructor;
@@ -42,8 +42,8 @@ declare module '@makestack/runtime/dist/api/event' {
 }
 
 declare module '@makestack/runtime/dist/api/logging' {
-    export function println(message: string): void;
-    export function eprintln(message: string): void;
+    export function print(message: string): void;
+    export function eprint(message: string): void;
 }
 
 declare module '@makestack/runtime/dist/api/serial' {

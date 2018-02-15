@@ -31,21 +31,21 @@ Available plugins are listed on: https://github.com/makestack/makestack/tree/mas
 Use `require()` from `makestack`:
 
 ```js
-const { println, GPIO, I2C } = require('makestack')
-println('Hello, World!')
+const { print, GPIO, I2C } = require('makestack')
+print('Hello, World!')
 ```
 
 ## Functions
 ### How to use
 ```js
-const { println, error, publish } = require('makestack')
+const { print, error, publish } = require('makestack')
 ```
 
-### println
+### print
 - **Definition:** `(message: string) => void`
 - **Usage:**
   ```js
-  println("Hello World!")
+  print("Hello World!")
   ```
 
 ### error
@@ -250,7 +250,7 @@ const { GPIO } = require('makestack')
   const button = new GPIO({ pin: 13, mode: 'in' })
   Timer.interval(0.5, () => {
     const value = button.read()
-    println(`button: ${value}`)
+    print(`button: ${value}`)
   })
   ```
 

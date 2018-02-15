@@ -92,13 +92,13 @@ You'll see there files in the directory:
    Load MakeStack APIs.
    Refer: https://github.com/makestack/makestack/blob/master/Documentation/api.md
 */
-const { Timer, println } = require('makestack')
+const { Timer, print } = require('makestack')
 
 /* Timer.interval(n, callback) calls `callback` every `n` seconds. */
 Timer.interval(3, () => {
-    /* println(str) adds `str` to the log buffer. The log buffer will be sent to
+    /* print(str) adds `str` to the log buffer. The log buffer will be sent to
        MakeStack Server in a heartbeat. */
-    println('Hello World!')
+    print('Hello World!')
 })
 ```
 

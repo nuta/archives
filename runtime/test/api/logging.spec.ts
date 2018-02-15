@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 
 process.env.MAKESTACK_ENV = 'test';
 process.env.MAKESTACK_DEVICE_TYPE = 'raspberrypi3';
-const { println, eprintln } = require('../..');
+const { print, eprint } = require('../..');
 
 describe('Logging API', function() {
     beforeEach(function () {
@@ -16,18 +16,18 @@ describe('Logging API', function() {
         this.processSend.restore()
     })
 
-    describe('println', function() {
+    describe('print', function() {
         it('calls process.send', function () {
             const message = 'Hello, World!'
-            println(message);
+            print(message);
             expect(this.processSend.calledWith({ type: "log", body: message })).to.be.true;
         })
     })
 
-    describe('eprintln', function() {
+    describe('eprint', function() {
         it('calls process.send', function () {
             const message = 'Something went wrong!'
-            eprintln(message);
+            eprint(message);
             expect(this.processSend.calledWith({ type: "log", body: `!${message}` })).to.be.true;
         })
     })

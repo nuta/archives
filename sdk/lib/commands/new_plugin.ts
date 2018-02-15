@@ -118,11 +118,11 @@ const TYPESCRIPT_TEMPLATES = [
     {
         filepath: "lib/index.ts",
         template: `\
-const { println } = require('makestack')
+const { print } = require('makestack')
 
 export class {{ CamelAppName }} {
     constructor() {
-        println('Hello form {{ CamelAppName }}!')
+        print('Hello form {{ CamelAppName }}!')
     }
 }
 `,
