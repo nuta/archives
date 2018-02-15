@@ -273,6 +273,7 @@ export default {
 
   async mounted() {
     this.app = await api.getApp(this.appName)
+    await this.refreshAppConfigs()
 
     const integrations = await api.getIntegrations(this.appName)
     for (const integration of integrations) {
