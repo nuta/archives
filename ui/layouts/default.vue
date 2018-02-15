@@ -7,6 +7,7 @@
 
 <script>
 import { appendToLog } from "platform";
+import api from "~/assets/js/api";
 import { getCurrentTheme } from "~/assets/js/preferences";
 import Notifications from "~/components/notifications";
 import { setTimeout, clearTimeout } from 'timers';
@@ -36,6 +37,11 @@ export default {
     }
   },
   beforeCreate() {
+    const allowedRoutes = ['login', 'logout', 'reset-password', 'create-account']
+    if (!api.loggedIn() && !allowedRoutes.includes(this.$route.name)) {
+      this.$router.replace({ path: 'login' })
+    }
+
     this.theme = getCurrentTheme()
     document.body.classList.add(this.theme + '-theme')
   },

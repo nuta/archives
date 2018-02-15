@@ -9,7 +9,9 @@ import {
 class API {
   constructor() {
     this.credentials = loadCredentials()
-    if (this.credentials) {
+    if (Object.keys(this.credentials).length === 0) {
+      this.credentials = null
+    } else {
       this.server = getServerUrl()
     }
   }
