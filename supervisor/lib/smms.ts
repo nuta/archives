@@ -165,6 +165,11 @@ export function deserialize(payload: Buffer) {
                     version: data.readUInt32BE(1)
                 }
                 break;
+            case SMMS_OSUPDATE_MSG:
+                messages.osupdate = {
+                    version: data.readUInt32BE(1)
+                }
+                break;
         }
         offset += 1 + lengthLength + length;
     }

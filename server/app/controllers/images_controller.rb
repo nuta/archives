@@ -34,6 +34,6 @@ class ImagesController < ApplicationController
   end
 
   def os_image_url(version, os, deviceTypes)
-    MakeStack.os_releases.dig(version, os, :assets, deviceTypes, :url)
+    MakeStack.releases.dig(version, os, :assets, deviceTypes, :url)
   end
  end

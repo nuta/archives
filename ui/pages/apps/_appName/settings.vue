@@ -148,14 +148,28 @@
           </tbody>
         </table>
       </tab>
-      <tab name="Settings">
-        <div class="form-sections">
+      <tab name="Actions">
+        <div class="sections">
           <section>
-            <div class="header">
-              <h3>Remove app</h3>
-              <p>This action can't be reverted. Be careful!</p>
-            </div>
+            <header>
+              <h1>Update OS</h1>
+            </header>
             <div class="content">
+              <p>Sends an os update request to devices. Note that you can't downgrading. Current os version is {{ app.osVersion }}.</p>
+              <form @submit.prevent="updateOS">
+                <select v-model="app.os_version">
+                  <option v-for="(release, version) in releases" :key="version">{{ version }}</option>
+                </select>
+                <input type="submit" value="Update OS" class="primary">
+              </form>
+            </div>
+          </section>
+          <section>
+            <header>
+              <h1>Remove app</h1>
+            </header>
+            <div class="content">
+              <p>This action can't be reverted. Be careful!</p>
               <button class="danger simple" @click="removeApp">Remove App</button>
             </div>
           </section>
@@ -170,12 +184,14 @@ import api from "~/assets/js/api"
 import DashboardLayout from "~/components/dashboard-layout"
 import Tabs from "~/components/tabs"
 import Tab from "~/components/fragments/tab"
+import releases from "~/../releases"
 
 export default {
   components: { DashboardLayout, Tabs, Tab },
   data() {
     return {
       appName: this.$route.params.appName,
+      releases,
       app: {},
       configs: [],
       newConfig: {
@@ -196,6 +212,9 @@ export default {
     }
   },
   methods: {
+    async updateOS() {
+      await api.updateApp(this.appName, { os_version: this.app.os_version })
+    },
     async removeApp() {
       await api.deleteApp(this.appName)
     },

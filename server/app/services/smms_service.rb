@@ -17,6 +17,23 @@ module SMMSService
   SMMS_UPDATE_MSG    = 0x0a
   SMMS_OSUPDATE_MSG  = 0x0b
   SMMS_CURRENT_VERSION_REPORT = 0x0001
+  SMMS_CURRENT_OS_VERSION_REPORT = 0x0001
+
+  def version_int_to_str(i)
+    if i
+      major = (i >> 16) && 0xff
+      minor = (i >> 0) && 0xff
+      patch = (i >> 8) && 0xff
+      "v#{major}.#{minor}.#{patch}"
+    end
+  end
+
+  def version_str_to_int(s)
+    if s
+      major, minor, patch = s[1..-1].split('.').map(&:to_i)
+      (major << 16) | (minor << 8) | patch
+    end
+  end
 
   #
   #  Device -> Server
@@ -57,6 +74,7 @@ module SMMSService
     payload = ""
     deployment = device.latest_deployment
     app_version = deployment.try(:version).try(:to_i)
+    os_version = version_str_to_int(device.try(:app).try(:os_version))
 
     if app_version && device.current_app_version.value != app_version
       data = [
@@ -64,6 +82,14 @@ module SMMSService
         app_version
       ].pack('CN')
       payload += generate_message(SMMS_UPDATE_MSG, data)
+    end
+
+    if os_version && device.current_os_version.value != os_version
+      data = [
+        2, # Download from adapter-specific way.
+        os_version
+      ].pack('CN')
+      payload += generate_message(SMMS_OSUPDATE_MSG, data)
     end
 
     # config
@@ -118,6 +144,8 @@ module SMMSService
           case id
         when SMMS_CURRENT_VERSION_REPORT
           messages[:reports][:app_version] = value
+        when SMMS_CURRENT_OS_VERSION_REPORT
+          messages[:reports][:app_version] = version_int_to_str(value)
         end
       end
 

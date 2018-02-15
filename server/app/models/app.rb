@@ -29,10 +29,10 @@ class App < ApplicationRecord
 
   validate :validate_os_version
 
-  default_value_for :os_version, value: MakeStack.os_releases.keys[-1]
+  default_value_for :os_version, value: MakeStack.releases.keys[-1]
 
   def validate_os_version
-    unless MakeStack.os_releases.include?(self.os_version)
+    unless MakeStack.releases.include?(self.os_version)
       errors.add(:os_version, 'is not released.')
     end
   end

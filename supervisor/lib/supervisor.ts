@@ -35,6 +35,13 @@ export interface SupervisorConstructorArgs {
     appNodePath?: string;
 }
 
+function osVersionToString(version: number) {
+    const major = (version >> 16) & 0xff
+    const minor = (version >> 8) & 0xff
+    const patch = (version >> 0) & 0xff
+    return `v${major}.${minor}.${patch}`
+}
+
 export class Supervisor {
     private app: any;
     private appDir: string;
@@ -65,6 +72,7 @@ export class Supervisor {
     private rebooting: boolean;
     private heartbeatTimer?: any;
     private appNodePath?: string;
+    private onMakeStackLinux: boolean;
 
     constructor(args: SupervisorConstructorArgs) {
         if (args.mode !== 'test') {
@@ -99,7 +107,8 @@ export class Supervisor {
         this.downloading = false;
         this.replEnabled = args.mode === 'debug';
         this.rebooting = false;
-        this.appNodePath = args.appNodePath
+        this.appNodePath = args.appNodePath;
+        this.onMakeStackLinux = fs.existsSync('/VERSION');
 
         if (this.replEnabled) {
             this.replVM = vm.createContext(apis);
@@ -308,7 +317,13 @@ export class Supervisor {
     }
 
     private async handleUpdateOSMessage(osVersion: number) {
-        logger.info(`updating os ${this.osVersion} -> ${osVersion}`);
+        logger.info(`updating OS ${osVersionToString(this.osVersion)} -> ${osVersionToString(osVersion)}`);
+
+        if (!this.onMakeStackLinux) {
+            logger.info("The OS is not MakeStack OS, ignoring os update request.")
+            return
+        }
+
         this.downloading = true;
 
         let image
@@ -351,7 +366,13 @@ export class Supervisor {
     }
 
     private async onSMMSReceive(payload: Buffer) {
-        const { commands, update, configs } = deserialize(payload);
+        const { commands, update, osupdate, configs } = deserialize(payload);
+
+        // Update OS
+        if (osupdate && this.updateEnabled && !this.downloading) {
+            await this.handleUpdateOSMessage(osupdate.version);
+            // handleUpdateOSMessage() returns if it ignores the update request.
+        }
 
         // Update App
         if (update && this.updateEnabled && !this.downloading) {

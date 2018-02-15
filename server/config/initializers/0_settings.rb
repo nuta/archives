@@ -3,8 +3,8 @@ module MakeStack
     @settings ||= load_config('settings', true)
   end
 
-  def self.os_releases
-    @os_releases ||= load_config('os_releases', false)
+  def self.releases
+    @releases ||= load_config('releases', false)
   end
 
   private
@@ -16,7 +16,21 @@ module MakeStack
       suffix = ''
     end
 
-    filename = "#{name}#{suffix}.yml"
-    YAML.load(open("#{Rails.root}/config/#{filename}").read).with_indifferent_access
+    candidates = [
+      File.join(Rails.root, 'config', "#{name}#{suffix}.yml"),
+      File.join(Rails.root, '..', "#{name}#{suffix}.json"),
+
+      # `releases.json' locates at the `Rails.root' on Heroku.
+      File.join(Rails.root, "#{name}#{suffix}.json")
+    ]
+
+    for filepath in candidates
+      if File.exist?(filepath)
+        # Note that JSON is compatible with YAML.
+        return YAML.load(open(filepath).read).with_indifferent_access
+      end
+    end
+
+    raise "Failed to load settings: #{name}"
   end
 end
