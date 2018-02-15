@@ -1,7 +1,7 @@
 {
   "name": "@makestack/hdc1000",
   "main": "dist/index.js",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
     "prepack": "tsc",

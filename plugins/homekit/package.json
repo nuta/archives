@@ -1,6 +1,6 @@
 {
   "name": "@makestack/homekit",
-  "version": "0.2.11",
+  "version": "0.2.12",
   "license": "(CC0-1.0 OR MIT)",
   "main": "dist/index.js",
   "scripts": {
