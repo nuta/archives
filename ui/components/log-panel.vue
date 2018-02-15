@@ -6,8 +6,7 @@
     </div>
 
     <div class="lines" v-show="showPanel">
-      <p class="line" v-for="line in log" :key="line.time"
-         :class="{ event: line.body.startsWith('@') }">
+      <p class="line" v-for="line in lines" :key="line.time" :class="[line.type]">
         <span class="time">[{{ line.time | date }}]</span>
         <span class="device">{{ line.device }}:</span>
         <span class="body">{{ line.body }}</span>
@@ -41,6 +40,42 @@ export default {
     date(unixtime) {
       const date = new Date(unixtime * 1000)
       return `${date.getMonth()}/${date.getDate()} ${date.getHours()}:${date.getMinutes()}`
+    }
+  },
+  computed: {
+    lines() {
+      const lines = []
+      let prevType = 'normal'
+      for (const line of this.log) {
+        let type, body
+        switch (line.body[0]) {
+          case '@':
+            type = 'event'
+            body = line.body
+            break
+          case '!':
+            type = 'error'
+            body = line.body.slice(1)
+            break
+          case '\\':
+            type = prevType
+            body = line.body.slice(1)
+            break
+          default:
+            type = 'normal'
+            body = line.body
+        }
+
+        prevType = type
+        lines.push({
+          type,
+          body,
+          device: line.device,
+          time: line.time
+        })
+      }
+
+      return lines
     }
   },
   methods: {
@@ -138,6 +173,12 @@ export default {
         color: var(--accent-color);
         font-weight: 600;
       }
+
+      &.error {
+        color: var(--negative-color);
+        font-weight: 600;
+      }
+
       .time {
         margin-right: 10px;
       }
