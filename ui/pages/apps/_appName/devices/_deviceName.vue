@@ -6,7 +6,7 @@
           <h2>{{ deviceName }}</h2>
           <div class="status">
             <i class="fas fa-circle" :class="{ online }"></i>
-            {{ statusMsg }}
+            {{ device.status }}
           </div>
         </div>
         <nuxt-link :to="{ name: 'apps-appName-devices', params: { name: appName } }">
@@ -175,10 +175,7 @@ export default {
       ]
     },
     online() {
-      return this.device && ['running', 'booting'].includes(this.device.status)
-    },
-    statusMsg() {
-      return 'unknown' // TODO
+        return ['running', 'booting'].includes(this.device.status)
     }
   },
   methods: {
@@ -221,6 +218,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.status {
+  color: var(--fg2-color);
+  .online {
+    color: var(--positive-color);
+  }
+}
+
 .actions-column {
   width: 200px;
 }
