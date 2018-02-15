@@ -13,7 +13,6 @@ class App < ApplicationRecord
 
   RESERVED_APP_NAMES = %w(new)
   SUPPORTED_APIS = %w(nodejs)
-  APP_LOG_MAX_LINES = 512
 
   quota scope: :user_id, limit: User::APPS_MAX_NUM
 

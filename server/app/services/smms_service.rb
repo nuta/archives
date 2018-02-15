@@ -54,6 +54,7 @@ module SMMSService
     end
 
     # Verified the message. It's now safe to update DB.
+    last_heartbeated_at = device.last_heartbeated_at.value
     device.last_heartbeated_at = Time.now
 
     if reports[:app_version]
@@ -61,6 +62,11 @@ module SMMSService
     end
 
     if log
+      unless last_heartbeated_at
+        # The device has been started.
+        log = "@__on #{device.name} is now online.\n" + log
+      end
+
       device.append_log(log)
     end
 

@@ -27,6 +27,8 @@ class Device < ApplicationRecord
   DEVICE_SECRET_REGEX = /\A[a-zA-Z0-9\-\_\.\~]{#{DEVICE_SECRET_LEN}}\z/
   TAG_NAME_REGEX = /\A[a-zA-Z][a-zA-Z0-9\:\/\-\_]*\z/
   TAG_LEN = 128
+  LOG_MAX_LINE_LENGTH = 128
+  LOG_MAX_LINES = 256
 
   delegate :id, to: :app, prefix: true, allow_nil: true
   quota scope: :user_id, limit: User::DEVICES_MAX_NUM
@@ -158,23 +160,13 @@ class Device < ApplicationRecord
     self.last_command_id = command_id
   end
 
-  def append_log_to(target, device, lines, time)
-    max_lines = APP_LOG_MAX_LINES
-    if target == :app
-      unless device.app
-        # The device is not associated with any app. Aborting.
-        return
-      end
-
-      log = app.log
-      integrations = device.app.integrations.all
-    else
-      log = device.log
-      integrations = []
-    end
-
+  def append_log_to(log, lines, time, integrations)
     device_name = self.name
     lines.each_with_index do |line, index|
+      if line.length > LOG_MAX_LINE_LENGTH
+        line = line[0..(LOG_MAX_LINE_LENGTH)]  + '...'
+      end
+
       log["#{time}:#{index}:#{device_name}:#{line}"] = time
 
       m = /\A@(?<event>[^ ]+) (?<body>.*)\z/.match(line)
@@ -198,18 +190,29 @@ class Device < ApplicationRecord
       end
     end
 
-    log.remrangebyrank(0, -max_lines)
+    log.remrangebyrank(0, -LOG_MAX_LINES)
+  end
+
+  def append_to_device_log(lines, time)
+    append_log_to(self.log, lines, time, [])
+  end
+
+  def append_to_app_log(lines, time)
+    app = self.app
+    p lines
+    if app
+      integrations = app.integrations.all
+      log = app.log
+      append_log_to(log, lines, time, integrations)
+    end
   end
 
   def append_log(body)
     return unless body.is_a?(String)
-
-    device_name = self.name
-    time = Time.now.to_f
     lines = body.split("\n").reject(&:empty?)
-
-    append_log_to(:device, self, lines, time)
-    append_log_to(:app, self, lines, time)
+    time = Time.now.to_f
+    append_to_device_log(lines, time)
+    append_to_app_log(lines, time)
   end
 
   def self.authenticate(device_id)

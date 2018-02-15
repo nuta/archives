@@ -1,8 +1,6 @@
 module DeviceLog
   extend ActiveSupport::Concern
 
-  APP_LOG_MAX_LINES = 512
-
   included do
     sorted_set :log, expiration: 1.hours
   end
