@@ -49,7 +49,12 @@
           <p>
             <nuxt-link to="/reset-password">Reset Password</nuxt-link>
             <br>
-            <nuxt-link to="/create-account">New to MakeStack? Create your account!</nuxt-link>
+            <a href="#" v-if="platform === 'desktop'" @click.prevent="openMakeStackCloud">
+              Create a account on MakeStack Cloud
+            </a>
+            <nuxt-link to="{ name: 'create-account' }" v-else>
+              New to MakeStack? Create your account!
+            </nuxt-link>
           </p>
         </div>
       </form>
@@ -66,6 +71,7 @@ export default {
   components: { SimpleLayout },
   data: () => {
     return {
+      platform: PLATFORM,
       serverUrl: DEFAULT_SERVER_URL,
       username: "",
       password: "",
@@ -87,6 +93,9 @@ export default {
       this.theme = theme
       this.savedTheme = theme
       setTheme(theme)
+    },
+    openMakeStackCloud() {
+      window.openMakeStackCloud()
     }
   },
   mounted() {

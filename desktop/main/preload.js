@@ -1,7 +1,7 @@
 const path = require('path')
 const fs = require('fs')
 const os = require('os')
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, shell } = require('electron')
 
 window.ipcRenderer = ipcRenderer
 
@@ -26,4 +26,8 @@ window.require = (moduleName) => {
   } else {
     throw new Error(`${moduleName} is not allowed to load.`)
   }
+}
+
+window.openMakeStackCloud = () => {
+  shell.openExternal('https://makestack.cloud')
 }
