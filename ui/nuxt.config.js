@@ -48,7 +48,7 @@ module.exports = {
         config.target = 'electron-renderer'
         config.resolve.alias['platform$'] = path.resolve(__dirname, 'desktop-platform.js')
       } else {
-        config.resolve.alias['platform$'] = path.resolve(__dirname, 'browser-platform.js')
+        config.resolve.alias['platform$'] = path.resolve(__dirname, 'web-platform.js')
         config.resolve.alias['electron$'] = path.resolve(__dirname, 'web-electron-stub.js')
       }
     }
