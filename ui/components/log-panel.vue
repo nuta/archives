@@ -5,7 +5,10 @@
       {{ drawerMsg }}
     </div>
 
-    <div class="lines" v-show="showPanel">
+    <div class="lines" v-show="showPanel" ref="lines">
+      <div class="auto-scroll-button" :class="{ activated: autoScroll }" @click="autoScroll = !autoScroll">
+        <i class="fas fa-angle-double-down"></i>
+      </div>
       <p class="line" v-for="line in lines" :key="line.time" :class="[line.type]">
         <span class="time">[{{ line.time | date }}]</span>
         <span class="device">{{ line.device }}:</span>
@@ -33,7 +36,8 @@ export default {
       lastFetched: null,
       log: [],
       drawerMsg: 'Open Log',
-      drawerIcon: 'fa-angle-double-up'
+      drawerIcon: 'fa-angle-double-up',
+      autoScroll: true
     }
   },
   filters: {
@@ -72,6 +76,12 @@ export default {
           body,
           device: line.device,
           time: line.time
+        })
+      }
+
+      if (this.autoScroll) {
+        this.$nextTick(() => {
+           this.$refs.lines.scrollTo(0, this.$refs.lines.scrollHeight)
         })
       }
 
@@ -145,6 +155,25 @@ export default {
     }
   }
 
+  .auto-scroll-button {
+    position: absolute;
+    width: 20px;
+    font-size: 18px;
+    text-align: center;
+    right: 10px;
+    padding: 10px;
+    background: var(--border-color);
+    border-radius: 20px;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &.activated {
+      background: var(--positive-color);
+    }
+  }
+
   .lines {
     height: 400px;
     overflow: scroll;
@@ -185,6 +214,7 @@ export default {
 
       .device {
         margin-right: 5px;
+        margin-right: 10px;
         font-weight: 600;
       }
     }
