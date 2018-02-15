@@ -35,6 +35,7 @@ matrix:
         directories:
           - linux/build/downloads
       install:
+        - ./tools/use-local-packages
         - npm install -g yarn
         - cd linux/pkgbuilder
         - yarn
@@ -116,10 +117,12 @@ matrix:
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
+        - ./tools/use-local-packages
         - npm install -g yarn
         - cd ui && yarn && cd ..
         - cd desktop
         - yarn
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
       script:
         - yarn run build:macos
       before_deploy:
@@ -144,9 +147,11 @@ matrix:
           - "$HOME/.electron"
           - "$HOME/.cache"
       install:
+        - ./tools/use-local-packages
         - cd ui && yarn && cd ..
         - cd desktop
         - yarn
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
       script:
         - yarn run build:linux
       before_deploy:
@@ -168,9 +173,10 @@ matrix:
       cache:
         yarn: true
       install:
+        - ./tools/use-local-packages
         - cd sdk
         - yarn
-        - ../tools/relink-local-packages
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
       script:
         - yarn run coverage
       deploy:
@@ -187,9 +193,10 @@ matrix:
       cache:
         yarn: true
       install:
+        - ./tools/use-local-packages
         - cd supervisor
         - yarn
-        - ../tools/relink-local-packages
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
       script:
         - yarn run coverage
       deploy:

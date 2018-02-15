@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+const fs = require('fs')
+const path = require('path')
+
+const pluginDirs = fs.readdirSync(path.resolve(__dirname, '../plugins'))
+  .map(d => path.join(__dirname, '../plugins', d))
+  .filter(d => fs.statSync(d).isDirectory())
+
+const pluginPackages = {}
+for (const pluginDir of pluginDirs) {
+  pluginPackages[`@makestack/${path.basename(pluginDir)}`] = pluginDir
+}
+
+const npmPackages = {
+  'makestack': path.resolve(__dirname, '../runtime'),
+  'makestack-sdk': path.resolve(__dirname, '../sdk'),
+  '@makestack/supervisor': path.resolve(__dirname, '../supervisor'),
+  'makestack-desktop': path.resolve(__dirname, '../desktop'),
+  'makestack-ui': path.resolve(__dirname, '../ui'),
+  ...pluginPackages
+}
+
+function updatePackageJson(pkgDir) {
+  const filepath = path.join(pkgDir, 'package.json')
+  const packageJson = JSON.parse(fs.readFileSync(filepath))
+
+  for (const depType of ['dependencies', 'devDependencies']) {
+    for (const name of Object.keys(packageJson[depType] || {})) {
+      if (name in npmPackages) {
+        packageJson[depType][name] = `file:${npmPackages[name]}`
+      }
+    }
+  }
+
+  fs.writeFileSync(filepath, JSON.stringify(packageJson, null, 2) + '\n')
+}
+
+function main() {
+  for (const pkgDir of Object.values(npmPackages)) {
+    updatePackageJson(pkgDir)
+  }
+}
+
+main()
