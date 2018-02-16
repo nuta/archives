@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "electron": "^1.8.2",
-    "makestack-sdk": "^0.3.1",
+    "makestack-sdk": "^0.3.2",
     "node-fetch": "^2.0.0",
     "vue": "^2.5.13",
     "vue-router": "^3.0.1",

@@ -2,6 +2,8 @@
 title: Change Log
 ---
 
+- v0.3.2
+  - linux: update libstc++
 - v0.3.1
   - Fix Travis CI automated deploy.
 - v0.3.0
