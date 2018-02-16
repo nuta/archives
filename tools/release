@@ -83,7 +83,7 @@ def main():
 
     print("Creating a new commit...")
     subprocess.run(["git", "add", "."])
-    subprocess.run(["git", "commit", "-m", f"version {version}"])
+    subprocess.run(["git", "commit", "-m", f"version {version.lstrip('v')}"])
     subprocess.run(["git", "tag", version])
 
     print("Done! Push the release commit and tags to GitHub!")
