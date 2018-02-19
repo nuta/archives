@@ -54,15 +54,15 @@ export default {
           title: 'Settings',
           to: { name: 'apps-appName-settings', params: { name: this.appName } },
         },
+        { divider: true },
         {
           title: 'User Settings',
-          to: { name: 'user-settings' },
-          divider: true
+          to: { name: 'user-settings' }
         },
+        { divider: true },
         {
           title: 'Logout',
-          to: { name: 'logout' },
-          divider: true
+          to: { name: 'logout' }
         }
       ],
       navSelected: this.title,
@@ -85,10 +85,10 @@ export default {
 
     this.appSwitcherItems = [
       ...appItems,
+      { divider: true },
       {
         title: 'Create a new app',
         icon: 'plus',
-        divider: true,
         bold: true,
         to: { name: 'create-app' }
       }

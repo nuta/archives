@@ -102,14 +102,15 @@ export default {
       user-select: none;
 
       &:hover {
-        cursor: pointer;
         background: var(--bg1-color);
+        cursor: pointer;
       }
 
       &.divider {
         border-top: 1px solid var(--border-color);
-        padding-top: 10px;
+        padding: 0;
         margin-top: 10px;
+        margin-bottom: 10px;
       }
 
       a {
