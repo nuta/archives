@@ -49,7 +49,7 @@ class API {
         })
         .then(json => {
           if (status === 422) {
-            reject(new Error('validation error'))
+            reject(new Error(json.errors[0]))
           } else {
             resolve(json)
           }
@@ -129,7 +129,7 @@ class API {
       return response.json()
     }).then(json => {
       if (status !== 200) {
-        throw new Error(`Error: failed to login: \`${json.errors}'`)
+        throw new Error(`Error: failed to login: ${json.errors.full_messages[0]}`)
       }
 
       this.server = server
