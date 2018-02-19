@@ -1,6 +1,6 @@
 <template>
   <dashboard-layout title="Setup a Device" :appName="appName">
-    <div class="grid">
+    <div class="rows">
       <card title="Run agent on Linux/macOS"
         subtitle="Run MakeStack agent on your Linux environment like Raspbian."
        :to="{ name: 'apps-appName-install-agent', params: { name: appName } }">

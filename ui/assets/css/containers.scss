@@ -32,9 +32,7 @@ details {
   }
 }
 
-.grid {
-  display: flex;
-  justify-content: space-between;
+.rows {
   & > * {
     margin: 10px;
   }

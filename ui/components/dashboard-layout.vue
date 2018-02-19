@@ -76,9 +76,10 @@ export default {
   },
   async beforeMount() {
     const appItems = (await api.getApps()).map(app => {
+      console.log(app.name)
       return {
         title: app.name,
-        to: { name: 'apps-appName', params: { name: app.name } }
+        to: { name: 'apps-appName', params: { appName: app.name } }
       }
     })
 
@@ -109,8 +110,7 @@ export default {
 
 <style lang="scss" scoped>
 .dashboard-layout {
-  height: 100vh;
-  padding-top: 10px;
+  height: 100%;
   box-sizing: border-box;
   color: var(--fg0-color);
   display: flex;
@@ -125,7 +125,7 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 8px;
+    padding: 20px 8px;
     background-color: var(--bg0-color);
 
     .hamburger {

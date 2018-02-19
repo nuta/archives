@@ -1,12 +1,12 @@
 @mixin button {
-  border: none;
+  border-bottom: 5px solid var(--bg2-color);
   border-radius: 5px;
-  padding: 9px 12px;
-  font-family: 'Open Sans';
+  font-family: 'Open Sans', sans-serif;
   font-weight: 600;
   background: var(--bg1-color);
   color: var(--fg0-color);
-  font-size: 15px;
+  font-size: 16px;
+  padding: 9px 12px 6px 12px;
 
   i.fas {
     position: relative;
@@ -15,34 +15,21 @@
     font-size: 16px;
   }
 
-  &.danger {
-    color: #ffffff;
-    background: var(--negative-color);
-  }
-
   &:hover {
     cursor: pointer;
-    transition: 0.2s ease-in-out;
+    box-shadow: 0px 0px 3px 3px var(--shadow-color);
   }
 
-  &.simple {
-    padding: 7px;
-
-    i.fa {
-      padding: 0;
-      margin: 0;
-      bottom: 0;
-    }
+  &.danger {
+    color: var(--colored-bg-font-color);
+    background: var(--negative1-color);
+    border-bottom: 5px solid var(--negative2-color);
   }
-
 
   &.primary {
-    background: var(--positive-color);
-    color: #ffffff;
-
-    &:hover {
-      background: #21afff;
-    }
+    color: var(--colored-bg-font-color);
+    background: var(--positive1-color);
+    border-bottom: 5px solid var(--positive2-color);
   }
 
   &:not(:first-child) {
@@ -91,7 +78,6 @@ input[type=text], input[type=password] {
   box-sizing: border-box;
 
   &::placeholder {
-    font-weight: 600;
     color: var(--fg1-color);
   }
 
@@ -108,13 +94,12 @@ input[type=text], input[type=password] {
 
 input[type=submit] {
   @include button;
-  font-size: 22px;
   margin-top: 20px;
 }
 
 select {
   background: var(--bg1-color);
-  border: none;
+  border: 1px solid var(--border-color);
   width: 100%;
   height: 55px;
   padding: 15px;

@@ -29,8 +29,11 @@
           <div ref="recaptcha"></div>
         </div>
 
-        <div class="action">
+        <div class="field">
          <p>By clicking "Create Account", you agree to our Term of Service and Privacy Policy.</p>
+        </div>
+
+        <div class="field">
           <input type="submit" :value="buttonMsg" class="primary">
         </div>
 

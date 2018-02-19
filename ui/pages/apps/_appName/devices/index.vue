@@ -3,7 +3,7 @@
     <guide-box v-if="devices.length === 0">
       <h1>You haven't set up any devices for {{ appName }} yet.</h1>
       <p>Let's install MakeStack Linux or Node.js CLI agent!</p>
-      <nuxt-link :to="{ name: 'apps-appName', params: { appName } }">
+      <nuxt-link :to="{ name: 'apps-appName-setup-device', params: { appName } }">
         <button class="primary">Set up Devices</button>
       </nuxt-link>
     </guide-box>

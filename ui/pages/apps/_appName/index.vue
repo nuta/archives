@@ -65,7 +65,10 @@ export default {
       let comment = "Deployment at " + (new Date()).toString(); // TODO
       const r = await api.deploy(this.appName, image, "", comment, null)
 
-      this.deployButton = "Deploy";
+      this.deployButton = "Deployed";
+      setTimeout(() => {
+        this.deployButton = "Deploy";
+      }, 3000)
     },
     codeChanged(newCode) {
       this.caption = 'Code will be saved when you stop typing...'
@@ -103,7 +106,7 @@ export default {
 <style lang="scss" scoped>
 .dashboard-layout {
   background: var(--bg0-color) !important;
-//  background: red !important;
+  height: 100vh !important;
 }
 
 footer {
