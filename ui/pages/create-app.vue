@@ -36,7 +36,7 @@ export default {
   methods: {
     async createApp() {
       await api.createApp(this.name, 'nodejs')
-      this.$router.push({ name: 'apps-appName', params: { name: this.name } })
+      this.$router.push({ name: 'apps-appName', params: { appName: this.name } })
     }
   }
 }
