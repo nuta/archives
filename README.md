@@ -3,24 +3,21 @@ MakeStack
 
 **[Getting Started](https://github.com/makestack/makestack/blob/master/Documentation/quickstart.md)** | **[API Refernce](https://github.com/makestack/makestack/blob/master/Documentation/api.md)** | **[Change Log](https://github.com/makestack/makestack/blob/master/Documentation/changelog.md)** |**[Tryout Server](https://try-makestack.herokuapp.com/)** | **[CI](https://travis-ci.org/makestack/makestack)**
 
-MakeStack is a software stack for connected devices for super-rapid prototyping that includes:
+MakeStack is a software stack for connected devices for super-rapid prototyping that featuring:
 
-- **Focus on Developer Experience:** Easy-to-use Node.js API.
-- **Batteries-included:** Remote app/os update, remote config management, sending command to device, etc.
-- **Integrations:** Incoming/Outgoing Webhook, IFTTT, Slack, and Datadog.
-- **A minimalized Linux:** smaller than 32MB including the root file system!
-- **Desktop app:** An Electron-based desktop app.
-- **Full-featured Backend:** A Rails and Vue.js based server backend.
-- **CLI SDK:** A Node.js SDK with CLI frontend to manage apps & devices.
-- **Node-RED device side programming:** Enjoy physical computing without coding!
-- **Plugins:** Of course we have!
-- **Free from vendor lock-in:** Fully open sourced :)
+- Intuitive Node.js API and out-of-the-box [plugins](https://github.com/makestack/makestack/tree/master/plugins).
+- Remote app/os update, remote config management, remote device log collection.
+- Electron-based desktop app and [CLI developer tools](https://www.npmjs.com/package/makestack-sdk).
+- [A CLI device agent](https://www.npmjs.com/package/makestack-sdk) and minimialized (< 32MB) Linux distribution for Raspberry Pi.
+- Rails-based backend server that [can be easiliy deployed to Heroku](https://makestack.org/documentation/#/guides/heroku).
+- Easy integrations with IFTTT, ThingSpeak, and Webhooks.
+- Fully open sourced (CC0/MIT).
 
 Sample Code
 -----------
 
 ```javascript
-// Load APIs (https://github.com/makestack/makestack/blob/master/Documentation/api.md)
+// Load APIs (https://makestack.org/documentation/#/api)
 const { Timer, Config, publish } = require('makestack')
 
 // Plugins.
