@@ -2,6 +2,10 @@
   <simple-layout>
     <header>
       <h1>Create an Account</h1>
+      <nuxt-link :to="{ name: 'login' }" class="return-link">
+        <i class="fas fa-chevron-left"></i>
+        Login
+      </nuxt-link>
     </header>
     <main>
       <form @submit.prevent="createAccount">
@@ -30,17 +34,14 @@
         </div>
 
         <div class="field">
-         <p>By clicking "Create Account", you agree to our Term of Service and Privacy Policy.</p>
+         <p>
+           By clicking "Create Account", you agree to our
+           <a href="/tos">Term of Service</a> and <a href="/privacy-policy">Privacy Policy</a>.
+          </p>
         </div>
 
         <div class="field">
           <input type="submit" :value="buttonMsg" class="primary">
-        </div>
-
-        <div class="action">
-          <p>
-            <nuxt-link to="/login">Login</nuxt-link>
-          </p>
         </div>
       </form>
     </main>
