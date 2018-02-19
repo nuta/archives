@@ -20,7 +20,7 @@ const { Timer, Config, publish, print } = require('makestack')
 const HDC1000 = require('@makestack/hdc1000')
 
 const led = new GPIO({ pin: 23, mode: 'out' })
-const display = new AQM0802A()
+const sensor = new HDC1000()
 
 Config.onChange('weather', value => {
   print('Received a change to weather config; manipulating the LED!')
