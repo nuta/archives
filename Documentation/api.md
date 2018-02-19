@@ -14,11 +14,11 @@ yarn init
 yarn add express lodash package-what-you-want
 ```
 
-You have to deploy the app from `makestack deploy` command. Web UI does not support npm dependencies.
+You have to deploy the app from `makestack deploy` command. **Desktop and Web does not support npm dependencies.**
 
 ## Using plugin
-Plugins provide a Node.js package such as device drivers. Plugins are bundled in the OS so you don't
-have to install them. To use a plugin use `require()` with the `@makestack/` prefix:
+Plugins is a npm package such as I2C device drivers. Official plugins are bundled in the OS so you don't
+have to install them. To use a official plugin use `require()` with the `@makestack/` prefix:
 
 ```js
 const { HDC1000 } = require('@makestack/hdc1000')
@@ -28,8 +28,6 @@ const TemperatureSensor = new HDC1000()
 Available plugins are listed on: https://github.com/makestack/makestack/tree/master/plugins
 
 ## Using APIs
-Use `require()` from `makestack`:
-
 ```js
 const { print, GPIO, I2C } = require('makestack')
 print('Hello, World!')
@@ -43,14 +41,14 @@ const { print, error, publish } = require('makestack')
 
 ### print
 - **Definition:** `(message: string) => void`
-- **Usage:**
+- **Example:**
   ```js
   print("Hello World!")
   ```
 
 ### error
 - **Definition:** `(message: string) => void`
-- **Usage:**
+- **Example:**
   ```js
   error("Something went wrong :(")
   ```
@@ -59,7 +57,7 @@ const { print, error, publish } = require('makestack')
 - **Definition:**
   -  `(event: string, data: string | number) => void`
   -  `(event: string) => void`
-- **Usage:**
+- **Example:**
   ```js
   publish('temperature', 25)
   ```
@@ -72,7 +70,7 @@ const { Config } = require('makestack')
 
 ### onCommand
 - **Definition:** `(key: string, callback: (newValue: string) => void) => void`
-- **Usage:**
+- **Example:**
   ```js
   const pumpRelay = new GPIO({ pin: 13, mode: 'out' })
   Config.onCommand('water-the-plant', duration => {
@@ -83,7 +81,7 @@ const { Config } = require('makestack')
 
 ### onChange
 - **Definition:** `(key: string, callback: (newValue: string) => void) => void`
-- **Usage:**
+- **Example:**
   ```js
   const AQM0802A = plugin('aqm0802a')
   const display = new AQM0802A()
@@ -98,23 +96,9 @@ const { Config } = require('makestack')
 const { Timer } = require('makestack')
 ```
 
-### loop
-- **Definition:** `(callback: () => void) => void`
-- **Warning:** Use `Timer.sleep()` in the callback or it becomes a busy loop.
-- **Usage:**
-  ```js
-  const led = new GPIO({ pin: 13, mode: 'out' })
-  Timer.loop(async () => {
-    led.write(true)
-    await Timer.sleep(1)
-    led.write(false)
-    await Timer.sleep(0.5)
-  })
-  ```
-
 ### interval
 - **Definition:** `(interval: number /* seconds */, callback: () => void) => void`
-- **Usage:**
+- **Example:**
   ```js
   const HDC1000 = plugin('hdc1000')
   const sensor = new HDC1000()
@@ -125,7 +109,7 @@ const { Timer } = require('makestack')
 
 ### sleep
 - **Definition:** `async (duration: number /* seconds */) => void`
-- **Usage:**
+- **Example:**
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
   Timer.loop(async () => {
@@ -139,7 +123,7 @@ const { Timer } = require('makestack')
 ### busywait
 - **Definition:** `(usec: number /* microseconds */) => void`
 - **Warning:** As its name implies it halts the app event loop. Avoid to use this API.
-- **Usage:**
+- **Example:**
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
   Timer.interval(1, () => {
@@ -159,7 +143,7 @@ const { App } = require('makestack')
 ### onExit
 - **Definition:** `(callback: () => void): void`
 - **Description:** Enable OS/app update (enabled by default).
-- **Usage:**
+- **Example:**
   ```js
   App.onExit(() => {
     console.log("I'll be back.")
@@ -174,9 +158,9 @@ const { App } = require('makestack')
 - **Definition:** `(): void`
 - **Description:** Disable OS/app update.
 - **Warning:** Don't forget to re-enable update!
-- **Usage:**
+- **Example:**
   ```js
-  Timer.interval(3 () => {
+  Timer.interval(3, () => {
     App.disableUpdate()
     try {
       // Do important stuff.
@@ -204,7 +188,7 @@ interface SubProcessResult {
 ### run
 - **Definition:** `(argv: string[]) => SubProcessResult`
 - **Description:** Spawns a child process and blocks until it exits.
-- **Usage:**
+- **Example:**
   ```js
   const { stdout, stderr, status } = SubProcess.run(['./app-written-in-golang'])
   if (status != 0) {
@@ -222,14 +206,14 @@ const { GPIO } = require('makestack')
 
 ## Constructor
 - **Definition:** `({ pin: number, mode: 'in' | 'out' })`
-- **Usage:**
+- **Example:**
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
   ```
 
 ### setMode
 - **Definition:** `(mode: 'in' | 'out') => void`
-- **Usage:**
+- **Example:**
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
   led.setMode(GPIO.INTPUT)
@@ -237,7 +221,7 @@ const { GPIO } = require('makestack')
 
 ### write
 - **Definition:** `(value: boolean) => void`
-- **Usage:**
+- **Example:**
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
   led.write(true)
@@ -245,7 +229,7 @@ const { GPIO } = require('makestack')
 
 ### read
 - **Definition:** `() => boolean`
-- **Usage:**
+- **Example:**
   ```js
   const button = new GPIO({ pin: 13, mode: 'in' })
   Timer.interval(0.5, () => {
@@ -257,7 +241,7 @@ const { GPIO } = require('makestack')
 ### onInterrupt
 - **Definition:**
   - `(mode: 'rising' | 'falling' | 'both', callback: () => void) => void`
-- **Usage:**
+- **Example:**
   ```js
   const button = new GPIO({ pin: 13, mode: 'in' })
   button.onInterrupt('rising', () => {
@@ -267,7 +251,7 @@ const { GPIO } = require('makestack')
 
 ### onChange
 - **Definition:** `(callback: () => void)`
-- **Usage:**
+- **Example:**
   ```js
   const button = new GPIO({ pin: 13, mode: 'in' })
   button.onChange(() => {
@@ -283,21 +267,21 @@ const { I2C } = require('makestack')
 
 ### Constructor
 - **Definition:** `({ address: number })`
-- **Usage:**
+- **Example:**
   ```js
   const device = new I2C({ address: 0x40 })
   ```
 
 ### read
 - **Definition:** `(length: number) => Buffer`
-- **Usage:**
+- **Example:**
   ```js
   const data = device.read(2)
   ```
 
 ### write
 - **Definition:** `(data: number[] | Buffer) => void`
-- **Usage:**
+- **Example:**
   ```js
   device.write([0x01, 0x00, 0x00])
   ```
@@ -312,7 +296,7 @@ const { Serial } = require('makestack')
 
 ### Constructor
 - **Definition:** `({ path: string, baudrate: 9600 | 115200 })`
-- **Usage:**
+- **Example:**
   ```js
   const port = new Serial({ path: '/dev/cu.usbmodem1421', baudrate: 115200 })
   ```ccccc
@@ -320,28 +304,28 @@ const { Serial } = require('makestack')
 ### Serial.list
 - **Definition:** `() => [string]`
 - **Description:** Returns a list of serial devices.
-- **Usage:**
+- **Example:**
   ```js
   Serial.list() //=> ['/dev/ttyUSB0']
   ```
 
 ### read
 - **Definition:** `() => Buffer`
-- **Usage:**
+- **Example:**
   ```js
   port.read()
   ```
 
 ### write
 - **Definition:** `(data: Buffer) => void`
-- **Usage:**
+- **Example:**
   ```js
   port.write('Hello!\n')
   ```
 
 ### onData
 - **Definition:** `(callback: (data) => void)`
-- **Usage:**
+- **Example:**
   ```js
   port.onData(chunk => {
     console.log(chunk)
@@ -351,7 +335,7 @@ const { Serial } = require('makestack')
 ### onNewLine
 - **Definition:** `(callback: (line) => void)`
 - **Description:** Polls data from the serial port and call `callback` each line.  The trailing `\r` and `\n` are removed.
-- **Usage:**
+- **Example:**
   ```js
   port.onLine(line => {
     console.log(line)
@@ -368,14 +352,14 @@ const { SPI } = require('makestack')
 
 ### Constructor
 - **Definition:** `({ slave: number, speed: number, mode: 'MODE0' | 'MODE1' | 'MODE2' | 'MODE3' })`
-- **Usage:**
+- **Example:**
   ```js
   const device = new SPI({ slave: 0 /* depends on the device */, speed: 100000, mode: 'MODE3' })
   ```
 
 ### transfer
 - **Definition:** `(tx: number[] | Buffer) => Buffer`
-- **Usage:**
+- **Example:**
   ```js
   console.log(device.transfer([0x30, 0x00, 0x00]))
   ```

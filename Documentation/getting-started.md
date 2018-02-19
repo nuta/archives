@@ -1,15 +1,8 @@
----
-title: Quickstart
----
-
-**Currently MakeStack is severly unstable. You will have to debug MakeStack to try. Good luck!**
-
 Requirements
 -------------
 
 - A macOS or Linux machine with Node.js version 8.x or higher
 - Raspberry Pi 3
-- Internet connection: Ethernet or Wi-Fi (WPA2-PSK)
 
 Creating an account
 -------------------

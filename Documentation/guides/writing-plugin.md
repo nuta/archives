@@ -1,26 +1,10 @@
----
-title: Writing a Plugin
----
-
-**TODO: This documention is out-of-date.**
+# Writing a Plugin
 
 Requirements
 -------------
 
 - A macOS or Linux machine with Node.js version 8.x or higher
-
-Installing SDK
---------------
-
-1. Install MakeStack SDK by npm.
-```bash
-npm install -g makestack
-```
-
-2. Login and save credentials. Credentials are stored in `~/.makestack`.
-```bash
-makestack login
-```
+- [MakeStack CLI developer tools](https://www.npmjs.com/package/makestack-sdk)
 
 Creating the your first plugin
 ------------------------------
@@ -41,7 +25,6 @@ You'll see there files in the directory:
 2. Edit `lib/index.ts`.
 
 ```typescript
-// TypeScript
 import { GPIO } from 'makestack';
 
 export class LEDBlinker {
@@ -54,12 +37,12 @@ export class LEDBlinker {
     }
 
     public start() {
-        let state = false;
+        let state = true;
 
         this.timer = setInterval(() => {
             this.instance.write(state);
             state = !state; // invert the state
-        })
+        }, this.interval)
     }
 
     public stop() {
@@ -74,11 +57,12 @@ export class LEDBlinker {
 // JavaScript
 const { LEDBlinker } = require('@makestack/led-blinker')
 
-const blinker = LEDBlinker({ pin: 22, interval: 2 })
+const blinker = LEDBlinker({ pin: 22 })
 blinker.start()
 ```
 
 4. Deloy the example app.
+
 ```bash
 cd example && makestack deploy
 ```
@@ -86,4 +70,5 @@ cd example && makestack deploy
 Publishing a plugin
 -------------------
 
-Add it
+[Publish the plugin as a npm package](https://docs.npmjs.com/getting-started/publishing-npm-packages) or
+send us a pull request that add your cool plugin into [official plugins](https://github.com/makestack/makestack/tree/master/plugins).

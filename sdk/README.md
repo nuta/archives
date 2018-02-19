@@ -1,12 +1,9 @@
 MakeStack SDK
 ==============
 
-A SDK library with a CLI frontend.
+MakeStack Node.js SDK with CLI interface.
 
-How to set up development environment
---------------------------------------
-
-```bash
-$ yarn
-$ ./bin/makestack --help
+## How to install
+```
+$ npm install -g makestack-sdk
 ```
