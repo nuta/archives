@@ -65,15 +65,20 @@ export default {
   },
   methods: {
     async createAccount() {
-      await api.createUser({
-        server: location.origin,
-        username: this.username,
-        email: this.email,
-        password: this.password,
-        passwordConfirmation: this.passwordConfirmation,
-        recaptcha: grecaptcha.getResponse(),
-        agreeTos: 'yes'
-      })
+      try {
+        await api.createUser({
+          server: location.origin,
+          username: this.username,
+          email: this.email,
+          password: this.password,
+          passwordConfirmation: this.passwordConfirmation,
+          recaptcha: grecaptcha.getResponse(),
+          agreeTos: 'yes'
+        })
+      } catch(e) {
+        grecaptcha.reset()
+        throw e
+      }
 
       this.buttonMsg = 'Sent a confirmation email!'
     }
