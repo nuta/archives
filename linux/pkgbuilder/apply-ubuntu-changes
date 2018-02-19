@@ -74,7 +74,7 @@ function main() {
     JSON.stringify(packagesJson, null, 2)
   )
 
-  const cp = spawnSync('diff', ['-u', '/dev/stdin', packagesJsonPath], {
+  const cp = spawnSync('diff', ['-u', '-', packagesJsonPath], {
     stdio: ['pipe', 'inherit', 'inherit'],
     input: originalPackagesJson
   })
