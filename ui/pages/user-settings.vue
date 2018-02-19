@@ -12,6 +12,15 @@
       <div class="sections">
         <section>
           <header>
+            <h1>Switch Theme</h1>
+          </header>
+          <main>
+            <theme-switcher></theme-switcher>
+          </main>
+        </section>
+
+        <section>
+          <header>
             <h1>Change Email Address</h1>
           </header>
           <main>
@@ -24,6 +33,7 @@
             </form>
           </main>
         </section>
+
         <section>
           <header>
             <h1>Change Password</h1>
@@ -46,6 +56,7 @@
             </form>
           </main>
         </section>
+
         <section>
           <header>
             <h1>Delete Account</h1>
@@ -64,9 +75,10 @@
 <script>
 import api from "~/assets/js/api"
 import SimpleLayout from "~/components/simple-layout"
+import ThemeSwitcher from "~/components/theme-switcher"
 
 export default {
-  components: { SimpleLayout },
+  components: { SimpleLayout, ThemeSwitcher },
   data() {
     return {
       username: api.username,

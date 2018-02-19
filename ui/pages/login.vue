@@ -26,19 +26,7 @@
         </details>
 
         <div class="field">
-          <div class="theme-switcher">
-            <div :class="{ active: theme == 'simple' }" class="simple-theme theme-button"
-             @click="saveTheme('simple')"
-             @mouseover="previewTheme('simple')" @mouseleave="previewTheme(savedTheme)"></div>
-
-            <div :class="{ active: theme == 'monokai' }" class="monokai-theme theme-button"
-             @click="saveTheme('monokai')"
-             @mouseover="previewTheme('monokai')" @mouseleave="previewTheme(savedTheme)"></div>
-
-            <div :class="{ active: theme == 'solarized-light' }" class="solarized-light-theme theme-button"
-             @click="saveTheme('solarized-light')"
-             @mouseover="previewTheme('solarized-light')" @mouseleave="previewTheme(savedTheme)"></div>
-          </div>
+          <theme-switcher></theme-switcher>
         </div>
 
         <div class="action">
@@ -64,35 +52,23 @@
 
 <script>
 import api from "~/assets/js/api";
-import { getCurrentTheme, setTheme } from "~/assets/js/preferences";
 import SimpleLayout from "~/components/simple-layout";
+import ThemeSwitcher from "~/components/theme-switcher";
 
 export default {
-  components: { SimpleLayout },
+  components: { SimpleLayout, ThemeSwitcher },
   data: () => {
     return {
       platform: PLATFORM,
       serverUrl: (PLATFORM === 'desktop') ? DEFAULT_SERVER_URL : location.origin,
       username: "",
-      password: "",
-      theme: getCurrentTheme(),
-      savedTheme: getCurrentTheme()
+      password: ""
     };
   },
   methods: {
     async login() {
       await api.login(this.serverUrl, this.username, this.password)
       this.$router.push({ path: 'apps' })
-    },
-    previewTheme(theme) {
-      document.body.classList.remove(this.theme + '-theme')
-      document.body.classList.add(theme + '-theme')
-      this.theme = theme
-    },
-    saveTheme(theme) {
-      this.theme = theme
-      this.savedTheme = theme
-      setTheme(theme)
     },
     openMakeStackCloud() {
       window.openMakeStackCloud()
@@ -111,28 +87,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import "~assets/css/theme";
-.theme-switcher {
-  border-radius: 10px;
-  padding: 20px 30px;
-  width: 200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-
-  .theme-button {
-    width: 30px;
-    height: 30px;
-    background: var(--bg0-color);
-    border-radius: 50%;
-    border: 1px solid var(--border-color);
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
-}
-</style>
-
