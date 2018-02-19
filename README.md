@@ -1,9 +1,8 @@
-MakeStack
-=========
+[![MakeStack](https://cdn.rawgit.com/makestack/media/master/banner.svg)](https://makestack.org)
 
-**[Getting Started](https://github.com/makestack/makestack/blob/master/Documentation/quickstart.md)** | **[API Refernce](https://github.com/makestack/makestack/blob/master/Documentation/api.md)** | **[Change Log](https://github.com/makestack/makestack/blob/master/Documentation/changelog.md)** |**[Tryout Server](https://try-makestack.herokuapp.com/)** | **[CI](https://travis-ci.org/makestack/makestack)**
+---
 
-MakeStack is a software stack for connected devices for super-rapid prototyping that featuring:
+MakeStack is a complete software stack for connected devices featuring:
 
 - Intuitive Node.js API and out-of-the-box [plugins](https://github.com/makestack/makestack/tree/master/plugins).
 - Remote app/os update, remote config management, remote device log collection.
@@ -13,27 +12,19 @@ MakeStack is a software stack for connected devices for super-rapid prototyping 
 - Easy integrations with IFTTT, ThingSpeak, and Webhooks.
 - Fully open sourced (CC0/MIT).
 
-Sample Code
------------
-
 ```javascript
-// Load APIs (https://makestack.org/documentation/#/api)
-const { Timer, Config, publish } = require('makestack')
-
-// Plugins.
-const AQM0802A = require('@makestack/aqm0802a')
+//
+//  A simple weather station app.
+//
+const { Timer, Config, publish, print } = require('makestack')
 const HDC1000 = require('@makestack/hdc1000')
 
-// Initialize device drivers.
+const led = new GPIO({ pin: 23, mode: 'out' })
 const display = new AQM0802A()
-const sensor = new HDC1000()
 
-Config.onChange('messages', msg => {
-  // print() sends a log message to the server.
-  print(`Updating the display message to ${msg}.`)
-
-  // Update the display.
-  display.update(msg)
+Config.onChange('weather', value => {
+  print('Received a change to weather config; manipulating the LED!')
+  led.on(value === 'rainy')
 })
 
 // Send temperature and humidity sensed by HDC1000.
@@ -42,6 +33,13 @@ Timer.interval(5, () => {
   publish('h', sensor.readHumidity())
 })
 ```
+
+Documentation
+-------------
+
+- **[Getting Started](https:///makestack.org/documentation/#/getting-started)**
+- **[API Reference](https://makestack.org/documentation/#/api)**
+- **[Guides](https://makestack.org/documentation/#/guides)**
 
 Code Status
 -----------

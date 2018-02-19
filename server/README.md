@@ -1,7 +1,7 @@
 MakeStack Server
 ================
 
-A MakeStack server backend (this directory) and frontend (`ui`).
+A MakeStack server backend.
 
 How to set up development environment
 --------------------------------------
@@ -12,6 +12,6 @@ $ brew services list # make sure that postgresql and redis are running
 
 $ bundler install --path vendor/bundle
 $ rails db:migrate
-$ cd ui && yarn && cd ..
+$ pushd ../ui && yarn && popd
 $ foreman start
 ```
