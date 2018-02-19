@@ -18,13 +18,11 @@ gem 'pg', '~> 0.18', group: :postgres
 gem 'redis-objects'
 gem 'redis-namespace'
 gem 'rest-client'
+gem 'strong_migrations'
 
 gem "skylight", group: :skylight
 gem "sentry-raven", group: :sentry
 gem "timber", group: :timber
-
-# TODO: enable this
-# gem 'strong_migrations'
 
 group :development, :test do
   gem 'spring'
