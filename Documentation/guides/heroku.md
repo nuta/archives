@@ -8,7 +8,7 @@ allows you to deploy your own MakeStack Server easily.
 Just click this button to save your time
 ----------------------------------------
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/makestack/heroku)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/makestack/makestack)
 
 
 Prepare for deploy
