@@ -20,7 +20,11 @@ class Auth::RegistrationsController < DeviseTokenAuth::RegistrationsController
     result = JSON.parse(resp.body)
     if resp.code != 200 || !result['success']
       logger.warn "reCAPTCHA failure: #{result['error-codes']}"
-      render json: { errors: ['reCAPTCHA failure'] }, status: :unprocessable_entity, layout: false
+      render status: :unprocessable_entity, layout: false, json: {
+        errors: {
+          full_messages: ['reCAPTCHA failure']
+        }
+      }
     end
   end
 end
