@@ -41,7 +41,7 @@
               Create a account on MakeStack Cloud
             </a>
             <nuxt-link :to="{ name: 'create-account' }" v-else>
-              New to MakeStack? Create your account!
+              Create your account
             </nuxt-link>
           </p>
         </div>

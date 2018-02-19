@@ -80,7 +80,7 @@ export default {
         throw e
       }
 
-      this.buttonMsg = 'Sent a confirmation email!'
+      this.buttonMsg = 'Sent a confirmation email'
     }
   },
   mounted() {
