@@ -24,7 +24,7 @@ const display = new AQM0802A()
 
 Config.onChange('weather', value => {
   print('Received a change to weather config; manipulating the LED!')
-  led.on(value === 'rainy')
+  led.write(value === 'rainy')
 })
 
 // Send temperature and humidity sensed by HDC1000.
