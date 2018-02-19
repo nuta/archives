@@ -24,7 +24,6 @@ module.exports = {
       'target.libTriplet': 'arm-linux-gnueabihf',
       'glibc.ldDestPath': '/lib/ld-linux-armhf.so.3',
       'glibc.ldSourcePath': 'lib/arm-linux-gnueabihf/ld-linux-armhf.so.3',
-      'target.ubuntu_pkg_url': 'http://ports.ubuntu.com/ubuntu-ports',
       'target.configure_host': 'arm-linux-gnueabihf',
       'target.toolchain_prefix': 'arm-linux-gnueabihf-',
       'openssl.configure_target': 'linux-armv4',

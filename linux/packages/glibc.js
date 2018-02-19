@@ -1,31 +1,8 @@
-const { config, assetPath } = require('../pkgbuilder').pkg
+const { config, assetPath, defineUbuntuPackage } = require('../pkgbuilder').pkg
 
-const version = '2.26-0ubuntu2'
-
-module.exports = {
+module.exports = defineUbuntuPackage('libc6', {
   name: 'glibc',
   type: 'library',
-  version,
-
-  url() {
-    return `${config('target.ubuntu_pkg_url')}/pool/main/g/glibc/libc6_${version}_${config('target.deb_arch')}.deb`
-  },
-
-  sha256() {
-    switch (config('target.deb_arch')) {
-      case 'amd64': return 'd42d424e72a9059bd00a89445d1af319caa4aee5eaf8f80636b2b3117ea475b3'
-      case 'armhf': return '7cf4c0033e69a10957b0dacc0b49683c470efa10e1d4a54872a7d5a9311a35d0'
-      default: throw new Error(`unknown target.deb_arch: \`${config('deb_arch')}'`)
-    }
-  },
-
-  changed() {
-    return false
-  },
-
-  build() {
-  },
-
   rootfs() {
     const files = {}
     files[config('glibc.ldDestPath')] = config('glibc.ldSourcePath')
@@ -52,4 +29,4 @@ module.exports = {
       '/lib/libnsl.so.1': `lib/${config('target.libTriplet')}/libnsl.so.1`
     })
   }
-}
+})

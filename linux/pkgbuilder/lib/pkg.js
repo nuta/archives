@@ -3,6 +3,7 @@ const os = require('os')
 const path = require('path')
 const { spawnSync } = require('child_process')
 const { find, mkdirp, copyFiles } = require('./helpers')
+const ubuntuPackages = require(path.resolve(__dirname, '../../packages/ubuntu-packages.json'))
 const chalk = require('chalk')
 
 function config(key) {
@@ -210,6 +211,23 @@ function modifyJsonFile(filepath, obj) {
   saveJsonFile(filepath, packageJson)
 }
 
+function defineUbuntuPackage(name, pkg) {
+  return Object.assign({}, pkg, {
+    version() {
+      return ubuntuPackages[config('target.deb_arch')][name]['version']
+    },
+    url() {
+      return ubuntuPackages[config('target.deb_arch')][name]['url']
+    },
+    sha256() {
+      return ubuntuPackages[config('target.deb_arch')][name]['sha256']
+    },
+    changed() {
+      return false
+    }
+  })
+}
+
 module.exports = {
   config,
   isNewerFile,
@@ -231,5 +249,6 @@ module.exports = {
   saveJsonFile,
   progress,
   find,
-  modifyJsonFile
+  modifyJsonFile,
+  defineUbuntuPackage
 }

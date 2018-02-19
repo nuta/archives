@@ -40,6 +40,8 @@ matrix:
         - cd linux/pkgbuilder
         - yarn
         - cd ..
+      before_script:
+        - ./pkgbuilder/apply-ubuntu-changes
       script:
         - BUILD=release make TARGET=raspberrypi3
       deploy:
