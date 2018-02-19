@@ -12,7 +12,8 @@ export default {
     if (!appName) {
       const app = (await api.getApps())[0]
       if (!app) {
-        this.$router.push({ name: 'createApp' })
+        this.$router.push({ name: 'create-app' })
+        return
       }
       appName = app.name
     }
