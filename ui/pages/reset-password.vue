@@ -10,8 +10,8 @@
           <input type="text" v-model="email" placeholder="Email Address" required="required" autofocus>
         </div>
 
-        <details>
-          <summary>Server URL (defaults to {{ serverUrl }})</summary>
+        <details v-if="platform === 'desktop'">
+          <summary>Server URL (defaults to {{ DEFAULT_SERVER_URL }})</summary>
           <div class="content">
             <label>Server URL</label>
             <input type="text" v-model="serverUrl" placeholder="Server URL" required="required" autofocus>
@@ -42,7 +42,8 @@ export default {
   components: { SimpleLayout },
   data: () => {
     return {
-      serverUrl: DEFAULT_SERVER_URL,
+      platform: PLATFORM,
+      serverUrl: (PLATFORM === 'desktop') ? DEFAULT_SERVER_URL : location.origin,
       buttonMsg: 'Reset Password',
       email: ''
     };

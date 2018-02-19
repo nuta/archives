@@ -62,7 +62,7 @@ export default {
   methods: {
     async createAccount() {
       await api.createUser({
-        server: location.host,
+        server: location.origin,
         username: this.username,
         email: this.email,
         password: this.password,
