@@ -6,7 +6,7 @@ class Device < ApplicationRecord
   belongs_to :app, optional: true
   has_many :configs, as: :owner, dependent: :destroy
 
-  value :status, expiration: 45.minutes
+  value :status, expiration: 5.minutes
   value :debug_mode, expiration: 45.minutes
   value :last_heartbeated_at, expiration: 3.days
   value :current_os, expiration: 45.minutes

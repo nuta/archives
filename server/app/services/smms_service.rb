@@ -61,11 +61,17 @@ module SMMSService
       device.current_app_version = reports[:app_version]
     end
 
+    unless device.status.value
+      device.status = 'running'
+      got_online = true
+    else
+      got_online = false
+    end
+
     if log
-      unless last_heartbeated_at
+      if got_online
         # The device has been started.
         log = "@__on #{device.name} is now online.\n" + log
-        device.status = 'running'
       end
 
       device.append_log(log)
