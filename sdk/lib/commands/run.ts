@@ -22,7 +22,7 @@ export async function main(args: any, opts: any, logger: any) {
         deviceId: device.device_id,
         deviceSecret: device.device_secret,
         heartbeatInterval: opts.heartbeatInterval,
-        appNodePath: path.resolve(__dirname, '../../node_modules')
+        appNodePath: path.resolve(__dirname, '../../..')
     });
 
     supervisor.start();
