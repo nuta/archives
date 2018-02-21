@@ -15,7 +15,7 @@
     "prepare": "npm run build",
     "pretest": "tsc",
     "build": "tsc",
-    "build:live": "tsc -w"
+    "dev": "tsc -w"
   },
   "repository": {
     "type": "git",

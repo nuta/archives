@@ -12,7 +12,7 @@
     "pretest": "tsc",
     "prepare": "tsc",
     "prepack": "tsc",
-    "build:live": "tsc -w"
+    "dev": "tsc -w"
   },
   "dependencies": {
     "makestack": "^0.3.2"

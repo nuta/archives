@@ -5,12 +5,12 @@
     "version": "3.4.4"
   },
   "scripts": {
-    "dev": "yarn live-server --port=5000 htdocs",
-    "build:live": "supervisor -n exit -w index.html,../Documentation -e 'html,md' -x yarn build",
+    "dev": "concurrently 'yarn live-server --port=5000 htdocs' 'supervisor -n exit -w index.html,../Documentation -e 'html,md' -x yarn build'",
     "build": "rm -rf htdocs/documentation && cp -r ../Documentation htdocs/documentation"
   },
   "dependencies": {},
   "devDependencies": {
+    "concurrently": "^3.5.1",
     "docsify-cli": "^4.2.0",
     "live-server": "^1.2.0",
     "supervisor": "^0.12.0"

@@ -12,7 +12,7 @@
     "test:live": "mocha -w",
     "prepare": "tsc",
     "prepack": "tsc",
-    "build:live": "tsc -w"
+    "dev": "tsc -w"
   },
   "dependencies": {
     "nan": "^2.8.0"
