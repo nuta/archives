@@ -23,8 +23,28 @@ export class LinuxGPIOAPI implements GPIOInterface {
         }
 
         fs.writeFileSync(`/sys/class/gpio/export`, `${this.pin}`);
-        fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/direction`,
-        (mode === "in") ? "in" : "out");
+
+        // Try changing the direction until the ownership of
+        // /sys/class/gpio/.../direction is updated by udev.
+        let err;
+        let retryCount = 30000;
+        while (retryCount > 0) {
+            try {
+                fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/direction`,
+                (mode === "in") ? "in" : "out");
+            } catch (e) {
+                err = e
+                retryCount--;
+                continue;
+            }
+
+            // Successfully changed the direction.
+            break;
+        }
+
+        if (retryCount === 0) {
+            throw new Error(`Failed to change the GPIO direction ${err}`)
+        }
     }
 
     public write(value: boolean) {
