@@ -44,7 +44,8 @@
             </header>
             <div class="content">
               <p>
-                ThingSpeak is an easy-to-use IoT platform to collect and visualize data like temperature.
+                ThingSpeak is an easy-to-use IoT platform to collect and visualize data like temperature. Note that
+                event name (<code>publish</code> API) must be one of <code>field1</code>, <code>field2</code>, ..., or <code>field8</code>.
               </p>
               <form @submit.prevent="updateThingSpeakIntegration" v-if="!thingSpeak.activated">
                 <input type="text" v-model="thingSpeak.write_api_key" placeholder="ThingSpeak Write API Key">
@@ -258,58 +259,99 @@ export default {
         return config
       })
     },
-    async createIftttIntegration() {
-      await api.createIntegration(this.appName, 'ifttt', {
+    async updateIftttIntegration() {
+      const args = [
+        this.appName,
+        'ifttt',
+        {
         key: this.ifttt.key
-      })
+        }
+      ]
+
+      if (this.ifttt.activated) {
+        await api.updateIntegration(...args)
+      } else {
+        await api.createIntegration(...args)
+      }
+
+      await this.refreshIntegrations()
     },
     async deleteIftttIntegration() {
       await api.deleteIntegration(this.appName, 'ifttt')
+      await this.refreshIntegrations()
     },
-    async createThingSpeakIntegration() {
-      await api.createIntegration(this.appName, 'thing_speak', {
-        write_api_key: this.thingSpeak.write_api_key
-      })
+    async updateThingSpeakIntegration() {
+      const args = [
+        this.appName,
+        'thing_speak',
+        {
+          write_api_key: this.thingSpeak.write_api_key
+        }
+      ]
+
+      if (this.thingSpeak.activated) {
+        await api.updateIntegration(...args)
+      } else {
+        await api.createIntegration(...args)
+      }
+
+      await this.refreshIntegrations()
     },
     async deleteThingSpeakIntegration() {
       await api.deleteIntegration(this.appName, 'thing_speak')
+      await this.refreshIntegrations()
     },
-    async createOutgoingWebhookIntegration() {
-      await api.createIntegration(this.appName, 'outgoing_webhook', {
-        webhook_url: this.outgoingWebhook.url
-      })
+    async updateOutgoingWebhookIntegration() {
+      const args = [
+        this.appName,
+        'outgoing_webhook',
+        {
+          webhook_url: this.outgoingWebhook.url
+        }
+      ]
+
+      if (this.outgoingWebhook.activated) {
+        await api.updateIntegration(...args)
+      } else {
+        await api.createIntegration(...args)
+      }
+
+      await this.refreshIntegrations()
     },
     async deleteOutgoingWebhookIntegration() {
       await api.deleteIntegration(this.appName, 'outgoing_webhook')
+      await this.refreshIntegrations()
+    },
+    async refreshIntegrations() {
+      const integrations = await api.getIntegrations(this.appName)
+      this.ifttt.activated = false;
+      this.thingSpeak.activated = false;
+      this.outgoingWebhook.activated = false;
+
+      for (const integration of integrations) {
+        const config = JSON.parse(integration.config)
+        switch (integration.service) {
+          case 'ifttt':
+            this.ifttt.activated = true;
+            this.ifttt.key = config.key;
+            break;
+          case 'thing_speak':
+            this.thingSpeak.activated = true;
+            this.thingSpeak.write_api_key = config.write_api_key;
+            break;
+          case 'outgoing_webhook':
+            this.outgoingWebhook.activated = true;
+            this.outgoingWebhook.url = config.webhook_url;
+            break;
+        }
+      }
     }
   },
 
   async mounted() {
     this.app = await api.getApp(this.appName)
     await this.refreshAppConfigs()
-
-    const integrations = await api.getIntegrations(this.appName)
-    for (const integration of integrations) {
-      const config = JSON.parse(integration.config)
-      switch (integration.service) {
-        case 'ifttt':
-          this.ifttt.activated = true;
-          this.ifttt.key = config.key;
-          break;
-        case 'thing_speak':
-          this.thingSpeak.activated = true;
-          this.thingSpeak.write_api_key = config.write_api_key;
-          break;
-        case 'outgoing_webhook':
-          this.outgoingWebhook.activated = true;
-          this.outgoingWebhook.url = config.webhook_url;
-          break;
-        case 'icoming_webhook':
-          this.incomingWebhook.activated = true;
-          this.incomingWebhook.key = integration.token;
-          break;
-      }
-    }
+    await this.refreshIntegrations()
   }
 };
 </script>

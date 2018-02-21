@@ -203,7 +203,7 @@ class API {
 
   createIntegration(appName, service, config, comment) {
     return this.invoke('POST', `/apps/${appName}/integrations`,
-      { service, config, comment })
+      { service, config: JSON.stringify(config), comment })
   }
 
   updateIntegration(appName, name, service, config) {
