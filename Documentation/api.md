@@ -1,6 +1,4 @@
----
-title: API
----
+# API
 
 ## Runtime environment
 Your MakeStack app is executed on [Node.js](https://nodejs.org) version 8.9.0. You
