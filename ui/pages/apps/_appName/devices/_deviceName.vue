@@ -4,8 +4,8 @@
       <div class="title-header-container">
         <div class="title-header">
           <h2>{{ deviceName }}</h2>
-          <div class="status">
-            <i class="fas fa-circle" :class="{ online }"></i>
+          <div class="device-status" :class="{ online }">
+            <i class="fas fa-circle"></i>
             {{ device.status }}
           </div>
         </div>
@@ -17,27 +17,13 @@
     </header>
 
     <tabs>
-      <tab name="Overview">
-        <div class="form-sections">
-          <section>
-            <header>
-              <h1>Device ID</h1>
-            </header>
-            <main>
-              <clipboardable :text="device.device_id"></clipboardable>
-            </main>
-          </section>
-          <section>
-            <header>
-              <h1>Device Secret</h1>
-            </header>
-            <main>
-              <clipboardable :text="device.device_secret" hidden="true"></clipboardable>
-            </main>
-          </section>
-        </div>
-      </tab>
       <tab name="Config">
+        <h2>Config</h2>
+        <p>
+          These config are synchronized with {{ deviceName }}. To use config read
+          <a href="https://makestack.org/documentation/#/api?id=config">Config API documentation</a>.
+        </p>
+
         <table>
           <thead>
             <tr>
@@ -111,6 +97,26 @@
             </tr>
           </tbody>
         </table>
+      </tab>
+      <tab name="Credentials">
+        <div class="form-sections">
+          <section>
+            <header>
+              <h1>Device ID</h1>
+            </header>
+            <main>
+              <clipboardable :text="device.device_id"></clipboardable>
+            </main>
+          </section>
+          <section>
+            <header>
+              <h1>Device Secret</h1>
+            </header>
+            <main>
+              <clipboardable :text="device.device_secret" hidden="true"></clipboardable>
+            </main>
+          </section>
+        </div>
       </tab>
       <tab name="Settings">
         <div class="form-sections">
@@ -218,10 +224,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.status {
-  color: var(--fg2-color);
-  .online {
-    color: var(--positive-color);
+.device-status {
+  color: var(--negative1-color);
+  margin-left: 16px;
+  margin-bottom: -7px;
+  font-size: 17px;
+  font-weight: 600;
+
+  .fas {
+    vertical-align: middle;
+    font-size: 0.5rem;
+    margin-right: 3px;
+  }
+
+  &.online {
+    color: var(--positive1-color);
   }
 }
 

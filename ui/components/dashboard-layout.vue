@@ -76,7 +76,6 @@ export default {
   },
   async beforeMount() {
     const appItems = (await api.getApps()).map(app => {
-      console.log(app.name)
       return {
         title: app.name,
         to: { name: 'apps-appName', params: { appName: app.name } }

@@ -64,14 +64,25 @@ export default {
 @import "~assets/css/form";
 @import "~assets/css/table";
 
+html {
+  height: 100%;
+}
+
 body {
   // Theme Switcher in the login page changes background-color.
-  transition: background-color 0.5s ease;
   background-color: var(--bg0-color);
+  transition: background-color 0.5s ease;
+
+  height: 100%;
+}
+
+#__nuxt {
+  height: 100%;
 }
 
 #app {
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Ubuntu, 'Helvetica Neue', sans-serif;
   box-sizing: border-box;
+  height: 100%;
 }
 </style>

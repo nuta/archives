@@ -162,6 +162,7 @@ export default {
     text-align: center;
     right: 10px;
     padding: 10px;
+    color: var(--fg1-color);
     background: var(--border-color);
     border-radius: 20px;
 
@@ -170,7 +171,8 @@ export default {
     }
 
     &.activated {
-      background: var(--positive-color);
+      color: var(--colored-bg-font-color);
+      background: var(--positive1-color);
     }
   }
 
@@ -204,7 +206,7 @@ export default {
       }
 
       &.error {
-        color: var(--negative-color);
+        color: var(--negative1-color);
         font-weight: 600;
       }
 

@@ -20,9 +20,12 @@
               </span>
             </header>
             <div class="content">
-              <p>(<a href="https://platform.ifttt.com/maker">https://platform.ifttt.com/maker</a>)</p>
+              <p>IFTTT is a popular platform that enables you to integrate MakeStack apps and external services:
+                SMS, Gmail, Google Sheets, Philips Hue, etc. To integrate with IFTTT you need
+                <a href="https://ifttt.com/maker_webhooks">an IFTTT webhook key</a>.
+              </p>
               <form @submit.prevent="updateIftttIntegration" v-if="!ifttt.activated">
-                <input type="text" v-model="ifttt.key" placeholder="IFTTT Key">
+                <input type="text" v-model="ifttt.key" placeholder="IFTTT Webhook Key">
                 <input type="submit" value="Save" class="primary">
               </form>
               <div v-else>
@@ -40,7 +43,9 @@
               </span>
             </header>
             <div class="content">
-              <p>(<a href="https://platform.ifttt.com/maker">https://thingspeak.com</a>)</p>
+              <p>
+                ThingSpeak is an easy-to-use IoT platform to collect and visualize data like temperature.
+              </p>
               <form @submit.prevent="updateThingSpeakIntegration" v-if="!thingSpeak.activated">
                 <input type="text" v-model="thingSpeak.write_api_key" placeholder="ThingSpeak Write API Key">
                 <input type="submit" value="Save" class="primary">
@@ -60,7 +65,9 @@
               </span>
             </header>
             <div class="content">
-              <p>A POST request will be sent.</p>
+              <p>
+                MakeStack sends POST requests to the specified url when a device published an event.
+              </p>
               <form @submit.prevent="updateOutgoingWebhookIntegration" v-if="!outgoingWebhook.activated">
                 <input type="text" v-model="outgoingWebhook.url" placeholder="Webhook URL">
                 <input type="submit" value="Save" class="primary">
@@ -74,6 +81,12 @@
         </div>
       </tab>
       <tab name="Config">
+        <h2>Config</h2>
+        <p>
+          Config are synchronized with all devices that belong to {{ appName }}. To use config read
+          <a href="https://makestack.org/documentation/#/api?id=config">Config API documentation</a>.
+        </p>
+
         <table>
           <thead>
             <tr>
