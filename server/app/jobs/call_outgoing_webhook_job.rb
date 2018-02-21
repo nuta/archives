@@ -2,16 +2,11 @@ class CallOutgoingWebhookJob < ApplicationJob
   queue_as :outgoing_webhook
   throttle limit: MakeStack.settings[:outgoing_webhook_limit_per_hour], period: 1.hour
 
-  rescue_from(StandardError) do |e|
-    backtrace = e.backtrace.join("\n")
-    Rails.logger.error "Failed to invoke a webhook: #{e.to_s}\n#{backtrace}"
-  end
-
   def execute(url:, params: {}, body: nil, accept_configs: false, device: nil)
     if body
       resp = RestClient.post(url, body.to_json, params: params, content_type: :json)
     else
-      resp = RestClient.post(url, params: params)
+      resp = RestClient.post(url, '', params: params)
     end
 
     # Update device configs.
