@@ -60,6 +60,10 @@ class API {
     })
   }
 
+  get serverUrl() {
+    return (this.server === '') ? location.origin : this.server
+  }
+
   get username() {
     return this.credentials ? this.credentials.username : null
   }

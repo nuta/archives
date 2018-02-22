@@ -7,7 +7,7 @@
       <code-box>
       $ npm install -g makestack-sdk
       $ makestack login
-      $ makestack register --app {{ appName }} {{ deviceName }}
+      $ makestack register --server {{ serverUrl }} --username {{ username }} --app {{ appName }} --name {{ deviceName }}
       $ makestack run
       </code-box>
       <a href="https://www.npmjs.com/package/makestack-sdk">
@@ -28,7 +28,9 @@ export default {
   data() {
     return {
       appName: this.$route.params.appName,
-      deviceName: 'DEVICE_NAME'
+      deviceName: 'DEVICE_NAME',
+      serverUrl: api.serverUrl,
+      username: api.username
     }
   }
 }
