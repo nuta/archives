@@ -1,17 +1,19 @@
-import * as os from "os";
-import * as path from "path";
-import { api } from "../api";
-import { Supervisor } from "@makestack/supervisor";
-import { loadDeviceConfig, saveDeviceConfig } from "../config";
+import * as inquirer from "inquirer";
+import { API } from "../api";
+import { saveDeviceConfig } from "../config";
 
-export function main(args: any, opts: any, logger: any) {
-    const deviceName = args.name;
-    api.registerDevice(deviceName, "sdk", opts.app).then((device) => {
-        saveDeviceConfig(Object.assign(device, {
-            serverURL: api.serverURL
-        }));
-    }).catch(e => {
-        logger.error("failed to create a device", e);
-    });
+export async function main(args: any, opts: any, logger: any) {
+    const answers = await inquirer.prompt([
+        { message: "User Password", name: "password", type: "password" }
+    ]);
+
+    // Log in without saving credentials to a file.
+    let cred: any = null;
+    const api = new API(() => cred, c => cred = c);
+    await api.login(opts.server, opts.username, answers.password)
+
+    const device = await api.registerDevice(opts.name, "sdk", opts.app)
+
+    saveDeviceConfig(Object.assign({}, device, { serverURL: opts.server }))
 }
 

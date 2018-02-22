@@ -1,18 +1,26 @@
 import * as FormData from "form-data";
 import * as fs from "fs";
 import * as util from "util";
-import { loadCredentials, saveCredentials } from "./config";
+import * as config from "./config";
 import { FatalError, APIError } from "./types";
 const fetch = require("node-fetch");
 
 export type ConfigType = 'string' | 'integer' | 'float' | 'bool';
 
 export class API {
+    loadCredentials: () => any;
+    saveCredentials: (cred: any) => void;
+
+    constructor(loadCredentials: () => any, saveCredentials: (cred: any) => void) {
+        this.loadCredentials = loadCredentials
+        this.saveCredentials = saveCredentials
+    }
+
     public invoke(method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH", path: string, body?: any): Promise<any> {
         const headers = {};
 
         return new Promise((resolve, reject) => {
-            const credentials = loadCredentials();
+            const credentials = this.loadCredentials();
             if (!credentials) {
                 reject(new FatalError("login first"));
             }
@@ -43,7 +51,7 @@ export class API {
     }
 
     get serverURL() {
-        return loadCredentials().url;
+        return this.loadCredentials().url;
     }
 
     public login(url: string, username: string, password: string) {
@@ -61,7 +69,7 @@ export class API {
                 throw new Error(`Error: failed to login: \`${json.errors}'`);
             }
 
-            saveCredentials({
+            this.saveCredentials({
                 url,
                 username,
                 "email": json.data.email,
@@ -197,4 +205,4 @@ export class API {
     }
 }
 
-export const api = new API();
+export const api = new API(config.loadCredentials, config.saveCredentials);

@@ -112,8 +112,11 @@ program
 
 program
 .command("register", "Register as a device.")
-.argument("name", "The mock device name.")
-.option("--app <app>", "The app name.", null, path.basename(process.cwd()))
+.option("--server <server>", "The server URL (starts with http:// or https://)",
+    /^https?:\/\//, null, true)
+.option("--username <username>", "The user name.", null, null, true)
+.option("--app <app>", "The app name.", null, null, true)
+.option("--name <app>", "The device name.", null, null, true)
 .action(registerCommand.main);
 
 program
