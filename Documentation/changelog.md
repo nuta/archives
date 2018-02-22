@@ -2,6 +2,8 @@
 title: Change Log
 ---
 
+- v0.3.3
+  - Bug fixes.
 - v0.3.2
   - linux: update libstc++
 - v0.3.1
