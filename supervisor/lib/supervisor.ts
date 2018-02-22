@@ -218,10 +218,16 @@ export class Supervisor {
         this.app.on("message", (data: { type: string, body: string }) => {
             switch (data.type) {
                 case "log":
-                    logger.debug("log:", data.body.replace(/[ \t\n]+$/, ''));
-                    this.log += data.body.replace(/[ \t\n]+$/, '') + "\n";
+                    const line = data.body.replace(/[ \t\n]+$/, '');
+                    logger.debug("log:", line);
+
+                    const lineWithTime = (this.adapterName === 'http')
+                        ? `=${Date.now() / 1000} ${line}`
+                        : line;
+
+                    this.log += lineWithTime + "\n";
                     if (this.testMode) {
-                        this.allLog += data.body.replace(/[ \t\n]+$/, '') + "\n";
+                        this.allLog += lineWithTime + "\n";
                     }
                     break;
                 case "setUpdateLock":

@@ -160,11 +160,19 @@ class Device < ApplicationRecord
     self.last_command_id = command_id
   end
 
-  def append_log_to(log, lines, time, integrations)
+  def append_log_to(log, lines, default_time, integrations)
     device_name = self.name
     lines.each_with_index do |line, index|
       if line.length > LOG_MAX_LINE_LENGTH
         line = line[0..(LOG_MAX_LINE_LENGTH)]  + '...'
+      end
+
+      # Date in unixtime.
+      if line.start_with?("=")
+        unixtime, line = line.split(' ', 2)
+        time = unixtime.gsub('=', '').to_i.to_f
+      else
+        time = default_time
       end
 
       log["#{time}:#{index}:#{device_name}:#{line}"] = time
