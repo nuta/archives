@@ -10,7 +10,7 @@ export async function main(args: any, opts: any, logger: any) {
         throw new FatalError(`Run register command first!`)
     }
 
-    logger.info(`Launching as ${device.name}...`)
+    console.log(`Launching as ${device.name}...`)
 
     let appNodePath = path.resolve(__dirname, '../../..')
     if (path.basename(appNodePath) !== 'node_modules') {
