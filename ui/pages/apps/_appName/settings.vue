@@ -59,6 +59,28 @@
           </section>
           <section>
             <header>
+              <h1>Slack</h1>
+              <span class="integration-status" :class="{ activated: slack.activated }">
+                <i class="fas" :class="[slack.activated ? 'fa-check' : 'fa-times']"></i>
+                {{ slack.activated ? 'activated' : 'unconfigured' }}
+              </span>
+            </header>
+            <div class="content">
+              <p>
+                MakeStack sends events published by devices to <a href="">Slack Incoming Webhook</a>.
+              </p>
+              <form @submit.prevent="updateSlackIntegration" v-if="!slack.activated">
+                <input type="text" v-model="slack.url" placeholder="Webhook URL (https://hooks.slack.com/services/XXXXXX/YYYYYYY)">
+                <input type="submit" value="Save" class="primary">
+              </form>
+              <div v-else>
+                <p>Slack integration is activated: The URL is <code>{{ slack.url }}</code></p>
+                <button @click="deleteSlackIntegration" class="danger">Delete Slack Integration</button>
+              </div>
+            </div>
+          </section>
+          <section>
+            <header>
               <h1>Outgoing Webhook</h1>
               <span class="integration-status" :class="{ activated: outgoingWebhook.activated }">
                 <i class="fas" :class="[outgoingWebhook.activated ? 'fa-check' : 'fa-times']"></i>
@@ -219,6 +241,10 @@ export default {
         activated: false,
         write_api_key: ''
       },
+      slack: {
+        activated: false,
+        url: ''
+      },
       outgoingWebhook: {
         activated: false,
         url: ''
@@ -301,6 +327,27 @@ export default {
       await api.deleteIntegration(this.appName, 'thing_speak')
       await this.refreshIntegrations()
     },
+    async updateSlackIntegration() {
+      const args = [
+        this.appName,
+        'slack',
+        {
+          webhook_url: this.slack.url
+        }
+      ]
+
+      if (this.slack.activated) {
+        await api.updateIntegration(...args)
+      } else {
+        await api.createIntegration(...args)
+      }
+
+      await this.refreshIntegrations()
+    },
+    async deleteSlackIntegration() {
+      await api.deleteIntegration(this.appName, 'slack')
+      await this.refreshIntegrations()
+    },
     async updateOutgoingWebhookIntegration() {
       const args = [
         this.appName,
@@ -326,6 +373,7 @@ export default {
       const integrations = await api.getIntegrations(this.appName)
       this.ifttt.activated = false;
       this.thingSpeak.activated = false;
+      this.slack.activated = false;
       this.outgoingWebhook.activated = false;
 
       for (const integration of integrations) {
@@ -338,6 +386,10 @@ export default {
           case 'thing_speak':
             this.thingSpeak.activated = true;
             this.thingSpeak.write_api_key = config.write_api_key;
+            break;
+          case 'slack':
+            this.slack.activated = true;
+            this.slack.url = config.webhook_url;
             break;
           case 'outgoing_webhook':
             this.outgoingWebhook.activated = true;
