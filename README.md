@@ -1,4 +1,4 @@
-[![MakeStack](https://cdn.rawgit.com/makestack/media/master/banner.svg)](https://makestack.org)
+[![MakeStack](https://cdn.rawgit.com/makestack/media/master/banner.png)](https://makestack.org)
 
 ---
 
