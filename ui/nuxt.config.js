@@ -3,6 +3,9 @@ const path = require('path')
 
 module.exports = {
   mode: 'spa',
+  router: {
+    mode: 'hash'
+  },
   head: {
     title: 'MakeStack',
     meta: [
