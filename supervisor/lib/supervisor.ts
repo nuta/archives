@@ -222,7 +222,6 @@ export class Supervisor {
         this.sendToApp("initialize", { configs: this.configs });
 
         this.app.on("message", (data: { type: string, body: string }) => {
-            logger.debug("message", data);
             switch (data.type) {
                 case "log":
                 logger.debug("log:", data.body.replace(/[ \t\n]+$/, ''));
