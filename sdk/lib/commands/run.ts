@@ -10,6 +10,8 @@ export async function main(args: any, opts: any, logger: any) {
         throw new FatalError(`Run register command first!`)
     }
 
+    logger.info(`Launching as ${device.name}...`)
+
     let appNodePath = path.resolve(__dirname, '../../..')
     if (path.basename(appNodePath) !== 'node_modules') {
         // We're in the makestack git repo. Use <repo>/sdk/node_modules
