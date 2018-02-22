@@ -21,7 +21,9 @@ module Throttle
 
     Redis.current.multi do
       Redis.current.incr(redis_key)
-      Redis.current.expire(redis_key, self.class.period.to_i)
+      if rate == 0
+        Redis.current.expire(redis_key, self.class.period.to_i)
+      end
     end
   end
 end
