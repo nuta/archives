@@ -199,7 +199,6 @@ class Device < ApplicationRecord
 
   def append_to_app_log(lines, time)
     app = self.app
-    p lines
     if app
       integrations = app.integrations.all
       log = app.log
