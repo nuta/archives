@@ -10,6 +10,12 @@ export async function main(args: any, opts: any, logger: any) {
         throw new FatalError(`Run register command first!`)
     }
 
+    let appNodePath = path.resolve(__dirname, '../../..')
+    if (path.basename(appNodePath) !== 'node_modules') {
+        // We're in the makestack git repo. Use <repo>/sdk/node_modules
+        appNodePath = path.resolve(__dirname, '../../node_modules')
+    }
+
     const supervisor = new Supervisor({
         mode: 'production',
         appDir: path.resolve(os.homedir(), ".makestack/app"),
@@ -22,7 +28,7 @@ export async function main(args: any, opts: any, logger: any) {
         deviceId: device.device_id,
         deviceSecret: device.device_secret,
         heartbeatInterval: opts.heartbeatInterval,
-        appNodePath: path.resolve(__dirname, '../../..')
+        appNodePath
     });
 
     supervisor.start();
