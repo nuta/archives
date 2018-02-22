@@ -67,8 +67,6 @@ export class Supervisor {
     private downloading: boolean;
     private adapter: AdapterBase;
     private includeDeviceId: boolean;
-    private replEnabled: boolean;
-    private replVM?: any;
     private rebooting: boolean;
     private heartbeatTimer?: any;
     private appNodePath?: string;
@@ -105,14 +103,10 @@ export class Supervisor {
         this.adapterName = args.adapter.name;
         this.updateEnabled = true;
         this.downloading = false;
-        this.replEnabled = args.mode === 'debug';
         this.rebooting = false;
         this.appNodePath = args.appNodePath;
         this.onMakeStackLinux = fs.existsSync('/VERSION');
 
-        if (this.replEnabled) {
-            this.replVM = vm.createContext(apis);
-        }
 
         switch (this.adapterName) {
             case "http": {
@@ -224,17 +218,17 @@ export class Supervisor {
         this.app.on("message", (data: { type: string, body: string }) => {
             switch (data.type) {
                 case "log":
-                logger.debug("log:", data.body.replace(/[ \t\n]+$/, ''));
-                this.log += data.body.replace(/[ \t\n]+$/, '') + "\n";
-                if (this.testMode) {
-                    this.allLog += data.body.replace(/[ \t\n]+$/, '') + "\n";
-                }
-                break;
+                    logger.debug("log:", data.body.replace(/[ \t\n]+$/, ''));
+                    this.log += data.body.replace(/[ \t\n]+$/, '') + "\n";
+                    if (this.testMode) {
+                        this.allLog += data.body.replace(/[ \t\n]+$/, '') + "\n";
+                    }
+                    break;
                 case "setUpdateLock":
-                this.updateEnabled = (data.body !== 'lock');
-                break;
+                    this.updateEnabled = (data.body !== 'lock');
+                    break;
                 default:
-                logger.warn("unknown message", data.type);
+                    logger.warn("unknown message", data.type);
             }
         });
 
