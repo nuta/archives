@@ -29,7 +29,6 @@ describe('new-plugin command', function() {
         await newPluginCommand({ dir: this.pluginDir }, { lang: 'javascript' });
         expect(fs.existsSync(path.join(this.pluginDir, 'README.md'))).to.be.true;
         expect(fs.existsSync(path.join(this.pluginDir, 'lib/index.js'))).to.be.true;
-        expect(fs.existsSync(path.join(this.pluginDir, 'plugin.yaml'))).to.be.true;
         expect(fs.existsSync(path.join(this.pluginDir, '.makestackignore'))).to.be.true;
         expect(fs.existsSync(path.join(this.pluginDir, 'package.json'))).to.be.true;
         expect(fs.existsSync(path.join(this.pluginDir, 'jsconfig.json'))).to.be.true;
