@@ -14,12 +14,6 @@ const DEFAULT_TEMPLATES = [
 `,
     },
     {
-        filepath: "plugin.yaml",
-        template: `\
-name: {{ appName }}
-`,
-    },
-    {
         filepath: ".gitignore",
         template: `\
 /dist
