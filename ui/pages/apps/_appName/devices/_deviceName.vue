@@ -119,7 +119,20 @@
         </div>
       </tab>
       <tab name="Settings">
-        <div class="form-sections">
+        <div class="sections">
+          <section>
+            <header>
+              <h1>Transfer to another app</h1>
+            </header>
+            <div class="content">
+              <form @submit.prevent="transferToAnotherApp">
+                <select v-model="transferTo">
+                  <option v-for="app in apps" :key="app.name">{{ app.name }}</option>
+                </select>
+                <input type="submit" value="Transfer" class="primary">
+              </form>
+            </div>
+          </section>
           <section>
             <div class="header">
               <h1>Remove device</h1>
@@ -146,9 +159,12 @@ import Clipboardable from "~/components/clipboardable"
 export default {
   components: { DashboardLayout, Card, Tabs, Tab, Clipboardable },
   data() {
+    const appName = this.$route.params.appName
     return {
-      appName: this.$route.params.appName,
+      appName,
       deviceName: this.$route.params.deviceName,
+      apps: [],
+      transferTo: appName,
       device: {},
       configs: [],
       newConfig: {
@@ -215,10 +231,16 @@ export default {
         return config
       })
     },
+    async transferToAnotherApp() {
+      await api.updateDevice(this.deviceName, {
+        app: this.transferTo
+      })
+    }
   },
   async beforeMount() {
     this.device = await api.getDevice(this.deviceName)
     await this.refreshDeviceConfigs()
+    this.apps = await api.getApps()
   }
 }
 </script>
