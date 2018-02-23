@@ -7,7 +7,7 @@
   "description": "A MakeStack desktop app.",
   "scripts": {
     "build:assets": "rm -rf build && cd ../ui && NODE_ENV=production PLATFORM=desktop yarn nuxt generate && cd ../desktop && mv ../ui/dist build",
-    "build:main": "rm -rf build/main && cp -r package.json main build",
+    "build:main": "rm -rf build/main && cp -r yarn.lock package.json main build && cd build && yarn",
     "build:macos": "yarn build:assets && yarn build:main && electron-packager build --platform darwin --asar --overwrite --out releases --arch x64 --icns assets/images/icon.icns",
     "build:linux": "yarn build:assets && yarn build:main && electron-packager build --platform linux  --asar --overwrite --out releases --arch x64",
     "dev": "concurrently --kill-others 'yarn run renderer' 'yarn run main'",
