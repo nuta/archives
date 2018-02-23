@@ -75,6 +75,10 @@ export default {
     }
   },
   async beforeMount() {
+    if (!api.loggedIn()) {
+      return;
+    }
+
     const appItems = (await api.getApps()).map(app => {
       return {
         title: app.name,

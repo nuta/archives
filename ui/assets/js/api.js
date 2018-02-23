@@ -115,7 +115,7 @@ class API {
   }
 
   createUser({ server, username, email, password, passwordConfirmation, recaptcha, agreeTos }) {
-    let status, headers
+    let status
     return fetch(`${server}/api/v1/auth`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -129,24 +129,13 @@ class API {
       })
     }).then((response) => {
       status = response.status
-      headers = response.headers
       return response.json()
     }).then(json => {
       if (status !== 200) {
-        throw new Error(`Error: failed to login: ${json.errors.full_messages[0]}`)
+        throw new Error(`Error: failed to create an account: ${json.errors.full_messages[0]}`)
       }
 
       this.server = server
-      this.credentials = {
-        url: this.server,
-        username: username,
-        email: json['data']['email'],
-        uid: headers.get('uid'),
-        'access-token': headers.get('access-token'),
-        'access-token-secret': headers.get('access-token-secret')
-      }
-
-      saveCredentials(this.credentials)
     })
   }
 
