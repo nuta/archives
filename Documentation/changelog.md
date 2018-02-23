@@ -2,6 +2,8 @@
 title: Change Log
 ---
 
+- v0.4.0
+  - Fix desktop app build.
 - v0.3.3
   - Bug fixes.
 - v0.3.2
