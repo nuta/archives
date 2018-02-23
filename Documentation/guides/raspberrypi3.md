@@ -1,6 +1,4 @@
----
-title: Raspberrry Pi3
----
+# Raspberrry Pi3
 
 APIs
 ----

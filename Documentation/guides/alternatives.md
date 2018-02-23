@@ -1,6 +1,4 @@
----
-title: alternatives
----
+# Alternatives
 
 There are many products to make hardware prototyping. Happy creating!
 

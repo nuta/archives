@@ -1,26 +1,37 @@
 # Writing a Plugin
 
+*Plugin* is a pure Node.js package such as device driver for I2c peripherals. Let's
+create a plugin named *led-blinker* and learn how to write a new plugin.
+
 Requirements
 -------------
 
 - A macOS or Linux machine with Node.js version 8.x or higher
 - [MakeStack CLI developer tools](https://www.npmjs.com/package/makestack-sdk)
 
-Creating the your first plugin
-------------------------------
+Setup
+------
 
-1. Create an plugin and `cd(1)` into the generated directory.
+1. Create plugin template files.
 
 ```bash
 makestack new-plugin led-blinker
 cd led-blinker
 ```
 
+2. Create an app for debugging the plugin.
+
+```bash
+yarn create-app
+```
+
+Writing code
+------------
+
 You'll see there files in the directory:
 
-- **plugin.yaml:** A MakeStack plugin config file. Leave it as it is for now.
-- **lib/index.ts:** A TypeScript (Node.js) script.
-- **example:** A sample MakeStack app to test the plugin.
+- **lib/index.ts:** A plugin source code.
+- **app.js:** An app code for debugging and demonstrating your plugin.
 
 2. Edit `lib/index.ts`.
 
@@ -51,24 +62,31 @@ export class LEDBlinker {
 }
 ```
 
-3. Edit `example/app.js`.
+3. Edit `app.js`.
 
 ```js
 // JavaScript
-const { LEDBlinker } = require('@makestack/led-blinker')
+const { LEDBlinker } = require('.')
 
-const blinker = LEDBlinker({ pin: 22 })
+const blinker = LEDBlinker({ pin: 26 })
 blinker.start()
 ```
 
-4. Deloy the example app.
+4. Transpile plugin source code.
 
 ```bash
-cd example && makestack deploy
+yarn build
 ```
+
+5. Deloy `app.js` including compiled plugin files. **Don't forget to transpile source code before deploying!**
+
+```bash
+makestack deploy
+```
+
+That's it!
 
 Publishing a plugin
 -------------------
 
-[Publish the plugin as a npm package](https://docs.npmjs.com/getting-started/publishing-npm-packages) or
-send us a pull request that add your cool plugin into [official plugins](https://github.com/makestack/makestack/tree/master/plugins).
+Send us a pull request to add your cool plugin into [official plugins](https://github.com/makestack/makestack/tree/master/plugins)!

@@ -1,6 +1,4 @@
----
-title: Deploying to Heroku
----
+# Deploying to Heroku
 
 [Heroku](https://heroku.com) is a fabulous Platform-as-a-Service that
 allows you to deploy your own MakeStack Server easily.
@@ -16,11 +14,13 @@ Prepare for deploy
 
 You need these stuffs before deployment.
 
-- A [Heroku account](https://heroku.com)
-- A [SendGrid account](https://sendgrid.com/) (or another SMTP server)
-- A [Google reCAPTCHA](https://www.google.com/recaptcha/) API key
+- [Heroku account](https://heroku.com)
+- [Google reCAPTCHA API key](https://www.google.com/recaptcha/)
+- [Skylight account](https://skylight.io)
+- [Timber account](https://timber.io)
+- [Sentry account](https://sentry.io)
+- [SendGrid account](https://sendgrid.com/) (or another SMTP server)
 - Heroku CLI toolchain
-
 
 Setting up the repository
 --------------------------
@@ -43,28 +43,13 @@ Create a Heroku app
 heroku create -a HEROKU_APP_NAME
 ```
 
-Configuration (MakeStack Server)
----------------------------------
-1. Clone MakeStack Git Repository.
-2. Copy template config files.
-
-```
-cd path/to/makestack
-cd server
-cp config/settings.yml.example config/settings.production.yml
-cp ui/config.js.example ui/config.js
-```
-
-3. Edit `config/settings.production.yml` and `ui/config.js`.
+Set environment variables
+--------------------------
+Define environment variables defined in `app.json`.
 
 **Note:** Since Heroku does not provide a mail server, MakeStack Server is not
 able to send e-mails (e.g. user registration confirmation e-mail) by default. Instead
 you can use [SendGrid to send e-mails for free](https://sendgrid.com/docs/Classroom/Basics/Email_Infrastructure/recommended_smtp_settings.html).
-
-4. Commit!
-```
-git commit -m 'heroku: add config files'
-```
 
 Configuration (Heroku)
 -----------------------
@@ -77,11 +62,15 @@ heroku buildpacks:set --index 2 heroku/nodejs
 heroku buildpacks:set --index 3 heroku/ruby
 ```
 
+Don't forget to follow instructions of Skylight, Timber, and Sentry.
+
 Deploy to Heroku
 -----------------
 ```bash
 git push heroku production:master
 ```
+
+This would take 5-6 minutes.
 
 Database Creation
 ------------------
