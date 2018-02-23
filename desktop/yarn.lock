@@ -2,17 +2,17 @@
 # yarn lockfile v1
 
 
-"@makestack/hdc1000@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@makestack/hdc1000/-/hdc1000-0.2.4.tgz#40456cbd870419f30ccf2139f3bf25ac9754b035"
+"@makestack/hdc1000@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@makestack/hdc1000/-/hdc1000-0.3.2.tgz#b5ada6a7f01c029ce269bc8a5ee79463085ba8c5"
   dependencies:
-    makestack "^0.2.4"
+    makestack "^0.3.2"
 
-"@makestack/supervisor@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/@makestack/supervisor/-/supervisor-0.2.4.tgz#913590ad3027cbcd1e7cb0e7ec816be2948e2165"
+"@makestack/supervisor@^0.3.2":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@makestack/supervisor/-/supervisor-0.3.3.tgz#602497af884b6e9b9c6e3823a08db3a5130d9142"
   dependencies:
-    makestack "^0.2.4"
+    makestack "^0.3.2"
 
 "@types/node@^8.0.24":
   version "8.9.3"
@@ -3699,12 +3699,12 @@ make-dir@^1.0.0:
   dependencies:
     pify "^3.0.0"
 
-makestack-sdk@^0.2.10:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/makestack-sdk/-/makestack-sdk-0.2.10.tgz#019432788717cf2a8c4f46c8927ef5b507abf088"
+makestack-sdk@^0.3.2:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/makestack-sdk/-/makestack-sdk-0.3.3.tgz#b9f446d61f3b152fdc867d4b6fc531ce0fede70c"
   dependencies:
-    "@makestack/hdc1000" "^0.2.4"
-    "@makestack/supervisor" "^0.2.4"
+    "@makestack/hdc1000" "^0.3.2"
+    "@makestack/supervisor" "^0.3.2"
     body-parser "^1.18.2"
     caporal "^0.9.0"
     chalk "^2.3.1"
@@ -3725,9 +3725,9 @@ makestack-sdk@^0.2.10:
     supervisor "^0.12.0"
     winston next
 
-makestack@^0.2.4:
-  version "0.2.4"
-  resolved "https://registry.yarnpkg.com/makestack/-/makestack-0.2.4.tgz#c61d8086f941281451062bc23b594d9ebae72e6e"
+makestack@^0.3.2:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/makestack/-/makestack-0.3.3.tgz#de9d824950161b09a51ae9cfd502e6627c559c8f"
   dependencies:
     nan "^2.8.0"
 
