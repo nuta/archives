@@ -38,7 +38,7 @@ program
 program
 .command("app create", "Create an app.")
 .argument("name", "The app name.")
-.option("--api <api>", "The API.", /^nodejs$/, null, true)
+.option("--api <api>", "The API.", /^nodejs$/, 'nodejs')
 .action(appCommand.create);
 
 program
