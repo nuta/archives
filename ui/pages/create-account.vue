@@ -36,7 +36,7 @@
         <div class="field">
          <p>
            By clicking "Create Account", you agree to our
-           <a href="/tos">Term of Service</a> and <a href="/privacy-policy">Privacy Policy</a>.
+           <a href="/tos.html" target="_blank">Term of Service</a> and <a href="/privacy-policy.html" target="_blank">Privacy Policy</a>.
           </p>
         </div>
 
