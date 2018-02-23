@@ -1,4 +1,5 @@
 @mixin button {
+  border: none;
   border-bottom: 5px solid var(--bg2-color);
   border-radius: 5px;
   font-family: 'Open Sans', sans-serif;

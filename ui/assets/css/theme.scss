@@ -19,16 +19,19 @@
 .solarized-light-theme {
   --bg0-color: #fdf6e3;
   --bg1-color: #eee8d5;
-  --bg1-color: #ded8c5;
+  --bg2-color: #ded8c5;
   --fg0-color: #567b83;
   --fg1-color: #93a1a1;
   --fg2-color: #93a1a1;
   --link-color: rgba(0, 150, 255, .90);
   --border-color: #cacaca;
   --accent-color: #859900;
-  --positive-color: #268bd2;
-  --negative-color: #dc322f;
-  --shadow-color: #073642;
+  --positive1-color: #268bd2;
+  --positive2-color: #167bc2;
+  --negative1-color: #dc322f;
+  --negative2-color: #a60303;
+  --colored-bg-font-color: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.09);
 }
 
 .monokai-theme {
@@ -39,9 +42,12 @@
   --fg1-color: #eaeaea;
   --fg2-color: #c8c8c8;
   --link-color: rgba(0, 150, 255, .90);
-  --border-color: #cacaca;
+  --border-color: #a6a6a6;
   --accent-color: #a6e22e;
-  --positive-color: #1b7eac;
-  --negative-color: #f92672;
-  --shadow-color: #eeeeee;
+  --positive1-color: #1b7eac;
+  --positive2-color: #0b6e9c;
+  --negative1-color: #f92672;
+  --negative2-color: #a60303;
+  --colored-bg-font-color: #f8f8f8;
+  --shadow-color: rgba(255, 255, 255, 0.9);
 }
