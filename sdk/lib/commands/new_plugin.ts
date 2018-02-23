@@ -86,7 +86,10 @@ const TYPESCRIPT_TEMPLATES = [
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "transpile": "tsc"
+    "build": "tsc",
+    "dev": "tsc -w",
+    "create-app": "makestack app create {{ appName }}",
+    "deploy": "makestack deploy"
   }
 }
 `,
@@ -110,12 +113,23 @@ const TYPESCRIPT_TEMPLATES = [
 `,
     },
     {
+        filepath: "app.js",
+        template: `\
+const { {{ CamelAppName }} } = require('.')
+
+const instance = new {{ CamelAppName }}()
+setInterval(() => {
+  instance.printHelloWorld()
+}, 1000)
+`,
+    },
+    {
         filepath: "lib/index.ts",
         template: `\
 const { print } = require('makestack')
 
 export class {{ CamelAppName }} {
-    constructor() {
+    printHelloWorld() {
         print('Hello form {{ CamelAppName }}!')
     }
 }
