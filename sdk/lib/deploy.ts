@@ -10,8 +10,7 @@ import { logger } from "./logger";
 import { FatalError } from "./types";
 import { spawnSync } from "child_process";
 
-export async function deploy(appYAML: any, files: any[]) {
-    const appName = appYAML.name;
+export async function deploy(appName: string, files: any[]) {
     const runtime = "runtime";
     let zip = new JSZip();
     let tempDir;
@@ -63,7 +62,7 @@ function shouldBePruned(filepath: string) {
 }
 
 export async function deployAppDir(appDir: string) {
-    const appYAML = loadPackageJson(appDir);
+    const appName = loadPackageJson(appDir).name || path.basename(appDir);
     const files = [];
 
     for (const filepath of find(appDir)) {
@@ -104,7 +103,7 @@ export async function deployAppDir(appDir: string) {
         }
     }
 
-    await deploy(appYAML, files);
+    await deploy(appName, files);
 
     if (tempDir) {
         removeFiles(tempDir);
