@@ -28,5 +28,15 @@
         }
       }
     }
+  },
+  "v0.4.2": {
+    "linux": {
+      "assets": {
+        "raspberrypi3": {
+          "url": "https://github.com/makestack/makestack/releases/download/v0.4.2/makestack-linux-raspberrypi3.img",
+          "shasum": "1b4432ad09c096bcdd632108e002fbdfc9af129955c9837fd03933e00240c5b6"
+        }
+      }
+    }
   }
 }
