@@ -2,6 +2,8 @@
 title: Change Log
 ---
 
+- v0.4.2
+  - Fix desktop build.
 - v0.4.1
   - Fix some UI bugs.
 - v0.4.0
