@@ -8,10 +8,10 @@
     "prepare": "tsc"
   },
   "dependencies": {
-    "hap-nodejs": "^0.4.36"
+    "hap-nodejs": "^0.4.41"
   },
   "devDependencies": {
-    "@types/node": "^8.5.2",
-    "typescript": "^2.6.2"
+    "@types/node": "^9.4.7",
+    "typescript": "^2.7.2"
   }
 }

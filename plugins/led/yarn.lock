@@ -2,19 +2,19 @@
 # yarn lockfile v1
 
 
-"@types/node@^9.4.6":
-  version "9.4.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.4.6.tgz#d8176d864ee48753d053783e4e463aec86b8d82e"
+"@types/node@^9.4.7":
+  version "9.4.7"
+  resolved "http://registry.npmjs.org/@types/node/-/node-9.4.7.tgz#57d81cd98719df2c9de118f2d5f3b1120dcd7275"
 
-makestack@^0.3.2:
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/makestack/-/makestack-0.3.2.tgz#3718ccc52a2595e1ec8cd48705ec0ead633dab55"
+makestack@0.x:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/makestack/-/makestack-0.4.2.tgz#c4c18f47bf24ff21fe720736edf2516476ade90e"
   dependencies:
     nan "^2.8.0"
 
 nan@^2.8.0:
-  version "2.8.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/nan/-/nan-2.10.0.tgz#96d0cd610ebd58d4b4de9cc0c6828cda99c7548f"
 
 typescript@^2.7.2:
   version "2.7.2"

@@ -15,28 +15,28 @@
     "renderer": "cd ../ui && NODE_ENV=development PLATFORM=desktop PORT=9080 yarn dev"
   },
   "dependencies": {
-    "makestack-sdk": "^0.4.0",
-    "node-fetch": "^2.0.0",
-    "vue": "^2.5.13",
+    "makestack-sdk": "0.x",
+    "node-fetch": "^2.1.1",
+    "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-loader": "^7.1.2",
+    "babel-loader": "^7.1.4",
     "concurrently": "^3.5.0",
-    "copy-webpack-plugin": "^4.4.1",
-    "css-loader": "^0.28.9",
-    "electron": "^1.8.2",
-    "electron-packager": "^11.0.0",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^0.28.11",
+    "electron": "^1.8.4",
+    "electron-packager": "^11.1.0",
     "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^2.30.1",
+    "html-webpack-plugin": "^3.0.6",
     "node-sass": "^4.5.3",
-    "postcss-loader": "^2.1.0",
-    "sass-loader": "^6.0.6",
-    "vue-loader": "^14.1.1",
-    "vue-template-compiler": "^2.5.13",
-    "webpack": "^3.11.0",
-    "webpack-dev-server": "^2.11.1"
+    "postcss-loader": "^2.1.2",
+    "sass-loader": "^6.0.7",
+    "vue-loader": "^14.2.1",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^4.1.1",
+    "webpack-dev-server": "^3.1.1"
   }
 }

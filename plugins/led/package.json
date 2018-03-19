@@ -5,11 +5,11 @@
     "transpile": "tsc"
   },
   "devDependencies": {
-    "@types/node": "^9.4.6",
+    "@types/node": "^9.4.7",
     "typescript": "^2.7.2"
   },
   "dependencies": {
-    "makestack": "^0.3.2"
+    "makestack": "0.x"
   },
   "version": "0.4.2"
 }
