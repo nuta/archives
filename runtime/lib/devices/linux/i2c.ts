@@ -13,14 +13,14 @@ export abstract class LinuxI2CAPI {
         this.fd = fs.openSync(this.path, "rs+");
     }
 
-    public read(length: number): Buffer {
+    public readSync(length: number): Buffer {
         this.selectSlaveAddress(this.address);
         const buffer = Buffer.alloc(length);
         fs.readSync(this.fd, buffer, 0, length, 0);
         return buffer;
     }
 
-    public write(data: number[] | Buffer) {
+    public writeSync(data: number[] | Buffer) {
         // FIXME: kludge for a compile error
         if (!Buffer.isBuffer(data)) {
             data = Buffer.from(data)

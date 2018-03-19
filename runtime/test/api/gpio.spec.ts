@@ -42,15 +42,15 @@ describe('GPIO API', function() {
 
     describe('write', function() {
         it('changes the value', function() {
-            this.instance.write(true);
+            this.instance.writeSync(true);
             expect(readFile('/sys/class/gpio/gpio1/value')).to.equal('1');
         })
     })
 
     describe('read', function() {
         it('reads the value', function() {
-            this.instance.write(false);
-            expect(this.instance.read()).to.equal(false);
+            this.instance.writeSync(false);
+            expect(this.instance.readSync()).to.equal(false);
         })
     })
 

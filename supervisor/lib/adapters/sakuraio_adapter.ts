@@ -137,7 +137,7 @@ export class I2CSakuraIODriver extends SakuraIODriverBase {
         Timer.busywait(10 * 1000);
 
         // Receive a response from the module.
-        const buf            = (await this.i2c.read(32));
+        const buf            = this.i2c.readSync(32);
         const result         = buf.readUInt8(0);
         const responseLength = buf.readUInt8(1);
         const parity         = buf.readUInt8(responseLength + 2);

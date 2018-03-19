@@ -47,11 +47,11 @@ export class LinuxGPIOAPI implements GPIOInterface {
         }
     }
 
-    public write(value: boolean) {
+    public writeSync(value: boolean) {
         fs.writeFileSync(`/sys/class/gpio/gpio${this.pin}/value`, value ? "1" : "0");
     }
 
-    public read() {
+    public readSync() {
         return fs.readFileSync(`/sys/class/gpio/gpio${this.pin}/value`, "utf-8") === "1\n";
     }
 

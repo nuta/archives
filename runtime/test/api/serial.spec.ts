@@ -39,7 +39,7 @@ describe('Serial API', function() {
 
     describe('read', function() {
         it('returns read data', function() {
-            const data = this.instance.read();
+            const data = this.instance.readSync();
             expect(data.equals(Buffer.from(this.writtenData))).to.true
         })
     })
@@ -47,7 +47,7 @@ describe('Serial API', function() {
     describe('write', function() {
         it('writes data to the device file', function () {
             const data = Buffer.from("hello");
-            this.instance.write(data);
+            this.instance.writeSync(data);
             expect(fs.readFileSync(this.deviceFile).includes(data)).to.be.true
         })
     })

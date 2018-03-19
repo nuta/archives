@@ -29,7 +29,7 @@ describe('I2C API', function() {
 
     describe('read', function() {
         it('access the device file', function() {
-            this.instance.read(8);
+            this.instance.readSync(8);
             expect(fs.statSync(this.deviceFile).atime).to.not.equal(this.atime)
             expect(this.ioctl.called).to.be.true
         })
@@ -37,7 +37,7 @@ describe('I2C API', function() {
 
     describe('write', function() {
         it('access the device file', function() {
-            this.instance.write([0x11, 0x22]);
+            this.instance.writeSync([0x11, 0x22]);
             expect(fs.statSync(this.deviceFile).atime).to.not.equal(this.atime)
             expect(this.ioctl.called).to.be.true
         })

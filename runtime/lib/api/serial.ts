@@ -30,11 +30,11 @@ export class SerialAPI {
         native.serialConfigure(this.fd, baudrate, 0, 0);
     }
 
-    public write(data: Buffer) {
+    public writeSync(data: Buffer) {
         fs.writeSync(this.fd, data);
     }
 
-    public read() {
+    public readSync() {
         return fs.readFileSync(this.fd);
     }
 
@@ -47,7 +47,7 @@ export class SerialAPI {
 
         // FIXME: use libuv
         setInterval(() => {
-            const chunk = this.read();
+            const chunk = this.readSync();
             if (chunk.length > 0) {
                 callback(chunk);
             }
@@ -64,7 +64,7 @@ export class SerialAPI {
         // FIXME: use libuv
         let buf = "";
         setInterval(() => {
-            const chunk = this.read().toString("utf-8");
+            const chunk = this.readSync().toString("utf-8");
             if (chunk.length > 0) {
                 buf += chunk;
                 while (buf.includes("\n")) {

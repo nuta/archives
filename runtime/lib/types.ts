@@ -3,8 +3,8 @@ export type GPIOInterruptMode = 'rising' | 'falling' | 'both'
 
 export interface GPIOInterface {
     setMode(mode: GPIOPinMode): void;
-    write(value: boolean): void;
-    read(): boolean;
+    writeSync(value: boolean): void;
+    readSync(): boolean;
     onInterrupt(mode: GPIOInterruptMode, callback: () => void): void;
 }
 
@@ -35,6 +35,6 @@ export interface I2CConstructor {
 }
 
 export interface I2CInterface {
-    read(length: number): Buffer;
-    write(data: number[] | Buffer): void;
+    readSync(length: number): Buffer;
+    writeSync(data: number[] | Buffer): void;
 }

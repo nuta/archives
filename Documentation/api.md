@@ -72,8 +72,8 @@ const { Config } = require('makestack')
   ```js
   const pumpRelay = new GPIO({ pin: 13, mode: 'out' })
   Config.onCommand('water-the-plant', duration => {
-    pumpRelay.write(true)
-    setTimeout(pumpRelay.write(false), parseInt(duration))
+    pumpRelay.writeSync(true)
+    setTimeout(pumpRelay.writeSync(false), parseInt(duration))
   })
   ```
 
@@ -111,9 +111,9 @@ const { Timer } = require('makestack')
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
   Timer.loop(async () => {
-    led.write(true)
+    led.writeSync(true)
     await Timer.sleep(0.3)
-    led.write(false)
+    led.writeSync(false)
     await Timer.sleep(0.3)
   })
   ```
@@ -125,9 +125,9 @@ const { Timer } = require('makestack')
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
   Timer.interval(1, () => {
-    led.write(true)
+    led.writeSync(true)
     Timer.busywait(1000)
-    led.write(false)
+    led.writeSync(false)
     Timer.busywait(1000)
   })
   ```
@@ -217,21 +217,21 @@ const { GPIO } = require('makestack')
   led.setMode(GPIO.INTPUT)
   ```
 
-### write
+### writeSync
 - **Definition:** `(value: boolean) => void`
 - **Example:**
   ```js
   const led = new GPIO({ pin: 13, mode: 'out' })
-  led.write(true)
+  led.writeSync(true)
   ```
 
-### read
+### readSync
 - **Definition:** `() => boolean`
 - **Example:**
   ```js
   const button = new GPIO({ pin: 13, mode: 'in' })
   Timer.interval(0.5, () => {
-    const value = button.read()
+    const value = button.readSync()
     print(`button: ${value}`)
   })
   ```
@@ -253,7 +253,7 @@ const { GPIO } = require('makestack')
   ```js
   const button = new GPIO({ pin: 13, mode: 'in' })
   button.onChange(() => {
-    publish('button', button.read())
+    publish('button', button.readSync())
   })
   ```
 
@@ -270,18 +270,18 @@ const { I2C } = require('makestack')
   const device = new I2C({ address: 0x40 })
   ```
 
-### read
+### readSync
 - **Definition:** `(length: number) => Buffer`
 - **Example:**
   ```js
-  const data = device.read(2)
+  const data = device.readSync(2)
   ```
 
-### write
+### writeSync
 - **Definition:** `(data: number[] | Buffer) => void`
 - **Example:**
   ```js
-  device.write([0x01, 0x00, 0x00])
+  device.writeSync([0x01, 0x00, 0x00])
   ```
 
 ## Serial
@@ -307,18 +307,18 @@ const { Serial } = require('makestack')
   Serial.list() //=> ['/dev/ttyUSB0']
   ```
 
-### read
+### readSync
 - **Definition:** `() => Buffer`
 - **Example:**
   ```js
-  port.read()
+  port.readSync()
   ```
 
-### write
+### writeSync
 - **Definition:** `(data: Buffer) => void`
 - **Example:**
   ```js
-  port.write('Hello!\n')
+  port.writeSync('Hello!\n')
   ```
 
 ### onData

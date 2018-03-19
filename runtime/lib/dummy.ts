@@ -15,12 +15,12 @@ class dummyGPIO implements GPIOInterface {
         logger.warn(`dummyGPIO.setMode(${mode})`);
     }
 
-    write(value: boolean): void {
-        logger.warn(`dummyGPIO.write(${value})`);
+    writeSync(value: boolean): void {
+        logger.warn(`dummyGPIO.writeSync(${value})`);
     }
 
-    read(): boolean {
-        logger.warn('dummyGPIO.read() returning false');
+    readSync(): boolean {
+        logger.warn('dummyGPIO.readSync() returning false');
         return false;
     }
 
@@ -34,13 +34,13 @@ class dummyI2C implements I2CInterface {
         logger.warn(`new dummyI2C(${args})`);
     }
 
-    read(length: number): Buffer {
+    readSync(length: number): Buffer {
         const retval = Buffer.alloc(length);
-        logger.warn(`dummyI2C.read(${length}) returning ${util.inspect(retval)}`);
+        logger.warn(`dummyI2C.readSync(${length}) returning ${util.inspect(retval)}`);
         return retval;
     }
-    write(data: number[] | Buffer) {
-        logger.warn(`dummyI2C.read(${data})`);
+    writeSync(data: number[] | Buffer) {
+        logger.warn(`dummyI2C.writeSync(${data})`);
     }
 }
 
