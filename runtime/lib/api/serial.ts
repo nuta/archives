@@ -9,8 +9,13 @@ export class SerialAPI {
     public baudrate: number;
 
     constructor(args: { path: string, baudrate: number }) {
+        if (!args.baudrate) {
+            throw new Error("`baudrate' is not speicified");
+        }
+
         this.path = args.path;
         this.watching = false;
+        this.baudrate = args.baudrate;
         this.fd = fs.openSync(args.path, O_RDWR | O_NOCTTY | O_SYNC);
         this.configure(args.baudrate);
     }
@@ -22,11 +27,6 @@ export class SerialAPI {
     }
 
     public configure(baudrate: number) {
-        if (!baudrate) {
-            throw new Error("`baudrate' is not speicified");
-        }
-
-        this.baudrate = baudrate;
         native.serialConfigure(this.fd, baudrate, 0, 0);
     }
 

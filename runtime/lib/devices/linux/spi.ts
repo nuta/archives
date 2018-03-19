@@ -1,7 +1,9 @@
 import * as fs from "fs";
 import { functions as native } from "../../native";
-import { GPIOInterface, SPIMode, SPIOrder } from "../../types";
 import { GPIO } from "../..";
+import {
+    SPIMode, SPIOrder
+} from "../../types";
 
 const SPI_CPHA = 0x01;
 const SPI_CPOL = 0x02;
@@ -13,8 +15,7 @@ const SPI_MODES: { [key: string]: number } = {
 };
 
 export abstract class LinuxSPIAPI {
-    public abstract bus: string;
-    public slave: number;
+    public bus: string;
     public ss?: any;
     public fd: number;
     public mode: SPIMode;
@@ -22,13 +23,17 @@ export abstract class LinuxSPIAPI {
     public speed: number;
     public order: SPIOrder;
 
-    constructor(args: {
-        slave?: number, speed?: number, mode: SPIMode, order?: SPIOrder,
-        bits?: number, ss?: number, path?: string
-    }) {
+    constructor(bus: string, args: any) {
+        this.bus = bus;
+
         let path;
+        const modeNumber = SPI_MODES[args.mode];
+        if (typeof modeNumber !== "number") {
+            throw new Error("invalid spi mode");
+        }
+
         if (args.slave) {
-            path = `/dev/spidev${this.bus}.${args.slave}`;
+            path = `/dev/spidev${bus}.${args.slave}`;
         } else {
             if (!args.path) {
                 throw new Error("Specify `path' or `slave'.");
@@ -49,20 +54,11 @@ export abstract class LinuxSPIAPI {
             this.ss = undefined;
         }
 
+        this.mode = args.mode || "MODE0";
+        this.bits = args.bits || 8;
+        this.speed = args.speed || 500000;
+        this.order = args.order || "MSBFIRST";
         this.fd = fs.openSync(path, "rs+");
-        this.configure(args.mode, args.bits || 8, args.speed || 500000, args.order || "MSBFIRST");
-    }
-
-    public configure(mode: SPIMode, bits: number, speed: number, order: SPIOrder) {
-        this.mode = mode || "MODE0";
-        this.bits = bits || 8;
-        this.speed = speed;
-        this.order = order;
-
-        const modeNumber = SPI_MODES[this.mode];
-        if (typeof modeNumber !== "number") {
-            throw new Error("invalid spi mode");
-        }
 
         native.spiConfigure(
             this.fd,

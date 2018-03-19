@@ -4,13 +4,14 @@ import { functions as native } from "../../native";
 const I2C_SLAVE = 0x0703;
 
 export abstract class LinuxI2CAPI {
-    public abstract path: string;
+    public path: string;
     public address: number;
     public fd: number;
 
-    constructor(args: { address: number }) {
+    constructor(path: string, args: { address: number }) {
+        this.path = path;
         this.address = args.address;
-        this.fd = fs.openSync(this.path, "rs+");
+        this.fd = fs.openSync(path, "rs+");
     }
 
     public readSync(length: number): Buffer {
