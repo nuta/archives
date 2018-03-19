@@ -5,12 +5,12 @@ const dts = require('dts-bundle')
 const { spawnSync } = require('child_process')
 
 const pluginDirs = fs
-  .readdirSync(path.resolve(__dirname, '../../../plugins'))
-  .map(name => path.join(__dirname, '../../../plugins', name))
+  .readdirSync(path.resolve(__dirname, '../../plugins'))
+  .map(name => path.join(__dirname, '../../plugins', name))
   .filter(dir => fs.existsSync(path.join(dir, 'package.json')))
 
 const dirs = [
-  path.resolve(__dirname, '../../../runtime'),
+  path.resolve(__dirname, '../../runtime'),
   ...pluginDirs
 ]
 
@@ -22,6 +22,7 @@ for (const dir of dirs) {
     path.join(dir, 'package.json'))
   ).name
 
+  console.log(dir)
   spawnSync('yarn', ['prepack'], { stdio: 'inherit', cwd: dir })
 
   dts.bundle({
