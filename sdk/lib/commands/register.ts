@@ -3,7 +3,7 @@ import { API } from "../api";
 import { saveDeviceConfig } from "../config";
 
 export async function main(args: any, opts: any, logger: any) {
-    const answers = await inquirer.prompt([
+    const answers: any = await inquirer.prompt([
         { message: "User Password", name: "password", type: "password" }
     ]);
 

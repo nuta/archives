@@ -94,7 +94,8 @@ export class Supervisor {
         this.heartbeatInterval = args.heartbeatInterval || 15;
         this.deviceId = args.deviceId;
         this.deviceSecret = args.deviceSecret;
-        const { Device } = require(`./devices/${apis.Device.getDeviceType()}`);
+        this.deviceType = apis.Device.getDeviceType();
+        const { Device } = require(`./devices/${this.deviceType}`);
         this.device = new Device();
         this.appVersion = 0;
         this.log = "";
