@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "allowJs": true,
     "target": "es2017",
     "module": "commonjs",
+    "moduleResolution": "node",
+    "declaration": true,
     "sourceMap": true,
-    "types": ["node", "makestack"]
+    "pretty": true
   },
   "include": [
-      "./lib/**/*"
+    "./lib/**/*"
   ]
 }
