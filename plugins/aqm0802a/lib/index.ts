@@ -7,14 +7,14 @@ export class AQM0802A {
         this.bus = new I2C({ address });
 
         for (const cmd of [0x39, 0x14, 0x74, 0x56, 0x6c, 0x0c]) {
-            this.bus.sendSync([0x00, cmd]);
+            this.bus.writeSync([0x00, cmd]);
         }
 
         this.clear();
     }
 
     public async clear() {
-        this.bus.sendSync([0x00, 0x01]);
+        this.bus.writeSync([0x00, 0x01]);
         await Timer.busywait(5 * 1000);
     }
 
@@ -23,9 +23,9 @@ export class AQM0802A {
 
         this.clear();
         for (const [i, ch] of shortenedText.split("").entries()) {
-            this.bus.sendSync([0x00, 0x80 + ((i > 7) ? 0x40 + i - 8 : i)]);
+            this.bus.writeSync([0x00, 0x80 + ((i > 7) ? 0x40 + i - 8 : i)]);
             await Timer.busywait(5 * 1000);
-            this.bus.sendSync([0x40, ch.charCodeAt(0)]);
+            this.bus.writeSync([0x40, ch.charCodeAt(0)]);
             await Timer.busywait(5 * 1000);
         }
     }

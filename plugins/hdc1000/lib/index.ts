@@ -10,12 +10,12 @@ export class HDC1000 {
     constructor(address = 0x40) {
         this.bus = new I2C({ address });
 
-        this.bus.sendSync([HDC1000_CONFIG_REG, 0x00, 0x00]);
+        this.bus.writeSync([HDC1000_CONFIG_REG, 0x00, 0x00]);
         Timer.busywait(500 * 1000);
     }
 
     private read(reg: number) {
-        this.bus.sendSync([reg]);
+        this.bus.writeSync([reg]);
 
         Timer.busywait(500 * 1000);
 
