@@ -11,9 +11,7 @@ gem 'jbuilder'
 gem 'devise'
 gem 'devise_token_auth'
 gem 'sidekiq'
-
-# https://github.com/rails/rails/pull/31671
-gem 'pg', '~> 0.18', group: :postgres
+gem 'pg', group: :postgres
 
 gem 'redis-objects'
 gem 'redis-namespace'
