@@ -1,0 +1,3 @@
+index.js: MIT
+deps/esptool: GPLv2
+deps/pyserial: BSD-3-Clause
