@@ -4,10 +4,10 @@ esptoolpy
 A Node.js package that bundles [esptool](https://github.com/espressif/esptool).
 
 ```js
-const esptoolpy = require('esptoolpy')
+const { esptool, ARDUINO_DIR } = require('esptoolpy')
 
 // Returns ChildProcess
-const cp = esptoolpy([
+const cp = esptool([
     '--chip', 'esp32',
     '--port', '/dev/tty.usbserial-142430',
     '--baud', '115200',
@@ -16,10 +16,10 @@ const cp = esptoolpy([
     'write_flash',
     '-z',
     '--flash_mode', 'dio', '--flash_freq', '40m', '--flash_size', 'detect',
-    '0xe000', ' partitions/boot_app0.bin',
-    '0x1000', ' bootloader/bootloader.bin',
-    '0x10000', 'firmware.bin',
-    '0x8000', ' default.bin'
+    '0x1000', path.resolve(ARDUINO_DIR, 'tools/sdk/bootloader_dio_40m.bin'),
+    '0x8000', path.resolve(ARDUINO_DIR, 'tools/partitions/default.bin'),
+    '0xe000', path.resolve(ARDUINO_DIR, 'tools/partitions/boot_app0.bin'),
+    '0x10000', 'firmware.bin'
 ])
 
 cp.stdout.on('data' s => console.log(s))
