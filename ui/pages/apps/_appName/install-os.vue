@@ -110,7 +110,8 @@ export default {
       installButtonMessage: 'Install',
       deviceName: '',
       availableDeviceTypes: [
-        { name: 'raspberrypi3', description: 'Raspberry Pi3 (MakeStack Linux)' }
+        { name: 'esp32', description: 'ESP-32' },
+        { name: 'raspberrypi3', description: 'Raspberry Pi3' }
       ],
       deviceType: null,
       drive: null,
