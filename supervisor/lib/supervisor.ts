@@ -16,6 +16,21 @@ import * as apis from "makestack";
 import { HTTPAdapter } from "./adapters/http_adapter";
 import { SakuraIOAdapter } from "./adapters/sakuraio_adapter";
 
+const startJs = `
+function __handleError(error) {
+  console.error(error.stack)
+  process.send({
+    type: 'log',
+    body: '!' + error.stack.replace(/\\n/g, "\\n\\\\")
+  })
+  process.exit(1)
+}
+
+process.on('unhandledRejection', __handleError)
+process.on('uncaughtException', __handleError)
+require('./app')
+`
+
 export interface SupervisorConstructorArgs {
     adapter: {
         name: string,
@@ -157,9 +172,19 @@ export class Supervisor {
         }
     }
 
-    private launchApp(appZip: Buffer) {
+    private launchApp(appImage: Buffer) {
         fsutils.removeFiles(this.currentAppDir);
-        unzip.extract(appZip, this.currentAppDir);
+
+        if (appImage.slice(0, 2).equals(Buffer.from('PK'))) {
+            // A Zip image.
+            unzip.extract(appImage, this.currentAppDir);
+        } else {
+            // A plain JavaScript code.
+            fs.mkdirSync(this.currentAppDir)
+            fs.writeFileSync(path.resolve(this.currentAppDir, 'start.js'), startJs)
+            fs.writeFileSync(path.resolve(this.currentAppDir, 'app.js'), appImage)
+        }
+
         this.spawnApp();
     }
 
@@ -297,10 +322,10 @@ export class Supervisor {
         logger.info(`updating ${this.appVersion} -> ${appVersion}`);
         this.appVersion = appVersion;
 
-        let appZip;
+        let appImage;
         this.downloading = true;
         try {
-            appZip = await this.adapter.getAppImage(appVersion);
+            appImage = await this.adapter.getAppImage(appVersion);
         } catch (e) {
             logger.error("failed to download app image:", e);
             this.downloading = false;
@@ -309,7 +334,7 @@ export class Supervisor {
             this.downloading = false;
         }
 
-        this.launchApp(appZip);
+        this.launchApp(appImage);
     }
 
     private async handleUpdateOSMessage(osVersion: number) {
