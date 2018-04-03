@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const { ipcMain } = require('electron')
 const makestack = require('makestack-sdk')
 
@@ -11,10 +12,26 @@ function initIpc() {
     makestack.config.saveCredentials(arg)
   })
 
-  ipcMain.on('getAvailableDrives', (event, arg) => {
-    makestack.drive.getAvailableDrives().then(drives => {
-      event.returnValue = drives
-    })
+  ipcMain.on('getAvailableDrives', (event, deviceType) => {
+    switch (deviceType) {
+      case 'raspberrypi3':
+        makestack.drive.getAvailableDrives().then(drives => {
+          event.returnValue = drives
+        });
+        break
+      case 'esp32':
+        event.returnValue = fs.readdirSync('/dev')
+          .filter(name => name.match(/cu./))
+          .map(name => {
+            return {
+              device: '/dev/' + name,
+              description: 'Serial Port'
+            }
+          })
+        break
+      default:
+        event.returnValue = []
+    }
   })
 
   ipcMain.on('install', async (event, arg) => {
