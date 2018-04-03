@@ -35,12 +35,17 @@ if (process.env.MAKESTACK_APP) {
         switch (data.type) {
             case 'initialize':
                 logger.info(`initialize message: configs=${JSON.stringify(data.configs)}`)
-                Config.update(data.configs)
+                Config.executeCommands(data.configs)
                 break
 
             case 'configs':
                 logger.info(`configs message: configs=${JSON.stringify(data.configs)}`)
-                Config.update(data.configs)
+                Config.executeCommands(data.configs)
+                break
+
+            case 'commands':
+                logger.info(`commands message: configs=${JSON.stringify(data.commands)}`)
+                Config.executeCommands(data.commands)
                 break
 
             default:

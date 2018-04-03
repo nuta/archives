@@ -19,10 +19,11 @@ describe('Config API', function() {
     describe('onCommand', function() {
         it('calls the callback', async function () {
             const cmd = 'move_forward'
-            const arg = '5'
+            const id = 'this_is_id'
+            const arg = '123'
             const callback = sinon.stub()
             Config.onCommand(cmd, callback)
-            await Config.update({ [`>1 ${cmd}`]: arg })
+            await Config.executeCommands({ [cmd]: `${id}:${arg}` })
 
             expect(callback.calledWith(arg)).to.be.true
         })
@@ -33,9 +34,9 @@ describe('Config API', function() {
             const key = 'display_message'
             const data = "Today's high will be 13 degrees."
             const callback = sinon.stub()
-            await Config.update({ [key]: '' })
+            await Config.updateConfigs({ [key]: '' })
             Config.onChange(key, callback)
-            await Config.update({ [key]: data })
+            await Config.updateConfigs({ [key]: data })
 
             expect(callback.calledWith(data)).to.be.true
         })
