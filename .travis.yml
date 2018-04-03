@@ -16,7 +16,7 @@ matrix:
     - language: node_js
       node_js: "8"
       sudo: true # because of losetup(8)
-      env: M=linux:raspberrypi3
+      env: M=os:raspberrypi3
       addons:
         apt:
           packages:
@@ -51,8 +51,8 @@ matrix:
         tag_name: "$TRAVIS_TAG"
         api_key: "$GITHUB_API_KEY"
         file:
-          - build/raspberrypi3/makestack-linux-raspberrypi3.img
-          - build/raspberrypi3/makestack-linux-raspberrypi3.img.shasum
+          - build/raspberrypi3/makestack-os-raspberrypi3.img
+          - build/raspberrypi3/makestack-os-raspberrypi3.img.shasum
         skip_cleanup: true
         on:
           tags: true

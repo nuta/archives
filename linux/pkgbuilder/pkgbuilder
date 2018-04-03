@@ -210,8 +210,8 @@ function main() {
     }
   }
 
-  const imageFile = path.resolve(build.buildDir, `makestack-linux-${target}.img`)
-  const shasumFile = path.resolve(build.buildDir, `makestack-linux-${target}.img.shasum`)
+  const imageFile = path.resolve(build.buildDir, `makestack-os-${target}.img`)
+  const shasumFile = path.resolve(build.buildDir, `makestack-os-${target}.img.shasum`)
   console.log(chalk.bold.blue('==> ') +
     chalk.bold('Buliding the disk image'))
   packages[build.target].buildImage(imageFile)
