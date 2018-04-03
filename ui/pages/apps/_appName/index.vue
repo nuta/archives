@@ -52,7 +52,7 @@ export default {
       code: '',
       devices: [],
       caption: 'Code will be automatically saved.',
-      autosaveAfter: 1000,
+      autosaveAfter: 3000,
       deployButton: "Deploy"
     }
   },
