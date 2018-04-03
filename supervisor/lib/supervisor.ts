@@ -356,9 +356,13 @@ export class Supervisor {
         process.exit(0);
     }
 
-    private handleConfigMessage(configs: [string]) {
+    private handleConfigMessage(configs: { [key: string]: string }) {
         this.configs = configs;
         this.sendToApp("configs", { configs });
+    }
+
+    private handleCommandMessage(commands: { [key: string]: string }) {
+        this.sendToApp("commands", { commands });
     }
 
     private async onSMMSReceive(payload: Buffer) {
@@ -376,9 +380,12 @@ export class Supervisor {
             return;
         }
 
-        // Send new configs to the app.
         if (configs) {
             this.handleConfigMessage(configs);
+        }
+
+        if (commands) {
+            this.handleCommandMessage(commands);
         }
     }
 
