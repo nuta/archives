@@ -41,8 +41,8 @@ class Deployment < ApplicationRecord
   end
 
   def validate_image_format
-    unless self.image[0..1] == 'PK'
-      errors.add(:image, 'is not valid zip file.')
+    if self.image[0..1] != 'PK' and !self.image.encode('utf-8').valid_encoding?
+      errors.add(:image, 'is not valid zip file nor code in UTF-8.')
     end
   end
 
