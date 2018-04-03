@@ -1132,6 +1132,10 @@ esprima@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.0.tgz#4499eddcd1110e0b218bacf2fa7f7f59f55ca804"
 
+esptoolpy@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/esptoolpy/-/esptoolpy-0.0.2.tgz#399ba9bef4a4027f3dc000feb988ffd4b0f50a65"
+
 esutils@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/esutils/-/esutils-2.0.2.tgz#0abf4f1caa5bcb1f7a9d8acc6dea4faaa04bac9b"

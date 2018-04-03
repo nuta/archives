@@ -162,7 +162,7 @@ function wifiCountryNameValidator(code: string) {
 program
 .command("install", "Install MakeStack OS/Linux to the device.")
 .option("--name <name>", "The device name.", null, null, true)
-.option("--type <type>", "The device type.", /^raspberrypi3|mock$/, null, true)
+.option("--type <type>", "The device type.", /^raspberrypi3|esp32$/, null, true)
 .option("--os <os>", "The OS image.", /^linux$/, "linux")
 .option("--drive <drive>", "The drive. Use `list-drives' command.", null, null, true)
 .option("--adapter <adapter>", "The network adapter.", /^http|sakuraio$/, "http")
