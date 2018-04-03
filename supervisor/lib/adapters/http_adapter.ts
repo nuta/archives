@@ -40,15 +40,13 @@ function request(method: string, url: string, body?: Buffer): Promise<Buffer> {
 }
 
 export class HTTPAdapter extends AdapterBase {
-    public osType: string;
     public deviceType: string;
     public deviceId: string;
     public serverURL: string;
 
-    constructor(osType: string, deviceType: string, deviceId: string, serverURL: string) {
+    constructor(deviceType: string, deviceId: string, serverURL: string) {
         super();
 
-        this.osType = osType;
         this.deviceType = deviceType;
         this.deviceId = deviceId;
         this.serverURL = serverURL;
@@ -70,7 +68,7 @@ export class HTTPAdapter extends AdapterBase {
     }
 
     public getOSImage(version: number) {
-        const url = `${this.serverURL}/api/v1/images/os/${this.deviceId}/${version}/${this.osType}/${this.deviceType}`;
+        const url = `${this.serverURL}/api/v1/images/os/${this.deviceId}/${version}/${this.deviceType}`;
         return request("GET", url);
     }
 }

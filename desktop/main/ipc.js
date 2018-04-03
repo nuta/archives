@@ -24,7 +24,6 @@ function initIpc() {
       await makestack.install({
         deviceName: arg.deviceName,
         deviceType: arg.deviceType,
-        osType: arg.os,
         app: arg.app,
         adapter: arg.adapter,
         drive: arg.drive,

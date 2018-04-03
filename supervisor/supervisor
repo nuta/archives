@@ -8,7 +8,6 @@ const supervisor = new Supervisor({
     url: process.env['MAKESTACK_SERVER_URL']
   },
   mode: process.env['MAKESTACK_MODE'],
-  osType: process.env['MAKESTACK_OS_TYPE'],
   osVersion: process.env['MAKESTACK_OS_VERSION'],
   deviceType: process.env['MAKESTACK_DEVICE_TYPE'],
   deviceId: process.env['MAKESTACK_DEVICE_ID'],

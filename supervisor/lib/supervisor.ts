@@ -23,7 +23,6 @@ export interface SupervisorConstructorArgs {
     };
     mode: 'production' | 'debug' | 'test';
     appDir: string;
-    osType: string;
     osVersion: number;
     deviceId: string;
     deviceSecret: string;
@@ -46,7 +45,6 @@ export class Supervisor {
     private app: any;
     private appDir: string;
     private currentAppDir: string;
-    private osType: string;
     private osVersion: number;
     private mode: string;
     private debugMode: boolean;
@@ -84,7 +82,6 @@ export class Supervisor {
         this.app = null;
         this.appDir = args.appDir;
         this.currentAppDir = path.join(args.appDir, "current");
-        this.osType = args.osType;
         this.osVersion = args.osVersion;
         this.mode = args.mode;
         this.debugMode = args.mode === 'debug';
@@ -115,8 +112,7 @@ export class Supervisor {
                     throw new Error('adapter.url is not specified')
                 }
 
-                this.adapter = new HTTPAdapter(this.osType, this.deviceType,
-                    this.deviceId, args.adapter.url);
+                this.adapter = new HTTPAdapter(this.deviceType, this.deviceId, args.adapter.url);
                 this.includeDeviceId = true;
                 break;
             }

@@ -1,42 +1,13 @@
 {
-  "v0.2.12": {
-    "linux": {
-      "assets": {
-        "raspberrypi3": {
-          "url": "https://github.com/makestack/makestack/releases/download/v0.2.12/makestack-linux-raspberrypi3.img",
-          "shasum": "eee1a4ffaada2e09ccb21da4d0f4746d29021b9eebae00581513444c86415939"
-        }
-      }
-    }
-  },
-  "v0.3.2": {
-    "linux": {
-      "assets": {
-        "raspberrypi3": {
-          "url": "https://github.com/makestack/makestack/releases/download/v0.3.2/makestack-linux-raspberrypi3.img",
-          "shasum": "a8727c219d5891a880de1af93a99302f22a606c621bb5431c22b9f87fa687473"
-        }
-      }
-    }
-  },
-  "v0.3.3": {
-    "linux": {
-      "assets": {
-        "raspberrypi3": {
-          "url": "https://github.com/makestack/makestack/releases/download/v0.3.3/makestack-linux-raspberrypi3.img",
-          "shasum": "300dec5865875bb96e4724063f4b030e35e8e56e0b6a99646e174b0f1f651040"
-        }
-      }
-    }
-  },
-  "v0.4.2": {
-    "linux": {
-      "assets": {
-        "raspberrypi3": {
-          "url": "https://github.com/makestack/makestack/releases/download/v0.4.2/makestack-linux-raspberrypi3.img",
-          "shasum": "1b4432ad09c096bcdd632108e002fbdfc9af129955c9837fd03933e00240c5b6"
-        }
+  "v0.3.0": {
+    "assets": {
+      "raspberrypi3": {
+        "url": "https://downloads.makestack.org/raspberrypi3.img"
+      },
+      "esp32": {
+        "url": "https://downloads.makestack.org/esp32.img"
       }
     }
   }
 }
+

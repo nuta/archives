@@ -36,7 +36,6 @@ export async function main(args: any, opts: any, logger: any) {
     await install({
         deviceName: opts.name,
         deviceType: opts.type,
-        osType: opts.os,
         adapter: opts.adapter,
         drive: opts.drive,
         flashCommand: [process.argv0, path.resolve(__dirname, "../../bin/makestack")],

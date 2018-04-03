@@ -3,7 +3,7 @@ class ImagesController < ApplicationController
   before_action :authenticate_device
 
   def os_image
-    image_url = os_image_url(params[:version], params[:os], params[:device_type])
+    image_url = os_image_url(params[:version], params[:device_type])
     unless image_url
       head :not_found
       return
@@ -33,7 +33,7 @@ class ImagesController < ApplicationController
     end
   end
 
-  def os_image_url(version, os, deviceTypes)
-    MakeStack.releases.dig(version, os, :assets, deviceTypes, :url)
+  def os_image_url(version, deviceType)
+    MakeStack.releases.dig(version, :assets, deviceType, :url)
   end
  end

@@ -1,9 +1,0 @@
-v0.2.4:
-  linux:
-    assets:
-      raspberrypi0w:
-        url: https://github.com/makestack/makestack/releases/download/v0.2.4/makestack-linux-v0.2.4-raspberrypi0w.img
-        shasum: 6414ae7ca7039319155286b1e996ed88174ff1838f5f4f94e665cfeacb1ec112
-      raspberrypi3:
-        url: https://github.com/makestack/makestack/releases/download/v0.2.4/makestack-linux-v0.2.4-raspberrypi3.img
-        shasum: 73f897c2eadd15efdf962e42e6563be16a870a7dc61d4f7661c150b09609f993

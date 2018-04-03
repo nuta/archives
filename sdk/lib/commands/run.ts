@@ -25,7 +25,6 @@ export async function main(args: any, opts: any, logger: any) {
             name: opts.adapter,
             url: device.serverURL,
         },
-        osType: "sdk",
         osVersion: 0,
         deviceId: device.device_id,
         deviceSecret: device.device_secret,

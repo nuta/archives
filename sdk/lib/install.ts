@@ -51,7 +51,7 @@ async function registerOrGetDevice(name: string, type: string, app: string): Pro
     return device;
 }
 
-function getLatestOSRelease(osType: string, deviceType: string):
+function getLatestOSRelease(deviceType: string):
     Promise<{ version: string, url: string, shasum: string }>
 {
     return new Promise((resolve, reject) => {
@@ -61,7 +61,7 @@ function getLatestOSRelease(osType: string, deviceType: string):
                 throw new Error('no os releases');
             }
 
-            const asset = releases[version][osType].assets[deviceType];
+            const asset = releases[version].assets[deviceType];
             resolve({
                 version,
                 url: asset.url,
@@ -71,9 +71,9 @@ function getLatestOSRelease(osType: string, deviceType: string):
     });
 }
 
-async function downloadDiskImage(osType: string, deviceType: string) {
+async function downloadDiskImage(deviceType: string) {
     const { version, url: osImageURL, shasum: imageShasum } =
-        await getLatestOSRelease(osType, deviceType);
+        await getLatestOSRelease(deviceType);
     const basename = path.basename(osImageURL);
     const originalImage = path.join(getenv('HOME'), `.makestack/caches/${basename}`);
     if (!fs.existsSync(originalImage) || shasum(originalImage) !== imageShasum) {
@@ -119,11 +119,13 @@ function writeConfigToDiskIamge(args: {
     return imagePath;
 }
 
-function prepareFlashCommand(flashCommand: string, ipcPath: string, drive: string,
+function prepareFlashCommand(deviceType: string, flashCommand: string,
+    ipcPath: string, drive: string,
     driveSize: number, imagePath: string) {
 
     let prefix = "env ";
     const env: { [name: string]: string } = {
+        DEVICE_TYPE: deviceType,
         DRIVE: drive,
         IMAGE_WRITER: "y",
         DRIVE_SIZE: driveSize.toString(),
@@ -139,7 +141,7 @@ function prepareFlashCommand(flashCommand: string, ipcPath: string, drive: strin
     return prefix + quote(flashCommand);
 }
 
-function flash(flashCommand: string, drive: string, driveSize: number,
+function flash(deviceType: string, flashCommand: string, drive: string, driveSize: number,
     imagePath: string, progressCallback: ProgressCallback) {
 
     return new Promise((resolve, reject) => {
@@ -156,7 +158,7 @@ function flash(flashCommand: string, drive: string, driveSize: number,
         ipc.server.start();
 
         const command = prepareFlashCommand(
-            flashCommand, ipcPath, drive, driveSize, imagePath
+            deviceType, flashCommand, ipcPath, drive, driveSize, imagePath
         );
         const options = { name: "MakeStack Installer" };
         sudo.exec(command, options, (error: Error, stdout: any, stderr: any) => {
@@ -173,7 +175,6 @@ function flash(flashCommand: string, drive: string, driveSize: number,
 export async function install(args: {
     deviceName: string,
     deviceType: string,
-    osType: string,
     app: string,
     adapter: string,
     wifiSSID: string,
@@ -185,7 +186,7 @@ export async function install(args: {
 }, progressCallback: ProgressCallback) {
 
     const {
-        deviceName, deviceType, osType, adapter, wifiSSID, wifiPassword, wifiCountry,
+        deviceName, deviceType, adapter, wifiSSID, wifiPassword, wifiCountry,
         drive, flashCommand, diskImagePath, app
     } = args;
 
@@ -199,7 +200,7 @@ export async function install(args: {
     if (diskImagePath) {
         originalImage = diskImagePath;
     } else {
-        originalImage = await downloadDiskImage(osType, deviceType);
+        originalImage = await downloadDiskImage(deviceType);
     }
 
     progressCallback("config");
@@ -208,6 +209,6 @@ export async function install(args: {
         wifiSSID, wifiPassword, wifiCountry
     })
     progressCallback('flash')
-    await flash(flashCommand, drive, driveSize, imagePath, progressCallback)
+    await flash(deviceType, flashCommand, drive, driveSize, imagePath, progressCallback)
     progressCallback('success')
 }

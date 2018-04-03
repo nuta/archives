@@ -13,18 +13,16 @@ def update_releases_json():
     print(f"Adding {version} to releases.json...")
     releases = json.load(open('releases.json'))
     releases[version] = {
-        "linux": {
-            "assets": {}
-        }
+        "assets": {}
     }
 
     for asset in latest["assets"]:
-        if asset["name"].startswith("makestack-linux-") and asset["name"].endswith(".img"):
+        if asset["name"].startswith("makestack-os-") and asset["name"].endswith(".img"):
             url = asset["browser_download_url"]
             device_type = asset["name"].split("-")[2].replace(".img", "")
             shasum = urllib.request.urlopen(url + ".shasum") \
                         .read().decode('utf-8').split()[0]
-            releases[version]["linux"]["assets"][device_type] = {
+            releases[version]["assets"][device_type] = {
                 "url": url,
                 "shasum": shasum
             }

@@ -67,7 +67,6 @@ export function createSupervisor() {
             name: 'http',
             url: SERVER_URL
         },
-        osType: 'mock',
         deviceType: 'raspberrypi3',
         deviceId: DEVICE_ID,
         deviceSecret: DEVICE_SECRET,
