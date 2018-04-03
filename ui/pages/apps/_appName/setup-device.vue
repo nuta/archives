@@ -5,7 +5,7 @@
         subtitle="Run MakeStack agent on your Linux environment like Raspbian."
        :to="{ name: 'apps-appName-install-agent', params: { name: appName } }">
       </card>
-      <card title="Install MakeStack Linux"
+      <card title="Install MakeStack OS"
         subtitle="Install a minimalized Linux distribution made for MakeStack apps."
        :to="{ name: 'apps-appName-install-os', params: { name: appName } }">
       </card>

@@ -1,15 +1,15 @@
 <template>
   <dashboard-layout title="Setup a Device" :appName="appName" inverted-bg="true">
     <guide-box v-if="platform !== 'desktop'">
-      <h1>Installing MakeStack Linux on your devices</h1>
-      <p>Use desktop app to install MakeStack Linux to a SD card:</p>
+      <h1>Installing MakeStack OS on your devices</h1>
+      <p>Use desktop app to install MakeStack OS to a SD card:</p>
       <a href="https://makestack.org">
         <button class="primary">Download Desktop App</button>
       </a>
     </guide-box>
     <div v-else>
       <header>
-        <h2>Install MakeStack Linux</h2>
+        <h2>Install MakeStack</h2>
       </header>
       <nuxt-link :to="{ name: 'apps-appName-devices', params: { name: appName } }">
         <i class="fas fa-chevron-left"></i>
@@ -36,7 +36,7 @@
             <div class="field">
               <label>Install To</label>
               <p v-if="availableDrives.length === 0">
-                No drives detected. Insert a SD Card!
+                No drives detected. Insert a SD Card or device!
               </p>
               <select v-model="drive" v-else>
                 <template v-for="drive in availableDrives">
