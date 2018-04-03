@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+          "type": "cppdbg",
+          "request": "launch",
+          "name": "ESP32: Launch GDB",
+          "MIMode": "gdb",
+          "program": "${workspaceRoot}/esp32/build/firmware.elf",
+          "miDebuggerPath": "${workspaceRoot}/esp32/deps/xtensa-esp32-elf/bin/xtensa-esp32-elf-gdb",
+          "cwd": "${workspaceRoot}/esp32",
+          "miDebuggerServerAddress": "localhost:3333",
+          "stopAtEntry": false,
+          "externalConsole": false
+        }
+    ]
+}

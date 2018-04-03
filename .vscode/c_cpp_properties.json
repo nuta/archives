@@ -1,0 +1,55 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceRoot}/esp32/deps/freertos/include",
+                "${workspaceRoot}/esp32/deps/jerry-core",
+                "${workspaceRoot}/esp32/deps/jerry-core/api",
+                "${workspaceRoot}/esp32/deps/jerry-core/debugger",
+                "${workspaceRoot}/esp32/deps/jerry-core/ecma/base",
+                "${workspaceRoot}/esp32/deps/jerry-core/ecma/builtin-objects",
+                "${workspaceRoot}/esp32/deps/jerry-core/ecma/builtin-objects/typedarray",
+                "${workspaceRoot}/esp32/deps/jerry-core/ecma/operations",
+                "${workspaceRoot}/esp32/deps/jerry-core/include",
+                "${workspaceRoot}/esp32/deps/jerry-core/jcontext",
+                "${workspaceRoot}/esp32/deps/jerry-core/jmem",
+                "${workspaceRoot}/esp32/deps/jerry-core/jrt",
+                "${workspaceRoot}/esp32/deps/jerry-core/lit",
+                "${workspaceRoot}/esp32/deps/jerry-core/parser/js",
+                "${workspaceRoot}/esp32/deps/jerry-core/parser/regexp",
+                "${workspaceRoot}/esp32/deps/jerry-core/vm",
+                "${workspaceRoot}/esp32/deps/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}/esp32/deps/freertos/include",
+                    "${workspaceRoot}/esp32/deps/jerry-core",
+                    "${workspaceRoot}/esp32/deps/jerry-core/api",
+                    "${workspaceRoot}/esp32/deps/jerry-core/debugger",
+                    "${workspaceRoot}/esp32/deps/jerry-core/ecma/base",
+                    "${workspaceRoot}/esp32/deps/jerry-core/ecma/builtin-objects",
+                    "${workspaceRoot}/esp32/deps/jerry-core/ecma/builtin-objects/typedarray",
+                    "${workspaceRoot}/esp32/deps/jerry-core/ecma/operations",
+                    "${workspaceRoot}/esp32/deps/jerry-core/include",
+                    "${workspaceRoot}/esp32/deps/jerry-core/jcontext",
+                    "${workspaceRoot}/esp32/deps/jerry-core/jmem",
+                    "${workspaceRoot}/esp32/deps/jerry-core/jrt",
+                    "${workspaceRoot}/esp32/deps/jerry-core/lit",
+                    "${workspaceRoot}/esp32/deps/jerry-core/parser/js",
+                    "${workspaceRoot}/esp32/deps/jerry-core/parser/regexp",
+                    "${workspaceRoot}/esp32/deps/jerry-core/vm"
+                ]
+            },
+            "macFrameworkPath": [
+                "/System/Library/Frameworks",
+                "/Library/Frameworks"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 3
+}

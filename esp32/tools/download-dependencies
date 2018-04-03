@@ -1,0 +1,41 @@
+#!/bin/bash
+set -ue
+ESP_IDF_VERSION=391c3ff959f9eb1b2975cb0d7b29c0478f3b6a48
+ARDUINO_ESP32_VERSION=bd0227a1601d11fefc13ee4b18285810d2a37806
+JERRYSCRIPT_VERSION=79289714dced3121c703cba4bde7bbfa2f78c934
+
+rm -rf deps deps.tmp
+mkdir deps.tmp
+pushd deps.tmp
+if [[ "$(uname)" == "Darwin" ]]; then
+    toolchain_url=https://dl.espressif.com/dl/xtensa-esp32-elf-osx-1.22.0-80-g6c4433a-5.2.0.tar.gz
+else
+    toolchain_url=https://dl.espressif.com/dl/xtensa-esp32-elf-linux64-1.22.0-61-gab8375a-5.2.0.tar.gz
+fi
+
+curl -fSL $toolchain_url | tar zxf -
+
+git clone https://github.com/espressif/esp-idf
+pushd esp-idf
+git checkout $ESP_IDF_VERSION
+git submodule update --init --recursive
+popd
+
+git clone --recursive https://github.com/espressif/arduino-esp32
+pushd arduino-esp32
+git checkout $ARDUINO_ESP32_VERSION
+git submodule update --init --recursive
+popd
+
+git clone https://github.com/jerryscript-project/jerryscript
+pushd jerryscript
+git checkout $JERRYSCRIPT_VERSION
+popd
+
+popd
+
+mv deps.tmp deps
+
+pushd plugins
+yarn
+popd

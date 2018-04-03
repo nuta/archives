@@ -20,6 +20,10 @@ indent_size = 2
 indent_style = space
 indent_size = 2
 
+[{*.c,*.cpp}]
+indent_style = space
+indent_size = 4
+
 [{*.yml,*.yaml}]
 indent_style = space
 indent_size = 2
@@ -32,5 +36,5 @@ indent_size = 2
 indent_style = space
 indent_size = 2
 
-[Makefile]
+[{Makefile,*.mk}]
 indent_style = tab

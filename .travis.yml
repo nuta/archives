@@ -57,6 +57,53 @@ matrix:
         on:
           tags: true
 
+    - language: node_js
+      node_js: "8"
+      env: M=os:esp32
+      addons:
+        apt:
+          packages:
+            - binutils-arm-linux-gnueabihf
+            - gcc-arm-linux-gnueabihf
+            - g++-arm-linux-gnueabihf
+            - libc6-dev-armhf-cross
+            - build-essential
+            - wget
+            - zsh
+            - nodejs
+            - libncurses-dev
+            - flex
+            - bison
+            - gperf
+            - python
+            - python-serial
+      cache:
+        apt: true
+        yarn: true
+        directories:
+          - esp32/deps
+          - esp32/plugins/node_modules
+      install:
+        - cd esp32
+        - test -d deps || ./tools/download-dependencies
+      script:
+        - make -j2 || make -j2 # yes, the build system has been broken
+      before_deploy:
+        - mv build/firmware.bin makestack-os-esp32.img
+        - shasum -a256 makestack-os-esp32.img > makestack-os-esp32.img.shasum
+      deploy:
+        <<: *deploy_options
+        provider: releases
+        name: "$TRAVIS_TAG"
+        tag_name: "$TRAVIS_TAG"
+        api_key: "$GITHUB_API_KEY"
+        file:
+          - makestack-os-esp32.img
+          - makestack-os-esp32.img.shasum
+        skip_cleanup: true
+        on:
+          tags: true
+
     - language: ruby
       rvm: 2.5
       env: M=server:sqlite3
