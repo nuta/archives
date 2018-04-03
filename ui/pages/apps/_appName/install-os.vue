@@ -113,7 +113,6 @@ export default {
         { name: 'raspberrypi3', description: 'Raspberry Pi3 (MakeStack Linux)' }
       ],
       deviceType: null,
-      os: 'linux',
       drive: null,
       adapter: null,
       availableAdapters: [
@@ -139,10 +138,15 @@ export default {
       }
     }
   },
+  watch: {
+    deviceType() {
+      this.refreshAvailableDrives()
+    }
+  },
   methods: {
     refreshAvailableDrives() {
-      this.availableDrives = ipcRenderer.sendSync('getAvailableDrives')
-      if (!this.drive) {
+      this.availableDrives = ipcRenderer.sendSync('getAvailableDrives', this.deviceType)
+      if (!this.drive || !this.availableDrives.includes(this.drive)) {
         this.$nextTick(() => {
           if (this.availableDrives[0]) {
             this.drive = this.availableDrives[0].device
@@ -198,7 +202,6 @@ export default {
       ipcRenderer.send('install', {
         deviceName: this.deviceName,
         deviceType: this.deviceType,
-        os: this.os,
         app: this.appName,
         adapter: this.adapter,
         drive: this.drive,

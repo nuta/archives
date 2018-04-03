@@ -18,7 +18,7 @@
         </div>
 
         <details v-if="platform === 'desktop'">
-          <summary>Server URL (defaults to {{ DEFAULT_SERVER_URL }})</summary>
+          <summary>Server URL (defaults to {{ defaultServerUrl }})</summary>
           <div class="content">
             <label>Server URL</label>
             <input type="text" v-model="serverUrl" placeholder="Server URL" required="required" autofocus>
@@ -60,6 +60,7 @@ export default {
   data: () => {
     return {
       platform: PLATFORM,
+      defaultServerUrl: DEFAULT_SERVER_URL,
       serverUrl: (PLATFORM === 'desktop') ? DEFAULT_SERVER_URL : location.origin,
       username: "",
       password: ""

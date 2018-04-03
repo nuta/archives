@@ -81,7 +81,7 @@ export default {
 
       if (this.autoScroll) {
         this.$nextTick(() => {
-           this.$refs.lines.scrollTo(0, this.$refs.lines.scrollHeight)
+           window.scrollTo(0, this.$refs.lines.scrollHeight)
         })
       }
 
