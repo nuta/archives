@@ -268,7 +268,7 @@ class API {
   deploy(appName, image, debug, comment, tag) {
     let form = new FormData()
     form.set('deployment[deployed_from]', 'web')
-    form.set('deployment[image]', image, 'app.zip')
+    form.set('deployment[image]', image)
 
     if (debug) {
       form.set('deployment[debug]', debug)
