@@ -4,10 +4,10 @@
 
 MakeStack is a complete software stack for connected devices featuring:
 
-- Intuitive Node.js API and out-of-the-box [plugins](https://github.com/makestack/makestack/tree/master/plugins).
+- JavaScript with intuitive APIs.
+- Supports Raspberry Pi 3 and ESP-32.
 - Remote app/os update, remote config management, remote device log collection.
-- Electron-based desktop app and [CLI developer tools](https://www.npmjs.com/package/makestack-sdk).
-- [A CLI device agent](https://www.npmjs.com/package/makestack-sdk) and minimialized (< 32MB) Linux distribution for Raspberry Pi.
+- Electron-based esktop app.
 - Rails-based backend server that [can be easiliy deployed to Heroku](https://makestack.org/documentation/#/guides/heroku).
 - Easy integrations with IFTTT, ThingSpeak, and Webhooks.
 - Fully open sourced (CC0/MIT).
