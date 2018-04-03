@@ -124,12 +124,16 @@ export default {
   }
 
   & > header {
-    height: 50px;
     display: flex;
+    position: sticky;
+    top: 0;
+    width: 100vw;
+    box-sizing: border-box;
     justify-content: space-between;
     align-items: center;
     padding: 20px 8px;
     background-color: var(--bg0-color);
+    z-index: 100;
 
     .hamburger {
       display: flex;
