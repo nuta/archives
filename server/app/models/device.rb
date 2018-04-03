@@ -13,6 +13,7 @@ class Device < ApplicationRecord
   value :current_os_version, expiration: 45.minutes
   value :current_app_version, expiration: 45.minutes
   value :last_command_id, expiration: 3.hours
+  list :pending_commands, marshal: true, expiration: 15.minutes
   hash_key :command_results, expiration: 5.minutes
 
   SUPPORTED_OS = %w(linux)
@@ -149,14 +150,7 @@ class Device < ApplicationRecord
 
   def invoke_command!(command, arg)
     command_id = (self.last_command_id.value.to_i || 0) + 1
-    Config.create!(
-      owner_type: 'Device',
-      owner_id: self.id,
-      key: "<#{command_id} #{command}",
-      data_type: 'string',
-      value: arg
-    )
-
+    pending_commands << { id: command_id, key: command, arg: arg }
     self.last_command_id = command_id
   end
 

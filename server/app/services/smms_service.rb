@@ -106,10 +106,18 @@ module SMMSService
     end
 
     # config
-    device.formatted_configs.each_with_index do |(key, config), index|
+    device.formatted_configs.each do |key, config|
       data = generate_variable_length(key) + key + config[:value]
       payload += generate_message(SMMS_CONFIG_MSG, data)
     end
+
+    #command
+    device.pending_commands.each do |command|
+      data = generate_variable_length(command[:key])  +
+        command[:key] + command[:id] + ':' + command[:arg]
+      payload += generate_message(SMMS_COMMAND_MSG, data)
+    end
+    device.pending_commands.clear
 
     header = [SMMS_VERSION << 4].pack('C') + generate_variable_length(payload)
     header + payload
