@@ -44,6 +44,9 @@ export default {
   head: {
     link: [
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Code+Pro:400,600' },
+    ],
+    script: [
+      { src: 'https://unpkg.com/babel-standalone@6/babel.min.js' }
     ]
   },
   data() {
@@ -59,11 +62,11 @@ export default {
   methods: {
     async deploy() {
       this.deployButton = "Building..."
-      const image = await buildApp(this.code)
+      const { image, debug } = await buildApp(this.code)
 
       this.deployButton = "Deploying...";
-      let comment = "Deployment at " + (new Date()).toString(); // TODO
-      const r = await api.deploy(this.appName, image, "", comment, null)
+      const comment = "Deployment at " + (new Date()).toString();
+      const r = await api.deploy(this.appName, image, debug, comment, null)
 
       this.deployButton = "Deployed";
       setTimeout(() => {
