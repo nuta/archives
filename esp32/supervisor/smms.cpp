@@ -135,8 +135,6 @@ static int parse_variable_length(uint8_t *buf, int buf_length, int *length) {
 
 
 void SmmsClient::receive_payload(const void *payload, size_t payload_length) {
-    hexdump((uint8_t*) payload, payload_length);
-
     if (payload_length < 2) {
         // Ignore a malformed payload.
         return;
@@ -184,9 +182,8 @@ void SmmsClient::receive_payload(const void *payload, size_t payload_length) {
                     goto next_message;
                 }
 
-                hexdump(p, 16);
-                printf("ver: %d\n", from_be32(p + 1));
-                download_app(from_be32(p + 1));
+                current_app_version = from_be32(p + 1);
+                download_app(current_app_version);
                 break;
             }
         }
@@ -207,9 +204,11 @@ void SmmsClient::send() {
                        strlen((char *) device_id));
     }
 
-    payload.append(SMMS_LOG_MSG, log_buffer, log_length);
-    log_index = 0;
-    log_length = 0;
+    if (log_length > 0) {
+        payload.append(SMMS_LOG_MSG, log_buffer, log_length);
+        log_index = 0;
+        log_length = 0;
+    }
 
     uint8_t ver_report_msg[6];
     to_be16(&ver_report_msg[0], SMMS_CURRENT_VERSION_REPORT);

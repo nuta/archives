@@ -166,7 +166,7 @@ void WiFiSmmsClient::download_app(int version) {
     int code = http.GET();
     if (code > 0) {
         if (code == HTTP_CODE_OK) {
-            printf("[http] downloading app image...");
+            printf("[http] downloading app image...\n");
             // Assuming that String is binary-safe; that is, it allows NULL
             // character and invalid character sequences in its buffer.
             String image = http.getString();
@@ -203,7 +203,6 @@ void init_wifi() {
     esp_wifi_connect();
 
     while (!connected) {
-        printf(".");
         vTaskDelay(100);
     }
 

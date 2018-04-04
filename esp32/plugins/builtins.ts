@@ -176,7 +176,7 @@ interface Timer {
     callback: () => void;
 }
 
-var __loop_interval = 4294967295 // the maximum integer
+var __loop_interval = 1000
 const __timers: Timer[] = []
 
 var setInterval = (callback: () => void, msec: number) => {

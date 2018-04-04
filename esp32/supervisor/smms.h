@@ -20,7 +20,7 @@ class SmmsClient {
     virtual void download_app(int version) = 0;
 
    protected:
-    int current_app_version;
+    unsigned long current_app_version;
     Engine *engine;
     const char *device_id;
     void receive_payload(const void *payload, size_t length);

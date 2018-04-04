@@ -13,6 +13,6 @@ void supervisor_task(void *param) {
 
     while (1) {
         smms->send();
-        vTaskDelay(3000);
+        vTaskDelay(3000 / portTICK_PERIOD_MS);
     }
 }

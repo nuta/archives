@@ -19,27 +19,12 @@ esp_err_t system_event_callback(void *ctx, system_event_t *event) {
     return ESP_OK;
 }
 
-#define BLINK_GPIO ((gpio_num_t)12)
-void blink_task(void *param) {
-    gpio_pad_select_gpio(BLINK_GPIO);
-    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);
-
-    while (1) {
-        gpio_set_level(BLINK_GPIO, 0);
-        vTaskDelay(300);
-        gpio_set_level(BLINK_GPIO, 1);
-        vTaskDelay(300);
-    }
-}
-
 extern "C" void app_main() {
     printf("Initializing...\n");
     nvs_flash_init();
     tcpip_adapter_init();
     esp_event_loop_init(system_event_callback, NULL);
     init_wifi();
-
-    xTaskCreate(&blink_task, "blink", 8192, NULL, 5, NULL);
 
     printf("Starting MakeStack...\n");
     xTaskCreate(&supervisor_task, "supervisor", 16 * 1024, NULL, 5, NULL);

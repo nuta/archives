@@ -9,7 +9,6 @@
 #include "preload.h"
 #include "utils.h"
 
-Engine::Engine() : initialized(false) {}
 
 static int get_global_integer_var(const char *var_name) {
     jerry_value_t global = jerry_get_global_object();
@@ -46,13 +45,14 @@ static void call_global_function(const char *func_name, jerry_value_t *args, int
 void interval_task(void *param) {
     while (1) {
         int delay = max(get_global_integer_var("__loop_interval"), 50);
-        vTaskDelay(delay);
+        vTaskDelay(delay / portTICK_PERIOD_MS);
 
         jerry_value_t args[] = { jerry_create_number(delay) };
         int argc = sizeof(args) / sizeof(jerry_value_t);
-        call_global_function("__loop_interval", args, argc);
+        call_global_function("__loop", args, argc);
     }
 }
+
 
 static void print_error_message(const char *title, jerry_value_t error) {
     jerry_value_t prop = jerry_create_string((const jerry_char_t *) "name");
@@ -81,16 +81,14 @@ static void print_error_message(const char *title, jerry_value_t error) {
 }
 
 
-void Engine::run(const char *script, size_t script_length) {
-    if (initialized) {
-        jerry_cleanup();
-    } else {
-        xTaskCreate(&interval_task, "interval", 8192, NULL, 5, NULL);
-    }
-
-    initialized = true;
+Engine::Engine() {
+    printf("initializing JavaScript engine...\n");
     jerry_init(JERRY_INIT_EMPTY);
+    xTaskCreate(&interval_task, "interval", 8192, NULL, 5, NULL);
+}
 
+
+void Engine::run(const char *script, size_t script_length) {
     // Register builtin functions.
     for (auto global_func = builtins; global_func->name; global_func++) {
         jerryx_handler_register_global((const jerry_char_t *)global_func->name,
@@ -136,7 +134,5 @@ void Engine::execute_command(const char *key, const char *value) {
 
 
 Engine::~Engine() {
-    if (initialized) {
-        jerry_cleanup();
-    }
+    jerry_cleanup();
 }

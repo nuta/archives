@@ -2,11 +2,7 @@
 #include <jerryscript.h>
 
 class Engine {
-   private:
-    bool initialized;
-    void run_preload();
-
-   public:
+public:
     Engine();
     ~Engine();
     void run(const char *script, size_t script_length);
