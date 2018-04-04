@@ -130,6 +130,5 @@ export default {
 .editor {
   display: flex;
   flex: 1;
-  z-index: 20000;
 }
 </style>

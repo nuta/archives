@@ -87,7 +87,7 @@ export default {
 
   .dropdown-items {
     position: absolute;
-    z-index: 1000;
+    z-index: 10;
     margin-top: 5px;
     list-style-type: none;
     border: 1px solid var(--border-color);

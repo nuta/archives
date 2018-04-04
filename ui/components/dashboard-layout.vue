@@ -133,7 +133,7 @@ export default {
     align-items: center;
     padding: 20px 8px;
     background-color: var(--bg0-color);
-    z-index: 100;
+    z-index: 5;
 
     .hamburger {
       display: flex;
