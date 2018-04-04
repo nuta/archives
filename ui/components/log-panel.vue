@@ -157,8 +157,8 @@ export default {
 
   .auto-scroll-button {
     position: absolute;
-    width: 20px;
-    font-size: 18px;
+    width: 10px;
+    font-size: 10px;
     text-align: center;
     right: 10px;
     padding: 10px;
@@ -177,13 +177,15 @@ export default {
   }
 
   .lines {
-    height: 400px;
+    height: 30vh;
     overflow: scroll;
     font-family: 'Source Code Pro', monospace;
     padding: 0px 20px;
     padding-bottom: 10px;
 
     p {
+      font-size: 14px;
+      line-height: 1rem;
       padding: 5px 0;
       margin: 0;
 
