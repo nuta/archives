@@ -70,7 +70,7 @@ RSpec.describe CallOutgoingWebhookJob, type: :job do
             accept_configs: true,
             device: device
           )
-        }.to raise_exception
+        }.to raise_exception(RuntimeError)
 
         expect(device.configs.all).to eq([])
       end
@@ -82,7 +82,7 @@ RSpec.describe CallOutgoingWebhookJob, type: :job do
       stub_request(:post, config['webhook_url']).to_timeout
       expect {
         CallOutgoingWebhookJob.perform_now(url: config['webhook_url'], body: "")
-      }.to raise_exception
+      }.to raise_exception(RuntimeError)
     end
   end
 end

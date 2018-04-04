@@ -7,7 +7,7 @@ RSpec.describe Deployment, type: :model do
 
   describe 'validations' do
     it 'does not allow invalid image' do
-      deployment = build_stubbed(:deployment, image: 'ELF')
+      deployment = build_stubbed(:deployment, image: "ELF\x80\x20")
       expect(deployment).not_to be_valid
     end
 
