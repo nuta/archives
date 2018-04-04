@@ -41,7 +41,7 @@ RSpec.describe Apps::DeploymentsController, type: :controller do
     context "with invalid params" do
       it "renders a JSON response with errors for the new deployment" do
         deployment = attributes_for(:deployment)
-        deployment[:image] = "invalid"
+        deployment[:image] = "\x80\x20" # invalid UTF-8 sequence
         post :create, params: { app_name: app.name, deployment: deployment }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json')
