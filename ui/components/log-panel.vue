@@ -9,7 +9,7 @@
       <div class="auto-scroll-button" :class="{ activated: autoScroll }" @click="autoScroll = !autoScroll">
         <i class="fas fa-angle-double-down"></i>
       </div>
-      <p class="line" v-for="line in lines" :key="line.time" :class="[line.type]">
+      <p class="line" v-for="line in lines" :class="[line.type]">
         <span class="time">[{{ line.time | date }}]</span>
         <span class="device">{{ line.device }}:</span>
         <span class="body">{{ line.body }}</span>
