@@ -106,27 +106,7 @@ matrix:
 
     - language: ruby
       rvm: 2.5
-      env: M=server:sqlite3
-      services:
-        - redis-server
-      cache:
-        directories:
-          - server/vendor/bundle
-      # See https://github.com/travis-ci/travis-ci/issues/8978#issuecomment-354036443
-      before_install:
-        - gem update --system --no-doc
-        - gem install bundler
-      install:
-        - cd server
-        - bundle install --jobs 2 --path vendor/bundle
-        - 'printf "test:\n  adapter: sqlite3\n  database: db/test.sqlite3" > config/database.yml'
-        - bundle exec rails db:migrate RAILS_ENV=test
-      script:
-        - bundle exec rspec
-
-    - language: ruby
-      rvm: 2.5
-      env: M=server:postgresql
+      env: M=server
       services:
         - postgresql
         - redis-server
