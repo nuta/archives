@@ -86,10 +86,10 @@ module SMMSService
   def payload_for(device)
     payload = ""
     deployment = device.latest_deployment
-    app_version = deployment.try(:version).try(:to_i)
+    app_version = deployment.try(:version)
     os_version = version_str_to_int(device.try(:app).try(:os_version))
 
-    if app_version && device.current_app_version.value != app_version
+    if app_version && device.current_app_version.value != app_version.try(:to_s)
       data = [
         2, # Download from adapter-specific way.
         app_version
