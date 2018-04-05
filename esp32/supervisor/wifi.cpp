@@ -3,6 +3,7 @@
 #include <esp_wifi.h>
 #include "engine.h"
 #include "smms.h"
+#include "logger.h"
 
 #define WIFI_SSID "curve25519"
 #define WIFI_PASSWORD "howudoing"
@@ -117,7 +118,7 @@ void WiFiSmmsClient::send_payload(const void *payload, size_t length) {
     url += server_host;
     url += "/api/v1/smms";
 
-    printf("[http] starting a request...\n");
+    INFO("sending a smms payload...");
     if (enable_tls) {
         http.begin(url, root_ca_cerificates);
     } else {
@@ -127,20 +128,20 @@ void WiFiSmmsClient::send_payload(const void *payload, size_t length) {
     http.addHeader("Connection", "close");
 
     int code = http.POST((uint8_t *)payload, length);
+
     if (code > 0) {
         if (code == HTTP_CODE_OK) {
             BinaryStream *stream = new BinaryStream();
             http.writeToStream(stream);
 
-            printf("[http] received a smms payload (%d bytes)\n", stream->length);
+            INFO("received a smms payload (%d bytes)", stream->length);
             receive_payload((const void *) stream->buffer, stream->length);
             delete stream;
         } else {
-            printf("[http] server returned an error: %d\n", code);
+            INFO("server returned an error: %d", code);
         }
     } else {
-        printf("[http] failed to connect: %s\n",
-               http.errorToString(code).c_str());
+        INFO("failed to connect: %s", http.errorToString(code).c_str());
     }
 
     http.end();
@@ -156,7 +157,7 @@ void WiFiSmmsClient::download_app(int version) {
     url += "/";
     url += version;
 
-    printf("[http] starting a request...\n");
+    INFO("starting a request...");
     if (enable_tls) {
         http.begin(url, root_ca_cerificates);
     } else {
@@ -166,17 +167,17 @@ void WiFiSmmsClient::download_app(int version) {
     int code = http.GET();
     if (code > 0) {
         if (code == HTTP_CODE_OK) {
-            printf("[http] downloading app image...\n");
+            INFO("downloading app image...");
             // Assuming that String is binary-safe; that is, it allows NULL
             // character and invalid character sequences in its buffer.
             String image = http.getString();
             current_app_version = version;
             launch_app((const void *)image.c_str(), image.length());
         } else {
-            printf("[http] server returned an error: %d\n", code);
+            INFO("server returned an error: %d\n", code);
         }
     } else {
-        printf("[http] failed to connect: %s\n",
+        INFO("failed to connect: %s",
                http.errorToString(code).c_str());
     }
 
@@ -194,7 +195,7 @@ void init_wifi() {
     strcpy((char *)config.sta.ssid, WIFI_SSID);
     strcpy((char *)config.sta.password, WIFI_PASSWORD);
 
-    printf("Connecting to %s.\n", WIFI_SSID);
+    INFO("Connecting to %s", WIFI_SSID);
     esp_wifi_init(&init_config);
     esp_wifi_set_storage(WIFI_STORAGE_RAM);
     esp_wifi_set_mode(WIFI_MODE_STA);
@@ -206,5 +207,5 @@ void init_wifi() {
         vTaskDelay(100);
     }
 
-    printf("connected to Wi-Fi\n");
+    INFO("connected to Wi-Fi");
 }

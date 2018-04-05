@@ -10,6 +10,7 @@
 #include <string.h>
 #include "supervisor.h"
 #include "wifi.h"
+#include "logger.h"
 
 esp_err_t system_event_callback(void *ctx, system_event_t *event) {
     if (event->event_id == SYSTEM_EVENT_STA_GOT_IP) {
@@ -20,12 +21,12 @@ esp_err_t system_event_callback(void *ctx, system_event_t *event) {
 }
 
 extern "C" void app_main() {
-    printf("Initializing...\n");
+    INFO("Initializing...");
     nvs_flash_init();
     tcpip_adapter_init();
     esp_event_loop_init(system_event_callback, NULL);
     init_wifi();
 
-    printf("Starting MakeStack...\n");
+    INFO("Starting MakeStack...");
     xTaskCreate(&supervisor_task, "supervisor", 16 * 1024, NULL, 5, NULL);
 }

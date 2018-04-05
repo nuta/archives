@@ -2,7 +2,7 @@ COMPONENT_DIR := $(PWD)/supervisor
 TOOLS_DIR := $(PWD)/tools
 PLUGINS_DIR := $(PWD)/plugins
 PLUGINS := aqm0802a
-COMPONENT_OBJS := main.o engine.o builtins.o smms.o supervisor.o wifi.o
+COMPONENT_OBJS := main.o engine.o builtins.o smms.o supervisor.o wifi.o logger.o
 
 TSC = cd $(PLUGINS_DIR) && yarn --silent run tsc
 TSCFLAGS = --target es5 --lib es5 --removeComments

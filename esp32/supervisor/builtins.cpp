@@ -4,6 +4,7 @@
 #include <driver/gpio.h>
 #include <driver/i2c.h>
 #include "smms.h"
+#include "logger.h"
 #include "utils.h"
 
 #define BUILTIN_FUNCTION(func_name)                          \
@@ -14,12 +15,12 @@
 #define VERIFY_ARG_TYPE(i, verify_type)              \
     do {                                             \
         if (i + 1 > argc) {                          \
-            printf("%s: too few args\n", __func__);  \
+            WARN("%s: too few args", __func__);     \
             return jerry_create_undefined();         \
         }                                            \
                                                      \
         if (!verify_type(args[i])) {                 \
-            printf("%s: %d: invalid arg type\n",     \
+            WARN("%s: %d: invalid arg type",         \
                    __func__, i);                     \
             return jerry_create_undefined();         \
         }                                            \
@@ -41,7 +42,7 @@ BUILTIN_FUNCTION(print) {
     size_t c = jerry_string_to_char_buffer(str_val, (jerry_char_t *)str, length);
     str[c] = '\0';
 
-    printf("log: %s\n", str);
+    INFO("%s", str);
     smms->append_log(str);
 
     free(str);

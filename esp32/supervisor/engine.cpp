@@ -7,6 +7,7 @@
 #include <string.h>
 #include "builtins.h"
 #include "preload.h"
+#include "logger.h"
 #include "utils.h"
 
 
@@ -74,7 +75,7 @@ static void print_error_message(const char *title, jerry_value_t error) {
     jerry_string_to_char_buffer(message_val, (jerry_char_t *) message, message_size);
     message[message_size] = '\0';
 
-    printf("%s: %s: %s\n", title, name, message);
+    WARN("JavaScript Error: %s: %s: %s", title, name, message);
 
     free(message);
     free(name);
@@ -84,7 +85,7 @@ static void print_error_message(const char *title, jerry_value_t error) {
 
 
 Engine::Engine() {
-    printf("initializing JavaScript engine...\n");
+    INFO("initializing JavaScript engine...");
     jerry_init(JERRY_INIT_EMPTY);
     xTaskCreate(&interval_task, "interval", 8192, NULL, 5, NULL);
 }

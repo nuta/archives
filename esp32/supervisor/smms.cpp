@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include "engine.h"
+#include "logger.h"
 #include "utils.h"
 
 #define SMMS_VERSION 1
@@ -230,15 +231,20 @@ void SmmsClient::launch_app(const void *image, size_t image_length) {
     const char *script = (const char *)image;
 
     if (image_length < 2) {
-        printf("bad app image\n");
+        INFO("bad app image");
         return;
     }
 
     if (script[0] == 'P' && script[1] == 'K') {
-        printf("ziped app image is not supported\n");
+        INFO("ziped app image is not supported");
         return;
     }
 
-    printf("launch_app: %s\n", (char *)image);
+    INFO("Launcing app....");
+    for (size_t i = 0; i < image_length; i++) {
+        printf("%c", script[i]);
+    }
+    printf("\n");
+
     engine->run(script, image_length);
 }
