@@ -50,6 +50,7 @@ void interval_task(void *param) {
         jerry_value_t args[] = { jerry_create_number(delay) };
         int argc = sizeof(args) / sizeof(jerry_value_t);
         call_global_function("__loop", args, argc);
+        jerry_gc();
     }
 }
 
