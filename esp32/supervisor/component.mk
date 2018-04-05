@@ -8,8 +8,7 @@ TSC = cd $(PLUGINS_DIR) && yarn --silent run tsc
 TSCFLAGS = --target es5 --lib es5 --removeComments
 
 PLUGIN_JS_SRCS = $(addsuffix .js, $(addprefix $(PLUGINS_DIR)/dist/, $(PLUGINS)))
-
-$(PLUGIN_JS_SRCS): %.js: $(wildcard (PLUGINS_DIR)/*.ts)
+$(PLUGIN_JS_SRCS): %: $(wildcard $(PLUGINS_DIR)/*.ts)
 	@echo TSC $@
 	$(TSC) $(TSCFLAGS) --outFile $@ $(PLUGINS_DIR)/$(basename $(notdir $@)).ts $(PLUGINS_DIR)/makestack.d.ts
 
