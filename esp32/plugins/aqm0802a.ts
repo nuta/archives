@@ -25,7 +25,6 @@ modules['@makestack/aqm0802a'] = class AQM0802A {
             Timer.busywait(50);
             this.bus.writeSync([0x40, shortenedText[i].charCodeAt(0)]);
             Timer.busywait(50);
-            i++;
         }
     }
 }

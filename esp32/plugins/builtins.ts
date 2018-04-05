@@ -3,6 +3,7 @@ declare function __print(str: string): void;
 declare function __setMode(pin: number, mode: 0 | 1): void;
 declare function __digitalWrite(pin: number, value: boolean): void;
 declare function __digitalRead(pin: number): boolean;
+declare function __i2cInit(): void;
 declare function __i2cRead(address: number, length: number): number[];
 declare function __i2cWrite(address: number, data: number[]): void;
 
@@ -154,6 +155,7 @@ class I2C {
 
     constructor(args: { address: number }) {
         this.address = args.address;
+        __i2cInit();
     }
 
     readSync(length: number): Buffer {
