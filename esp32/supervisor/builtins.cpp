@@ -1,6 +1,6 @@
 #include "builtins.h"
-#include <FreeRTOS/FreeRTOS.h>
-#include <FreeRTOS/task.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <driver/gpio.h>
 #include "smms.h"
 #include "utils.h"
