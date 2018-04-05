@@ -85,7 +85,7 @@ matrix:
           - esp32/plugins/node_modules
       install:
         - cd esp32
-        - test -d deps || ./tools/download-dependencies
+        - ./tools/download-dependencies
       script:
         - make -j2 || make -j2 # yes, the build system has been broken
       before_deploy:
@@ -115,6 +115,7 @@ matrix:
       # See https://github.com/travis-ci/travis-ci/issues/8978#issuecomment-354036443
       before_install:
         - gem update --system --no-doc
+        - gem install bundler
       install:
         - cd server
         - bundle install --jobs 2 --path vendor/bundle
@@ -135,6 +136,7 @@ matrix:
       # See https://github.com/travis-ci/travis-ci/issues/8978#issuecomment-354036443
       before_install:
         - gem update --system --no-doc
+        - gem install bundler
       install:
         - cd server
         - psql -c 'create database travis_ci_test;' -U postgres
