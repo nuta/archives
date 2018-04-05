@@ -19,6 +19,7 @@ static int get_global_integer_var(const char *var_name) {
 
     jerry_release_value(val);
     jerry_release_value(prop);
+    jerry_release_value(global);
     return ret;
 }
 
