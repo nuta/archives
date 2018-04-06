@@ -15,6 +15,7 @@ import * as redCommand from "./commands/red";
 import * as replCommand from "./commands/repl";
 import * as runCommand from "./commands/run";
 import * as registerCommand from "./commands/register";
+import { api } from "./api";
 import * as fs from "fs";
 import * as path from "path";
 const program = require("caporal");
@@ -162,14 +163,15 @@ function wifiCountryNameValidator(code: string) {
 program
 .command("install", "Install MakeStack OS/Linux to the device.")
 .option("--name <name>", "The device name.", null, null, true)
+.option("--app <name>", "The app name.")
 .option("--type <type>", "The device type.", /^raspberrypi3|esp32$/, null, true)
-.option("--os <os>", "The OS image.", /^linux$/, "linux")
 .option("--drive <drive>", "The drive. Use `list-drives' command.", null, null, true)
 .option("--adapter <adapter>", "The network adapter.", /^http|sakuraio$/, "http")
 .option("--wifi-ssid <wifi-ssid>", "The Wi-Fi SSID.")
 .option("--wifi-password <wifi-password>", "The Wi-Fi password. (WPA/WPA2 Personal)")
 .option("--wifi-country <wifi-country>", "The Wi-Fii country code. (ISO/IEC alpha2 country code)", wifiCountryNameValidator)
 .option("--image <image>", "The path to disk image.")
+.option("--url <url>", "The server URL.", null, api.serverURL)
 .action(installCommand.main);
 
 program

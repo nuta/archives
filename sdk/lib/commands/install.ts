@@ -34,6 +34,7 @@ export async function main(args: any, opts: any, logger: any) {
     }
 
     await install({
+        app: opts.app,
         deviceName: opts.name,
         deviceType: opts.type,
         adapter: opts.adapter,
@@ -42,7 +43,8 @@ export async function main(args: any, opts: any, logger: any) {
         wifiSSID: opts.wifiSsid,
         wifiPassword: opts.wifiPassword,
         wifiCountry: opts.wifiCountry,
-        diskImagePath: opts.image
+        diskImagePath: opts.image,
+        url: opts.url
     }, progress);
 
     console.info(chalk.bold.green("Done!"));

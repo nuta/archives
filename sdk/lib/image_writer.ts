@@ -36,7 +36,7 @@ function umount(drive: string) {
 
 export interface WriterArgs {
     drive: string;
-    driveSize: number;
+    driveSize?: number;
     server: any;
     imagePath: string;
 }
@@ -75,7 +75,7 @@ async function flashByDd({ drive, driveSize, server, imagePath }: WriterArgs) {
     });
 }
 
-async function flashByEsptool({ drive, driveSize, server, imagePath }: WriterArgs) {
+async function flashByEsptool({ drive, server, imagePath }: WriterArgs) {
     console.log("image-writer:", "writing");
     const cp = esptool([
         '--chip', 'esp32',
@@ -86,35 +86,47 @@ async function flashByEsptool({ drive, driveSize, server, imagePath }: WriterArg
         'write_flash',
         '-z',
         '--flash_mode', 'dio', '--flash_freq', '40m', '--flash_size', 'detect',
-        '0x1000', path.resolve(ARDUINO_DIR, 'tools/sdk/bootloader_dio_40m.bin'),
+        '0x1000', path.resolve(ARDUINO_DIR, 'tools/sdk/bin/bootloader_dio_40m.bin'),
         '0x8000', path.resolve(ARDUINO_DIR, 'tools/partitions/default.bin'),
         '0xe000', path.resolve(ARDUINO_DIR, 'tools/partitions/boot_app0.bin'),
         '0x10000', path.resolve(imagePath)
     ]);
 
-    cp.stdout.on('stdout', (s: string) => console.log(s))
-    cp.stderr.on('stderr', (s: string) => console.error(s))
+    cp.stdout.on('data', (s: Buffer) => {
+        const str = s.toString()
+        const progressRegex = /Writing at 0x[0-9a-f]+\.{3} \((\d+ %)\)/
+        for (const line of str.split("\n")) {
+            const match = progressRegex.exec(line)
+            if (match !== null) {
+                server.emit("progress", JSON.stringify({
+                    type: 'write',
+                    percentage: parseInt(match[1])
+                }))
+            }
+        }
+    })
 
-    cp.on('exit', (code: number) => {
+    cp.stderr.on('data', (s: Buffer) => console.error(s.toString()))
+
+    cp.on('close', (code: number) => {
         if (code === 0) {
             server.emit('success', JSON.stringify({}))
+            console.log("image-writer:", "done");
         } else {
             server.emit('error', JSON.stringify({}))
+            console.error("image-writer:", `error: ${code}`);
         }
+
+        ipc.disconnect("server");
     })
 }
 
 export async function imageWriter() {
-    const deviceType = process.env.DEVICE_TYPE;
-    const ipcPath = process.env.IPC_PATH;
-    const drive = process.env.DRIVE;
+    const deviceType = getenv('DEVICE_TYPE');
+    const ipcPath = getenv('IPC_PATH');
+    const drive = getenv('DRIVE');
     const driveSize = parseInt(getenv('DRIVE_SIZE'));
-    const imagePath = process.env.IMAGE_PATH;
-
-    if (deviceType === undefined || ipcPath === undefined || drive === undefined ||
-        driveSize === undefined || imagePath === undefined) {
-            throw new Error("specify `DEVICE_TYPE`, `IPC_PATH', `DRIVE_PATH', `DRIVE_SIZE' and `IMAGE_PATH'");
-    }
+    const imagePath = getenv('IMAGE_PATH');
 
     console.log(`image-writer: drive=${drive}, drive_size=${driveSize}, image_path=${imagePath}`);
 
@@ -126,7 +138,7 @@ export async function imageWriter() {
             await flashByDd({ drive, driveSize, server, imagePath });
             break;
         case 'esp32':
-            await flashByEsptool({ drive, driveSize, server, imagePath });
+            await flashByEsptool({ drive, server, imagePath });
             break;
     }
 }

@@ -89,7 +89,7 @@ matrix:
       script:
         - make -j2 || make -j2 # yes, the build system has been broken
       before_deploy:
-        - mv build/firmware.bin makestack-os-esp32.img
+        - mv build/firmware.elf makestack-os-esp32.img
         - shasum -a256 makestack-os-esp32.img > makestack-os-esp32.img.shasum
       deploy:
         <<: *deploy_options

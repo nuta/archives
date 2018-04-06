@@ -6,6 +6,7 @@ const fetch = require("node-fetch");
 const ipc = require("node-ipc");
 const { quote } = require("shell-quote");
 const sudo = require("sudo-prompt");
+const { esptool } = require("esptoolpy");
 import { api } from "./api";
 import { getDriveSize } from "./drive";
 import {
@@ -16,7 +17,11 @@ import { FatalError, APIError } from "./types";
 
 export type ProgressCallback = (stage: string, meta?: any) => void
 
-function replaceBuffer(buf: Buffer, value: string, id: string): Buffer {
+function checkDriveExistence(drivePath: string) {
+    return fs.existsSync(drivePath)
+}
+
+function replaceBuffer(buf: Buffer, value: string, id: string, fill: number): Buffer {
     const needle = `_____REPLACE_ME_MAKESTACK_CONFIG_${id}_____`;
 
     const index = buf.indexOf(Buffer.from(needle));
@@ -24,7 +29,7 @@ function replaceBuffer(buf: Buffer, value: string, id: string): Buffer {
         throw new FatalError(`replaceBuffer: failed to replace ${id}`);
     }
 
-    const paddedValue = Buffer.alloc(needle.length, " ");
+    const paddedValue = Buffer.alloc(needle.length, fill);
     const valueBuf = Buffer.from(value);
     valueBuf.copy(paddedValue);
     paddedValue.copy(buf, index);
@@ -89,7 +94,8 @@ function writeConfigToDiskIamge(args: {
     adapter: string,
     wifiSSID?: string,
     wifiPassword?: string,
-    wifiCountry?: string
+    wifiCountry?: string,
+    url: string
 }) {
     const {
         deviceType,
@@ -98,22 +104,31 @@ function writeConfigToDiskIamge(args: {
         adapter,
         wifiSSID = '',
         wifiPassword = '',
-        wifiCountry = ''
+        wifiCountry = '',
+        url
     } = args
 
     const imagePath = generateTempPath('installer', '.img');
-    const wifiPsk = crypto.pbkdf2Sync(wifiPassword, wifiSSID, 4096, 256, "sha1").toString('hex').substring(0, 64);
+    let wifiPsk, fill
+    if (deviceType === 'esp32') {
+        wifiPsk = wifiPassword
+        fill = 0x00
+    } else {
+        wifiPsk = crypto.pbkdf2Sync(wifiPassword, wifiSSID, 4096, 256, "sha1")
+        .toString('hex').substring(0, 64);
+        fill = 0x20 // white space
+    }
 
     // TODO: What if the image is large?
     let image = fs.readFileSync(originalImage);
-    image = replaceBuffer(image, deviceType, "DEVICE_TYPE");
-    image = replaceBuffer(image, device.device_id, "DEVICE_ID");
-    image = replaceBuffer(image, device.device_secret, "DEVICE_SECRET");
-    image = replaceBuffer(image, api.serverURL, "SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890");
-    image = replaceBuffer(image, adapter, "NETWORK_ADAPTER");
-    image = replaceBuffer(image, wifiSSID, "WIFI_SSID");
-    image = replaceBuffer(image, wifiPsk, "WIFI_PSK");
-    image = replaceBuffer(image, wifiCountry, "WIFI_COUNTRY");
+    image = replaceBuffer(image, deviceType, "DEVICE_TYPE", fill);
+    image = replaceBuffer(image, device.device_id, "DEVICE_ID", fill);
+    image = replaceBuffer(image, device.device_secret, "DEVICE_SECRET", fill);
+    image = replaceBuffer(image, url, "SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890", fill);
+    image = replaceBuffer(image, adapter, "NETWORK_ADAPTER", fill);
+    image = replaceBuffer(image, wifiSSID, "WIFI_SSID", fill);
+    image = replaceBuffer(image, wifiPsk, "WIFI_PSK", fill);
+    image = replaceBuffer(image, wifiCountry, "WIFI_COUNTRY", fill);
     fs.writeFileSync(imagePath, image);
 
     return imagePath;
@@ -172,6 +187,34 @@ function flash(deviceType: string, flashCommand: string, drive: string, driveSiz
     });
 }
 
+function prepareEsp32Image(imagePath: string) {
+    return new Promise((resolve, reject) => {
+        const tmpImagePath = imagePath + '.tmp';
+        fs.copyFileSync(imagePath, tmpImagePath);
+
+        const cp = esptool([
+            '--chip', 'esp32',
+            'elf2image',
+            '--flash_mode', 'dio',
+            '--flash_freq', '40m',
+            '--flash_size', '2MB',
+            '-o', imagePath,
+            tmpImagePath
+        ]);
+
+        cp.stderr.on('data', (error: Buffer) => console.log(error.toString()));
+
+        cp.on('close', (code: number) => {
+            fs.unlinkSync(tmpImagePath);
+
+            if (code === 0)
+                resolve()
+            else
+                reject(new Error(`esptool elf2image returned ${code}`))
+        });
+    });
+}
+
 export async function install(args: {
     deviceName: string,
     deviceType: string,
@@ -182,16 +225,19 @@ export async function install(args: {
     wifiCountry: string,
     drive: string,
     flashCommand: string,
-    diskImagePath?: string
+    diskImagePath?: string,
+    url: string
 }, progressCallback: ProgressCallback) {
 
     const {
         deviceName, deviceType, adapter, wifiSSID, wifiPassword, wifiCountry,
-        drive, flashCommand, diskImagePath, app
+        drive, flashCommand, diskImagePath, app, url
     } = args;
 
     progressCallback("look-for-drive");
-    const driveSize = await getDriveSize(drive);
+    checkDriveExistence(drive)
+    const driveSize = (deviceType === 'esp32') ? 0 : await getDriveSize(drive);
+
     progressCallback("register");
     const device = await registerOrGetDevice(deviceName, deviceType, app);
     progressCallback("download");
@@ -206,8 +252,13 @@ export async function install(args: {
     progressCallback("config");
     const imagePath = writeConfigToDiskIamge({
         deviceType, originalImage, device, adapter,
-        wifiSSID, wifiPassword, wifiCountry
+        wifiSSID, wifiPassword, wifiCountry, url
     })
+
+    if (deviceType === 'esp32') {
+        await prepareEsp32Image(imagePath)
+    }
+
     progressCallback('flash')
     await flash(deviceType, flashCommand, drive, driveSize, imagePath, progressCallback)
     progressCallback('success')
