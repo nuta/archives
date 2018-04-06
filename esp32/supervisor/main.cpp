@@ -25,7 +25,6 @@ extern "C" void app_main() {
     nvs_flash_init();
     tcpip_adapter_init();
     esp_event_loop_init(system_event_callback, NULL);
-    wifi_init();
 
     INFO("Starting MakeStack...");
     xTaskCreate(&supervisor_task, "supervisor", 16 * 1024, NULL, 5, NULL);

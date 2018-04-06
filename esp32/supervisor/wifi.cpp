@@ -6,38 +6,17 @@
 #include "logger.h"
 #include "BinaryStream.h"
 
-#define WIFI_SSID "curve25519"
-#define WIFI_PASSWORD "howudoing"
+static bool connected = false;
 
-// COMODO ECC Certification Authority (used for Cloudflare SNI ones)
-const char *root_ca_cerificates =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIID0DCCArigAwIBAgIQQ1ICP/qokB8Tn+P05cFETjANBgkqhkiG9w0BAQwFADBv\n"
-    "MQswCQYDVQQGEwJTRTEUMBIGA1UEChMLQWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFk\n"
-    "ZFRydXN0IEV4dGVybmFsIFRUUCBOZXR3b3JrMSIwIAYDVQQDExlBZGRUcnVzdCBF\n"
-    "eHRlcm5hbCBDQSBSb290MB4XDTAwMDUzMDEwNDgzOFoXDTIwMDUzMDEwNDgzOFow\n"
-    "gYUxCzAJBgNVBAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAO\n"
-    "BgNVBAcTB1NhbGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYD\n"
-    "VQQDEyJDT01PRE8gRUNDIENlcnRpZmljYXRpb24gQXV0aG9yaXR5MHYwEAYHKoZI\n"
-    "zj0CAQYFK4EEACIDYgAEA0d7L3XJghWF+3XkkRbUq2KZ9T5SCwbOQQB/l+EKJDwd\n"
-    "AQTuPdKNCZcM4HXk+vt3iir1A2BLNosWIxatCXH0SvQoULT+iBxuP2wvLwlZW6Vb\n"
-    "CzOZ4sM9iflqLO+y0wbpo4H+MIH7MB8GA1UdIwQYMBaAFK29mHo0tCb3+sQmVO8D\n"
-    "veAky1QaMB0GA1UdDgQWBBR1cacZSBm8nZ3qQUfflMRId5nTeTAOBgNVHQ8BAf8E\n"
-    "BAMCAYYwDwYDVR0TAQH/BAUwAwEB/zARBgNVHSAECjAIMAYGBFUdIAAwSQYDVR0f\n"
-    "BEIwQDA+oDygOoY4aHR0cDovL2NybC50cnVzdC1wcm92aWRlci5jb20vQWRkVHJ1\n"
-    "c3RFeHRlcm5hbENBUm9vdC5jcmwwOgYIKwYBBQUHAQEELjAsMCoGCCsGAQUFBzAB\n"
-    "hh5odHRwOi8vb2NzcC50cnVzdC1wcm92aWRlci5jb20wDQYJKoZIhvcNAQEMBQAD\n"
-    "ggEBAB3H+i5AtlwFSw+8VTYBWOBTBT1k+6zZpTi4pyE7r5VbvkjI00PUIWxB7Qkt\n"
-    "nHMAcZyuIXN+/46NuY5YkI78jG12yAA6nyCmLX3MF/3NmJYyCRrJZfwE67SaCnjl\n"
-    "lztSjxLCdJcBns/hbWjYk7mcJPuWJ0gBnOqUP3CYQbNzUTcp6PYBerknuCRR2RFo\n"
-    "1KaFpzanpZa6gPim/a5thCCuNXZzQg+HCezF3OeTAyIal+6ailFhp5cmHunudVEI\n"
-    "kAWvL54TnJM/ev/m6+loeYyv4Lb67psSE/5FjNJ80zXrIRKT/mZ1JioVhCb3ZsnL\n"
-    "jbsJQdQYr7GzEPUQyp2aDrV1aug=\n"
-    "-----END CERTIFICATE-----\n";
+void connected_to_wifi() {
+    connected = true;
+}
 
-
-WiFiSmmsClient::WiFiSmmsClient(Engine *engine, const char *server_url, const char *device_id)
-    : SmmsClient(engine, device_id) {
+WiFiSmmsClient::WiFiSmmsClient(Engine *engine, const char *wifi_ssid,
+    const char *wifi_password, const char *server_url, const char *ca_cert,
+    const char *device_id) :
+    SmmsClient(engine, device_id), wifi_ssid(wifi_ssid),
+    wifi_password(wifi_password), ca_cert(ca_cert) {
 
     String url = server_url;
 
@@ -66,6 +45,26 @@ WiFiSmmsClient::WiFiSmmsClient(Engine *engine, const char *server_url, const cha
     if (port_sep_pos > 0) {
         port = url.substring(port_sep_pos + 1).toInt();
     }
+
+    wifi_init_config_t init_config = WIFI_INIT_CONFIG_DEFAULT();
+    wifi_config_t config;
+    memset(&config, 0, sizeof(config));
+    strcpy((char *)config.sta.ssid, wifi_ssid);
+    strcpy((char *)config.sta.password, wifi_password);
+
+    INFO("Connecting to %s", wifi_ssid);
+    esp_wifi_init(&init_config);
+    esp_wifi_set_storage(WIFI_STORAGE_RAM);
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_set_config(WIFI_IF_STA, &config);
+    esp_wifi_start();
+    esp_wifi_connect();
+
+    while (!connected) {
+        vTaskDelay(100);
+    }
+
+    INFO("connected to Wi-Fi");
 }
 
 
@@ -81,7 +80,7 @@ void WiFiSmmsClient::send_payload(const void *payload, size_t length) {
 
     INFO("sending a smms payload...");
     if (tls_enabled) {
-        http.begin(url, root_ca_cerificates);
+        http.begin(url, ca_cert);
     } else {
         http.begin(url);
     }
@@ -124,7 +123,7 @@ void WiFiSmmsClient::download_app(int version) {
 
     INFO("starting a request...");
     if (tls_enabled) {
-        http.begin(url, root_ca_cerificates);
+        http.begin(url, ca_cert);
     } else {
         http.begin(url);
     }
@@ -151,32 +150,4 @@ void WiFiSmmsClient::download_app(int version) {
     }
 
     http.end();
-}
-
-static bool connected = false;
-
-void connected_to_wifi() {
-    connected = true;
-}
-
-void wifi_init() {
-    wifi_init_config_t init_config = WIFI_INIT_CONFIG_DEFAULT();
-    wifi_config_t config;
-    memset(&config, 0, sizeof(config));
-    strcpy((char *)config.sta.ssid, WIFI_SSID);
-    strcpy((char *)config.sta.password, WIFI_PASSWORD);
-
-    INFO("Connecting to %s", WIFI_SSID);
-    esp_wifi_init(&init_config);
-    esp_wifi_set_storage(WIFI_STORAGE_RAM);
-    esp_wifi_set_mode(WIFI_MODE_STA);
-    esp_wifi_set_config(WIFI_IF_STA, &config);
-    esp_wifi_start();
-    esp_wifi_connect();
-
-    while (!connected) {
-        vTaskDelay(100);
-    }
-
-    INFO("connected to Wi-Fi");
 }
