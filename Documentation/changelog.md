@@ -2,6 +2,9 @@
 title: Change Log
 ---
 
+- v0.5.0
+  - Experimental support for ESP-32
+  - server: fix some bugs
 - v0.4.2
   - Fix desktop build.
 - v0.4.1
