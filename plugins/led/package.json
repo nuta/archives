@@ -1,7 +1,7 @@
 {
   "name": "@makestack/led",
   "main": "dist/index.js",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
     "prepack": "tsc",

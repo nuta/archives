@@ -1,6 +1,6 @@
 {
   "name": "@makestack/aqm0802a",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "main": "dist/index.js",
   "license": "(CC0-1.0 OR MIT)",
   "scripts": {
