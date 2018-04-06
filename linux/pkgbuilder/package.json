@@ -17,8 +17,8 @@
   },
   "homepage": "http://makestack.org",
   "dependencies": {
-    "chalk": "^2.3.0",
+    "chalk": "^2.3.2",
     "node-gyp": "^3.6.2",
-    "typescript": "^2.6.2"
+    "typescript": "^2.8.1"
   }
 }

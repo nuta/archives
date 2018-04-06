@@ -8,11 +8,11 @@
     "prepare": "tsc"
   },
   "dependencies": {
-    "makestack": "0.x"
+    "makestack": "0.5.1"
   },
   "devDependencies": {
-    "@types/node": "^9.4.7",
+    "@types/node": "^9.6.2",
     "ts-node": "^5.0.1",
-    "typescript": "^2.7.2"
+    "typescript": "^2.8.1"
   }
 }

@@ -9,8 +9,8 @@
     "transpile": "tsc"
   },
   "devDependencies": {
-    "@types/node": "^9.4.7",
-    "typescript": "^2.7.2"
+    "@types/node": "^9.6.2",
+    "typescript": "^2.8.1"
   },
   "dependencies": {
     "makestack": "0.x"
