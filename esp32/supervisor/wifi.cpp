@@ -4,12 +4,10 @@
 #include "engine.h"
 #include "smms.h"
 #include "logger.h"
+#include "BinaryStream.h"
 
 #define WIFI_SSID "curve25519"
 #define WIFI_PASSWORD "howudoing"
-
-bool enable_tls = false;
-const char *server_host = "http://172.18.0.105:8080";
 
 // COMODO ECC Certification Authority (used for Cloudflare SNI ones)
 const char *root_ca_cerificates =
@@ -37,89 +35,52 @@ const char *root_ca_cerificates =
     "jbsJQdQYr7GzEPUQyp2aDrV1aug=\n"
     "-----END CERTIFICATE-----\n";
 
-class BinaryStream : public Stream {
-private:
-    int buffer_size;
 
-    // Returns 1 on success or 0 on failure.
-    int reserve(int new_length) {
-        const int count = 64;
+WiFiSmmsClient::WiFiSmmsClient(Engine *engine, const char *server_url, const char *device_id)
+    : SmmsClient(engine, device_id) {
 
-        if (buffer_size < new_length) {
-            buffer_size = new_length + count;
-            buffer = (uint8_t *) realloc(buffer, buffer_size);
-            // TODO: check return value
-        }
+    String url = server_url;
 
-        return 1;
+    int schema_length = 0;
+    if (url.startsWith("https://")) {
+        schema_length = 8;
+        port = 443;
+        tls_enabled = true;
+    } else if (url.startsWith("http://")) {
+        schema_length = 7;
+        port = 80;
+        tls_enabled = false;
+    } else {
+        WARN("invalid url scheme, assuming HTTPS");
+        schema_length = 0;
+        port = 443;
+        tls_enabled = true;
     }
 
-public:
-    int length;
-    int read_index;
-    uint8_t *buffer;
+    int port_sep_pos = url.indexOf(':', schema_length);
+    hostname = url.substring(
+        schema_length,
+        (port_sep_pos > 0) ? port_sep_pos : url.length()
+    );
 
-    BinaryStream() : length(0), read_index(0) {
-        buffer_size = 128;
-        buffer = (uint8_t *) malloc(buffer_size);
+    if (port_sep_pos > 0) {
+        port = url.substring(port_sep_pos + 1).toInt();
     }
+}
 
-    ~BinaryStream() {
-        free(buffer);
-    }
-
-    size_t write(const uint8_t *data, size_t size) {
-        if(size && data) {
-            if(reserve(length + size)) {
-                memcpy((void *) (buffer + length), (const void *) data, size);
-                length += size;
-                return size;
-            }
-        }
-        return 0;
-    }
-
-    size_t write(uint8_t data) {
-        if (reserve(length + 1)) {
-            buffer[length] = data;
-            return data;
-        }
-
-        return 0;
-    }
-
-    int available() {
-        return length > 0;
-    }
-
-    int read() {
-        if(length > 0) {
-            char c = buffer[read_index];
-            read_index++;
-            return c;
-
-        }
-
-        return -1;
-    }
-
-    int peek() {
-        return ((length > 0) ? buffer[0] : -1);
-    }
-
-    void flush() {
-    }
-};
 
 void WiFiSmmsClient::send_payload(const void *payload, size_t length) {
     HTTPClient http;
     String url;
 
-    url += server_host;
+    url += tls_enabled ? "https://" : "http://";
+    url += hostname;
+    url += ":";
+    url += port;
     url += "/api/v1/smms";
 
     INFO("sending a smms payload...");
-    if (enable_tls) {
+    if (tls_enabled) {
         http.begin(url, root_ca_cerificates);
     } else {
         http.begin(url);
@@ -127,6 +88,7 @@ void WiFiSmmsClient::send_payload(const void *payload, size_t length) {
 
     http.addHeader("Connection", "close");
 
+    DEBUG("POST %s", url.c_str());
     int code = http.POST((uint8_t *)payload, length);
 
     if (code > 0) {
@@ -151,20 +113,27 @@ void WiFiSmmsClient::download_app(int version) {
     HTTPClient http;
     String url;
 
-    url += server_host;
+    url += tls_enabled ? "https://" : "http://";
+    url += hostname;
+    url += ":";
+    url += port;
     url += "/api/v1/images/app/";
     url += device_id;
     url += "/";
     url += version;
 
     INFO("starting a request...");
-    if (enable_tls) {
+    if (tls_enabled) {
         http.begin(url, root_ca_cerificates);
     } else {
         http.begin(url);
     }
 
+    http.addHeader("Connection", "close");
+
+    DEBUG("GET %s", url.c_str());
     int code = http.GET();
+
     if (code > 0) {
         if (code == HTTP_CODE_OK) {
             INFO("downloading app image...");
@@ -186,9 +155,11 @@ void WiFiSmmsClient::download_app(int version) {
 
 static bool connected = false;
 
-void connected_to_wifi() { connected = true; }
+void connected_to_wifi() {
+    connected = true;
+}
 
-void init_wifi() {
+void wifi_init() {
     wifi_init_config_t init_config = WIFI_INIT_CONFIG_DEFAULT();
     wifi_config_t config;
     memset(&config, 0, sizeof(config));
