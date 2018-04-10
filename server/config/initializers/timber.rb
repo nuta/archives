@@ -9,6 +9,7 @@
 # Documentation: https://timber.io/docs
 # Support:       support@timber.io
 # -------------------------------------------------------------------
+require 'timber'
 
 config = Timber::Config.instance
 

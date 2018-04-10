@@ -29,7 +29,8 @@ class Deployment < ApplicationRecord
   before_create :set_version
   before_create :compute_shasum
 
-  def initialize(attrs = {})
+  def initialize(attrs)
+    attrs ||= {}
     image_file = attrs.delete(:image)
     super
 

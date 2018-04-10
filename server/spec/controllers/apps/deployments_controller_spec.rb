@@ -9,7 +9,7 @@ RSpec.describe Apps::DeploymentsController, type: :controller do
     it "returns a success response" do
       create(:deployment, app: app)
       get :index, params: { app_name: app.name }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -18,7 +18,7 @@ RSpec.describe Apps::DeploymentsController, type: :controller do
     it "returns a success response" do
       deployment = create(:deployment, app: app)
       get :show, params: { app_name: app.name, version: deployment.version }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 

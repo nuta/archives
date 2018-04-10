@@ -15,14 +15,14 @@ RSpec.shared_examples 'config controller' do
     it "returns a success response" do
       create(:config, owner: owner)
       get :index, params: { path_name => owner.name }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
   describe "GET #show" do
     it "returns a success response" do
       config = create(:config, owner: owner)
       get :show, params: { path_name => owner.name, key: config.key }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -41,7 +41,7 @@ RSpec.shared_examples 'config controller' do
         put :update, params: { path_name => owner.name, key: config.key, config: valid }
         config.reload
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "renders a JSON response with the config" do

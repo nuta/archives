@@ -8,7 +8,7 @@ RSpec.describe DevicesController, type: :controller do
     it "returns a success response" do
       create(:device, user: user)
       get :index
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -16,7 +16,7 @@ RSpec.describe DevicesController, type: :controller do
     it "returns a success response" do
       device = create(:device, user: user)
       get :show, params: {name: device.name}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -56,7 +56,7 @@ RSpec.describe DevicesController, type: :controller do
         put :update, params: {name: device.name, device: valid}
         device.reload
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       context "" do
@@ -68,7 +68,7 @@ RSpec.describe DevicesController, type: :controller do
           put :update, params: { name: device.name, device: { app: app.name } }
           device.reload
 
-          expect(response).to be_success
+          expect(response).to be_successful
           expect(device.app).to eq(app)
         end
 

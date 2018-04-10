@@ -9,7 +9,7 @@ RSpec.describe Apps::IntegrationsController, type: :controller do
     it "returns a success response" do
       create(:integration, app: app)
       get :index, params: { app_name: app.name }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -18,7 +18,7 @@ RSpec.describe Apps::IntegrationsController, type: :controller do
     it "returns a success response" do
       integration = create(:integration, app: app)
       get :show, params: { app_name: app.name, name: integration.name }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe Apps::IntegrationsController, type: :controller do
         put :update, params: { app_name: app.name, name: integration.name, integration: valid }
         integration.reload
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "renders a JSON response with the integration" do

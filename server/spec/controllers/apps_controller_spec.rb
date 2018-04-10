@@ -8,7 +8,7 @@ RSpec.describe AppsController, type: :controller do
     it "returns a success response" do
       create(:app, user: user)
       get :index
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -17,7 +17,7 @@ RSpec.describe AppsController, type: :controller do
     it "returns a success response" do
       app = create(:app, user: user)
       get :show, params: {name: app.name}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -57,7 +57,7 @@ RSpec.describe AppsController, type: :controller do
         put :update, params: {name: app.name, app: valid}
         app.reload
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "renders a JSON response with the app" do

@@ -9,7 +9,7 @@ RSpec.describe Apps::SourceFilesController, type: :controller do
     it "returns a success response" do
       create(:source_file, app: app)
       get :index, params: { app_name: app.name }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -18,7 +18,7 @@ RSpec.describe Apps::SourceFilesController, type: :controller do
     it "returns a success response" do
       source_file= create(:source_file, app: app)
       get :show, params: { app_name: app.name, path: source_file.path }
-      expect(response).to be_success
+      expect(response).to be_successful
     end
   end
 
@@ -37,7 +37,7 @@ RSpec.describe Apps::SourceFilesController, type: :controller do
         put :update, params: { app_name: app.name, path: source_file.path, source_file: valid }
         source_file.reload
 
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "renders a JSON response with the source_file" do
