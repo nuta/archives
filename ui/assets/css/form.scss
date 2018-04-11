@@ -8,6 +8,7 @@
   color: var(--fg0-color);
   font-size: 16px;
   padding: 9px 12px 6px 12px;
+  user-select: none;
 
   i.fas {
     position: relative;
@@ -69,7 +70,7 @@ form {
   }
 }
 
-input[type=text], input[type=password] {
+input[type=text], input[type=number], input[type=password] {
   color: var(--fg0-color);
   background: var(--bg1-color);
   border: 1px solid var(--border-color);
