@@ -9,6 +9,23 @@
     </nuxt-link>
 
     <tabs>
+      <tab name="General">
+        <div class="sections">
+          <section>
+            <header>
+              <h1>Editor Mode</h1>
+            </header>
+            <div class="content">
+              <form @submit.prevent="saveEditorMode">
+                <select v-model="editor">
+                  <option v-for="(title, value) in editors" :key="value" :value="value">{{ title }}</option>
+                </select>
+                <input type="submit" value="Save" class="primary">
+              </form>
+            </div>
+          </section>
+        </div>
+      </tab>
       <tab name="Integrations">
         <div class="sections">
           <section>
@@ -228,6 +245,11 @@ export default {
     return {
       appName: this.$route.params.appName,
       releases,
+      editor: '',
+      editors: {
+        code: 'Code Editor',
+        flow: 'Flow'
+      },
       app: {},
       configs: [],
       newConfig: {
@@ -254,6 +276,9 @@ export default {
   methods: {
     async updateOS() {
       await api.updateApp(this.appName, { os_version: this.app.os_version })
+    },
+    async saveEditorMode() {
+      await api.updateApp(this.appName, { editor: this.editor })
     },
     async removeApp() {
       await api.deleteApp(this.appName)
@@ -402,6 +427,7 @@ export default {
 
   async mounted() {
     this.app = await api.getApp(this.appName)
+    this.editor = this.app.editor
     await this.refreshAppConfigs()
     await this.refreshIntegrations()
   }
