@@ -12,7 +12,7 @@ class App < ApplicationRecord
 
   RESERVED_APP_NAMES = %w(new)
   SUPPORTED_APIS = %w(nodejs)
-  SUPPORTED_EDITORS = %w(code)
+  SUPPORTED_EDITORS = %w(code flow)
   CODE_MAX_LEN = 16 * 1024
 
   quota scope: :user_id, limit: User::APPS_MAX_NUM

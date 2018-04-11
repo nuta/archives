@@ -1,6 +1,8 @@
 <template>
   <dashboard-layout title="Code" :appName="appName" no-padding="true">
-    <editor :code="code" @changed="codeChanged"></editor>
+    <code-editor :code="code" @changed="codeChanged" v-if="editor === 'code'"></code-editor>
+    <flow-editor :defs="defs" @changed="codeChanged" :nodes="nodes" v-if="editor === 'flow'"></flow-editor>
+
     <footer>
       <div class="bottom-bar">
         <template v-if="this.devices.length === 0">
@@ -35,12 +37,14 @@
 import api from "~/assets/js/api"
 import { buildApp } from "~/assets/js/build"
 import { setLastUsedApp } from "~/assets/js/preferences"
-import Editor from "~/components/editor"
+import { defs, buildFlowApp } from "~/assets/js/flow"
+import CodeEditor from "~/components/code-editor"
+import FlowEditor from "~/components/flow-editor"
 import LogPanel from "~/components/log-panel"
 import DashboardLayout from "~/components/dashboard-layout"
 
 export default {
-  components: { DashboardLayout, Editor, LogPanel },
+  components: { DashboardLayout, CodeEditor, FlowEditor, LogPanel },
   head: {
     link: [
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Source+Code+Pro:400,600' },
@@ -52,7 +56,10 @@ export default {
   data() {
     return {
       appName: this.$route.params.appName,
+      editor: 'code',
       code: '',
+      nodes: {},
+      defs,
       devices: [],
       caption: 'Code will be automatically saved.',
       autosaveAfter: 3000,
@@ -61,8 +68,14 @@ export default {
   },
   methods: {
     async deploy() {
+      let code = this.code
+      if (this.editor === 'flow') {
+        this.deployButton = "Building Flow..."
+        code = await buildFlowApp(this.nodes)
+      }
+
       this.deployButton = "Building..."
-      const { image, debug } = await buildApp(this.code)
+      const { image, debug } = await buildApp(code)
 
       this.deployButton = "Deploying...";
       const comment = "Deployment at " + (new Date()).toString();
@@ -74,7 +87,7 @@ export default {
       }, 3000)
     },
     codeChanged(newCode) {
-      this.caption = 'Code will be saved when you stop typing...'
+      this.caption = 'Code will be saved when you stop editing...'
       if (this.autosaveTimer) {
         clearTimeout(this.autosaveTimer)
       }
@@ -84,7 +97,7 @@ export default {
           this.caption = 'Code will be automatically saved.'
         } else {
           this.caption = 'Saving...'
-          await api.saveFile(this.appName, 'app.js', newCode)
+          await api.updateApp(this.appName, { code: newCode })
           this.caption = 'Saved'
           this.code = newCode
         }
@@ -93,13 +106,13 @@ export default {
   },
 
   async mounted() {
-    for (const file of await api.getFiles(this.appName)) {
-      if (file.path === 'app.js') {
-        this.code = file.body
-      }
-    }
-
     this.app = await api.getApp(this.appName)
+    this.editor = this.app.editor
+    this.code = this.app.code
+
+    if (this.editor === 'flow')
+      this.nodes = JSON.parse(this.code)
+
     this.devices = await api.getAppDevices(this.appName)
     setLastUsedApp(this.appName)
   }

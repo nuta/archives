@@ -248,7 +248,7 @@ export default {
       editor: '',
       editors: {
         code: 'Code Editor',
-        flow: 'Flow'
+        flow: 'Flow Editor (Experimental)'
       },
       app: {},
       configs: [],

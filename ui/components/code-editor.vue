@@ -1,5 +1,5 @@
 <template>
-  <div class="editor" ref="editor"></div>
+  <div class="code-editor" ref="editor"></div>
 </template>
 
 <script>
@@ -47,7 +47,7 @@ export default {
         monaco.editor.defineTheme(name, colorScheme)
       }
 
-      this.editor = monaco.editor.create(document.querySelector('.editor'), {
+      this.editor = monaco.editor.create(this.$refs.editor, {
         theme: getCurrentTheme(),
         fontFamily: 'Source Code Pro',
         fontSize: '15px',
@@ -127,7 +127,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.editor {
+.code-editor {
   display: flex;
   flex: 1;
 }
