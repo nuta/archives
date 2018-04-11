@@ -287,7 +287,7 @@ class API {
 
   createApp(appName, api) {
     return this.invoke('POST', `/apps`, {
-      app: { name: appName, api: api }
+      app: { name: appName, api: api, code: '' }
     })
   }
 
