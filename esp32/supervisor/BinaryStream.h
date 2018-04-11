@@ -12,7 +12,10 @@ private:
         if (buffer_size < new_length) {
             buffer_size = new_length + count;
             buffer = (uint8_t *) realloc(buffer, buffer_size);
-            // TODO: check return value
+            if (!buffer) {
+                free(buffer);
+                return 0;
+            }
         }
 
         return 1;
