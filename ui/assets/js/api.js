@@ -291,14 +291,6 @@ class API {
     })
   }
 
-  getFiles(appName) {
-    return this.invoke('GET', `/apps/${appName}/files`)
-  }
-
-  saveFile(appName, path, body) {
-    return this.invoke('PUT', `/apps/${appName}/files/${path}`, { body })
-  }
-
   getAppConfigs(appName) {
     return this.invoke('GET', `/apps/${appName}/configs`)
   }
