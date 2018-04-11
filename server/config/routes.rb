@@ -21,10 +21,6 @@ Rails.application.routes.draw do
 
         resources :integrations, controller: 'apps/integrations', param: :name
 
-        resources :source_files, controller: 'apps/source_files',
-          param: :path, path: 'files', format: false,
-         constraints: { path: /.+/ }, only: [:index, :show, :update, :destroy]
-
         resources :log, controller: 'apps/log', only: [:index]
       end
 

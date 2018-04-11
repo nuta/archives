@@ -6,13 +6,14 @@ class App < ApplicationRecord
   belongs_to :user
   has_many :deployments, dependent: :destroy
   has_many :configs, as: :owner, dependent: :destroy
-  has_many :source_files, dependent: :destroy
   has_many :integrations, dependent: :destroy
   has_many :devices # nullified in disassociate_devices on destroy
   before_destroy :disassociate_devices
 
   RESERVED_APP_NAMES = %w(new)
   SUPPORTED_APIS = %w(nodejs)
+  SUPPORTED_EDITORS = %w(code)
+  CODE_MAX_LEN = 16 * 1024
 
   quota scope: :user_id, limit: User::APPS_MAX_NUM
 
@@ -25,6 +26,12 @@ class App < ApplicationRecord
 
   validates :api,
     inclusion: { in: SUPPORTED_APIS, message: "`%{value}' is unsupported (unknown) API." }
+
+  validates :editor,
+    inclusion: { in: SUPPORTED_EDITORS, message: "`%{value}' is unsupported editor." }
+
+  validates :code,
+    length: { in: 0..CODE_MAX_LEN }
 
   validate :validate_os_version
 

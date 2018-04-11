@@ -4,5 +4,6 @@ FactoryBot.define do
     sequence(:name) {|n| "app#{n}" }
     api  "nodejs"
     os_version "v0.5.0"
+    code ""
   end
 end

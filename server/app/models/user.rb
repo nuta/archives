@@ -11,7 +11,6 @@ class User < ActiveRecord::Base
   # Quotas
   APPS_MAX_NUM = 30
   DEVICES_MAX_NUM = 30
-  SOURCE_FILES_MAX_NUM_PER_APP = 16
   STORES_MAX_NUM = 30
 
   RESERVED_USER_NAMES = %w(

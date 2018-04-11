@@ -31,6 +31,6 @@ class AppsController < ApplicationController
   end
 
   def app_params
-    params.require(:app).permit(:name, :api, :os_version)
+    params.require(:app).permit(:name, :api, :os_version, :editor, :code)
   end
 end

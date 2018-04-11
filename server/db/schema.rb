@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171210015058) do
+ActiveRecord::Schema.define(version: 20180411004133) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(version: 20171210015058) do
     t.bigint "user_id", null: false
     t.string "api", null: false
     t.string "os_version", null: false
+    t.string "code"
+    t.string "editor", default: "code"
     t.index ["user_id"], name: "index_apps_on_user_id"
   end
 
@@ -94,16 +96,6 @@ ActiveRecord::Schema.define(version: 20171210015058) do
     t.index ["token_prefix"], name: "index_integrations_on_token_prefix"
   end
 
-  create_table "source_files", id: :serial, force: :cascade do |t|
-    t.string "path", null: false
-    t.text "body"
-    t.bigint "app_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["app_id", "path"], name: "index_source_files_on_app_id_and_path"
-    t.index ["app_id"], name: "index_source_files_on_app_id"
-  end
-
   create_table "users", id: :serial, force: :cascade do |t|
     t.string "provider", default: "email", null: false
     t.string "uid", default: "", null: false
@@ -141,5 +133,4 @@ ActiveRecord::Schema.define(version: 20171210015058) do
   add_foreign_key "devices", "apps"
   add_foreign_key "devices", "users"
   add_foreign_key "integrations", "apps"
-  add_foreign_key "source_files", "apps"
 end
