@@ -11,7 +11,6 @@ import * as loginCommand from "./commands/login";
 import * as newCommand from "./commands/new";
 import * as addPluginCommand from "./commands/add_plugin";
 import * as newPluginCommand from "./commands/new_plugin";
-import * as redCommand from "./commands/red";
 import * as replCommand from "./commands/repl";
 import * as runCommand from "./commands/run";
 import * as registerCommand from "./commands/register";
@@ -192,13 +191,6 @@ program
 .argument("dir", "The plugin directory.")
 .option("--lang <lang>", "The programming language.", /^typescript|javascript$/, "typescript")
 .action(newPluginCommand.main);
-
-program
-.command("red", "Program the app with Node-RED.")
-.option("--port <port>", "The port.", null, 31313)
-.option("--app-dir <app-dir>", "The app directory.", null, process.cwd())
-.option("--dev", "Restart Node-RED automatically for Node-RED node development.", false)
-.action(redCommand.main);
 
 export async function run(argv: string[]): Promise<{}> {
     return new Promise((resolve, reject) => {
