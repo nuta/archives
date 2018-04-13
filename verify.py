@@ -29,6 +29,7 @@ def print_result(desc, additional, result):
 def verify_disk_image(filepath):
     global sectors_per_cluster
     image = open(filepath, "rb").read()
+    sector_size = unpack(0x0b, 2, image)
     sectors_per_cluster = unpack(0x0d, 1, image)
     total_sectors = unpack(0x20, 4, image)
     total_clusters = total_sectors // sectors_per_cluster
@@ -44,6 +45,12 @@ def verify_disk_image(filepath):
         "The file system must be FAT-32",
         f"{total_clusters} clusters",
         total_clusters > 0xfff7
+    )
+
+    print_result(
+        "The sector size must be 512",
+        f"{sector_size}",
+        sector_size == 512
     )
 
     res = math.log2(sectors_per_cluster)
