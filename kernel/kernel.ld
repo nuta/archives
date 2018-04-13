@@ -1,4 +1,4 @@
-ENTRY(boot)
+ENTRY(main)
 
 SECTIONS {
     . = 0x10000;

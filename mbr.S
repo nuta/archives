@@ -5,6 +5,8 @@
 #define FAT_TABLE_SIZE_IN_SECTORS ((0xf000 - 0x9000) / 512)
 #define ELF_HEADER 0xf000
 #define SECTORS_PER_CLUSTER 8
+#define KERNEL_FIRST_CLUSTER 0x500 /* word */
+#define FIRST_CLUSTER_SECTOR 0x502 /* word */
 
 .globl boot
 boot:
@@ -44,7 +46,7 @@ boot:
     // di points to the the beginning of file name field which
     // is the beginning of a directory entry.
     mov ax, [di + 0x1a] // assuming that higher 16-bits are zero
-    mov [kernel_first_cluster], ax
+    mov [KERNEL_FIRST_CLUSTER], ax
 
     // Look for BIOS Parameter Block
     lea ax, bpb_jump_code
@@ -60,7 +62,7 @@ boot:
     add bx, dx // the beginning of BPB
     mul cx
     add bx, ax
-    mov [first_cluster_sector], bx
+    mov [FIRST_CLUSTER_SECTOR], bx
 
     // Look for the FAT ID and endianess marker. (F0 FF FF FF)
     lea ax, fat_table_signature
@@ -73,9 +75,6 @@ boot:
     mov word ptr [dap_dest], FAT_TABLE
     mov word ptr [dap_num], FAT_TABLE_SIZE_IN_SECTORS
     call read_sector
-
-    mov al, 'E'
-    call printchar
 
     // Load ELF header.
     mov di, ELF_HEADER
@@ -101,7 +100,7 @@ load_segment:
     jne 1f
 
     mov si, [bx + 0x08] // offset in the file
-    mov edi, [bx + 0x10] // virtual adress
+    mov edi, [bx + 0x10] // virtual address
     mov dx, [bx + 0x20] // size
     shr si, cl // assuming that offset is multiple of cluster
     shr dx, cl
@@ -117,23 +116,28 @@ load_segment:
 
 2:
     // Jump into the kernel.
-    mov ax, [ELF_HEADER + 0x18]
-    hlt
+    mov edx, [ELF_HEADER + 0x18]
+    mov eax, edx
+    shr eax, 4
+    and ax, 0xf000
+    and edx, 0xffff
+    push ax // CS
+    push edx // EIP
 
-    mov bx, ax
-    mov al, 'Y'
-    jmp error
-
-    jmp ax
+    call printchar
+    retf
 
 not_reachable:
     mov al, 'H'
-    jmp error
+
+error:
+    call printchar
+    hlt
 
 // DI: dest address, SI: cluster offset, CX: # of clusters
 read_kernel_file:
     pusha
-    mov ax, [kernel_first_cluster]
+    mov ax, [KERNEL_FIRST_CLUSTER]
 
 read_cluster:
     // Skip clusters.
@@ -141,28 +145,35 @@ read_cluster:
     cmp si, 0
     jge next_cluster
 
-    push ax
+    pusha
     sub ax, 2 // Cluster number *typically* starts with 2.
     shl ax, 3 // assuming that 8 sectors per cluster TODO
-    add ax, first_cluster_sector
-    mov bx, first_cluster_sector
+    add ax, [FIRST_CLUSTER_SECTOR]
     mov word ptr [dap_sector], ax
-    mov dword ptr [dap_dest], edi
+    mov word ptr [dap_dest], di
+    shr edi, 4
+    and di, 0xf000
+    mov word ptr [dap_dest_seg], di
     mov word ptr [dap_num], SECTORS_PER_CLUSTER
-    pop ax
+    popa
     call read_sector
     add di, SECTORS_PER_CLUSTER * 512
 
 next_cluster:
-    mov dx, FAT_TABLE
+    mov bx, FAT_TABLE
     shl ax, 2
+    add bx, ax
+    mov edx, [bx] // The next cluster number.
 
     pusha
-    mov di, [dx + ax]
+    mov di, dx
     lea si, fat_end_marker
+    mov cx, 4
     repe cmpsb
     popa
     je 1f
+
+    mov ax, dx
 
     // Skip clusters.
     cmp si, 0
@@ -214,8 +225,7 @@ search_sector:
     sub bx, 1
     jnz try_next_sector
 
-    // JNZ did not perform jump to try_next_sector because the signature is
-    // not found.
+    // The signature is not found.
     mov al, 'N'
     jmp error
 
@@ -239,10 +249,6 @@ printchar:
     popa
     ret
 
-error:
-    call printchar
-    hlt
-
 // Disk drive number.
 drive_number:
     .byte 0x00
@@ -250,20 +256,16 @@ drive_number:
 // Disk address Packet
 // https://en.wikipedia.org/wiki/INT_13H#INT_13h_AH=42h:_Extended_Read_Sectors_From_Drive
 dap:
-    .byte   0x10        // Size of the disk address packet.
-    .byte   0x00        // Unused.
+    .byte  0x10        // Size of the disk address packet.
+    .byte  0x00        // Unused.
 dap_num:
-    .word   0x0001      // # of sectors to be read.
+    .word  0x0001      // # of sectors to be read.
 dap_dest:
-    .long   0x00000000  // The destination address.
+    .word  0x0000     // The destination offset.
+dap_dest_seg:
+    .word  0x0000     // The destination segment.
 dap_sector:
     .quad   0x0000000000000000  // The source sector.
-
-kernel_first_cluster:
-    .word 0
-
-first_cluster_sector:
-    .word 0
 
 bpb_jump_code:
     .byte 0xeb, 0x58, 0x90 // XXX
@@ -272,7 +274,7 @@ fat_table_signature:
     .byte 0xf0, 0xff, 0xff, 0xff
 
 fat_end_marker:
-    .byte 0x0f, 0xff, 0xff, 0xff
+    .byte 0x0ff, 0xff, 0xff, 0xf0
 
 kernel_filename:
     .ascii "KERNEL  ELF"
