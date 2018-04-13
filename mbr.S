@@ -5,36 +5,45 @@
 #define FAT_TABLE_SIZE_IN_SECTORS ((0xf000 - 0x9000) / 512)
 #define ELF_HEADER 0xf000
 #define SECTORS_PER_CLUSTER 8
+
+#define BSS_ADDR 0x500
+#define BSS_SIZE 0x100
 #define KERNEL_FIRST_CLUSTER 0x500 /* word */
 #define FIRST_CLUSTER_SECTOR 0x502 /* word */
+#define DRIVER_NUMBER        0x504 /* byte */
+
+// Disk address Packet
+// https://en.wikipedia.org/wiki/INT_13H#INT_13h_AH=42h:_Extended_Read_Sectors_From_Drive
+#define DAP          0x510
+#define DAP_SIZE     0x510 /* byte */
+#define DAP_NUM      0x512 /* word */
+#define DAP_DEST     0x514 /* word */
+#define DAP_DEST_SEG 0x516 /* word */
+#define DAP_SECTOR   0x518 /* quad */
 
 .globl boot
 boot:
-    // Disable interrupts.
     cli
     cld
-
-    // DL register holds the drive index. It's already set by BIOS.
-    mov [drive_number], dl
-
-    // Initialize the stack pointer.
-    // According to osdev, 0x0500 - 0x7bff are available.
-    mov sp, 0x7c00
     mov ax, 0
     mov ds, ax
-    mov es, ax
     mov ss, ax
+    mov sp, 0x7c00
+    mov di, BSS_ADDR
+    mov cx, BSS_SIZE
+    rep stosb
+
+    // DL register holds the drive index set by BIOS.
+    mov [DRIVER_NUMBER], dl
 
     // Initialize the serial port.
-    // http://webpages.charter.net/danrollins/techhelp/0208.HTM
-    mov ah, 0x00    // Initialize serial port feature.
+    mov ah, 0x00
     mov al, 0xe3    // baud_rate=9600, no parity,
                     // one stop bit, one character is 8bits
     mov dx, 0x0000  // The COM port.
     int 0x14
 
-    mov al, '*'
-    call printchar
+    mov byte ptr [DAP_SIZE], 0x10
 
     // Look for the dictory entry.
     lea ax, kernel_filename
@@ -71,9 +80,9 @@ boot:
     call look_for_signature
 
     // Load the FAT table.
-    mov word ptr [dap_sector], dx
-    mov word ptr [dap_dest], FAT_TABLE
-    mov word ptr [dap_num], FAT_TABLE_SIZE_IN_SECTORS
+    mov word ptr [DAP_SECTOR], dx
+    mov word ptr [DAP_DEST], FAT_TABLE
+    mov word ptr [DAP_NUM], FAT_TABLE_SIZE_IN_SECTORS
     call read_sector
 
     // Load ELF header.
@@ -123,15 +132,14 @@ load_segment:
     and edx, 0xffff
     push ax // CS
     push edx // EIP
-
-    call printchar
     retf
 
 not_reachable:
-    mov al, 'H'
 
 error:
-    call printchar
+    mov ah, 0x01    // Send a character feature.
+    mov dx, 0x0000  // The COM port.
+    int 0x14
     hlt
 
 // DI: dest address, SI: cluster offset, CX: # of clusters
@@ -149,12 +157,12 @@ read_cluster:
     sub ax, 2 // Cluster number *typically* starts with 2.
     shl ax, 3 // assuming that 8 sectors per cluster TODO
     add ax, [FIRST_CLUSTER_SECTOR]
-    mov word ptr [dap_sector], ax
-    mov word ptr [dap_dest], di
+    mov word ptr [DAP_SECTOR], ax
+    mov word ptr [DAP_DEST], di
     shr edi, 4
     and di, 0xf000
-    mov word ptr [dap_dest_seg], di
-    mov word ptr [dap_num], SECTORS_PER_CLUSTER
+    mov word ptr [DAP_DEST_SEG], di
+    mov word ptr [DAP_NUM], SECTORS_PER_CLUSTER
     popa
     call read_sector
     add di, SECTORS_PER_CLUSTER * 512
@@ -188,8 +196,9 @@ read_sector:
     pusha
 
     mov ah, 0x42
-    lea si, dap
-    mov dl, [drive_number]
+    mov si, DAP
+    mov dl, [DRIVER_NUMBER]
+    xchg bx,bx
     int 0x13
 
     popa
@@ -198,14 +207,14 @@ read_sector:
 // Look for the signature in the disk. Returns in SI the offset of signature
 // in the buffer.
 look_for_signature:
-    push bx
     mov bx, 0x8000
-    mov word ptr [dap_dest], bx
+    mov word ptr [DAP_DEST], bx
+    mov word ptr [DAP_NUM], 1
     mov bx, 1024   // The maximum sector number.
 
 try_next_sector:
     // Read a sector.
-    mov word ptr [dap_sector], dx
+    mov word ptr [DAP_SECTOR], dx
     call read_sector
     mov di, 0x8000
 
@@ -230,42 +239,11 @@ search_sector:
     jmp error
 
 2:
-    pop bx
     ret
 
-//  Prints a character in the screen.
-//
-//  Parameters:
-//
-//    AL - The ASCII character.
-//
-printchar:
-    pusha
-
-    mov ah, 0x01    // Send a character feature.
-    mov dx, 0x0000  // The COM port.
-    int 0x14
-
-    popa
-    ret
-
-// Disk drive number.
-drive_number:
-    .byte 0x00
-
-// Disk address Packet
-// https://en.wikipedia.org/wiki/INT_13H#INT_13h_AH=42h:_Extended_Read_Sectors_From_Drive
-dap:
-    .byte  0x10        // Size of the disk address packet.
-    .byte  0x00        // Unused.
-dap_num:
-    .word  0x0001      // # of sectors to be read.
-dap_dest:
-    .word  0x0000     // The destination offset.
-dap_dest_seg:
-    .word  0x0000     // The destination segment.
-dap_sector:
-    .quad   0x0000000000000000  // The source sector.
+// The partition table. No partitions for now.
+.org 0x01be
+.space 0x20 // reserved for two partitions
 
 bpb_jump_code:
     .byte 0xeb, 0x58, 0x90 // XXX
@@ -279,17 +257,7 @@ fat_end_marker:
 kernel_filename:
     .ascii "KERNEL  ELF"
 
-// Fill 0x00 until 0x01b8 th byte from the beginning of the MBR. From here
-// some data about the partition. Refer Wikipedia for details:
-//
-//   https://en.wikipedia.org/wiki/Master_boot_record#Sector_layout
-//
-// Here we use "Structure of a classical generic MBR".
-// XXX .org 0x01be
 .org 0x01fe
-
-// The partition table. No partitions for now.
-// XXX .space 0x40
 
 // The MBR boot signature. "0x55 0xaa" indicates that the partition is bootable.
 .byte 0x55

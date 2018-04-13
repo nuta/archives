@@ -4,13 +4,15 @@ default: build
 # Set `y' to suppress annoying build messages.
 V =
 
-BUILD_DIR = build
-override CC = /usr/local/opt/llvm/bin/clang --target=x86_64
 override CFLAGS += -O2 -Wall -Wextra -Werror -g3
-LINK ?= sh -c 'exec -a ld.lld /usr/local/opt/llvm/bin/lld $$*'
-LINKFLAGS ?=
+override LDFLAGS +=
+
+ifeq ($(shell uname), Darwin)
+CC = /usr/local/opt/llvm/bin/clang --target=x86_64
+LD = sh -c 'exec -a ld.lld /usr/local/opt/llvm/bin/lld $$*'
+endif
+
 OBJCOPY ?= gobjcopy
-PYTHON ?= python3
 PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
 objs =
 
@@ -40,16 +42,16 @@ mbr.o: mbr.S
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 mbr.elf: mbr.o mbr.ld
-	$(PROGRESS) LINK $@
-	$(LINK) $(LINKFLAGS) --script mbr.ld -o $@ $<
+	$(PROGRESS) LD $@
+	$(LD) $(LDFLAGS) --script mbr.ld -o $@ $<
 
 mbr.bin: mbr.elf
 	$(PROGRESS) OBJCOPY $@
 	$(OBJCOPY) -Obinary $< $@
 
 kernel/kernel.elf: kernel/kernel.o kernel/kernel.ld
-	$(PROGRESS) LINK $@
-	$(LINK) $(LINKFLAGS) --script kernel/kernel.ld -o $@ $<
+	$(PROGRESS) LD $@
+	$(LD) $(LDFLAGS) --script kernel/kernel.ld -o $@ $<
 
 disk.img: mbr.bin kernel/kernel.elf
 	$(PROGRESS) DD $@.tmp

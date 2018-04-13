@@ -17,7 +17,7 @@ main:
     putchar 'l'
     putchar 'o'
     putchar ' '
-    putchar 'w'
+    putchar 'W'
     putchar 'o'
     putchar 'r'
     putchar 'l'
@@ -25,4 +25,5 @@ main:
     putchar '!'
     putchar '!'
     putchar '!'
+    putchar '\n'
     hlt
