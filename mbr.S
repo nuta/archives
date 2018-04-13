@@ -92,21 +92,21 @@ boot:
     add cl, 9 // assuming that offset is multiple of 512
 
     // Load segments.
-    mov ax, ELF_HEADER + 64 // the first program header offset
+    mov bx, ELF_HEADER + 64 // the first program header offset
 
+#define PT_LOAD 1
 load_segment:
-    // FIXME: Assembler emits incorrect machine code.
-    cmp byte ptr [ax], 1 // PT_LOAD
+    mov dx, [bx]
+    cmp dx, PT_LOAD
     jne 1f
 
-    mov si, [ax + 0x08] // offset in the file
-    mov di, [ax + 0x10] // virtual adress
-    mov bx, [ax + 0x20] // size
+    mov si, [bx + 0x08] // offset in the file
+    mov edi, [bx + 0x10] // virtual adress
+    mov dx, [bx + 0x20] // size
     shr si, cl // assuming that offset is multiple of cluster
-    shr bx, cl
-    inc bx // in case the segment size is not multiple of 512
-    mov cx, bx
-    hlt
+    shr dx, cl
+    inc dx // in case the segment size is not multiple of 512
+    mov cx, dx
     call read_kernel_file
 
 1:
@@ -118,6 +118,7 @@ load_segment:
 2:
     // Jump into the kernel.
     mov ax, [ELF_HEADER + 0x18]
+    hlt
 
     mov bx, ax
     mov al, 'Y'
@@ -146,7 +147,7 @@ read_cluster:
     add ax, first_cluster_sector
     mov bx, first_cluster_sector
     mov word ptr [dap_sector], ax
-    mov word ptr [dap_dest], di
+    mov dword ptr [dap_dest], edi
     mov word ptr [dap_num], SECTORS_PER_CLUSTER
     pop ax
     call read_sector
@@ -160,6 +161,7 @@ next_cluster:
     mov di, [dx + ax]
     lea si, fat_end_marker
     repe cmpsb
+    je 1f
     popa
 
     // Skip clusters.
@@ -167,6 +169,7 @@ next_cluster:
     jge read_cluster
 
     loop read_cluster
+1:
     popa
     ret
 
@@ -237,12 +240,6 @@ printchar:
     ret
 
 error:
-    push ax
-    mov al, '!'
-    call printchar
-    pop ax
-    call printchar
-    mov al, '\n'
     call printchar
     hlt
 
