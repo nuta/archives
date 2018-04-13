@@ -107,9 +107,7 @@ boot:
     jne error
 
 valid_elf:
-
-    // # of program headers.
-    mov dx, [ELF_HEADER + 0x38]
+    mov dx, [ELF_HEADER + 0x38] // # of program headers.
     mov cl, [LOG2_SECTORS_PER_CLUSTER]
     add cl, 9 // assuming that offset is multiple of 512
 
