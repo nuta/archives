@@ -161,8 +161,8 @@ next_cluster:
     mov di, [dx + ax]
     lea si, fat_end_marker
     repe cmpsb
-    je 1f
     popa
+    je 1f
 
     // Skip clusters.
     cmp si, 0
