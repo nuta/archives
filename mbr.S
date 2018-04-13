@@ -240,10 +240,6 @@ search_sector:
 2:
     ret
 
-// The partition table. No partitions for now.
-.org 0x01be
-.space 0x20 // reserved for two partitions
-
 bpb_jump_code:
     .byte 0xeb, 0x58, 0x90 // XXX
 
@@ -256,8 +252,10 @@ fat_end_marker:
 kernel_filename:
     .ascii "KERNEL  ELF"
 
-.org 0x01fe
+// The partition table.
+.org 0x01be
+.space 0x40
 
-// The MBR boot signature. "0x55 0xaa" indicates that the partition is bootable.
+// The MBR boot signature.
 .byte 0x55
 .byte 0xaa
