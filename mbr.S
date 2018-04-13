@@ -1,7 +1,10 @@
 .intel_syntax noprefix
 .code16
 
+#define PT_LOAD 1
 #define SECTOR_SIZE 512
+#define ELF_MAGIC 0x7f
+#define ELF_HEADER_SIZE 64
 
 // Memory Areas.
 // Assuming that 0x8000-0x8fff are filled by zero.
@@ -100,7 +103,7 @@ boot:
 
     // Verify magic number.
     mov al, 'E'
-    cmp byte ptr [di], 0x7f
+    cmp byte ptr [di], ELF_MAGIC
     jne error
 
 valid_elf:
@@ -111,9 +114,8 @@ valid_elf:
     add cl, 9 // assuming that offset is multiple of 512
 
     // Load segments.
-    mov bx, ELF_HEADER + 64 // the first program header offset
+    mov bx, ELF_HEADER + ELF_HEADER_SIZE // the first program header offset
 
-#define PT_LOAD 1
 load_segment:
     mov dx, [bx]
     cmp dx, PT_LOAD
