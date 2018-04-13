@@ -1,4 +1,4 @@
-.PHONY: default build clean run
+.PHONY: default build clean run bochs test setup
 default: build
 
 # Set `y' to suppress annoying build messages.
@@ -22,11 +22,18 @@ build: disk.img
 clean:
 	rm -rf *.img *.o *.elf *.bin
 
+bochs: disk.img
+	rm -rf disk.img.lock
+	bochs -qf bochsrc
+
 run: disk.img
 	qemu-system-x86_64 -hda disk.img -nographic
 
 test: disk.img
 	(sleep 3; echo -e "\x01cq") | qemu-system-x86_64 -hda disk.img -nographic
+
+setup:
+	brew install llvm binutils qemu mtools bochs
 
 mbr.o: mbr.S
 	$(PROGRESS) CC $@
