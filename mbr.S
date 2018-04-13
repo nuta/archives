@@ -1,46 +1,46 @@
 .intel_syntax noprefix
 .code16
 
-#define FAT_TABLE 0x9000
-#define FAT_TABLE_SIZE_IN_SECTORS ((0xf000 - 0x9000) / 512)
-#define ELF_HEADER 0xf000
-#define SECTORS_PER_CLUSTER 8
+#define SECTOR_SIZE 512
 
-#define BSS_ADDR 0x500
-#define BSS_SIZE 0x100
-#define KERNEL_FIRST_CLUSTER 0x500 /* word */
-#define FIRST_CLUSTER_SECTOR 0x502 /* word */
-#define DRIVER_NUMBER        0x504 /* byte */
+// Memory Areas.
+// Assuming that 0x8000-0x8fff are filled by zero.
+#define KERNEL_FIRST_CLUSTER     0x8000 /* word */
+#define FIRST_CLUSTER_SECTOR     0x8002 /* word */
+#define DRIVER_NUMBER            0x8004 /* byte */
+#define SECTORS_PER_CLUSTER      0x8006 /* byte */
+#define LOG2_SECTORS_PER_CLUSTER 0x8007 /* byte */
 
 // Disk address Packet
 // https://en.wikipedia.org/wiki/INT_13H#INT_13h_AH=42h:_Extended_Read_Sectors_From_Drive
-#define DAP          0x510
-#define DAP_SIZE     0x510 /* byte */
-#define DAP_NUM      0x512 /* word */
-#define DAP_DEST     0x514 /* word */
-#define DAP_DEST_SEG 0x516 /* word */
-#define DAP_SECTOR   0x518 /* quad */
+#define DAP          0x8010
+#define DAP_SIZE     0x8010 /* byte */
+#define DAP_NUM      0x8012 /* word */
+#define DAP_DEST     0x8014 /* word */
+#define DAP_DEST_SEG 0x8016 /* word */
+#define DAP_SECTOR   0x8018 /* quad */
+
+#define LOOK_FOR_SIG_BUF 0x9000
+#define FAT_TABLE 0xa000
+#define ELF_HEADER 0xf000
+#define FAT_TABLE_SECTORS ((ELF_HEADER - FAT_TABLE) / SECTOR_SIZE)
 
 .globl boot
 boot:
     cli
     cld
-    mov ax, 0
+    mov sp, 0x7c00
+    xor ax, ax
     mov ds, ax
     mov ss, ax
-    mov sp, 0x7c00
-    mov di, BSS_ADDR
-    mov cx, BSS_SIZE
-    rep stosb
 
     // DL register holds the drive index set by BIOS.
     mov [DRIVER_NUMBER], dl
 
     // Initialize the serial port.
-    mov ah, 0x00
-    mov al, 0xe3    // baud_rate=9600, no parity,
+    mov ax, 0x00e3  // baud_rate=9600, no parity,
                     // one stop bit, one character is 8bits
-    mov dx, 0x0000  // The COM port.
+    xor dx, dx      // The COM port.
     int 0x14
 
     mov byte ptr [DAP_SIZE], 0x10
@@ -63,6 +63,13 @@ boot:
     mov cx, 3
     call look_for_signature
 
+    mov al, [di + 0x0d]
+    mov [SECTORS_PER_CLUSTER], al
+
+    // Compute log2(AL). Assuming that AL is a power of 2.
+    bsf cx, ax
+    mov [LOG2_SECTORS_PER_CLUSTER], cl
+
     // (bpb sec) + (# of rsvd sec) + (# of fat) * (sec per fat)
     mov bx, [di + 0x0e] // # of reserved sectors
     xor cx, cx
@@ -82,21 +89,25 @@ boot:
     // Load the FAT table.
     mov word ptr [DAP_SECTOR], dx
     mov word ptr [DAP_DEST], FAT_TABLE
-    mov word ptr [DAP_NUM], FAT_TABLE_SIZE_IN_SECTORS
+    mov word ptr [DAP_NUM], FAT_TABLE_SECTORS
     call read_sector
 
     // Load ELF header.
     mov di, ELF_HEADER
-    mov si, 0
+    xor si, si
     mov cx, 1
     call read_kernel_file
 
-    // TODO: check header
+    // Verify magic number.
+    mov al, 'E'
+    cmp byte ptr [di], 0x7f
+    jne error
+
+valid_elf:
 
     // # of program headers.
     mov dx, [ELF_HEADER + 0x38]
-    mov cl, 3 // assuming that 8 sectors per cluster
-              // TODO: log2(num of sectors in a cluster)
+    mov cl, [LOG2_SECTORS_PER_CLUSTER]
     add cl, 9 // assuming that offset is multiple of 512
 
     // Load segments.
@@ -118,7 +129,7 @@ load_segment:
     call read_kernel_file
 
 1:
-    sub dx, 1
+    dec dx
     jz 2f
     add ax, 0x38
     jmp load_segment
@@ -138,7 +149,7 @@ not_reachable:
 
 error:
     mov ah, 0x01    // Send a character feature.
-    mov dx, 0x0000  // The COM port.
+    xor dx, dx // The COM port.
     int 0x14
     hlt
 
@@ -149,20 +160,22 @@ read_kernel_file:
 
 read_cluster:
     // Skip clusters.
-    sub si, 1
+    dec si
     cmp si, 0
     jge next_cluster
 
     pusha
     sub ax, 2 // Cluster number *typically* starts with 2.
-    shl ax, 3 // assuming that 8 sectors per cluster TODO
+    mov cl, [LOG2_SECTORS_PER_CLUSTER]
+    shl ax, cl // Divide by SECTORS_PER_CLUSTER
     add ax, [FIRST_CLUSTER_SECTOR]
     mov word ptr [DAP_SECTOR], ax
     mov word ptr [DAP_DEST], di
     shr edi, 4
     and di, 0xf000
     mov word ptr [DAP_DEST_SEG], di
-    mov word ptr [DAP_NUM], SECTORS_PER_CLUSTER
+    mov al, [SECTORS_PER_CLUSTER]
+    mov byte ptr [DAP_NUM], al
     popa
     call read_sector
     add di, SECTORS_PER_CLUSTER * 512
@@ -194,7 +207,6 @@ next_cluster:
 
 read_sector:
     pusha
-
     mov ah, 0x42
     mov si, DAP
     mov dl, [DRIVER_NUMBER]
@@ -206,7 +218,7 @@ read_sector:
 // Look for the signature in the disk. Returns in SI the offset of signature
 // in the buffer.
 look_for_signature:
-    mov bx, 0x8000
+    mov bx, LOOK_FOR_SIG_BUF
     mov word ptr [DAP_DEST], bx
     mov word ptr [DAP_NUM], 1
     mov bx, 1024   // The maximum sector number.
@@ -215,7 +227,7 @@ try_next_sector:
     // Read a sector.
     mov word ptr [DAP_SECTOR], dx
     call read_sector
-    mov di, 0x8000
+    mov di, LOOK_FOR_SIG_BUF
 
 search_sector:
     pusha
@@ -224,13 +236,13 @@ search_sector:
     popa
     je 2f
 
-    add di, 1
-    cmp di, 0x8200
+    inc di
+    cmp di, LOOK_FOR_SIG_BUF + SECTOR_SIZE
     jne search_sector
 
     // Try next sector.
-    add dx, 1
-    sub bx, 1
+    inc dx
+    dec bx
     jnz try_next_sector
 
     // The signature is not found.
