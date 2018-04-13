@@ -198,7 +198,6 @@ read_sector:
     mov ah, 0x42
     mov si, DAP
     mov dl, [DRIVER_NUMBER]
-    xchg bx,bx
     int 0x13
 
     popa
