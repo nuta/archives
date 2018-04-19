@@ -1,4 +1,5 @@
 const { isNewerFile, copyFile, isRebuilt, assetPath, run, config } = require('../pkgbuilder').pkg
+const path = require('path')
 
 module.exports = {
   name: 'linux',
@@ -16,10 +17,12 @@ module.exports = {
     return config('linux.sha256')
   },
 
-  changed() {
-    return isRebuilt('initramfs') ||
-      isNewerFile('.config',
-        assetPath(config('target.name'), 'linux.config'))
+  changed(buildDir) {
+    return isRebuilt('initramfs') || !buildDir ||
+      isNewerFile(
+        assetPath(config('target.name'), 'linux.config'),
+        path.resolve(buildDir, '.config')
+      )
   },
 
   build() {

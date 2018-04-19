@@ -16,13 +16,13 @@ function config(key) {
 
 function isNewerFile(file1, file2) {
   if (!fs.existsSync(file1) || !fs.existsSync(file2)) {
-    return false
+    return true
   }
 
   const stat1 = fs.statSync(file1)
   const stat2 = fs.statSync(file2)
 
-  return stat1.ctimeMs > stat2.ctimeMs
+  return stat1.mtimeMs > stat2.mtimeMs
 }
 
 function isNewerDirContent(dir1, dir2, ignorePatterns) {

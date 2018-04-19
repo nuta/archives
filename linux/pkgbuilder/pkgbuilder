@@ -147,10 +147,15 @@ function isBuildRequired(pkg) {
     return true
   }
 
+  let pkgBuildDir = path.resolve(build.buildDir, pkg.name)
+  if (!fs.existsSync(pkgBuildDir)) {
+    pkgBuildDir = null
+  }
+
   if (pkg.changed === undefined) {
     return !installed
   } else {
-    return !installed || pkg.changed()
+    return !installed || pkg.changed(pkgBuildDir)
   }
 }
 

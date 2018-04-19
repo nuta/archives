@@ -1,4 +1,5 @@
 const { isNewerFile, copyFile, assetPath, run, config } = require('../pkgbuilder').pkg
+const path = require('path')
 
 const version = '1.27.2'
 const url = `http://busybox.net/downloads/busybox-${version}.tar.bz2`
@@ -10,8 +11,8 @@ module.exports = {
   url,
   sha256: '9d4be516b61e6480f156b11eb42577a13529f75d3383850bb75c50c285de63df',
 
-  changed() {
-    return isNewerFile('.config', assetPath('busybox', 'config'))
+  changed(buildDir) {
+    return !buildDir || isNewerFile(assetPath('busybox', 'config'), path.resolve(buildDir, '.config'))
   },
 
   build() {
