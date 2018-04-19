@@ -9,3 +9,4 @@ desktop/releases
 */native/*
 .DS_Store
 server/public/*.*.js
+server/tmp
