@@ -31,6 +31,8 @@ GCCFLAGS = -O2 -g -mno-red-zone -m64 -nostdinc \
            -DV8_HOST_ARCH_X64 -DV8_TARGET_ARCH_X64 -DV8_OS_EFIJS=1 \
            -U__linux__ -U__STRICT_ANSI__
 
+QEMUFLAGS = -bios tmp/OVMF.fd -drive file=fat:rw:boot -nographic
+
 override CFLAGS += \
     -std=c11 \
     $(GCCFLAGS) $(EXTRA_GCCFLAGS) \
@@ -74,14 +76,18 @@ override LDFLAGS  += -Tvendor/gnuefi/gnuefi/elf_x86_64_efi.lds \
 $(V).SILENT:
 .SUFFIXES:
 .SECONDARY:
-.POHNY: clean run
+.POHNY: clean run test
 
 clean:
 	-rm -f bootx64.efi bootx64.so bootx64.map $(objs)
 
 run: tmp/OVMF.fd boot/efi/boot/bootx64.efi
 	$(CMDECHO) RUN boot/efi/boot/bootx64.efi
-	$(PYTHON) ./tools/run.py "qemu-system-x86_64 -bios tmp/OVMF.fd -drive file=fat:rw:boot -nographic"
+	$(PYTHON) ./tools/run.py "qemu-system-x86_64 $(QEMUFLAGS)"
+
+test: tmp/OVMF.fd boot/efi/boot/bootx64.efi
+	$(CMDECHO) RUN boot/efi/boot/bootx64.efi
+	(sleep 15; echo -e "\x01cq") | qemu-system-x86_64 $(QEMUFLAGS)
 
 boot/efi/boot/bootx64.efi: bootx64.efi
 	mkdir -p $(dir $@)
