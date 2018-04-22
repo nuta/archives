@@ -86,10 +86,6 @@ char* fgets(char* s, int n, FILE* f) {
     EFIJS_NYI();
 }
 
-size_t fwrite(const void* src, size_t size, size_t nmemb, FILE* f) {
-
-    EFIJS_NYI();
-}
 
 int fputc(int c, FILE* f) {
 
@@ -177,26 +173,6 @@ int sscanf(const char* s, const char* fmt, ...) {
 }
 
 int vsscanf(const char* s, const char* fmt, va_list ap) {
-
-    EFIJS_NYI();
-}
-
-int vsnprintf(char *s, size_t n, const char *fmt, va_list ap) {
-
-    EFIJS_NYI();
-}
-
-int vfprintf(FILE* f, const char* fmt, va_list ap) {
-
-    EFIJS_NYI();
-}
-
-int vasprintf(char **s, const char *fmt, va_list ap) {
-
-    EFIJS_NYI();
-}
-
-int vsprintf(char *s, const char *fmt, va_list ap) {
 
     EFIJS_NYI();
 }

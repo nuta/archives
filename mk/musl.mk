@@ -380,6 +380,16 @@ musl_objs = \
     vendor/musl/src/string/wmemmove.o \
     vendor/musl/src/string/wmemset.o \
     vendor/musl/src/malloc/memalign.o \
-    vendor/musl/src/malloc/posix_memalign.o
+    vendor/musl/src/malloc/posix_memalign.o \
+    vendor/musl/src/stdio/vsnprintf.o \
+    vendor/musl/src/stdio/vasprintf.o \
+    vendor/musl/src/stdio/vfprintf.o \
+    vendor/musl/src/stdio/fwrite.o \
+    vendor/musl/src/stdio/ofl.o \
+    vendor/musl/src/stdio/__lockfile.o \
+    vendor/musl/src/stdio/__towrite.o \
+    vendor/musl/src/stdio/__stdio_exit.o \
+    vendor/musl/src/thread/__wait.o \
+    vendor/musl/src/thread/__lock.o \
 
 objs += $(musl_objs)
