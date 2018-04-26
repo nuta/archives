@@ -26,7 +26,7 @@ arch/x64/boot/mbr.bin: arch/x64/boot/mbr.elf
 
 arch/x64/disk.img: arch/x64/boot/mbr.bin kernel/kernel.elf
 	$(PROGRESS) DD $@.tmp
-	dd if=/dev/zero of=$@.tmp bs=1m count=64
+	$(DD) if=/dev/zero of=$@.tmp bs=1M count=64
 	$(PROGRESS) OFORMAT $@.tmp
 	mformat -i $@.tmp -F -t 120000 -h 2 -s 4 ::
 	$(PROGRESS) MCOPY $@.tmp

@@ -23,10 +23,12 @@ $(V).SILENT:
 CC = clang
 LD = ld
 OBJCOPY = $(TOOLCHAIN_PREFIX)objcopy
+DD = dd
 
 ifeq ($(shell uname), Darwin)
 CC = /usr/local/opt/llvm/bin/clang
 LD = sh -c 'exec -a ld.lld /usr/local/opt/llvm/bin/lld $$*'
+dd = gdd
 TOOLCHAIN_PREFIX = g
 endif
 
