@@ -1,14 +1,9 @@
 objs := startup.o init.o thread.o
 include_dirs := .
-CFLAGS += -O2 -Wall -Wextra -g3
+CFLAGS += -O2 -Wall -Wextra -g3 --target=x86_64
 CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=large
 CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
-LDFLAGS += -ffreestanding
-
-ifeq ($(shell uname), Darwin)
-CC = /usr/local/opt/llvm/bin/clang --target=x86_64
-LD = sh -c 'exec -a ld.lld /usr/local/opt/llvm/bin/lld $$*'
-endif
+LDFLAGS +=
 
 .PHONY: bochs
 run: arch/x64/disk.img

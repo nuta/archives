@@ -20,7 +20,16 @@ V =
 $(V).SILENT:
 .SECONDARY:
 
-OBJCOPY ?= gobjcopy
+CC = clang
+LD = ld
+OBJCOPY = $(TOOLCHAIN_PREFIX)objcopy
+
+ifeq ($(shell uname), Darwin)
+CC = /usr/local/opt/llvm/bin/clang
+LD = sh -c 'exec -a ld.lld /usr/local/opt/llvm/bin/lld $$*'
+TOOLCHAIN_PREFIX = g
+endif
+
 PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
 
 build: kernel/kernel.elf
