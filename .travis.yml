@@ -1,0 +1,11 @@
+lang: c
+
+addons:
+  apt:
+    packages:
+      - qemu-system
+      - mtools
+
+script:
+  - make -j2
+  - make test
