@@ -37,6 +37,8 @@ void kernel_init(void) {
     thread_set_state(t_b, THREAD_RUNNABLE);
     thread_set_state(t_c, THREAD_RUNNABLE);
 
+    for(;;);
+
     for (;;) {
         thread_switch();
         printf("Returned from thread_switch().\n");
