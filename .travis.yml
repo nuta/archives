@@ -8,4 +8,3 @@ addons:
 
 script:
   - make -j2
-  - make test
