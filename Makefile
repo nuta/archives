@@ -42,7 +42,7 @@ clean:
 		*/*.bin */*/*.bin */*/*/*.bin
 
 setup:
-	brew install llvm binutils qemu mtools
+	brew install coreutils llvm binutils qemu mtools
 
 kernel/kernel.elf: $(all_objs) $(ARCH_DIR)/kernel.ld
 	$(PROGRESS) LD $@
