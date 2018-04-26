@@ -125,7 +125,6 @@ long_mode:
     mov fs, ax
     mov gs, ax
 
-    xchg bx,bx
     mov rax, x64_init_addr
     call rax
 
