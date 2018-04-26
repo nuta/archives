@@ -28,7 +28,7 @@ DD = dd
 ifeq ($(shell uname), Darwin)
 CC = /usr/local/opt/llvm/bin/clang
 LD = sh -c 'exec -a ld.lld /usr/local/opt/llvm/bin/lld $$*'
-dd = gdd
+DD = gdd
 TOOLCHAIN_PREFIX = g
 endif
 
