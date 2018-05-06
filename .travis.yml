@@ -11,7 +11,7 @@ addons:
     sources:
       - llvm-toolchain-trusty-6.0
     packages:
-      - clang-6.0
+      - lld-6.0
       - qemu-system-x86
       - mtools
 
