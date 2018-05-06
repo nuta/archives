@@ -6,7 +6,7 @@ elif [ "$TRAVIS" = "true" ]; then
     pyenv global 3.6.3
     wget http://www.antlr.org/download/antlr-4.7.1-complete.jar
 else
-    sudo apt install build-essential clang mtools qemu-system \
+    sudo apt install build-essential clang lld mtools qemu-system \
         python3 python3-pip
 fi
 
