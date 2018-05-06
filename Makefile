@@ -1,59 +1,66 @@
 ARCH ?= x64
-COMMON_MK = $(shell pwd)/mk/common.mk
+SERVERS ?=
+BUILD_DIR ?= build
+KFS_DIR = $(BUILD_DIR)/kernel/kfs
 
-.PHONY: default build clean run test setup
+server_dirs := $(filter-out servers/server.mk, $(wildcard servers/*))
+ifeq ($(SERVERS),all)
+override SERVERS := $(notdir $(server_dirs))
+endif
+
+.PHONY: default build clean run test
 default: build
 
-ARCH_DIR = arch/$(ARCH)
-CFLAGS := $(CFLAGS)
-LDFLAGS := $(CFLAGS)
+override LDFLAGS := $(LDFLAGS)
+override CFLAGS := $(CFLAGS) \
+	-std=c11 \
+    -Wall \
+	-Werror=implicit-function-declaration \
+	-Werror=int-conversion \
+	-Werror=incompatible-pointer-types \
+	-Werror=shift-count-overflow \
+	-Werror=shadow
 
-all_objs :=
-all_libs :=
-all_include_dirs :=
+all_kfs_files :=
 
-include kernel/build.mk arch/$(ARCH)/build.mk
-include $(foreach lib, $(all_libs), libs/$(lib)/build.mk)
+# Load server rules.
+include $(foreach dir, $(server_dirs), $(dir)/build.mk)
+
+# Load kernel rules.
+include kernel/kernel.mk
 
 # Set `y' to suppress annoying build messages.
 V =
 $(V).SILENT:
 .SECONDARY:
+.SUFFIXES:
+
+ANTLR4 ?= antlr4
+OBJCOPY ?= $(TOOLCHAIN_PREFIX)objcopy
+STRIP ?= $(TOOLCHAIN_PREFIX)strip
+DD ?= dd
+TAR ?= tar
 
 CC = clang
-LD = ld
-OBJCOPY = $(TOOLCHAIN_PREFIX)objcopy
-DD = dd
-
+LD = lld
 ifeq ($(shell uname), Darwin)
 CC = /usr/local/opt/llvm/bin/clang
-LD = sh -c 'exec -a ld.lld /usr/local/opt/llvm/bin/lld $$*'
+LD = /usr/local/opt/llvm/bin/ld.lld
 DD = gdd
+TAR = gtar
 TOOLCHAIN_PREFIX = g
 endif
 
 PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
 
-build: kernel/kernel.elf
+build: $(BUILD_DIR)/kernel/kernel.elf
+
+tools/genstub/parser/idlParser.py: tools/genstub/idl.g4
+	mkdir -p tools/genstub/parser
+	$(PROGRESS) ANTLR4 $@
+	cd tools/genstub && \
+		$(ANTLR4) -Dlanguage=Python3 -o parser $(notdir $<)
+	touch $(dir $@)__init__.py
 
 clean:
-	rm -f */*.o */*/*.o */*/*/*.o \
-		*/*.elf */*/*.elf */*/*/*.elf \
-		*/*.img */*/*.img */*/*/*.img \
-		*/*.tmp */*/*.tmp */*/*/*.tmp \
-		*/*.bin */*/*.bin */*/*/*.bin
-
-setup:
-	brew install coreutils llvm binutils qemu mtools
-
-kernel/kernel.elf: $(all_objs) $(ARCH_DIR)/kernel.ld
-	$(PROGRESS) LD $@
-	$(LD) $(LDFLAGS) --script $(ARCH_DIR)/kernel.ld -o $@ $(all_objs)
-
-%.o: %.S Makefile
-	$(PROGRESS) CC $@
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-%.o: %.c Makefile
-	$(PROGRESS) CC $@
-	$(CC) $(CFLAGS) $(addprefix -I,$(all_include_dirs)) -c -o $@ $<
+	rm -rf $(BUILD_DIR)

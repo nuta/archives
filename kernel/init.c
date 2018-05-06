@@ -1,46 +1,59 @@
 #include "memory.h"
 #include "process.h"
 #include "thread.h"
-#include <printf.h>
+#include "kfs.h"
+#include "elf.h"
+#include "server.h"
+#include "string.h"
 
-void thread_a() {
-    while (1) {
-        arch_putchar('A');
-    }
-}
 
-void thread_b() {
-    while (1) {
-        arch_putchar('B');
-    }
-}
-
-void thread_c() {
-    while (1) {
-        arch_putchar('C');
+static void launch_servers(void) {
+    struct kfs_dir dir;
+    struct kfs_file file;
+    kfs_opendir(&dir);
+    while (kfs_readdir(&dir, &file) != NULL) {
+        if (!strncmp("/servers/", file.name, 9)) {
+            INFO("kernel: starting %s", file.name);
+            elf_create_process(file.data, file.length, kfs_pager, file.pager_arg);
+        }
     }
 }
 
 
 void kernel_init(void) {
-    printf("Starting Resea...\n");
-
+    INFO("Starting Resea...");
+    INFO("kernel: initializing memory system");
     memory_init();
+    arch_early_init();
+
+    INFO("kernel: initializing process system");
     process_init();
+
+    INFO("kernel: initializing thread system");
     thread_init();
 
-    struct process *kernel = process_create();
-    struct thread *t_a = thread_create(kernel, (uintptr_t) thread_b, 0);
-    struct thread *t_b = thread_create(kernel, (uintptr_t) thread_a, 0);
-    struct thread *t_c = thread_create(kernel, (uintptr_t) thread_c, 0);
-    thread_set_state(t_a, THREAD_RUNNABLE);
-    thread_set_state(t_b, THREAD_RUNNABLE);
-    thread_set_state(t_c, THREAD_RUNNABLE);
+    INFO("kernel: initializing kfs system");
+    kfs_init();
+    arch_init();
 
-    for(;;);
+    INFO("kernel: lauching kernel servers");
+    kernel_server_init();
 
+    INFO("kernel: lauching servers in kfs");
+    launch_servers();
+
+    if (thread_list_is_empty(&kernel_process->threads)) {
+        PANIC("No threads to run.");
+    }
+
+    thread_switch();
+
+    // From here, we're in the idle thread context. The thread
+    // is resumed when there are no other threads to run.
     for (;;) {
-        thread_switch();
-        printf("Returned from thread_switch().\n");
+        PANIC("idling...\n");
+        // Sleep until an interrupt occurs in order not to heat up the computer
+        // and to save money on electricity.
+        arch_idle();
     }
 }

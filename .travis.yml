@@ -1,10 +1,26 @@
 lang: c
+dist: trusty
+sudo: false
+
+notifications:
+  on_success: change
+  on_failure: change
 
 addons:
   apt:
+    sources:
+      - llvm-toolchain-trusty-6.0
     packages:
-      - qemu-system
+      - clang-6.0
+      - lld-6.0
+      - qemu-system-x86
       - mtools
 
+cache:
+  pip: true
+
+before_script:
+  - ./tools/bootstrap
+
 script:
-  - make -j2
+  - make -j2 ANTLR4="java -jar $PWD/antlr-4.7.1-complete.jar" SERVERS="benchmark-client benchmark-server test" run

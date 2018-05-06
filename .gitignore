@@ -1,6 +1,10 @@
-*.o
-*.elf
-*.img
-*.bin
-*.lock
-*.tmp
+build
+*.log
+
+tools/genstub/parser
+tools/genstub/.antlr
+
+libs/rust/*/targets
+libs/rust/*/target
+server/*/target
+server/*/targets

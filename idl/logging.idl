@@ -1,0 +1,3 @@
+service "logging" (2)
+
+emit(str: string, str_length: usize) -> ();
