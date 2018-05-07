@@ -8,6 +8,8 @@ notifications:
 
 addons:
   apt:
+    sources:
+      - llvm-toolchain-trusty-5.0
     packages:
       - lld-5.0
       - qemu-system-x86
