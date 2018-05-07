@@ -57,7 +57,6 @@ $(executable): $(server_c_objs) $(server_s_objs)
 	$(STRIP) $@
 endif
 
-$(info $(server_stubs))
 $(server_c_objs): $(server_build_dir)/%.o: %.c $(server_stubs)
 	$(PROGRESS) CC $@
 	mkdir -p $(dir $@)
