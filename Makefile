@@ -42,7 +42,7 @@ DD ?= dd
 TAR ?= tar
 
 CC = clang
-LD = lld
+LD = ld.lld
 ifeq ($(shell uname), Darwin)
 CC = /usr/local/opt/llvm/bin/clang
 LD = /usr/local/opt/llvm/bin/ld.lld
