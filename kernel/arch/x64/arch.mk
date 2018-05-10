@@ -1,14 +1,14 @@
 arch_include_dirs := .
 arch_objs := startup.o init.o thread.o serial.o gdt.o idt.o tss.o paging.o \
 	smp.o apic.o ioapic.o cpu.o handler.o irq.o exception.o pic.o switch.o \
-	idle.o syscall.o usercopy.o
+	idle.o syscall.o usercopy.o vga.o putchar.o
 
 BOCHS ?= bochs
 override CFLAGS += -O2 -g3 --target=x86_64
 override CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=large
 override CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
 override LDFLAGS +=
-QEMUFLAGS += -d cpu_reset,page -D qemu.log -nographic -cpu SandyBridge,rdtscp
+QEMUFLAGS += -d cpu_reset,page -D qemu.log -cpu SandyBridge,rdtscp
 
 .PHONY: bochs
 run: $(BUILD_DIR)/$(ARCH_DIR)/disk.img

@@ -8,6 +8,7 @@
 #include "apic.h"
 #include "paging.h"
 #include "serial.h"
+#include "vga.h"
 #include "smp.h"
 #include "syscall.h"
 
@@ -15,6 +16,7 @@
 /* The bootstarap processor (the first processor) initialization. */
 void x64_init_bsp(void) {
     // Note that the kernel memory allocator is not initialized yet.
+    x64_vga_init();
     x64_init_serial();
     x64_init_pic();
     kernel_init();

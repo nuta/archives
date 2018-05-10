@@ -23,8 +23,8 @@ void x64_init_serial(void) {
 }
 
 
-void arch_putchar(char ch) {
-    while ((asm_inb(IOPORT_SERIAL + LSR) & TX_READY) == 0);
+void x64_serial_putchar(char ch) {
 
+    while ((asm_inb(IOPORT_SERIAL + LSR) & TX_READY) == 0);
     asm_outb(IOPORT_SERIAL, ch);
 }
