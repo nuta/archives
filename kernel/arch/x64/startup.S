@@ -3,6 +3,7 @@
 
 #define MEMMAP_ADDR 0x8000
 
+/* Boot from mbr.S */
 .globl x64_startup
 x64_startup:
     cld
@@ -51,6 +52,45 @@ x64_startup:
     retf
 
 .code32
+
+multiboot:
+    .long 0xe85250d6    /* magic */
+    .long 0             /* arch (i386) */
+    .long multiboot - multiboot_end
+
+    /* terminator */
+    .word 0
+    .word 0
+    .word 0
+multiboot_end:
+
+/* Boot from GRUB. We are already in the protected mode. */
+multiboot_entry:
+    cli
+    mov esp, 0x7c00
+
+    /* Prepare for RETF. */
+    mov ax, 24
+    lea edx, [protected_mode]
+    push ax
+    push edx
+
+    /* Copy GDTR and GDT to a lower address. */
+    mov ecx, 0x100
+    mov edi, 0x7e00
+    lea esi, [gdtr]
+    and si, 0xffff
+    mov ax, 0x1000
+    mov ds, ax
+    rep movsb
+
+    mov dx, 0
+    mov ds, dx
+    lgdt [0x7e00]
+
+    mov cr0, eax
+    retf
+
 protected_mode:
     mov ax, 16
     mov ds, ax
