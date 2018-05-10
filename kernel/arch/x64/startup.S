@@ -1,13 +1,32 @@
 .intel_syntax noprefix
-.code16
 
 #define MEMMAP_ADDR 0x8000
 
 /* Boot from mbr.S */
 .globl x64_startup
 x64_startup:
-    cld
+    xchg bx,bx
+    .byte 0x0f, 0x20, 0xc0 /* mov eax, cr0 */
+
+    /*
+     * In protected mode there instructions are decoded as: test eax, 0xd740001
+     */
+    .byte 0xa9, 0x01, 0x00 /* test, ax, 1 */
+    .byte 0x74, multiboot_trampoline_end - multiboot_trampoline /* jz boot_from_mbrboot */
+
+multiboot_trampoline:
+.code32
+    lea edx, [multiboot_entry]
     mov esp, 0x7c00
+    push edx
+    ret
+multiboot_trampoline_end:
+
+boot_from_mbrboot:
+.code16
+    cli
+    cld
+    mov sp, 0x7c00
 
     /* Get memory map. */
     mov ax, 0
@@ -52,11 +71,12 @@ x64_startup:
     retf
 
 .code32
-
+.align 8
 multiboot:
     .long 0xe85250d6    /* magic */
     .long 0             /* arch (i386) */
-    .long multiboot - multiboot_end
+    .long multiboot_end - multiboot
+    .long   -(0xe85250d6 + 0 + (multiboot_end - multiboot))  /* checksum */
 
     /* terminator */
     .word 0
@@ -67,6 +87,7 @@ multiboot_end:
 /* Boot from GRUB. We are already in the protected mode. */
 multiboot_entry:
     cli
+    cld
     mov esp, 0x7c00
 
     /* Prepare for RETF. */
@@ -80,15 +101,9 @@ multiboot_entry:
     mov edi, 0x7e00
     lea esi, [gdtr]
     and si, 0xffff
-    mov ax, 0x1000
-    mov ds, ax
     rep movsb
 
-    mov dx, 0
-    mov ds, dx
     lgdt [0x7e00]
-
-    mov cr0, eax
     retf
 
 protected_mode:
