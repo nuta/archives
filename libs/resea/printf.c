@@ -1,154 +1,140 @@
 #include <resea.h>
 #include <resea/logging.h>
 
-#define abs(x) ((x < 0)? -x : x)
-
 
 static char *print_str(char *buf, const char *s) {
 
-    for (int i = 0; s[i] != '\0'; i++)
-        *buf++ = s[i];
+    while (*s != '\0') {
+        *buf++ = *s++;
+    }
 
     return buf;
 }
 
 
-static char *print_int(char *buf, umax_t base, umax_t v, umax_t len,
-                      bool sign, bool alt, bool pad, bool sep) {
-
-    static const char *nchars = "0123456789abcdef";
-    char tmp[20];
-    umax_t i;
-
-    /*
-     *  -567
-     *  ^
-     */
-    if (sign && (int) v < 0) {
-        *buf++ = '-';
-        v = abs((int) v);
-    }
-
-    /*
-     *  0x00001234
-     *  ^^
-     */
-    if (alt && base == 16) {
-        buf = print_str(buf, "0x");
-    }
-
-    /*
-     *  0x00001234
-     *    ^^^^
-     */
-    if (pad) {
-        umax_t order, _v;
-        for (order=1, _v=(umax_t) v; _v /= (umax_t) base; order++);
-        for (umax_t j=order; j < len*2; j++) {
-            *buf++ = '0';
-            if (sep && j == len+1)
-                *buf++ = '_';
-        }
-    }
-
-    /*
-     *  0x00001234
-     *        ^^^^
-     */
-    for (int j=0; j < (int) sizeof(tmp); j++)
-        tmp[j] = '\0';
-    i = sizeof(tmp) - 2;
-
+static char *print_uint(char *buf, umax_t n, int base, char pad, int width) {
+    char tmp[32];
+    int i = sizeof(tmp) - 2;
     do {
-        umax_t index;
-        index  = ((umax_t) v % (umax_t) base);
-        v     /= (umax_t) base;
-        tmp[i--] = nchars[index];
-        if (sep && i == len+2)
-            tmp[i--] = '_';
-    } while(v != 0);
+        tmp[i] = "0123456789abcdef"[n % base];
+        n /= base;
+        width--;
+        i--;
+    } while(n > 0 && i > 0);
 
-    i = 0;
-    for (int j=0; tmp[i] == '\0' && j < (int) sizeof(tmp); j++, i++);
-    return print_str(buf, &tmp[i]);
+    while (width-- > 0) {
+        *buf++ = pad;
+    }
+
+    tmp[sizeof(tmp) - 1] = '\0';
+    return print_str(buf, &tmp[i + 1]);
 }
 
 
-#define RESERVE_BUF_SIZE(size) do { \
-        if (buf_size - 1 <= size) { \
-            *buf = '\0';            \
-            return;                 \
-        } else {                    \
-            buf_size -= size;       \
-        }                           \
+static umax_t va_arg_uint(va_list vargs, int num_size) {
+    switch (num_size) {
+        case 3: return va_arg(vargs, unsigned long long);
+        case 2: return va_arg(vargs, unsigned long);
+        default: return va_arg(vargs, unsigned);
+    }
+}
+
+#define RESERVE_BUF_SIZE(size) do {  \
+        int _size = size;            \
+        if (buf_size - 1 <= _size) { \
+            *buf = '\0';             \
+            return;                  \
+        } else {                     \
+            buf_size -= _size;       \
+        }                            \
     } while(0)
 
-void vsprintf(char *buf, size_t buf_size, const char *fmt, va_list vargs) {
-    for (int i=0; fmt[i] != '\0'; i++) {
-        if (fmt[i] == '%') {
-            bool alt = false;
-            bool pad = false;
-            char specifier;
-            umax_t len = sizeof(umax_t); // 1: char, 2: short, 4: unsigned, ...
+static void vsprintf(char *buf, size_t buf_size, const char *fmt, va_list vargs) {
+    int num_size;
+    int width;
+    char pad;
+    bool in_fmt = false;
 
-            for (;;) {
-                i++;
-                if (fmt[i] == '#') {
-                    alt = true;
-                } else if (fmt[i] == '0') {
-                    pad = true;
-                } else if (fmt[i] == '\0') {
-                    specifier = '%';
+    for (int i=0; fmt[i] != '\0'; i++) {
+        if (in_fmt) {
+            switch(fmt[i]) {
+                case 'l':
+                    num_size++;
+                case '%':
+                    RESERVE_BUF_SIZE(1);
+                    *buf++ = '%';
+                    in_fmt = false;
                     break;
-                } else {
-                    specifier = fmt[i];
+                case '0':
+                    pad = '0';
+                    break;
+                case '#':
+                    RESERVE_BUF_SIZE(2);
+                    buf = print_str(buf, "0x");
+                    break;
+                case 'p':
+                    num_size = 3;
+                    pad = '0';
+                    width = sizeof(uptr_t) * 2;
+                    // fallthrough
+                case 'x':
+                    RESERVE_BUF_SIZE(32);
+                    buf = print_uint(buf, va_arg_uint(vargs, num_size), 16, pad, width);
+                    in_fmt = false;
+                    break;
+                case 'd': {
+                    RESERVE_BUF_SIZE(32);
+                    umax_t n = va_arg_uint(vargs, width);
+                    if ((int) n < 0) {
+                        *buf++ = '-';
+                        n = - ((int) n);
+                    }
+
+                    buf = print_uint(buf, n, 10, pad, width);
+                    in_fmt = false;
                     break;
                 }
+                case 'u':
+                    RESERVE_BUF_SIZE(32);
+                    buf = print_uint(buf, va_arg_uint(vargs, num_size), 10, pad, width);
+                    in_fmt = false;
+                    break;
+                case 'c':
+                    RESERVE_BUF_SIZE(1);
+                    *buf++ = va_arg(vargs, int);
+                    in_fmt = false;
+                    break;
+                case 's': {
+                    char *str = va_arg(vargs, char *);
+                    RESERVE_BUF_SIZE(strlen(str));
+                    buf = print_str(buf, str);
+                    in_fmt = false;
+                    break;
+                }
+                default:
+                    RESERVE_BUF_SIZE(2);
+                    *buf++ = '%';
+                    *buf++ = fmt[i];
+                    in_fmt = false;
             }
-
-            switch(specifier) {
-            case '%':
-                RESERVE_BUF_SIZE(1);
-                *buf++ = '%';
-                break;
-            case 'd':
-                RESERVE_BUF_SIZE(20);
-                buf = print_int(buf, 10, va_arg(vargs, umax_t), len, true,  alt, pad, false);
-                break;
-            case 'u':
-                RESERVE_BUF_SIZE(20);
-                buf = print_int(buf, 10, va_arg(vargs, umax_t), len, false, alt, pad, false);
-                break;
-            case 'p':
-                alt = true;
-                pad = true;
-                // fallthrough
-            case 'x':
-                RESERVE_BUF_SIZE(20);
-                buf = print_int(buf, 16, va_arg(vargs, umax_t), len, false, alt, pad, false);
-                break;
-            case 'c':
-                RESERVE_BUF_SIZE(1);
-                *buf++ = va_arg(vargs, int);
-                break;
-            case 's': {
-                char *str = va_arg(vargs, char *);
-                size_t str_len = strlen(str);
-                RESERVE_BUF_SIZE(str_len);
-                buf = print_str(buf, str);
-                break;
-            }
-            default:
-                *buf++ = '%';
-                *buf++ = fmt[i];
-            }
+        } else if (fmt[i] == '%' && fmt[i + 1] == '\0') {
+            RESERVE_BUF_SIZE(1);
+            *buf++ = '%';
+        } else if (fmt[i] == '%') {
+            in_fmt = true;
+            num_size = 1;
+            width = 0; // no padding
+            pad = ' ';
         } else {
+            RESERVE_BUF_SIZE(1);
             *buf++ = fmt[i];
         }
     }
 
+    RESERVE_BUF_SIZE(1);
     *buf = '\0';
 }
+
 
 int printf(const char *fmt, ...) {
     va_list vargs;
