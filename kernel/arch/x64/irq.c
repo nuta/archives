@@ -1,7 +1,8 @@
 #include <kernel/types.h>
+#include <kernel/thread.h>
+#include <kernel/printk.h>
 #include "apic.h"
 #include "irq.h"
-#include <kernel/thread.h>
 
 
 void x64_handle_unkown_irq(void) {

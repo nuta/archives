@@ -1,6 +1,7 @@
 #include <kernel/types.h>
 #include <kernel/string.h>
 #include <kernel/init.h>
+#include <kernel/printk.h>
 #include "gdt.h"
 #include "idt.h"
 #include "tss.h"

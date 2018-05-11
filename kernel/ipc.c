@@ -1,5 +1,5 @@
-#define LOG_SCOPE ipc
 #include "cpu.h" // FIXME
+#include "printk.h"
 #include "thread.h"
 #include "process.h"
 #include "ipc.h"

@@ -60,14 +60,4 @@ void arch_link_page(struct arch_vmspace *vms, uptr_t vaddr, paddr_t paddr, size_
                     int attrs);
 void arch_copy_from_user(void *kernel, uptr_t user, size_t length);
 
-int printf(const char *fmt, ...);
-
-#define DEBUG(fmt, ...) printf(fmt "\n", ## __VA_ARGS__)
-#define INFO(fmt, ...) printf(fmt "\n", ## __VA_ARGS__)
-#define BUG(fmt, ...) printf("BUG: " fmt "\n", ## __VA_ARGS__)
-#define PANIC(fmt, ...) do { \
-        printf("PANIC: " fmt "\n", ## __VA_ARGS__); \
-        arch_panic(); \
-    } while(0)
-
 #endif

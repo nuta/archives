@@ -1,3 +1,4 @@
+#include <kernel/printk.h>
 #include "smp.h"
 #include "ioapic.h"
 

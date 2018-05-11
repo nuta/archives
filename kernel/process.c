@@ -1,5 +1,6 @@
 #include "list.h"
 #include "memory.h"
+#include "printk.h"
 #include "process.h"
 
 

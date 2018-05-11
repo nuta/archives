@@ -1,4 +1,5 @@
 #include "types.h"
+#include "printk.h"
 #include "ipc.h"
 #include <resea/exit.h>
 #include <resea/logging.h>

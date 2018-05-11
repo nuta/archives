@@ -1,5 +1,6 @@
 #include "string.h"
-#include <kernel/types.h>
+#include "printk.h"
+#include "types.h"
 #include "thread.h"
 #include "process.h"
 #include "memory.h"

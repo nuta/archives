@@ -1,5 +1,6 @@
 #include <kernel/types.h>
 #include <kernel/memory.h>
+#include <kernel/printk.h>
 #include "asm.h"
 #include "exception.h"
 #include "usercopy.h"

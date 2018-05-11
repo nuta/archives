@@ -1,4 +1,5 @@
 #include "memory.h"
+#include "printk.h"
 #include "process.h"
 #include "thread.h"
 #include "kfs.h"

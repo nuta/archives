@@ -1,4 +1,5 @@
 #include "string.h"
+#include "printk.h"
 #include "process.h"
 #include "thread.h"
 #include "memory.h"

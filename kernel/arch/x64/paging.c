@@ -1,5 +1,6 @@
 #include <kernel/types.h>
 #include <kernel/memory.h>
+#include <kernel/printk.h>
 #include <kernel/string.h>
 #include "paging.h"
 #include "asm.h"

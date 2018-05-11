@@ -1,7 +1,7 @@
 ARCH_DIR = kernel/arch/$(ARCH)
 include $(ARCH_DIR)/arch.mk
 
-objs := init.o memory.o process.o thread.o ipc.o kfs.o elf.o server.o printf.o string.o list.o
+objs := init.o memory.o process.o thread.o ipc.o kfs.o elf.o server.o printk.o string.o list.o
 stubs := discovery exit logging
 
 kernel_objs := $(addprefix kernel/, $(objs)) $(addprefix $(ARCH_DIR)/, $(arch_objs))

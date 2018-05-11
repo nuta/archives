@@ -12,6 +12,7 @@
 typedef unsigned long long paddr_t;
 typedef unsigned long long uptr_t;
 typedef unsigned long long umax_t;
+typedef long long imax_t;
 
 /* TODO: lock-free! */
 #define KMUTEX_UNLOCKED 0
