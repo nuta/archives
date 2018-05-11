@@ -2,73 +2,7 @@
 import argparse
 import os
 import sys
-from antlr4 import *
-from parser.idlLexer import idlLexer
-from parser.idlParser import idlParser
-from parser.idlListener import idlListener
-
-class Listener(idlListener):
-    def __init__(self):
-        self.types = []
-        self.calls = []
-
-    def exitService(self, ctx):
-        self.name = str(ctx.getChild(2))
-        self.id = int(str(ctx.getChild(5)))
-
-    def exitCallDef(self, ctx):
-        self.calls.append({
-            "name": str(ctx.getChild(0)),
-            "args": ctx.getChild(2).args,
-            "rets": ctx.getChild(6).args
-        })
-
-        for i in range(0, ctx.getChildCount()):
-            child = ctx.getChild(i)
-            if isinstance(child, TerminalNode):
-                break
-
-    def exitArgList(self, ctx):
-        ctx.args = []
-        for i in range(0, ctx.getChildCount()):
-            child = ctx.getChild(i)
-            if child == ')':
-                break
-
-            if isinstance(child, TerminalNode):
-                continue
-
-            ctx.args.append({
-                "name": child.name,
-                "type": child.type
-            })
-
-    def exitArg(self, ctx):
-        ctx.name = str(ctx.getChild(0))
-        ctx.type = str(ctx.getChild(2))
-
-    def exitTypeDef(self, ctx):
-        self.types.append({
-            "new_name": str(ctx.getChild(1)),
-            "alias_of": str(ctx.getChild(3))
-        })
-
-
-def parse_idl(filepath):
-    lexer = idlLexer(FileStream(filepath))
-    stream = CommonTokenStream(lexer)
-    parser = idlParser(stream)
-    tree = parser.idl()
-    walker = ParseTreeWalker()
-    listener = Listener()
-    walker.walk(listener, tree)
-    return {
-        "name": listener.name,
-        "id": listener.id,
-        "types": listener.types,
-        "calls": listener.calls
-    }
-
+import idl
 
 def generate_stub(service):
     service_name = service["name"].replace("-", "_")
@@ -217,24 +151,19 @@ void main(void) {{
 }}
 """
 
-    return service_name, client_stub, server_scaffold
+    return service_name, client_stub
 
 
-def main(argv):
+def main():
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-o', required=True)
-    argparser.add_argument('--scaffold', action="store_true")
     argparser.add_argument('idl_file')
     args = argparser.parse_args()
 
-    service = parse_idl(args.idl_file)
-    service_name, stub, server = generate_stub(service)
+    service = idl.parse(args.idl_file)
+    service_name, stub = generate_stub(service)
     with open(os.path.join(args.o, service_name + ".h"), 'w') as f:
         f.write(stub)
 
-    if args.scaffold:
-        with open(os.path.join(args.o, service_name + ".c"), 'w') as f:
-            f.write(server)
-
 if __name__ == '__main__':
-    main(sys)
+    main()

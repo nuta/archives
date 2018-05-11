@@ -1,8 +1,8 @@
 build
 *.log
 
-tools/genstub/parser
-tools/genstub/.antlr
+tools/idl/parser
+tools/idl/.antlr
 
 libs/rust/*/targets
 libs/rust/*/target

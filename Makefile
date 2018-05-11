@@ -55,10 +55,10 @@ PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
 
 build: $(BUILD_DIR)/kernel/kernel.elf
 
-tools/genstub/parser/idlParser.py: tools/genstub/idl.g4
-	mkdir -p tools/genstub/parser
+tools/idl/parser/idlParser.py: tools/idl/idl.g4
+	mkdir -p tools/idl/parser
 	$(PROGRESS) ANTLR4 $@
-	cd tools/genstub && \
+	cd tools/idl && \
 		$(ANTLR4) -Dlanguage=Python3 -o parser $(notdir $<)
 	touch $(dir $@)__init__.py
 
