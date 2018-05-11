@@ -27,7 +27,7 @@ $(BUILD_DIR)/kernel/kernel.elf: $(kernel_objs) $(ARCH_DIR)/kernel.ld
 	$(PROGRESS) "LD(K)" $@
 	$(LD) $(LDFLAGS) --Map=$(BUILD_DIR)/kernel/kernel.map --script $(ARCH_DIR)/kernel.ld -o $@ $(kernel_objs)
 
-$(BUILD_DIR)/resea/%.h: idl/%.idl tools/genstub.py tools/idl/parser/idlParser.py
+$(BUILD_DIR)/resea/%.h: interfaces/%.idl tools/genstub.py tools/idl/parser/idlParser.py
 	mkdir -p $(dir $@)
 	$(PROGRESS) GENSTUB $@
 	./tools/genstub.py -o $(dir $@) $<

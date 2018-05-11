@@ -37,7 +37,7 @@ server_c_objs := $(addprefix $(server_build_dir)/, \
 server_s_objs := $(addprefix $(server_build_dir)/, \
 	$(patsubst %.S, %.o, $(wildcard $(server_objs:.o=.S))))
 
-$(server_build_dir)/resea/%.h: idl/%.idl tools/genstub.py tools/idl/parser/idlParser.py
+$(server_build_dir)/resea/%.h: interfaces/%.idl tools/genstub.py tools/idl/parser/idlParser.py
 	mkdir -p $(dir $@)
 	$(PROGRESS) GENSTUB $@
 	./tools/genstub.py -o $(dir $@) $<
