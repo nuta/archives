@@ -50,7 +50,7 @@ arch_switch:
     /* Set GS base addresses. Note that we're in kernel space; the
        current GS base will be swapped by SWAPGS in the interrupt
        handler. */
-    lea 40(%rsi), %rdx
+    mov %rsi, %rdx
     mov $MSR_GS_BASE, %ecx
     mov %edx, %eax
     shrq $32, %rdx

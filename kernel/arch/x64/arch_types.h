@@ -59,25 +59,7 @@ static inline paddr_t to_paddr(void *addr) {
     return ((uptr_t) addr & ~KERNEL_BASE_ADDR);
 }
 
-// Don't forget to update hardcoded offsets in switch.S and
-// handler.S!
-struct gsinfo {
-    // A pointer to the dedicated kernel stack. This value
-    // is used by only userspace threads.
-    u64_t rsp0; // kstack + sizeof(kstack)
-    u64_t kstack;
-};
-
-// Don't forget to update hardcoded offsets in switch.S!
-struct arch_thread {
-    // IRET frame.
-    u64_t rip;          // offset: 0
-    u64_t rsp;          // offset: 8
-    u64_t rflags;       // offset: 16
-    u64_t is_user;      // offset: 24
-    u64_t gs;           // offset: 32
-    struct gsinfo gsinfo;  // offset: 40
-};
+#include "arch_thread.h"
 
 struct arch_vmspace {
     paddr_t pml4_addr;

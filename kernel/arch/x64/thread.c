@@ -25,12 +25,12 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
         arch->gs = KERNEL_DS;
         arch->is_user = false;
     } else {
-        arch->gsinfo.kstack = (uptr_t) kmalloc(KERNEL_STACK_SIZE, KMALLOC_NORMAL);
-        arch->gsinfo.rsp0 = arch->gsinfo.kstack + KERNEL_STACK_SIZE;
+        arch->kstack = (uptr_t) kmalloc(KERNEL_STACK_SIZE, KMALLOC_NORMAL);
+        arch->rsp0 = arch->kstack + KERNEL_STACK_SIZE;
 
         // Temporarily use the kernel stack to pass `arg` and an IRET frame
         // to enter_userspace.
-        u64_t *rsp0 = (u64_t *) arch->gsinfo.rsp0;
+        u64_t *rsp0 = (u64_t *) arch->rsp0;
         rsp0 -= 6;
         rsp0[0] = arg;
         rsp0[1] = start;
@@ -49,6 +49,6 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
 
 void arch_destroy_thread(struct arch_thread *arch) {
     if (arch->is_user) {
-        kfree((void *) arch->gsinfo.kstack);
+        kfree((void *) arch->kstack);
     }
 }

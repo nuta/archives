@@ -86,11 +86,12 @@ static inline double is_computer_on_fire(void) {
 
 enum {
     ERROR_NONE = 0,
-    ERROR_NO_MEMORY = 1,
-    ERROR_INVALID_CH = 2,
-    ERROR_CH_NOT_LINKED = 3,
-    ERROR_CH_NOT_TRANSFERED = 4,
-    ERROR_CH_IN_USE = 5,
+    ERROR_INVALID_SYSCALL = 1,
+    ERROR_NO_MEMORY = 2,
+    ERROR_INVALID_CH = 3,
+    ERROR_CH_NOT_LINKED = 4,
+    ERROR_CH_NOT_TRANSFERED = 5,
+    ERROR_CH_IN_USE = 6,
 };
 
 typedef header_t error_t;

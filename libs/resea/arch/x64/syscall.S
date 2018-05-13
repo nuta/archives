@@ -3,16 +3,10 @@
 /* channel_t ipc_open(void) */
 .globl ipc_open
 ipc_open:
-    push r14
-    push r13
-    push r12
-
-    mov r14, 1
+    push r15
+    mov rax, 1
     syscall
-
-    pop r12
-    pop r13
-    pop r14
+    pop r15
     ret
 
 
@@ -42,37 +36,26 @@ ipc_send:
  */
  .globl ipc_recv
 ipc_recv:
-    push rbp
-    mov rbp, rsp
-    push r14
-    push r13
-    push r12
-
-    push rsi
-    push rdx
-    push rcx
-    push r8
+    push r15
     push r9
-
-    xchg rcx, r12
-    mov r14, 4
+    push r8
+    push rcx
+    push rdx
+    push rsi
+    mov rax, 4
     syscall
 
-    pop r14
-    pop r11
-    pop rcx
-    pop rdx
-    pop rsi
-    mov [rsi], r8
-    mov [rdx], r9
-    mov [rcx], r10
-    mov [r11], r12
-    mov [r14], r13
-
-    pop r12
-    pop r13
-    pop r14
-    pop rbp
+    pop rdi
+    mov [rdi], rdx
+    pop rdi
+    mov [rdi], r8
+    pop rdi
+    mov [rdi], r9
+    pop rdi
+    mov [rdi], r10
+    pop rdi
+    mov [rdi], rsi
+    pop r15
     ret
 
 /*
@@ -91,29 +74,20 @@ ipc_recv:
  */
 .globl ipc_call
 ipc_call:
-    push rbp
-    mov rbp, rsp
-    push r14
-    push r13
-    push r12
-
-    xchg rcx, r12
-    mov r14, 5
+    push r15
+    xchg rcx, r10
+    mov rax, 5
     syscall
 
-    mov r14, [rbp + 16]
-    mov [r14], r8
-    mov r14, [rbp + 24]
-    mov [r14], r9
-    mov r14, [rbp + 32]
-    mov [r14], r10
-    mov r14, [rbp + 40]
-    mov [r14], r12
-
-    pop r12
-    pop r13
-    pop r14
-    pop rbp
+    mov rdi, [rsp + 16]
+    mov [rdi], rdx
+    mov rdi, [rsp + 24]
+    mov [rdi], r8
+    mov rdi, [rsp + 32]
+    mov [rdi], r9
+    mov rdi, [rsp + 40]
+    mov [rdi], r10
+    pop r15
     ret
 
 /*
@@ -132,33 +106,24 @@ ipc_call:
  */
  .globl ipc_replyrecv
 ipc_replyrecv:
-    push rbp
-    mov rbp, rsp
-    push r14
-    push r13
-    push r12
+    push r15
     push rdi
-
     mov rdi, [rdi]
-    xchg rcx, r12
-    mov r14, 6
+    xchg rcx, r10
+    mov rax, 6
     syscall
 
     pop rdi
-    mov [rdi], r8
-    mov r14, [rbp + 16]
-    mov [r14], r9
-    mov r14, [rbp + 24]
-    mov [r14], r10
-    mov r14, [rbp + 32]
-    mov [r14], r12
-    mov r14, [rbp + 40]
-    mov [r14], r13
-
-    pop r12
-    pop r13
-    pop r14
-    pop rbp
+    mov [rdi], rdx
+    mov rdx, [rsp + 16]
+    mov [rdx], r8
+    mov rdx, [rsp + 24]
+    mov [rdx], r9
+    mov rdx, [rsp + 32]
+    mov [rdx], r10
+    mov rdx, [rsp + 40]
+    mov [rdx], rsi
+    pop r15
     ret
 
 /* header_t ipc_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t ool3); */
@@ -179,14 +144,5 @@ ipc_transfer:
 /* channel_t ipc_connect(channel_t server); */
 .globl ipc_connect
 ipc_connect:
-    push r13
-    push r14
-    push r12
-
-    mov r14, 9
-    syscall
-
-    pop r12
-    pop r14
-    pop r13
+    xchg bx,bx
     ret

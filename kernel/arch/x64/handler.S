@@ -1,4 +1,5 @@
 #include "asmdefs.h"
+#include "arch_thread.h"
 
 .macro SAVE_REGS
     push r15
@@ -36,103 +37,152 @@
     pop r15
 .endm
 
+syscall_table:
+    .quad invalid_syscall_handler /* 0 */
+    .quad ipc_open_handler        /* 1 */
+    .quad invalid_syscall_handler /* 2 */
+    .quad ipc_send_handler        /* 3 */
+    .quad ipc_recv_handler        /* 4 */
+    .quad ipc_call_handler        /* 5 */
+    .quad ipc_replyrecv_handler   /* 6 */
+    .quad invalid_syscall_handler /* 7 */
+    .quad invalid_syscall_handler /* 8 */
+    .quad invalid_syscall_handler /* 9 */
+    .quad invalid_syscall_handler /* 11 */
+    .quad invalid_syscall_handler /* 12 */
+    .quad invalid_syscall_handler /* 13 */
+    .quad invalid_syscall_handler /* 14 */
+    .quad invalid_syscall_handler /* 15 */
+
+syscall_table_addr:
+    .quad syscall_table
+
 .extern handle_syscall
 .globl x64_syscall_handler
 x64_syscall_handler:
     /*
+     *  RAX: syscall number
      *  RDI: 1st argument
      *  RSI: 2nd argument
      *  RDX: 3rd argument
      *  RCX: user RIP
      *  R8:  5th arugment
      *  R9:  6th arugment
-     *  R10: 7th arugment
+     *  R10: 4th arugment
      *  R11: user RFLAGS
-     *  R12: 4th argument
-     *  R13: user RSP
-     *  R14: syscall number
+     *
+     *  Scraches R15
      *
      */
+    xchg r15, rax
+    and r15, 0x0f
+    shl r15, 3    /* rax *= 8 */
+    movabs rax, syscall_table_addr
+    add r15, rax
+    xchg r15, rax
+    xor r15, r15 /* sanitize not to leak the syscall_table location to user */
+    jmp [rax]
 
+.macro ENTER_NORMAL_SYSCALL
     /* Switch to the kernel stack. */
     swapgs
-    mov r13, rsp
-    mov rsp, gs:[0]
-
-    /* TODO: save callee saved registers  */
-
-    push r13 /* user RSP */
+    mov rax, rsp
+    mov rsp, gs:[GS_RSP0]
+    push rax /* user RSP */
     push r11 /* user RFLAGS */
     push rcx /* user RIP */
-    push r12 /* user R12 (callee-saved) */
-    xchg rcx, r12
+    xchg rcx, r10
+.endm
 
-5:
-    cmp r14, 5
-    jne 6f
-    sub rsp, 8 * 5 /* recvfrom, r0, r1, r2, and r3 */
-    push rsp
-    call sys_call
-    add rsp, 16 /* rs and recvfrom */
-    pop r8
-    pop r9
-    pop r10
-    pop r12
+.macro LEAVE_NORMAL_SYSCALL
     jmp return_from_syscall
-6:
-    cmp r14, 6
-    jne 4f
+.endm
+
+.macro ENTER_RECV_SYSCALL
+    /* Switch to the kernel stack. */
+    swapgs
+    mov rax, rsp
+    mov rsp, gs:[GS_RSP0]
+    push rax /* user RSP */
+    push r11 /* user RFLAGS */
+    push rcx /* user RIP */
+    xchg rcx, r10
+
     sub rsp, 8 * 5 /* recvfrom, r0, r1, r2, and r3 */
     push rsp
-    call sys_replyrecv
+.endm
+
+.macro LEAVE_RECV_SYSCALL
+    xchg bx,bx
     add rsp, 8 /* rs */
+    pop rdx
     pop r8
     pop r9
     pop r10
-    pop r12
-    pop r13
+    pop rsi
     jmp return_from_syscall
-4:
-    cmp r14, 4
-    jne 1f
+.endm
+
+ipc_open_handler:
+    ENTER_NORMAL_SYSCALL
+    call sys_open
+    LEAVE_NORMAL_SYSCALL
+
+ipc_send_handler:
+    ENTER_NORMAL_SYSCALL
+    call sys_send
+    LEAVE_NORMAL_SYSCALL
+
+ipc_recv_handler:
+    /* Switch to the kernel stack. */
+    swapgs
+    mov rax, rsp
+    mov rsp, gs:[GS_RSP0]
+    push rax /* user RSP */
+    push r11 /* user RFLAGS */
+    push rcx /* user RIP */
+    xchg rcx, r10
+
     sub rsp, 8 * 5 /* recvfrom, r0, r1, r2, and r3 */
     mov rsi, rsp
     call sys_recv
+    pop rdx
     pop r8
     pop r9
     pop r10
-    pop r12
-    pop r13
-    jmp return_from_syscall
-1:
-    cmp r14, 1
-    jne 9f
-    call sys_open
-    jmp return_from_syscall
-9:
-    cmp r14, 9
-    jne invalid
-    call sys_connect
+    pop rsi
     jmp return_from_syscall
 
-invalid:
-    call invalid_syscall
+ipc_call_handler:
+    ENTER_RECV_SYSCALL
+    call sys_call
+    add rsp, 16 /* rs and recvfrom */
+    pop rdx
+    pop r8
+    pop r9
+    pop r10
+    jmp return_from_syscall
+/*    LEAVE_RECV_SYSCALL */
+
+ipc_replyrecv_handler:
+    ENTER_RECV_SYSCALL
+    call sys_replyrecv
+    LEAVE_RECV_SYSCALL
+
+invalid_syscall_handler:
+    mov rax, 1 /* ERROR_INVALID_SYSCALL */
+    jmp return_from_syscall
 
 return_from_syscall:
     /*
-     * It returns these registers:
-     *
-     * RAX: type
-     * R8: 1st return value
-     * R9: 2nd return value
-     * R10: 3rd return value
-     * R11: (unused)
-     * R12: 4th return value
-     * R13: 5th return value
-     *
+     * RAX: message header
+     * RDX: 1st return value
+     * R8:  2nd return value
+     * R9:  3rd return value
+     * R10: 4th return value
+     * RSI: 5th return value
      */
 
-    pop r12
     pop rcx
     pop r11
     pop rsp
@@ -144,14 +194,13 @@ return_from_syscall:
 .align 8
 .globl x64_irq_handler\num
 x64_irq_handler\num:
-    cli
-
     /*
      * The current RSP points to IST0, a shared interrupt handler stack.
      * Switch into the thread's own kernel stack since x64_handler_irq()
      * returns after context switches to other threads.
      */
 
+    cli
     push rsi
     mov rsi, rsp
 
@@ -162,7 +211,7 @@ x64_irq_handler\num:
     /* from user: use dedicated kernel stack */
     swapgs
 
-    mov rsp, gs:[0] /* Extract RSP from gsinfo. */
+    mov rsp, gs:[GS_RSP0] /* Extract RSP from gsinfo. */
     jmp 2f
 1:
     /* from kernel: use current stack (assuming Red Zone is disabled) */
