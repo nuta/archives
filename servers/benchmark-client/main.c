@@ -43,7 +43,7 @@ void bench_summarize(const char *name) {
 
     // Sort the results in order to obtain these parameters.
     u64_t median, q1, q3;
-    bool swapped = false;
+    bool swapped = true;
     while (swapped) {
         swapped = false;
         for (int i = 0; i < TEST_NUM - 1; i++) {
