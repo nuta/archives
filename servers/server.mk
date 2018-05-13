@@ -3,14 +3,14 @@ build_mk := $(word $(words $(mkfiles)), $(mkfiles))
 server_dir := $(patsubst %/,%, $(dir $(build_mk)))
 
 libs += resea
-requires += logging exit discovery benchmark
+requires := logging exit discovery benchmark
 
 server_name := $(name)
 server_build_dir := $(BUILD_DIR)/$(server_dir)
 executable := $(server_build_dir)/server.elf
 server_objs := $(foreach obj, $(objs), $(server_dir)/$(obj))
 server_libs := $(libs)
-server_include_dirs := $(include_dirs)
+server_include_dirs := $(include_dirs) $(BUILD_DIR)
 
 ifeq ($(lang), rust)
 libs := rust $(filter-out rust, $(libs))
@@ -30,14 +30,14 @@ included_subdirs :=
 include $(foreach lib, $(server_libs), libs/$(lib)/build.mk)
 server_objs += $(all_objs)
 server_include_dirs += $(server_build_dir) $(all_include_dirs)
-server_stubs := $(foreach stub, $(requires), $(server_build_dir)/resea/$(stub).h)
+server_stubs := $(foreach stub, $(requires), $(BUILD_DIR)/resea/$(stub).h)
 
 server_c_objs := $(addprefix $(server_build_dir)/, \
 	$(patsubst %.c, %.o, $(wildcard $(server_objs:.o=.c))))
 server_s_objs := $(addprefix $(server_build_dir)/, \
 	$(patsubst %.S, %.o, $(wildcard $(server_objs:.o=.S))))
 
-$(server_build_dir)/resea/%.h: interfaces/%.idl tools/genstub.py tools/idl/parser/idlParser.py
+$(BUILD_DIR)/resea/%.h: interfaces/%.idl tools/genstub.py tools/idl/parser/idlParser.py
 	mkdir -p $(dir $@)
 	$(PROGRESS) GENSTUB $@
 	./tools/genstub.py -o $(dir $@) $<
