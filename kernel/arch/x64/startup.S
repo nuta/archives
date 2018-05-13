@@ -5,7 +5,6 @@
 /* Boot from mbr.S */
 .globl x64_startup
 x64_startup:
-    xchg bx,bx
     .byte 0x0f, 0x20, 0xc0 /* mov eax, cr0 */
 
     /*
