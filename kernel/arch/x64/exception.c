@@ -33,6 +33,6 @@ void x64_handle_exception(u8_t exception, u64_t error, u64_t rip) {
             break;
         }
         default:
-            PANIC("Exception %d", exception);
+            PANIC("Exception %d at %p", exception, rip);
     }
 }
