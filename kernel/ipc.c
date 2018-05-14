@@ -189,7 +189,7 @@ header_t sys_replyrecv(
 }
 
 
-header_t sys_send(
+static header_t sys_send_slowpath(
     channel_t ch,
     header_t type,
     payload_t a0,
@@ -220,6 +220,11 @@ header_t sys_send(
 
     // Get the sender right.
     while (true) {
+        if (dst->sender == current_thread) {
+            // We've already got a sender right in sys_send.
+            break;
+        }
+
         if (atomic_compare_and_swap(&dst->sender, NULL, current_thread)) {
             // Now we have a sender right (dst->sender == current_thread).
             break;
@@ -252,6 +257,47 @@ header_t sys_send(
     dst->buffer[3] = copy_payload(PAYLOAD_TYPE(type, 3), src_process, dst_process, a3, 0);
 
     thread_resume(dst->receiver);
+    return ERROR_NONE;
+}
+
+
+header_t sys_send(
+    channel_t ch,
+    header_t type,
+    payload_t a0,
+    payload_t a1,
+    payload_t a2,
+    payload_t a3
+) {
+    // Get the sender right.
+    struct channel *src, *dst, *linked_to;
+    struct thread *receiver;
+
+    if ((type & 0xfff) != 0 /* Are all payloads inlined? */
+        || (src = get_channel_by_id(ch)) == NULL
+        || (linked_to = src->linked_to) == NULL
+        || (dst = (linked_to->transfer_to ?: linked_to)) == NULL
+        || !atomic_compare_and_swap(&dst->sender, NULL, CPUVAR->current)
+        || (receiver = dst->receiver) == NULL) {
+
+        return sys_send_slowpath(ch, type, a0, a1, a2, a3);
+    }
+
+    DEBUG("sys_fast_send: @%d.%d -> @%d.%d ~> @%d.%d (type=%d.%d)",
+        src->process->pid, src->cid,
+        linked_to->process->pid, linked_to->cid,
+        dst->process->pid, dst->cid,
+        MSG_SERVICE_ID(type), MSG_ID(type));
+
+    // Copy payloads.
+    dst->header = type;
+    dst->sent_from = linked_to->cid;
+    dst->buffer[0] = a0;
+    dst->buffer[1] = a1;
+    dst->buffer[2] = a2;
+    dst->buffer[3] = a3;
+
+    thread_resume(receiver);
     return ERROR_NONE;
 }
 
