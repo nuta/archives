@@ -64,19 +64,11 @@ void bench_summarize(const char *name) {
     median = results[TEST_NUM / 2];
     mean /= TEST_NUM;
 
-    printf("min:  %d\t1Q: %d\t\tmedian: %d\t\n",
-        min, q1, median);
-    printf("mean: %d\t3Q: %d\t\tmax:    %d\t\n\n",
-        mean, q3, max);
-
-    // Print in JSON.
     printf("{\"name\": \"%s\", min: %d, q1: %d, q3: %d, max: %d}\n",
         name, min, q1, q3, max);
 }
 
 void rdtscp_latency_benchmark(void) {
-    printf("The rdtscp latency\n");
-    printf("----------------------------------\n");
     for (int i = 0; i < TEST_NUM; i++) {
         bench_start(i);
         bench_end(i);
@@ -94,8 +86,6 @@ void rpc_latency_benchmark(void) {
     payload_t a2 = 0xabcdef000000002;
     payload_t a3 = 0xabcdef000000003;
 
-    printf("RPC style IPC latency (round-trip)\n");
-    printf("----------------------------------\n");
     for (int i = 0; i < TEST_NUM; i++) {
         payload_t r;
         bench_start(i);
@@ -106,9 +96,21 @@ void rpc_latency_benchmark(void) {
     bench_summarize("ipc-roundtrip");
 }
 
+void syscall_latency_benchmark(void) {
+    for (int i = 0; i < TEST_NUM; i++) {
+        payload_t r;
+        bench_start(i);
+        ipc_close(0);
+        bench_end(i);
+    }
+
+    bench_summarize("syscall");
+}
+
 void main(void) {
     printf("\nBenchmarks are being started. It’s time to brew coffee!\n\n");
     rdtscp_latency_benchmark();
     rpc_latency_benchmark();
+    syscall_latency_benchmark();
     printf("\nFinished all benchmarks.\n");
 }
