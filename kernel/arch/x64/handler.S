@@ -40,7 +40,7 @@
 syscall_table:
     .quad invalid_syscall_handler /* 0 */
     .quad ipc_open_handler        /* 1 */
-    .quad invalid_syscall_handler /* 2 */
+    .quad ipc_close_handler       /* 2 */
     .quad ipc_send_handler        /* 3 */
     .quad ipc_recv_handler        /* 4 */
     .quad ipc_call_handler        /* 5 */
@@ -125,6 +125,11 @@ x64_syscall_handler:
 ipc_open_handler:
     ENTER_NORMAL_SYSCALL
     call sys_open
+    LEAVE_NORMAL_SYSCALL
+
+ipc_close_handler:
+    ENTER_NORMAL_SYSCALL
+    call sys_close
     LEAVE_NORMAL_SYSCALL
 
 ipc_send_handler:

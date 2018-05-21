@@ -148,6 +148,10 @@ channel_t sys_open(void) {
 }
 
 
+void sys_close(channel_t ch) {
+}
+
+
 header_t sys_call(
     channel_t ch,
     header_t type,
