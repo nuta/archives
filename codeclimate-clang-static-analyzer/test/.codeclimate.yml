@@ -1,0 +1,5 @@
+engines:
+  clang-static-analyzer:
+    enabled: true
+    config:
+      script: "make"
