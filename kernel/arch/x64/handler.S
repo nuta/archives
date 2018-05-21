@@ -170,7 +170,7 @@ ipc_replyrecv_handler:
 
 invalid_syscall_handler:
     mov rax, 1 /* ERROR_INVALID_SYSCALL */
-    jmp return_from_syscall
+    sysret
 
 return_from_syscall:
     /*
