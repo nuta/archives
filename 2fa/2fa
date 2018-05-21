@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+import argparse
+from collections import OrderedDict
+import configparser
+import json
+import os
+import subprocess
+import sys
+import time
+import urllib.parse
+import pyotp
+import pyqrcode
+
+__version__ = '0.0.1'
+
+USAGE = """\
+Usage: 2fa                          Generate codes
+       2fa --qrcode name            Print a QR code for Google Authenticator
+       2fa --register name secret   Register new one
+"""
+
+DEFAULT_CONFIG = """\
+[gpg]
+program = gpg2
+user = nuta@seiya.me
+"""
+
+def get_secrets_path():
+    return os.path.expanduser('~/.2fa.secrets')
+
+
+def load_config():
+    global config
+
+    path = os.path.expanduser('~/.2fa.conf')
+    config = configparser.ConfigParser()
+
+    try:
+        config.read_file(open(path))
+    except FileNotFoundError:
+        with open(path, 'w') as f:
+            f.write(DEFAULT_CONFIG)
+        return load_config()
+
+    return config
+
+
+def run_gpg(args, input=None):
+    return subprocess.run([config['gpg']['program']] + args, input=input,
+               check=True, stdout=subprocess.PIPE).stdout
+
+
+def load_secrets():
+    try:
+        encrypted = open(get_secrets_path(), 'rb').read()
+    except FileNotFoundError:
+        return {}
+
+    secrets = run_gpg(['-d', '--batch', '--no-tty'], input=encrypted).decode('utf-8')
+
+    try:
+        secrets = json.loads(secrets)
+    except json.decoder.JSONDecodeError:
+        return {}
+
+    if secrets is None:
+        return {}
+
+    return OrderedDict(sorted(secrets.items()))
+
+
+def save_secrets(secrets):
+    encrypted = run_gpg(['-e', '-r', config['gpg']['user']],
+        input=bytes(json.dumps(secrets), encoding='utf-8'))
+    return open(get_secrets_path(), 'wb').write(encrypted)
+
+
+def totp(secret):
+    return pyotp.TOTP(secret).now()
+
+
+def main(argv):
+    parser = argparse.ArgumentParser(description='2-factor auth token generator')
+    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--register', nargs=2, metavar=('name', 'secret'))
+    parser.add_argument('--qrcode', metavar='name')
+    args = parser.parse_args()
+
+    load_config()
+    secrets = load_secrets()
+
+    if args.register:
+        name, secret = args.register
+        secrets.update({name: secret})
+        save_secrets(secrets)
+    elif args.qrcode:
+        name = args.qrcode
+
+        if name not in secrets:
+            sys.exit("2fa: {} is not registered.".format(name))
+
+        qr = pyqrcode.create('otpauth://totp/{label}?secret={secret}'.format(
+            label=urllib.parse.quote(name), secret=secrets[name]))
+        print(qr.terminal(quiet_zone=1))
+    else:
+        print()
+        if len(secrets) == 0:
+            sys.exit(USAGE)
+
+        lines = len(secrets.keys())
+        while True:
+            expire = 30 - (int(time.time()) % 30)
+
+            for name, secret in secrets.items():
+                if 5 < expire:
+                    print("\x1b[01;34m{:<20}{}\t({})\x1b[0m".format(name, totp(secret), expire))
+                else:
+                    print("\x1b[0;31m{:<20}{}\t({})\x1b[0m".format(name, totp(secret), expire))
+
+            for i in range(lines):
+                print("\x1b[1F\x1b[0K", end="")
+
+            time.sleep(1)
+
+if __name__ == "__main__":
+    try:
+        main(sys.argv)
+    except KeyboardInterrupt:
+        pass
