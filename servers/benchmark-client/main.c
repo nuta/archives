@@ -108,7 +108,7 @@ void syscall_latency_benchmark(void) {
 }
 
 void main(void) {
-    printf("\nBenchmarks are being started. It’s time to brew coffee!\n\n");
+    printf("\nBenchmarks are being started. It's time to brew coffee!\n\n");
     rdtscp_latency_benchmark();
     rpc_latency_benchmark();
     syscall_latency_benchmark();
