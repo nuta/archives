@@ -110,6 +110,7 @@ typedef header_t error_t;
 #define SYSCALL_CONNECT 9
 
 channel_t ipc_open(void);
+void ipc_close(channel_t ch);
 header_t ipc_send(
     channel_t ch,
     header_t type,

@@ -10,6 +10,16 @@ ipc_open:
     ret
 
 
+/* void ipc_close(channel_t ch) */
+.globl ipc_close
+ipc_close:
+    push r15
+    mov rax, 2
+    syscall
+    pop r15
+    ret
+
+
 /*
  *  header_t ipc_send(
  *      channel_t ch,
