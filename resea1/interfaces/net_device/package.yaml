@@ -1,0 +1,98 @@
+name: net_device
+id: 100
+category: interface
+license: Public Domain
+summary: The interface of network devices
+description:
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+  packet_type:
+    type: const
+    size: uint32
+    consts:
+      TYPE_IPV4: 0x0001
+      TYPE_ARP:  0x0002
+  hw_type:
+    type: const
+    size: uint32
+    consts:
+      HW_ETHERNET: 0x0001
+
+#
+#  interface definitions
+#
+interface:
+  listen:
+    id: 1
+    type: request
+    reply: listen_reply
+    payloads:
+      - name: channel
+        type: channel
+  listen_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  transmit:
+    id: 3
+    type: request
+    reply: transmit_reply
+    payloads:
+      - name: data
+        type: data
+        attrs: [readonly]
+  transmit_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  get_info:
+    id: 5
+    type: request
+    reply: get_info_reply
+    payloads:
+  get_info_reply:
+    id: 6
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: type
+        type: net_device(hw_type)
+      - name: hwaddr
+        type: data
+      - name: max_data_size
+        type: size
+
+  received:
+    id: 9
+    type: push
+    payloads:
+      - name: data
+        type: data

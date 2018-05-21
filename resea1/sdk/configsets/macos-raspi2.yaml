@@ -1,0 +1,7 @@
+global_config:
+    HAL: arm
+    MACHINE: raspi2
+    CC:  arm-elf-eabi-gcc
+    CXX: arm-elf-eabi-g++
+    LD:  arm-elf-eabi-ld
+    ADDR2LINE: arm-elf-eabi-addr2line

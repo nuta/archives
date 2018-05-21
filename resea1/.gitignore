@@ -1,0 +1,17 @@
+*.pyc
+*.o
+*.img
+*.iso
+*.pcap
+.coverage*
+*.tmp
+
+GPATH
+GRTAGS
+GTAGS
+tags
+
+/resea.net/docs
+
+\#*\#
+.\#*

@@ -1,0 +1,104 @@
+name: x86
+category: hal
+license: Public Domain
+summary: The HAL library for x86
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: [cpp, genstartcpp]
+lang: cpp
+
+# OS requirements
+os_requirements:
+  macos:
+    homebrew:
+      taps:
+        - resea/resea
+      packages:
+        - qemu
+        - xorriso
+        - grub --HEAD
+  ubuntu:
+    apt:
+      packages:
+        - qemu
+        - xorriso
+        - grub
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: [hal]
+
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  HAL_LINK:
+    default: "{{ LD }} -Map {{ BUILD_DIR }}/executable.map -nostdlib -nodefaultlibs -T{{ X86_DIR }}/src/executable.lds -o"
+  HAL_LIBLINK:
+    default: '{{ LD }} -r -o'
+  HAL_RUN:
+    default: "{{ X86_DIR }}/run"
+  HAL_GENSTART:
+    default: "{{ GENSTARTCPP_DIR }}/genstartcpp"
+  HAL_START_LANG:
+    default: cpp
+  CXXFLAGS:
+    append_words: >
+      -m64 -ffreestanding -mno-sse -mno-mmx
+      -fno-stack-protector -mno-red-zone
+      -mcmodel=large
+      -I{{ X86_DIR }}/src
+  QEMU:
+    default: qemu-system-x86_64
+
+config:
+  FILES:
+    set:
+      - path: src/executable.lds
+        cmd: "{{ X86_DIR }}/gen-lds {{ BUILD_DIR }} {{ X86_DIR }}/src/executable.lds.template"
+        required_on: link
+        rebuild_on: always
+  SOURCES:
+    set:
+      - src/startup.cpp
+      - src/asm.S
+      - src/exception.cpp
+      - src/gdt.cpp
+      - src/global.cpp
+      - src/idt.cpp
+      - src/init.S
+      - src/init2.cpp
+      - src/interrupt.cpp
+      - src/interrupt_handler.S
+      - src/ioapic.cpp
+      - src/localapic.cpp
+      - src/pic.cpp
+      - src/print.cpp
+      - src/smp.cpp
+      - src/thread.cpp
+      - src/tss.cpp
+      - src/vm.cpp
+      - src/cpu.cpp
+      - src/callback.cpp
+

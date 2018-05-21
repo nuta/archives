@@ -1,0 +1,146 @@
+name: memory
+category: interface
+id: 2
+license: Public Domain
+summary:     # brief explanation
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+
+#
+#  interface definitions
+#
+types:
+  mapflags:
+    type: const
+    size: uint16
+    consts:
+      MAP_READ:  0x0001
+      MAP_WRITE: 0x0002
+      MAP_EXEC:  0x0004
+  alloc:
+    type: const
+    size: uint16
+    consts:
+      ALLOC_NORMAL:       0x0000 # no requirements
+      ALLOC_PAGE_ALIGNED: 0x0001 # aligned to PAGE_SIZE
+      ALLOC_CONTINUOUS:   0x0004 # straight in physical memory space
+      ALLOC_ZEROED:       0x0008 # zero-filled
+      ALLOC_USER:         0x0010 # map in user virtual memory, used by kernel
+      ALLOC_WIRED:        0x0020 # wired memory (pages that always exist)
+
+interface:
+  map:
+    id: 1
+    type: request
+    reply: map_reply
+    payloads:
+      - name: group
+        type: id
+      - name: addr
+        type: addr
+      - name: size
+        type: size
+      - name: pager
+        type: channel
+      - name: pager_arg
+        type: id
+      - name: offset
+        type: offset
+  map_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  unmap:
+    id: 3
+    type: request
+    reply: unmap_reply
+    payloads:
+      - name: addr
+        type: addr
+  unmap_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  get_page_size:
+    id: 5
+    type: request
+    reply: get_page_size_reply
+    payloads:
+  get_page_size_reply:
+    id: 6
+    type: reply
+    payloads:
+      - name: size
+        type: size
+
+  allocate:
+    id: 7
+    type: request
+    reply: allocate_reply
+    payloads:
+      - name: size
+        type: size
+      - name: flags
+        type: uint32
+  allocate_reply:
+    id: 8
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: addr
+        type: addr
+
+  release:
+    id: 9
+    type: request
+    payloads:
+      - name: addr
+        type: addr
+
+  allocate_physical:
+    id: 10
+    type: request
+    reply: allocate_physical_reply
+    payloads:
+      - name: paddr
+        type: paddr
+      - name: size
+        type: size
+      - name: flags
+        type: uint32
+  allocate_physical_reply:
+    id: 11
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: addr
+        type: addr
+      - name: paddr
+        type: paddr
+
+# TODO: get_mappable_range, markas_clean_pages, get_dirty_pages

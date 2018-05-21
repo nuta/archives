@@ -1,0 +1,107 @@
+name: cpp
+category: lang
+license: Public Domain
+summary: The language library for C++
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net   # e.g. http://example.com/foo/bar
+
+# Required packages
+depends: []
+
+lang: cpp
+
+# OS requirements
+os_requirements:
+  macos:
+    homebrew:
+      taps:
+        - resea/resea
+      packages:
+        - clang-static-analyzer
+        - x86_64-elf-gcc
+        - x86_64-elf-binutils
+        - arm-elf-eabi-gcc
+        - arm-elf-eabi-binutils
+        - lcov
+  ubuntu:
+    apt:
+      packages:
+        - clang
+        - gcc
+        - lcov
+
+# Interfaces which this package uses
+uses: [memory, io, channel]
+
+# Interfaces which this package implements
+implements: [lang]
+
+global_config:
+  LANGS:
+    append:
+      asm:
+        ext:  S
+        abbrev: AS
+        mkdeps: touch
+        compile: '{{ CXX }} {{ CXXFLAGS }} -c -o'
+      cpp:
+        ext:  cpp
+        abbrev: CXX
+        stub:
+          prefix: resea/
+          suffix: .h
+        compile:  '{{ CXX }} {{ CXXFLAGS }} -c -o'
+        mkdeps:   '{{ CPP_DIR }}/mkdeps "{{ CXX }} {{ CXXFLAGS }}"'
+        scaffold: '{{ CPP_DIR }}/scaffold'
+        genstub:  '{{ CPP_DIR }}/genstub'
+        doctor:   '{{ CPP_DIR }}/doctor'
+  CXXFLAGS:
+    append_words: >
+      -Wall -ggdb3 -std=c++14
+      -fdiagnostics-color -fno-exceptions -fno-rtti
+      -I{{ CPP_DIR }}/src -I{{ BUILD_DIR }}/stubs/cpp
+
+config:
+  - SOURCES:
+      set:
+        - src/ctype.cpp
+        - src/hal_callback.cpp
+        - src/channel.cpp
+        - src/string.cpp
+        - src/syscall.cpp
+        - src/memory.cpp
+        - src/mutex.cpp
+        - src/printfmt.cpp
+        - src/io.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      append:
+        - tests/test.cpp
+  - if: "HAL == 'x86'"
+    SOURCES:
+      append:
+        - src/x86.cpp
+  - if: "HAL == 'arm'"
+    SOURCES:
+      append:
+        - src/arm.cpp
+  - if: "HAL == 'posix_host'"
+    SOURCES:
+      append:
+        - src/posix_host.cpp
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:

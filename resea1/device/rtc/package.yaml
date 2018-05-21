@@ -1,0 +1,47 @@
+name: rtc
+category: application
+license: Public Domain
+summary: A device driver for CMOS RTC (PC/AT)
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: [io, cpp]
+lang: cpp
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: [datetime_device]
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+config:
+  - SOURCES:
+      set:
+        - src/startup.cpp
+        - src/handler.cpp
+        - src/datetime_device_server.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      append:
+        - tests/test.cpp

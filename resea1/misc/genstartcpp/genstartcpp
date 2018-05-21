@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+import sys
+import argparse
+import os
+import jinja2
+
+TEMPLATE = """
+#include <resea.h>
+#include <hal.h>
+
+#undef PACKAGE_NAME
+#define PACKAGE_NAME "start_apps"
+
+{% for app in apps %}
+extern "C" void {{ app }}_startup();
+{% endfor %}
+
+{% if test %}
+extern "C" void {{ test_target }}_test();
+{% endif %}
+
+static void app_entrypoint (void (*startup)()) {
+  startup();
+  PANIC("startup() returned");
+}
+
+void start_apps(void){
+
+{% for app in apps %}
+{% if with_threading %}
+    INFO("starting {{ app }}");
+    call_hal_callback(HAL_CALLBACK_RUN_THREAD,
+        1, "{{ app }}", app_entrypoint,
+        {{ app }}_startup
+    );
+
+{% else %}
+    INFO("starting {{ app }} (direct-startup)");
+    {{ app }}_startup();
+{% endif %}
+{% endfor %}
+
+{%if test %}
+    INFO("starting {{ test_target }} tests");
+    call_hal_callback(HAL_CALLBACK_RUN_THREAD,
+        1, "{{ test_target }}", app_entrypoint,
+        {{ test_target }}_test
+    );
+{% endif %}
+
+{% if with_threading %}
+    INFO("starting threading");
+    call_hal_callback(HAL_CALLBACK_START_THREADING);
+{% endif %}
+}
+"""
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('apps', nargs='*')
+    parser.add_argument('--with-threading', action='store_true')
+    parser.add_argument('--test', action='store_true')
+    parser.add_argument('--test-target')
+    args = parser.parse_args()
+    print(jinja2.Template(TEMPLATE).render(vars(args)))
+
+if __name__ == "__main__":
+   main()

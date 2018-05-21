@@ -1,0 +1,10 @@
+.
+kernel
+lang
+hal
+device
+exec
+fs
+libs
+misc
+interfaces

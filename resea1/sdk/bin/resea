@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+import os
+import sys
+
+# for SDK development in resea repository
+sys.path.insert(0, os.path.join(os.getcwd(), "sdk"))
+sys.path.insert(0, os.path.join(os.getcwd(), "../sdk"))
+sys.path.insert(0, os.path.join(os.getcwd(), "../../sdk"))
+sys.path.insert(0, os.path.join(os.getcwd(), "../../../sdk"))
+sys.path.insert(0, os.path.join(os.getcwd(), "../../../../sdk"))
+
+import resea
+
+if __name__ == '__main__':
+    sys.exit(resea.main(sys.argv[1:]))
+

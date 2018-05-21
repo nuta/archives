@@ -1,0 +1,66 @@
+name: channel
+category: interface
+id: 1
+license: Public Domain
+summary:     # brief explanation
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+#
+#  Type definitions
+#
+types:
+
+#
+#  interface definitions
+#
+interface:
+  connect:
+    id: 1
+    type: request
+    reply: connect_reply
+    payloads:
+      - name: channel
+        type: uintmax
+        description: The channel ID
+      - name: interface
+        type: interface
+  connect_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  register:
+    id: 3
+    type: request
+    reply: register_reply
+    payloads:
+      - name: channel
+        type: uintmax
+        description: The channel ID
+      - name: interface
+        type: interface
+  register_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result

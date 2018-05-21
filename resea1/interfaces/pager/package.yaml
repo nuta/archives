@@ -1,0 +1,53 @@
+name: pager
+id: 3
+category: interface
+license: Public Domain
+summary: The interface of pager
+description:
+
+warning:     # some important things to note
+info: "`id` in interface arguments are depends on implementors."
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+
+#
+#  interface definitions
+#
+interface:
+  fill:
+    id: 1
+    type: request
+    reply: fill_reply
+    payloads:
+      - name: id
+        type: id
+      - name: offset
+        type: offset
+      - name: size
+        type: size
+  fill_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: data
+        type: data

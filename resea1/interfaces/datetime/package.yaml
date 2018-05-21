@@ -1,0 +1,99 @@
+name: datetime
+category: interface
+id: 6
+license: Public Domain
+summary: The interface of date/time management
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+
+
+#
+#  interface definitions
+#
+interface:
+  get_date:
+    id: 1
+    type: request
+    reply: get_date_reply
+    payloads:
+  get_date_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: year
+        type: uint32
+      - name: date
+        type: uint32
+        description: unused:month:day:hour:min:sec (6, 4, 5, 5, 6, 6 bits respectively)
+      - name: nsec
+        type: uint32
+
+  set_oneshot_timer:
+    id: 3
+    type: request
+    reply: set_oneshot_timer_reply
+    payloads:
+      - name: ch
+        type: channel
+      - name: msec
+        type: uintmax
+  set_oneshot_timer_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  set_interval_timer:
+    id: 5
+    type: request
+    reply: set_interval_timer_reply
+    payloads:
+      - name: ch
+        type: channel
+      - name: msec
+        type: uintmax
+  set_interval_timer_reply:
+    id: 6
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  delay:
+    id: 7
+    type: request
+    reply: delay_reply
+    description: Delays returning
+    payloads:
+      - name: msec
+        type: uintmax
+  delay_reply:
+    id: 8
+    type: reply
+    payloads:
+      - name: result
+        type: result

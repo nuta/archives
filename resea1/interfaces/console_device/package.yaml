@@ -1,0 +1,56 @@
+name: console_device
+id: 103
+category: interface
+license: Public Domain
+summary: The interface of console devices
+description:
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+
+#
+#  interface definitions
+#
+interface:
+  read:
+    id: 1
+    type: request
+    reply: read_reply
+    payloads:
+  read_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: data
+        type: uint8
+
+  write:
+    id: 3
+    type: request
+    reply: write_reply
+    payloads:
+      - name: data
+        type: uint8
+  write_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result

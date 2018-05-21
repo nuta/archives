@@ -1,0 +1,56 @@
+name: arm
+category: hal
+license: Public Domain
+summary: The HAL library for ARM processors
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+lang: cpp
+depends: [cpp, genstartcpp]
+uses: []
+implements: [hal, console_device]
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Machines
+#
+includes:
+  - machines/raspi2/config.yaml
+
+#
+#  Config
+#
+global_config:
+  HAL_GENSTART:
+    default: '{{ GENSTARTCPP_DIR }}/genstartcpp'
+  HAL_START_LANG:
+    default: cpp
+
+config:
+  SOURCES:
+    set:
+      - src/startup.cpp
+      - src/debug.cpp
+      - src/thread.cpp
+      - src/memory.cpp
+      - src/hw.cpp
+      - src/vm.cpp
+      - src/cpu.cpp
+      - src/callback.cpp
+      - src/handler.cpp
+      - src/console_device_server.cpp

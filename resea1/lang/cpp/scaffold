@@ -1,0 +1,239 @@
+#!/usr/bin/env python3
+import argparse
+from collections import OrderedDict
+import os
+import re
+import sys
+import traceback
+import yaml
+from resea.defines import PAYLOAD_NUM
+from resea.package import get_package_dir
+from resea.support import is_ool_type
+from resea.helpers import render, error, generating, load_yaml
+from resea.validators import validate_package_yml
+from helpers import ctype
+
+
+STARTUP_CPP_TEMPLATE = """\
+#include "{{ package_name }}.h"
+#include <resea.h>
+{% for implement in implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+
+
+void {{ package_name }}_startup() {
+
+}
+
+"""
+
+HANDLER_CPP_TEMPLATE = """\
+#include "{{ package_name }}.h"
+#include <resea.h>
+#include <resea/cpp/memory.h>
+{% for implement in implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+{% for server in servers %}
+#include "{{ server }}_server.h"
+{% endfor %}
+
+namespace {{ package_name }} {
+
+void server_handler(channel_t __ch, payload_t *m) {
+    if ((m[0] & 1) != 1) {
+        WARN("the first payload is not inline one (expected inline msgid_t)");
+        return;
+    }
+
+    switch (EXTRACT_MSGID(m)) {
+{% for interface_name, msg_name, payloads in all_messages %}
+    case MSGID({{ interface_name }}, {{ msg_name }}):
+        DEBUG("received {{ interface_name }}.{{ msg_name }}");
+        {{ interface_name }}_server::handle_{{ msg_name }}(
+            __ch
+        {% for type, name, _ in payloads %}
+            , ({{ type }}) EXTRACT(m, {{ interface_name }}, {{ msg_name }}, {{ name }})
+        {% endfor %}
+        );
+        return;
+
+#ifndef KERNEL
+        // free readonly payloads sent via kernel (user-space)
+    {% for _, name, attrs in payloads %}
+        {% if 'readonly' in attrs %}
+        release_memory((void * ) m[__PINDEX(m, {{ interface_name }}, {{ msg_name }}, {{ name }})]);
+        {% endif %}
+    {% endfor %}
+#endif
+
+{% endfor %}
+    }
+
+    WARN("unsupported message: msgid=%#x", EXTRACT_MSGID(m));
+}
+
+} // namespace {{ package_name }}
+"""
+
+HANDLER_H_TEMPLATE = """\
+#include "{{ package_name }}.h"
+#include <resea.h>
+
+namespace {{ package_name }} {
+
+void server_handler(channel_t __ch, payload_t *m);
+
+} // namespace {{ package_name }}
+
+"""
+
+SERVER_H_TEMPLATE = """\
+#include "{{ package_name }}.h"
+#include <resea.h>
+{% for implement in implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+
+namespace {{ package_name }} {
+namespace {{ interface_name }}_server {
+
+{% for msg_name, payloads in messages %}
+void handle_{{ msg_name }}(
+    channel_t __ch
+{% for type, name, _ in payloads %}
+    , {{ type }} {{ name }}
+{% endfor %}
+);
+{% endfor %}
+
+} // namespace {{ interface_name }}
+} // namespace {{ package_name }}
+
+"""
+
+SERVER_CPP_TEMPLATE = """\
+#include "{{ package_name }}.h"
+#include <resea.h>
+{% for implement in implements %}
+#include <resea/{{ implement }}.h>
+{% endfor %}
+#include "{{ interface_name }}_server.h"
+
+
+namespace {{ package_name }} {
+namespace {{ interface_name }}_server {
+
+{% for msg_name, payloads in messages %}
+
+void handle_{{ msg_name }}(
+    channel_t __ch
+{% for type, name, _ in payloads %}
+    , {{ type }} {{ name }}
+{% endfor %}
+) {
+    // TODO: add your code
+}
+
+{% endfor %}
+
+} // namespace {{ interface_name }}_server
+} // namespace {{ package_name }}
+"""
+
+PACKAGE_H_TEMPLATE = """\
+#ifndef __{{ package_name | upper }}_{{ package_name | upper }}_H__
+#define __{{ package_name | upper }}_{{ package_name | upper }}_H__
+
+#define PACKAGE_NAME "{{ package_name }}"
+
+#endif
+"""
+
+def create_file(path, data, overwrite=False):
+    if overwrite or not os.path.exists(path):
+        generating("GEN", path)
+        open(path, "w").write(data)
+    else:
+        generating("GEN",
+                   "{} (file already exists, skipping)".format(path))
+
+
+def main(args):
+    package_name = load_yaml(args.package_yml, validator=validate_package_yml)['name']
+
+    ymls = []
+    implements = []
+    packages = [package_name]
+    while len(packages) > 0:
+        package = packages.pop()
+        yml = load_yaml(os.path.join(get_package_dir(package), 'package.yaml'),
+                        validator=validate_package_yml)
+        ymls.append(yml)
+        implements.append(package)
+        for x in yml["implements"]:
+            if package in implements:
+                implements.append(x)
+                packages.append(x)
+
+    implements = list(set(implements))
+
+    servers = []
+    all_messages = []
+    for yml in ymls:
+        interface_name = yml["name"]
+        messages = []
+        sorted_messages = OrderedDict(sorted(yml['interface'].items(), key=lambda e: e[1]["id"]))
+        for  msg_name, msg in sorted_messages.items():
+            if msg['type'] != 'request':
+                continue
+
+            payloads = []
+            if msg['payloads'] is not None:
+                for payload in msg['payloads']:
+                    payloads.append((
+                        ctype(payload['type']),
+                        payload['name'],
+                        payload.get('attrs', [])
+                    ))
+                    if is_ool_type(payload['type']):
+                        payloads.append((
+                            ctype('size'),
+                            payload['name'] + '_size',
+                            payload.get('attrs', [])))
+
+            messages.append((msg_name, payloads))
+            all_messages.append((interface_name, msg_name, payloads))
+
+        if len(messages) > 0:
+            servers.append(interface_name)
+            create_file("{}/src/{}_server.cpp".format(args.output_dir, interface_name),
+                        render(SERVER_CPP_TEMPLATE, locals()))
+            create_file("{}/src/{}_server.h".format(args.output_dir, interface_name),
+                        render(SERVER_H_TEMPLATE, locals()),
+                        overwrite=True)
+
+    create_file("{}/src/handler.cpp".format(args.output_dir),
+                render(HANDLER_CPP_TEMPLATE, locals()),
+                overwrite=True)
+    create_file("{}/src/handler.h".format(args.output_dir),
+                render(HANDLER_H_TEMPLATE, locals()),
+                overwrite=True)
+    create_file("{}/src/startup.cpp".format(args.output_dir),
+                render(STARTUP_CPP_TEMPLATE, locals()))
+    create_file("{}/src/{}.h".format(args.output_dir, package_name),
+                render(PACKAGE_H_TEMPLATE, locals()))
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate boilerplates for C")
+    parser.add_argument("output_dir")
+    parser.add_argument("package_yml")
+    args = parser.parse_args()
+
+    try:
+        main(args)
+    except Exception as e:
+        sys.stderr.write("scaffold ({}): {}\n".format(args.package_yml, str(e)))
+        traceback.print_exc()
+        sys.exit(1)

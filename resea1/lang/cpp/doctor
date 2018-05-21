@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+import os
+import sys
+import glob
+import tempfile
+import subprocess
+import webbrowser
+from resea.helpers import info, notice, plan, progress, load_yaml, render
+from resea.validators import validate_package_yml
+import resea.commands.build
+import resea.commands.test
+
+LANG_HTML = """
+<li><a href="/ci/{{ package_name }}/csa/index.html">Static code analysis</a></li>
+<li><a href="/ci/{{ package_name }}/coverage/index.html">Test coverage</a></li>
+"""
+
+def main():
+    _, lang_html_path, tmp_dir = sys.argv # TODO
+    yml = load_yaml('package.yaml', validator=validate_package_yml)
+    package_name = yml['name']
+
+    plan('Analysing with Clang Static Analyzer')
+    csa_dir = os.path.join(tmp_dir, 'csa')
+    csa_options = [
+        '--keep-empty',
+        '-plist-html',
+        '-analyzer-config stable-report-filename=true'
+    ]
+    resea.commands.build.main([
+       'HAL=posix_host',
+       'MAKE=scan-build {} -o {} make'.format(' '.join(csa_options), csa_dir),
+       'CXX=clang',
+       'LD=ld',
+       'LINKFLAGS=',
+       'HAL_LINK=clang -pthread -o'
+    ])
+
+    plan('Testing with gcov')
+    resea.commands.test.main([
+       '--wait',
+       'HAL=posix_host',
+       'MAKE=make',
+       'CXX=gcc',
+       'LD=ld',
+       'CXXFLAGS+=-fprofile-arcs -ftest-coverage',
+       'HAL_LINK=gcc -fprofile-arcs -ftest-coverage -pthread -o'
+    ])
+
+    progress('Collecting coverages')
+    coverage_info = os.path.join(tmp_dir, 'coverage.info')
+    coverage_dir = os.path.join(tmp_dir, 'coverage')
+    subprocess.run(['lcov', '--capture', '--directory',
+        'build/test/objs/' + yml['name'],
+        '--quiet', '--output-file', coverage_info],
+        check=True)
+    subprocess.run(['genhtml', coverage_info, '--quiet',
+        '--output-directory', coverage_dir],
+        check=True)
+
+    with open(lang_html_path, 'w') as f:
+        f.write(render(LANG_HTML, locals()))
+
+if __name__ == '__main__':
+    main()

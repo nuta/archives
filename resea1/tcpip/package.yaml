@@ -1,0 +1,160 @@
+name: tcpip
+category: application
+id: 9
+license: Public Domain
+summary: The TCP/IP server
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Prefered language
+lang: cpp
+
+# Required packages
+depends: [cpp, channel, net_device]
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+  protocol:
+    type: const
+    size: uint32
+    consts:
+      PROTOCOL_IPV4: 0x0001
+      PROTOCOL_IPV6: 0x0004
+      PROTOCOL_UDP:  0x0008
+      PROTOCOL_TCP:  0x0010
+
+
+#
+#  Interface definitions
+#
+interface:
+  open:
+    id: 1
+    type: request
+    reply: open_reply
+    payloads:
+      - name: transport
+        type: tcpip(protocol)
+      - name: handler
+        type: channel
+  open_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: socket
+        type: id
+
+  close:
+    id: 3
+    type: request
+    reply: close_reply
+    payloads:
+      - name: socket
+        type: id
+  close_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  bind:
+    id: 5
+    type: request
+    reply: bind_reply
+    payloads:
+      - name: socket
+        type: id
+      - name: network
+        type: tcpip(protocol)
+      - name: address
+        type: data
+      - name: port
+        type: uint16
+  bind_reply:
+    id: 6
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  sendto:
+    id: 7
+    type: request
+    reply: sendto_reply
+    payloads:
+      - name: socket
+        type: id
+      - name: network
+        type: tcpip(protocol)
+      - name: address
+        type: data
+      - name: port
+        type: uint16
+      - name: payload
+        type: data
+  sendto_reply:
+    id: 8
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  received:
+    id: 9
+    type: push
+    payloads:
+      - name: socket
+        type: id
+      - name: network
+        type: tcpip(protocol)
+      - name: address
+        type: data
+      - name: port
+        type: uint16
+      - name: payload
+        type: data
+
+
+#
+#  Config
+#
+config:
+  - SOURCES:
+      set:
+        - src/arp.cpp
+        - src/ethernet.cpp
+        - src/endian.cpp
+        - src/icmp.cpp
+        - src/ip.cpp
+        - src/ipv4.cpp
+        - src/mbuf.cpp
+        - src/receive.cpp
+        - src/udp.cpp
+        - src/socket.cpp
+        - src/device.cpp
+        - src/route.cpp
+        - src/startup.cpp
+        - src/handler.cpp
+        - src/tcpip_server.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      append:
+        - tests/test.cpp

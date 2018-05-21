@@ -1,0 +1,113 @@
+name: fs
+id: 8
+category: interface
+license: Public Domain
+summary: The interface of fs
+description:
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: [pager]
+
+
+#
+#  Type definitions
+#
+types:
+  filemode:
+    type: const
+    size: uint32
+    consts:
+      FILEMODE_READ:   0x0001
+      FILEMODE_WRITE:  0x0004
+      FILEMODE_APPEND: 0x0008
+
+
+#
+#  interface definitions
+#
+interface:
+  open:
+    id: 1
+    type: request
+    reply: open_reply
+    payloads:
+      - name: path
+        type: Array<uchar>
+        attrs: [readonly]
+      - name: mode
+        type: fs(filemode)
+  open_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: file
+        type: id
+
+  close:
+    id: 3
+    type: request
+    reply: close_reply
+    payloads:
+      - name: file
+        type: id
+  close_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  read:
+    id: 5
+    type: request
+    reply: read_reply
+    payloads:
+      - name: file
+        type: id
+      - name: offset
+        type: offset
+      - name: size
+        type: size
+  read_reply:
+    id: 6
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: data
+        type: data
+
+  write:
+    id: 7
+    type: request
+    reply: write_reply
+    payloads:
+      - name: file
+        type: id
+      - name: offset
+        type: offset
+      - name: data
+        type: data
+        attrs: [readonly]
+  write_reply:
+    id: 8
+    type: reply
+    payloads:
+      - name: result
+        type: result

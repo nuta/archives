@@ -1,0 +1,330 @@
+#!/usr/bin/env python3
+import argparse
+import re
+import sys
+import traceback
+import yaml
+import jinja2
+from resea.defines import PAYLOAD_NUM
+from resea.helpers import load_yaml
+from resea.support import is_ool_type
+from resea.validators import validate_package_yml
+from helpers import ctype
+
+class GeneratingError(Exception):
+    pass
+
+HEADER_TEMPLATE = """
+#ifndef __RESEA_{{ name | upper }}__H__
+#define __RESEA_{{ name | upper }}__H__
+#include <resea.h>
+
+namespace resea {
+namespace interfaces {
+namespace {{ name }} {
+
+{% if id %}
+static const uint32_t interface_id = {{ id }} << 12;
+{% endif %}
+"""
+
+FOOTER_TEMPLATE = """
+} // namespace {{ name }}
+} // namespace interfaces
+} // namespace resea
+#endif
+"""
+
+SEND_TEMPLATE = """
+static inline void {{ func_name }}_{{ msg_name }} (
+    channel_t __ch
+{%- for type, name in payloads -%}
+    {% if type != '' -%}
+    , {{ type }} {{ name }}
+    {%- endif %}
+{%- endfor %}
+    ) {
+
+    payload_t __payloads[{{ payloads_length }}];
+
+{% set i = 0 %}
+{% for type, name in payloads %}
+    {% if type != 'payloadtype_t' %}
+    __payloads[{{ i }}] = (payload_t) {{ name }};
+    {% set i = i + 1 %}
+    {% endif %}
+{%- endfor %}
+
+    sys_send(__ch, (payload_t *) &__payloads, sizeof(__payloads));
+
+#ifndef KERNEL
+    // free move payloads in user-space
+    payload_t __header;
+    for (size_t i = 0; i < {{ payloads | length }}; i++) {
+        if (IS_PAYLOAD_HEADER_INDEX(i)) {
+            header = __payloads[i];
+        } else {
+            if (GET_PAYLOAD_TYPE(header, i) == PAYLOAD_MOVE_OOL) {
+                release_memory(__payloads[i]);
+            }
+        }
+    }
+#endif
+}
+
+"""
+
+CALL_TEMPLATE = """
+static inline void {{ func_name }}_{{ msg_name }} (
+    channel_t __ch
+{%- for type, name in args -%}
+    {% if type != '' -%}
+    , {{ type }} {{ name }}
+    {%- endif %}
+{%- endfor %}
+{%- for type, name in rets -%}
+    {% if type != '' -%}
+    , {{ type }}* {{ name }}
+    {%- endif %}
+{%- endfor %}
+    ) {
+
+    payload_t __arg[{{ args_length }}];
+    payload_t __ret[{{ rets_length }}];
+
+{% set i = 0 %}
+{% for type, val in args %}
+    {%- if type != 'payloadtype_t' %}
+    __arg[{{ i }}] = (payload_t) {{ val }};
+    {% set i = i + 1 %}
+    {% endif %}
+{% endfor %}
+
+    sys_call(__ch, (payload_t *) &__arg, sizeof(__arg), (payload_t *) &__ret, sizeof(__ret));
+
+{% for type, name in rets %}
+    {% if type != '' -%}
+    *{{ name }} = ({{ type }}) __ret[{{ loop.index0 }}];
+    {% endif %}
+{%- endfor %}
+}
+
+"""
+
+MSGID_TEMPLATE = """
+const uint32_t {{ msg_name }}_id = ({{ interface_id }} << 12) | {{ msg_id }};
+
+"""
+
+PMACROS_TEMPLATE = """
+{% for type, name in payloads %}
+    {% if type != '' %}
+    typedef {{ type }} {{ msg_name }}_{{ name }}_type;
+    const int {{ msg_name }}_{{ name }}_index = {{ loop.index0 }};
+    {% endif %}
+{% endfor %}
+"""
+
+STRUCT_TEMPLATE = """
+typedef struct {
+{% for type, name in members.items() %}
+    {{ type }} {{ name }};
+{% endfor %}
+} {{ type_name }}_t;
+
+"""
+
+CONST_TEMPLATE = """
+typedef {{ ctype }} {{ type_name }}_t;
+{% for name, val in consts.items() %}
+const {{ ctype }} {{ name }} = {{ val }};
+{% endfor %}
+
+"""
+
+ALIAS_TEMPLATE = """
+typedef {{ ctype }} {{ type_name }}_t;
+
+"""
+
+
+def load_payload_defs(interface_name, msg_name, msg, name_prefix=None,
+                      with_type_args=False):
+
+    if name_prefix is None:
+        name_prefix = ''
+
+    if msg['payloads'] is None:
+        msg['payloads'] = []
+
+    defs = [{
+        'type': '',
+        'name': 'resea::interfaces::{}::{}_id'.format(interface_name, msg_name)
+    }]
+
+    for p in msg['payloads']:
+        defs.append(p)
+
+        if is_ool_type(p['type']):
+            # size of an OoL payload
+            defs.append({
+                'type': 'size',
+                'name': p['name'] + '_size'
+            })
+
+    length = 0
+    payloads = []
+    for i, p in enumerate(defs, start=0):
+        if i % 8 == 0:
+            # inject a payload header
+            header = '0'
+            size_payload = False
+            for j, q in enumerate(defs[i:i+8]):
+                if size_payload:
+                    header += ' | (0x0f << {})'.format(j * 4)
+                    size_payload = False
+                    continue
+
+                if isinstance(q, dict):
+                    if with_type_args and q['type'] != '':
+                        header += '| ({} << {})'.format("type" + str(j), j * 4)
+                        j += 1
+                    else:
+                        if q['type'] == 'channel':
+                            header += '| (0x02 << {})'.format(j * 4)
+                        elif is_ool_type(q['type']):
+                            header += '| (0x03 << {})'.format(j * 4)
+                            size_payload = True
+                        else:
+                            header += '| (0x01 << {})'.format(j * 4)
+
+            payloads.append(('', header))
+            length += 1
+
+        payloads.append((ctype(p['type']), name_prefix + p['name'])) # payload
+        length += 1
+
+        if i > 0 and with_type_args:
+            payloads.append(('payloadtype_t', 'type' + str(i)))
+
+    return payloads, length
+
+
+def write(template, args):
+    global output
+    output.write(jinja2.Template(template).render(**args))
+
+
+def process_message(yml, msg_name, msg):
+    interface_name = yml['name']
+    payloads, payloads_length = load_payload_defs(interface_name, msg_name, msg)
+    payloads_with_type, payloads_with_type_length = \
+        load_payload_defs(interface_name, msg_name, msg, with_type_args=True)
+
+    write(PMACROS_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'payloads': payloads,
+        'payloads_length': payloads_length
+    })
+    write(MSGID_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'interface_id': yml['id'],
+        'msg_id': msg['id']
+    })
+    write(SEND_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'func_name': 'send',
+        'payloads': payloads,
+        'payloads_length': payloads_length
+    })
+    write(SEND_TEMPLATE, {
+        'interface_name': interface_name,
+        'msg_name': msg_name,
+        'func_name': 'sendas',
+        'payloads': payloads_with_type,
+        'payloads_length': payloads_with_type_length
+    })
+
+    if msg['type'] == 'request' and 'reply' in msg:
+        rets, rets_length = load_payload_defs(interface_name, msg_name,
+                                yml['interface'][msg['reply']], '__r_')
+        write(CALL_TEMPLATE, {
+            'interface_name': interface_name,
+            'msg_name': msg_name,
+            'func_name': 'call',
+            'args': payloads,
+            'args_length': payloads_length,
+            'rets': rets,
+            'rets_length': rets_length
+        })
+        write(CALL_TEMPLATE, {
+            'interface_name': interface_name,
+            'msg_name': msg_name,
+            'func_name': 'callas',
+            'args': payloads_with_type,
+            'args_length': payloads_with_type_length,
+            'rets': rets,
+            'rets_length': rets_length
+        })
+
+
+def process_types(interface_name, type_name, type_):
+    """Returns the declaration of a type."""
+    if type_["type"] == "struct":
+        write(STRUCT_TEMPLATE, {
+            'interface_name': interface_name,
+            'type_name': type_name,
+            'members': type_['members']
+        })
+    elif type_["type"] == "const":
+        write(CONST_TEMPLATE, {
+            'interface_name': interface_name,
+            'type_name': type_name,
+            'consts': type_['consts'],
+            'ctype': ctype(type_['size'])
+        })
+    elif type_["type"] == "alias":
+        write(ALIAS_TEMPLATE, {
+            'interface_name': interface_name,
+            'type_name': type_name,
+            'ctype': ctype(type_['alias_of'])
+        })
+    else:
+        raise GeneratingError("unknown type: '{}' in the type definition " +
+                              "of '{}'".format(type_["type"], type_name))
+
+
+def main(args):
+    """Generates stubs of arg.package_yml into args.output"""
+    global output
+
+    package_yml = load_yaml(args.package_yml, validator=validate_package_yml)
+    output = open(args.output, "w")
+
+    write(HEADER_TEMPLATE, package_yml)
+
+    for name, type_ in package_yml["types"].items():
+        process_types(package_yml["name"], name, type_)
+
+    for name, msg in package_yml["interface"].items():
+        process_message(package_yml, name, msg)
+
+    write(FOOTER_TEMPLATE, package_yml)
+    output.close()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate stubs for C")
+    parser.add_argument("output")
+    parser.add_argument("package_yml")
+    args = parser.parse_args()
+
+    try:
+        main(args)
+    except Exception as e:
+        sys.stderr.write("genstub ({}): {}\n".format(args.package_yml, str(e)))
+        traceback.print_exc()
+        sys.exit(1)

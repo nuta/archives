@@ -1,0 +1,53 @@
+name: virtio
+category: application
+id: 1004
+license: Public Domain
+summary: A device driver for virtio devices
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage:    # e.g. http://example.com/foo/bar
+
+# Required packages
+depends: [io, cpp, pci, libpci]
+lang: cpp
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: [net_device, storage_device]
+
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+config:
+  - SOURCES:
+      set:
+        - src/net_device_server.cpp
+        - src/storage_device_server.cpp
+        - src/handler.cpp
+        - src/startup.cpp
+        - src/virtio.cpp
+        - src/virtio_net.cpp
+        - src/virtio_blk.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      append:
+        - tests/test.cpp

@@ -1,0 +1,50 @@
+name: elf
+id: 1001
+category: application
+license: Public Domain
+summary: The ELF loader
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: [thread, memory, cpp, channel, zeroed_pager]
+lang: cpp
+
+# Interfaces which this package uses
+uses: [fs, pager]
+
+# Interfaces which this package implements
+implements: [exec]
+
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+config:
+  - SOURCES:
+      set:
+        - src/startup.cpp
+        - src/elf.cpp
+        - src/handler.cpp
+        - src/exec_server.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      append:
+        - tests/test.cpp

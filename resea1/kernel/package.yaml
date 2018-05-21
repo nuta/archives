@@ -1,0 +1,70 @@
+name: kernel
+category: library
+license: Public Domain
+summary: The kernel.
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: [cpp]
+lang: cpp
+
+# Interfaces which this package uses
+uses:
+  - datetime_device
+
+# Interfaces which this package implements
+implements:
+  - channel
+  - memory
+  - thread
+  - io
+  - datetime
+  - pager
+  - zeroed_pager
+
+#
+#  Type definitions
+#
+types:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  CXXFLAGS:
+    append_words: -DKERNEL
+
+config:
+  - SOURCES:
+      set:
+        - src/channel.cpp
+        - src/channel_server.cpp
+        - src/datetime.cpp
+        - src/datetime_server.cpp
+        - src/handler.cpp
+        - src/io_server.cpp
+        - src/memory.cpp
+        - src/page_fault.cpp
+        - src/memory_server.cpp
+        - src/pager_server.cpp
+        - src/startup.cpp
+        - src/syscall.cpp
+        - src/thread.cpp
+        - src/thread_server.cpp
+  - if: "ENV == 'test'"
+    SOURCES:
+      append:
+        - tests/test.cpp

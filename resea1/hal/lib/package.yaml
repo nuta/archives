@@ -1,0 +1,57 @@
+name: lib
+category: hal
+license: Public Domain
+summary: The HAL library for libraries including Resea packages
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: [cpp, genstartcpp]
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: [hal]
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  HAL_LINK:
+    default: '{{ LD }} -r -o'
+  HAL_LIBLINK:
+    default: '{{ LD }} -r -o'
+  HAL_GENSTART:
+    default: '{{ GENSTARTCPP_DIR }}/genstartcpp'
+  HAL_START_LANG:
+    default: cpp
+  HAL_RUN:
+    default: echo
+  CXXFLAGS:
+    append_words: >
+      -I{{ LIB_DIR }}/src
+
+#
+#  Config
+#
+config:
+  SOURCES:
+    set:
+      - src/stubs.cpp

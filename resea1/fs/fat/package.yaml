@@ -1,0 +1,69 @@
+name: fat
+category: application
+license: Public Domain
+summary:     # brief explanation
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: [cpp]
+lang: cpp
+
+# OS requirements
+os_requirements:
+  macos:
+    homebrew:
+      packages:
+        - mtools
+  ubuntu:
+    apt:
+      packages:
+        - mtools
+
+# Interfaces which this package uses
+uses:
+  - storage_device
+
+# Interfaces which this package implements
+implements:
+  - fs
+
+
+#
+#  Type definitions
+#
+type:
+
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+config:
+  - SOURCES:
+      set:
+        - src/startup.cpp
+        - src/handler.cpp
+        - src/fat.cpp
+        - src/file.cpp
+        - src/fs_server.cpp
+        - src/pager_server.cpp
+  - if: "ENV == 'test'"
+    FILES:
+      set:
+        - path: tests/test_img.cpp
+          cmd: "{{ FAT_DIR }}/gen_testimg {{ CPP_DIR }}"
+    SOURCES:
+      append:
+        - tests/test_img.cpp
+        - tests/test.cpp

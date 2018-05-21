@@ -1,0 +1,30 @@
+include_if: "MACHINE == 'raspi2'"
+
+global_config:
+  CXXFLAGS:
+    append_words: >
+      -ffreestanding
+      -I{{ ARM_DIR }}/src
+      -I{{ ARM_DIR }}/machines/raspi2/include
+      -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard
+  HAL_RUN:
+    default: "{{ ARM_DIR }}/machines/raspi2/run"
+  HAL_LINK:
+    default: >
+      {{ LD }} -Map {{ BUILD_DIR }}/executable.map
+      -nostdlib -nodefaultlibs
+      -T{{ ARM_DIR }}/machines/raspi2/executable.lds
+      -o
+  HAL_LIBLINK:
+    default: '{{ LD }} -r -o'
+
+config:
+  SOURCES:
+    append:
+      - machines/raspi2/init.S
+      - machines/raspi2/asm.S
+      - machines/raspi2/cpu.cpp
+      - machines/raspi2/interrupt.cpp
+      - machines/raspi2/timer.cpp
+      - machines/raspi2/startup.cpp
+      - machines/raspi2/thread.cpp

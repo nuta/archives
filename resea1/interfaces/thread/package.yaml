@@ -1,0 +1,119 @@
+name: thread
+category: interface
+id: 5
+license: Public Domain
+summary: The threading server
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+
+#
+#  interface definitions
+#
+interface:
+  create:
+    id: 1
+    type: request
+    reply: create_reply
+    payloads:
+      - name: group
+        type: id
+      - name: name
+        type: Array<uchar>
+        attrs: [readonly]
+  create_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: thread
+        type: id
+      - name: group
+        type: id
+
+  delete:
+    id: 3
+    type: request
+    reply: delete_reply
+    payloads:
+      - name: thread
+        type: id
+  delete_reply:
+    id: 4
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  start:
+    id: 5
+    type: request
+    reply: start_reply
+    payloads:
+      - name: thread
+        type: id
+  start_reply:
+    id: 6
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  set:
+    id: 9
+    type: request
+    reply: set_reply
+    payloads:
+      - name: thread
+        type: id
+      - name: entry
+        type: addr
+      - name: arg
+        type: addr
+      - name: stack
+        type: addr
+      - name: stack_size
+        type: size
+  set_reply:
+    id: 10
+    type: reply
+    payloads:
+      - name: result
+        type: result
+
+  get_current_thread:
+    id: 11
+    type: request
+    reply: get_current_thread_reply
+    payloads:
+
+  get_current_thread_reply:
+    id: 12
+    type: reply
+    payloads:
+      - name: thread
+        type: id
+      - name: group
+        type: id

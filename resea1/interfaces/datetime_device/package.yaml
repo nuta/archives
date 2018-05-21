@@ -1,0 +1,55 @@
+name: datetime_device
+category: interface
+id: 102
+license: Public Domain
+summary: The interface of datetime devices
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage:    # e.g. http://example.com/foo/bar
+
+# Required packages
+depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+
+#
+#  Type definitions
+#
+types:
+
+
+#
+#  interface definitions
+#
+interface:
+  get_date:
+    description: Returns the current date & time
+    id: 1
+    type: request
+    reply: get_date_reply
+    payloads:
+
+  get_date_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: year
+        type: uint32
+      - name: date
+        type: uint32
+        description: unused:month:day:hour:min:sec (6, 4, 5, 5, 6, 6 bits respectively)
+      - name: nsec
+        type: uint32
+        description: nano sec.

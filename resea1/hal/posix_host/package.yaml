@@ -1,0 +1,61 @@
+name: posix_host
+category: library
+license: Public Domain
+summary: The HAL library for posix_host
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: [cpp, genstartcpp, kernel]
+
+# Interfaces which this package uses
+uses: []
+
+# Interfaces which this package implements
+implements: [hal]
+
+#
+#  Type definitions
+#
+type:
+
+#
+#  Interface definitions
+#
+interface:
+
+#
+#  Config
+#
+global_config:
+  HAL_LINK:
+    default: '{{ CXX }} {{ LINKFLAGS }} -pthread -o'
+  HAL_LIBLINK:
+    default: '{{ LD }} -r -o'
+  HAL_RUN:
+    default: '{{ POSIX_HOST_DIR }}/run'
+  HAL_GENSTART:
+    default: '{{ GENSTARTCPP_DIR }}/genstartcpp'
+  HAL_START_LANG:
+    default: cpp
+  CXXFLAGS:
+    append_words: >
+      -I{{ POSIX_HOST_DIR }}/src -DPOSIX_HOST
+
+config:
+  SOURCES:
+    set:
+      - src/main.cpp
+      - src/debug.cpp
+      - src/thread.cpp
+      - src/memory.cpp
+      - src/hw.cpp
+      - src/vm.cpp
+      - src/cpu.cpp
+      - src/callback.cpp

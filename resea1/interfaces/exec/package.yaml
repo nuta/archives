@@ -1,0 +1,57 @@
+name: exec
+id: 7
+category: interface
+license: Public Domain
+summary: The interface of exec
+description:
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+#
+#  Type definitions
+#
+types:
+
+#
+#  interface definitions
+#
+interface:
+  create:
+    id: 1
+    type: request
+    reply: create_reply
+    payloads:
+      - name: name
+        type: Array<uchar>
+        attrs: [readonly]
+      - name: fs
+        type: channel
+      - name: file
+        type: id
+      - name: group
+        type: id
+  create_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: group
+        type: id
+      - name: thread
+        type: id

@@ -1,0 +1,67 @@
+name: io
+category: interface
+id: 4
+license: Public Domain
+summary:     # brief explanation
+description: # longer explanation
+
+warning:     # some important things to note
+info:        # what we should know
+
+author: Seiya Nuta
+email: nuta@seiya.me
+homepage: http://resea.net
+
+# Required packages
+depends: []
+lib_depends: []
+
+# interfaces which this package uses
+uses: []
+
+# interfaces which this package implements
+implements: []
+
+#
+#  Type definitions
+#
+types:
+  space:
+    type: const
+    size: uint8
+    consts:
+      SPACE_PORT: 1
+      SPACE_MEM:  2
+
+#
+#  interface definitions
+#
+interface:
+  allocate:
+    id: 1
+    type: request
+    reply: allocate_reply
+    payloads:
+      - name: iospace
+        type: io(space)
+      - name: addr
+        type: addr
+      - name: size
+        type: size
+  allocate_reply:
+    id: 2
+    type: reply
+    payloads:
+      - name: result
+        type: result
+      - name: addr
+        type: addr
+
+  release:
+    id: 3
+    type: request
+    payloads:
+      - name: iospace
+        type: io(space)
+      - name: addr
+        type: addr
