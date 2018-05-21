@@ -19,9 +19,9 @@ kernel_include_dirs := $(PWD) $(addprefix $(ARCH_DIR)/, $(arch_include_dirs)) \
 	build $(all_include_dirs)
 
 $(BUILD_DIR)/kernel/kfs.o: $(BUILD_DIR)/kernel/kfs.bin
-$(BUILD_DIR)/kernel/kfs.bin: $(all_kfs_files) tools/mkkfs
+$(BUILD_DIR)/kernel/kfs.bin: $(all_kfs_files) tools/mkkfs.py
 	$(PROGRESS) MKKFS $@
-	./tools/mkkfs $@ $(KFS_DIR)
+	./tools/mkkfs.py $@ $(KFS_DIR)
 
 $(BUILD_DIR)/kernel/kernel.elf: $(kernel_objs) $(ARCH_DIR)/kernel.ld
 	$(PROGRESS) "LD(K)" $@
