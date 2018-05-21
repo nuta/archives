@@ -1,0 +1,10 @@
+romimage: file=$BXSHARE/BIOS-bochs-latest
+config_interface: textconfig
+display_library: nogui
+cpu: ips=50000000
+memory: guest=512, host=256
+
+ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
+ata0-master: type=disk, mode=flat, path=/Users/seiya/dev/mbrboot/disk.img, translation=lba
+boot: disk
+magic_break: enabled=1
