@@ -113,7 +113,6 @@ x64_syscall_handler:
 .endm
 
 .macro LEAVE_RECV_SYSCALL
-    xchg bx,bx
     add rsp, 8 /* rs */
     pop rdx
     pop r8
