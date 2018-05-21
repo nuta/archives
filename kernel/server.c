@@ -129,5 +129,9 @@ void kernel_server_init(void) {
     kmutex_init(&logging_lock, KMUTEX_UNLOCKED);
 
     kernel_channel = channel_create(kernel_process);
+    if (kernel_channel == NULL) {
+        PANIC("failed to create a kernel channel");
+    }
+
     thread_resume(thread_create(kernel_process, (uptr_t) kernel_server, 0));
 }
