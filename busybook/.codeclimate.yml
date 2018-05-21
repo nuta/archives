@@ -1,0 +1,30 @@
+---
+engines:
+  brakeman:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby
+  fixme:
+    enabled: true
+  rubocop:
+    enabled: true
+  rubymotion:
+    enabled: true
+  bundler-audit:
+    enabled: true
+
+ratings:
+  paths:
+    - Gemfile.lock
+    - "**.erb"
+    - "**.rb"
+    - "**.js"
+    - "**.scss"
+
+exclude_paths:
+  - db/
+  - test/
+  - vendor/

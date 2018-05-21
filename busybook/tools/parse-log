@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+require 'csv'
+require 'time'
+
+method = ''
+path = ''
+
+while l = ARGF.gets
+  unless l.include?('-- :')
+    next
+  end
+
+  begin
+    type, rest = l.split(',', 2)
+    date, log = rest.split('-- :')
+    date = Time.parse(date.split(' ')[0].gsub(/[^0-9T:\-.]/, ''))
+    type.strip!
+    log.strip!
+    log.gsub!(/\e\[\d+m/, '')
+  rescue => e
+    # unparsable line, ignoring
+    STDERR.puts "ignoring: #{e} (#{l.strip})"
+    next
+  end
+
+  unixtime = date.to_time.to_i
+  if log =~ /^([A-Z].*) (Load|Exists) \(([0-9\.]+)ms\)/
+    table = $1
+    type = $2.upcase
+    ms = $3.to_f
+    puts [unixtime, type, ms, table].to_csv
+  elsif log =~ /SQL \(([0-9\.]+)ms\)/
+    sql = log.split('ms)  ', 2).last.split(' ', 2).first
+    ms = $1.to_f
+    puts [unixtime, 'SQL', ms, sql].to_csv
+  elsif log.start_with?('Completed')
+     _, http_status, rest = log.split(' ', 3)
+     ms = rest.scan(/ (\d+)ms /)[0][0].to_f
+     http_status = http_status.to_i
+     puts [unixtime, 'HTTP', ms, "#{method} #{path} #{http_status}"].to_csv
+  elsif log.start_with?('Started')
+     _, method, path, _ = log.split(' ', 4)
+     path.gsub!('"', '')
+  end
+end

@@ -1,0 +1,19 @@
+sqlite: &sqlite
+  adapter: sqlite3
+  database: db/test.sqlite3
+
+mysql: &mysql
+  adapter: mysql2
+  username: root
+
+postgresql: &postgresql
+  adapter: postgresql
+  username: postgres
+
+test:
+  pool: 5
+  timeout: 5000
+  host: localhost
+  password:
+  database: busybook_test
+  <<: *<%= ENV['DB'] %>

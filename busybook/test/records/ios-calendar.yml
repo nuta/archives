@@ -1,0 +1,2372 @@
+---
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    depth: '0'
+    brief: t
+    accept: "*/*"
+    connection: keep-alive
+    prefer: return=minimal
+    user_agent: iOS/9.2.1 (13D15) accountsd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:current-user-principal/>
+        <A:principal-URL/>
+        <A:resourcetype/>
+      </A:prop>
+    </A:propfind>
+  status: 401
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) accountsd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:current-user-principal/>
+        <A:principal-URL/>
+        <A:resourcetype/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) accountsd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    depth: '0'
+    brief: t
+    accept: "*/*"
+    connection: keep-alive
+    prefer: return=minimal
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 401
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    depth: '0'
+    brief: t
+    accept: "*/*"
+    connection: keep-alive
+    prefer: return=minimal
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 401
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPPATCH
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propertyupdate xmlns:A="DAV:"><A:set><A:prop><E:calendar-color xmlns:E="http://apple.com/ns/ical/" symbolic-color="green">#63DA38</E:calendar-color></A:prop></A:set></A:propertyupdate>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PUT
+  path: "/calendar/Private/B3DADA73-A92A-45AA-A3A7-028F20D8DE63.ics"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    if_none_match: "*"
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: "BEGIN:VCALENDAR\r\nCALSCALE:GREGORIAN\r\nPRODID:-//Apple Inc.//iOS 9.2.1//EN\r\nVERSION:2.0\r\nBEGIN:VTIMEZONE\r\nTZID:Asia/Tokyo\r\nBEGIN:DAYLIGHT\r\nDTSTART:19500507T020000\r\nRRULE:FREQ=YEARLY;UNTIL=19510505T170000Z;BYMONTH=5;BYDAY=1SU\r\nTZNAME:GMT+9\r\nTZOFFSETFROM:+0900\r\nTZOFFSETTO:+1000\r\nEND:DAYLIGHT\r\nBEGIN:STANDARD\r\nDTSTART:19510908T020000\r\nTZNAME:GMT+9\r\nTZOFFSETFROM:+1000\r\nTZOFFSETTO:+0900\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\nBEGIN:VEVENT\r\nCREATED:20160321T065952Z\r\nDTEND;TZID=Asia/Tokyo:20160321T160000\r\nDTSTAMP:20160321T065953Z\r\nDTSTART;TZID=Asia/Tokyo:20160321T150000\r\nLAST-MODIFIED:20160321T065952Z\r\nSEQUENCE:0\r\nSUMMARY:こんにちは\r\nTRANSP:OPAQUE\r\nUID:B3DADA73-A92A-45AA-A3A7-028F20D8DE63\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+  status: 201
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getetag/>
+        <A:getcontenttype/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: REPORT
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-multiget xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getetag/>
+        <B:calendar-data/>
+        <C:updated-by xmlns:C="http://calendarserver.org/ns/"/>
+        <C:created-by xmlns:C="http://calendarserver.org/ns/"/>
+        <B:schedule-tag/>
+      </A:prop>
+      <A:href xmlns:A="DAV:">/calendar/Private/B3DADA73-A92A-45AA-A3A7-028F20D8DE63</A:href>
+    </B:calendar-multiget>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PUT
+  path: "/calendar/Private/B3DADA73-A92A-45AA-A3A7-028F20D8DE63"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept_encoding: gzip, deflate
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    if_match: '"6fb36101df014797b3b376f91490ecc2"'
+    accept_language: en-us
+  body: "BEGIN:VCALENDAR\r\nCALSCALE:GREGORIAN\r\nPRODID:-//Apple Inc.//iOS 9.2.1//EN\r\nVERSION:2.0\r\nBEGIN:VTIMEZONE\r\nTZID:Asia/Tokyo\r\nBEGIN:DAYLIGHT\r\nDTSTART:19500507T020000\r\nRRULE:FREQ=YEARLY;UNTIL=19510505T170000Z;BYMONTH=5;BYDAY=1SU\r\nTZNAME:GMT+9\r\nTZOFFSETFROM:+0900\r\nTZOFFSETTO:+1000\r\nEND:DAYLIGHT\r\nBEGIN:STANDARD\r\nDTSTART:19510908T020000\r\nTZNAME:GMT+9\r\nTZOFFSETFROM:+1000\r\nTZOFFSETTO:+0900\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\nBEGIN:VEVENT\r\nCREATED:20160321T065952Z\r\nDTEND;TZID=Asia/Tokyo:20160321T180000\r\nDTSTAMP:20160321T070002Z\r\nDTSTART;TZID=Asia/Tokyo:20160321T170000\r\nLAST-MODIFIED:20160321T070001Z\r\nSEQUENCE:1\r\nSUMMARY:こんにちは\r\nTRANSP:OPAQUE\r\nUID:B3DADA73-A92A-45AA-A3A7-028F20D8DE63\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+  status: 201
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: REPORT
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-multiget xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getetag/>
+        <B:calendar-data/>
+        <B:schedule-tag/>
+        <C:updated-by xmlns:C="http://calendarserver.org/ns/"/>
+        <C:created-by xmlns:C="http://calendarserver.org/ns/"/>
+      </A:prop>
+      <A:href xmlns:A="DAV:">/calendar/Private/B3DADA73-A92A-45AA-A3A7-028F20D8DE63</A:href>
+    </B:calendar-multiget>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    depth: '0'
+    brief: t
+    accept: "*/*"
+    connection: keep-alive
+    prefer: return=minimal
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 401
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: MKCALENDAR
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:mkcalendar xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:set xmlns:A="DAV:">
+        <A:prop>
+          <B:calendar-timezone>BEGIN:VCALENDAR&#13;
+    VERSION:2.0&#13;
+    CALSCALE:GREGORIAN&#13;
+    BEGIN:VTIMEZONE&#13;
+    TZID:Asia/Tokyo&#13;
+    BEGIN:DAYLIGHT&#13;
+    TZOFFSETFROM:+0900&#13;
+    RRULE:FREQ=YEARLY;UNTIL=19510505T170000Z;BYMONTH=5;BYDAY=1SU&#13;
+    DTSTART:19500507T020000&#13;
+    TZNAME:GMT+9&#13;
+    TZOFFSETTO:+1000&#13;
+    END:DAYLIGHT&#13;
+    BEGIN:STANDARD&#13;
+    TZOFFSETFROM:+1000&#13;
+    DTSTART:19510908T020000&#13;
+    TZNAME:GMT+9&#13;
+    TZOFFSETTO:+0900&#13;
+    END:STANDARD&#13;
+    END:VTIMEZONE&#13;
+    END:VCALENDAR&#13;
+    </B:calendar-timezone>
+          <B:supported-calendar-component-set>
+            <B:comp name="VEVENT"/>
+          </B:supported-calendar-component-set>
+          <E:calendar-color xmlns:E="http://apple.com/ns/ical/" symbolic-color="orange">#FF9500</E:calendar-color>
+          <E:calendar-order xmlns:E="http://apple.com/ns/ical/">2</E:calendar-order>
+          <B:calendar-free-busy-set>
+            <NO/>
+          </B:calendar-free-busy-set>
+          <A:displayname>Second</A:displayname>
+        </A:prop>
+      </A:set>
+    </B:mkcalendar>
+  status: 201
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getetag/>
+        <A:getcontenttype/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: MOVE
+  path: "/calendar/Private/B3DADA73-A92A-45AA-A3A7-028F20D8DE63"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    destination: http://192.168.88.10:3000/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E/B3DADA73-A92A-45AA-A3A7-028F20D8DE63.ics
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 201
+- method: PUT
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E/B3DADA73-A92A-45AA-A3A7-028F20D8DE63.ics"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept_encoding: gzip, deflate
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    if_match: '"2a4933dd102afa13165aca148cd6d159"'
+    accept_language: en-us
+  body: "BEGIN:VCALENDAR\r\nCALSCALE:GREGORIAN\r\nPRODID:-//Apple Inc.//iOS 9.2.1//EN\r\nVERSION:2.0\r\nBEGIN:VTIMEZONE\r\nTZID:Asia/Tokyo\r\nBEGIN:DAYLIGHT\r\nDTSTART:19500507T020000\r\nRRULE:FREQ=YEARLY;UNTIL=19510505T170000Z;BYMONTH=5;BYDAY=1SU\r\nTZNAME:GMT+9\r\nTZOFFSETFROM:+0900\r\nTZOFFSETTO:+1000\r\nEND:DAYLIGHT\r\nBEGIN:STANDARD\r\nDTSTART:19510908T020000\r\nTZNAME:GMT+9\r\nTZOFFSETFROM:+1000\r\nTZOFFSETTO:+0900\r\nEND:STANDARD\r\nEND:VTIMEZONE\r\nBEGIN:VEVENT\r\nCREATED:20160321T065952Z\r\nDTEND;TZID=Asia/Tokyo:20160321T180000\r\nDTSTAMP:20160321T070039Z\r\nDTSTART;TZID=Asia/Tokyo:20160321T170000\r\nLAST-MODIFIED:20160321T070039Z\r\nSEQUENCE:1\r\nSUMMARY:こんにちは\r\nTRANSP:OPAQUE\r\nUID:B3DADA73-A92A-45AA-A3A7-028F20D8DE63\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+  status: 201
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getetag/>
+        <A:getcontenttype/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: REPORT
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-multiget xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getetag/>
+        <B:calendar-data/>
+        <B:schedule-tag/>
+        <C:updated-by xmlns:C="http://calendarserver.org/ns/"/>
+        <C:created-by xmlns:C="http://calendarserver.org/ns/"/>
+      </A:prop>
+      <A:href xmlns:A="DAV:">/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E/B3DADA73-A92A-45AA-A3A7-028F20D8DE63</A:href>
+    </B:calendar-multiget>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: DELETE
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E/B3DADA73-A92A-45AA-A3A7-028F20D8DE63"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 204
+- method: PROPFIND
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <B:calendar-home-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-user-address-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-principal/>
+        <A:displayname/>
+        <C:dropbox-home-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <C:email-address-set xmlns:C="http://calendarserver.org/ns/"/>
+        <C:notification-URL xmlns:C="http://calendarserver.org/ns/"/>
+        <A:principal-collection-set/>
+        <A:principal-URL/>
+        <A:resource-id/>
+        <B:schedule-inbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-outbox-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: OPTIONS
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 200
+- method: DELETE
+  path: "/calendar/E8508F9C-5EDB-4EDB-BA57-7381389A253E"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    authorization: Basic Z3Vlc3Q6MTIz
+    connection: keep-alive
+    accept: "*/*"
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+  body: ''
+  status: 204
+- method: PROPFIND
+  path: "/calendar"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:add-member/>
+        <C:allowed-sharing-modes xmlns:C="http://calendarserver.org/ns/"/>
+        <E:autoprovisioned xmlns:E="http://apple.com/ns/ical/"/>
+        <F:bulk-requests xmlns:F="http://me.com/_namespace/"/>
+        <B:calendar-alarm xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-color xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-description xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:calendar-free-busy-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <E:calendar-order xmlns:E="http://apple.com/ns/ical/"/>
+        <B:calendar-timezone xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:current-user-privilege-set/>
+        <B:default-alarm-vevent-date xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:default-alarm-vevent-datetime xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:displayname/>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <E:language-code xmlns:E="http://apple.com/ns/ical/"/>
+        <E:location-code xmlns:E="http://apple.com/ns/ical/"/>
+        <A:owner/>
+        <C:pre-publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:publish-url xmlns:C="http://calendarserver.org/ns/"/>
+        <C:push-transports xmlns:C="http://calendarserver.org/ns/"/>
+        <C:pushkey xmlns:C="http://calendarserver.org/ns/"/>
+        <A:quota-available-bytes/>
+        <A:quota-used-bytes/>
+        <E:refreshrate xmlns:E="http://apple.com/ns/ical/"/>
+        <A:resource-id/>
+        <A:resourcetype/>
+        <B:schedule-calendar-transp xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:schedule-default-calendar-URL xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <C:source xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-alarms xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-attachments xmlns:C="http://calendarserver.org/ns/"/>
+        <C:subscribed-strip-todos xmlns:C="http://calendarserver.org/ns/"/>
+        <B:supported-calendar-component-set xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <B:supported-calendar-component-sets xmlns:B="urn:ietf:params:xml:ns:caldav"/>
+        <A:supported-report-set/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '0'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <C:getctag xmlns:C="http://calendarserver.org/ns/"/>
+        <A:sync-token/>
+      </A:prop>
+    </A:propfind>
+  status: 207
+- method: REPORT
+  path: "/calendar/Private"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <B:calendar-query xmlns:B="urn:ietf:params:xml:ns:caldav">
+      <A:prop xmlns:A="DAV:">
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+      <B:filter>
+        <B:comp-filter name="VCALENDAR">
+          <B:comp-filter name="VEVENT">
+            <B:time-range start="20160219T000000Z"/>
+          </B:comp-filter>
+        </B:comp-filter>
+      </B:filter>
+    </B:calendar-query>
+  status: 207
+- method: PROPFIND
+  path: "/calendar/ToDo"
+  headers:
+    version: HTTP/1.1
+    host: 192.168.88.10:3000
+    accept: "*/*"
+    brief: t
+    authorization: Basic Z3Vlc3Q6MTIz
+    accept_language: en-us
+    accept_encoding: gzip, deflate
+    depth: '1'
+    connection: keep-alive
+    user_agent: iOS/9.2.1 (13D15) dataaccessd/1.0
+    prefer: return=minimal
+  body: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <A:propfind xmlns:A="DAV:">
+      <A:prop>
+        <A:getcontenttype/>
+        <A:getetag/>
+      </A:prop>
+    </A:propfind>
+  status: 207

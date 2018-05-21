@@ -1,0 +1,34 @@
+language: ruby
+services:
+  - postgresql
+  - mysql
+
+rvm:
+  - 2.4.1
+  - 2.3.1
+  - 2.2.5
+
+cache:
+  directories:
+    - vendor/bundle
+
+env:
+  - DB=sqlite
+  - DB=postgresql
+  - DB=mysql
+
+install:
+  - cp travis/database.yml config/database.yml
+  - echo -e "[server]\ncharacter-set-server=utf8" | sudo tee -a /etc/mysql/my.cnf
+  - sudo service mysql restart
+  - mysql -e 'create database busybook_test'
+  - psql -c 'create database busybook_test' -U postgres
+  - bundle install --jobs 4 --path vendor/bundle
+  - bundle exec rake db:migrate
+  - bundle exec rake user:add username=guest password=123
+
+script:
+  - ./travis/script.sh
+
+after_script:
+  - bundle exec codeclimate-test-reporter

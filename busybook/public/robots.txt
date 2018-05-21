@@ -1,0 +1,3 @@
+# Hello bot. I am not a web server.
+User-agent: *
+Disallow: /
