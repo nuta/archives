@@ -28,6 +28,8 @@ typedef unsigned char bool;
 #define atomic_fetch_and_sub  __sync_fetch_and_sub
 #define offsetof __builtin_offsetof
 #define va_list __builtin_va_list
+#define likely(expr)   __builtin_expect(!!(expr), 1)
+#define unlikely(expr) __builtin_expect(!!(expr), 0)
 #define va_start(ap, param) __builtin_va_start(ap, param)
 #define va_end(ap) __builtin_va_end(ap)
 #define va_arg(ap, type) __builtin_va_arg(ap, type)

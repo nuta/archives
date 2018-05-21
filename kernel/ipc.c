@@ -162,7 +162,7 @@ header_t sys_call(
     payload_t *rs
 ) {
     header_t error = sys_send(ch, type, a0, a1, a2, a3);
-    if (error != ERROR_NONE) {
+    if (unlikely(error != ERROR_NONE)) {
         return error;
     }
 
@@ -180,12 +180,12 @@ header_t sys_replyrecv(
     payload_t *rs
 ) {
     header_t error = sys_send(client, type, r0, r1, r2, r3);
-    if (error != ERROR_NONE) {
+    if (unlikely(error != ERROR_NONE)) {
         return error;
     }
 
     struct channel *server = get_channel_by_id(client)->transfer_to;
-    if (!server) {
+    if (unlikely(!server)) {
         return ERROR_CH_NOT_TRANSFERED;
     }
 
@@ -202,13 +202,13 @@ static header_t sys_send_slowpath(
     payload_t a3
 ) {
     struct channel *src = get_channel_by_id(ch);
-    if (!src) {
+    if (unlikely(!src)) {
         DEBUG("sys_send: @%d no such channel", ch);
         return ERROR_INVALID_CH;
     }
 
     struct channel *linked_to = src->linked_to;
-    if (!linked_to) {
+    if (unlikely(!linked_to)) {
         DEBUG("sys_send: @%d not linked", ch);
         return ERROR_CH_NOT_LINKED;
     }
@@ -224,12 +224,12 @@ static header_t sys_send_slowpath(
 
     // Get the sender right.
     while (true) {
-        if (dst->sender == current_thread) {
+        if (likely(dst->sender == current_thread)) {
             // We've already got a sender right in sys_send.
             break;
         }
 
-        if (atomic_compare_and_swap(&dst->sender, NULL, current_thread)) {
+        if (likely(atomic_compare_and_swap(&dst->sender, NULL, current_thread))) {
             // Now we have a sender right (dst->sender == current_thread).
             break;
         }
@@ -246,7 +246,7 @@ static header_t sys_send_slowpath(
     }
 
     // Wait for the receiver.
-    if (!dst->receiver) {
+    if (likely(!dst->receiver)) {
         thread_block_current();
     }
 
@@ -277,13 +277,14 @@ header_t sys_send(
     struct channel *src, *dst, *linked_to;
     struct thread *receiver;
 
-    if ((type & 0xfff) != 0 /* Are all payloads inlined? */
-        || (src = get_channel_by_id(ch)) == NULL
-        || (linked_to = src->linked_to) == NULL
-        || (dst = (linked_to->transfer_to ?: linked_to)) == NULL
-        || !atomic_compare_and_swap(&dst->sender, NULL, CPUVAR->current)
-        || (receiver = dst->receiver) == NULL) {
+    bool slowpath =  ((type & 0xfff) != 0 /* Are all payloads inlined? */
+                  || (src = get_channel_by_id(ch)) == NULL
+                  || (linked_to = src->linked_to) == NULL
+                  || (dst = (linked_to->transfer_to ?: linked_to)) == NULL
+                  || !atomic_compare_and_swap(&dst->sender, NULL, CPUVAR->current)
+                  || (receiver = dst->receiver) == NULL);
 
+    if (unlikely(slowpath)) {
         return sys_send_slowpath(ch, type, a0, a1, a2, a3);
     }
 
@@ -311,20 +312,20 @@ header_t sys_recv(
     payload_t *rs
 ) {
     struct channel *src = get_channel_by_id(ch);
-    if (!src) {
+    if (unlikely(!src)) {
         DEBUG("sys_recv: @%d no such channel", ch);
         return ERROR_INVALID_CH;
     }
 
     // Try to get the receiver right.
     struct thread *current_thread = CPUVAR->current;
-    if (!atomic_compare_and_swap(&src->receiver, NULL, current_thread)) {
+    if (unlikely(!atomic_compare_and_swap(&src->receiver, NULL, current_thread))) {
         return ERROR_CH_IN_USE;
     }
 
     // Wait for the sender.
     // Resume a thread in the wait queue.
-    if (src->sender) {
+    if (likely(src->sender)) {
         // The sender waits for us. Resume it and wait for it.
         thread_resume(src->sender);
     } else {
