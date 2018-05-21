@@ -14,7 +14,9 @@ paddr_t alloc_pages(size_t size, UNUSED int flags) {
     allocated += size;
 
     // XXX: The page could be not mapped.
-    memset(from_paddr(addr), 0, size);
+    if (flags & KMALLOC_ZEROED) {
+        memset(from_paddr(addr), 0, size);
+    }
 
     used += size;
 //    DEBUG("kernel: allocated %d bytes at %p (%dKB used)",
