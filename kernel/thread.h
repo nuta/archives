@@ -2,6 +2,7 @@
 #define __THREAD_H__
 
 #include <kernel/types.h>
+#include "ipc.h"
 #include "cpu.h"
 #include "list.h"
 
@@ -11,6 +12,11 @@ typedef u32_t tid_t;
 #define THREAD_BLOCKED 2
 #define KERNEL_STACK_SIZE 8192
 
+struct runqueue {
+    struct runqueue *next;
+    struct thread *thread;
+};
+
 struct process;
 struct thread {
     struct thread *next;
@@ -19,11 +25,8 @@ struct thread {
     tid_t tid;
     struct arch_thread arch;
     int resumed_count; /* runnable if resumed_count > 0 */
-};
-
-struct runqueue {
-    struct runqueue *next;
-    struct thread *thread;
+    struct runqueue rq;
+    struct msg buffer;
 };
 
 DEFINE_LIST(thread, struct thread)

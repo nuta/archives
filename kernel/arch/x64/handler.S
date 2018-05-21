@@ -101,18 +101,18 @@ x64_syscall_handler:
     push r11 /* user RFLAGS */
     push rcx /* user RIP */
     xchg rcx, r10
-
-    sub rsp, 8 * 5 /* recvfrom, r0, r1, r2, and r3 */
-    push rsp
 .endm
 
 .macro LEAVE_RECV_SYSCALL
-    add rsp, 8 /* rs */
-    pop rdx
-    pop r8
-    pop r9
-    pop r10
-    pop rsi
+    cmp rax, 0
+    jb 1f
+    mov rdx, [rax + 8]
+    mov r8,  [rax + 16]
+    mov r9,  [rax + 24]
+    mov r10, [rax + 32]
+    mov rsi, [rax + 40]
+    mov rax, [rax]
+1:
     jmp return_from_syscall
 .endm
 
@@ -140,25 +140,30 @@ ipc_recv_handler:
     push r11 /* user RFLAGS */
     push rcx /* user RIP */
     xchg rcx, r10
-
-    sub rsp, 8 * 5 /* recvfrom, r0, r1, r2, and r3 */
-    mov rsi, rsp
     call sys_recv
-    pop rdx
-    pop r8
-    pop r9
-    pop r10
-    pop rsi
+    cmp rax, 0
+    jb 1f
+    mov rdx, [rax + 8]
+    mov r8,  [rax + 16]
+    mov r9,  [rax + 24]
+    mov r10, [rax + 32]
+    mov rsi, [rax + 40]
+    mov rax, [rax]
+1:
     jmp return_from_syscall
 
 ipc_call_handler:
     ENTER_RECV_SYSCALL
     call sys_call
-    add rsp, 16 /* rs and recvfrom */
-    pop rdx
-    pop r8
-    pop r9
-    pop r10
+    cmp rax, 0
+    jb 1f
+    mov rdx, [rax + 16]
+    mov r8,  [rax + 24]
+    mov r9,  [rax + 32]
+    mov r10, [rax + 40]
+    mov rsi, [rax + 48]
+    mov rax, [rax]
+1:
     jmp return_from_syscall
 /*    LEAVE_RECV_SYSCALL */
 

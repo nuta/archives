@@ -2,7 +2,7 @@
 #define __IPC_H__
 
 #include <kernel/types.h>
-#include "thread.h"
+#include "list.h"
 
 typedef umax_t channel_t;
 typedef umax_t header_t;
@@ -41,6 +41,8 @@ enum {
 
     /* Internally used in the server. */
     ERROR_DONT_REPLY = 255,
+
+    /* The maximum error number must be less than NULL_PAGE_SIZE. */
 };
 
 struct waitqueue {
@@ -50,6 +52,13 @@ struct waitqueue {
 
 DEFINE_LIST(waitqueue, struct waitqueue)
 
+struct msg {
+    header_t header;
+    channel_t sent_from;
+    payload_t payloads[4];
+};
+
+struct thread;
 struct channel {
     int flags;
     channel_t cid;
@@ -59,7 +68,6 @@ struct channel {
     struct thread *receiver;
     struct thread *sender;
     struct waitqueue *wq;
-    payload_t sent_from, header, buffer[5];
 };
 
 struct channel *channel_create(struct process *process);
@@ -74,29 +82,26 @@ header_t sys_send(
     payload_t a3
 );
 
-header_t sys_recv(
-    channel_t ch,
-    payload_t *rs
+struct msg *sys_recv(
+    channel_t ch
 );
 
-header_t sys_call(
+struct msg *sys_call(
     channel_t ch,
     header_t type,
     payload_t a0,
     payload_t a1,
     payload_t a2,
-    payload_t a3,
-    payload_t *rs
+    payload_t a3
 );
 
-header_t sys_replyrecv(
+struct msg *sys_replyrecv(
     channel_t client,
     header_t type,
     payload_t r0,
     payload_t r1,
     payload_t r2,
-    payload_t r3,
-    channel_t *rs
+    payload_t r3
 );
 
 channel_t sys_connect(channel_t server);
@@ -109,14 +114,17 @@ static inline header_t ipc_recv(
     payload_t *a2,
     payload_t *a3
 ) {
-    payload_t rs[5];
-    header_t header = sys_recv(ch, (payload_t *) &rs);
-    *from = rs[0];
-    *a0 = rs[1];
-    *a1 = rs[2];
-    *a2 = rs[3];
-    *a3 = rs[4];
-    return header;
+    struct msg *msg = sys_recv(ch);
+    if (IS_ERROR_PTR(msg)) {
+        return ERROR_FROM_PTR(msg);
+    }
+
+    *from = msg->sent_from;
+    *a0 = msg->payloads[0];
+    *a1 = msg->payloads[1];
+    *a2 = msg->payloads[2];
+    *a3 = msg->payloads[3];
+    return msg->header;
 }
 
 static inline header_t ipc_send(
@@ -142,13 +150,16 @@ static inline header_t ipc_call(
     payload_t *r2,
     payload_t *r3
 ) {
-    payload_t rs[5];
-    header_t header = sys_call(ch, type, a0, a1, a2, a3, (payload_t *) &rs);
-    *r0 = rs[1];
-    *r1 = rs[2];
-    *r2 = rs[3];
-    *r3 = rs[4];
-    return header;
+    struct msg *msg = sys_call(ch, type, a0, a1, a2, a3);
+    if (IS_ERROR_PTR(msg)) {
+        return ERROR_FROM_PTR(msg);
+    }
+
+    *r0 = msg->payloads[0];
+    *r1 = msg->payloads[1];
+    *r2 = msg->payloads[2];
+    *r3 = msg->payloads[3];
+    return msg->header;
 }
 
 static inline header_t ipc_replyrecv(
@@ -163,14 +174,17 @@ static inline header_t ipc_replyrecv(
     payload_t *a2,
     payload_t *a3
 ) {
-    payload_t rs[5];
-    header_t header = sys_replyrecv(*client, type, r0, r1, r2, r3, (payload_t *) &rs);
-    *client = rs[0];
-    *a0 = rs[1];
-    *a1 = rs[2];
-    *a2 = rs[3];
-    *a3 = rs[4];
-    return header;
+    struct msg *msg = sys_replyrecv(*client, type, r0, r1, r2, r3);
+    if (IS_ERROR_PTR(msg)) {
+        return ERROR_FROM_PTR(msg);
+    }
+
+    *client = msg->sent_from;
+    *a0 = msg->payloads[0];
+    *a1 = msg->payloads[1];
+    *a2 = msg->payloads[2];
+    *a3 = msg->payloads[3];
+    return msg->header;
 }
 
 static inline channel_t ipc_connect(channel_t server) {

@@ -44,6 +44,13 @@ typedef unsigned char bool;
 typedef umax_t size_t;
 typedef umax_t off_t;
 
+// 0 - NULL_PAGE_SIZE are not allocated for both kernel and user. Pointers points
+// to the range as invalid.
+#define NULL_PAGE_SIZE (0x1000)
+#define ERROR_PTR(error) ((void *) (error))
+#define IS_ERROR_PTR(ptr) ((uptr_t) (ptr) < NULL_PAGE_SIZE)
+#define ERROR_FROM_PTR(ptr) ((int) (ptr))
+
 void arch_init(void);
 void arch_early_init(void);
 void arch_putchar(char ch);

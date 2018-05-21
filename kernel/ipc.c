@@ -152,55 +152,37 @@ void sys_close(channel_t ch) {
 }
 
 
-header_t sys_call(
-    channel_t ch,
-    header_t type,
-    payload_t a0,
-    payload_t a1,
-    payload_t a2,
-    payload_t a3,
-    payload_t *rs
-) {
+struct msg *sys_call(channel_t ch, header_t type, payload_t a0,
+                     payload_t a1, payload_t a2, payload_t a3) {
+
     header_t error = sys_send(ch, type, a0, a1, a2, a3);
     if (unlikely(error != ERROR_NONE)) {
-        return error;
+        return ERROR_PTR(error);
     }
 
-    return sys_recv(ch, rs);
+    return sys_recv(ch);
 }
 
 
-header_t sys_replyrecv(
-    channel_t client,
-    header_t type,
-    payload_t r0,
-    payload_t r1,
-    payload_t r2,
-    payload_t r3,
-    payload_t *rs
-) {
+struct msg *sys_replyrecv(channel_t client, header_t type, payload_t r0,
+                          payload_t r1, payload_t r2, payload_t r3) {
+
     header_t error = sys_send(client, type, r0, r1, r2, r3);
     if (unlikely(error != ERROR_NONE)) {
-        return error;
+        return ERROR_PTR(error);
     }
 
     struct channel *server = get_channel_by_id(client)->transfer_to;
     if (unlikely(!server)) {
-        return ERROR_CH_NOT_TRANSFERED;
+        return ERROR_PTR(ERROR_CH_NOT_TRANSFERED);
     }
 
-    return sys_recv(server->cid, rs);
+    return sys_recv(server->cid);
 }
 
 
-static header_t sys_send_slowpath(
-    channel_t ch,
-    header_t type,
-    payload_t a0,
-    payload_t a1,
-    payload_t a2,
-    payload_t a3
-) {
+static header_t sys_send_slowpath(channel_t ch, header_t type, payload_t a0,
+                                  payload_t a1, payload_t a2, payload_t a3) {
     struct channel *src = get_channel_by_id(ch);
     if (unlikely(!src)) {
         DEBUG("sys_send: @%d no such channel", ch);
@@ -253,26 +235,21 @@ static header_t sys_send_slowpath(
     // Copy payloads.
     struct process *src_process = CPUVAR->current->process;
     struct process *dst_process = dst->process;
-    dst->header = type;
-    dst->sent_from = linked_to->cid;
-    dst->buffer[0] = copy_payload(PAYLOAD_TYPE(type, 0), src_process, dst_process, a0, a1);
-    dst->buffer[1] = copy_payload(PAYLOAD_TYPE(type, 1), src_process, dst_process, a1, a2);
-    dst->buffer[2] = copy_payload(PAYLOAD_TYPE(type, 2), src_process, dst_process, a2, a3);
-    dst->buffer[3] = copy_payload(PAYLOAD_TYPE(type, 3), src_process, dst_process, a3, 0);
+    struct thread *receiver = dst->receiver;
+    receiver->buffer.header = type;
+    receiver->buffer.sent_from = linked_to->cid;
+    receiver->buffer.payloads[0] = copy_payload(PAYLOAD_TYPE(type, 0), src_process, dst_process, a0, a1);
+    receiver->buffer.payloads[1] = copy_payload(PAYLOAD_TYPE(type, 1), src_process, dst_process, a1, a2);
+    receiver->buffer.payloads[2] = copy_payload(PAYLOAD_TYPE(type, 2), src_process, dst_process, a2, a3);
+    receiver->buffer.payloads[3] = copy_payload(PAYLOAD_TYPE(type, 3), src_process, dst_process, a3, 0);
 
     thread_resume(dst->receiver);
     return ERROR_NONE;
 }
 
 
-header_t sys_send(
-    channel_t ch,
-    header_t type,
-    payload_t a0,
-    payload_t a1,
-    payload_t a2,
-    payload_t a3
-) {
+header_t sys_send(channel_t ch, header_t type, payload_t a0, payload_t a1,
+                  payload_t a2, payload_t a3) {
     // Get the sender right.
     struct channel *src, *dst, *linked_to;
     struct thread *receiver;
@@ -295,32 +272,29 @@ header_t sys_send(
         MSG_SERVICE_ID(type), MSG_ID(type));
 
     // Copy payloads.
-    dst->header = type;
-    dst->sent_from = linked_to->cid;
-    dst->buffer[0] = a0;
-    dst->buffer[1] = a1;
-    dst->buffer[2] = a2;
-    dst->buffer[3] = a3;
+    receiver->buffer.header = type;
+    receiver->buffer.sent_from = linked_to->cid;
+    receiver->buffer.payloads[0] = a0;
+    receiver->buffer.payloads[1] = a1;
+    receiver->buffer.payloads[2] = a2;
+    receiver->buffer.payloads[3] = a3;
 
     thread_resume(receiver);
     return ERROR_NONE;
 }
 
 
-header_t sys_recv(
-    channel_t ch,
-    payload_t *rs
-) {
+struct msg *sys_recv(channel_t ch) {
     struct channel *src = get_channel_by_id(ch);
     if (unlikely(!src)) {
         DEBUG("sys_recv: @%d no such channel", ch);
-        return ERROR_INVALID_CH;
+        return ERROR_PTR(ERROR_INVALID_CH);
     }
 
     // Try to get the receiver right.
     struct thread *current_thread = CPUVAR->current;
     if (unlikely(!atomic_compare_and_swap(&src->receiver, NULL, current_thread))) {
-        return ERROR_CH_IN_USE;
+        return ERROR_PTR(ERROR_CH_IN_USE);
     }
 
     // Wait for the sender.
@@ -333,23 +307,16 @@ header_t sys_recv(
         if (wq) {
             thread_resume(wq->thread);
             kfree(wq);
-        } else {
         }
     }
 
     thread_block_current();
 
     // Receiver sent a reply message and resumed the sender thread. Do recv
-    // work.
-    header_t reply_header = src->header;
-    rs[0] = src->sent_from;
-    rs[1] = src->buffer[0];
-    rs[2] = src->buffer[1];
-    rs[3] = src->buffer[2];
-    rs[4] = src->buffer[3];
+    // work. Release sender/receiver rights and return the receiver message.
     src->receiver = NULL;
     src->sender = NULL;
-    return reply_header;
+    return &current_thread->buffer;
 }
 
 

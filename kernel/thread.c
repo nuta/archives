@@ -35,6 +35,8 @@ struct thread *thread_create(struct process *process, uptr_t start, uptr_t arg) 
     thread->tid = allocate_tid();
     thread->flags = THREAD_BLOCKED;
     thread->resumed_count = 0;
+    thread->rq.thread = thread;
+
     arch_create_thread(&thread->arch, is_kernel_thread,
         start, arg, stack, stack_size);
     thread_list_append(&process->threads, thread);
@@ -92,11 +94,8 @@ void thread_resume(struct thread *thread) {
     int prev = atomic_fetch_and_add(&thread->resumed_count, 1);
     if (prev == 0) {
         thread->flags = (thread->flags & ~3) | THREAD_RUNNABLE;
-        struct runqueue *rq = kmalloc(sizeof(*rq), KMALLOC_NORMAL);
-        rq->thread = thread;
-
         kmutex_state_t state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
-        runqueue_list_append(&CPUVAR->runqueue, rq);
+        runqueue_list_append(&CPUVAR->runqueue, &thread->rq);
         kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, state);
     }
 }
