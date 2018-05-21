@@ -71,16 +71,10 @@ x64_syscall_handler:
      *  R10: 4th arugment
      *  R11: user RFLAGS
      *
-     *  Scraches R15
-     *
      */
-    xchg r15, rax
-    and r15, 0x0f
-    shl r15, 3    /* rax *= 8 */
-    movabs rax, syscall_table_addr
-    add r15, rax
-    xchg r15, rax
-    xor r15, r15 /* sanitize not to leak the syscall_table location to user */
+    and rax, 0x0f
+    shl rax, 3
+    add rax, [rip + syscall_table_addr]
     jmp [rax]
 
 .macro ENTER_NORMAL_SYSCALL

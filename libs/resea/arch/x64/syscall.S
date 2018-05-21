@@ -3,20 +3,16 @@
 /* channel_t ipc_open(void) */
 .globl ipc_open
 ipc_open:
-    push r15
     mov rax, 1
     syscall
-    pop r15
     ret
 
 
 /* void ipc_close(channel_t ch) */
 .globl ipc_close
 ipc_close:
-    push r15
     mov rax, 2
     syscall
-    pop r15
     ret
 
 
@@ -46,7 +42,6 @@ ipc_send:
  */
  .globl ipc_recv
 ipc_recv:
-    push r15
     push r9
     push r8
     push rcx
@@ -65,7 +60,6 @@ ipc_recv:
     mov [rdi], r10
     pop rdi
     mov [rdi], rsi
-    pop r15
     ret
 
 /*
@@ -84,20 +78,18 @@ ipc_recv:
  */
 .globl ipc_call
 ipc_call:
-    push r15
     xchg rcx, r10
     mov rax, 5
     syscall
 
-    mov rdi, [rsp + 16]
+    mov rdi, [rsp + 8]
     mov [rdi], rdx
-    mov rdi, [rsp + 24]
+    mov rdi, [rsp + 16]
     mov [rdi], r8
-    mov rdi, [rsp + 32]
+    mov rdi, [rsp + 24]
     mov [rdi], r9
-    mov rdi, [rsp + 40]
+    mov rdi, [rsp + 32]
     mov [rdi], r10
-    pop r15
     ret
 
 /*
@@ -116,7 +108,6 @@ ipc_call:
  */
  .globl ipc_replyrecv
 ipc_replyrecv:
-    push r15
     push rdi
     mov rdi, [rdi]
     xchg rcx, r10
@@ -125,15 +116,14 @@ ipc_replyrecv:
 
     pop rdi
     mov [rdi], rdx
-    mov rdx, [rsp + 16]
+    mov rdx, [rsp + 8]
     mov [rdx], r8
-    mov rdx, [rsp + 24]
+    mov rdx, [rsp + 16]
     mov [rdx], r9
-    mov rdx, [rsp + 32]
+    mov rdx, [rsp + 24]
     mov [rdx], r10
-    mov rdx, [rsp + 40]
+    mov rdx, [rsp + 32]
     mov [rdx], rsi
-    pop r15
     ret
 
 /* header_t ipc_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t ool3); */
