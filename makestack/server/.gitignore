@@ -1,0 +1,12 @@
+/config/settings.production.yml
+/ui/config.js
+/ui/config.json
+/.bundle
+/.secrets
+/vendor
+/db/*.sqlite3
+/tmp/pids
+/tmp/cache
+/public/index.html
+/public/app.*.js
+/public/vendor.*.js

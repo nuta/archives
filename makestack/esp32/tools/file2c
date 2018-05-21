@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+const fs = require('fs')
+
+const data = fs.readFileSync('/dev/stdin')
+const bytes = Array.from(data.values()).map(c => {
+    if (0x20 <= c && c < 0x80) {
+        return (([0x27, 0x5c].includes(c)) ? "'\\" : "'") + String.fromCharCode(c) + "'"
+    } else {
+        return '0x' + c.toString(16)
+    }
+})
+
+console.log(`
+unsigned char ${process.argv[2]}[] = {
+    ${bytes.join(', ')}
+};
+`)

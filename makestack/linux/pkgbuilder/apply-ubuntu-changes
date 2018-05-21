@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+const repositories = [
+  {
+    arch: 'x64',
+    baseUrl: 'http://us.archive.ubuntu.com/ubuntu/',
+    packagesUrl: 'http://us.archive.ubuntu.com/ubuntu/dists/xenial/main/binary-amd64/Packages.xz'
+  },
+  {
+    arch: 'armhf',
+    baseUrl: 'http://ports.ubuntu.com/ubuntu-ports/',
+    packagesUrl: 'http://ports.ubuntu.com/ubuntu-ports/dists/xenial/main/binary-armhf/Packages.xz'
+  }
+]
+
+const targetPackages = [
+  'apparmor', 'libc6', 'libgcc1', 'libstdc++6'
+]
+
+const fs = require('fs')
+const path = require('path')
+const { spawnSync } = require('child_process')
+
+function parsePackagesFile(baseUrl, packageFile) {
+  const packages = {}
+
+  for (const packageSection of packageFile.split('\n\n')) {
+    let packageName, version, url, sha256
+    for (const line of packageSection.split('\n')) {
+      const [attr, value] = line.split(': ', 2)
+      switch (attr) {
+        case 'Package':
+          packageName = value
+          break
+        case 'Version':
+          version = value
+          break
+        case 'Filename':
+          url = baseUrl + value
+          break
+        case 'SHA256':
+          sha256 = value
+          break
+      }
+
+      if (targetPackages.includes(packageName)) {
+        packages[packageName] = { version, url, sha256 }
+      }
+    }
+  }
+
+  return packages
+}
+
+function main() {
+  const packagesJsonPath = path.resolve(__dirname, '../packages/ubuntu-packages.json')
+  const originalPackagesJson = fs.readFileSync(packagesJsonPath, { encoding: 'utf-8' })
+
+  const packagesJson = {}
+  for (const { baseUrl, packagesUrl, arch } of repositories) {
+    console.log(`Downloading a package database from ${packagesUrl}`)
+    const packagesFile = spawnSync(
+      'sh', ['-c', `curl ${packagesUrl} | xz -d -`],
+      { encoding: 'utf-8' }
+    ).stdout
+
+    console.log('Parsing the database...')
+    packagesJson[arch] = parsePackagesFile(baseUrl, packagesFile)
+  }
+
+
+  console.log('Writing to ubuntu-packages.json')
+  fs.writeFileSync(
+    path.resolve(__dirname, '../packages/ubuntu-packages.json'),
+    JSON.stringify(packagesJson, null, 2)
+  )
+
+  const cp = spawnSync('diff', ['-u', '-', packagesJsonPath], {
+    stdio: ['pipe', 'inherit', 'inherit'],
+    input: originalPackagesJson
+  })
+
+  if (cp.status !== 0) {
+    console.log('New versions detected!')
+    process.exit(1)
+  } else {
+    console.log('ubuntu-packages.json is up-to-date.')
+  }
+}
+
+main()

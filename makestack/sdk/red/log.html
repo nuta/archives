@@ -1,0 +1,29 @@
+<script type="text/javascript">
+RED.nodes.registerType('log', {
+  category: 'output',
+  color: '#88aa80',
+  defaults: {
+    name: { value: '' },
+  },
+  icon: 'debug.png',
+  inputs: 1,
+  outputs: 0,
+  label() {
+     return this.name || 'debug'
+  }
+})
+</script>
+
+<script type="text/x-red" data-template-name="log">
+<div class="form-row">
+  <label for="node-input-name">
+    <i class="icon-tag"></i>
+    Name
+  </label>
+  <input type="text" id="node-input-name" placeholder="Name">
+</div>
+</script>
+
+<script type="text/x-red" data-help-name="log">
+<p>Sends a log message.</p>
+</script>

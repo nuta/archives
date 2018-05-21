@@ -1,0 +1,57 @@
+---
+title: Change Log
+---
+
+- v0.5.0
+  - Experimental support for ESP-32
+  - server: fix some bugs
+- v0.4.2
+  - Fix desktop build.
+- v0.4.1
+  - Fix some UI bugs.
+- v0.4.0
+  - Fix desktop app build.
+- v0.3.3
+  - Bug fixes.
+- v0.3.2
+  - linux: update libstc++
+- v0.3.1
+  - Fix Travis CI automated deploy.
+- v0.3.0
+  - Bunch of bug fixes and improvements. MakeStack is now ready for use!
+- v0.2.4
+  - A release for testing OS installer
+  - Improve UI
+- v0.2.3
+  - Fix Supervisor package published to npm
+- v0.2.2
+  - Simpler, neater, better UI
+  - Desktop app
+  - Breaking changes to SMMS Protocol
+- v0.2.1
+  - Remove `app.yaml`
+  - **SDK:** `add-plugin` command
+- v0.2.0
+  - Breaking changes to the plugin system: plugins are no longer built as a
+    `*.plugin.zip` file. Instead, they are now pure npm packages.
+  - Official plugins are bundled in the os image (in `/lib/node`).
+  - Add documentation.
+  - New plugin: homekit
+  - **webui:** Introdue Monaco Editor
+  - **sdk:** Remove/replace some commands
+- v0.1.1
+  - apps now have to `require('makestack')` to use APIs
+  - rename Store to Config
+- v0.1.0
+  - linux: support Raspberry Pi 3 built-in Wi-Fi chip
+  - add makestack.github.io website files
+  - sdk: add new/new-plugin command
+  - migrate some components to TypeScript
+  - bunch of bug fixes and improvements
+- v0.0.2
+  - Node.js runtime: support Serial and SPI API
+  - linux: use UEFI in x86_64 target
+  - experimental remote REPL support
+  - fixes server bugs
+- v0.0.1
+  - The very first (yet unstable) release. Hello World!

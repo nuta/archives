@@ -1,0 +1,283 @@
+os: linux
+dist: trusty
+sudo: false
+
+env:
+  global:
+    - secure: "NGI9TLs1QtrzbUN2WOQz7Xl4+d7M3ahEjJ4xl1lJIogHXugZFrgNwL6PW+ROYwDpg1NAdX5B7qinwQuqXs/wL6FFJ+pGNZqWB7g2CqmZ2/OhnXKpm08De7DmAmIoGI0vCOMvx5//8sPnGJFJDQJduY9VYZMJjCVGJGndxl81tNBsipXSvZzV7jREFz3VdKvrf1L6xRJfpMEVr4aIN821J9Vj/mY+iJsTB+w0CZ++Z2S1WwLuzUxkJvhKvbzYPqeFg2ontPMhP9beD6oUV/8Hqp4Ip9Vem1bfvtXHSyzqlp00kcXDukfVHLaF77Vcb1WX6XgBvcg0hqsh45xlSWdjYoGK/EGCrm0m5hXWAmLTf22tCtKW0CGk2O9onQv9qzU3HjBpQYdgbZAY8Ho6EZdXu+fwvU9K+3A5E5Kx6l/055XebWZYGItuS03s1hWyTHpDurxLg4MBpgBJjq3J3l0llc3BZBJB6ePvVmRhq1IB7Ns6/SDN9S3BCA6UDT2FdDp/skBV2kX3ACHC8F87BimQwH8gBgwzQfJB8IJOqBo9/+FmA5T7JdM12uCIbHxaUOiYxvDCM6UV5yarVh+BWmS3fUi6yZ8xAtI0hTrVug2YEuRjzZFPn00GWFr7DtWMnJTSi9bMjRv/sn//WBGO+Ata1p2BwpqBDG6wYaaPe8Hms9A="
+
+deploy_options: &deploy_options
+  body: "ChangeLog: https://makestack.org/documentation/#/changelog"
+  draft: true
+  overwrite: true
+
+matrix:
+  include:
+    - language: node_js
+      node_js: "8"
+      sudo: true # because of losetup(8)
+      env: M=os:raspberrypi3
+      addons:
+        apt:
+          packages:
+            - binutils-arm-linux-gnueabihf
+            - gcc-arm-linux-gnueabihf
+            - g++-arm-linux-gnueabihf
+            - libc6-dev-armhf-cross
+            - build-essential
+            - wget
+            - zsh
+            - realpath
+            - nodejs
+      cache:
+        apt: true
+        yarn: true
+        directories:
+          - linux/build/downloads
+      install:
+        - ./tools/use-local-packages
+        - npm install -g yarn
+        - cd linux/pkgbuilder
+        - yarn
+        - cd ..
+      before_script:
+        - ./pkgbuilder/apply-ubuntu-changes
+      script:
+        - BUILD=release make TARGET=raspberrypi3
+      deploy:
+        <<: *deploy_options
+        provider: releases
+        name: "$TRAVIS_TAG"
+        tag_name: "$TRAVIS_TAG"
+        api_key: "$GITHUB_API_KEY"
+        file:
+          - build/raspberrypi3/makestack-os-raspberrypi3.img
+          - build/raspberrypi3/makestack-os-raspberrypi3.img.shasum
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - language: node_js
+      node_js: "8"
+      env: M=os:esp32
+      addons:
+        apt:
+          packages:
+            - binutils-arm-linux-gnueabihf
+            - gcc-arm-linux-gnueabihf
+            - g++-arm-linux-gnueabihf
+            - libc6-dev-armhf-cross
+            - build-essential
+            - wget
+            - zsh
+            - nodejs
+            - libncurses-dev
+            - flex
+            - bison
+            - gperf
+            - python
+            - python-serial
+      cache:
+        apt: true
+        yarn: true
+        directories:
+          - esp32/deps
+          - esp32/plugins/node_modules
+      install:
+        - cd esp32
+        - ./tools/download-dependencies
+      script:
+        - make -j2 || make -j2 # yes, the build system has been broken
+      before_deploy:
+        - mv build/firmware.elf makestack-os-esp32.img
+        - shasum -a256 makestack-os-esp32.img > makestack-os-esp32.img.shasum
+      deploy:
+        <<: *deploy_options
+        provider: releases
+        name: "$TRAVIS_TAG"
+        tag_name: "$TRAVIS_TAG"
+        api_key: "$GITHUB_API_KEY"
+        file:
+          - makestack-os-esp32.img
+          - makestack-os-esp32.img.shasum
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - language: ruby
+      rvm: 2.5
+      env: M=server
+      services:
+        - postgresql
+        - redis-server
+      cache:
+        directories:
+          - server/vendor/bundle
+      # See https://github.com/travis-ci/travis-ci/issues/8978#issuecomment-354036443
+      before_install:
+        - gem update --system --no-doc
+        - gem install bundler
+      install:
+        - cd server
+        - psql -c 'create database travis_ci_test;' -U postgres
+        - 'printf "test:\n  adapter: postgresql\n  database: travis_ci_test" > config/database.yml'
+        - bundle install --jobs 2 --path vendor/bundle
+        - bundle exec rails db:migrate RAILS_ENV=test
+      script:
+        - bundle exec rspec
+
+    - language: node_js
+      node_js: "8"
+      env: M=ui
+      cache: yarn
+      install:
+        - cd ui
+        - yarn
+      script:
+        - yarn generate
+
+    - language: node_js
+      env:
+        - M=desktop:macos
+      os: osx
+      osx_image: xcode9.1
+      node_js: "8"
+      cache:
+        yarn: true
+        directories:
+          - "$HOME/.electron"
+          - "$HOME/.cache"
+      install:
+        - ./tools/use-local-packages
+        - npm install -g yarn
+        - cd ui && yarn && cd ..
+        - cd desktop
+        - yarn
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
+      script:
+        - yarn run build:macos
+      before_deploy:
+        - zip -r makestack-desktop-$TRAVIS_TAG-macos.app.zip releases/MakeStack-darwin-x64/MakeStack.app
+      deploy:
+        <<: *deploy_options
+        provider: releases
+        name: "$TRAVIS_TAG"
+        tag_name: "$TRAVIS_TAG"
+        api_key: "$GITHUB_API_KEY"
+        file: makestack-desktop-$TRAVIS_TAG-macos.app.zip
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - language: node_js
+      node_js: "8"
+      env: M=desktop:linux
+      cache:
+        yarn: true
+        directories:
+          - "$HOME/.electron"
+          - "$HOME/.cache"
+      install:
+        - ./tools/use-local-packages
+        - cd ui && yarn && cd ..
+        - cd desktop
+        - yarn
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
+      script:
+        - yarn run build:linux
+      before_deploy:
+        - zip -r makestack-desktop-$TRAVIS_TAG-linux.zip releases/MakeStack-linux-x64/MakeStack
+      deploy:
+        <<: *deploy_options
+        provider: releases
+        name: "$TRAVIS_TAG"
+        tag_name: "$TRAVIS_TAG"
+        api_key: "$GITHUB_API_KEY"
+        file: makestack-desktop-$TRAVIS_TAG-linux.zip
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - language: node_js
+      node_js: "8"
+      env: M=SDK
+      cache:
+        yarn: true
+      install:
+        - ./tools/use-local-packages
+        - cd sdk
+        - yarn
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
+      script:
+        - yarn run coverage
+      deploy:
+        provider: npm
+        email: nuta@seiya.me
+        api_key: "$NPM_API_KEY"
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - language: node_js
+      node_js: "8"
+      env: M=supervisor
+      cache:
+        yarn: true
+      install:
+        - ./tools/use-local-packages
+        - cd supervisor
+        - yarn
+        - git checkout -- package.json yarn.lock # restore files modified by ./tools/use-local-packages
+      script:
+        - yarn run coverage
+      deploy:
+        provider: npm
+        email: nuta@seiya.me
+        api_key: "$NPM_API_KEY"
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - language: node_js
+      node_js: "8"
+      env: M=runtime
+      cache:
+        yarn: true
+      install:
+        - cd runtime
+        - yarn
+      script:
+        - yarn run coverage
+      deploy:
+        provider: npm
+        email: nuta@seiya.me
+        api_key: "$NPM_API_KEY"
+        skip_cleanup: true
+        on:
+          tags: true
+
+    - language: node_js
+      node_js: "8"
+      env: M=makestack.org
+      cache:
+        yarn: true
+      install:
+        - cd makestack.org
+        - yarn
+      script:
+        - yarn build
+      deploy:
+        provider: pages
+        fqdn: makestack.org
+        repo: makestack/makestack.github.io
+        target-branch: master
+        local-dir: makestack.org/htdocs
+        skip-cleanup: true
+        keep-histroy: true
+        github-token: "$GITHUB_API_KEY"
+        on:
+          branch: master
+
+notifications:
+  on_success: change
+  on_failure: change

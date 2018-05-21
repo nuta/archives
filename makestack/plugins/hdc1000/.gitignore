@@ -1,0 +1,4 @@
+*.zip
+/dist
+/build
+/native

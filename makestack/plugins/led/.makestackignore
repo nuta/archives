@@ -1,0 +1,14 @@
+dist/*.map
+scaffold.js
+coverage
+test
+lib
+node_modules/nan
+node_modules/.yarn-integrity
+binding.gyp
+build
+node_modules
+package.json
+tsconfig.json
+yarn.lock
+package-lock.json

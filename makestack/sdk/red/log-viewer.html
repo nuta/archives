@@ -1,0 +1,60 @@
+<script type="text/javascript">
+(() => {
+  let content = $('<div id="log-content">')
+
+  RED.comms.subscribe("log", (topic, log) => {
+    // Remove old lines.
+    const lines = $('.log-line')
+    for (let i = 0; lines.length - i > 50; i++) {
+      lines[i].remove()
+    }
+
+    const content = $(
+      '<div class="log-line">' +
+      '  <div class="log-meta">' +
+      '    <span class="log-device"></span>' +
+      '    <span class="log-timestamp"></span>' +
+      '  </div>' +
+      '  <div class="log-body"></div>' +
+      '</div>')
+
+    $('.log-device', content).text(log.device)
+    $('.log-timestamp', content).text(log.time)
+    $('.log-body', content).text(log.body)
+    content.appendTo($('#log-content'))
+    const height = $('#log-content').height()
+    $('#sidebar-content').scrollTop(height)
+  })
+
+  RED.sidebar.addTab({ id: 'log', label: 'Log', content })
+  RED.actions.add('core:show-log-tab', () => RED.sidebar.show('log'))
+})()
+</script>
+
+<style>
+.log-line {
+  padding: 10px 10px;
+  border-bottom: #eaeaea 1px solid;
+}
+
+.log-meta {
+  margin-left: 5px;
+  color: #777777;
+  padding: 5px 0px;
+  font-size: 10px;
+}
+
+.log-device {
+  font-weight: bold;
+}
+
+.log-body {
+  color: #b72828;
+  margin: 5px;
+  padding: 10px;
+  font-family: 'Menlo', monospace;
+  font-size: 13px !important;
+  line-height: 1.2em;
+  background: #efefef;
+}
+</style>

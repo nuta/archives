@@ -1,0 +1,166 @@
+#!/bin/busybox sh
+
+RANDSEED_FILE=/boot/randseed
+RANDSEED_SIZE=512
+
+start_daemon() {
+  script=$1
+  backoff=1
+  while :; do
+    sh -c "$script" 2>&1 | logger
+    exitcode=$?
+    if [ $exitcode -eq 0 ] ;then
+      logger "'$script' exited with $exitcode. Stopping the daemon..."
+      break
+    fi
+
+    logger "'$script' exited with $exitcode. Restarting in $backoff seconds..."
+    sleep $backoff
+    backoff=$(($backoff << 1))
+  done
+}
+
+init_busybox() {
+  # Install symbolic links to /busybox into /bin and /sbin.
+  /bin/busybox mkdir -p /sbin /bin
+  /bin/busybox --install -s
+}
+
+mount_filesystems() {
+  mkdir -p sys proc tmp app dev
+  mount -t sysfs    sysfs    /sys
+  mount -t securityfs securityfs /sys/kernel/security
+  mount -t proc     proc     /proc
+  mount -t devtmpfs devtmpfs /dev
+  mknod /dev/console c 5 1
+
+  # Redirect stdout and stderr to the console.
+  exec > /dev/console 2>&1
+
+  root=$(egrep -o "root=([^ ]+)" /proc/cmdline | awk -F= '{print $2}')
+  if [ "$root" = "" ]; then
+    echo "Error: root is not speicifed in /proc/cmdline"
+    exit 1
+  fi
+
+  mkdir /boot
+  mount $root /boot
+}
+
+init_mdev() {
+  echo /sbin/mdev > /proc/sys/kernel/hotplug
+  mdev -s
+}
+
+banner() {
+  cat <<"EOF"
+ __  __       _        ____  _             _       _     _
+|  \/  | __ _| | _____/ ___|| |_ __ _  ___| | __  | |   (_)_ __  _   ___  __
+| |\/| |/ _` | |/ / _ \___ \| __/ _` |/ __| |/ /  | |   | | '_ \| | | \ \/ /
+| |  | | (_| |   <  __/___) | || (_| | (__|   <   | |___| | | | | |_| |>  <
+|_|  |_|\__,_|_|\_\___|____/ \__\__,_|\___|_|\_\  |_____|_|_| |_|\__,_/_/\_\
+
+EOF
+}
+
+start_syslogd() {
+  syslogd -n -s 1024 -b 1 &
+}
+
+start_klogd() {
+  start_daemon "klogd -n" &
+}
+
+load_makestack_config() {
+  . /boot/makestack.config
+}
+
+set_hostname() {
+  hostname makestack-linux
+}
+
+init_apparmor() {
+  if [ "$DISABLE_APPARMOR" = "yes" ]; then
+    apparmor_parser -C -r /etc/apparmor.d/*
+  else
+    apparmor_parser -r /etc/apparmor.d/*
+  fi
+}
+
+init_urandom() {
+  if [ -f "$RANDSEED_FILE" ]; then
+    logger "Feeding random seed"
+    cat "$RANDSEED_FILE" > /dev/urandom
+  fi
+}
+
+init_networking() {
+  if [ "$MAKESTACK_NETWORK_ADAPTER" = "http" ]; then
+    for interface in $(echo /sys/class/net/* | xargs -n1 basename); do
+      [ "$interface" = "lo" ] && continue
+      [ "$interface" = "irlan0" ] && continue
+
+      logger "Initializing $interface"
+      ip link set $interface up
+
+      # TODO: We should use NetworkManager or something.
+      if [ "$interface" = "wlan0" -a ! "$WIFI_SSID" = "" ]; then
+        echo "" > /etc/wpa_supplicant.conf
+        echo "country=$WIFI_COUNTRY"  >> /etc/wpa_supplicant.conf
+        echo "network={"              >> /etc/wpa_supplicant.conf
+        echo "  ssid=\"$WIFI_SSID\""  >> /etc/wpa_supplicant.conf
+        echo "  psk=$WIFI_PSK"        >> /etc/wpa_supplicant.conf
+        echo "}"                      >> /etc/wpa_supplicant.conf
+
+        echo "** Starting wpa_supplicant on $interface"
+        start_daemon "wpa_supplicant -B -i$interface -c/etc/wpa_supplicant.conf" &
+      fi
+
+      start_daemon "udhcpc -i $interface -s /etc/udhcpc.script" &
+    done
+
+    start_daemon "ntpd -n -p 1.pool.ntp.org" &
+  fi
+}
+
+start_supervisor() {
+  export MAKESTACK_OS_VERSION="$(cat /VERSION | awk '{ printf "%s", $0 }')"
+  export MAKESTACK_APP_UID=0
+  export MAKESTACK_APP_GID=0
+  logger "Starting MakeStack Supervisor..."
+
+  # Don't append `&'. `start_daemon`` must return if the supervisor exited with 0 to reboot.
+  start_daemon "node /supervisor/supervisor"
+}
+
+save_urandom_seed() {
+  logger "Saving random seed..."
+  dd if=/dev/urandom of=$RANDSEED_FILE bs=$RANDSEED_SIZE count=1
+}
+
+init() {
+  cd /
+
+  init_busybox
+  mount_filesystems
+  init_mdev
+  banner
+  start_syslogd
+  start_klogd
+  load_makestack_config
+  set_hostname
+  init_apparmor
+  init_urandom
+  init_networking
+
+  logger "Boot time: $(awk '{print $1}' /proc/uptime) secs"
+  start_supervisor
+
+  # Supervisor exited with 0. Do some work and reboot.
+  save_urandom_seed
+  logger "Rebooting in 10 seconds..."
+  sleep 10
+  reboot -f
+}
+
+init

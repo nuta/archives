@@ -1,0 +1,14 @@
+*.tgz
+lib
+test
+node_modules
+binding.gyp
+tsconfig.json
+yarn.lock
+index.d.ts
+build
+src
+dist/*.map
+dist/*/*.map
+scaffold.js
+build-native

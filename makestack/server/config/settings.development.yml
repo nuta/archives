@@ -1,0 +1,6 @@
+protocol: http
+host: localhost
+port: 8080 # access through webpack-dev-server
+outgoing_webhook_limit_per_hour: 5000
+push_to_sakuraio_limit_per_hour: 5000
+mailer_sender: makestack@localhost

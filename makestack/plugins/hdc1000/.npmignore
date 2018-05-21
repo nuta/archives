@@ -1,0 +1,5 @@
+*.tgz
+lib
+coverage
+test
+node_modules

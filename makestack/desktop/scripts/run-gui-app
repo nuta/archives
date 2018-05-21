@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "$(uname)" != "Darwin" ]; then
+  alias reattach-to-user-namespace=
+fi
+
+reattach-to-user-namespace $*

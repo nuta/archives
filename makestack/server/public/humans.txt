@@ -1,0 +1,3 @@
+Hi there! MakeStack is a open-source community for everyone.
+
+    https://github.com/makestack/makestack

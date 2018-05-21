@@ -1,0 +1,36 @@
+{
+  "name": "makestack",
+  "version": "0.5.2",
+  "license": "(CC0-1.0 OR MIT)",
+  "description": "MakeStack Node.js app runtime environment.",
+  "gypfile": true,
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "scripts": {
+    "coverage": "istanbul cover _mocha",
+    "test": "mocha",
+    "test:live": "mocha -w",
+    "prepare": "tsc",
+    "prepack": "tsc",
+    "dev": "tsc -w"
+  },
+  "dependencies": {
+    "nan": "^2.10.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.2",
+    "@types/mocha": "^2.2.48",
+    "@types/mock-fs": "^3.6.30",
+    "@types/node": "^9.4.7",
+    "@types/sinon": "^4.3.0",
+    "chai": "^4.1.2",
+    "istanbul": "^1.1.0-alpha.1",
+    "mocha": "^5.0.4",
+    "mock-fs": "^4.4.2",
+    "node-gyp": "^3.6.2",
+    "sinon": "^4.4.6",
+    "source-map-support": "^0.5.4",
+    "ts-node": "^5.0.1",
+    "typescript": "^2.7.2"
+  }
+}

@@ -1,0 +1,8 @@
+*.d
+*.o
+build
+deps
+sdkconfig.old
+supervisor/preload.h
+plugins/node_modules
+plugins/dist

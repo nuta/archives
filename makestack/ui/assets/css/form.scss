@@ -1,0 +1,116 @@
+@mixin button {
+  border: none;
+  border-bottom: 5px solid var(--bg2-color);
+  border-radius: 5px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 600;
+  background: var(--bg1-color);
+  color: var(--fg0-color);
+  font-size: 16px;
+  padding: 9px 12px 6px 12px;
+  user-select: none;
+
+  i.fas {
+    position: relative;
+    bottom: 1px;
+    padding-right: 3px;
+    font-size: 16px;
+  }
+
+  &:hover {
+    cursor: pointer;
+    box-shadow: 0px 0px 3px 3px var(--shadow-color);
+  }
+
+  &.danger {
+    color: var(--colored-bg-font-color);
+    background: var(--negative1-color);
+    border-bottom: 5px solid var(--negative2-color);
+  }
+
+  &.primary {
+    color: var(--colored-bg-font-color);
+    background: var(--positive1-color);
+    border-bottom: 5px solid var(--positive2-color);
+  }
+
+  &:not(:first-child) {
+    margin-left: 5px;
+  }
+}
+
+button {
+  @include button;
+}
+
+form {
+  .field {
+    &:not(:first-child) {
+      margin-top: 45px;
+    }
+  }
+
+  .action {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 30px;
+
+    p {
+      font-weight: 600;
+      line-height: 28px;
+    }
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin-left: 2px;
+    margin-bottom: 10px;
+  }
+}
+
+input[type=text], input[type=number], input[type=password] {
+  color: var(--fg0-color);
+  background: var(--bg1-color);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  padding: 15px;
+  width: 100%;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: var(--fg1-color);
+  }
+
+  &.inverted {
+    background: var(--bg0-color);
+  }
+
+  &.small {
+    height: 40px;
+    font-size: 1rem;
+    padding: 7px 10px;
+  }
+}
+
+input[type=submit] {
+  @include button;
+  margin-top: 20px;
+}
+
+select {
+  background: var(--bg1-color);
+  border: 1px solid var(--border-color);
+  width: 100%;
+  height: 55px;
+  padding: 15px;
+
+  &.inverted {
+    background: var(--bg0-color);
+  }
+
+  &.small {
+    height: 40px;
+  }
+}

@@ -1,0 +1,12 @@
+*node_modules*
+.git
+ui/dist
+server/vendor
+server/log/*.log
+*/coverage/*
+*/build/*
+desktop/releases
+*/native/*
+.DS_Store
+server/public/*.*.js
+server/tmp

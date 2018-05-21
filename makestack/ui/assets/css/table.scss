@@ -1,0 +1,30 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  --table-border-color: var(--border-color);
+
+  thead {
+
+    th {
+      border-bottom: 2px solid var(--table-border-color);
+      font-weight: 600;
+      padding: 0.75rem;
+    }
+  }
+
+  tbody {
+
+    td {
+      padding: 0.75rem;
+    }
+
+    tr:not(:last-child) {
+      border-bottom: 1px solid var(--table-border-color);
+    }
+
+    tr.secondary-row {
+      background: var(--bg2-color);
+    }
+  }
+}

@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+import argparse
+import urllib.request
+import subprocess
+import json
+
+LATEST_RELEASE_URL = "https://api.github.com/repos/makestack/makestack/releases/latest"
+
+def update_releases_json():
+    latest = json.load(urllib.request.urlopen(LATEST_RELEASE_URL))
+    version = latest["tag_name"]
+
+    print(f"Adding {version} to releases.json...")
+    releases = json.load(open('releases.json'))
+    releases[version] = {
+        "assets": {}
+    }
+
+    for asset in latest["assets"]:
+        if asset["name"].startswith("makestack-os-") and asset["name"].endswith(".img"):
+            url = asset["browser_download_url"]
+            device_type = asset["name"].split("-")[2].replace(".img", "")
+            shasum = urllib.request.urlopen(url + ".shasum") \
+                        .read().decode('utf-8').split()[0]
+            releases[version]["assets"][device_type] = {
+                "url": url,
+                "shasum": shasum
+            }
+
+    json.dump(releases, open('releases.json', 'w'), indent=2)
+
+def main():
+    parser = argparse.ArgumentParser(description="Run this after publishing a new release.")
+    parser.parse_args()
+
+    update_releases_json()
+
+    print("Creating a new commit...")
+    subprocess.run(["git", "add", "releases.json"])
+    subprocess.run(["git", "commit", "-m", "update releases.json"])
+    print("Done! Push the release commit and tags to GitHub!")
+
+if __name__ == "__main__":
+    main()

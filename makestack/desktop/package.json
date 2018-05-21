@@ -1,0 +1,43 @@
+{
+  "productName": "MakeStack",
+  "private": true,
+  "version": "0.2.1",
+  "license": "(CC0-1.0 OR MIT)",
+  "main": "./main/index.js",
+  "description": "A MakeStack desktop app.",
+  "scripts": {
+    "build:assets": "rm -rf build && cd ../ui && NODE_ENV=production PLATFORM=desktop yarn nuxt generate && cd ../desktop && mv ../ui/dist build",
+    "build:main": "rm -rf build/main && cp -r package.json main build && cd build && npm i --prod",
+    "build:macos": "yarn build:assets && yarn build:main && electron-packager build --platform darwin --asar --overwrite --out releases --arch x64 --icon assets/images/icon.icns",
+    "build:linux": "yarn build:assets && yarn build:main && electron-packager build --platform linux  --asar --overwrite --out releases --arch x64",
+    "dev": "concurrently --kill-others 'yarn run renderer' 'yarn run main'",
+    "main": "NODE_ENV=development ./scripts/run-gui-app npx electron .",
+    "renderer": "cd ../ui && NODE_ENV=development PLATFORM=desktop PORT=9080 yarn dev"
+  },
+  "dependencies": {
+    "makestack-sdk": "0.x",
+    "node-fetch": "^2.1.1",
+    "vue": "^2.5.16",
+    "vue-router": "^3.0.1",
+    "whatwg-fetch": "^2.0.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "concurrently": "^3.5.0",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^0.28.11",
+    "electron": "^1.8.4",
+    "electron-packager": "^11.1.0",
+    "electron-rebuild": "^1.7.3",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.0.6",
+    "node-sass": "^4.5.3",
+    "postcss-loader": "^2.1.2",
+    "sass-loader": "^6.0.7",
+    "vue-loader": "^14.2.1",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^4.1.1",
+    "webpack-dev-server": "^3.1.1"
+  }
+}

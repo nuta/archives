@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^2.7.2"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "name": "makestack",
+  "description": "A Heroku app.json for MakeStack Server.",
+  "repository": "https://github.com/makestack/makestack",
+  "addons": [
+    "heroku-postgresql:hobby-dev",
+    "heroku-redis:hobby-dev"
+
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/makestack/heroku.git"
+    },
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/ruby"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "bundle exec rake db:migrate"
+  },
+  "env": {
+    "SERVER_PROTOCOL": {
+      "description": "The server hostname. (http or https)",
+      "value": "https"
+    },
+    "SERVER_HOST": {
+      "description": "The server hostname. (<your-heroku-app-name>.herokuapp.com)",
+      "value": ""
+    },
+    "SERVER_PORT": {
+      "description": "The server port number.",
+      "value": "443"
+    },
+    "MAILER_SENDER": {
+      "description": "The mail address sent from the server. (e.g., noreply@foo.herokuapp.com)",
+      "value": ""
+    },
+    "RECAPTCHA_SECRET": {
+      "description": "A Google reCAPTCHA secret key. (get one from https://www.google.com/recaptcha/admin)",
+      "value": ""
+    },
+    "RECAPTCHA_SITEKEY": {
+      "description": "A Google reCAPTCHA site secret key.",
+      "value": ""
+    },
+    "SMTP_HOST": {
+      "description": "A SMTP server hostname. (you can use SendGrid for free if you don't have one)",
+      "value": "smtp.sendgrid.net"
+    },
+    "SMTP_PORT": {
+      "description": "A SMTP server port.",
+      "value": "587"
+    },
+    "SMTP_USERNAME": {
+      "description": "A SMTP server user name.",
+      "value": "apikey"
+    },
+    "SMTP_PASSWORD": {
+      "description": "A SMTP server user name. (set an API key if you want to use SendGrid)",
+      "value": ""
+    },
+    "GENERATE_CONFIG_FROM_ENV": {
+      "description": "Generate config files during deployment. Leave this parameter alone.",
+      "value": "1"
+    },
+    "WELCOME_MESSAGE": {
+      "description": "A description in the top page.",
+      "value": "This is a demonstration place to play with MakeStack."
+    },
+    "SKYLIGHT_AUTHENTICATION": {
+      "description": "https://skylight.io authentication token (Optional)",
+      "value": ""
+    },
+    "SENTRY_DSN": {
+      "description": "Sentry DSN (Optional)",
+      "value": ""
+    }
+  }
+}

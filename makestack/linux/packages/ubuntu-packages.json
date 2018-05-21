@@ -1,0 +1,46 @@
+{
+  "x64": {
+    "apparmor": {
+      "version": "2.10.95-0ubuntu2",
+      "url": "http://us.archive.ubuntu.com/ubuntu/pool/main/a/apparmor/apparmor_2.10.95-0ubuntu2_amd64.deb",
+      "sha256": "e5a26afe7f04b5d8b6292a5c6fbb5482797e410bda4ab8720cba528f3ba1fb3f"
+    },
+    "libc6": {
+      "version": "2.23-0ubuntu3",
+      "url": "http://us.archive.ubuntu.com/ubuntu/pool/main/g/glibc/libc6_2.23-0ubuntu3_amd64.deb",
+      "sha256": "68d69a0fb2dae7578a2a7054bc0cd5f0994d523f60d540bc6708ff3f2fb33e18"
+    },
+    "libgcc1": {
+      "version": "1:6.0.1-0ubuntu1",
+      "url": "http://us.archive.ubuntu.com/ubuntu/pool/main/g/gccgo-6/libgcc1_6.0.1-0ubuntu1_amd64.deb",
+      "sha256": "6e374d7b6ee1ffbcff568705b7f9ec7b9befbfcf17e683a21ef6480dc9d0cfe0"
+    },
+    "libstdc++6": {
+      "version": "5.3.1-14ubuntu2",
+      "url": "http://us.archive.ubuntu.com/ubuntu/pool/main/g/gcc-5/libstdc++6_5.3.1-14ubuntu2_amd64.deb",
+      "sha256": "3667b4bf3945a03580b8d8bc4b8699789b0b93b1d472d08eb693daa89321728e"
+    }
+  },
+  "armhf": {
+    "apparmor": {
+      "version": "2.10.95-0ubuntu2",
+      "url": "http://ports.ubuntu.com/ubuntu-ports/pool/main/a/apparmor/apparmor_2.10.95-0ubuntu2_armhf.deb",
+      "sha256": "e3b8c1d7d88e34e92af91309f860dae8f8e454211cf39217ced609afc47cf87b"
+    },
+    "libc6": {
+      "version": "2.23-0ubuntu3",
+      "url": "http://ports.ubuntu.com/ubuntu-ports/pool/main/g/glibc/libc6_2.23-0ubuntu3_armhf.deb",
+      "sha256": "5ff24aacaab8ac9e2627ab50146c034f69331973c4f7c2c3e1fa5578cf4d3f94"
+    },
+    "libgcc1": {
+      "version": "1:6.0.1-0ubuntu1",
+      "url": "http://ports.ubuntu.com/ubuntu-ports/pool/main/g/gccgo-6/libgcc1_6.0.1-0ubuntu1_armhf.deb",
+      "sha256": "01b0f7b51b694b2553c3f315f9aaa999722a4ecb3fa9387e31ed7361e9df5042"
+    },
+    "libstdc++6": {
+      "version": "5.3.1-14ubuntu2",
+      "url": "http://ports.ubuntu.com/ubuntu-ports/pool/main/g/gcc-5/libstdc++6_5.3.1-14ubuntu2_armhf.deb",
+      "sha256": "2fadbf42745477997f9425c7500a427669a99da6b5af9ec0a6fc2dddbe534001"
+    }
+  }
+}

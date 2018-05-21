@@ -1,0 +1,232 @@
+#!/usr/bin/env node
+const path = require('path')
+const fs = require('fs')
+const chalk = require('chalk')
+const { isRebuilt, runWithPipe } = require('.').pkg
+const {
+  mkdirp, copyFiles, download, extract, rmrf
+} = require('./lib/helpers')
+
+global.build = {
+  config: {}
+}
+
+function addConfigPrefix(name, config) {
+  for (let key in (config || {})) {
+    if (key.indexOf('.') === -1) {
+      config[`${name}.${key}`] = config[key]
+      delete config[key]
+    }
+  }
+
+  return config
+}
+
+function loadPackages(target) {
+  let remainingPackages = [target]
+  let packages = {}
+  let buildOrder = []
+
+  while (remainingPackages.length > 0) {
+    let pkg = require(`../packages/${remainingPackages.pop()}`)
+
+    if (pkg.name in packages) {
+      continue
+    }
+
+    if (pkg.config instanceof Function) {
+      pkg.config = pkg.config()
+    }
+
+    Object.assign(build.config, addConfigPrefix(pkg.name, pkg.config))
+
+    if (pkg.dependencies instanceof Function) {
+      pkg.dependencies = pkg.dependencies()
+    } else if (!pkg.dependencies) {
+      pkg.dependencies = []
+    }
+
+    if (pkg.dependencies.length > 0) {
+      const unloadedDependencies = []
+      for (const name of pkg.dependencies) {
+        if (!fs.existsSync(path.resolve(__dirname, `../packages/${name}.js`))) {
+          throw new Error(`Unknown package: \`${name}' (typo?)`)
+        }
+
+        if (!(name in packages)) {
+          unloadedDependencies.push(name)
+        }
+      }
+
+      if (unloadedDependencies.length > 0) {
+        // Resolve dependencies first.
+        remainingPackages.push(pkg.name)
+        remainingPackages = remainingPackages.concat(pkg.dependencies)
+        continue
+      }
+    }
+
+    for (let attr in pkg) {
+      if (['build', 'buildImage', 'changed', 'check'].includes(attr)) {
+        continue
+      }
+
+      const value = pkg[attr]
+      pkg[attr] = (value instanceof Function) ? value() : value
+    }
+
+    buildOrder.push(pkg.name)
+    packages[pkg.name] = pkg
+  }
+
+  return [packages, buildOrder]
+}
+
+function isInstalled(dest, pkg) {
+  return pkg[dest] === undefined || Object.keys(pkg[dest]).every(file => {
+    return fs.existsSync(path.resolve(build[`${dest}Dir`], `./${file}`))
+  })
+}
+
+function getPkgFilesToCopy(pkgName, files, destDir) {
+  const filesToCopy = []
+
+  for (let filepath in files) {
+    if (files[filepath] === false) {
+      // a special case for `console' package because a special
+      // file like /dev/console cannot be copied.
+      continue
+    }
+
+    const src = path.resolve(build.buildDir, pkgName, files[filepath])
+    const dest = path.resolve(destDir, `./${filepath}`)
+    if (!fs.existsSync(dest) || fs.statSync(src).ctimeMs > fs.statSync(dest).ctimeMs) {
+      filesToCopy.push([src, dest])
+    }
+  }
+
+  return filesToCopy
+}
+
+function copyFilesInPkg(pkgName, files, destDir, ignorePatterns) {
+  for (const [src, dst] of getPkgFilesToCopy(pkgName, files, destDir)) {
+    copyFiles(src, dst, ignorePatterns)
+  }
+}
+
+function buildPackage(pkg) {
+  const cwd = process.cwd()
+  const pkgBuildDir = path.resolve(build.buildDir, pkg.name)
+
+  if (pkg.url) {
+    const dlpath = download(pkg, pkg.sha256)
+    extract(dlpath, pkgBuildDir)
+  } else if (pkg.path) {
+    rmrf(pkgBuildDir)
+    copyFiles(pkg.path, pkgBuildDir, pkg.ignore)
+  } else {
+    mkdirp(pkgBuildDir)
+  }
+
+  process.chdir(pkgBuildDir)
+
+  if (pkg.build instanceof Function) {
+    pkg.build()
+  }
+
+  copyFilesInPkg(pkg.name, pkg.bootfs, build.bootfsDir, pkg.bootfsIgnore)
+  copyFilesInPkg(pkg.name, pkg.rootfs, build.rootfsDir, pkg.rootfsIgnore)
+
+  process.chdir(cwd)
+}
+
+function isBuildRequired(pkg) {
+  const installed = isInstalled('bootfs', pkg) && isInstalled('rootfs', pkg)
+
+  if (pkg.dependencies.some(isRebuilt)) {
+    return true
+  }
+
+  let pkgBuildDir = path.resolve(build.buildDir, pkg.name)
+  if (!fs.existsSync(pkgBuildDir)) {
+    pkgBuildDir = null
+  }
+
+  if (pkg.changed === undefined) {
+    return !installed
+  } else {
+    return !installed || pkg.changed(pkgBuildDir)
+  }
+}
+
+function main() {
+  const target = process.argv[2]
+
+  build.version = process.argv[3]
+  build.target = target
+  build.rebuiltPackages = []
+  build.buildDir = path.resolve(__dirname, `../build/${target}`)
+  build.bootfsDir = path.resolve(build.buildDir, 'bootfs')
+  build.rootfsDir = path.resolve(build.buildDir, 'rootfs')
+  build.downloadsDir = path.resolve(__dirname, '../build/downloads')
+
+  mkdirp(build.buildDir)
+  mkdirp(build.bootfsDir)
+  mkdirp(build.rootfsDir)
+  mkdirp(build.downloadsDir)
+
+  const [packages, buildOrder] = loadPackages(target)
+
+  for (const [i, pkgName] of buildOrder.entries()) {
+    const pkg = packages[pkgName]
+
+    if (typeof pkg.check === 'function') {
+      pkg.check()
+    }
+
+    if (isBuildRequired(pkg)) {
+      console.log(chalk.bold.blue('==> ') +
+      chalk.bold(`(${i + 1}/${buildOrder.length}) Building ${pkgName}...`))
+      buildPackage(pkg)
+      build.rebuiltPackages.push(pkgName)
+    } else {
+      const filesToBootFS = getPkgFilesToCopy(pkg.name, pkg.bootfs, build.bootfsDir)
+      const filesToRootFS = getPkgFilesToCopy(pkg.name, pkg.rootfs, build.rootfsDir)
+
+      if (filesToBootFS.length > 0 || filesToRootFS.length > 0) {
+        for (const [src, dest] of filesToBootFS) {
+          rmrf(dest)
+          copyFiles(src, dest)
+        }
+
+        for (const [src, dest] of filesToRootFS) {
+          rmrf(dest)
+          copyFiles(src, dest)
+        }
+
+        build.rebuiltPackages.push(pkgName)
+        const num = filesToBootFS.length + filesToRootFS.length
+        console.log(chalk.bold.magenta('==> ') +
+          chalk.bold(`(${i + 1}/${buildOrder.length}) Copying ${num} files from ${pkgName}...`))
+      } else {
+        console.log(chalk.bold.yellow('==> ') +
+        chalk.bold(`(${i + 1}/${buildOrder.length}) Skipping ${pkgName}`))
+      }
+    }
+  }
+
+  const imageFile = path.resolve(build.buildDir, `makestack-os-${target}.img`)
+  const shasumFile = path.resolve(build.buildDir, `makestack-os-${target}.img.shasum`)
+  console.log(chalk.bold.blue('==> ') +
+    chalk.bold('Buliding the disk image'))
+  packages[build.target].buildImage(imageFile)
+  fs.writeFileSync(
+    shasumFile,
+    runWithPipe(
+      ['shasum', '-a256', path.basename(imageFile)],
+      {}, path.dirname(imageFile)
+    )
+  )
+}
+
+main()

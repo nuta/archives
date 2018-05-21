@@ -1,0 +1,10 @@
+#
+#  Copy this file to `settings.production.yml'.
+#
+
+protocol: # https
+host: # makestack.org
+port: # 443
+outgoing_webhook_limit_per_hour: 5000
+push_to_sakuraio_limit_per_hour: 5000
+mailer_sender: # noreply@makestack.org

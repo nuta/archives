@@ -1,0 +1,55 @@
+source 'https://rubygems.org'
+
+git_source(:github) do |repo_name|
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
+  "https://github.com/#{repo_name}.git"
+end
+
+gem 'rails', '~> 5.2.0'
+gem 'bootsnap', '>= 1.1.0', require: false
+gem 'puma', '~> 3.7'
+gem 'jbuilder'
+gem 'devise'
+gem 'devise_token_auth'
+gem 'sidekiq'
+gem 'pg', group: :postgres
+
+gem 'redis-objects'
+gem 'redis-namespace'
+gem 'rest-client'
+gem 'strong_migrations'
+
+gem "skylight", group: :skylight
+gem "sentry-raven", group: :sentry
+gem "timber", group: :timber
+
+group :development, :test do
+  gem 'spring'
+  gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'sqlite3'
+  gem 'pry-rails'
+  gem 'pry-byebug'
+  gem 'pry-stack_explorer'
+  gem 'active_record_query_trace'
+  gem 'ffaker', require: false
+  gem 'factory_bot_rails', require: false
+  gem 'guard-rspec', require: false
+end
+
+group :development do
+  gem 'bullet'
+  gem 'request-log-analyzer', require: false
+  gem 'rails_best_practices', require: false
+  gem 'rails-erd', require: false
+  gem 'foreman', require: false
+end
+
+group :test do
+  gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'rspec-rails'
+  gem 'rspec-json_expectations'
+  gem 'shoulda-matchers'
+  gem 'database_cleaner'
+  gem 'simplecov', require: false
+  gem 'webmock'
+end
