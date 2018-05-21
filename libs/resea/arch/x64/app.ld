@@ -6,7 +6,7 @@ SECTIONS {
     . = 0x01000000;
 
     .text :{
-        *(.text);
+        *(.text*);
     }
 
     .data ALIGN(0x1000) :{
@@ -18,7 +18,7 @@ SECTIONS {
     }
 
     .bss ALIGN(0x1000) :{
-        *(.bss);
+        *(.bss*);
     }
 
     /DISCARD/ :{
