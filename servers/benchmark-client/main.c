@@ -94,6 +94,18 @@ void rpc_latency_benchmark(void) {
     }
 
     bench_summarize("ipc-roundtrip");
+
+    a0 = (payload_t) "Hello";
+    a1 = 5;
+
+    for (int i = 0; i < TEST_NUM; i++) {
+        payload_t r;
+        bench_start(i);
+        ipc_call(server, 1, a0, a1, a2, a3, &r, &r, &r, &r);
+        bench_end(i);
+    }
+
+    bench_summarize("small-ool-ipc-roundtrip");
 }
 
 void syscall_latency_benchmark(void) {
