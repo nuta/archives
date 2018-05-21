@@ -1,0 +1,26 @@
+{
+  "name": "esptool.js",
+  "version": "0.0.1",
+  "description": "Esptool for Node.js and web browsers.",
+  "main": "lib/index.js",
+  "repository": "https://github.com/seiyanuta/esptool.js",
+  "author": "Seiya Nuta <nuta@seiya.me>",
+  "license": "(CC0-1.0 OR MIT)",
+  "scripts": {
+    "node:dev": "tsc -w",
+    "web:build": "webpack",
+    "web:dev": "webpack-dev-server"
+  },
+  "devDependencies": {
+    "@types/serialport": "^6.0.0",
+    "copy-webpack-plugin": "^4.3.1",
+    "ts-loader": "^3.3.1",
+    "ts-node": "^4.1.0",
+    "typescript": "^2.6.2",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.11.1"
+  },
+  "dependencies": {
+    "serialport": "^6.0.4"
+  }
+}
