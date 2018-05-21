@@ -72,13 +72,8 @@ static inline void close_channel(struct channel *ch) {
 }
 
 
-static payload_t copy_payload(
-    int type,
-    struct process *src,
-    struct process *dst,
-    payload_t payload,
-    size_t ool_length
-) {
+static payload_t copy_payload(int type, struct process *src, struct process *dst,
+                              payload_t payload, size_t ool_length) {
 
     switch (type) {
         case PAYLOAD_INLINE:
@@ -132,7 +127,7 @@ static payload_t copy_payload(
         }
     }
 
-    // Invalid payload type.
+    // Invalid payload header.
     return 0;
 }
 
@@ -152,10 +147,10 @@ void sys_close(channel_t ch) {
 }
 
 
-struct msg *sys_call(channel_t ch, header_t type, payload_t a0,
+struct msg *sys_call(channel_t ch, header_t header, payload_t a0,
                      payload_t a1, payload_t a2, payload_t a3) {
 
-    header_t error = sys_send(ch, type, a0, a1, a2, a3);
+    header_t error = sys_send(ch, header, a0, a1, a2, a3);
     if (unlikely(error != ERROR_NONE)) {
         return ERROR_PTR(error);
     }
@@ -164,10 +159,10 @@ struct msg *sys_call(channel_t ch, header_t type, payload_t a0,
 }
 
 
-struct msg *sys_replyrecv(channel_t client, header_t type, payload_t r0,
+struct msg *sys_replyrecv(channel_t client, header_t header, payload_t r0,
                           payload_t r1, payload_t r2, payload_t r3) {
 
-    header_t error = sys_send(client, type, r0, r1, r2, r3);
+    header_t error = sys_send(client, header, r0, r1, r2, r3);
     if (unlikely(error != ERROR_NONE)) {
         return ERROR_PTR(error);
     }
@@ -181,7 +176,7 @@ struct msg *sys_replyrecv(channel_t client, header_t type, payload_t r0,
 }
 
 
-static header_t sys_send_slowpath(channel_t ch, header_t type, payload_t a0,
+static header_t sys_send_slowpath(channel_t ch, header_t header, payload_t a0,
                                   payload_t a1, payload_t a2, payload_t a3) {
     struct channel *src = get_channel_by_id(ch);
     if (unlikely(!src)) {
@@ -198,11 +193,11 @@ static header_t sys_send_slowpath(channel_t ch, header_t type, payload_t a0,
     struct thread *current_thread = CPUVAR->current;
     struct channel *dst = (linked_to->transfer_to) ? linked_to->transfer_to : linked_to;
 
-    DEBUG("sys_send: @%d.%d -> @%d.%d ~> @%d.%d (type=%d.%d)",
+    DEBUG("sys_send: @%d.%d -> @%d.%d ~> @%d.%d (header=%d.%d)",
         src->process->pid, src->cid,
         linked_to->process->pid, linked_to->cid,
         dst->process->pid, dst->cid,
-        MSG_SERVICE_ID(type), MSG_ID(type));
+        MSG_SERVICE_ID(header), MSG_ID(header));
 
     // Get the sender right.
     while (true) {
@@ -236,25 +231,25 @@ static header_t sys_send_slowpath(channel_t ch, header_t type, payload_t a0,
     struct process *src_process = CPUVAR->current->process;
     struct process *dst_process = dst->process;
     struct thread *receiver = dst->receiver;
-    receiver->buffer.header = type;
+    receiver->buffer.header = header;
     receiver->buffer.sent_from = linked_to->cid;
-    receiver->buffer.payloads[0] = copy_payload(PAYLOAD_TYPE(type, 0), src_process, dst_process, a0, a1);
-    receiver->buffer.payloads[1] = copy_payload(PAYLOAD_TYPE(type, 1), src_process, dst_process, a1, a2);
-    receiver->buffer.payloads[2] = copy_payload(PAYLOAD_TYPE(type, 2), src_process, dst_process, a2, a3);
-    receiver->buffer.payloads[3] = copy_payload(PAYLOAD_TYPE(type, 3), src_process, dst_process, a3, 0);
+    receiver->buffer.payloads[0] = copy_payload(PAYLOAD_TYPE(header, 0), src_process, dst_process, a0, a1);
+    receiver->buffer.payloads[1] = copy_payload(PAYLOAD_TYPE(header, 1), src_process, dst_process, a1, a2);
+    receiver->buffer.payloads[2] = copy_payload(PAYLOAD_TYPE(header, 2), src_process, dst_process, a2, a3);
+    receiver->buffer.payloads[3] = copy_payload(PAYLOAD_TYPE(header, 3), src_process, dst_process, a3, 0);
 
     thread_resume(dst->receiver);
     return ERROR_NONE;
 }
 
 
-header_t sys_send(channel_t ch, header_t type, payload_t a0, payload_t a1,
+header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
                   payload_t a2, payload_t a3) {
     // Get the sender right.
     struct channel *src, *dst, *linked_to;
     struct thread *receiver;
 
-    bool slowpath =  ((type & 0xfff) != 0 /* Are all payloads inlined? */
+    bool slowpath =  ((header & 0xfff) != 0 /* Are all payloads inlined? */
                   || (src = get_channel_by_id(ch)) == NULL
                   || (linked_to = src->linked_to) == NULL
                   || (dst = (linked_to->transfer_to ?: linked_to)) == NULL
@@ -262,17 +257,17 @@ header_t sys_send(channel_t ch, header_t type, payload_t a0, payload_t a1,
                   || (receiver = dst->receiver) == NULL);
 
     if (unlikely(slowpath)) {
-        return sys_send_slowpath(ch, type, a0, a1, a2, a3);
+        return sys_send_slowpath(ch, header, a0, a1, a2, a3);
     }
 
-    DEBUG("sys_fast_send: @%d.%d -> @%d.%d ~> @%d.%d (type=%d.%d)",
+    DEBUG("sys_fast_send: @%d.%d -> @%d.%d ~> @%d.%d (header=%d.%d)",
         src->process->pid, src->cid,
         linked_to->process->pid, linked_to->cid,
         dst->process->pid, dst->cid,
-        MSG_SERVICE_ID(type), MSG_ID(type));
+        MSG_SERVICE_ID(header), MSG_ID(header));
 
     // Copy payloads.
-    receiver->buffer.header = type;
+    receiver->buffer.header = header;
     receiver->buffer.sent_from = linked_to->cid;
     receiver->buffer.payloads[0] = a0;
     receiver->buffer.payloads[1] = a1;
