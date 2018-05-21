@@ -9,7 +9,10 @@ static inline u64_t rdtscp(u32_t *cpu) {
     __asm__ __volatile__(
         "cpuid      \n"
         "rdtscp     \n"
-    : "=a"(rax), "=d"(rdx), "=c"(*cpu));
+    : "=a"(rax), "=d"(rdx), "=c"(*cpu)
+    :
+    : "%rbx"
+    );
 
     return (rdx << 32) | rax;
 }
