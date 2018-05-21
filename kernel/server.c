@@ -23,8 +23,6 @@ static inline void handle_exit_exit(channel_t from, u32_t error) {
 
 
 static inline error_t handle_logging_emit(channel_t from, string_t str, usize_t length) {
-    DEBUG("logging %p %d", str, length);
-
     kmutex_state_t mstate = kmutex_lock_irq_disabled(&logging_lock);
 
     for (usize_t i = 0; i < length; i++) {
