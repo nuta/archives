@@ -1,7 +1,7 @@
 ARCH_DIR = kernel/arch/$(ARCH)
 include $(ARCH_DIR)/arch.mk
 
-objs := init.o memory.o process.o thread.o ipc.o kfs.o elf.o server.o printk.o string.o list.o
+objs := init.o memory.o process.o thread.o ipc.o server.o printk.o string.o list.o
 stubs := discovery exit logging
 
 kernel_objs := $(addprefix kernel/, $(objs)) $(addprefix $(ARCH_DIR)/, $(arch_objs))
@@ -18,7 +18,7 @@ kernel_objs := $(addprefix $(BUILD_DIR)/, $(kernel_objs) $(all_objs))
 kernel_include_dirs := $(PWD) $(addprefix $(ARCH_DIR)/, $(arch_include_dirs)) \
 	build $(all_include_dirs)
 
-$(BUILD_DIR)/kernel/kfs.o: $(BUILD_DIR)/kernel/kfs.bin
+$(BUILD_DIR)/kernel/init.o: $(BUILD_DIR)/kernel/kfs.bin
 $(BUILD_DIR)/kernel/kfs.bin: $(all_kfs_files) tools/mkkfs.py
 	$(PROGRESS) MKKFS $@
 	./tools/mkkfs.py $@ $(KFS_DIR)
