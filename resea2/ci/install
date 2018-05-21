@@ -1,0 +1,29 @@
+#!/bin/sh
+set -ue
+
+case $TARGET in
+analyze)
+    case $TRAVIS_OS_NAME in
+    linux)
+        cd ..
+        # Install CodeClimate CLI
+        curl -L https://github.com/codeclimate/codeclimate/archive/master.tar.gz | tar xvz
+        cd codeclimate-* && sudo make install && cd ..
+
+        # Install CodeClimate engine
+        docker pull seiyanuta/codeclimate-clang-static-analyzer
+        docker tag seiyanuta/codeclimate-clang-static-analyzer codeclimate/codeclimate-clang-static-analyzer
+        cd ../resea
+        ;;
+    esac
+    ;;
+
+kernel-test)
+    case $TRAVIS_OS_NAME in
+    linux)
+        docker pull ubuntu:16.04
+        docker build -t ci-image -f ci/Dockerfile .
+        ;;
+    esac
+    ;;
+esac

@@ -1,0 +1,7 @@
+name: channel-server
+author: Seiya Nuta <nuta@seiya.me>
+implements:
+  - channel
+requires: []
+objs:
+  - startup.o

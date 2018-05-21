@@ -1,0 +1,8 @@
+name: led-blink
+author: Seiya Nuta <nuta@seiya.me>
+implements:
+  - gpio
+requires:
+  - channel
+objs:
+  - startup.o

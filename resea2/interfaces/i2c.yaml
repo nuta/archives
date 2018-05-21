@@ -1,0 +1,50 @@
+name: i2c
+id: 11
+
+messages:
+  send:
+    id: 1
+    desc: Sends bytes to a slave.
+    reply: send_reply
+    payloads:
+      - name: addr
+        type: int
+        desc: The slave address.
+      - name: data
+        type: data
+        desc: The data to be sent.
+      - name: data_size
+        type: size
+        desc: The size of `data`.
+  send_reply:
+    id: 2
+    desc: The reply message of `.send`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  receive:
+    id: 3
+    desc: Receives bytes from a slave.
+    reply: receive_reply
+    payloads:
+      - name: addr
+        type: int
+        desc: The slave address.
+      - name: size
+        type: size
+        desc: The number of bytes to receive.
+  receive_reply:
+    id: 4
+    desc: The reply message of `.receive`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+      - name: data
+        type: data
+        desc: The received data.
+      - name: data_size
+        type: size
+        desc: The size of `data`.

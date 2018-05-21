@@ -1,0 +1,25 @@
+notifications:
+  on_success: change
+  on_failure: change
+
+language: c++
+
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      env: TARGET=kernel-test
+      services:
+        - docker
+    - os: linux
+      sudo: required
+      language: generic
+      env: TARGET=analyze
+      services:
+        - docker
+
+install:
+  - ./ci/install
+
+script:
+  - ./ci/script

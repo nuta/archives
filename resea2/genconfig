@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+import argparse
+import sys
+import os
+import resea
+
+
+CONFIG_MK_FMT = """\
+{% for k, v in values.items() %}
+{{ k }} = {{ v }}
+{% endfor %}
+
+{% for app_yaml in app_yamls %}
+app_yamls += {{ app_yaml }}
+{% endfor %}
+
+{% if values["TARGET"] == "kernel" %}
+include kernel/kernel.mk
+{% endif %}
+
+objs += $(OBJS)
+{% for path in objs %}
+objs += {{ path }}
+{% endfor %}
+
+{% for name in interfaces %}
+interfaces += {{ name }}
+{% endfor %}
+"""
+
+
+def main(args):
+    values = {}
+    for value in args.values:
+        k, v = value.split("=", 1)
+        values[k] = v
+
+    objs = []
+    app_yamls = []
+    interfaces = set()
+    for app in values["APPS"].split(" "):
+        app_dir = os.path.join("apps", app)
+        yaml_path = os.path.join(app_dir, "app.yaml")
+        app_yamls.append(yaml_path)
+        yaml = resea.load_yaml(yaml_path)
+        objs += map(lambda obj: os.path.join(app_dir, obj), yaml["objs"])
+        interfaces.update(yaml["requires"])
+        interfaces.update(yaml["implements"])
+
+    values.setdefault("LANGS", "cpp")
+    values.setdefault("BUILD_DIR", "build")
+    values.setdefault("TARGET_FILE", os.path.join(values["BUILD_DIR"], values["TARGET"] + ".elf"))
+
+    os.makedirs(values["BUILD_DIR"], exist_ok=True)
+    with open(os.path.join(values["BUILD_DIR"], "config.mk"), "w") as f:
+        f.write(resea.fmt(CONFIG_MK_FMT, locals()))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="A config.mk generator")
+    parser.add_argument("values", nargs="*")
+    main(parser.parse_args())

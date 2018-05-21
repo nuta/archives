@@ -1,0 +1,154 @@
+name: interrupt
+id: 3
+
+messages:
+  listen:
+    desc: Receive interrupt event messages of the interrupt pin.
+    id: 1
+    reply: listen_reply
+    payloads:
+      - name: channel
+        type: channel
+        desc: The channel where events will be sent to.
+      - name: pin
+        type: int
+        desc: The interrupt vector. Depends on the environment.
+      - name: arg
+        type: uintmax
+        desc: The data to be sent with interrupt messages.
+  listen_reply:
+    desc: The reply message of `.listen`.
+    id: 2
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  interrupt0:
+    desc: "Interrupt #0"
+    id: 1000
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt1:
+    desc: "Interrupt #1"
+    id: 1001
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt2:
+    desc: "Interrupt #2"
+    id: 1002
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt3:
+    desc: "Interrupt #3"
+    id: 1003
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt4:
+    desc: "Interrupt #4"
+    id: 1004
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt5:
+    desc: "Interrupt #5"
+    id: 1005
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt6:
+    desc: "Interrupt #6"
+    id: 1006
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt7:
+    desc: "Interrupt #7"
+    id: 1007
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt8:
+    desc: "Interrupt #8"
+    id: 1008
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt9:
+    desc: "Interrupt #9"
+    id: 1009
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt10:
+    desc: "Interrupt #10"
+    id: 1010
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt11:
+    desc: "Interrupt #11"
+    id: 1011
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt12:
+    desc: "Interrupt #12"
+    id: 1012
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt13:
+    desc: "Interrupt #13"
+    id: 1013
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt14:
+    desc: "Interrupt #14"
+    id: 1014
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.
+  interrupt15:
+    desc: "Interrupt #15"
+    id: 1015
+    stub: no
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data passed by `.listen`.

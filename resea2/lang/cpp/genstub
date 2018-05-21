@@ -1,0 +1,270 @@
+#!/usr/bin/env python3
+import argparse
+from collections import OrderedDict
+import sys
+import resea
+
+H_HEADER_FMT = """\
+#ifndef __RESEA_CSTUB_{{ interface_name | upper }}_H__
+#define __RESEA_CSTUB_{{ interface_name | upper }}_H__
+
+#include <resea.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define {{ interface_name | upper }}_INTERFACE ({{ interface_id }} << 12)
+"""
+
+H_MSG_FMT = """
+#define {{ interface_name | upper }}_{{name | upper }} ({{ interface_name | upper }}_INTERFACE | {{ id }})
+
+{% if is_reply_msg %}
+result_t reply_{{ interface_name }}_{{ without_suffix_name }}(channel_t __ch {{ arg_defs }});
+{% endif %}
+result_t send_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}, int flags);
+result_t recv_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_ptr_defs }}, int flags, channel_t *__from);
+{% if reply_name %}
+result_t call_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}{{ reply_ptr_defs }});
+{% endif %}
+
+static inline void marshal_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_defs }}) {
+
+{% for type, name in payloads %}
+    __payloads[{{ loop.index0 }}] = (payload_t) {{ name }};
+{% endfor %}
+}
+
+static inline void unmarshal_{{ interface_name }}_{{ name }}(payload_t *__payloads {{ arg_ptr_defs }}) {
+
+{% for type, name in payloads %}
+    {% if type != '' %}
+    *{{ name }} = ({{ type }}) __payloads[{{ loop.index0 }}];
+    {% endif %}
+{%- endfor %}
+}
+"""
+
+H_FOOTER_FMT = """
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+"""
+
+C_HEADER_FMT = """\
+#include <resea.h>
+#include <resea/{{ interface_name}}.h>
+"""
+
+C_MSG_FMT = """
+result_t send_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}, int flags) {
+    payload_t __payloads[{{ payloads_length }}];
+    marshal_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
+    return send(__ch, (payload_t *) &__payloads, sizeof(__payloads), flags);
+}
+
+{% if is_reply_msg %}
+result_t reply_{{ interface_name }}_{{ without_suffix_name }}(channel_t __ch {{ arg_defs }}) {
+    payload_t __payloads[{{ payloads_length }}];
+    marshal_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
+    return send(__ch, (payload_t *) &__payloads, sizeof(__payloads), 0);
+}
+{% endif %}
+
+
+result_t recv_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_ptr_defs }}, int flags, channel_t *__from) {
+    payload_t __payloads[{{ payloads_length }}];
+    result_t __r = recv(__ch, (payload_t *) &__payloads, sizeof(__payloads), flags, __from);
+    if (__r != OK)
+        return __r;
+
+    unmarshal_{{ interface_name }}_{{ name }}((payload_t *) &__payloads {{ args }});
+    return __r;
+}
+
+{% if reply_name %}
+result_t call_{{ interface_name }}_{{ name }}(channel_t __ch {{ arg_defs }}
+             {{ reply_ptr_defs }}) {
+
+    payload_t __args[{{ args_length }}];
+    payload_t __rets[{{ rets_length }}];
+
+    marshal_{{ interface_name }}_{{ name }}((payload_t *) &__args {{ args }});
+    result_t __r = call(__ch, (payload_t *) &__args, sizeof(__args), (payload_t *) &__rets, sizeof(__rets));
+    if (__r != OK)
+        return __r;
+
+    unmarshal_{{ interface_name }}_{{ reply_name }}((payload_t *) &__rets {{ reply_args }});
+    return __r;
+}
+{% endif %}
+"""
+
+C_FOOTER_FMT = """
+"""
+
+
+def is_ool_type(type_):
+    return type_ == 'data'
+
+def ctype(type_):
+    types = {
+        'data':      'void *',
+        'channel':   'channel_t',
+        'payload':   'payload_t',
+        'id':        'ident_t',
+        'addr':      'uintptr_t',
+        'paddr':     'paddr_t',
+        'offset':    'offset_t',
+        'interface': 'interface_t',
+        'msgid':     'msgid_t',
+        'cid':       'cid_t',
+        'result':    'result_t',
+        'uchar':     'uchar_t',
+        'size':      'size_t',
+        'int8':      'int8_t',
+        'int16':     'int16_t',
+        'int32':     'int32_t',
+        'int64':     'int64_t',
+        'int':       'int32_t',
+        'intmax':    'intmax_t',
+        'uint8':     'uint8_t',
+        'uint16':    'uint16_t',
+        'uint32':    'uint32_t',
+        'uint64':    'uint64_t',
+        'uint':      'uint32_t',
+        'uintmax':   'uintmax_t',
+        '': ''
+    }
+
+    return types[type_]
+
+
+def load_payload_defs(interface_name, msg_name, payloads):
+
+    if payloads is None:
+        payloads = []
+
+    defs = [{
+        'type': '',
+        'name': '{}_{}'.format(interface_name.upper(), msg_name.upper())
+    }]
+
+    for p in payloads:
+        defs.append(p)
+
+        if is_ool_type(p['type']):
+            # size of an OoL payload
+            defs.append({
+                'type': 'size',
+                'name': p['name'] + '_size'
+            })
+
+    length = 0
+    payloads = []
+    for i, p in enumerate(defs, start=0):
+        if i % 8 == 0:
+            # inject a payload header
+            header = '0'
+            size_payload = False
+            for j, q in enumerate(defs[i:i+8]):
+                if size_payload:
+                    header += ' | (0x04 << {})'.format(j * 4)
+                    size_payload = False
+                    continue
+
+                if isinstance(q, dict):
+                    if q['type'] == 'channel':
+                        header += '| (0x02 << {})'.format(j * 4)
+                    elif is_ool_type(q['type']):
+                        header += '| (0x03 << {})'.format(j * 4)
+                        size_payload = True
+                    else:
+                        header += '| (0x01 << {})'.format(j * 4)
+
+            payloads.append(('', header))
+            length += 1
+
+        payloads.append((ctype(p['type']), p['name']))
+        length += 1
+
+    return payloads, length
+
+
+def generate_consts(yaml):
+    consts = OrderedDict(sorted(yaml.get("consts", {}).items()))
+    for name, const in consts.items():
+        print("#define {interface_name}_{name} ({value})".format(
+                interface_name=yaml["name"].upper(), name=name.upper(),
+                value=const["value"]))
+
+
+def generate_msg(interface_name, messages, name, msg_fmt):
+    msg = messages[name]
+    def generate_defs(fmt, payloads):
+        if payloads is None:
+            payloads = []
+
+        args = list(map(lambda p: fmt.format(type=ctype(p['type']),
+                                             name=p['name']), payloads))
+
+        if args == []:
+            return ""
+        else:
+            return ", " + ", ".join(args)
+
+    id = msg["id"]
+    arg_defs = generate_defs("{type} {name}", msg["payloads"])
+    arg_ptr_defs = generate_defs("{type}* {name}", msg["payloads"])
+    args = generate_defs("{name}", msg["payloads"])
+    payloads, payloads_length = load_payload_defs(interface_name, name, msg["payloads"])
+
+    if name.endswith("_reply"):
+        is_reply_msg = True
+        without_suffix_name = name[:-len("_reply")]
+    else:
+        is_reply_msg = False
+
+    if "reply" in msg:
+        reply_name = msg["reply"]
+        reply_ptr_defs = generate_defs("{type}* {name}", messages[reply_name]["payloads"])
+        reply_args = generate_defs("{name}", messages[reply_name]["payloads"])
+        args_length = len(payloads)
+        _, rets_length = load_payload_defs(interface_name, name, messages[reply_name]["payloads"])
+    else:
+        reply_name = None
+
+    print(resea.fmt(msg_fmt, locals()))
+
+
+def main(args):
+    yaml = resea.load_yaml(args.file)
+    file_type = args.type
+    interface_name = yaml["name"]
+    messages = OrderedDict(sorted(yaml["messages"].items()))
+
+    if args.type == 'c':
+        print(resea.fmt(C_HEADER_FMT, locals()))
+        for name, msg in messages.items():
+            if msg.get('stub', True):
+                generate_msg(interface_name, messages, name, C_MSG_FMT)
+        print(resea.fmt(C_FOOTER_FMT, locals()))
+    elif args.type == 'h':
+        interface_id = yaml["id"]
+        print(resea.fmt(H_HEADER_FMT, locals()))
+        generate_consts(yaml)
+        for name, _ in messages.items():
+            generate_msg(interface_name, messages, name, H_MSG_FMT)
+        print(resea.fmt(H_FOOTER_FMT, locals()))
+    else:
+        sys.exit("genstub: unknown file type")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="A stub generator for C/C++")
+    parser.add_argument("file", help="The interface yaml.")
+    parser.add_argument("type", help="The file type to be generated (c or h).")
+    main(parser.parse_args())

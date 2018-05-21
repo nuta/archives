@@ -1,0 +1,14 @@
+name: makestack-driver
+author: Seiya Nuta <nuta@seiya.me>
+implements:
+  - gpio
+  - i2c
+  - interrupt
+  - makestack
+  - timer
+  - http
+requires:
+  - channel
+objs:
+  - startup.o
+stack_size: 5000

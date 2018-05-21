@@ -1,0 +1,41 @@
+name: channel
+id: 1
+
+messages:
+  connect:
+    id: 1
+    desc: Connects a channel with a registered channel.
+    reply: connect_reply
+    payloads:
+      - name: channel
+        type: cid
+        desc: The channel ID.
+      - name: interface
+        type: interface
+        desc: The interface ID.
+  connect_reply:
+    id: 2
+    desc: The reply message of `.connect`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  register:
+    id: 3
+    desc: Registers a channel.
+    reply: register_reply
+    payloads:
+      - name: channel
+        type: cid
+        desc: The channel ID.
+      - name: interface
+        type: interface
+        desc: The interface ID.
+  register_reply:
+    id: 4
+    desc: The reply message of `.register`.
+    payloads:
+      - name: result
+        type: result
+        desc: The result.

@@ -1,0 +1,83 @@
+name: makestack
+id: 101
+
+messages:
+  reset:
+    id: 1
+    desc: Restarts the app.
+    reply: reset_reply
+    payloads:
+  reset_reply:
+    id: 2
+    desc: The reply message of `.reset`.
+    payloads:
+
+  update:
+    id: 3
+    desc: Downloads and launches app to the speicified `deployment_version`. The
+          current running app will be killed.
+    reply: update_reply
+    payloads:
+      - name: deployment_version
+        type: int
+        desc: The deployment ID.
+  update_reply:
+    id: 4
+    desc: The reply message of `.update`.
+    payloads:
+
+  get_device_secret:
+    id: 5
+    desc: Returns the device secret.
+    reply: get_device_secret_reply
+    payloads:
+  get_device_secret_reply:
+    id: 6
+    desc: The reply message of `.get_device_secret`.
+    payloads:
+      - name: device_secret
+        type: data
+        desc: The device secret.
+      - name: device_secret_size
+        type: size
+
+  get_server_url:
+    id: 7
+    desc: Returns the server URL.
+    reply: get_server_url_reply
+    payloads:
+  get_server_url_reply:
+    id: 8
+    desc: The reply message of `.get_server_url`.
+    payloads:
+      - name: server_url
+        type: data
+        desc: The server url.
+      - name: server_url_size
+        type: size
+
+  get_deployment_version:
+    id: 9
+    desc: Returns the current deployment ID.
+    reply: get_deployment_version_reply
+    payloads:
+  get_deployment_version_reply:
+    id: 10
+    desc: The reply message of `.get_deployment_version`.
+    payloads:
+      - name: deployment_version
+        type: int
+        desc: The deployment ID.
+
+  reboot_after:
+    id: 11
+    desc: Reboot after `ms`.
+    reply: reboot_after_reply
+    payloads:
+      - name: ms
+        type: int
+        desc: msec
+  reboot_after_reply:
+    id: 12
+    desc: The reply message of `.reboot_after`.
+    payloads:

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -ue
+sudo apt-get update
+sudo apt-get install -y build-essential zsh git python3-pip
+sudo pip3 install termcolor jinja2 pyyaml

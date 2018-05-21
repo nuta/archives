@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import subprocess
+import re
+import resea
+import sys
+from termcolor import colored, cprint
+
+
+LOG_LINE_REGEX = r"(B|I|D|M|W|P|TP|TF|TE)> (.*)"
+
+def get_type_color(type_):
+    return {
+        'B':  ("red",    None, ["bold"]),
+        'I':  ("blue",   None, ["bold"]),
+        'D':  ("yellow", None, ["bold"]),
+        'W':  ("red",    None, ["bold"]),
+        'P':  ("red",    None, ["bold", "underline"]),
+        'TP': ("green",  None, ["bold"]),
+        'TF': ("red",    None, ["bold"]),
+    }.get(type_, ())
+
+def get_type_name(type_):
+    return {
+        'B':  'BUG  ',
+        'I':  'INFO ',
+        'D':  'DEBUG',
+        'W':  'WARN ',
+        'P':  'PANIC',
+        'TP': 'PASS ',
+        'TF': 'FAIL ',
+        'TE': 'END  ',
+    }.get(type_, type_)
+
+def main(args):
+    p = subprocess.Popen(args.command, shell=True,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT,
+                         preexec_fn=os.setsid)
+
+    try:
+        passed = 0
+        failed = 0
+        bugs = 0
+        while True:
+            b = p.stdout.readline()
+            try:
+                l = b.decode("utf-8").strip()
+            except UnicodeDecodeError:
+                resea.notice('cannot decode utf-8 string [{}]'.format(b))
+
+            if l == "":
+                continue
+
+            m = re.match(LOG_LINE_REGEX, l)
+            if m is None:
+                print(l)
+            else:
+                type_ = m.groups(1)[0]
+                if type_ == "TP":
+                    passed += 1
+                elif type_ == "TF":
+                    failed += 1
+                elif type_ == "TE":
+                    p.kill()
+                    p.wait()
+
+                    if failed > 0:
+                        sys.exit(colored("\n{} tests are failed.".format(failed), "red", attrs=["bold"]))
+                    else:
+                        cprint("\nAll {} tests are passed.".format(passed), "green", attrs=["bold"])
+                    return
+
+                name = get_type_name(type_)
+                color = get_type_color(type_)
+                msg = m.groups(1)[1]
+                print("{} {}".format(colored(name, *color), msg))
+    except KeyboardInterrupt:
+        p.kill()
+        p.wait()
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Runs a Resea application with prettified loggging output")
+    parser.add_argument("command", help="A command to execute.")
+    main(parser.parse_args())

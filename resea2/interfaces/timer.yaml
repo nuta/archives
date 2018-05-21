@@ -1,0 +1,70 @@
+name: timer
+id: 4
+
+messages:
+  set_interval:
+    desc: Set an interval timer.
+    id: 1
+    reply: set_interval_reply
+    payloads:
+      - name: channel
+        type: channel
+        desc: The channel where `.timeout` message will be sent to.
+      - name: ms
+        type: uint
+        desc: The interval in msec.
+      - name: arg
+        type: uintmax
+        desc: The data to be sent with `.timeout` message.
+  set_interval_reply:
+    desc: The reply message of `.set_interval`.
+    id: 2
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  set_oneshot:
+    desc: Set an oneshot timer.
+    id: 3
+    reply: set_oneshot_reply
+    payloads:
+      - name: channel
+        type: channel
+        desc: The channel where `.timeout` message will be sent to.
+      - name: ms
+        type: uint
+        desc: The interval in msec.
+      - name: arg
+        type: uintmax
+        desc: The data to be sent with `.timeout` message.
+  set_oneshot_reply:
+    desc: The reply message of `.set_oneshot`.
+    id: 4
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  delete_timer:
+    desc: Removes all timers set on the channel.
+    id: 3
+    reply: delete_timer_reply
+    payloads:
+      - name: channel
+        type: channel
+        desc: The channel where `.timeout` message will be sent to.
+  delete_timer_reply:
+    desc: The reply message of `.delete_timer`.
+    id: 4
+    payloads:
+      - name: result
+        type: result
+        desc: The result.
+
+  timeout:
+    id: 1000
+    payloads:
+      - name: arg
+        type: uintmax
+        desc: The data set by `.set_*` messages.
