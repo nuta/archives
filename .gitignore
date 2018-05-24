@@ -1,6 +1,7 @@
 .cache
 build
 *.log
+*.pyc
 
 tools/idl/parser
 tools/idl/.antlr
