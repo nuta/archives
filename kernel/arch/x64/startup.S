@@ -71,17 +71,25 @@ boot_from_mbrboot:
 
 .code32
 .align 8
-multiboot:
+multiboot2:
     .long 0xe85250d6    /* magic */
     .long 0             /* arch (i386) */
-    .long multiboot_end - multiboot
-    .long   -(0xe85250d6 + 0 + (multiboot_end - multiboot))  /* checksum */
+    .long multiboot2_end - multiboot2
+    .long   -(0xe85250d6 + 0 + (multiboot2_end - multiboot2))  /* checksum */
 
     /* terminator */
     .word 0
     .word 0
     .word 0
-multiboot_end:
+multiboot2_end:
+
+/* Old fashion multiboot header for QEMU. */
+.align 8
+old_multiboot:
+    .long 0x1badb002    /* magic */
+    .long 0             /* flags */
+    .long -(0x1badb002 + 0) /* checksum */
+old_multiboot_end:
 
 /* Boot from GRUB. We are already in the protected mode. */
 multiboot_entry:
