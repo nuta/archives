@@ -103,7 +103,6 @@ boot:
     call read_kernel_file
 
     /* Verify magic number. */
-    mov al, 'E'
     cmp byte ptr [di], ELF_MAGIC
     jne error
 
@@ -123,9 +122,9 @@ load_segment:
 
     mov si, [bx + 0x08] /* offset in the file */
     mov edi, [bx + 0x18] /* physical address */
-    mov dx, [bx + 0x20] /* size */
+    mov edx, [bx + 0x20] /* size */
     shr si, cl /* assuming that offset is multiple of cluster */
-    shr dx, cl
+    shr edx, cl
     inc dx /* in case the segment size is not multiple of 512 */
     mov cx, dx
     call read_kernel_file
@@ -150,8 +149,8 @@ load_segment:
 not_reachable:
 
 error:
-    mov ah, 0x01 /* Send a character feature. */
-    xor dx, dx   /* The COM port. */
+    mov ah, 0x0145 /* Send 'E'. */
+    xor dx, dx     /* The COM port. */
     int 0x14
     hlt
 
@@ -214,7 +213,6 @@ read_sector:
     mov si, DAP
     mov dl, [DRIVER_NUMBER]
     int 0x13
-
     popad
     ret
 
@@ -249,7 +247,6 @@ search_sector:
     jnz try_next_sector
 
     /* The signature is not found. */
-    mov al, 'N'
     jmp error
 
 2:
