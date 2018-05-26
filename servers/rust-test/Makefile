@@ -1,4 +1,5 @@
 name := rust-test
 lang := rust
-
-#include servers/server.mk
+objs :=
+libs :=
+requires :=

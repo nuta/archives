@@ -1,6 +1,5 @@
-name := benchmark-client
+name := benchmark-server
+lang := c
 objs := main.o
 libs :=
 requires := discovery benchmark
-
-include servers/server.mk

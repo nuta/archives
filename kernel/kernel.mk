@@ -1,58 +1,55 @@
 ARCH_DIR = kernel/arch/$(ARCH)
+KFS_DIR = $(BUILD_DIR)/kernel/kfs
 include $(ARCH_DIR)/arch.mk
 
 objs := init.o memory.o process.o thread.o ipc.o server.o printk.o string.o list.o
 stubs := discovery exit logging
 
 kernel_objs := $(addprefix kernel/, $(objs)) $(addprefix $(ARCH_DIR)/, $(arch_objs))
-kernel_libs := $(libs)
-stub_files :=  $(foreach stub, $(stubs), build/resea/$(stub).h)
+libs := $(libs)
+stub_files := $(foreach stub, $(stubs), $(BUILD_DIR)/stubs/resea/$(stub).h)
+kfs_files := $(addprefix $(KFS_DIR)/servers/, $(SERVERS))
 
 # Load libs.
 all_objs :=
 all_libs :=
 all_include_dirs :=
 included_subdirs :=
-include $(foreach lib, $(kernel_libs), libs/$(lib)/build.mk)
-kernel_objs := $(addprefix $(BUILD_DIR)/, $(kernel_objs) $(all_objs))
-kernel_include_dirs := $(PWD) $(addprefix $(ARCH_DIR)/, $(arch_include_dirs)) \
-	build $(all_include_dirs)
+include $(foreach lib, $(libs), libs/$(lib)/build.mk)
+objs := $(addprefix $(BUILD_DIR)/, $(kernel_objs) $(all_objs))
+include_dirs := $(PWD) $(addprefix $(ARCH_DIR)/, $(arch_include_dirs)) \
+	$(all_include_dirs) $(BUILD_DIR)/stubs
 
-$(BUILD_DIR)/kernel/init.o: $(BUILD_DIR)/kernel/kfs.bin
-$(BUILD_DIR)/kernel/kfs.bin: $(all_kfs_files) tools/mkkfs.py
-	$(PROGRESS) MKKFS $@
-	./tools/mkkfs.py $@ $(KFS_DIR)
+$(BUILD_DIR)/kernel/kernel.elf: $(objs) $(ARCH_DIR)/kernel.ld
+	$(PROGRESS) "LD" $@
+	$(LD) $(LDFLAGS) --Map=$(BUILD_DIR)/kernel/kernel.map --script $(ARCH_DIR)/kernel.ld -o $@ $(objs)
 
-$(BUILD_DIR)/kernel/kernel.elf: $(kernel_objs) $(ARCH_DIR)/kernel.ld
-	$(PROGRESS) "LD(K)" $@
-	$(LD) $(LDFLAGS) --Map=$(BUILD_DIR)/kernel/kernel.map --script $(ARCH_DIR)/kernel.ld -o $@ $(kernel_objs)
-
-$(BUILD_DIR)/resea/%.h: interfaces/%.idl tools/genstub.py tools/idl/parser/idlParser.py
+$(KFS_DIR)/servers/%:
+	$(MAKE) servers/$(notdir $@)
 	mkdir -p $(dir $@)
-	$(PROGRESS) GENSTUB $@
-	./tools/genstub.py -o $(dir $@) $<
+	$(PROGRESS) CP $@
+	cp $(BUILD_DIR)/servers/$(notdir $@)/server.elf $@
 
 $(BUILD_DIR)/%.o: %.S Makefile
 	mkdir -p $(dir $@)
-	$(PROGRESS) "CC(K)" $@
+	$(PROGRESS) "CC" $@
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/%.o: %.c Makefile $(stub_files)
 	mkdir -p $(dir $@)
-	$(PROGRESS) "CC(K)" $@
-	$(CC) $(CFLAGS) $(addprefix -I, $(kernel_include_dirs)) -c -o $@ $<
+	$(PROGRESS) "CC" $@
+	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -c -o $@ $<
 
 $(BUILD_DIR)/%.deps: %.c Makefile $(stub_files)
 	mkdir -p $(dir $@)
-	$(PROGRESS) "GENDEPS(K)" $@
-	$(CC) $(CFLAGS) $(addprefix -I, $(kernel_include_dirs)) -MF $@ -MT $(<:.c=.o) -MM $<
+	$(PROGRESS) "GENDEPS" $@
+	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -MF $@ -MT $(<:.c=.o) -MM $<
 
-# Clear variables.
-objs :=
-libs :=
-stub_files :=
-include_dirs :=
-subdirs :=
-included_subdirs :=
+# KFS
+$(BUILD_DIR)/kernel/init.o: $(BUILD_DIR)/kernel/kfs.bin
 
--include $(kernel_objs:.o=.deps)
+$(BUILD_DIR)/kernel/kfs.bin: $(kfs_files) tools/mkkfs.py
+	$(PROGRESS) MKKFS $@
+	./tools/mkkfs.py $@ $(KFS_DIR)
+
+-include $(objs:.o=.deps)
