@@ -334,16 +334,19 @@ channel_t sys_connect(channel_t server) {
 
 channel_t sys_link(channel_t ch1, channel_t ch2) {
     /* TODO */
+    return 0;
 }
 
 
 channel_t sys_transfer(channel_t ch, channel_t dest) {
     /* TODO */
+    return 0;
 }
 
 
 channel_t sys_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t ool3) {
     /* TODO */
+    return 0;
 }
 
 
