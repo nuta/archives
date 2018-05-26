@@ -4,7 +4,6 @@
 #include "thread.h"
 #include "process.h"
 #include "memory.h"
-#include "cpu.h" // FIXME
 
 paddr_t allocated;
 int used = 0;

@@ -1,7 +1,6 @@
 #include <kernel/types.h>
 #include <kernel/string.h>
 #include "gdt.h"
-#include "cpu.h"
 #include "asm.h"
 
 
@@ -31,10 +30,10 @@ static void set_tss_desc(struct tss_desc *desc, paddr_t base) {
 
 
 void  x64_init_gdt(void) {
-    struct seg_desc *gdt = (struct seg_desc *) &CPUVAR->gdt;
+    struct seg_desc *gdt = (struct seg_desc *) &CPUVAR->arch.gdt;
 
-    memset(&CPUVAR->gdt, 0, sizeof(CPUVAR->gdt));
-    memset(&CPUVAR->gdtr, 0, sizeof(CPUVAR->gdtr));
+    memset(&CPUVAR->arch.gdt, 0, sizeof(CPUVAR->arch.gdt));
+    memset(&CPUVAR->arch.gdtr, 0, sizeof(CPUVAR->arch.gdtr));
 
     // NULL
     set_seg_desc(&gdt[GDT_NULL], 0, 0, 0, 0);
@@ -55,10 +54,10 @@ void  x64_init_gdt(void) {
                  GDTTYPE_USER_DATA64, GDT_LIMIT2_MASK_DATA64);
 
     // TSS
-    set_tss_desc((struct tss_desc *) &gdt[GDT_TSS], (uptr_t) &CPUVAR->tss);
+    set_tss_desc((struct tss_desc *) &gdt[GDT_TSS], (uptr_t) &CPUVAR->arch.tss);
 
     // Update GDTR
-    CPUVAR->gdtr.length = GDT_LENGTH;
-    CPUVAR->gdtr.address = (uptr_t) gdt;
-    asm_lgdt((uptr_t) &CPUVAR->gdtr);
+    CPUVAR->arch.gdtr.length = GDT_LENGTH;
+    CPUVAR->arch.gdtr.address = (uptr_t) gdt;
+    asm_lgdt((uptr_t) &CPUVAR->arch.gdtr);
 }

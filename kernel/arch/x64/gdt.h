@@ -11,7 +11,6 @@
 #define GDT_USER_CODE   5
 #define GDT_TSS         6 // Note: a TSS descriptor is twice as large as
                           //       a code segment descriptor.
-#define GDT_DESC_NUM    8
 
 #define KERNEL_NULL_SEG    0
 #define KERNEL_CODE64_SEG  (GDT_KERNEL_CODE * 8)
@@ -32,31 +31,6 @@
 #define GDT_LIMIT2_MASK_CODE64    0xa0
 #define GDT_LIMIT2_MASK_CODE32    0xc0
 #define GDT_LIMIT2_MASK_DATA64    0x80
-
-struct seg_desc {
-    u16_t limit1;
-    u16_t base1;
-    u8_t  base2;
-    u8_t  type;
-    u8_t  limit2;
-    u8_t  base3;
-} PACKED;
-
-struct tss_desc {
-    u16_t limit1;
-    u16_t base1;
-    u8_t  base2;
-    u8_t  type;
-    u8_t  limit2;
-    u8_t  base3;
-    u32_t base4;
-    u32_t reserved;
-} PACKED;
-
-struct gdtr {
-    u16_t length;
-    u64_t address;
-} PACKED;
 
 void x64_init_gdt(void);
 

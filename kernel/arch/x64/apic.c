@@ -1,6 +1,5 @@
 #include "apic.h"
 #include "ioapic.h"
-#include "cpu.h"
 #include "handler.h"
 #include "gdt.h"
 #include "idt.h"

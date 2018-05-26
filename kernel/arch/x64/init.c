@@ -5,6 +5,7 @@
 #include "gdt.h"
 #include "idt.h"
 #include "tss.h"
+#include "cpuvar.h"
 #include "pic.h"
 #include "apic.h"
 #include "paging.h"
@@ -28,16 +29,14 @@ void x64_init_bsp(void) {
 void arch_early_init(void) {
     // Now we are able to use kernel memory allocator.
 
-    // Initialize paging table first: we need mappings to
-    // Local APIC.
     INFO("x64: initializing paging");
     x64_init_paging();
 
-    // Local APIC have to be initialized *just* after page
-    // table initialization because CPUVAR uses Local APIC
-    // internally.
     INFO("x64: initializing Local APIC");
     x64_init_apic();
+
+    INFO("x64: initializing cpuvar");
+    x64_init_cpuvar();
 
     INFO("x64: initializing GDT");
     x64_init_gdt();

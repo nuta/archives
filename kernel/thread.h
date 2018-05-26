@@ -3,7 +3,6 @@
 
 #include <kernel/types.h>
 #include "ipc.h"
-#include "cpu.h"
 #include "list.h"
 
 typedef u32_t tid_t;

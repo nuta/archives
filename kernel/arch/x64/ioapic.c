@@ -1,5 +1,4 @@
 #include "asm.h"
-#include "cpu.h"
 #include "gdt.h"
 #include "idt.h"
 #include "handler.h"

@@ -1,6 +1,6 @@
 #include <kernel/string.h>
-#include "cpu.h"
 #include "asm.h"
+#include "gdt.h"
 #include "idt.h"
 #include "tss.h"
 #include "handler.h"
@@ -32,10 +32,10 @@ static void set_kernel_intr_desc(struct intr_desc *desc, uptr_t offset) {
 
 
 void x64_init_idt(void) {
-    struct intr_desc *idt = (struct intr_desc *) &CPUVAR->idt;
+    struct intr_desc *idt = (struct intr_desc *) &CPUVAR->arch.idt;
 
-    memset(&CPUVAR->idt, 0, sizeof(CPUVAR->idt));
-    memset(&CPUVAR->idtr, 0, sizeof(CPUVAR->idtr));
+    memset(&CPUVAR->arch.idt, 0, sizeof(CPUVAR->arch.idt));
+    memset(&CPUVAR->arch.idtr, 0, sizeof(CPUVAR->arch.idtr));
 
     // expeptions
     SET_EXP_DESC(0);
@@ -100,7 +100,7 @@ void x64_init_idt(void) {
     }
 
     // Update GDTR
-    CPUVAR->idtr.length = IDT_LENGTH;
-    CPUVAR->idtr.address = (uptr_t) idt;
-    asm_lidt((uptr_t) &CPUVAR->idtr);
+    CPUVAR->arch.idtr.length = IDT_LENGTH;
+    CPUVAR->arch.idtr.address = (uptr_t) idt;
+    asm_lidt((uptr_t) &CPUVAR->arch.idtr);
 }

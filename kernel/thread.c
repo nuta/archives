@@ -1,6 +1,5 @@
 #include "printk.h"
 #include "list.h"
-#include "cpu.h" // FIXME
 #include "memory.h"
 #include "thread.h"
 #include "process.h"
