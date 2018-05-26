@@ -2,4 +2,4 @@ name := rust-test
 lang := rust
 objs :=
 libs :=
-requires :=
+requires := discovery

@@ -36,12 +36,6 @@ endif
 
 PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
 
-# Stubs.
-$(BUILD_DIR)/stubs/resea/%.h: interfaces/%.idl tools/genstub.py tools/idl/parser/idlParser.py
-	mkdir -p $(dir $@)
-	$(PROGRESS) GENSTUB $@
-	./tools/genstub.py -o $(dir $@) $<
-
 tools/idl/parser/idlParser.py: tools/idl/idl.g4
 	mkdir -p tools/idl/parser
 	$(PROGRESS) ANTLR4 $@
