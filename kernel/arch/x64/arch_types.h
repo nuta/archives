@@ -105,11 +105,11 @@ static inline void kmutex_unlock_restore_irq(kmutex_t *lock, kmutex_state_t stat
 }
 
 static inline void *from_paddr(paddr_t addr) {
-    return (void *) (addr | KERNEL_BASE_ADDR);
+    return (void *) (addr + KERNEL_BASE_ADDR);
 }
 
 static inline paddr_t to_paddr(void *addr) {
-    return ((uptr_t) addr & ~KERNEL_BASE_ADDR);
+    return ((uptr_t) addr - KERNEL_BASE_ADDR);
 }
 
 #include "arch_thread.h"
