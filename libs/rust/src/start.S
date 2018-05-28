@@ -32,3 +32,20 @@ memset:
     rep stosb
     mov rax, r8
     ret
+
+/* void *memcmp(void *ptr1, void *ptr2, size_t n); */
+.globl memcmp
+memcmp:
+    xchg rcx, rdx
+    cld
+    rep cmpsb
+
+    test rcx, 0
+    jne 1f
+    xor rax, rax
+    ret
+
+1:
+    mov al, [rdi]
+    sub al, [rsi]
+    ret
