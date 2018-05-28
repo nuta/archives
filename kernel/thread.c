@@ -26,7 +26,7 @@ struct thread *thread_create(struct process *process, uptr_t start, uptr_t arg) 
         stack_size = 4 * PAGE_SIZE;
 
         process->next_stack_start = stack + stack_size;
-        add_vmarea(&process->vms, stack, 0, stack_size,
+        add_vmarea(&process->vms, HEAP_ADDR, 0, HEAP_ADDR_SIZE,
             PAGE_USER | PAGE_WRITABLE, zeroed_pager, NULL);
     }
 

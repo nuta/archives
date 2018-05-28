@@ -5,7 +5,10 @@
 #include "thread.h"
 #include "ipc.h"
 
-#define STACK_ADDR 0xc0000000
+#define HEAP_ADDR  0xc0000000
+#define HEAP_ADDR_SIZE (0x40000000)
+#define STACK_ADDR 0xf0000000
+
 #define DEFAULT_CHANNELS_NUM 128
 
 struct process {
