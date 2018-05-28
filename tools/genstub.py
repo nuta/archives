@@ -173,6 +173,8 @@ def generate_rust_file(service):
                     # Skip an ool length; we use slice.len() instead.
                     skip_next = True
                     params += f", {name}.as_ptr() as Payload, {name}.len() as Payload"
+                elif type_id == CHANNEL_PAYLOAD:
+                    params += f", {name}.to_cid() as Payload"
                 else:
                     params += f", {name} as Payload"
 
@@ -187,6 +189,7 @@ def generate_rust_file(service):
             else:
                 type_id = get_type_id_by_name(types, type_)
                 reply_header += f" | ({type_id} << {i * 3}u64)"
+                params += ", &mut __r as *mut Payload" # TODO
                 rets_def += ""
                 rets += ""
 
@@ -213,9 +216,11 @@ const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_h
 
     return Template("""\
 #![allow(dead_code)]
+#![allow(unused_imports)]
 
 use core::result::{Result};
 use error::{GeneralError};
+use channel::{Channel};
 use arch::{ipc_call, CId, Payload};
 
 const ${service_name_upper}_SERVICE: u16 = $service_id << 8;

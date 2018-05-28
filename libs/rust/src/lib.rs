@@ -10,6 +10,7 @@ pub mod interfaces;
 pub mod error;
 pub mod arch;
 pub mod lang_items;
+pub mod channel;
 
 global_asm!(include_str!("start.S"));
 
