@@ -85,13 +85,20 @@ static inline double is_computer_on_fire(void) {
 #define ERRTYPE(header) (((header) >> MAJOR_ID_OFFSET) & 0xff)
 
 enum {
+    /* Errors returned from the app. */
     ERROR_NONE = 0,
-    ERROR_INVALID_SYSCALL = 1,
-    ERROR_NO_MEMORY = 2,
-    ERROR_INVALID_CH = 3,
-    ERROR_CH_NOT_LINKED = 4,
-    ERROR_CH_NOT_TRANSFERED = 5,
-    ERROR_CH_IN_USE = 6,
+    ERROR_UNKNOWN_MSG = 1,
+    ERROR_NOT_IMPLEMENTED = 2,
+
+    /* errors returned by kernel */
+    ERROR_NO_MEMORY = 200,
+    ERROR_INVALID_CH = 201,
+    ERROR_CH_NOT_LINKED = 202,
+    ERROR_CH_NOT_TRANSFERED = 203,
+    ERROR_CH_IN_USE = 204,
+
+    /* Internally used in the server. */
+    ERROR_DONT_REPLY = 255
 };
 
 typedef header_t error_t;
