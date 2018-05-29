@@ -72,6 +72,7 @@ struct channel {
 
 struct channel *channel_create(struct process *process);
 error_t channel_connect(struct channel *server, struct process *client);
+struct channel *get_channel_by_id(channel_t cid);
 
 header_t sys_send(
     channel_t ch,

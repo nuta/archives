@@ -14,7 +14,7 @@ static inline void transfer_to(struct channel *from, struct channel *to) {
 }
 
 
-static inline struct channel *get_channel_by_id(channel_t cid) {
+struct channel *get_channel_by_id(channel_t cid) {
     size_t channels_max = CPUVAR->current->process->channels_max;
     struct channel *channels = (struct channel *) &CPUVAR->current->process->channels;
 
