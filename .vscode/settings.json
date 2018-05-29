@@ -1,4 +1,3 @@
 {
-    "cquery.launch.command": "cquery",
-    "cquery.cacheDirectory": ".cache/cquery"
+    "cquery.cacheDirectory": "${workspaceFolder}/.vscode/cquery_cached_index/"
 }
