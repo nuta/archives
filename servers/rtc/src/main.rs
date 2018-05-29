@@ -3,6 +3,7 @@
 
 #[macro_use]
 extern crate resea;
+use resea::option::{Option};
 use resea::arch::x64::{IoPort};
 
 #[derive(Debug)]
@@ -15,8 +16,9 @@ struct DateTime {
     sec: u8
 }
 
-const IOPORT_RTC_W: u16 = 0x70;
-const IOPORT_RTC_R: u16 = 0x71;
+const RTC_IO_BASE: u16 = 0x70;
+const RTC_IO_W: u16 = 0x00;
+const RTC_IO_R: u16 = 0x01;
 const RTC_REG_SEC: u8 = 0x00;
 const RTC_REG_MIN: u8 = 0x02;
 const RTC_REG_HOUR: u8 = 0x04;
@@ -27,12 +29,12 @@ const RTC_REG_CENTURY: u8 = 0x32;
 const RTC_REG_STATUS_A: u8 = 0x0a;
 const RTC_REG_STATUS_B: u8 = 0x0b;
 
-unsafe fn read_cmos(reg: u8) -> u8 {
-    let wio = IoPort::new(IOPORT_RTC_W);
-    let rio = IoPort::new(IOPORT_RTC_R);
+static mut ioport: Option<IoPort> = None;
 
-    wio.out8(reg);
-    rio.in8()
+unsafe fn read_cmos(reg: u8) -> u8 {
+    let port = ioport.as_mut().unwrap();
+    port.out8(RTC_IO_W, reg);
+    port.in8(RTC_IO_R)
 }
 
 unsafe fn wait_for_rtc() {
@@ -91,6 +93,10 @@ fn read_datetime() -> DateTime {
 #[start]
 fn main(_argc: isize, _argv: *const *const u8) -> isize {
     println!("rtc: starting rtc driver...");
+
+    unsafe {
+        ioport = Some(IoPort::new(RTC_IO_BASE, 2));
+    }
 
     let date = read_datetime();
     println!("date: {:?}", date);
