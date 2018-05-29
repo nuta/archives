@@ -9,6 +9,7 @@
 #define HEAP_ADDR_SIZE (0x40000000)
 #define STACK_ADDR 0xf0000000
 
+#define IS_KERNEL_PROCESS(proc) ((proc)->pid == 1)
 #define DEFAULT_CHANNELS_NUM 128
 
 struct process {
