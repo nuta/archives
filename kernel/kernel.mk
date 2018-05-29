@@ -1,5 +1,5 @@
 objs := init.o memory.o process.o thread.o ipc.o server.o printk.o string.o list.o
-stubs := discovery exit logging
+stubs := discovery exit logging io
 
 ARCH_DIR = kernel/arch/$(ARCH)
 KFS_DIR = $(BUILD_DIR)/kernel/kfs

@@ -4,6 +4,7 @@
 #include <resea/exit.h>
 #include <resea/logging.h>
 #include <resea/discovery.h>
+#include <resea/io.h>
 #include "thread.h"
 #include "process.h"
 #include "ipc.h"
@@ -76,6 +77,28 @@ static inline error_t handle_discovery_connect(channel_t from, u32_t service_typ
 }
 
 
+static inline error_t handle_io_ioalloc(channel_t from, u32_t base, usize_t length) {
+    struct channel *ch = get_channel_by_id(from);
+
+    // TODO: Allow new threads in its process to perform io operations after this
+    //       ioalloc.
+
+    struct process *proc = ch->linked_to->process;
+    for (struct thread *t = proc->threads; t != NULL; t = t->next) {
+        arch_allow_io(&t->arch);
+    }
+
+    return ERROR_NONE;
+}
+
+
+static inline error_t handle_io_pmalloc(channel_t from, uptr_t vaddr, uptr_t paddr,
+                                        usize_t length, uptr_t *vaddr_allocated) {
+    /* TODO */
+    return ERROR_NONE;
+}
+
+
 void kernel_server_mainloop(channel_t server) {
     channel_t from;
     payload_t a0, a1, a2, a3;
@@ -101,7 +124,14 @@ void kernel_server_mainloop(channel_t server) {
                 error = handle_discovery_connect(from, (u32_t) a0, (channel_t *) &r0);
                 header = DISCOVERY_CONNECT_REPLY_HEADER | (error << ERROR_OFFSET);
                 break;
-
+            case IO_IOALLOC_MSG:
+                error = handle_io_ioalloc(from, (u32_t) a0, (usize_t) a1);
+                header = IO_IOALLOC_REPLY_HEADER | error;
+                break;
+            case IO_PMALLOC_MSG:
+                error = handle_io_pmalloc(from, (uptr_t) a0, (uptr_t) a1, (usize_t) a2, (uptr_t *) &r0);
+                header = IO_PMALLOC_REPLY_HEADER | error;
+                break;
             default:
                 /* Unknown message. */
                 DEBUG("kernel: unknown message %d.%d", MSG_SERVICE_ID(header), MSG_ID(header));
