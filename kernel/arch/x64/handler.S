@@ -189,6 +189,7 @@ return_from_syscall:
     pop rcx
     pop r11
     pop rsp
+    or  r11, gs:[GS_RFLAGS_ORMASK]
     swapgs
     sysret
 

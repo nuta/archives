@@ -65,7 +65,9 @@ arch_switch:
     /* We have to restore Interrupt Flags properly. */
     pushfq
     pop %rdx
-    pushq 16(%rsi)      /* Restore next's RFLAGS. */
+    mov 16(%rsi), %rax      /* Restore next's RFLAGS. */
+    or  56(%rsi), %rax
+    push %rax
     popfq
 
     movabs $1f, %rax

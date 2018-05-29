@@ -22,6 +22,7 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
         arch->rip = (u64_t) start_kernel_thread;
         arch->rsp = (u64_t) rsp;
         arch->rflags = KERNEL_DEFAULT_RFLAGS;
+        arch->rflags_ormask = KERNEL_DEFAULT_RFLAGS_ORMASK;
         arch->gs = KERNEL_DS;
         arch->is_user = false;
     } else {
@@ -42,6 +43,7 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
         arch->rip = (u64_t) enter_userspace;
         arch->rsp = (u64_t) rsp0;
         arch->rflags = ENTER_USERSPACE_DEFAULT_RFLAGS;
+        arch->rflags_ormask = USER_DEFAULT_RFLAGS_ORMASK;
         arch->gs = USER_DS | USER_RPL;
         arch->is_user = true;
     }

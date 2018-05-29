@@ -8,9 +8,13 @@
 #define USER_DS   USER_DATA64_SEG
 #define USER_RPL  3
 
-// IF and reserved bit set.
+// IF and reserved bit are set.
 #define USER_DEFAULT_RFLAGS (0x202)
 #define KERNEL_DEFAULT_RFLAGS (0x202)
+#define USER_DEFAULT_RFLAGS_ORMASK (0x202)
+#define KERNEL_DEFAULT_RFLAGS_ORMASK (0x202)
+#define RFLAGS_ORMASK_IOPL(iopl) ((iopl) << 12)
+#define RFLAGS_ANDMASK_IOPL3     (3 << 12)
 
 // Disable interrupts since the kernel stack temporarily holds `arg` and
 // a IRET frame. If interrupt is enabled during enter_userspace, an
