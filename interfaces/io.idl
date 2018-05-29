@@ -1,0 +1,4 @@
+service "io" (4)
+
+ioalloc(base: u32, length: usize) -> ();
+pmalloc(vaddr: uptr, paddr: uptr, length: usize) -> (vaddr_allocated: uptr);
