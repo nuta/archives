@@ -1,5 +1,6 @@
 include mk/common.mk
 include $(DIR)/Makefile
+server_name := $(name)
 server_build_dir := $(BUILD_DIR)/$(DIR)
 executable := $(server_build_dir)/server.elf
 
@@ -15,7 +16,9 @@ ifeq ($(lang), rust)
 stubs := $(requires) logging io
 stub_dir = libs/rust/src/interfaces
 abs_server_build_dir = $(PWD)/$(server_build_dir)
-$(executable): stubs
+$(executable): $(server_build_dir)/$(ARCH)/debug/$(name)
+
+$(server_build_dir)/$(ARCH)/debug/$(name): $(stub_dir)
 	mkdir -p $(server_build_dir)
 	$(PROGRESS) GEN $(server_build_dir)/$(ARCH).json
 	./libs/rust/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
@@ -24,13 +27,20 @@ $(executable): stubs
 	cd $(DIR) && \
 	CARGO_TARGET_DIR=$(abs_server_build_dir) \
 	RUST_TARGET_PATH=$(abs_server_build_dir) \
+	RUSTFLAGS=--emit=link,dep-info \
 		xargo build --target $(ARCH)
-	cp $(server_build_dir)/$(ARCH)/debug/$(name) $@
+	cp $(server_build_dir)/$(ARCH)/debug/$(name) $(executable).debug
+	cp $(executable).debug $(executable)
+	$(PROGRESS) STRIP $(executable)
+	$(STRIP) $@
+	$(PROGRESS) CP $(KFS_DIR)/servers/$(server_name)
+	cp $(BUILD_DIR)/servers/$(server_name)/server.elf $(KFS_DIR)/servers/$(server_name)
 
-.PHONY: stubs
-stubs: tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
+$(stub_dir): tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
 	$(PROGRESS) "GENSTUB" $(stub_dir)
 	./tools/genstub.py --idl-dir interfaces --out-dir $(stub_dir) --lang rust $(stubs)
+
+include $(wildcard $(server_build_dir)/debug/$(name).d)
 endif
 
 # C projects.
@@ -66,19 +76,23 @@ $(executable): $(c_objs) $(s_objs)
 	cp $@ $@.debug
 	$(PROGRESS) STRIP $@
 	$(STRIP) $@
+	$(PROGRESS) CP $(KFS_DIR)/servers/$(server_name)
+	cp $(BUILD_DIR)/servers/$(server_name)/server.elf $(KFS_DIR)/servers/$(server_name)
 
-$(c_objs): $(server_build_dir)/%.o: %.c stubs
+$(c_objs): $(server_build_dir)/%.o: %.c $(stub_dir)
 	$(PROGRESS) CC $@
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(addprefix -I, $(server_include_dirs)) -c -o $@ $<
+	$(CC) $(CFLAGS) $(addprefix -I, $(server_include_dirs)) -MF $(@:.o=.deps) -MT $(server_build_dir)/$(<:.c=.o) -MM $<
 
 $(s_objs): $(server_build_dir)/%.o: %.S
 	$(PROGRESS) CC $@
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(addprefix -I, $(server_include_dirs)) -c -o $@ $<
 
-.PHONY: stubs
-stubs: tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
-	$(PROGRESS) "GENSTUB" $(stub_dir)
-	./tools/genstub.py --idl-dir interfaces --out-dir $(stub_dir) --lang c $(stubs)
+$(stub_dir): tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
+	$(PROGRESS) "GENSTUB" $@
+	./tools/genstub.py --idl-dir interfaces --out-dir $@ --lang c $(stubs)
+
+include $(wildcard $(c_objs:.o=.deps))
 endif

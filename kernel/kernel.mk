@@ -24,31 +24,20 @@ $(BUILD_DIR)/kernel/kernel.elf: $(objs) $(ARCH_DIR)/kernel.ld
 	$(PROGRESS) "LD" $@
 	$(LD) $(LDFLAGS) --Map=$(BUILD_DIR)/kernel/kernel.map --script $(ARCH_DIR)/kernel.ld -o $@ $(objs)
 
-$(KFS_DIR)/servers/%:
-	$(MAKE) servers/$(notdir $@)
-	mkdir -p $(dir $@)
-	$(PROGRESS) CP $@
-	cp $(BUILD_DIR)/servers/$(notdir $@)/server.elf $@
-
 $(BUILD_DIR)/%.o: %.S Makefile
 	mkdir -p $(dir $@)
 	$(PROGRESS) "CC" $@
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(BUILD_DIR)/%.o: %.c Makefile stubs
+$(BUILD_DIR)/%.o: %.c Makefile $(C_STUB_DIR)
 	mkdir -p $(dir $@)
 	$(PROGRESS) "CC" $@
 	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -c -o $@ $<
+	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -MF $(@:.o=.deps) -MT $(BUILD_DIR)/$(<:.c=.o) -MM $<
 
-$(BUILD_DIR)/%.deps: %.c Makefile stubs
-	mkdir -p $(dir $@)
-	$(PROGRESS) "GENDEPS" $@
-	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -MF $@ -MT $(<:.c=.o) -MM $<
-
-.PHONY: stubs
-stubs: tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
-	$(PROGRESS) "GENSTUB" $(C_STUB_DIR)
-	./tools/genstub.py --idl-dir interfaces --out-dir $(C_STUB_DIR) --lang c $(stubs)
+$(C_STUB_DIR): tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
+	$(PROGRESS) "GENSTUB" $@
+	./tools/genstub.py --idl-dir interfaces --out-dir $@ --lang c $(stubs)
 
 # KFS
 $(BUILD_DIR)/kernel/init.o: $(BUILD_DIR)/kernel/kfs.bin
@@ -57,4 +46,4 @@ $(BUILD_DIR)/kernel/kfs.bin: $(kfs_files) tools/mkkfs.py
 	$(PROGRESS) MKKFS $@
 	./tools/mkkfs.py $@ $(KFS_DIR)
 
-#-include $(objs:.o=.deps)
+include $(wildcard $(objs:.o=.deps))
