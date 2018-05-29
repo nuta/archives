@@ -31,6 +31,7 @@ enum {
     /* Errors returned from the app. */
     ERROR_NONE = 0,
     ERROR_UNKNOWN_MSG = 1,
+    ERROR_NOT_IMPLEMENTED = 2,
 
     /* errors returned by kernel */
     ERROR_NO_MEMORY = 200,
