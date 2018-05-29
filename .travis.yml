@@ -12,6 +12,8 @@ addons:
       - llvm-toolchain-trusty-6.0
     packages:
       - lld-6.0
+      - libllvm6.0
+      - llvm-6.0-dev
       - qemu-system-x86
       - mtools
 
