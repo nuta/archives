@@ -9,9 +9,9 @@ notifications:
 addons:
   apt:
     sources:
-      - llvm-toolchain-trusty-5.0
+      - llvm-toolchain-trusty-6.0
     packages:
-      - lld-5.0
+      - lld-6.0
       - qemu-system-x86
       - mtools
 
