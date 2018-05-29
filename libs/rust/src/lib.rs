@@ -5,6 +5,7 @@
 
 extern crate alloc;
 pub use alloc::*;
+pub use core::*;
 
 pub mod allocator;
 pub mod interfaces;
