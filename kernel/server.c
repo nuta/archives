@@ -15,6 +15,11 @@ struct service *services;
 struct client *clients;
 kmutex_t logging_lock;
 
+static struct process *get_callee_process(channel_t from) {
+    struct channel *ch = get_channel_by_id(from);
+    return ch->linked_to->process;
+}
+
 
 static inline void handle_exit_exit(channel_t from, u32_t error) {
     struct process *caller = kernel_process->channels[from - 1].linked_to->process;
@@ -78,12 +83,10 @@ static inline error_t handle_discovery_connect(channel_t from, u32_t service_typ
 
 
 static inline error_t handle_io_ioalloc(channel_t from, u32_t base, usize_t length) {
-    struct channel *ch = get_channel_by_id(from);
-
     // TODO: Allow new threads in its process to perform io operations after this
     //       ioalloc.
 
-    struct process *proc = ch->linked_to->process;
+    struct process *proc = get_callee_process(from);
     for (struct thread *t = proc->threads; t != NULL; t = t->next) {
         arch_allow_io(&t->arch);
     }
