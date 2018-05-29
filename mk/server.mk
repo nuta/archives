@@ -12,7 +12,7 @@ endif
 
 # Rust projects.
 ifeq ($(lang), rust)
-stubs := $(requires) logging
+stubs := $(requires) logging io
 stub_dir = libs/rust/src/interfaces
 abs_server_build_dir = $(PWD)/$(server_build_dir)
 $(executable): stubs
