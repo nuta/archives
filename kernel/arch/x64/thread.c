@@ -49,6 +49,12 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
     }
 }
 
+void arch_allow_io(struct arch_thread *arch) {
+    arch->rflags_ormask = (arch->rflags_ormask & (~RFLAGS_ANDMASK_IOPL3))
+                        | RFLAGS_ORMASK_IOPL(arch->is_user ? 3 : 0);
+}
+
+
 void arch_destroy_thread(struct arch_thread *arch) {
     if (arch->is_user) {
         kfree((void *) arch->kstack);

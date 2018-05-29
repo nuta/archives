@@ -35,5 +35,6 @@ void arch_switch_vmspace(struct arch_vmspace *vms);
 void arch_link_page(struct arch_vmspace *vms, uptr_t vaddr, paddr_t paddr, size_t num,
                     int attrs);
 void arch_copy_from_user(void *kernel, uptr_t user, size_t length);
+void arch_allow_io(struct arch_thread *arch);
 
 #endif
