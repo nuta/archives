@@ -3,7 +3,7 @@ global_asm!(include_str!("../../../resea/arch/x64/syscall.S"));
 #[cfg(target_arch="x86_64")]
 pub mod x64;
 
-pub type CId = i32;
+pub type CId = i64;
 pub type Header = u64;
 pub type Payload = u64;
 
