@@ -30,7 +30,8 @@ def get_type_id_by_name(types, name):
         "u8": INLINE_PAYLOAD,
         "u16": INLINE_PAYLOAD,
         "u32": INLINE_PAYLOAD,
-        "u64": INLINE_PAYLOAD
+        "u64": INLINE_PAYLOAD,
+        "uptr": INLINE_PAYLOAD
     }[name]
 
 def generate_c_file(service):
@@ -139,6 +140,7 @@ def generate_rust_file(service):
     def rename_type(type_):
         return {
             "u32": 'u32',
+            "uptr": 'usize',
             "channel": 'Channel',
             "usize": "usize",
             "string": "&[u8]"
@@ -153,8 +155,9 @@ def generate_rust_file(service):
         reply_header = "0"
         args = ""
         params = ""
-        rets_def = ""
-        rets = ""
+        tmps = []
+        rets_def = []
+        rets = []
         skip_next = False
         for i in range(0, 4):
             try:
@@ -189,10 +192,17 @@ def generate_rust_file(service):
             else:
                 type_id = get_type_id_by_name(types, type_)
                 reply_header += f" | ({type_id} << {i * 3}u64)"
-                params += ", &mut __r as *mut Payload" # TODO
-                rets_def += ""
-                rets += ""
+                tmps.append(f"let mut {name}: Payload = 0;")
+                params += f", &mut {name} as *mut Payload"
+                rets_def.append(rename_type(type_))
+                if type_id == CHANNEL_PAYLOAD:
+                    rets.append(f"Channel::from_cid({name} as CId)")
+                else:
+                    rets.append(f"{name} as {rename_type(type_)}")
 
+        rets_def = ", ".join(rets_def)
+        rets = ", ".join(rets)
+        tmps = "\n".join(tmps)
         msg_name = f"{service_name.upper()}_{call_name.upper()}_MSG"
         reply_msg_name = f"{service_name.upper()}_{call_name.upper()}_REPLY_MSG"
         header_name = f"{service_name.upper()}_{call_name.upper()}_HEADER"
@@ -207,6 +217,8 @@ const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_h
         stub += Template("""\
     pub fn $call_name(&self${args}) -> Result<(${rets_def}), GeneralError> {
         let mut __r: Payload = 0;
+        ${tmps}
+
         unsafe {
             ipc_call(self.cid, ${header_name} as Payload${params});
         }
@@ -217,6 +229,7 @@ const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_h
     return Template("""\
 #![allow(dead_code)]
 #![allow(unused_imports)]
+#![allow(unused_parens)]
 
 use core::result::{Result};
 use error::{GeneralError};
