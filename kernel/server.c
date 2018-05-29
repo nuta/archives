@@ -97,7 +97,20 @@ static inline error_t handle_io_ioalloc(channel_t from, u32_t base, usize_t leng
 
 static inline error_t handle_io_pmalloc(channel_t from, uptr_t vaddr, uptr_t paddr,
                                         usize_t length, uptr_t *vaddr_allocated) {
-    /* TODO */
+
+    if (vaddr != 0) {
+        return ERROR_NOT_IMPLEMENTED;
+    }
+
+    struct process *proc = get_callee_process(from);
+    struct vmspace *vms = &proc->vms;
+    int flags = PAGE_WRITABLE | (IS_KERNEL_PROCESS(proc) ? 0 : PAGE_USER);
+    length = ROUND_UP(length, PAGE_SIZE);
+    vaddr = valloc(vms, length);
+
+    arch_link_page(&vms->arch, vaddr, paddr, length / PAGE_SIZE, flags);
+
+    *vaddr_allocated = vaddr;
     return ERROR_NONE;
 }
 
