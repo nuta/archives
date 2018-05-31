@@ -23,4 +23,28 @@ impl IoPort {
         asm!("inb %dx, %al" : "={ax}"(value) : "{dx}"(self.port + offset));
         value
     }
+
+    #[inline]
+    pub unsafe fn out16(&self, offset: u16, value: u8) {
+        asm!("outw %ax, %dx" :: "{dx}"(self.port + offset), "{ax}"(value));
+    }
+
+    #[inline]
+    pub unsafe fn in16(&self, offset: u16) -> u8 {
+        let value: u8;
+        asm!("inw %dx, %ax" : "={ax}"(value) : "{dx}"(self.port + offset));
+        value
+    }
+
+    #[inline]
+    pub unsafe fn out32(&self, offset: u16, value: u32) {
+        asm!("outl %eax, %dx" :: "{dx}"(self.port + offset), "{eax}"(value));
+    }
+
+    #[inline]
+    pub unsafe fn in32(&self, offset: u16) -> u32 {
+        let value: u32;
+        asm!("inl %dx, %eax" : "={eax}"(value) : "{dx}"(self.port + offset));
+        value
+    }
 }
