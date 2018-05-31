@@ -3,16 +3,20 @@ arch_objs := startup.o init.o thread.o serial.o gdt.o idt.o tss.o paging.o \
 	smp.o apic.o ioapic.o handler.o irq.o exception.o pic.o switch.o cpuvar.o \
 	idle.o syscall.o usercopy.o vga.o putchar.o
 
+disk_img = $(BUILD_DIR)/$(ARCH_DIR)/disk.img
 BOCHS ?= bochs
 override CFLAGS += -O2 -g3 --target=x86_64
 override CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=large
 override CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
 override LDFLAGS +=
 QEMUFLAGS += -d cpu_reset,page -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
+QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw
 
 .PHONY: bochs
-run: $(BUILD_DIR)/$(ARCH_DIR)/disk.img
-	qemu-system-x86_64 $(QEMUFLAGS) -hda $<
+run:
+	$(MAKE) build
+	$(MAKE) $(disk_img)
+	qemu-system-x86_64 $(QEMUFLAGS)
 
 bochs: $(BUILD_DIR)/$(ARCH_DIR)/disk.img
 	rm -f $(ARCH_DIR)/disk.img.lock
@@ -29,7 +33,7 @@ $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.bin: $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.elf
 	$(PROGRESS) OBJCOPY $@
 	$(OBJCOPY) -Obinary $< $@
 
-$(BUILD_DIR)/$(ARCH_DIR)/disk.img: $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.bin $(BUILD_DIR)/kernel/kernel.elf
+$(disk_img): $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.bin $(BUILD_DIR)/kernel/kernel.elf
 	$(PROGRESS) DD $@.tmp
 	$(DD) if=/dev/zero of=$@.tmp bs=1M count=64
 	$(PROGRESS) OFORMAT $@.tmp
