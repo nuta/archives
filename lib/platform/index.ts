@@ -1,6 +1,6 @@
-import { Platform as LocalPlatform } from "./local";
 import { Platform } from "../types";
 import { Platform as FirebasePlatform } from "./firebase";
+import { Platform as LocalPlatform } from "./local";
 
 export let platformCtor: any;
 if (process.env.MAKESTACK_PLATFORM == "local") {

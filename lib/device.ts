@@ -7,7 +7,7 @@ function isDeepEqual(obj1: object, obj2: object) {
 
 export class Device {
     public name: string;
-    public data:DeviceData;
+    public data: DeviceData;
     private initialData: DeviceData;
 
     constructor(name: string) {
@@ -16,8 +16,8 @@ export class Device {
         this.data = Object.assign({}, this.initialData);
     }
 
-    saveIfChanged() {
-        if(!isDeepEqual(this.initialData, this.data)) {
+    public saveIfChanged() {
+        if (!isDeepEqual(this.initialData, this.data)) {
             platform.setDeviceData(this.name, this.data);
         }
     }

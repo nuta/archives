@@ -7,7 +7,7 @@ const libDir = path.resolve(__dirname, "./makestack");
 
 // Add __dirname to allow requiring libDir.
 process.env.NODE_PATH = __dirname;
-require('module').Module._initPaths();
+require("module").Module._initPaths();
 
 process.env.APP_DIR = __dirname;
 const mainPath = path.join(libDir, "./dist/lib/platform/firebase/main");

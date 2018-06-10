@@ -3,5 +3,5 @@ import * as server from "./server";
 
 export {
     main,
-    server
+    server,
 };

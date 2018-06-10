@@ -6,17 +6,17 @@ export type HeartbeatCallback = (device: Device) => void;
 
 export const endpoints: { [name: string]: HTTPCallback } = {};
 export const callbacks = {
-    'heartbeat': [] as HeartbeatCallback[]
+    heartbeat: [] as HeartbeatCallback[],
 };
 
 export const http = {
     get(name: string, callback: HTTPCallback): void {
         endpoints[name] = callback;
-    }
-}
+    },
+};
 
 export const device = {
     onHeartbeat(callback: HeartbeatCallback): void {
-        callbacks['heartbeat'].push(callback);
-    }
-}
+        callbacks.heartbeat.push(callback);
+    },
+};

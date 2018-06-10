@@ -1,5 +1,5 @@
 import * as firebase from "firebase-admin";
-import { Platform, DeviceData } from "../../types";
+import { DeviceData, Platform } from "../../types";
 
 export class FirebasePlatform extends Platform {
     constructor() {
@@ -7,18 +7,18 @@ export class FirebasePlatform extends Platform {
         firebase.initializeApp();
     }
 
-    async getDeviceData(deviceName: string): Promise<DeviceData> {
+    public async getDeviceData(deviceName: string): Promise<DeviceData> {
         return await firebase
                         .firestore()
-                        .collection('devices')
+                        .collection("devices")
                         .doc(deviceName)
                         .get();
     }
 
-    async setDeviceData(deviceName: string, data: DeviceData) {
+    public async setDeviceData(deviceName: string, data: DeviceData) {
         await firebase
                   .firestore()
-                  .collection('devices')
+                  .collection("devices")
                   .doc(deviceName)
                   .set(data);
     }

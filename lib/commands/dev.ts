@@ -1,43 +1,43 @@
 const chalk = require("chalk");
+import * as child_process from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import * as child_process from "child_process";
 import { App } from "../app";
-import { Args, Opts, Command } from "../cli";
 import { board } from "../boards";
+import { Args, Command, Opts } from "../cli";
 
 export default class DevCommand extends Command {
-    static command = "dev";
-    static desc = "";
-    static args = [];
-    static opts = [
-        { name: '--app-dir', desc: 'The app directory.', default: process.cwd() }
+    public static command = "dev";
+    public static desc = "";
+    public static args = [];
+    public static opts = [
+        { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
     ];
 
-    async run(args: Args, opts: Opts, logger: Logger) {
-        logger.info("starting dev")
+    public async run(args: Args, opts: Opts, logger: Logger) {
+        logger.info("starting dev");
 
-        logger.info("Building...")
+        logger.info("Building...");
         await board.build(opts.appDir);
 
-        const localRuntimePath = path.resolve(__dirname, '../platform/local/start');
+        const localRuntimePath = path.resolve(__dirname, "../platform/local/start");
         const forkOptions = {
             cwd: opts.appDir,
             env: Object.assign({}, process.env, {
                 // This points to node_modules or the repo directory.
                 NODE_PATH: path.resolve(__dirname, "../../../.."),
-                MAKESTACK_PLATFORM: "local"
-            })
-        }
+                MAKESTACK_PLATFORM: "local",
+            }),
+        };
 
         let app = child_process.fork(localRuntimePath, [], forkOptions);
         process.on("exit", () => {
-            app.kill()
-        })
+            app.kill();
+        });
 
         const reload = async (filepath: string) => {
-            logger.info(`==> change detected: ${filepath}`)
-            logger.info("Building...")
+            logger.info(`==> change detected: ${filepath}`);
+            logger.info("Building...");
             await board.build(opts.appDir);
 
             logger.info("killing...");
@@ -46,12 +46,12 @@ export default class DevCommand extends Command {
             app.on("exit", () => {
                 logger.info("reloading...");
                 app = child_process.fork(localRuntimePath, [], forkOptions);
-            })
-        }
+            });
+        };
 
-        fs.watch(path.resolve(opts.appDir, "server.js"), (_: string, filepath: string) => reload(filepath))
-        fs.watch(path.resolve(opts.appDir, "device.cc"), (_: string, filepath: string) => reload(filepath))
+        fs.watch(path.resolve(opts.appDir, "server.js"), (_: string, filepath: string) => reload(filepath));
+        fs.watch(path.resolve(opts.appDir, "device.cc"), (_: string, filepath: string) => reload(filepath));
 
-        logger.info("Press Ctrl-C to stop")
+        logger.info("Press Ctrl-C to stop");
     }
 }

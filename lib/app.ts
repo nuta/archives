@@ -1,5 +1,5 @@
 export class App {
-    module: any;
+    public module: any;
 
     constructor(appPath: string) {
         this.module = require(appPath);

@@ -1,7 +1,7 @@
 import * as zlib from "zlib";
-import { callbacks, HeartbeatCallback } from "./server";
 import { Device } from "./device";
 import { createFirmwareImage } from "./firmware";
+import { callbacks, HeartbeatCallback } from "./server";
 
 const SMMS_VERSION = 1;
 const SMMS_HMAC_MSG      = 0x01;
@@ -17,21 +17,21 @@ const SMMS_UPDATE_MSG    = 0x0a;
 const SMMS_OSUPDATE_MSG  = 0x0b;
 const SMMS_CURRENT_VERSION_REPORT = 0x0001;
 
-export type DeviceState = 'ready' | 'running';
-export type Reports = {
-    currentVersion?: number
-};
-export type Configs = { [key: string]: string };
-export type Commands = { [key: string]: string };
+export type DeviceState = "ready" | "running";
+export interface Reports {
+    currentVersion?: number;
+}
+export interface Configs { [key: string]: string; }
+export interface Commands { [key: string]: string; }
 
 export interface PayloadMessages {
     reports?: Reports;
     configs?: Configs;
     commands?: Commands;
     update?: {
-        type: 'inline' | 'bulk',
+        type: "inline" | "bulk",
         data?: Buffer,
-        version: number
+        version: number,
     };
     deviceId?: string;
     log?: string;
@@ -87,7 +87,7 @@ export function generateMessage(type: number, payload: any) {
 export interface SerializeOptions {
     includeDeviceId: boolean;
     deviceSecret: string;
-};
+}
 
 export function serialize({ deviceId, log, reports, configs, update, commands }: PayloadMessages, options: SerializeOptions) {
     let payload = Buffer.alloc(0);
@@ -104,13 +104,13 @@ export function serialize({ deviceId, log, reports, configs, update, commands }:
 
     if (reports) {
         if (reports.currentVersion) {
-            const idBuffer = Buffer.alloc(2)
-            idBuffer.writeUInt16BE(SMMS_CURRENT_VERSION_REPORT, 0)
-            const valueBuffer = Buffer.alloc(4)
-            valueBuffer.writeUInt32BE(reports.currentVersion, 0)
-            const data = Buffer.from([idBuffer, valueBuffer])
-            const reportMsg = generateMessage(SMMS_REPORT_MSG, data)
-            payload = Buffer.concat([payload, reportMsg])
+            const idBuffer = Buffer.alloc(2);
+            idBuffer.writeUInt16BE(SMMS_CURRENT_VERSION_REPORT, 0);
+            const valueBuffer = Buffer.alloc(4);
+            valueBuffer.writeUInt32BE(reports.currentVersion, 0);
+            const data = Buffer.from([idBuffer, valueBuffer]);
+            const reportMsg = generateMessage(SMMS_REPORT_MSG, data);
+            payload = Buffer.concat([payload, reportMsg]);
         }
     }
 
@@ -140,18 +140,18 @@ export function serialize({ deviceId, log, reports, configs, update, commands }:
 
     if (update) {
         // Used by tests.
-        const data = Buffer.alloc(5)
-        data.writeUInt8(2, 0) // Download method
-        data.writeUInt32BE(update.version, 1)
+        const data = Buffer.alloc(5);
+        data.writeUInt8(2, 0); // Download method
+        data.writeUInt32BE(update.version, 1);
         const updateMsg = generateMessage(SMMS_UPDATE_MSG, data);
-        payload = Buffer.concat([payload, updateMsg])
+        payload = Buffer.concat([payload, updateMsg]);
     }
 
     let header = Buffer.alloc(1);
     header.writeUInt8(SMMS_VERSION << 4, 0);
     header = Buffer.concat([header, generateVariableLength(payload)]);
 
-    if (update && update.type == 'inline') {
+    if (update && update.type == "inline") {
         if (!update.data) {
             throw Error("BUG: update.data is not set");
         }
@@ -204,13 +204,13 @@ export function deserialize(payload: Buffer) {
             }
             case SMMS_UPDATE_MSG:
                 messages.update = {
-                    version: data.readUInt32BE(1)
-                }
+                    version: data.readUInt32BE(1),
+                };
                 break;
             case SMMS_OSUPDATE_MSG:
                 messages.osupdate = {
-                    version: data.readUInt32BE(1)
-                }
+                    version: data.readUInt32BE(1),
+                };
                 break;
         }
         offset += 1 + lengthLength + length;
@@ -222,9 +222,9 @@ export function deserialize(payload: Buffer) {
 export function process(payload: Buffer) {
     const deviceName = "device-name"; // TODO
     const device = new Device(deviceName);
-    console.log('telemata: ', deserialize(payload));
+    console.log("telemata: ", deserialize(payload));
 
-    for (const callback of callbacks['heartbeat']) {
+    for (const callback of callbacks.heartbeat) {
         callback(device);
     }
 

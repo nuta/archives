@@ -1,7 +1,7 @@
 import * as caporal from "caporal";
 
-export type Args = { [name: string]: any };
-export type Opts = { [name: string]: any };
+export interface Args { [name: string]: any }
+export interface Opts { [name: string]: any }
 
 export type Validator
     =  RegExp
@@ -25,9 +25,9 @@ export interface OptDefinition {
 }
 
 export abstract class Command {
-    static command: string;
-    static desc: string;
-    static args: ArgDefinition[];
-    static opt: OptDefinition[];
-    abstract async run(args: Args, opts: Opts, logger: Logger): Promise<void>;
+    public static command: string;
+    public static desc: string;
+    public static args: ArgDefinition[];
+    public static opt: OptDefinition[];
+    public abstract async run(args: Args, opts: Opts, logger: Logger): Promise<void>;
 }

@@ -1,4 +1,4 @@
-import { Platform, DeviceData } from "../../types";
+import { DeviceData, Platform } from "../../types";
 
 export class LocalPlatform extends Platform {
     private devices: { [deviceName: string]: DeviceData };
@@ -8,11 +8,11 @@ export class LocalPlatform extends Platform {
         this.devices = {};
     }
 
-    async getDeviceData(deviceName: string): Promise<DeviceData> {
+    public async getDeviceData(deviceName: string): Promise<DeviceData> {
         return this.devices[deviceName] || {};
     }
 
-    async setDeviceData(deviceName: string, data: DeviceData) {
+    public async setDeviceData(deviceName: string, data: DeviceData) {
         this.devices[deviceName] = data;
     }
 }

@@ -2,7 +2,6 @@ export function getFirmwareVersion(firmware: Buffer): number {
     return firmware.readUInt32LE(8);
 }
 
-
 export function createFirmwareImage(version: number, image: Buffer): Buffer {
     const firmwareHeader = Buffer.alloc(16);
     firmwareHeader.writeUInt8(0x81, 0);

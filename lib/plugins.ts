@@ -14,24 +14,24 @@ export class Plugin {
         this.firmwarePath = args.firmwarePath;
     }
 
-    server(express: express.Express): void {
+    public server(express: express.Express): void {
     }
 
-    async sendPayload(payload: Buffer): Promise<void> {
+    public async sendPayload(payload: Buffer): Promise<void> {
         return Promise.resolve();
     }
 
-    receivePayload(callback: AdapterCallback): void {
+    public receivePayload(callback: AdapterCallback): void {
 
     }
 }
 
 function getBuiltinPlugins(): string[] {
-    const builtinPluginsDir = path.resolve(__dirname, '../plugins');
+    const builtinPluginsDir = path.resolve(__dirname, "../plugins");
 
-    return fs.readdirSync(builtinPluginsDir).map(name => {
+    return fs.readdirSync(builtinPluginsDir).map((name) => {
         return path.join(builtinPluginsDir, name);
-    })
+    });
 }
 
 export function loadPlugins(plugins: string[], args: PluginArgs): Plugin[] {

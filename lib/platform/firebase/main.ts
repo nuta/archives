@@ -1,25 +1,25 @@
-import * as fs from "fs";
-import * as path from "path";
 import * as express from "express";
 import * as functions from "firebase-functions";
-import * as telemata from "../../telemata";
+import * as fs from "fs";
+import * as path from "path";
+import { getFirmwareVersion } from "../../firmware";
 import { loadPlugins } from "../../plugins";
 import { endpoints } from "../../server";
-import { getFirmwareVersion } from "../../firmware";
+import * as telemata from "../../telemata";
 
 if (!process.env.APP_DIR) {
-    throw new Error('BUG: APP_DIR is not set');
+    throw new Error("BUG: APP_DIR is not set");
 }
 
 const httpServer = express();
 httpServer.use(function(req: any, res, next) {
     req.rawBody = Buffer.alloc(0);
 
-    req.on('data', function(chunk: Buffer) {
+    req.on("data", function(chunk: Buffer) {
         req.rawBody = Buffer.concat([req.rawBody, chunk]);
-    });;
+    });
 
-    req.on('end', function() {
+    req.on("end", function() {
         next();
     });
 });
@@ -28,8 +28,8 @@ const firmwarePath = path.resolve(process.env.APP_DIR, "firmware.bin");
 const firmwareImage = fs.readFileSync(firmwarePath);
 const appVersion = getFirmwareVersion(firmwareImage);
 
-const plugins = loadPlugins(['http_adapter'], {
-    firmwarePath
+const plugins = loadPlugins(["http_adapter"], {
+    firmwarePath,
 });
 
 for (const plugin of plugins) {
@@ -44,14 +44,14 @@ for (const plugin of plugins) {
 
             return telemata.serialize({
                 commands: {
-                    "Hello": "World!",
-                    "this": "is it!",
+                    Hello: "World!",
+                    this: "is it!",
                 },
                 update: {
-                    type: 'bulk',
-                    version: appVersion
-                }
-            }, { includeDeviceId: false, deviceSecret: 'asd' });
+                    type: "bulk",
+                    version: appVersion,
+                },
+            }, { includeDeviceId: false, deviceSecret: "asd" });
         });
     }
 }

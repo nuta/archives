@@ -3,14 +3,14 @@ import * as fs from "fs";
 import * as path from "path";
 const { version } = require("../../package.json");
 
-caporal.version(version)
+caporal.version(version);
 
 // Load commands.
 const COMMANDS = [
     "new",
     "dev",
-    "deploy"
-]
+    "deploy",
+];
 
 for (const name of COMMANDS) {
     const modulePath = path.resolve(__dirname, "commands", name);
@@ -26,12 +26,12 @@ for (const name of COMMANDS) {
     }
 
     cmd.action(async (args, opts, logger) => {
-        const instance = new klass()
-        await instance.run(args, opts, logger)
-    })
+        const instance = new klass();
+        await instance.run(args, opts, logger);
+    });
 }
 
 export function run(args?: string[]) {
-    const argv = args ? [process.argv0, 'makestack', ...args] : process.argv;
-    caporal.parse(argv)
+    const argv = args ? [process.argv0, "makestack", ...args] : process.argv;
+    caporal.parse(argv);
 }

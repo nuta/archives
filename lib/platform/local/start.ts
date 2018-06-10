@@ -1,23 +1,23 @@
+import * as bodyParser from "body-parser";
+import * as express from "express";
 import * as fs from "fs";
 import * as path from "path";
-import * as express from "express";
-import * as bodyParser from "body-parser";
-import * as telemata from "../../telemata";
+import { getFirmwareVersion } from "../../firmware";
 import { loadPlugins } from "../../plugins";
 import { endpoints } from "../../server";
-import { getFirmwareVersion } from "../../firmware";
+import * as telemata from "../../telemata";
 
-console.log("==> starting local runtime")
+console.log("==> starting local runtime");
 const httpServer = express();
 
 httpServer.use(function(req: any, res, next) {
     req.rawBody = Buffer.alloc(0);
 
-    req.on('data', function(chunk: Buffer) {
+    req.on("data", function(chunk: Buffer) {
         req.rawBody = Buffer.concat([req.rawBody, chunk]);
-    });;
+    });
 
-    req.on('end', function() {
+    req.on("end", function() {
         next();
     });
 });
@@ -27,8 +27,8 @@ const firmwareImage = fs.readFileSync(firmwarePath);
 const appVersion = getFirmwareVersion(firmwareImage);
 console.log(`   version: ${appVersion}`);
 
-const plugins = loadPlugins(['http_adapter'], {
-    firmwarePath
+const plugins = loadPlugins(["http_adapter"], {
+    firmwarePath,
 });
 
 for (const plugin of plugins) {
@@ -43,14 +43,14 @@ for (const plugin of plugins) {
 
             return telemata.serialize({
                 commands: {
-                    "Hello": "World!",
-                    "this": "is it!",
+                    Hello: "World!",
+                    this: "is it!",
                 },
                 update: {
-                    type: 'bulk',
-                    version: appVersion
-                }
-            }, { includeDeviceId: false, deviceSecret: 'asd' });
+                    type: "bulk",
+                    version: appVersion,
+                },
+            }, { includeDeviceId: false, deviceSecret: "asd" });
         });
     }
 }
