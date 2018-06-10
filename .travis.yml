@@ -1,0 +1,15 @@
+language: node_js
+
+node_js:
+  - "10"
+  - "8"
+
+install: yarn
+script:
+  - yarn build
+  - yarn test
+after_script:
+  - yarn global add codeclimate-test-reporter
+  - yarn nyc report --reporter=text-lcov | codeclimate-test-reporter
+cache:
+  yarn: true

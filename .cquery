@@ -1,0 +1,9 @@
+%clang
+%cpp -std=c++14
+-Iesp32/deps
+-Iesp32/build/include
+-Iesp32/deps/esp-idf/components/nvs_flash/include
+-Iesp32/deps/esp-idf/components/driver/include/
+-Iesp32/deps/esp-idf/components/esp32/include
+-Iesp32/deps/esp-idf/components/freertos/include
+-Iesp32/deps/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include

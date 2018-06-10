@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "sourceMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "pretty": true,
+    "alwaysStrict": true,
+    "strict": true,
+    "target": "es2017"
+  },
+  "include": [
+    "./lib/**/*",
+    "./plugins/**/*"
+  ]
+}
