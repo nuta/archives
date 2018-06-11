@@ -35,11 +35,15 @@ export class Logger {
     }
 
     public error(...messages: any[]) {
-        this.log(bold(red(join(messages))));
+        this.log(red.bold(join(messages)));
     }
 
     public command(...messages: any[]) {
         this.log(bold("==> " + join(messages)));
+    }
+
+    public action(action: string, target: string) {
+        this.log(blue.bold(action.padStart(8)) + "  " + target);
     }
 
     public progress(...messages: any[]) {
