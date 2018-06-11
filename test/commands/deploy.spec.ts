@@ -10,9 +10,13 @@ describe("deploy command", function() {
     beforeEach(async function() {
         const spawnSync = childProcess.spawnSync;
         sinon.stub(childProcess, "spawnSync")
-            .callsFake(() =>
-                spawnSync("echo", ["-n"])
-            );
+            .callsFake((cmd, args, opts) => {
+                if (cmd === "firebase") {
+                    return spawnSync("echo", ["-n"]);
+                } else {
+                    return spawnSync(cmd, args, opts);
+                }
+            });
 
         this.cwd = process.cwd()
         this.appDir = "test-app"
