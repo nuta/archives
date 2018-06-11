@@ -22,11 +22,11 @@ class TelemataClient {
 
    protected:
     unsigned long current_app_version;
-    const char *device_id;
+    const char *device_name;
     int receive_payload(const void *payload, size_t length);
 
    public:
-    TelemataClient(const char *device_id);
+    TelemataClient(const char *device_name);
 
     void send();
     void append_log(char ch);

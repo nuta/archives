@@ -1,9 +1,8 @@
 export PWD  := $(shell pwd)
 export PATH := $(PWD)/deps/xtensa-esp32-elf/bin:$(PATH)
-COMMANDS := build menuconfig clean flash monitor
+COMMANDS := build menuconfig clean flash monitor print_flash_cmd
 
-export APP_OBJS DEVICE_ID WIFI_SSID WIFI_PASSWORD SERVER_URL CA_CERT
-export FIRMWARE_VERSION APP_VERSION
+export APP_OBJS FIRMWARE_VERSION
 
 .PHONY: $(COMMANDS)
 $(COMMANDS):

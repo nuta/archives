@@ -17,6 +17,7 @@ export class Command extends CommandBase {
 
     public async run(args: Args, opts: Opts) {
         const localRuntimePath = path.resolve(__dirname, "../platform/local/start");
+
         const forkOptions = {
             cwd: opts.appDir,
             env: Object.assign({}, process.env, {

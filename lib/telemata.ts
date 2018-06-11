@@ -151,16 +151,7 @@ export function serialize({ deviceId, log, reports, configs, update, commands }:
     header.writeUInt8(SMMS_VERSION << 4, 0);
     header = Buffer.concat([header, generateVariableLength(payload)]);
 
-    if (update && update.type == "inline") {
-        if (!update.data) {
-            throw Error("BUG: update.data is not set");
-        }
-
-        const firmware = createFirmwareImage(update.version, update.data);
-        return Buffer.concat([header, payload, firmware]);
-    } else {
-        return Buffer.concat([header, payload]);
-    }
+    return Buffer.concat([header, payload]);
 }
 
 export function deserialize(payload: Buffer) {

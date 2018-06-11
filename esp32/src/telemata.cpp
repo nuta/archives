@@ -11,7 +11,7 @@
 #define TELEMATA_VERSION 1
 #define TELEMATA_HMAC_MSG 0x01
 #define TELEMATA_CACHE_MSG 0x02
-#define TELEMATA_DEVICE_ID_MSG 0x03
+#define TELEMATA_DEVICE_NAME_MSG 0x03
 #define TELEMATA_LOG_MSG 0x04
 #define TELEMATA_COMMAND_MSG 0x05
 #define TELEMATA_GET_MSG 0x06
@@ -72,12 +72,12 @@ class TelemataPayloadBuilder {
     }
 };
 
-TelemataClient::TelemataClient(const char *device_id)
+TelemataClient::TelemataClient(const char *device_name)
     : log_length(0),
       log_index(0),
       config(),
       current_app_version(0),
-      device_id(device_id) {
+      device_name(device_name) {
     log_allocated_length = 2048;
     log_buffer = (char *) malloc(log_allocated_length);
 }
@@ -223,13 +223,13 @@ next_message:
 }
 
 void TelemataClient::send() {
-    int include_device_id = 1;
+    int include_device_name = 1; // FIXME
 
     TelemataPayloadBuilder payload;
 
-    if (include_device_id) {
-        payload.append(TELEMATA_DEVICE_ID_MSG, (void *) device_id,
-                       strlen((char *) device_id));
+    if (include_device_name) {
+        payload.append(TELEMATA_DEVICE_NAME_MSG, (void *) device_name,
+                       strlen((char *) device_name));
     }
 
     if (log_length > 0) {

@@ -1,7 +1,9 @@
+import * as fs from "fs-extra";
 import * as express from "express";
 import { Request, Response } from "express";
 import { Plugin, PluginArgs, AdapterCallback } from "../../lib/plugins";
 import { parseVariableLength } from "../../lib/telemata";
+import { createFirmwareImage } from "../../lib/firmware";
 
 export default class HttpAdapter extends Plugin {
     receivedCallback?: AdapterCallback;
@@ -30,7 +32,9 @@ export default class HttpAdapter extends Plugin {
         };
 
         const firmwareHandler = (req: Request, res: Response) => {
-            res.sendFile(this.firmwarePath);
+            const config = {} as any; // FIXME
+            const firmware = createFirmwareImage(fs.readFileSync(this.firmwarePath), config);
+            res.send(firmware);
         };
 
         // cloud
