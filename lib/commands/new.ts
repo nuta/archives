@@ -3,6 +3,7 @@ import * as ejs from "ejs";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { Args, Command, Opts } from "../cli";
+import { logger } from "../logger";
 
 const DEVICE_CC_TMPL = `
 #include "makestack.h"
@@ -43,7 +44,7 @@ export default class NewCommand extends Command {
     ];
     public static opts = [];
 
-    public async run(args: Args, opts: Opts, logger: Logger) {
+    public async run(args: Args, opts: Opts) {
         const ctx = {
             name: path.basename(args.dir),
         };

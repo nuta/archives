@@ -29,5 +29,5 @@ export abstract class Command {
     public static desc: string;
     public static args: ArgDefinition[];
     public static opt: OptDefinition[];
-    public abstract async run(args: Args, opts: Opts, logger: Logger): Promise<void>;
+    public abstract async run(args: Args, opts: Opts): Promise<void>;
 }

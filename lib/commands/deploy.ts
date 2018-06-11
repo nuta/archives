@@ -3,6 +3,7 @@ import * as child_process from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import { board } from "../boards";
+import { logger } from "../logger";
 import { Args, Command, Opts } from "../cli";
 
 export default class DeployCommand extends Command {
@@ -15,16 +16,16 @@ export default class DeployCommand extends Command {
         { name: "--firebase-project", desc: "The Firebase project name." },
     ];
 
-    public async run(args: Args, opts: Opts, logger: Logger) {
-        logger.info("==> Building...");
-        // await board.build(opts.appDir);
+    public async run(args: Args, opts: Opts) {
+        logger.progress("Building the firmware");
+        await board.build(opts.appDir);
 
-        logger.info(`==> Deploying to ${opts.platform}`);
+        logger.progress(`Deploying to ${opts.platform}`);
         const mod = require(path.resolve(__dirname, `../platform/${opts.platform}`));
         await mod.deploy(opts.appDir, {
             firebaseProject: opts.firebaseProject,
         });
 
-        logger.info(`==> Successfully deployed to ${opts.platform}`);
+        logger.progress(`Successfully deployed to ${opts.platform}`);
     }
 }

@@ -29,7 +29,7 @@ for (const name of COMMANDS) {
     cmd.action(async (args, opts, logger) => {
         const instance = new klass();
         try {
-            await instance.run(args, opts, logger);
+            await instance.run(args, opts);
         } catch (e) {
             logger.error(e.message);
         }
