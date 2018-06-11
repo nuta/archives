@@ -65,7 +65,7 @@ export default class NewCommand extends Command {
             name: "--frontend",
             desc: "The frontend framework.",
             default: "static",
-            validators: ["static", "nuxt"]
+            validators: ["static"]
         }
     ];
 
