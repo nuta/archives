@@ -10,6 +10,13 @@ export class Esp32Board extends Board {
     public async build(appDir: string): Promise<void> {
         const esp32Dir = path.resolve(__dirname, "../../../esp32");
 
+        if (!fs.existsSync(path.join(esp32Dir, "deps"))) {
+            spawnSync("./tools/download-dependencies", {
+                stdio: 'inherit',
+                cwd: esp32Dir
+            });
+        }
+
         fs.mkdirpSync(path.join(esp32Dir, "build"));
         fs.copyFileSync(
             path.join(appDir, "device.cc"),
