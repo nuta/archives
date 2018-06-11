@@ -12,6 +12,7 @@ const logger = new Logger("server");
 logger.debug("Staring the runtime");
 const httpServer = express();
 
+httpServer.use(express.static("public"));
 httpServer.use(function(req: any, res, next) {
     req.rawBody = Buffer.alloc(0);
 
