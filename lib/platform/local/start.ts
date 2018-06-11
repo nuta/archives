@@ -40,7 +40,6 @@ for (const plugin of plugins) {
 
     if (plugin.receivePayload) {
         plugin.receivePayload((payload: Buffer) => {
-            logger.log(payload);
             telemata.process(payload);
 
             return telemata.serialize({
