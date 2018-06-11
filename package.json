@@ -46,9 +46,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "test": "mocha test/**/*.spec.ts",
-    "coverage": "nyc mocha test/**/*.spec.ts",
-    "test:live": "mocha --watch test/**/*.spec.ts --watch-extensions ts"
+    "test": "mocha",
+    "coverage": "nyc mocha",
+    "test:live": "mocha --watch --watch-extensions ts"
   },
   "repository": {
     "type": "git",
@@ -62,14 +62,14 @@
     "extension": [
       ".ts"
     ],
-    "exclude": [
-      "esp32",
-      "coverage"
+    "include": [
+      "lib/**/*"
     ],
     "reporter": [
       "text",
       "html"
     ],
+    "sourceMap":true,
     "all": true
   },
   "author": "Seiya Nuta <nuta@seiya.me>",
