@@ -5,6 +5,7 @@ import * as path from "path";
 import { App } from "../app";
 import { board } from "../boards";
 import { Args, Command, Opts } from "../cli";
+import { logger } from "../logger";
 
 export default class DevCommand extends Command {
     public static command = "dev";
@@ -14,12 +15,7 @@ export default class DevCommand extends Command {
         { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
     ];
 
-    public async run(args: Args, opts: Opts, logger: Logger) {
-        logger.info("starting dev");
-
-        logger.info("Building...");
-        await board.build(opts.appDir);
-
+    public async run(args: Args, opts: Opts) {
         const localRuntimePath = path.resolve(__dirname, "../platform/local/start");
         const forkOptions = {
             cwd: opts.appDir,
@@ -30,21 +26,35 @@ export default class DevCommand extends Command {
             }),
         };
 
-        let app = child_process.fork(localRuntimePath, [], forkOptions);
+
+        let app: child_process.ChildProcess;
         process.on("exit", () => {
             app.kill();
         });
 
-        const reload = async (filepath: string) => {
-            logger.info(`==> change detected: ${filepath}`);
-            logger.info("Building...");
+        try {
+
+            logger.progress("Building the firmware");
             await board.build(opts.appDir);
+            logger.progress("Launching the server")
+            app = child_process.fork(localRuntimePath, [], forkOptions);
+        } catch (e) {
+            logger.error(e.message);
+        }
 
-            logger.info("killing...");
+        const reload = async (filepath: string) => {
+            logger.progress(`Change detected: ${filepath}`);
+            logger.progress("Building the firmware");
+            try {
+                await board.build(opts.appDir);
+            } catch (e) {
+                logger.error(e.message);
+                return;
+            }
+
+            logger.progress("Restarting the server")
             app.kill();
-
             app.on("exit", () => {
-                logger.info("reloading...");
                 app = child_process.fork(localRuntimePath, [], forkOptions);
             });
         };
@@ -52,6 +62,7 @@ export default class DevCommand extends Command {
         fs.watch(path.resolve(opts.appDir, "server.js"), (_: string, filepath: string) => reload(filepath));
         fs.watch(path.resolve(opts.appDir, "device.cc"), (_: string, filepath: string) => reload(filepath));
 
-        logger.info("Press Ctrl-C to stop");
+        logger.info("*** Watching the changes to source code...")
+        logger.info("*** Press Ctrl-C to quit");
     }
 }

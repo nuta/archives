@@ -2,6 +2,7 @@ import { spawnSync } from "child_process";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
+import { logger } from "../logger";
 import { createFirmwareImage } from "../firmware";
 import { Board } from "../types";
 const packageJson = require("../../../package.json");
@@ -31,7 +32,6 @@ export class Esp32Board extends Board {
         // Use an (almost) unique number as the app version.
         const appVersion = process.hrtime()[0] % 4200000000;
 
-        console.log(`==> make in ${esp32Dir} version ${appVersion}`);
         const procs = os.cpus().length;
         const cp = spawnSync("/usr/bin/make", [`-j${procs}`], {
             stdio: "inherit",

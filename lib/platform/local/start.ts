@@ -6,8 +6,10 @@ import { getFirmwareVersion } from "../../firmware";
 import { loadPlugins } from "../../plugins";
 import { endpoints } from "../../server";
 import * as telemata from "../../telemata";
+import { Logger } from "../../logger";
 
-console.log("==> starting local runtime");
+const logger = new Logger("server");
+logger.debug("Staring the runtime");
 const httpServer = express();
 
 httpServer.use(function(req: any, res, next) {
@@ -25,8 +27,8 @@ httpServer.use(function(req: any, res, next) {
 const firmwarePath = path.resolve("firmware.bin");
 const firmwareImage = fs.readFileSync(firmwarePath);
 const appVersion = getFirmwareVersion(firmwareImage);
-console.log(`   version: ${appVersion}`);
 
+logger.debug("Loading plugins");
 const plugins = loadPlugins(["http_adapter"], {
     firmwarePath,
 });
@@ -38,7 +40,7 @@ for (const plugin of plugins) {
 
     if (plugin.receivePayload) {
         plugin.receivePayload((payload: Buffer) => {
-            console.log(payload);
+            logger.log(payload);
             telemata.process(payload);
 
             return telemata.serialize({
@@ -64,4 +66,5 @@ for (const [name, callback] of Object.entries(endpoints)) {
 const host = "0.0.0.0";
 const port = process.env.PORT || 7878;
 httpServer.listen(port, host as any);
-console.log(`started a http server at ${host}:${port}`);
+logger.debug(`Started a http server at http://${host}:${port}`);
+logger.debug(`    version: ${appVersion}`);

@@ -1,6 +1,7 @@
 import * as caporal from "caporal";
 import * as fs from "fs";
 import * as path from "path";
+import { logger } from "./logger";
 const { version } = require("../../package.json");
 
 caporal.version(version);
@@ -27,7 +28,11 @@ for (const name of COMMANDS) {
 
     cmd.action(async (args, opts, logger) => {
         const instance = new klass();
-        await instance.run(args, opts, logger);
+        try {
+            await instance.run(args, opts, logger);
+        } catch (e) {
+            logger.error(e.message);
+        }
     });
 }
 
