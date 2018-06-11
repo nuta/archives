@@ -26,12 +26,14 @@ for (const name of COMMANDS) {
         cmd.option(opt.name, opt.desc, opt.validator, opt.default, opt.required);
     }
 
-    cmd.action(async (args, opts, logger) => {
+    cmd.action(async (args, opts) => {
         const instance = new klass();
         try {
             await instance.run(args, opts);
         } catch (e) {
             logger.error(e.message);
+            logger.debug(e.stack);
+            process.exit(1);
         }
     });
 }
