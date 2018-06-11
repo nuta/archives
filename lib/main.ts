@@ -2,20 +2,13 @@ import * as caporal from "caporal";
 import * as fs from "fs";
 import * as path from "path";
 import { logger } from "./logger";
+import { commands } from "./commands";
 const { version } = require("../../package.json");
 
 caporal.version(version);
 
 // Load commands.
-const COMMANDS = [
-    "new",
-    "dev",
-    "deploy",
-];
-
-for (const name of COMMANDS) {
-    const modulePath = path.resolve(__dirname, "commands", name);
-    const klass: any = require(modulePath).default;
+for (const klass of commands) {
     const cmd = caporal.command(klass.command, klass.desc);
 
     for (const arg of klass.args) {
@@ -40,5 +33,5 @@ for (const name of COMMANDS) {
 
 export function run(args?: string[]) {
     const argv = args ? [process.argv0, "makestack", ...args] : process.argv;
-    caporal.parse(argv);
+    return caporal.parse(argv);
 }

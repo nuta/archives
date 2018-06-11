@@ -24,7 +24,7 @@ export interface OptDefinition {
     required?: boolean;
 }
 
-export abstract class Command {
+export abstract class CommandBase {
     public static command: string;
     public static desc: string;
     public static args: ArgDefinition[];

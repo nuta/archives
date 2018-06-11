@@ -4,10 +4,10 @@ import * as fs from "fs";
 import * as path from "path";
 import { App } from "../app";
 import { board } from "../boards";
-import { Args, Command, Opts } from "../cli";
+import { Args, CommandBase, Opts } from "../cli";
 import { logger } from "../logger";
 
-export default class DevCommand extends Command {
+export class Command extends CommandBase {
     public static command = "dev";
     public static desc = "";
     public static args = [];

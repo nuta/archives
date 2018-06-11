@@ -4,9 +4,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { board } from "../boards";
 import { logger } from "../logger";
-import { Args, Command, Opts } from "../cli";
+import { Args, CommandBase, Opts } from "../cli";
 
-export default class DeployCommand extends Command {
+export class Command extends CommandBase {
     public static command = "deploy";
     public static desc = "";
     public static args = [];

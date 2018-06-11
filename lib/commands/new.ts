@@ -2,7 +2,7 @@ const chalk = require("chalk");
 import * as ejs from "ejs";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { Args, Command, Opts } from "../cli";
+import { Args, CommandBase, Opts } from "../cli";
 import { logger } from "../logger";
 
 const DEVICE_CC_TMPL = `\
@@ -54,7 +54,7 @@ function mkdir(filepath: string) {
     fs.mkdirSync(filepath);
 }
 
-export default class NewCommand extends Command {
+export class Command extends CommandBase {
     public static command = "new";
     public static desc = "Create a new app.";
     public static args = [
