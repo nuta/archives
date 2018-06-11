@@ -14,6 +14,18 @@ export async function deploy(appDir: string, opts: DeployOptions) {
     fs.mkdirpSync(pkgDir);
 
     fs.writeJsonSync(path.join(projDir, "firebase.json"), {
+        "hosting": {
+            "public": "public",
+            "ignore": [
+              "**/.*"
+            ],
+            "rewrites": [
+                {
+                    "source": "/makestack/**",
+                    "function": "makestack"
+                }
+            ]
+        }
     });
 
     const packageJsonPath = path.resolve(__dirname, "../../../../package.json");
@@ -34,6 +46,11 @@ export async function deploy(appDir: string, opts: DeployOptions) {
         packageJsonPath,
         path.join(pkgDir, "makestack/package.json"),
     );
+
+    fs.copySync(
+        path.join(appDir, "public"),
+        path.join(projDir, "public")
+    )
 
     fs.copyFileSync(
         path.join(appDir, "server.js"),
