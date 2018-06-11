@@ -26,7 +26,6 @@ export default class DevCommand extends Command {
             }),
         };
 
-
         let app: child_process.ChildProcess;
         process.on("exit", () => {
             app.kill();
