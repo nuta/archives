@@ -35,7 +35,7 @@ if (!config || !config["devPlugins"]) {
     throw new Error("Specify makestack.devPlugins in package.json");
 }
 
-const plugins = instantiatePlugins(config["devPlugins"], { firmwarePath });
+const plugins = instantiatePlugins(config["devPlugins"]);
 
 for (const plugin of plugins) {
     if (plugin.server) {

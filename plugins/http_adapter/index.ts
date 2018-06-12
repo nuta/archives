@@ -4,14 +4,9 @@ import { Request, Response } from "express";
 import { Plugin, AdapterCallback } from "../../lib/plugins";
 import { parseVariableLength } from "../../lib/telemata";
 import { createFirmwareImage } from "../../lib/firmware";
-import { PackageConfig } from "../../lib/types";
 
 export default class HttpAdapter extends Plugin {
     receivedCallback?: AdapterCallback;
-
-    constructor(args: PackageConfig) {
-        super(args);
-    }
 
     async sendPayload(payload: Buffer): Promise<void> {
     }
@@ -33,9 +28,13 @@ export default class HttpAdapter extends Plugin {
         };
 
         const firmwareHandler = (req: Request, res: Response) => {
-            const config = {} as any; // FIXME
-            const firmware = createFirmwareImage(fs.readFileSync(this.firmwarePath), config);
-            res.send(firmware);
+            const boardType = req.query.board;
+            if (!/\A[a-z0-9]+\z/.exec(boardType)) {
+                res.status(400);
+                return;
+            }
+
+            res.send(`firmware.${boardType}.bin`);
         };
 
         // cloud

@@ -28,9 +28,7 @@ const firmwarePath = path.resolve(process.env.APP_DIR, "firmware.bin");
 const firmwareImage = fs.readFileSync(firmwarePath);
 const appVersion = getFirmwareVersion(firmwareImage);
 
-const plugins = instantiatePlugins(["http_adapter"], {
-    firmwarePath,
-});
+const plugins = instantiatePlugins(["http_adapter"]);
 
 for (const plugin of plugins) {
     if (plugin.server) {

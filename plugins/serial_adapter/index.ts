@@ -1,7 +1,7 @@
 import * as SerialPort from "serialport";
 import { Plugin, AdapterCallback } from "../../lib/plugins";
-import { PackageConfig } from "../../lib/types";
 import { parseVariableLength } from "../../lib/telemata";
+import { guessSerialFilePath } from "../../lib/helpers";
 
 const PACKET_HEADER = Buffer.from([0xaa, 0xab, 0xff]);
 
@@ -13,13 +13,15 @@ async function sleep(ms: number): Promise<void> {
 
 export default class SerialAdapter extends Plugin {
     private serial: SerialPort;
-    constructor(config: PackageConfig) {
-        super(config);
+    constructor() {
+        super();
 
-        config.serialFilePath = "/dev/cu.usbserial-14210";
-        this.serial = new SerialPort(config.serialFilePath, {
-            baudRate: 115200
-        });
+        const serialFilePath = process.env.SERIAL || guessSerialFilePath();
+        if (!serialFilePath) {
+            throw new Error("Specify the serial device file path in $SERIAL.");
+        }
+
+        this.serial = new SerialPort(serialFilePath, { baudRate: 115200 });
     }
 
     async sendChunk(chunk: Buffer): Promise<void> {

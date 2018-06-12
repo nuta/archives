@@ -1,10 +1,5 @@
 export interface DeviceData { [key: string]: any }
 
-export interface PackageConfig {
-    firmwarePath: string;
-    serialFilePath?: string;
-}
-
 export interface InstallConfig {
     wifiSsid?: string;
     wifiPassword?: string;

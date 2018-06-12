@@ -1,17 +1,10 @@
 import * as express from "express";
 import * as fs from "fs-extra";
 import * as path from "path";
-import { PackageConfig } from "./types";
 
 export type AdapterCallback = (payload: Buffer) => Buffer | undefined;
 
 export class Plugin {
-    protected firmwarePath: string;
-
-    constructor(args: PackageConfig) {
-        this.firmwarePath = args.firmwarePath;
-    }
-
     public server(express: express.Express): void {
     }
 
@@ -70,7 +63,7 @@ export function loadPlugins(required: string[]): { [name: string]: any } {
     return plugins;
 }
 
-export function instantiatePlugins(plugins: string[], args: PackageConfig): Plugin[] {
+export function instantiatePlugins(plugins: string[]): Plugin[] {
     const modules = [];
     const builtinPlugins = getBuiltinPlugins().map(plugin => path.basename(plugin));
     for (const plugin of Object.values(loadPlugins(plugins))) {
@@ -82,7 +75,7 @@ export function instantiatePlugins(plugins: string[], args: PackageConfig): Plug
         } else {
             ctor = require(plugin.dir).default as any;
         }
-        modules.push(new ctor(args));
+        modules.push(new ctor());
     }
     return modules;
 }
