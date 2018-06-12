@@ -6,6 +6,7 @@ import { board } from "../boards";
 import { logger } from "../logger";
 import { Args, CommandBase, Opts } from "../cli";
 import { downloadRepo } from "../helpers";
+import { loadPlatform } from "../platform";
 
 export class Command extends CommandBase {
     public static command = "deploy";
@@ -25,8 +26,7 @@ export class Command extends CommandBase {
         await board.build(repoDir, opts.appDir);
 
         logger.progress(`Deploying to ${opts.platform}`);
-        const mod = require(path.resolve(__dirname, `../platform/${opts.platform}`));
-        await mod.deploy(opts.appDir, {
+        await loadPlatform(opts.platform).deploy(opts.appDir, {
             firebaseProject: opts.firebaseProject,
         });
 

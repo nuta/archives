@@ -1,14 +1,21 @@
+import * as path from "path";
 import { Platform } from "../types";
-import { Platform as FirebasePlatform } from "./firebase";
-import { Platform as LocalPlatform } from "./local";
+import * as local from "./local";
+import * as firebase from "./firebase";
 
-export let platformCtor: any;
-if (process.env.MAKESTACK_PLATFORM == "local") {
-    platformCtor = LocalPlatform;
-} else if (process.env.GCLOUD_PROJECT) {
-    platformCtor = FirebasePlatform;
-} else {
-    throw new Error("cannot detect the platform");
+export function instantiatePlatform(): Platform {
+    let platformCtor: any;
+    if (process.env.MAKESTACK_PLATFORM == "local") {
+        platformCtor = local.Platform;
+    } else if (process.env.GCLOUD_PROJECT) {
+        platformCtor = firebase.Platform;
+    } else {
+        throw new Error("cannot detect the platform");
+    }
+
+    return new platformCtor() as Platform;
 }
 
-export const platform = new platformCtor() as Platform;
+export function loadPlatform(platform: string): any {
+    return require(path.resolve(__dirname, `./${platform}`));
+}
