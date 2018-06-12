@@ -12,6 +12,43 @@ const logger = new Logger("server");
 logger.debug("Staring the runtime");
 const httpServer = express();
 
+// Enable basic authentication to requests except /makestack/*.
+if (process.env.BASIC_AUTH) {
+    const basicAuthCredential = process.env.BASIC_AUTH.split(":", 2);
+    const requestsFromDevices = [
+        "/makestack/telemata",
+        "/makestack/firmware",
+    ];
+
+    httpServer.use((req, res, next) => {
+        if (requestsFromDevices.includes(req.path)) {
+            // Currently no authentication mechanism are implementd.
+            next();
+        }
+
+        const header = req.headers.authorization;
+        if (!header) {
+            res.status(401).header("WWW-Authenticate", 'Basic realm=""').end();
+            return;
+        }
+
+        const base64Cred = header.split("Basic ")[1];
+        if (!base64Cred) {
+            res.status(401).header("WWW-Authenticate", 'Basic realm=""').end();
+            return;
+        }
+
+        const cred = Buffer.from(base64Cred, 'base64').toString();
+        const [username, password] = cred.split(":", 2);
+        if (username !== basicAuthCredential[0] || password !== basicAuthCredential[1]) {
+            res.status(401).header("WWW-Authenticate", 'Basic realm=""').end();
+            return;
+        }
+
+        next();
+    });
+}
+
 httpServer.use(express.static("public"));
 httpServer.use(function(req: any, res, next) {
     req.rawBody = Buffer.alloc(0);
