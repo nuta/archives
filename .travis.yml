@@ -1,16 +1,32 @@
 language: node_js
 
+linux_addons: &linux_addons
+  apt:
+    packages:
+      - git
+      - wget
+      - make
+      – libncurses-dev
+      - flex
+      - bison
+      - gperf
+      - python
+      - python-serial
+
 matrix:
   include:
     - os: linux
       node_js: "10"
+      addons: *linux_addons
     - os: linux
       node_js: "8"
+      addons: *linux_addons
     - os: osx
       osx_image: xcode9.3
       node_js: "10"
 
-install: yarn
+install:
+  - yarn
 script:
   - yarn build
   - yarn test
@@ -19,6 +35,8 @@ after_script:
   - yarn nyc report --reporter=text-lcov | codeclimate-test-reporter
 cache:
   yarn: true
+  directories:
+    - esp32/deps
 
 notifications:
   on_success: change
