@@ -19,3 +19,7 @@ after_script:
   - yarn nyc report --reporter=text-lcov | codeclimate-test-reporter
 cache:
   yarn: true
+
+notifications:
+  on_success: change
+  on_failure: change
