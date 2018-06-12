@@ -89,13 +89,8 @@ export interface SerializeOptions {
     deviceSecret: string;
 }
 
-export function serialize({ deviceId, log, reports, configs, update, commands }: PayloadMessages, options: SerializeOptions) {
+export function serialize({ deviceId, log, reports, configs, update, commands }: PayloadMessages) {
     let payload = Buffer.alloc(0);
-
-    if (options.includeDeviceId && deviceId) {
-        const deviceIdMsg = generateMessage(SMMS_DEVICE_ID_MSG, deviceId);
-        payload = Buffer.concat([payload, deviceIdMsg]);
-    }
 
     if (log) {
         const logMsg = generateMessage(SMMS_LOG_MSG, log);
