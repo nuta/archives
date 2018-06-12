@@ -13,6 +13,10 @@ function replaceBuffer(buf: Buffer, value: string, id: string, fill: number): Bu
         throw new Error(`replaceBuffer: failed to replace ${id}`);
     }
 
+    if (value.length + 1 /* in case `fill' is a NULL chracter */ > id.length) {
+        throw new Error(`too long value for ${id}: \`${value}'`);
+    }
+
     const paddedValue = Buffer.alloc(needle.length, fill);
     const valueBuf = Buffer.from(value);
     valueBuf.copy(paddedValue);
