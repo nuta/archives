@@ -1,8 +1,8 @@
-#include "telemata.h"
-#include "makestack.h"
-#include "logger.h"
 #include <string.h>
 #include <stdio.h>
+#include <makestack.h>
+#include "telemata.h"
+#include "logger.h"
 
 void publish(const char *event, char *value) {
     char buf[256];

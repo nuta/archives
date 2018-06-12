@@ -4,7 +4,7 @@ dist
 coverage
 .nyc_output
 node_modules
-esp32/src/app.cc
+esp32/app
 esp32/build
 esp32/deps
 esp32/sdkconfig.old

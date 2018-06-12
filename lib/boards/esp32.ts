@@ -15,7 +15,7 @@ function make(esp32Dir: string, firmwareVersion: string, appVersion: number): an
         encoding: 'utf-8',
         env: {
             PATH: process.env.PATH,
-            APP_OBJS: "app.o",
+            MY_COMPONENTS: "app",
             RELEASE: "", // debug build
             APP_VERSION: appVersion,
             FIRMWARE_VERSION: packageJson.version,
@@ -30,6 +30,7 @@ export class Esp32Board extends Board {
 
     public async build(appDir: string): Promise<void> {
         const esp32Dir = this.prepareEsp32Dir();
+        const appComponentDir = path.join(esp32Dir, "app");
 
         if (!fs.existsSync(path.join(esp32Dir, "deps"))) {
             spawnSync("./tools/download-dependencies", {
@@ -38,11 +39,16 @@ export class Esp32Board extends Board {
             });
         }
 
-        fs.mkdirpSync(path.join(esp32Dir, "build"));
+        fs.mkdirpSync(appComponentDir);
         fs.copyFileSync(
             path.join(appDir, "device.cc"),
-            path.join(esp32Dir, "src/app.cc"),
+            path.join(appComponentDir, "device.cc"),
         );
+
+        fs.writeFileSync(
+            path.join(appComponentDir, "component.mk"),
+            "COMPONENT_OBJS := device.o"
+        )
 
         // Update src/component.mk to rebuild source files depends
         // on WIFI_SSID, etc.
