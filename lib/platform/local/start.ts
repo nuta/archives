@@ -3,7 +3,7 @@ import * as express from "express";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { getFirmwareVersion } from "../../firmware";
-import { loadPlugins } from "../../plugins";
+import { instantiatePlugins } from "../../plugins";
 import { endpoints } from "../../server";
 import * as telemata from "../../telemata";
 import { Logger } from "../../logger";
@@ -35,7 +35,7 @@ if (!config || !config["devPlugins"]) {
     throw new Error("Specify makestack.devPlugins in package.json");
 }
 
-const plugins = loadPlugins(config["devPlugins"], { firmwarePath });
+const plugins = instantiatePlugins(config["devPlugins"], { firmwarePath });
 
 for (const plugin of plugins) {
     if (plugin.server) {

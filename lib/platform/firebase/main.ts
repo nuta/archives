@@ -3,7 +3,7 @@ import * as functions from "firebase-functions";
 import * as fs from "fs";
 import * as path from "path";
 import { getFirmwareVersion } from "../../firmware";
-import { loadPlugins } from "../../plugins";
+import { instantiatePlugins } from "../../plugins";
 import { endpoints } from "../../server";
 import * as telemata from "../../telemata";
 
@@ -28,7 +28,7 @@ const firmwarePath = path.resolve(process.env.APP_DIR, "firmware.bin");
 const firmwareImage = fs.readFileSync(firmwarePath);
 const appVersion = getFirmwareVersion(firmwareImage);
 
-const plugins = loadPlugins(["http_adapter"], {
+const plugins = instantiatePlugins(["http_adapter"], {
     firmwarePath,
 });
 
