@@ -3,7 +3,7 @@ import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
 import { logger } from "../logger";
-import { createFirmwareImage, removeFirmwareHeader, prepareFirmware } from "../firmware";
+import { createFirmwareImage, embedCredentials, CREDENTIALS_DATA_TEMPLATE } from "../firmware";
 import { Board, InstallConfig } from "../types";
 import { loadPlugins } from "../plugins";
 const packageJson = require("../../../package.json");
@@ -75,6 +75,7 @@ CXXFLAGS += -fdiagnostics-color=always
         fs.writeFileSync(mk, fs.readFileSync(mk));
 
         // Use an (almost) unique number as the app version.
+        // FIXME: production
         const appVersion = process.hrtime()[0] % 4200000000;
 
         const cp = make(esp32Dir, packageJson.version, appVersion);
@@ -94,10 +95,9 @@ CXXFLAGS += -fdiagnostics-color=always
             }
         }
 
-        fs.copyFileSync(
-            path.join(esp32Dir, "build/firmware.elf"),
-            path.join(appDir, "firmware.elf"),
-        );
+        let image = fs.readFileSync(path.join(appDir, "firmware.esp32.bin"));
+        image = createFirmwareImage(appVersion, image);
+        fs.writeFileSync(path.join(esp32Dir, "build/firmware.bin"), image);
     }
 
     public async install(appDir: string, config: InstallConfig): Promise<void> {
@@ -106,30 +106,31 @@ CXXFLAGS += -fdiagnostics-color=always
         }
 
         const esp32Dir = this.prepareEsp32Dir();
-        const esptoolPath = path.resolve(esp32Dir, "deps/esp-idf/components/esptool_py/esptool/esptool.py");
-        const tmpElfPath =  path.join(appDir, `firmware.${config.deviceName}.elf`);
-        const rawFirmwarePath =  path.join(appDir, `firmware.${config.deviceName}.raw`);
-        const firmwarePath =  path.join(appDir, `firmware.${config.deviceName}.bin`);
-        const elf = fs.readFileSync(path.join(esp32Dir, "build/firmware.elf"));
-        fs.writeFileSync(tmpElfPath, prepareFirmware(elf, config));
+        const firmwarePath =  path.join(appDir, `firmware.esp32.bin`);
+        const credentialsPath = path.join(appDir, `credentials.${config.deviceName}.bin`);
+        fs.writeFileSync(credentialsPath, embedCredentials(CREDENTIALS_DATA_TEMPLATE, config));
 
-        spawnSync("python", [
-            esptoolPath,
-            '--chip', 'esp32',
-            'elf2image',
-            '--flash_mode', 'dio',
-            '--flash_freq', '40m',
-            '--flash_size', '2MB',
-            '-o', rawFirmwarePath,
-            tmpElfPath
-        ]);
+        // Create otadata.bin to initialize the otadata partiton.
+        fs.writeFileSync(
+            path.join(esp32Dir, "build/otadata.bin"),
+            Buffer.alloc(0x2000 /* The size of otadata partition */)
+        );
 
-
-        const image = removeFirmwareHeader(createFirmwareImage(fs.readFileSync(rawFirmwarePath)));
-        fs.writeFileSync(firmwarePath, image);
-
+        // The partition table (default.bin) must be the following layout:
+        // # Name, Type, SubType, Offset, Size, Flags
+        // nvs,data,nvs,0x9000,20K,
+        // otadata,data,ota,0xe000,8K,
+        // app0,app,ota_0,0x10000,1280K,
+        // app1,app,ota_1,0x150000,1280K,
+        // eeprom,data,153,0x290000,4K,
+        // spiffs,data,spiffs,0x291000,1468K, (we use here to save credentials instead)
+        //
+        // Credentials (i.e. device name, wifi password, etc.) exists at 0x291000; don't
+        // use the space for SPIFFS or move the position or the firmware is no longer able
+        // to communicate with the server.
+        //
         const args = [
-            esptoolPath,
+            path.resolve(esp32Dir, "deps/esp-idf/components/esptool_py/esptool/esptool.py"),
             "--port", config.serial,
             "--baud", "921600",
             "--chip", "esp32",
@@ -140,13 +141,8 @@ CXXFLAGS += -fdiagnostics-color=always
             "0xe000", "otadata.bin",
             "0x1000", "bootloader/bootloader.bin",
             "0x10000", firmwarePath,
+            "0x291000", credentialsPath
         ]
-
-        // Create otadata.bin to initialize the otadata partiton.
-        fs.writeFileSync(
-            path.join(esp32Dir, "build/otadata.bin"),
-            Buffer.alloc(0x2000 /* The size of otadata partition */)
-        );
 
         // TODO: ensure that pyserial is installed
         const { status } = spawnSync("python", args, {

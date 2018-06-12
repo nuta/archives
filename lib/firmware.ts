@@ -24,12 +24,31 @@ function replaceBuffer(buf: Buffer, value: string, id: string, fill: number): Bu
     return buf;
 }
 
+export function getReplaceMeId(name: string, length: number): Buffer {
+    const prefix = "__REPLACE_ME__" + name + "_";
+    if (length - prefix.length < 0) {
+        throw new Error(`BUG: too long replace me: ${name}`);
+    }
 
-export function removeFirmwareHeader(image: Buffer): Buffer {
-    return image.slice(16);
+    return Buffer.from(prefix + Buffer.alloc(length - prefix.length, "x"));
 }
 
-export function prepareFirmware(image: Buffer, config: InstallConfig): Buffer {
+// struct {
+//     char DEVICE_NAME[64];
+//     char SERVER_URL[256];
+//     char NETWORK_ADAPTER[32];
+//     char WIFI_SSID[64];
+//     char WIFI_PASSWORD[64];
+// };
+export const CREDENTIALS_DATA_TEMPLATE = Buffer.concat([
+    getReplaceMeId("DEVICE_NAME", 64),
+    getReplaceMeId("SERVER_URL", 256),
+    getReplaceMeId("NETWORK_ADAPTER", 32),
+    getReplaceMeId("WIFI_SSID", 64),
+    getReplaceMeId("WIFI_PASSWORD", 64),
+])
+
+export function embedCredentials(image: Buffer, config: InstallConfig): Buffer {
     const fill = 0x00;
     image = replaceBuffer(image, config.deviceName, "DEVICE_NAME_abcdefghijklmnopqrstuvwxyz1234567890", fill);
     image = replaceBuffer(image, config.serverUrl, "SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890", fill);
@@ -46,8 +65,7 @@ export function prepareFirmware(image: Buffer, config: InstallConfig): Buffer {
     return image;
 }
 
-export function createFirmwareImage(image: Buffer): Buffer {
-    const version = process.hrtime()[0] % 10000000; // FIXME
+export function createFirmwareImage(version: number, image: Buffer): Buffer {
     const header = Buffer.alloc(16);
     header.writeUInt8(0x81, 0);
     header.writeUInt8(0xf1, 1);

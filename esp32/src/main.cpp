@@ -22,12 +22,15 @@ esp_err_t system_event_callback(void *ctx, system_event_t *event) {
     return ESP_OK;
 }
 
-const char *WIFI_SSID = "__REPLACE_ME_WIFI_SSID_abcdefghijklmnopqrstuvwxyz1234567890__";
-const char *WIFI_PASSWORD = "__REPLACE_ME_WIFI_PASSWORD_abcdefghijklmnopqrstuvwxyz1234567890__";
-const char *DEVICE_NAME = "__REPLACE_ME_DEVICE_NAME_abcdefghijklmnopqrstuvwxyz1234567890__";
-const char *SERVER_URL = "__REPLACE_ME_SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890__";
-const char *NETWORK_ADAPTER = "__REPLACE_ME_NETWORK_ADAPTER__";
+struct credentials_struct {
+    char device_name[64];
+    char server_url[256];
+    char network_adapter[32];
+    char wifi_ssid[64];
+    char wifi_password[64];
+};
 
+struct credentials_struct *credentials = (struct credentials_struct *) 0x291000;
 TelemataClient *telemata = nullptr;
 
 void uart_adapter_send_task(void *param) {
@@ -46,8 +49,11 @@ void uart_adapter_task(void *param) {
     uart_telemata->poll_uart();
 }
 
-void http_adapter_task(void *param) {
-    telemata = new WiFiTelemataClient(WIFI_SSID, WIFI_PASSWORD, SERVER_URL, DEVICE_NAME);
+void wifi_adapter_task(void *param) {
+    telemata = (TelemataClient *) new WiFiTelemataClient(
+        credentials->wifi_ssid, credentials->wifi_password,
+        credentials->server_url, credentials->device_name
+    );
 
     while (1) {
         telemata->send();
@@ -75,7 +81,11 @@ extern "C" void app_main() {
 
     INFO("Starting MakeStack...");
 
-//    xTaskCreate(&uart_adapter_task, "uart_adapter", 16 * 1024, NULL, 5, NULL);
+    if (strcmp(credentials->network_adapter, "wifi") == 0) {
+        xTaskCreate(&wifi_adapter_task, "wifi_adapter", 16 * 1024, NULL, 5, NULL);
+    } else if (strcmp(credentials->network_adapter, "serial") == 0) {
+        xTaskCreate(&uart_adapter_task, "uart_adapter", 16 * 1024, NULL, 5, NULL);
+    }
+
     xTaskCreate(&app_task, "app", 16 * 1024, NULL, 5, NULL);
-    xTaskCreate(&http_adapter_task, "http_adapter", 16 * 1024, NULL, 5, NULL);
 }
