@@ -116,7 +116,7 @@ int parse_variable_length(uint8_t *buf, int buf_length, int *length) {
     return -1;
 }
 
-#define PARSE_KEY_VALUE_MSG(len, type, key, value) \
+#define PARSE_KEY_VALUE_MSG(len) \
     int key_len;                                                           \
     int key_len_len = parse_variable_length(p, remaining, &key_len);       \
     int value_len = len - key_len_len - key_len;                           \
@@ -125,7 +125,7 @@ int parse_variable_length(uint8_t *buf, int buf_length, int *length) {
         goto next_message;                                                 \
     }                                                                      \
                                                                            \
-    int type = p[0];                                                       \
+    int value_type = p[0];                                                 \
     char *key = (char *) malloc(key_len + 1);                              \
     memcpy(key, p + 1 + key_len_len, key_len);                             \
     key[key_len] = '\0';                                                   \
@@ -179,16 +179,22 @@ int TelemataClient::receive_payload(const void *payload, size_t payload_length) 
 
         switch (type) {
             case TELEMATA_CONFIG_MSG: {
-                PARSE_KEY_VALUE_MSG(len, type, key, value);
+                PARSE_KEY_VALUE_MSG(len);
                 // update_config(key, value);
                 free(key);
                 free(value);
+                if (value_type == 0x01 /* string */) {
+                    // TODO
+                }
                 break;
             }
             case TELEMATA_COMMAND_MSG: {
-                PARSE_KEY_VALUE_MSG(len, type, key, value);
+                PARSE_KEY_VALUE_MSG(len);
                 // execute_command(key, value);
-                printf("command: %s(\"%s\")\n", key, value);
+                if (value_type == 0x01 /* string */) {
+                    // TODO
+                    printf("command: %s(\"%s\")\n", key, value);
+                }
                 free(key);
                 free(value);
                 break;
