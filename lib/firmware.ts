@@ -21,7 +21,11 @@ function replaceBuffer(buf: Buffer, value: string, id: string, fill: number): Bu
 }
 
 
-export function createFirmwareImage(image: Buffer, config: InstallConfig): Buffer {
+export function removeFirmwareHeader(image: Buffer): Buffer {
+    return image.slice(16);
+}
+
+export function prepareFirmware(image: Buffer, config: InstallConfig): Buffer {
     const fill = 0x20; /* a white space character */
     image = replaceBuffer(image, config.deviceName, "DEVICE_NAME", fill);
     image = replaceBuffer(image, config.serverUrl, "SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890", fill);
@@ -35,6 +39,10 @@ export function createFirmwareImage(image: Buffer, config: InstallConfig): Buffe
         image = replaceBuffer(image, config.wifiPassword, "WIFI_PASSWORD", fill);
     }
 
+    return image;
+}
+
+export function createFirmwareImage(image: Buffer): Buffer {
     const version = process.hrtime()[0] % 10000000; // FIXME
     const header = Buffer.alloc(16);
     header.writeUInt8(0x81, 0);

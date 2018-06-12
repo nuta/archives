@@ -3,7 +3,7 @@ import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
 import { logger } from "../logger";
-import { createFirmwareImage } from "../firmware";
+import { createFirmwareImage, removeFirmwareHeader, prepareFirmware } from "../firmware";
 import { Board, InstallConfig } from "../types";
 import { loadPlugins } from "../plugins";
 const packageJson = require("../../../package.json");
@@ -95,8 +95,8 @@ CXXFLAGS += -fdiagnostics-color=always
         }
 
         fs.copyFileSync(
-            path.join(esp32Dir, "build/firmware.bin"),
-            path.join(appDir, "firmware.bin"),
+            path.join(esp32Dir, "build/firmware.elf"),
+            path.join(appDir, "firmware.elf"),
         );
     }
 
@@ -105,24 +105,48 @@ CXXFLAGS += -fdiagnostics-color=always
             throw new Error("serial is not set")
         }
 
-        const rawImage = fs.readFileSync(path.join(appDir, "firmware.bin"));
-        const firmwarePath =  path.join(appDir, `firmware.${config.deviceName}.bin`);
-        fs.writeFileSync(firmwarePath, createFirmwareImage(rawImage, config));
-
         const esp32Dir = this.prepareEsp32Dir();
+        const esptoolPath = path.resolve(esp32Dir, "deps/esp-idf/components/esptool_py/esptool/esptool.py");
+        const tmpElfPath =  path.join(appDir, `firmware.${config.deviceName}.elf`);
+        const rawFirmwarePath =  path.join(appDir, `firmware.${config.deviceName}.raw`);
+        const firmwarePath =  path.join(appDir, `firmware.${config.deviceName}.bin`);
+        const elf = fs.readFileSync(path.join(esp32Dir, "build/firmware.elf"));
+        fs.writeFileSync(tmpElfPath, prepareFirmware(elf, config));
+
+        spawnSync("python", [
+            esptoolPath,
+            '--chip', 'esp32',
+            'elf2image',
+            '--flash_mode', 'dio',
+            '--flash_freq', '40m',
+            '--flash_size', '2MB',
+            '-o', rawFirmwarePath,
+            tmpElfPath
+        ]);
+
+
+        const image = removeFirmwareHeader(createFirmwareImage(fs.readFileSync(rawFirmwarePath)));
+        fs.writeFileSync(firmwarePath, image);
+
         const args = [
-            path.resolve(esp32Dir, "deps/esp-idf/components/esptool_py/esptool/esptool.py"),
+            esptoolPath,
             "--port", config.serial,
             "--baud", "921600",
             "--chip", "esp32",
             "--before", "default_reset", "--after", "hard_reset" ,
             "write_flash",
             "-z", "--flash_mode", "dio", "--flash_freq", "80m", "--flash_size", "detect",
-            "0xe000", path.resolve(esp32Dir, "deps/arduino-esp32/tools/partitions/boot_app0.bin"),
+            "0x8000", "default.bin",
+            "0xe000", "otadata.bin",
             "0x1000", "bootloader/bootloader.bin",
-            "0x10000", "firmware.bin",
-            "0x8000", "default.bin"
+            "0x10000", firmwarePath,
         ]
+
+        // Create otadata.bin to initialize the otadata partiton.
+        fs.writeFileSync(
+            path.join(esp32Dir, "build/otadata.bin"),
+            Buffer.alloc(0x2000 /* The size of otadata partition */)
+        );
 
         // TODO: ensure that pyserial is installed
         const { status } = spawnSync("python", args, {
