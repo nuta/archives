@@ -2,6 +2,7 @@ import * as SerialPort from "serialport";
 import { Plugin, AdapterCallback } from "../../lib/plugins";
 import { parseVariableLength } from "../../lib/telemata";
 import { guessSerialFilePath } from "../../lib/helpers";
+import { logger } from "../../lib/logger";
 
 const PACKET_HEADER = Buffer.from([0xaa, 0xab, 0xff]);
 
@@ -12,13 +13,14 @@ async function sleep(ms: number): Promise<void> {
 }
 
 export default class SerialAdapter extends Plugin {
-    private serial: SerialPort;
+    private serial?: SerialPort;
     constructor() {
         super();
 
         const serialFilePath = process.env.SERIAL || guessSerialFilePath();
         if (!serialFilePath) {
-            throw new Error("Specify the serial device file path in $SERIAL.");
+            logger.warn("Failed to open a serial device file. Disabling the serial adapter plugin.")
+            return;
         }
 
         this.serial = new SerialPort(serialFilePath, { baudRate: 115200 });
@@ -26,6 +28,11 @@ export default class SerialAdapter extends Plugin {
 
     async sendChunk(chunk: Buffer): Promise<void> {
         return new Promise<void>((resolve, reject) => {
+            if (!this.serial) {
+                resolve();
+                return;
+            }
+
             this.serial.write(chunk, (error, len) => {
                 if (error) {
                     console.error('serialport returned error:', error);
@@ -58,6 +65,10 @@ export default class SerialAdapter extends Plugin {
     }
 
     receivePayload(callback: AdapterCallback) {
+        if (!this.serial) {
+            return;
+        }
+
         let buf = Buffer.alloc(0);
         this.serial.on('data', (data: Buffer) => {
             buf = Buffer.concat([buf, data]);
