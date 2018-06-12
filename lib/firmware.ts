@@ -26,8 +26,8 @@ export function removeFirmwareHeader(image: Buffer): Buffer {
 }
 
 export function prepareFirmware(image: Buffer, config: InstallConfig): Buffer {
-    const fill = 0x20; /* a white space character */
-    image = replaceBuffer(image, config.deviceName, "DEVICE_NAME", fill);
+    const fill = 0x00;
+    image = replaceBuffer(image, config.deviceName, "DEVICE_NAME_abcdefghijklmnopqrstuvwxyz1234567890", fill);
     image = replaceBuffer(image, config.serverUrl, "SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890", fill);
     image = replaceBuffer(image, config.adapter, "NETWORK_ADAPTER", fill);
 
@@ -35,8 +35,8 @@ export function prepareFirmware(image: Buffer, config: InstallConfig): Buffer {
         if (!config.wifiSsid || !config.wifiPassword)
             throw new Error("wifi ssid or wifi password is not provided");
 
-        image = replaceBuffer(image, config.wifiSsid, "WIFI_SSID", fill);
-        image = replaceBuffer(image, config.wifiPassword, "WIFI_PASSWORD", fill);
+        image = replaceBuffer(image, config.wifiSsid, "WIFI_SSID_abcdefghijklmnopqrstuvwxyz1234567890", fill);
+        image = replaceBuffer(image, config.wifiPassword, "WIFI_PASSWORD_abcdefghijklmnopqrstuvwxyz1234567890", fill);
     }
 
     return image;

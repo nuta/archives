@@ -21,9 +21,9 @@ esp_err_t system_event_callback(void *ctx, system_event_t *event) {
     return ESP_OK;
 }
 
-const char *WIFI_SSID = "__REPLACE_ME_WIFI_SSID__";
-const char *WIFI_PASSWORD = "__REPLACE_ME_WIFI_PASSWORD__";
-const char *DEVICE_NAME = "__REPLACE_ME_DEVICE_NAME__";
+const char *WIFI_SSID = "__REPLACE_ME_WIFI_SSID_abcdefghijklmnopqrstuvwxyz1234567890__";
+const char *WIFI_PASSWORD = "__REPLACE_ME_WIFI_PASSWORD_abcdefghijklmnopqrstuvwxyz1234567890__";
+const char *DEVICE_NAME = "__REPLACE_ME_DEVICE_NAME_abcdefghijklmnopqrstuvwxyz1234567890__";
 const char *SERVER_URL = "__REPLACE_ME_SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890__";
 const char *NETWORK_ADAPTER = "__REPLACE_ME_NETWORK_ADAPTER__";
 
