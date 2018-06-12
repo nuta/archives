@@ -37,6 +37,7 @@
     "@types/serialport": "^6.0.1",
     "@types/sinon": "^5.0.1",
     "chai": "^4.1.2",
+    "docsify-cli": "^4.2.1",
     "mocha": "^5.2.0",
     "mock-fs": "^4.5.0",
     "nyc": "^12.0.2",
@@ -51,7 +52,8 @@
     "dev": "tsc -w",
     "test": "mocha",
     "coverage": "nyc mocha",
-    "test:live": "mocha --watch --watch-extensions ts"
+    "test:live": "mocha --watch --watch-extensions ts",
+    "docs": "docsify serve docs/docs"
   },
   "repository": {
     "type": "git",

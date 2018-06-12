@@ -1,0 +1,114 @@
+body {
+  background: #fefefe;
+  color: #2f2d2e;
+  font-family: 'Lato', sans-serif;
+  font-size: 16px;
+}
+
+a {
+  color: #346cea;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul {
+    padding: 0;
+}
+
+.container {
+    width: 800px;
+    margin: 0 auto;
+}
+
+.container > header {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.container > header > h1 {
+  font-family: "Roboto", sans-serif;
+  font-weight: 900;
+  margin: 0;
+  padding: 0;
+}
+
+.container > header > nav > a {
+  color: #5f5d5e;
+  font-weight: 700;
+}
+
+.container > header > nav > a:not(:first-child) {
+  margin-left: 20px;
+}
+
+.goto-cloud-button {
+  color: #fefefe !important;
+  background: #12b886;
+  border-bottom: 5px solid #0e996d;
+  border-radius: 5px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 5px 10px;
+  margin-left: 30px !important;
+}
+
+.container > main {
+  text-align: center;
+  margin: 80px auto 150px auto;
+}
+
+.copywriting {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 30px;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.features {
+  margin: 35px auto;
+  width: fit-content;
+  text-align: left;
+  line-height: 1.5rem;
+}
+
+.video-container {
+  width: 800px;
+  margin: 0 auto;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.65);
+}
+
+video {
+  width: 100%;
+}
+
+.container footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: #f3f3f3;
+  width: 100%;
+  padding: 15px 0;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.container footer > .fa-github-alt {
+  color: #7f7d7e;
+  font-size: 25px;
+  vertical-align: middle;
+}
+
+.container footer > span {
+  margin-left: 10px;
+  color: #6f6d6e;
+  font-size: 15px;
+  vertical-align: middle;
+  font-size: 15px;
+}
