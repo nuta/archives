@@ -22,6 +22,10 @@ export class Device {
         this.commands = this.data.commands || {};
     }
 
+    private getByName(name: string) {
+        return new Device(name);
+    }
+
     public command(name: string, arg: string) {
         this.commands[name] = arg;
     }
