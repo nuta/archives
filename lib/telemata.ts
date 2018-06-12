@@ -6,7 +6,7 @@ import { callbacks, HeartbeatCallback } from "./server";
 const SMMS_VERSION = 1;
 const SMMS_HMAC_MSG      = 0x01;
 const SMMS_CACHE_MSG     = 0x02;
-const SMMS_DEVICE_ID_MSG = 0x03;
+const SMMS_DEVICE_NAME_MSG = 0x03;
 const SMMS_LOG_MSG       = 0x04;
 const SMMS_COMMAND_MSG   = 0x05;
 const SMMS_GET_MSG       = 0x06;
@@ -192,6 +192,9 @@ export function deserialize(payload: Buffer) {
                 messages.commands[key.toString("utf-8")] = value.toString("utf-8");
                 break;
             }
+            case SMMS_DEVICE_NAME_MSG:
+                messages.update = data.toString("utf-8")
+                break;
             case SMMS_UPDATE_MSG:
                 messages.update = {
                     version: data.readUInt32BE(1),
