@@ -212,14 +212,14 @@ export function deserialize(payload: Buffer) {
     return messages;
 }
 
-export function process(payload: Buffer) {
-    const deviceName = "device-name"; // TODO
+export function process(payload: Buffer): Device {
+    const { deviceName } = deserialize(payload);
     const device = new Device(deviceName);
-    console.log("telemata: ", deserialize(payload));
 
     for (const callback of callbacks.heartbeat) {
         callback(device);
     }
 
     device.saveIfChanged();
+    return device;
 }

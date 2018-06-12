@@ -39,19 +39,11 @@ for (const plugin of plugins) {
 
     if (plugin.receivePayload) {
         plugin.receivePayload((payload: Buffer) => {
-            console.log(payload);
-            telemata.process(payload);
-
+            const device = telemata.process(payload);
             return telemata.serialize({
-                commands: {
-                    Hello: "World!",
-                    this: "is it!",
-                },
-                update: {
-                    type: "bulk",
-                    version: appVersion,
-                },
-            }, { includeDeviceId: false, deviceSecret: "asd" });
+                commands: device.data.commands,
+                update: { type: "bulk", version: appVersion }
+            });
         });
     }
 }
