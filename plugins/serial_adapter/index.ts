@@ -56,8 +56,6 @@ export default class SerialAdapter extends Plugin {
     }
 
     receivePayload(callback: AdapterCallback) {
-        console.log('--> starting serial adapter');
-
         let buf = Buffer.alloc(0);
         this.serial.on('data', (data: Buffer) => {
             buf = Buffer.concat([buf, data]);
