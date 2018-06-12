@@ -12,6 +12,7 @@
 #include "uart.h"
 #include "wifi.h"
 #include "logger.h"
+#include <makestack.h>
 
 esp_err_t system_event_callback(void *ctx, system_event_t *event) {
     if (event->event_id == SYSTEM_EVENT_STA_GOT_IP) {
@@ -58,7 +59,9 @@ void setup();
 void loop();
 
 void app_task(void *param) {
+    Wire.begin();
     setup();
+
     for (;;) {
         loop();
     }
