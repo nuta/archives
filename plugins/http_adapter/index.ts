@@ -1,14 +1,15 @@
 import * as fs from "fs-extra";
 import * as express from "express";
 import { Request, Response } from "express";
-import { Plugin, PluginArgs, AdapterCallback } from "../../lib/plugins";
+import { Plugin, AdapterCallback } from "../../lib/plugins";
 import { parseVariableLength } from "../../lib/telemata";
 import { createFirmwareImage } from "../../lib/firmware";
+import { PackageConfig } from "../../lib/types";
 
 export default class HttpAdapter extends Plugin {
     receivedCallback?: AdapterCallback;
 
-    constructor(args: PluginArgs) {
+    constructor(args: PackageConfig) {
         super(args);
     }
 

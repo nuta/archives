@@ -1,6 +1,6 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import { getFirmwareVersion } from "../../firmware";
 import { loadPlugins } from "../../plugins";
@@ -30,9 +30,12 @@ const firmwareImage = fs.readFileSync(firmwarePath);
 const appVersion = getFirmwareVersion(firmwareImage);
 
 logger.debug("Loading plugins");
-const plugins = loadPlugins(["http_adapter"], {
-    firmwarePath,
-});
+const config = fs.readJsonSync("./package.json")["makestack"];
+if (!config || !config["devPlugins"]) {
+    throw new Error("Specify makestack.devPlugins in package.json");
+}
+
+const plugins = loadPlugins(config["devPlugins"], { firmwarePath });
 
 for (const plugin of plugins) {
     if (plugin.server) {

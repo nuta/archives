@@ -1,5 +1,6 @@
 import * as SerialPort from "serialport";
-import { Plugin, AdapterCallback, PluginArgs } from "../../lib/plugins";
+import { Plugin, AdapterCallback } from "../../lib/plugins";
+import { PackageConfig } from "../../lib/types";
 import { parseVariableLength } from "../../lib/telemata";
 
 const PACKET_HEADER = Buffer.from([0xaa, 0xab, 0xff]);
@@ -12,10 +13,11 @@ async function sleep(ms: number): Promise<void> {
 
 export default class SerialAdapter extends Plugin {
     private serial: SerialPort;
-    constructor(args: PluginArgs) {
-        super(args);
+    constructor(config: PackageConfig) {
+        super(config);
 
-        this.serial = new SerialPort('/dev/cu.usbserial-1410', {
+        config.serialFilePath = "/dev/cu.usbserial-14210";
+        this.serial = new SerialPort(config.serialFilePath, {
             baudRate: 115200
         });
     }

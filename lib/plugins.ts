@@ -1,16 +1,14 @@
 import * as express from "express";
 import * as fs from "fs-extra";
 import * as path from "path";
+import { PackageConfig } from "./types";
 
 export type AdapterCallback = (payload: Buffer) => Buffer | undefined;
-export interface PluginArgs {
-    firmwarePath: string;
-}
 
 export class Plugin {
     protected firmwarePath: string;
 
-    constructor(args: PluginArgs) {
+    constructor(args: PackageConfig) {
         this.firmwarePath = args.firmwarePath;
     }
 
@@ -34,7 +32,7 @@ function getBuiltinPlugins(): string[] {
     });
 }
 
-export function loadPlugins(plugins: string[], args: PluginArgs): Plugin[] {
+export function loadPlugins(plugins: string[], args: PackageConfig): Plugin[] {
     const pluginPaths = getBuiltinPlugins();
     const modules = [];
     for (const pluginPath of pluginPaths) {
