@@ -116,20 +116,21 @@ int parse_variable_length(uint8_t *buf, int buf_length, int *length) {
     return -1;
 }
 
-#define PARSE_KEY_VALUE_MSG(len, key, value) \
+#define PARSE_KEY_VALUE_MSG(len, type, key, value) \
     int key_len;                                                           \
     int key_len_len = parse_variable_length(p, remaining, &key_len);       \
     int value_len = len - key_len_len - key_len;                           \
-    if (value_len < 0 || key_len_len + key_len + value_len > remaining) {  \
+    if (value_len < 0 || 1 + key_len_len + key_len + value_len > remaining) {  \
        printf("inval cmd: %d %d %d\n", value_len, key_len, remaining); \
         goto next_message;                                                 \
     }                                                                      \
                                                                            \
+    int type = p[0];                                                       \
     char *key = (char *) malloc(key_len + 1);                              \
-    memcpy(key, p + key_len_len, key_len);                                 \
+    memcpy(key, p + 1 + key_len_len, key_len);                             \
     key[key_len] = '\0';                                                   \
     char *value = (char *) malloc(value_len + 1);                          \
-    memcpy(value, p + key_len_len + key_len, value_len);                   \
+    memcpy(value, p + 1 + key_len_len + key_len, value_len);               \
     value[value_len] = '\0';
 
 // Returns 0 on success, or -1 on failure, or 1 if the server is sending
@@ -178,14 +179,14 @@ int TelemataClient::receive_payload(const void *payload, size_t payload_length) 
 
         switch (type) {
             case TELEMATA_CONFIG_MSG: {
-                PARSE_KEY_VALUE_MSG(len, key, value);
+                PARSE_KEY_VALUE_MSG(len, type, key, value);
                 // update_config(key, value);
                 free(key);
                 free(value);
                 break;
             }
             case TELEMATA_COMMAND_MSG: {
-                PARSE_KEY_VALUE_MSG(len, key, value);
+                PARSE_KEY_VALUE_MSG(len, type, key, value);
                 // execute_command(key, value);
                 printf("command: %s(\"%s\")\n", key, value);
                 free(key);

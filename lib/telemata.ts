@@ -116,7 +116,9 @@ export function serialize({ deviceId, log, reports, configs, update, commands }:
 
     if (configs) {
         for (const [key, value] of Object.entries(configs)) {
+            const type = Buffer.from([0x01]); /* string */
             const configMsg = generateMessage(SMMS_CONFIG_MSG, Buffer.concat([
+                type,
                 generateVariableLength(Buffer.from(key)),
                 Buffer.from(key),
                 Buffer.from(value.toString()),
@@ -128,7 +130,9 @@ export function serialize({ deviceId, log, reports, configs, update, commands }:
 
     if (commands) {
         for (const [key, value] of Object.entries(commands)) {
+            const type = Buffer.from([0x01]); /* string */
             const commandMsg = generateMessage(SMMS_COMMAND_MSG, Buffer.concat([
+                type,
                 generateVariableLength(Buffer.from(key)),
                 Buffer.from(key),
                 Buffer.from(value.toString()),
