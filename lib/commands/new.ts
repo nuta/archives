@@ -27,6 +27,7 @@ const PACKAGE_JSON_TMPL = `\
 {
     "private": true,
     "makestack": {
+        "plugins": ["http_adapter"],
         "devPlugins": ["serial_adapter", "http_adapter"]
     }
 }
