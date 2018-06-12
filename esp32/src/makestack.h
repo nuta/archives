@@ -3,4 +3,6 @@
 
 #include <Arduino.h>
 
+void publish(const char *event, char *value);
+
 #endif

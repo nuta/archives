@@ -195,6 +195,9 @@ export function deserialize(payload: Buffer) {
             case SMMS_DEVICE_NAME_MSG:
                 messages.update = data.toString("utf-8")
                 break;
+            case SMMS_LOG_MSG:
+                messages.log = data.toString("utf-8")
+                break;
             case SMMS_UPDATE_MSG:
                 messages.update = {
                     version: data.readUInt32BE(1),
@@ -212,12 +215,35 @@ export function deserialize(payload: Buffer) {
     return messages;
 }
 
+export function parseLog(log: string): any {
+    const events = [];
+    const eventRegex = /^@([^ ]+) (.*)$/;
+    for (const line in log.split("\n")) {
+        const match = eventRegex.exec(line);
+        if (match) {
+            events.push({ name: match[0], value: match[1] });
+        }
+    }
+
+    return { events };
+}
+
 export function process(payload: Buffer): Device {
-    const { deviceName } = deserialize(payload);
+    const { deviceName, log } = deserialize(payload);
     const device = new Device(deviceName);
+    const { events } = parseLog(log || "");
 
     for (const callback of callbacks.heartbeat) {
         callback(device);
+    }
+
+    for (const { event, value } of events) {
+        const callback = callbacks.event[event];
+        if (!callback) {
+            continue;
+        }
+
+        callback(device, event, value);
     }
 
     device.saveIfChanged();
