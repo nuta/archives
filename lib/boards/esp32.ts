@@ -5,6 +5,7 @@ import * as path from "path";
 import { logger } from "../logger";
 import { createFirmwareImage } from "../firmware";
 import { Board, InstallConfig } from "../types";
+import { loadPlugins } from "../plugins";
 const packageJson = require("../../../package.json");
 
 function make(esp32Dir: string, firmwareVersion: string, appVersion: number): any {
@@ -31,6 +32,7 @@ export class Esp32Board extends Board {
     public async build(appDir: string): Promise<void> {
         const esp32Dir = this.prepareEsp32Dir();
         const appComponentDir = path.join(esp32Dir, "app");
+        const config = fs.readJsonSync(path.join(appDir, "package.json")).makestack;
 
         if (!fs.existsSync(path.join(esp32Dir, "deps"))) {
             spawnSync("./tools/download-dependencies", {
@@ -40,15 +42,31 @@ export class Esp32Board extends Board {
         }
 
         fs.mkdirpSync(appComponentDir);
+        const objs: string[] = ["device.o"];
         fs.copyFileSync(
             path.join(appDir, "device.cc"),
             path.join(appComponentDir, "device.cc"),
         );
 
+        for (const plugin of Object.values(loadPlugins(config.plugins))) {
+            if (plugin.sources) {
+                for (const source of plugin.sources) {
+                    fs.copyFileSync(
+                        path.join(plugin.dir, source),
+                        path.join(appComponentDir, source)
+                    );
+
+                    if (source.match(/\.(cc|cpp)$/)) {
+                        objs.push(source.replace(/\..+$/, ".o"));
+                    }
+                }
+            }
+        }
+
         fs.writeFileSync(
-            path.join(appComponentDir, "component.mk"),
-            "COMPONENT_OBJS := device.o"
-        )
+            path.join(appComponentDir, "component.mk"), `\
+COMPONENT_OBJS := ${objs.join(" ")}
+`);
 
         // Update src/component.mk to rebuild source files depends
         // on WIFI_SSID, etc.

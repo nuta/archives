@@ -13,8 +13,9 @@ EXTRA_COMPONENT_DIRS = \
 	$(DEPS_DIR)/arduino-esp32 \
     $(MY_COMPONENTS)
 
+CPPFLAGS += -I$(ESP32_DIR)/src/include -I$(ESP32_DIR)/app
 ifeq ($(RELEASE),)
-CPPFLAGS += -DDEBUG_BUILD -I$(ESP32_DIR)/src/include
+CPPFLAGS += -DDEBUG_BUILD
 endif
 
 ifneq ($(V),)
