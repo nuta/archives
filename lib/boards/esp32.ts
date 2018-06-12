@@ -66,6 +66,7 @@ export class Esp32Board extends Board {
         fs.writeFileSync(
             path.join(appComponentDir, "component.mk"), `\
 COMPONENT_OBJS := ${objs.join(" ")}
+CXXFLAGS += -fdiagnostics-color=always
 `);
 
         // Update src/component.mk to rebuild source files depends
