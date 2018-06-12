@@ -34,6 +34,10 @@ export class Logger {
         this.log(cyanBright(join(messages)));
     }
 
+    public warn(...messages: any[]) {
+        this.log(red.yellow(join(messages)));
+    }
+
     public error(...messages: any[]) {
         this.log(red.bold(join(messages)));
     }

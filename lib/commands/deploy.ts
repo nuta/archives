@@ -5,6 +5,7 @@ import * as path from "path";
 import { board } from "../boards";
 import { logger } from "../logger";
 import { Args, CommandBase, Opts } from "../cli";
+import { downloadRepo } from "../helpers";
 
 export class Command extends CommandBase {
     public static command = "deploy";
@@ -12,13 +13,16 @@ export class Command extends CommandBase {
     public static args = [];
     public static opts = [
         { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
+        { name: "--repo-dir", desc: "The file path to the seiyanuta/makestack repo." },
         { name: "--platform", desc: "The platform.", required: true, validator: ["firebase"] },
         { name: "--firebase-project", desc: "The Firebase project name." },
     ];
 
     public async run(args: Args, opts: Opts) {
+        const repoDir = opts.repoDir || downloadRepo(opts.appDir);
+
         logger.progress("Building the firmware");
-        await board.build(opts.appDir);
+        await board.build(repoDir, opts.appDir);
 
         logger.progress(`Deploying to ${opts.platform}`);
         const mod = require(path.resolve(__dirname, `../platform/${opts.platform}`));

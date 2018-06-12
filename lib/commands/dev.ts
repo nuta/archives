@@ -6,6 +6,7 @@ import { App } from "../app";
 import { board } from "../boards";
 import { Args, CommandBase, Opts } from "../cli";
 import { logger } from "../logger";
+import { downloadRepo } from "../helpers";
 
 export class Command extends CommandBase {
     public static command = "dev";
@@ -13,9 +14,11 @@ export class Command extends CommandBase {
     public static args = [];
     public static opts = [
         { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
+        { name: "--repo-dir", desc: "The file path to the seiyanuta/makestack repo." },
     ];
 
     public async run(args: Args, opts: Opts) {
+        const repoDir = opts.repoDir || downloadRepo(opts.appDir);
         const localRuntimePath = path.resolve(__dirname, "../platform/local/start");
 
         const forkOptions = {
@@ -35,7 +38,7 @@ export class Command extends CommandBase {
         try {
 
             logger.progress("Building the firmware");
-            await board.build(opts.appDir);
+            await board.build(repoDir, opts.appDir);
             logger.progress("Launching the server")
             app = child_process.fork(localRuntimePath, [], forkOptions);
         } catch (e) {
@@ -46,7 +49,7 @@ export class Command extends CommandBase {
             logger.progress(`Change detected: ${filepath}`);
             logger.progress("Building the firmware");
             try {
-                await board.build(opts.appDir);
+                await board.build(repoDir, opts.appDir);
             } catch (e) {
                 logger.error(e.message);
                 return;

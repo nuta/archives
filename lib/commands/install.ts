@@ -7,6 +7,7 @@ import { logger } from "../logger";
 import { Args, CommandBase, Opts } from "../cli";
 import { InstallConfig } from "../types";
 import * as inquirer from "inquirer";
+import { downloadRepo } from "../helpers";
 
 const installConfigOptions = [
     { name: "--adapter", desc: "The network adapter." },
@@ -46,14 +47,16 @@ export class Command extends CommandBase {
     public static args = [];
     public static opts = [
         { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
+        { name: "--repo-dir", desc: "The file path to the seiyanuta/makestack repo." },
         ...installConfigOptions,
     ];
 
     public async run(args: Args, opts: Opts) {
+        const repoDir = opts.repoDir || downloadRepo(opts.appDir);
         logger.progress("Building the firmware");
-        await board.build(opts.appDir);
+        await board.build(repoDir, opts.appDir);
         logger.progress("Installing the firmware");
-        await board.install(opts.appDir, await getInstallConfigOrAsk(opts));
+        await board.install(repoDir, opts.appDir, await getInstallConfigOrAsk(opts));
         logger.progress(`Successfully installed to ${opts.serial}`);
     }
 }

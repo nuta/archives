@@ -25,12 +25,9 @@ function make(esp32Dir: string, firmwareVersion: string, appVersion: number): an
 }
 
 export class Esp32Board extends Board {
-    private prepareEsp32Dir(): string {
-        return path.resolve(__dirname, "../../../esp32");
-    }
+    public async build(repoDir: string, appDir: string): Promise<void> {
 
-    public async build(appDir: string): Promise<void> {
-        const esp32Dir = this.prepareEsp32Dir();
+        const esp32Dir = path.join(repoDir, "esp32");
         const appComponentDir = path.join(esp32Dir, "app");
         const config = fs.readJsonSync(path.join(appDir, "package.json")).makestack;
 
@@ -95,19 +92,19 @@ CXXFLAGS += -fdiagnostics-color=always
             }
         }
 
-        let image = fs.readFileSync(path.join(appDir, "firmware.esp32.bin"));
+        let image = fs.readFileSync(path.join(esp32Dir, "build/firmware.bin"));
         image = createFirmwareImage(appVersion, image);
-        fs.writeFileSync(path.join(esp32Dir, "build/firmware.bin"), image);
+        fs.writeFileSync(path.join(esp32Dir, "firmware.esp32.bin"), image);
     }
 
-    public async install(appDir: string, config: InstallConfig): Promise<void> {
+    public async install(repoDir: string, appDir: string, config: InstallConfig): Promise<void> {
         if (!config.serial) {
             throw new Error("serial is not set")
         }
 
-        const esp32Dir = this.prepareEsp32Dir();
-        const firmwarePath =  path.join(appDir, `firmware.esp32.bin`);
-        const credentialsPath = path.join(appDir, `credentials.${config.deviceName}.bin`);
+        const esp32Dir = path.join(repoDir, "esp32");
+        const firmwarePath =  path.join(appDir, "firmware.esp32.bin");
+        const credentialsPath = path.join(appDir, "build/credentials.${config.deviceName}.bin");
         fs.writeFileSync(credentialsPath, embedCredentials(CREDENTIALS_DATA_TEMPLATE, config));
 
         // Create otadata.bin to initialize the otadata partiton.
