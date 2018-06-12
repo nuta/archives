@@ -23,6 +23,15 @@ void setup() {
 const SERVER_JS_TMPL = `\
 `;
 
+const PACKAGE_JSON_TMPL = `\
+{
+    "private": true,
+    "makestack": {
+        "devPlugins": ["serial_adapter", "http_adapter"]
+    }
+}
+`
+
 const GITIGNORE_TMPL = `\
 firmware.bin
 build
@@ -77,6 +86,7 @@ export class Command extends CommandBase {
         };
 
         mkdir(appDir);
+        genFile(path.join(appDir, "package.json"), PACKAGE_JSON_TMPL, ctx);
         genFile(path.join(appDir, "server.js"), SERVER_JS_TMPL, ctx);
         genFile(path.join(appDir, "device.cc"), DEVICE_CC_TMPL, ctx);
         genFile(path.join(appDir, ".gitignore"), GITIGNORE_TMPL, ctx);
