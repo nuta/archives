@@ -129,7 +129,7 @@ export class Esp32Board extends Board {
 
             let image = fs.readFileSync(path.join(esp32Dir, "build/firmware.bin"));
             image = createFirmwareImage(appVersion, image);
-            fs.writeFileSync(path.join(esp32Dir, "firmware.esp32.bin"), image);
+            fs.writeFileSync(path.join(appDir, "firmware.esp32.bin"), image);
         }
 
         public async install(repoDir: string, appDir: string, config: InstallConfig): Promise<void> {
