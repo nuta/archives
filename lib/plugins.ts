@@ -72,8 +72,16 @@ export function loadPlugins(required: string[]): { [name: string]: any } {
 
 export function instantiatePlugins(plugins: string[], args: PackageConfig): Plugin[] {
     const modules = [];
+    const builtinPlugins = getBuiltinPlugins().map(plugin => path.basename(plugin));
     for (const plugin of Object.values(loadPlugins(plugins))) {
-        const ctor = require(plugin.dir).default as any;
+        let ctor;
+        const name = path.basename(plugin.name); // Remove `@makestack/' prefix.
+        if (builtinPlugins.includes(name)) {
+            /* Load from dist/plugins */
+            ctor = require(path.resolve(__dirname, "../plugins/" + name)).default as any;
+        } else {
+            ctor = require(plugin.dir).default as any;
+        }
         modules.push(new ctor(args));
     }
     return modules;
