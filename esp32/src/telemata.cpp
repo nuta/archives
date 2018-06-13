@@ -9,18 +9,10 @@
 #include "utils.h"
 
 #define TELEMATA_VERSION 1
-#define TELEMATA_HMAC_MSG 0x01
-#define TELEMATA_CACHE_MSG 0x02
-#define TELEMATA_DEVICE_NAME_MSG 0x03
-#define TELEMATA_LOG_MSG 0x04
-#define TELEMATA_COMMAND_MSG 0x05
-#define TELEMATA_GET_MSG 0x06
-#define TELEMATA_OBSERVE_MSG 0x07
-#define TELEMATA_REPORT_MSG 0x08
-#define TELEMATA_CONFIG_MSG 0x09
-#define TELEMATA_UPDATE_MSG 0x0a
-#define TELEMATA_OSUPDATE_MSG 0x0b
-#define TELEMATA_CURRENT_VERSION_REPORT 0x0001
+#define TELEMATA_DEVICE_NAME_MSG  0x01
+#define TELEMATA_LOG_MSG          0x02
+#define TELEMATA_UPDATE_MSG       0x0a
+#define TELEMATA_COMMAND_MSG      0x0b
 
 using namespace std;
 
@@ -173,16 +165,6 @@ int TelemataClient::receive_payload(const void *payload, size_t payload_length) 
         remaining -= len_len;
 
         switch (type) {
-            case TELEMATA_CONFIG_MSG: {
-                PARSE_KEY_VALUE_MSG(len);
-                // update_config(key, value);
-                free(key);
-                free(value);
-                if (value_type == 0x01 /* string */) {
-                    // TODO
-                }
-                break;
-            }
             case TELEMATA_COMMAND_MSG: {
                 PARSE_KEY_VALUE_MSG(len);
                 // execute_command(key, value);
@@ -239,11 +221,6 @@ void TelemataClient::send() {
         log_index = 0;
         log_length = 0;
     }
-
-    uint8_t ver_report_msg[6];
-    to_be16(&ver_report_msg[0], TELEMATA_CURRENT_VERSION_REPORT);
-    to_be32(&ver_report_msg[2], current_app_version);
-    payload.append(TELEMATA_REPORT_MSG, ver_report_msg, sizeof(ver_report_msg));
 
     // Construct the header.
     uint8_t *ptr = (uint8_t *) malloc(1 + 4 + payload.length());

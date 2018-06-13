@@ -5,18 +5,10 @@ import { logger } from "./logger";
 import { callbacks, HeartbeatCallback } from "./server";
 
 const SMMS_VERSION = 1;
-const SMMS_HMAC_MSG      = 0x01;
-const SMMS_CACHE_MSG     = 0x02;
-const SMMS_DEVICE_NAME_MSG = 0x03;
-const SMMS_LOG_MSG       = 0x04;
-const SMMS_COMMAND_MSG   = 0x05;
-const SMMS_GET_MSG       = 0x06;
-const SMMS_OBSERVE_MSG   = 0x07;
-const SMMS_REPORT_MSG    = 0x08;
-const SMMS_CONFIG_MSG    = 0x09;
-const SMMS_UPDATE_MSG    = 0x0a;
-const SMMS_OSUPDATE_MSG  = 0x0b;
-const SMMS_CURRENT_VERSION_REPORT = 0x0001;
+const SMMS_DEVICE_NAME_MSG = 0x01;
+const SMMS_LOG_MSG         = 0x02;
+const SMMS_UPDATE_MSG      = 0x0a;
+const SMMS_COMMAND_MSG     = 0x0b;
 
 export type DeviceState = "ready" | "running";
 export interface Reports {
@@ -85,43 +77,12 @@ export function generateMessage(type: number, payload: any) {
     return msg;
 }
 
-export interface SerializeOptions {
-    includeDeviceId: boolean;
-    deviceSecret: string;
-}
-
 export function serialize({ deviceId, log, reports, configs, update, commands }: PayloadMessages) {
     let payload = Buffer.alloc(0);
 
     if (log) {
         const logMsg = generateMessage(SMMS_LOG_MSG, log);
         payload = Buffer.concat([payload, logMsg]);
-    }
-
-    if (reports) {
-        if (reports.currentVersion) {
-            const idBuffer = Buffer.alloc(2);
-            idBuffer.writeUInt16BE(SMMS_CURRENT_VERSION_REPORT, 0);
-            const valueBuffer = Buffer.alloc(4);
-            valueBuffer.writeUInt32BE(reports.currentVersion, 0);
-            const data = Buffer.from([idBuffer, valueBuffer]);
-            const reportMsg = generateMessage(SMMS_REPORT_MSG, data);
-            payload = Buffer.concat([payload, reportMsg]);
-        }
-    }
-
-    if (configs) {
-        for (const [key, value] of Object.entries(configs)) {
-            const type = Buffer.from([0x01]); /* string */
-            const configMsg = generateMessage(SMMS_CONFIG_MSG, Buffer.concat([
-                type,
-                generateVariableLength(Buffer.from(key)),
-                Buffer.from(key),
-                Buffer.from(value.toString()),
-            ]));
-
-            payload = Buffer.concat([payload, configMsg]);
-        }
     }
 
     if (commands) {
@@ -139,9 +100,8 @@ export function serialize({ deviceId, log, reports, configs, update, commands }:
     }
 
     if (update) {
-        // Used by tests.
         const data = Buffer.alloc(5);
-        data.writeUInt8(2, 0); // Download method
+        data.writeUInt8(2, 0);
         data.writeUInt32BE(update.version, 1);
         const updateMsg = generateMessage(SMMS_UPDATE_MSG, data);
         payload = Buffer.concat([payload, updateMsg]);
@@ -150,7 +110,6 @@ export function serialize({ deviceId, log, reports, configs, update, commands }:
     let header = Buffer.alloc(1);
     header.writeUInt8(SMMS_VERSION << 4, 0);
     header = Buffer.concat([header, generateVariableLength(payload)]);
-
     return Buffer.concat([header, payload]);
 }
 
@@ -171,17 +130,6 @@ export function deserialize(payload: Buffer) {
         const data = payload.slice(dataOffset, dataOffset + length);
 
         switch (type) {
-            case SMMS_CONFIG_MSG: {
-                const keyLengthOffset = dataOffset;
-                const [keyLength, keyLengthLength] = parseVariableLength(payload.slice(keyLengthOffset));
-                const keyOffset = keyLengthOffset + keyLengthLength;
-                const valueOffset = keyOffset + keyLength;
-                const valueLength = length - (valueOffset - keyLengthOffset);
-                const key = payload.slice(keyOffset, keyOffset + keyLength);
-                const value = payload.slice(valueOffset, valueOffset + valueLength);
-                messages.configs[key.toString("utf-8")] = value.toString("utf-8");
-                break;
-            }
             case SMMS_COMMAND_MSG: {
                 const keyLengthOffset = dataOffset;
                 const [keyLength, keyLengthLength] = parseVariableLength(payload.slice(keyLengthOffset));
@@ -204,12 +152,8 @@ export function deserialize(payload: Buffer) {
                     version: data.readUInt32BE(1),
                 };
                 break;
-            case SMMS_OSUPDATE_MSG:
-                messages.osupdate = {
-                    version: data.readUInt32BE(1),
-                };
-                break;
         }
+
         offset += 1 + lengthLength + length;
     }
 
