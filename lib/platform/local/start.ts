@@ -62,6 +62,52 @@ httpServer.use(function(req: any, res, next) {
     });
 });
 
+import * as net from "net";
+import { instantiatePlatform } from "..";
+import { Device } from "../../device";
+interface LocalRequest {
+    type: string;
+    command?: {
+        name: string;
+        device: string;
+        arg: string;
+    }
+
+}
+async function handleLocalRequest(req: LocalRequest) {
+    switch (req.type) {
+        case "command":
+            if (!req.command) {
+                return { "result": "error" };
+            }
+
+            const device = await Device.getByName(req.command.device);
+            device.command(req.command.name, req.command.arg);
+            device.save();
+            return { "result": "success" };
+        default:
+            return { "result": "error" };
+    }
+}
+
+const sock = net.createServer();
+sock.on("connection", (client) => {
+    let str = ""
+    client.on("data", async (data) => {
+        let req;
+        try {
+            req = JSON.parse(data.toString("utf-8"));
+        } catch (e) {
+            logger.error(e);
+            logger.error(e.stack);
+            client.write(JSON.stringify({ "result": "error" }));
+        }
+        client.write(JSON.stringify(await handleLocalRequest(req)));
+    });
+});
+
+fs.removeSync("dev.sock");
+sock.listen("dev.sock");
 
 logger.debug("Loading plugins");
 const config = fs.readJsonSync("./package.json")["makestack"];
