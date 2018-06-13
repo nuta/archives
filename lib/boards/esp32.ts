@@ -128,6 +128,8 @@ export class Esp32Board extends Board {
             }
 
             let image = fs.readFileSync(path.join(esp32Dir, "build/firmware.bin"));
+            fs.mkdirpSync(path.join(appDir, "build"));
+            fs.copyFileSync(path.join(esp32Dir, "build/firmware.bin"), path.join(appDir, "build/firmware.esp32.raw.bin"));
             image = createFirmwareImage(appVersion, image);
             fs.writeFileSync(path.join(appDir, "firmware.esp32.bin"), image);
         }
@@ -138,8 +140,8 @@ export class Esp32Board extends Board {
             }
 
             const esp32Dir = path.join(repoDir, "esp32");
-            const firmwarePath =  path.join(appDir, "firmware.esp32.bin");
-            const credentialsPath = path.join(appDir, "build/credentials.${config.deviceName}.bin");
+            const firmwarePath =  path.join(appDir, "build/firmware.esp32.raw.bin");
+            const credentialsPath = path.join(appDir, `build/credentials.${config.deviceName}.bin`);
             fs.writeFileSync(credentialsPath, embedCredentials(CREDENTIALS_DATA_TEMPLATE, config));
 
             // Create otadata.bin to initialize the otadata partiton.
