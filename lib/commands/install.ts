@@ -4,8 +4,8 @@ import * as fs from "fs";
 import * as inquirer from "inquirer";
 import * as path from "path";
 import { board } from "../boards";
-import { Args, CommandBase, Opts } from "../cli";
-import { downloadRepo } from "../helpers";
+import { Args, CommandBase, Opts, constructEnvOption } from "../cli";
+import { downloadRepo, generateRandomVersion } from "../helpers";
 import { logger } from "../logger";
 import { InstallConfig } from "../types";
 
@@ -49,12 +49,18 @@ export class Command extends CommandBase {
         { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
         { name: "--repo-dir", desc: "The file path to the seiyanuta/makestack repo." },
         ...installConfigOptions,
+        constructEnvOption("development"),
     ];
 
     public async run(args: Args, opts: Opts) {
         const repoDir = opts.repoDir || downloadRepo(opts.appDir);
+        const isReleaseBuild = (opts.env == "production") ? true : false;
+
+        // We don't have the latest firmware image in production. Use 0 for now.
+        const version = isReleaseBuild ? 0 : generateRandomVersion();
+
         logger.progress("Building the firmware");
-        await board.build(repoDir, opts.appDir);
+        await board.build(isReleaseBuild, version, repoDir, opts.appDir);
         logger.progress("Installing the firmware");
         await board.install(repoDir, opts.appDir, await getInstallConfigOrAsk(opts));
         logger.progress(`Successfully installed to ${opts.serial}`);

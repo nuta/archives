@@ -10,7 +10,7 @@ export interface InstallConfig {
 }
 
 export abstract class Board {
-    public abstract async build(repoDir: string, appDir: string): Promise<void>;
+    public abstract async build(isReleaseBuild: boolean, version: number, repoDir: string, appDir: string): Promise<void>;
     public abstract async install(repoDir: string, appDir: string, config: InstallConfig): Promise<void>;
 }
 

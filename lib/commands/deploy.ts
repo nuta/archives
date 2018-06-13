@@ -1,6 +1,6 @@
 const chalk = require("chalk");
 import * as child_process from "child_process";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import { board } from "../boards";
 import { Args, CommandBase, Opts, constructEnvOption } from "../cli";
@@ -23,10 +23,16 @@ export class Command extends CommandBase {
         const repoDir = opts.repoDir || downloadRepo(opts.appDir);
 
         logger.progress("Building the firmware");
-        await board.build(repoDir, opts.appDir);
+        const version = (config.production.version || 0) + 1;
+        await board.build(true, version, repoDir, opts.appDir);
 
         logger.progress(`Deploying to ${config.platform}`);
         await getSdkInstance(config.platform).deploy(opts.appDir, config);
-        logger.progress(`Successfully deployed to ${config.platform}`);
+        logger.progress(`Successfully deployed #${version} to ${config.platform}`);
+
+        const packageJsonPath = path.join(opts.appDir, "package.json");
+        const packageJson = fs.readJsonSync(packageJsonPath);
+        packageJson.makestack.production.version = version;
+        fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
     }
 }

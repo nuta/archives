@@ -11,7 +11,7 @@ import { execCmd } from "../helpers";
 const Gauge = require("gauge");
 const packageJson = require("../../../package.json");
 
-function make(esp32Dir: string, firmwareVersion: string, appVersion: number): Promise<any> {
+function make(isReleaseBuild: boolean, version: number, esp32Dir: string): Promise<any> {
     return new Promise((resolve, reject) => {
         const makeExecutable = "/usr/bin/make";
         const procs = os.cpus().length;
@@ -24,13 +24,12 @@ function make(esp32Dir: string, firmwareVersion: string, appVersion: number): Pr
                 MAKE: makeExecutable,
                 PATH: process.env.PATH,
                 MY_COMPONENTS: "app",
-                RELEASE: "", // debug build
-                APP_VERSION: appVersion,
+                RELEASE: isReleaseBuild ? "1" : "",
+                APP_VERSION: version,
                 FIRMWARE_VERSION: packageJson.version,
             },
         };
 
-        // TODO: release build
         const totalLines = spawnSync(makeExecutable, ["--dry-run"].concat(args), opts)
                                 .stdout.toString("utf-8").split("\n").length;
 
@@ -96,12 +95,12 @@ export class Esp32Board extends Board {
         return objs;
     }
 
-    private async doBuild(esp32Dir: string, appVersion: number) {
-        const cp = await make(esp32Dir, packageJson.version, appVersion);
+    private async doBuild(isReleaseBuild: boolean, version: number, esp32Dir: string) {
+        const cp = await make(isReleaseBuild, version, esp32Dir);
         if (cp.status != 0) {
             if (cp.stderr.includes("No rule to make target `cores/esp32/libb64/cencode.o'")) {
-                // Try again because the build system is broken. TODO: fixme
-                const cp2 = await make(esp32Dir, packageJson.version, appVersion);
+                // FIXME: Try again because the build system is broken.
+                const cp2 = await make(isReleaseBuild, version, esp32Dir);
                 if (cp2.status != 0) {
                     console.log(cp2.stdout);
                     console.log(cp2.stderr);
@@ -116,15 +115,15 @@ export class Esp32Board extends Board {
 
     }
 
-    private copyBuiltArtifacts(appDir: string, esp32Dir: string, appVersion: number) {
+    private copyBuiltArtifacts(appDir: string, esp32Dir: string, version: number) {
         let image = fs.readFileSync(path.join(esp32Dir, "build/firmware.bin"));
         fs.mkdirpSync(path.join(appDir, "build"));
         fs.copyFileSync(path.join(esp32Dir, "build/firmware.bin"), path.join(appDir, "build/firmware.esp32.bin"));
-        image = createFirmwareImage(appVersion, image);
+        image = createFirmwareImage(version, image);
         fs.writeFileSync(path.join(appDir, "esp32.firmware"), image);
     }
 
-    public async build(repoDir: string, appDir: string): Promise<void> {
+    public async build(isReleaseBuild: boolean, version: number, repoDir: string, appDir: string): Promise<void> {
         const esp32Dir = path.join(repoDir, "esp32");
         const appComponentDir = path.join(esp32Dir, "app");
         const config = fs.readJsonSync(path.join(appDir, "package.json")).makestack;
@@ -143,12 +142,8 @@ export class Esp32Board extends Board {
             ejs.render(COMPONENT_MK_TMPL, { objs })
         );
 
-        // Use an (almost) unique number as the app version.
-        // FIXME: production
-        const appVersion = process.hrtime()[0] % 4200000000;
-
-        await this.doBuild(esp32Dir, appVersion);
-        this.copyBuiltArtifacts(appDir, esp32Dir, appVersion);
+        await this.doBuild(isReleaseBuild, version, esp32Dir);
+        this.copyBuiltArtifacts(appDir, esp32Dir, version);
     }
 
     public async install(repoDir: string, appDir: string, config: InstallConfig): Promise<void> {

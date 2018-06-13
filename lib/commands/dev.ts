@@ -5,7 +5,7 @@ import * as path from "path";
 import { App } from "../app";
 import { board } from "../boards";
 import { Args, CommandBase, Opts } from "../cli";
-import { downloadRepo } from "../helpers";
+import { downloadRepo, generateRandomVersion } from "../helpers";
 import { logger } from "../logger";
 
 export class Command extends CommandBase {
@@ -38,7 +38,7 @@ export class Command extends CommandBase {
         try {
 
             logger.progress("Building the firmware");
-            await board.build(repoDir, opts.appDir);
+            await board.build(false, generateRandomVersion(), repoDir, opts.appDir);
             logger.progress("Launching the server");
             app = child_process.fork(localRuntimePath, [], forkOptions);
         } catch (e) {
@@ -49,7 +49,7 @@ export class Command extends CommandBase {
             logger.progress(`Change detected: ${filepath}`);
             logger.progress("Building the firmware");
             try {
-                await board.build(repoDir, opts.appDir);
+                await board.build(false, generateRandomVersion(), repoDir, opts.appDir);
             } catch (e) {
                 logger.error(e.message);
                 return;

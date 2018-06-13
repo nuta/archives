@@ -3,6 +3,10 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { logger } from "./logger";
 
+export function generateRandomVersion(): number {
+    return process.hrtime()[0] % 4200000000;
+}
+
 export function loadConfig(appDir: string, env: string) {
     const config = fs.readJsonSync(path.join(appDir, "package.json")).makestack;
     if (!config) {
