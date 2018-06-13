@@ -5,16 +5,14 @@ export function getFirmwareVersion(firmware: Buffer): number {
 }
 
 
-function replaceBuffer(buf: Buffer, value: string, id: string, fill: number): Buffer {
-    const needle = `__REPLACE_ME_${id}__`;
-
-    const index = buf.indexOf(Buffer.from(needle));
+function replaceBuffer(buf: Buffer, value: string, needle: Buffer, fill: number): Buffer {
+    const index = buf.indexOf(needle);
     if (index === -1) {
-        throw new Error(`replaceBuffer: failed to replace ${id}`);
+        throw new Error(`replaceBuffer: failed to replace ${needle.toString("utf-8")}`);
     }
 
-    if (value.length + 1 /* in case `fill' is a NULL chracter */ > id.length) {
-        throw new Error(`too long value for ${id}: \`${value}'`);
+    if (value.length + 1 /* in case `fill' is a NULL chracter */ > needle.length) {
+        throw new Error(`too long value for ${needle}: \`${value}'`);
     }
 
     const paddedValue = Buffer.alloc(needle.length, fill);
@@ -40,26 +38,31 @@ export function getReplaceMeId(name: string, length: number): Buffer {
 //     char WIFI_SSID[64];
 //     char WIFI_PASSWORD[64];
 // };
+const REPLACE_ME_DEVICE_NAME = getReplaceMeId("DEVICE_NAME", 64);
+const REPLACE_ME_SERVER_URL = getReplaceMeId("SERVER_URL", 256);
+const REPLACE_ME_NETWORK_ADAPTER = getReplaceMeId("NETWORK_ADAPTER", 32);
+const REPLACE_ME_WIFI_SSID = getReplaceMeId("WIFI_SSID", 64);
+const REPLACE_ME_WIFI_PASSWORD = getReplaceMeId("WIFI_PASSWORD", 64);
 export const CREDENTIALS_DATA_TEMPLATE = Buffer.concat([
-    getReplaceMeId("DEVICE_NAME", 64),
-    getReplaceMeId("SERVER_URL", 256),
-    getReplaceMeId("NETWORK_ADAPTER", 32),
-    getReplaceMeId("WIFI_SSID", 64),
-    getReplaceMeId("WIFI_PASSWORD", 64),
+    REPLACE_ME_DEVICE_NAME,
+    REPLACE_ME_SERVER_URL,
+    REPLACE_ME_NETWORK_ADAPTER,
+    REPLACE_ME_WIFI_SSID,
+    REPLACE_ME_WIFI_PASSWORD,
 ])
 
 export function embedCredentials(image: Buffer, config: InstallConfig): Buffer {
     const fill = 0x00;
-    image = replaceBuffer(image, config.deviceName, "DEVICE_NAME_abcdefghijklmnopqrstuvwxyz1234567890", fill);
-    image = replaceBuffer(image, config.serverUrl, "SERVER_URL_abcdefghijklmnopqrstuvwxyz1234567890", fill);
-    image = replaceBuffer(image, config.adapter, "NETWORK_ADAPTER", fill);
+    image = replaceBuffer(image, config.deviceName, REPLACE_ME_DEVICE_NAME, fill);
+    image = replaceBuffer(image, config.serverUrl, REPLACE_ME_SERVER_URL, fill);
+    image = replaceBuffer(image, config.adapter, REPLACE_ME_NETWORK_ADAPTER, fill);
 
     if (config.adapter === 'wifi') {
         if (!config.wifiSsid || !config.wifiPassword)
             throw new Error("wifi ssid or wifi password is not provided");
 
-        image = replaceBuffer(image, config.wifiSsid, "WIFI_SSID_abcdefghijklmnopqrstuvwxyz1234567890", fill);
-        image = replaceBuffer(image, config.wifiPassword, "WIFI_PASSWORD_abcdefghijklmnopqrstuvwxyz1234567890", fill);
+        image = replaceBuffer(image, config.wifiSsid, REPLACE_ME_WIFI_SSID, fill);
+        image = replaceBuffer(image, config.wifiPassword, REPLACE_ME_WIFI_PASSWORD, fill);
     }
 
     return image;
