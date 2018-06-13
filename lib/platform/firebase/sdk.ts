@@ -77,8 +77,8 @@ export class FirebasePlatformSdk extends PlatformSdk {
         );
 
         fs.copyFileSync(
-            path.join(appDir, "firmware.esp32.bin"),
-            path.join(pkgDir, "firmware.esp32.bin"),
+            path.join(appDir, "esp32.firmware"),
+            path.join(pkgDir, "esp32.firmware"),
         );
 
         fs.copyFileSync(
