@@ -1,6 +1,7 @@
-import { Args, CommandBase, Opts } from "../cli";
+import { Args, CommandBase, Opts, constructEnvOption } from "../cli";
 import { logger } from "../logger";
 import { getSdkInstance } from "../platform";
+import { loadConfig } from "../helpers";
 
 export class Command extends CommandBase {
     public static command = "command";
@@ -11,13 +12,11 @@ export class Command extends CommandBase {
     ];
     public static opts = [
         { name: "--device", desc: "The target device.", required: true },
-        // TODO:
-        { name: "--firebase-project", desc: "The Firebase project name." },
+        constructEnvOption("development"),
     ];
 
     public async run(args: Args, opts: Opts) {
-        // FIXME:
-        opts.platform = "local";
-        await getSdkInstance(opts.platform).command(opts.device, args.command, args.arg);
+        const config = loadConfig(opts.appDir, opts.env);
+        await getSdkInstance(config.platform).command(opts.device, args.command, args.arg);
     }
 }

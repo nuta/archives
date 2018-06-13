@@ -3,6 +3,19 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import { logger } from "./logger";
 
+export function loadConfig(appDir: string, env: string) {
+    const config = fs.readJsonSync(path.join(appDir, "package.json")).makestack;
+    if (!config) {
+        throw new Error(`Add \`makestack' config to package.json.`);
+    }
+
+    if (!config[env]) {
+        throw new Error(`Add \`makestack.${env}' config to package.json.`);
+    }
+
+    return Object.assign({}, config, config[env]);
+}
+
 export function guessSerialFilePath(): string | null {
     const patterns = [
         /cu\.usbserial-[0-9]+/,

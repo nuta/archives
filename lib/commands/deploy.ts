@@ -3,8 +3,8 @@ import * as child_process from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import { board } from "../boards";
-import { Args, CommandBase, Opts } from "../cli";
-import { downloadRepo } from "../helpers";
+import { Args, CommandBase, Opts, constructEnvOption } from "../cli";
+import { downloadRepo, loadConfig } from "../helpers";
 import { logger } from "../logger";
 import { getSdkInstance } from "../platform";
 
@@ -15,21 +15,18 @@ export class Command extends CommandBase {
     public static opts = [
         { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
         { name: "--repo-dir", desc: "The file path to the seiyanuta/makestack repo." },
-        { name: "--platform", desc: "The platform.", required: true, validator: ["firebase"] },
-        { name: "--firebase-project", desc: "The Firebase project name." },
+        constructEnvOption("production"),
     ];
 
     public async run(args: Args, opts: Opts) {
+        const config = loadConfig(opts.appDir, opts.env);
         const repoDir = opts.repoDir || downloadRepo(opts.appDir);
 
         logger.progress("Building the firmware");
         await board.build(repoDir, opts.appDir);
 
-        logger.progress(`Deploying to ${opts.platform}`);
-        await getSdkInstance(opts.platform).deploy(opts.appDir, {
-            firebaseProject: opts.firebaseProject,
-        });
-
-        logger.progress(`Successfully deployed to ${opts.platform}`);
+        logger.progress(`Deploying to ${config.platform}`);
+        await getSdkInstance(config.platform).deploy(opts.appDir, config);
+        logger.progress(`Successfully deployed to ${config.platform}`);
     }
 }

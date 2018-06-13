@@ -3,6 +3,15 @@ import * as caporal from "caporal";
 export interface Args { [name: string]: any; }
 export interface Opts { [name: string]: any; }
 
+export function constructEnvOption(defaultValue: "development" | "production") {
+    return {
+        name: "--env",
+        desc: "The environment.",
+        default: defaultValue,
+        validator: ["development", "production"],
+    }
+}
+
 export type Validator
     =  RegExp
     | number // Caporal flags
