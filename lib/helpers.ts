@@ -5,8 +5,8 @@ import { logger } from "./logger";
 
 export function guessSerialFilePath(): string | null {
     const patterns = [
-        /\Acu\.usbserial-[0-9]+\z/,
-        /\AttyUSB[0-9]\z/
+        /cu\.usbserial-[0-9]+/,
+        /ttyUSB[0-9]/
     ];
 
     const candidates = fs.readdirSync("/dev")
@@ -15,7 +15,7 @@ export function guessSerialFilePath(): string | null {
         );
 
     if (candidates.length === 1) {
-        return candidates[0];
+        return path.join("/dev", candidates[0]);
     } else {
         return null;
     }
