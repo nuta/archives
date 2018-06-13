@@ -11,6 +11,7 @@ const packageJson = require("../../../package.json");
 
 function make(esp32Dir: string, firmwareVersion: string, appVersion: number): Promise<any> {
     return new Promise((resolve, reject) => {
+        const makeExecutable = "/usr/bin/make";
         const procs = os.cpus().length;
         const args = [`-j${procs}`];
         const opts = {
@@ -18,6 +19,7 @@ function make(esp32Dir: string, firmwareVersion: string, appVersion: number): Pr
             stdio: "pipe",
             env: {
                 V: "1",
+                MAKE: makeExecutable,
                 PATH: process.env.PATH,
                 MY_COMPONENTS: "app",
                 RELEASE: "", // debug build
@@ -27,12 +29,12 @@ function make(esp32Dir: string, firmwareVersion: string, appVersion: number): Pr
         };
 
         // TODO: release build
-        const totalLines = spawnSync("/usr/bin/make", ["--dry-run"].concat(args), opts)
+        const totalLines = spawnSync(makeExecutable, ["--dry-run"].concat(args), opts)
                                 .stdout.toString("utf-8").split("\n").length;
 
         const gauge = new Gauge(process.stderr, { theme: "colorASCII" });
         gauge.show("", 0.);
-        const cp = spawn("/usr/bin/make", args, opts);
+        const cp = spawn(makeExecutable, args, opts);
 
         let stderr = "";
         cp.stderr.on("data", (data: Buffer) => {
