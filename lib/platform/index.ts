@@ -28,7 +28,7 @@ let sdkInstance: PlatformSdk;
 
 export function getSdkInstance(platform: string): PlatformSdk {
     if (!sdkInstance) {
-        switch (process.env.MAKESTACK_PLATFORM) {
+        switch (platform) {
             case "local":
                 sdkInstance = new LocalPlatformSdk();
                 break;
@@ -36,7 +36,7 @@ export function getSdkInstance(platform: string): PlatformSdk {
                 sdkInstance = new FirebasePlatformSdk();
                 break;
             default:
-                throw new Error(`MAKESTACK_PLATFORM is not set.`);
+                throw new Error(`Unknown platform \`${platform}'.`);
         }
     }
 

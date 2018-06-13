@@ -19,10 +19,10 @@ export class Device {
     constructor(name: string) {
         this.name = name;
         this.board = "esp32"; // FIXME:
+        this.platform = getRuntimeInstance();
     }
 
     public async load() {
-        this.platform = getRuntimeInstance();
         this.initialData = await this.platform.getDeviceData(this.name);
         this.data = Object.assign({}, this.initialData);
         this.commands = this.data.commands || {};
