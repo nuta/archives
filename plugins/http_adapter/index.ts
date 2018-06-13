@@ -23,9 +23,7 @@ export default class HttpAdapter extends Plugin {
                 throw new Error("received callback is not set");
             }
 
-            console.log((req as any).rawBody);
             const reply = await this.receivedCallback((req as any).rawBody);
-            console.log('replying: ', reply);
             res.send(reply);
         };
 

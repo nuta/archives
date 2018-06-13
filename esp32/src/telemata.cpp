@@ -137,16 +137,10 @@ int parse_variable_length(uint8_t *buf, int buf_length, int *length) {
 // Returns 0 on success, or -1 on failure, or 1 if the server is sending
 // a new firmware.
 int TelemataClient::receive_payload(const void *payload, size_t payload_length) {
-    printf("payload(%d): ", payload_length);
-    for (int i = 0; i < 20; i++)
-        printf("%x ", *((char *) payload + i));
-    printf("\n");
-
     if (payload_length < 2) {
         // Ignore a malformed payload.
         return -1;
     }
-
 
     uint8_t *p = (uint8_t *) payload;
 
@@ -207,7 +201,6 @@ int TelemataClient::receive_payload(const void *payload, size_t payload_length) 
                 }
 
                 int version = from_be32(p + 1);
-                printf("APP: %d %d\n", APP_VERSION, version);
 
 #ifdef DEBUG_BUILD
                 if (APP_VERSION != version) {

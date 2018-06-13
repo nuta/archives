@@ -125,7 +125,6 @@ for (const plugin of plugins) {
     if (plugin.receivePayload) {
         plugin.receivePayload(async (payload: Buffer) => {
             const device = await telemata.process(payload);
-            console.log(device)
             const firmwarePath = path.resolve(`firmware.${device.board}.bin`);
             const firmwareImage = fs.readFileSync(firmwarePath);
             const appVersion = getFirmwareVersion(firmwareImage);

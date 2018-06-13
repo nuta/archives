@@ -55,7 +55,6 @@ export default class SerialAdapter extends Plugin {
                 break;
             }
 
-            console.log(`chunk ${i} ${chunk.length}`);
             await this.sendChunk(chunk);
             if (i == 0)
                 await sleep(3000);// ota_begin takes long
