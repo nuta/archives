@@ -1,7 +1,6 @@
-import { instantiatePlatform } from "./platform";
 import { DeviceData } from "./types";
-
-const platform = instantiatePlatform();
+import { getRuntimeInstance } from "./platform/index";
+import { PlatformRuntime } from "./platform/runtime";
 
 function isDeepEqual(obj1: object, obj2: object) {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
@@ -13,6 +12,7 @@ export class Device {
     public name: string;
     public data?: DeviceData;
     public board: BoardType;
+    private platform: PlatformRuntime;
     private initialData?: DeviceData;
     private commands?: { [name: string]: string };
 
@@ -22,7 +22,8 @@ export class Device {
     }
 
     public async load() {
-        this.initialData = await platform.getDeviceData(this.name);
+        this.platform = getRuntimeInstance();
+        this.initialData = await this.platform.getDeviceData(this.name);
         this.data = Object.assign({}, this.initialData);
         this.commands = this.data.commands || {};
     }
@@ -63,7 +64,7 @@ export class Device {
         this.data.commands = this.commands;
 
         if (!isDeepEqual(this.initialData, this.data)) {
-            await platform.setDeviceData(this.name, this.data);
+            await this.platform.setDeviceData(this.name, this.data);
         }
     }
 }

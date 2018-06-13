@@ -1,6 +1,6 @@
 import { Args, CommandBase, Opts } from "../cli";
 import { logger } from "../logger";
-import { loadPlatform } from "../platform";
+import { getSdkInstance } from "../platform";
 
 export class Command extends CommandBase {
     public static command = "log";
@@ -14,6 +14,6 @@ export class Command extends CommandBase {
 
     public async run(args: Args, opts: Opts) {
         logger.progress(`Reading logs from ${opts.platform}`);
-        loadPlatform(opts.platform).viewLog(opts);
+        getSdkInstance(opts.platform).viewLog(opts);
     }
 }

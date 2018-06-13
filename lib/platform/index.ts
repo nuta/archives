@@ -1,21 +1,44 @@
-import * as path from "path";
-import { Platform } from "../types";
-import * as firebase from "./firebase";
-import * as local from "./local";
+import { PlatformRuntime } from "./runtime";
+import { PlatformSdk } from "./sdk";
+import { LocalPlatformRuntime } from "./local/runtime";
+import { LocalPlatformSdk } from "./local/sdk";
+import { FirebasePlatformRuntime } from "./firebase/runtime";
+import { FirebasePlatformSdk } from "./firebase/sdk";
 
-export function instantiatePlatform(): Platform {
-    let platformCtor: any;
-    if (process.env.MAKESTACK_PLATFORM == "local") {
-        platformCtor = local.Platform;
-    } else if (process.env.GCLOUD_PROJECT) {
-        platformCtor = firebase.Platform;
-    } else {
-        throw new Error("cannot detect the platform");
+let runtimeInstance: PlatformRuntime;
+
+export function getRuntimeInstance(): PlatformRuntime {
+    if (!runtimeInstance) {
+        switch (process.env.MAKESTACK_PLATFORM) {
+            case "local":
+                runtimeInstance = new LocalPlatformRuntime();
+                break;
+            case "firebase":
+                runtimeInstance = new FirebasePlatformRuntime();
+                break;
+            default:
+                throw new Error(`MAKESTACK_PLATFORM is not set.`);
+        }
     }
 
-    return new platformCtor() as Platform;
+    return runtimeInstance;
 }
 
-export function loadPlatform(platform: string): any {
-    return require(path.resolve(__dirname, `./${platform}`));
+let sdkInstance: PlatformSdk;
+
+export function getSdkInstance(platform: string): PlatformSdk {
+    if (!sdkInstance) {
+        switch (process.env.MAKESTACK_PLATFORM) {
+            case "local":
+                sdkInstance = new LocalPlatformSdk();
+                break;
+            case "firebase":
+                sdkInstance = new FirebasePlatformSdk();
+                break;
+            default:
+                throw new Error(`MAKESTACK_PLATFORM is not set.`);
+        }
+    }
+
+    return sdkInstance;
 }

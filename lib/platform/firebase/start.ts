@@ -1,14 +1,10 @@
-// Firebase Functions loads this file.
-import * as fs from "fs";
-import * as path from "path";
+// The entry point in Firebase Functions.
 require("babel-polyfill");
-
-const libDir = path.resolve(__dirname, "./makestack");
-
-// Add __dirname to allow requiring libDir.
-process.env.NODE_PATH = __dirname;
-require("module").Module._initPaths();
+import * as path from "path";
+import * as functions from "firebase-functions";
 
 process.env.APP_DIR = __dirname;
-const mainPath = path.join(libDir, "./dist/lib/platform/firebase/main");
-export const makestack = require(mainPath).api;
+const { getRuntimeInstance } = require(path.resolve(__dirname, "./makestack/dist/lib/runtime"));
+const platform = getRuntimeInstance();
+platform.start();
+export const api = functions.https.onRequest(platform.httpServer);

@@ -1,6 +1,6 @@
 import { Args, CommandBase, Opts } from "../cli";
 import { logger } from "../logger";
-import { loadPlatform } from "../platform";
+import { getSdkInstance } from "../platform";
 
 export class Command extends CommandBase {
     public static command = "command";
@@ -18,6 +18,6 @@ export class Command extends CommandBase {
     public async run(args: Args, opts: Opts) {
         // FIXME:
         opts.platform = "local";
-        await loadPlatform(opts.platform).command(opts.device, args.command, args.arg);
+        await getSdkInstance(opts.platform).command(opts.device, args.command, args.arg);
     }
 }

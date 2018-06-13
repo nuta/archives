@@ -1,7 +1,8 @@
 import * as firebase from "firebase-admin";
-import { DeviceData, Platform } from "../../types";
+import { DeviceData } from "../../types";
+import { PlatformRuntime } from "../runtime";
 
-export class FirebasePlatform extends Platform {
+export class FirebasePlatformRuntime extends PlatformRuntime {
     constructor() {
         super();
         firebase.initializeApp();

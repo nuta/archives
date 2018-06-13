@@ -6,7 +6,7 @@ import { board } from "../boards";
 import { Args, CommandBase, Opts } from "../cli";
 import { downloadRepo } from "../helpers";
 import { logger } from "../logger";
-import { loadPlatform } from "../platform";
+import { getSdkInstance } from "../platform";
 
 export class Command extends CommandBase {
     public static command = "deploy";
@@ -26,7 +26,7 @@ export class Command extends CommandBase {
         await board.build(repoDir, opts.appDir);
 
         logger.progress(`Deploying to ${opts.platform}`);
-        await loadPlatform(opts.platform).deploy(opts.appDir, {
+        await getSdkInstance(opts.platform).deploy(opts.appDir, {
             firebaseProject: opts.firebaseProject,
         });
 
