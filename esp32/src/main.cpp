@@ -74,7 +74,13 @@ extern "C" void app_main() {
     tcpip_adapter_init();
     esp_event_loop_init(system_event_callback, NULL);
 
-    INFO("Starting MakeStack...");
+    INFO("MakeStack version " FIRMWARE_VERSION " (%s: %d)",
+#ifdef RELEASE_BUILD
+        "production"
+#else
+        "development"
+#endif
+        , APP_VERSION);
 
     credentials = (struct credentials_struct *) malloc(CREDENTIALS_SIZE);
     spi_flash_read(0x291000, credentials, CREDENTIALS_SIZE);
