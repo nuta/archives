@@ -194,7 +194,7 @@ export function deserialize(payload: Buffer) {
                 break;
             }
             case SMMS_DEVICE_NAME_MSG:
-                messages.update = data.toString("utf-8")
+                messages.deviceName = data.toString("utf-8")
                 break;
             case SMMS_LOG_MSG:
                 messages.log = data.toString("utf-8")
