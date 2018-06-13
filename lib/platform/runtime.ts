@@ -114,17 +114,24 @@ export abstract class PlatformRuntime {
             if (plugin.receivePayload) {
                 plugin.receivePayload(async (payload: Buffer) => {
                     const device = await telemata.process(payload);
-                    const firmwarePath = path.resolve(`firmware.${device.board}.bin`);
+                    const commands = device.dequeuePendingCommands();
+
+                    device.save();
+                    if (!device.state) {
+                        return telemata.serialize({ commands });
+                    }
+
+                    // TODO: remove this
+                    const firmwarePath = path.resolve(`firmware.${device.state.board}.bin`);
                     const firmwareImage = fs.readFileSync(firmwarePath);
                     const appVersion = getFirmwareVersion(firmwareImage);
 
-                    const reply = telemata.serialize({
-                        commands: device.dequeuePendingCommands(),
-                        update: { type: "bulk", version: appVersion },
-                    });
-
-                    device.save();
-                    return reply;
+                    if (appVersion != device.state.version) {
+                        const update = { type: "bulk", version: appVersion };
+                        return telemata.serialize({ update, commands } as any);
+                    } else {
+                        return telemata.serialize({ commands });
+                    }
                 });
             }
         }

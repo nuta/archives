@@ -1,14 +1,15 @@
 import * as zlib from "zlib";
-import { Device } from "./device";
+import { Device, getBoardNameByDeviceType } from "./device";
 import { createFirmwareImage } from "./firmware";
 import { logger } from "./logger";
 import { callbacks, HeartbeatCallback } from "./server";
 
 const SMMS_VERSION = 1;
-const SMMS_DEVICE_NAME_MSG = 0x01;
-const SMMS_LOG_MSG         = 0x02;
-const SMMS_UPDATE_MSG      = 0x0a;
-const SMMS_COMMAND_MSG     = 0x0b;
+const SMMS_DEVICE_NAME_MSG  = 0x01;
+const SMMS_LOG_MSG          = 0x02;
+const SMMS_DEVICE_STATE_MSG = 0x03;
+const SMMS_UPDATE_MSG       = 0x0a;
+const SMMS_COMMAND_MSG      = 0x0b;
 
 export type DeviceState = "ready" | "running";
 export interface Reports {
@@ -141,6 +142,15 @@ export function deserialize(payload: Buffer) {
                 messages.commands[key.toString("utf-8")] = value.toString("utf-8");
                 break;
             }
+            case SMMS_DEVICE_STATE_MSG: {
+                messages.deviceState = {
+                    type: getBoardNameByDeviceType(data.readUInt8(2)),
+                    battery: (data.readUInt8(3) > 0xf0) ? null : data.readUInt8(3),
+                    version: data.readUInt32LE(4),
+                    ram_free: data.readUInt32LE(8),
+                }
+                break;
+            }
             case SMMS_DEVICE_NAME_MSG:
                 messages.deviceName = data.toString("utf-8");
                 break;
@@ -174,9 +184,10 @@ export function parseLog(log: string): any {
 }
 
 export async function process(payload: Buffer): Promise<Device> {
-    const { deviceName, log } = deserialize(payload);
+    const { deviceName, log, deviceState } = deserialize(payload);
     logger.info(`Heartbeat from ${deviceName}`);
     const device = await Device.getByName(deviceName);
+    device.state = deviceState;
     const { events } = parseLog(log || "");
 
     for (const callback of callbacks.heartbeat) {

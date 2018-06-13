@@ -8,6 +8,22 @@ enum TelemataClientState { no_app, running_app, update_app };
 
 int parse_variable_length(uint8_t *buf, int buf_length, int *length);
 
+#define TELEMATA_VERSION 1
+#define TELEMATA_DEVICE_NAME_MSG  0x01
+#define TELEMATA_LOG_MSG          0x02
+#define TELEMATA_DEVICE_STATE_MSG 0x03
+#define TELEMATA_UPDATE_MSG       0x0a
+#define TELEMATA_COMMAND_MSG      0x0b
+#define DEVICE_TYPE_ESP32 1
+
+struct device_state_msg {
+    uint8_t reserved[2];
+    uint8_t type;
+    uint8_t battery;
+    uint32_t version;
+    uint32_t ram_free;
+} __attribute__((packed));
+
 class TelemataClient {
 private:
     int state;
@@ -22,7 +38,6 @@ private:
     virtual void download_app(int version) = 0;
 
 protected:
-    unsigned long current_app_version;
     const char *device_name;
     int receive_payload(const void *payload, size_t length);
 

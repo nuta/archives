@@ -7,18 +7,34 @@ function isDeepEqual(obj1: object, obj2: object) {
 }
 
 export type BoardType = "esp32";
+const DEVICE_TYPE_ESP32 = 1;
+
+export function getBoardNameByDeviceType(id: number): BoardType {
+    switch (id) {
+        case DEVICE_TYPE_ESP32:
+            return "esp32";
+        default:
+            throw new Error(`Unknown device type: ${id}`);
+    }
+}
+
+export interface DeviceState {
+    version: number;
+    board: BoardType;
+    ramFree?: number;
+    battery?: number;
+};
 
 export class Device {
     public name: string;
     public data?: DeviceData;
-    public board: BoardType;
+    public state?: DeviceState;
     private platform: PlatformRuntime;
     private initialData?: DeviceData;
     private commands?: { [name: string]: string };
 
     constructor(name: string) {
         this.name = name;
-        this.board = "esp32"; // FIXME:
         this.platform = getRuntimeInstance();
     }
 

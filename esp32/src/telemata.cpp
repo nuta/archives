@@ -1,18 +1,13 @@
-#include "telemata.h"
+#include <esp_system.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <memory>
 #include <string>
+#include "telemata.h"
 #include "logger.h"
 #include "utils.h"
-
-#define TELEMATA_VERSION 1
-#define TELEMATA_DEVICE_NAME_MSG  0x01
-#define TELEMATA_LOG_MSG          0x02
-#define TELEMATA_UPDATE_MSG       0x0a
-#define TELEMATA_COMMAND_MSG      0x0b
 
 using namespace std;
 
@@ -68,7 +63,6 @@ TelemataClient::TelemataClient(const char *device_name)
     : log_length(0),
       log_index(0),
       config(),
-      current_app_version(0),
       device_name(device_name) {
     log_allocated_length = 2048;
     log_buffer = (char *) malloc(log_allocated_length);
@@ -221,6 +215,13 @@ void TelemataClient::send() {
         log_index = 0;
         log_length = 0;
     }
+
+    struct device_state_msg device_state;
+    device_state.type = DEVICE_TYPE_ESP32;
+    device_state.version = APP_VERSION;
+    device_state.ram_free = esp_get_free_heap_size();
+    device_state.battery = 0xf0; /* Unsupported */
+    payload.append(TELEMATA_DEVICE_STATE_MSG, &device_state, sizeof(device_state));
 
     // Construct the header.
     uint8_t *ptr = (uint8_t *) malloc(1 + 4 + payload.length());
