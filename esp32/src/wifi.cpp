@@ -228,7 +228,7 @@ void WiFiTelemataClient::download_app(int version) {
     url += hostname;
     url += ":";
     url += port;
-    url += "/makestack/firmware";
+    url += "/makestack/firmware?board=esp32";
 
     INFO("starting a request...");
     if (tls_enabled) {
