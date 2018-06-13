@@ -2,6 +2,7 @@ import * as zlib from "zlib";
 import { Device } from "./device";
 import { createFirmwareImage } from "./firmware";
 import { callbacks, HeartbeatCallback } from "./server";
+import { logger } from "./logger";
 
 const SMMS_VERSION = 1;
 const SMMS_HMAC_MSG      = 0x01;
@@ -228,9 +229,10 @@ export function parseLog(log: string): any {
     return { events };
 }
 
-export function process(payload: Buffer): Device {
+export async function process(payload: Buffer): Promise<Device> {
     const { deviceName, log } = deserialize(payload);
-    const device = new Device(deviceName);
+    logger.info(`Heartbeat from ${deviceName}`);
+    const device = await Device.getByName(deviceName);
     const { events } = parseLog(log || "");
 
     for (const callback of callbacks.heartbeat) {
@@ -246,6 +248,5 @@ export function process(payload: Buffer): Device {
         callback(device, event, value);
     }
 
-    device.saveIfChanged();
     return device;
 }

@@ -36,13 +36,17 @@ for (const plugin of plugins) {
     }
 
     if (plugin.receivePayload) {
-        plugin.receivePayload((payload: Buffer) => {
-            const device = telemata.process(payload);
-            return telemata.serialize({
-                commands: device.data.commands,
+        plugin.receivePayload(async (payload: Buffer) => {
+            const device = await telemata.process(payload);
+            const reply = telemata.serialize({
+                commands: device.dequeuePendingCommands(),
                 update: { type: "bulk", version: appVersion }
             });
+
+            device.save();
+            return reply;
         });
+
     }
 }
 

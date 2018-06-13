@@ -2,7 +2,7 @@ import * as express from "express";
 import * as fs from "fs-extra";
 import * as path from "path";
 
-export type AdapterCallback = (payload: Buffer) => Buffer | undefined;
+export type AdapterCallback = (payload: Buffer) => Promise<Buffer | undefined>;
 
 export class Plugin {
     public server(express: express.Express): void {

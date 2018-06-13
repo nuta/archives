@@ -11,32 +11,59 @@ export type BoardType = "esp32";
 
 export class Device {
     public name: string;
-    public data: DeviceData;
+    public data?: DeviceData;
     public board: BoardType;
-    private initialData: DeviceData;
-    private commands: { [name: string]: string };
+    private initialData?: DeviceData;
+    private commands?: { [name: string]: string };
 
     constructor(name: string) {
         this.name = name;
         this.board = "esp32"; // FIXME:
-        this.initialData = platform.getDeviceData(name);
+    }
+
+    public async load() {
+        this.initialData = await platform.getDeviceData(this.name);
         this.data = Object.assign({}, this.initialData);
         this.commands = this.data.commands || {};
     }
 
-    private getByName(name: string) {
-        return new Device(name);
+    static async getByName(name: string): Promise<Device> {
+        if (!name) {
+            throw new Error("Invalid device name.");
+        }
+
+        const device = new Device(name);
+        await device.load();
+        return device;
     }
 
     public command(name: string, arg: string) {
+        if (!this.commands) {
+            throw new Error("Perform device.load() first!");
+        }
+
         this.commands[name] = arg;
     }
 
-    public saveIfChanged() {
+    public dequeuePendingCommands(): { [name: string]: string } {
+        if (!this.commands) {
+            throw new Error("Perform device.load() first!");
+        }
+
+        const commands = this.commands;
+        this.commands = {};
+        return commands;
+    }
+
+    public async save() {
+        if (!this.data || !this.initialData) {
+            throw new Error("Perform device.load() first!");
+        }
+
         this.data.commands = this.commands;
 
         if (!isDeepEqual(this.initialData, this.data)) {
-            platform.setDeviceData(this.name, this.data);
+            await platform.setDeviceData(this.name, this.data);
         }
     }
 }

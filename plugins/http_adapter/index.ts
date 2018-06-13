@@ -16,13 +16,13 @@ export default class HttpAdapter extends Plugin {
     }
 
     server(httpServer: express.Express) {
-        const telemataHandler = (req: Request, res: Response) => {
+        const telemataHandler = async (req: Request, res: Response) => {
             if (!this.receivedCallback) {
                 throw new Error("received callback is not set");
             }
 
             console.log((req as any).rawBody);
-            const reply = this.receivedCallback((req as any).rawBody);
+            const reply = await this.receivedCallback((req as any).rawBody);
             console.log('replying: ', reply);
             res.send(reply);
         };
