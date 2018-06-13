@@ -32,7 +32,7 @@ script:
   - yarn coverage
 after_script:
   - yarn global add codeclimate-test-reporter
-  - if [[ $TRAVIS_OS_NAME = "osx" ]] then yarn nyc report --reporter=text-lcov | codeclimate-test-reporter; fi
+  - if [[ $TRAVIS_OS_NAME = "osx" ]]; then yarn nyc report --reporter=text-lcov | codeclimate-test-reporter; fi
 cache:
   yarn: true
   directories:
