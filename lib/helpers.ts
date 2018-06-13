@@ -34,7 +34,7 @@ export function guessSerialFilePath(): string | null {
     }
 }
 
-export function exec(argv: string[], options: SpawnSyncOptions = {}) {
+export function execCmd(argv: string[], options: SpawnSyncOptions = {}) {
 
     const exe = argv[0];
     const args = argv.slice(1);
@@ -49,7 +49,7 @@ export function exec(argv: string[], options: SpawnSyncOptions = {}) {
     }
 }
 
-export function execWithPipe(argv: string[], options: SpawnSyncOptions = {}):
+export function execCmdWithPipe(argv: string[], options: SpawnSyncOptions = {}):
     { stdout: string, stderr: string } {
 
     const exe = argv[0];
@@ -75,7 +75,7 @@ export function downloadRepo(appDir: string): string {
     if (!fs.existsSync(path.join(appDir, "build/repo/.git"))) {
         logger.progress("Downloading the repository");
         fs.mkdirpSync(path.dirname(repoDir));
-        exec(["git", "clone", "https://github.com/seiyanuta/makestack", "repo"], {
+        execCmd(["git", "clone", "https://github.com/seiyanuta/makestack", "repo"], {
             cwd: path.join(appDir, "build"),
         });
     }

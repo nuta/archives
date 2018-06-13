@@ -7,7 +7,7 @@ import { createFirmwareImage, CREDENTIALS_DATA_TEMPLATE, embedCredentials } from
 import { logger } from "../logger";
 import { loadPlugins } from "../plugins";
 import { Board, InstallConfig } from "../types";
-import { exec } from "../helpers";
+import { execCmd } from "../helpers";
 const Gauge = require("gauge");
 const packageJson = require("../../../package.json");
 
@@ -130,7 +130,7 @@ export class Esp32Board extends Board {
         const config = fs.readJsonSync(path.join(appDir, "package.json")).makestack;
 
         if (!fs.existsSync(path.join(esp32Dir, "deps"))) {
-            exec(["./tools/download-dependencies"],  { cwd: esp32Dir });
+            execCmd(["./tools/download-dependencies"],  { cwd: esp32Dir });
         }
 
         // Copy app and plugin source files.
@@ -180,7 +180,8 @@ export class Esp32Board extends Board {
         // use the space for SPIFFS or move the position or the firmware is no longer able
         // to communicate with the server.
         //
-        const args = [
+        const argv = [
+            "python",
             path.resolve(esp32Dir, "deps/esp-idf/components/esptool_py/esptool/esptool.py"),
             "--port", config.serial,
             "--baud", "921600",
@@ -196,13 +197,6 @@ export class Esp32Board extends Board {
         ];
 
         // TODO: ensure that pyserial is installed
-        const { status } = spawnSync("python", args, {
-            stdio: "inherit",
-            cwd: path.join(esp32Dir, "build"),
-        });
-
-        if (status != 0) {
-            throw new Error("Failed to install the firmware.");
-        }
+        execCmd(argv, { cwd: path.join(esp32Dir, "build") });
     }
 }
