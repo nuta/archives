@@ -4,7 +4,6 @@ export function getFirmwareVersion(firmware: Buffer): number {
     return firmware.readUInt32LE(8);
 }
 
-
 function replaceBuffer(buf: Buffer, value: string, needle: Buffer, fill: number): Buffer {
     const index = buf.indexOf(needle);
     if (index === -1) {
@@ -49,7 +48,7 @@ export const CREDENTIALS_DATA_TEMPLATE = Buffer.concat([
     REPLACE_ME_NETWORK_ADAPTER,
     REPLACE_ME_WIFI_SSID,
     REPLACE_ME_WIFI_PASSWORD,
-])
+]);
 
 export function embedCredentials(image: Buffer, config: InstallConfig): Buffer {
     const fill = 0x00;
@@ -57,9 +56,10 @@ export function embedCredentials(image: Buffer, config: InstallConfig): Buffer {
     image = replaceBuffer(image, config.serverUrl, REPLACE_ME_SERVER_URL, fill);
     image = replaceBuffer(image, config.adapter, REPLACE_ME_NETWORK_ADAPTER, fill);
 
-    if (config.adapter === 'wifi') {
-        if (!config.wifiSsid || !config.wifiPassword)
+    if (config.adapter === "wifi") {
+        if (!config.wifiSsid || !config.wifiPassword) {
             throw new Error("wifi ssid or wifi password is not provided");
+        }
 
         image = replaceBuffer(image, config.wifiSsid, REPLACE_ME_WIFI_SSID, fill);
         image = replaceBuffer(image, config.wifiPassword, REPLACE_ME_WIFI_PASSWORD, fill);

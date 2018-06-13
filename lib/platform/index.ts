@@ -1,7 +1,7 @@
 import * as path from "path";
 import { Platform } from "../types";
-import * as local from "./local";
 import * as firebase from "./firebase";
+import * as local from "./local";
 
 export function instantiatePlatform(): Platform {
     let platformCtor: any;

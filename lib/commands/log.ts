@@ -1,4 +1,4 @@
-import { CommandBase, Args, Opts } from "../cli";
+import { Args, CommandBase, Opts } from "../cli";
 import { logger } from "../logger";
 import { loadPlatform } from "../platform";
 

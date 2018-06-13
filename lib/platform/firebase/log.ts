@@ -1,6 +1,6 @@
 import * as EventEmitter from "events";
-import { execWithPipe } from "../../helpers";
 import * as readline from "readline";
+import { execWithPipe } from "../../helpers";
 const { blue } = require("chalk");
 
 export function viewLog(opts: any) {
@@ -11,13 +11,13 @@ export function viewLog(opts: any) {
     const readLog = () => {
         const argv = ["firebase", "functions:log", "--project", opts.firebaseProject];
         const { stdout } = execWithPipe(argv);
-        lastLine = stdout.split("\n").filter(l => l.length > 0).pop();
+        lastLine = stdout.split("\n").filter((l) => l.length > 0).pop();
         return stdout;
-    }
+    };
 
     const printCountdown = () => {
         process.stdout.write(blue.bold(`==> Reloading in ${current} seconds...`));
-    }
+    };
 
     const loop = () => {
         readline.clearLine(process.stdout, 0);

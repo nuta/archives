@@ -3,9 +3,9 @@ import * as child_process from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import { board } from "../boards";
-import { logger } from "../logger";
 import { Args, CommandBase, Opts } from "../cli";
 import { downloadRepo } from "../helpers";
+import { logger } from "../logger";
 import { loadPlatform } from "../platform";
 
 export class Command extends CommandBase {

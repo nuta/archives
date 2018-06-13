@@ -5,8 +5,8 @@ import * as path from "path";
 import { App } from "../app";
 import { board } from "../boards";
 import { Args, CommandBase, Opts } from "../cli";
-import { logger } from "../logger";
 import { downloadRepo } from "../helpers";
+import { logger } from "../logger";
 
 export class Command extends CommandBase {
     public static command = "dev";
@@ -39,7 +39,7 @@ export class Command extends CommandBase {
 
             logger.progress("Building the firmware");
             await board.build(repoDir, opts.appDir);
-            logger.progress("Launching the server")
+            logger.progress("Launching the server");
             app = child_process.fork(localRuntimePath, [], forkOptions);
         } catch (e) {
             logger.error(e.message);
@@ -55,7 +55,7 @@ export class Command extends CommandBase {
                 return;
             }
 
-            logger.progress("Restarting the server")
+            logger.progress("Restarting the server");
             app.kill();
             app.on("exit", () => {
                 app = child_process.fork(localRuntimePath, [], forkOptions);
@@ -65,7 +65,7 @@ export class Command extends CommandBase {
         fs.watch(path.resolve(opts.appDir, "server.js"), (_: string, filepath: string) => reload(filepath));
         fs.watch(path.resolve(opts.appDir, "device.cc"), (_: string, filepath: string) => reload(filepath));
 
-        logger.info("*** Watching the changes to source code...")
+        logger.info("*** Watching the changes to source code...");
         logger.info("*** Press Ctrl-C to quit");
     }
 }

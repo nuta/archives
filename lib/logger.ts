@@ -1,7 +1,7 @@
 const { green, blue, red, cyanBright, magenta, bold } = require("chalk");
 
 function join(messages: any[]): string {
-    return messages.map(m => m.toString()).join(" ");
+    return messages.map((m) => m.toString()).join(" ");
 }
 
 export type LoggerSubject = "server" | "device";
@@ -16,8 +16,8 @@ export class Logger {
         if (this.subject) {
             const colors = {
                 server: blue,
-                device: magenta
-            }
+                device: magenta,
+            };
 
             const prefix = colors[this.subject](this.subject.padStart(8) + ":");
             console.log(prefix + " " + str);
@@ -53,6 +53,6 @@ export class Logger {
     public progress(...messages: any[]) {
         this.log(bold(green("==> ") + join(messages)));
     }
-};
+}
 
 export const logger = new Logger();

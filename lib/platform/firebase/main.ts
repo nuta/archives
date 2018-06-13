@@ -40,7 +40,7 @@ for (const plugin of plugins) {
             const device = await telemata.process(payload);
             const reply = telemata.serialize({
                 commands: device.dequeuePendingCommands(),
-                update: { type: "bulk", version: appVersion }
+                update: { type: "bulk", version: appVersion },
             });
 
             device.save();

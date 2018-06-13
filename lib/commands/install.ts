@@ -1,13 +1,13 @@
 const chalk = require("chalk");
 import * as child_process from "child_process";
 import * as fs from "fs";
+import * as inquirer from "inquirer";
 import * as path from "path";
 import { board } from "../boards";
-import { logger } from "../logger";
 import { Args, CommandBase, Opts } from "../cli";
-import { InstallConfig } from "../types";
-import * as inquirer from "inquirer";
 import { downloadRepo } from "../helpers";
+import { logger } from "../logger";
+import { InstallConfig } from "../types";
 
 const installConfigOptions = [
     { name: "--adapter", desc: "The network adapter." },
@@ -15,7 +15,7 @@ const installConfigOptions = [
     { name: "--wifi-password", desc: "Wi-Fi Password." },
     { name: "--server-url", desc: "The server URL." },
     { name: "--device-name", desc: "The device name." },
-    { name: "--serial", desc: "The serial device file." }
+    { name: "--serial", desc: "The serial device file." },
 ];
 
 async function getOrAsk(opts: { [name: string]: string }, questions: inquirer.Question[]) {

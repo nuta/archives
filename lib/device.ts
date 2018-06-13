@@ -27,7 +27,7 @@ export class Device {
         this.commands = this.data.commands || {};
     }
 
-    static async getByName(name: string): Promise<Device> {
+    public static async getByName(name: string): Promise<Device> {
         if (!name) {
             throw new Error("Invalid device name.");
         }

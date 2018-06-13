@@ -1,8 +1,7 @@
-import { LocalPlatform } from "./runtime";
-import { logger } from "../../logger";
-import * as path from "path";
 import * as net from "net";
-
+import * as path from "path";
+import { logger } from "../../logger";
+import { LocalPlatform } from "./runtime";
 
 export async function command(deviceName: string, command: string, arg: string) {
     return new Promise((resolve, reject) => {
@@ -15,7 +14,7 @@ export async function command(deviceName: string, command: string, arg: string) 
             } else {
                 reject(error);
             }
-        })
+        });
 
         sock.on("connect", () => {
             sock.write(JSON.stringify({
@@ -24,8 +23,8 @@ export async function command(deviceName: string, command: string, arg: string) 
                     device: deviceName,
                     name: command,
                     arg,
-                }
-            }))
+                },
+            }));
 
             sock.on("data", (data) => {
                 const resp = JSON.parse(data.toString("utf-8"));
@@ -36,14 +35,13 @@ export async function command(deviceName: string, command: string, arg: string) 
                 }
 
                 resolve(resp);
-            })
-        })
-    })
+            });
+        });
+    });
 }
 
 export async function viewLog() {
-    logger.error("log command is not available in local platform")
+    logger.error("log command is not available in local platform");
 }
-
 
 export const Platform = LocalPlatform;

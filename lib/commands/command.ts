@@ -1,4 +1,4 @@
-import { CommandBase, Args, Opts } from "../cli";
+import { Args, CommandBase, Opts } from "../cli";
 import { logger } from "../logger";
 import { loadPlatform } from "../platform";
 
@@ -7,7 +7,7 @@ export class Command extends CommandBase {
     public static desc = "";
     public static args = [
         { name: "command", desc: "The command name." },
-        { name: "arg", desc: "The command argument." }
+        { name: "arg", desc: "The command argument." },
     ];
     public static opts = [
         { name: "--device", desc: "The target device.", required: true },
@@ -17,7 +17,7 @@ export class Command extends CommandBase {
 
     public async run(args: Args, opts: Opts) {
         // FIXME:
-        opts.platform = "local"
+        opts.platform = "local";
         await loadPlatform(opts.platform).command(opts.device, args.command, args.arg);
     }
 }

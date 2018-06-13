@@ -1,8 +1,8 @@
 import * as zlib from "zlib";
 import { Device } from "./device";
 import { createFirmwareImage } from "./firmware";
-import { callbacks, HeartbeatCallback } from "./server";
 import { logger } from "./logger";
+import { callbacks, HeartbeatCallback } from "./server";
 
 const SMMS_VERSION = 1;
 const SMMS_HMAC_MSG      = 0x01;
@@ -194,10 +194,10 @@ export function deserialize(payload: Buffer) {
                 break;
             }
             case SMMS_DEVICE_NAME_MSG:
-                messages.deviceName = data.toString("utf-8")
+                messages.deviceName = data.toString("utf-8");
                 break;
             case SMMS_LOG_MSG:
-                messages.log = data.toString("utf-8")
+                messages.log = data.toString("utf-8");
                 break;
             case SMMS_UPDATE_MSG:
                 messages.update = {

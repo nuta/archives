@@ -3,10 +3,10 @@ import * as express from "express";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { getFirmwareVersion } from "../../firmware";
+import { Logger } from "../../logger";
 import { instantiatePlugins } from "../../plugins";
 import { endpoints } from "../../server";
 import * as telemata from "../../telemata";
-import { Logger } from "../../logger";
 
 const logger = new Logger("server");
 logger.debug("Staring the runtime");
@@ -38,7 +38,7 @@ if (process.env.BASIC_AUTH) {
             return;
         }
 
-        const cred = Buffer.from(base64Cred, 'base64').toString();
+        const cred = Buffer.from(base64Cred, "base64").toString();
         const [username, password] = cred.split(":", 2);
         if (username !== basicAuthCredential[0] || password !== basicAuthCredential[1]) {
             res.status(401).header("WWW-Authenticate", 'Basic realm=""').end();
@@ -71,28 +71,28 @@ interface LocalRequest {
         name: string;
         device: string;
         arg: string;
-    }
+    };
 
 }
 async function handleLocalRequest(req: LocalRequest) {
     switch (req.type) {
         case "command":
             if (!req.command) {
-                return { "result": "error" };
+                return { result: "error" };
             }
 
             const device = await Device.getByName(req.command.device);
             device.command(req.command.name, req.command.arg);
             device.save();
-            return { "result": "success" };
+            return { result: "success" };
         default:
-            return { "result": "error" };
+            return { result: "error" };
     }
 }
 
 const sock = net.createServer();
 sock.on("connection", (client) => {
-    let str = ""
+    const str = "";
     client.on("data", async (data) => {
         let req;
         try {
@@ -100,7 +100,7 @@ sock.on("connection", (client) => {
         } catch (e) {
             logger.error(e);
             logger.error(e.stack);
-            client.write(JSON.stringify({ "result": "error" }));
+            client.write(JSON.stringify({ result: "error" }));
         }
         client.write(JSON.stringify(await handleLocalRequest(req)));
     });
@@ -110,12 +110,12 @@ fs.removeSync("dev.sock");
 sock.listen("dev.sock");
 
 logger.debug("Loading plugins");
-const config = fs.readJsonSync("./package.json")["makestack"];
-if (!config || !config["devPlugins"]) {
+const config = fs.readJsonSync("./package.json").makestack;
+if (!config || !config.devPlugins) {
     throw new Error("Specify makestack.devPlugins in package.json");
 }
 
-const plugins = instantiatePlugins(config["devPlugins"]);
+const plugins = instantiatePlugins(config.devPlugins);
 
 for (const plugin of plugins) {
     if (plugin.server) {
@@ -131,7 +131,7 @@ for (const plugin of plugins) {
 
             const reply = telemata.serialize({
                 commands: device.dequeuePendingCommands(),
-                update: { type: "bulk", version: appVersion }
+                update: { type: "bulk", version: appVersion },
             });
 
             device.save();

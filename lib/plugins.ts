@@ -54,7 +54,7 @@ export function loadPlugins(required: string[]): { [name: string]: any } {
     }
 
     if (required) {
-        const missing = required.filter(pkg => pkg in plugins);
+        const missing = required.filter((pkg) => pkg in plugins);
         if (missing.length > 0) {
             throw new Error(`missing plugins: ${missing.join(", ")}`);
         }
@@ -65,7 +65,7 @@ export function loadPlugins(required: string[]): { [name: string]: any } {
 
 export function instantiatePlugins(plugins: string[]): Plugin[] {
     const modules = [];
-    const builtinPlugins = getBuiltinPlugins().map(plugin => path.basename(plugin));
+    const builtinPlugins = getBuiltinPlugins().map((plugin) => path.basename(plugin));
     for (const plugin of Object.values(loadPlugins(plugins))) {
         let ctor;
         const name = path.basename(plugin.name); // Remove `@makestack/' prefix.

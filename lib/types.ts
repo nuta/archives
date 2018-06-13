@@ -1,4 +1,4 @@
-export interface DeviceData { [key: string]: any }
+export interface DeviceData { [key: string]: any; }
 
 export interface InstallConfig {
     wifiSsid?: string;
@@ -6,7 +6,7 @@ export interface InstallConfig {
     serverUrl: string;
     deviceName: string;
     serial?: string;
-    adapter: 'wifi';
+    adapter: "wifi";
 }
 
 export abstract class Platform {

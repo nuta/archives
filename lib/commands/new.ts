@@ -31,7 +31,7 @@ const PACKAGE_JSON_TMPL = `\
         "devPlugins": ["serial_adapter", "http_adapter"]
     }
 }
-`
+`;
 
 const GITIGNORE_TMPL = `\
 firmware.bin
@@ -75,8 +75,8 @@ export class Command extends CommandBase {
             name: "--frontend",
             desc: "The frontend framework.",
             default: "static",
-            validators: ["static"]
-        }
+            validators: ["static"],
+        },
     ];
 
     public async run(args: Args, opts: Opts) {
