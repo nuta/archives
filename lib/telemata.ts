@@ -219,7 +219,7 @@ export function deserialize(payload: Buffer) {
 export function parseLog(log: string): any {
     const events = [];
     const eventRegex = /^@([^ ]+) (.*)$/;
-    for (const line in log.split("\n")) {
+    for (const line of log.split("\n")) {
         const match = eventRegex.exec(line);
         if (match) {
             events.push({ name: match[0], value: match[1] });
