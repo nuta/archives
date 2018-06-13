@@ -1,11 +1,11 @@
-import { spawnSync } from "child_process";
 import * as fs from "fs-extra";
 import * as path from "path";
 import * as EventEmitter from "events";
 import * as readline from "readline";
 import { PlatformSdk } from "../sdk";
 import { DeployOptions } from "../../types";
-import { execWithPipe } from "../../helpers";
+import { execWithPipe, exec } from "../../helpers";
+import { logger } from "../../logger";
 const { blue } = require("chalk");
 
 export class FirebasePlatformSdk extends PlatformSdk {
@@ -40,22 +40,30 @@ export class FirebasePlatformSdk extends PlatformSdk {
         });
 
         const packageJsonPath = path.resolve(__dirname, "../../../../package.json");
-        const { dependencies } = require(packageJsonPath);
+        const pluginsDir = path.resolve(__dirname, "../../../../plugins");
+        const { dependencies } = fs.readJsonSync(packageJsonPath);
         const blacklist = ["serialport"];
         for (const dep of blacklist) {
             delete dependencies[dep];
         }
 
+        const appPackageJson = fs.readJsonSync(path.resolve(appDir, "package.json"));
         fs.writeJsonSync(path.join(pkgDir, "package.json"), {
             private: true,
             main: "./index.js",
-            dependencies,
+            dependencies: Object.assign({}, dependencies, appPackageJson.dependencies),
+            makestack: appPackageJson.makestack,
         });
 
         fs.mkdirpSync(path.join(pkgDir, "makestack"));
         fs.copyFileSync(
             packageJsonPath,
             path.join(pkgDir, "makestack/package.json"),
+        );
+
+        fs.copySync(
+            path.join(pluginsDir),
+            path.join(pkgDir, "makestack/plugins"),
         );
 
         fs.copySync(
@@ -78,24 +86,17 @@ export class FirebasePlatformSdk extends PlatformSdk {
             path.join(pkgDir, "index.js"),
         );
 
-        spawnSync("yarn", [
-            "run",
-            "babel",
-            "--presets=es2015,stage-3",
-            path.resolve(__dirname, "../../../../dist"),
-            "--out-dir",
-            path.join(pkgDir, "makestack/dist"),
-        ]);
+        logger.progress("Installing dependencies");
+        exec(["yarn"], { cwd: pkgDir });
 
-        spawnSync("yarn", { cwd: pkgDir, stdio: "inherit" });
-        spawnSync(
-            "firebase",
-            ["deploy", "--project", opts.firebaseProject],
-            {
-                stdio: "inherit",
-                cwd: projDir,
-            },
-        );
+        logger.progress("Transpiling");
+        exec(["yarn", "run", "babel", "--presets=es2015,stage-3",
+            "--out-dir", path.join(pkgDir, "makestack/dist"),
+            path.resolve(__dirname, "../../../../dist"),
+        ], { cwd: pkgDir });
+
+        logger.progress("firebase deploy (it may takes long)");
+        exec(["firebase", "deploy", "--project", opts.firebaseProject], { cwd: projDir });
     }
 
     public viewLog(opts: any) {

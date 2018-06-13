@@ -67,11 +67,13 @@ function rawBodyMiddleware(req: any, res: express.Response, next: Function) {
 
 export abstract class PlatformRuntime {
     public httpServer: express.Express;
+    private appDir: string;
 
     public abstract async getDeviceData(deviceName: string): Promise<DeviceData>;
     public abstract async setDeviceData(deviceName: string, data: DeviceData): Promise<void>;
 
     constructor() {
+        this.appDir = process.env.APP_DIR || process.cwd();
         this.httpServer = express();
         this.httpServer.use(basicAuthMiddleware);
         this.httpServer.use(express.static("public"));
@@ -84,7 +86,7 @@ export abstract class PlatformRuntime {
     }
 
     private loadAppServer() {
-        const app = require(path.resolve(process.cwd(), "./server"));
+        const app = require(path.resolve(this.appDir, "./server"));
         for (const [name, callback] of Object.entries(endpoints)) {
             // TODO: support other methods
             this.httpServer.get(name, callback);
@@ -92,12 +94,17 @@ export abstract class PlatformRuntime {
     }
 
     private loadPlugins() {
-        const config = fs.readJsonSync("./package.json").makestack;
-        if (!config || !config.devPlugins) {
-            throw new Error("Specify makestack.devPlugins in package.json");
+        const config = fs.readJsonSync(path.join(this.appDir, "package.json")).makestack;
+        if (!config) {
+            throw new Error("Specify makestack.plugins and makestack.devPlugins in package.json");
         }
 
-        const plugins = instantiatePlugins(config.devPlugins);
+        const requiredPlugins = (process.env.MAKESTACK_PRODUCTION) ? config.plugins : config.devPlugins;
+        if (!requiredPlugins) {
+            throw new Error("Specify makestack.plugins and makestack.devPlugins in package.json");
+        }
+
+        const plugins = instantiatePlugins(requiredPlugins);
 
         for (const plugin of plugins) {
             if (plugin.server) {

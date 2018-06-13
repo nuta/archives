@@ -5,6 +5,10 @@ import { PlatformRuntime } from "../runtime";
 export class FirebasePlatformRuntime extends PlatformRuntime {
     constructor() {
         super();
+    }
+
+    public init() {
+        this.doInit();
         firebase.initializeApp();
     }
 
