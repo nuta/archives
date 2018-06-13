@@ -34,7 +34,7 @@ const PACKAGE_JSON_TMPL = `\
 `;
 
 const GITIGNORE_TMPL = `\
-firmware.bin
+*.firmware
 build
 `;
 
