@@ -80,6 +80,7 @@ TelemataClient::TelemataClient(const char *device_name)
       device_name(device_name) {
     log_allocated_length = 2048;
     log_buffer = (char *) malloc(log_allocated_length);
+    command_callback = nullptr;
 }
 
 void TelemataClient::append_log(char ch) {
@@ -117,20 +118,20 @@ int parse_variable_length(uint8_t *buf, int buf_length, int *length) {
 }
 
 #define PARSE_KEY_VALUE_MSG(len) \
-    int key_len;                                                           \
-    int key_len_len = parse_variable_length(p, remaining, &key_len);       \
-    int value_len = len - key_len_len - key_len;                           \
+    int key_len;                                                               \
+    int key_len_len = parse_variable_length(p + 1, remaining - 1, &key_len);   \
+    int value_len = len - key_len_len - key_len - 1;                           \
     if (value_len < 0 || 1 + key_len_len + key_len + value_len > remaining) {  \
-       printf("inval cmd: %d %d %d\n", value_len, key_len, remaining); \
-        goto next_message;                                                 \
-    }                                                                      \
-                                                                           \
-    int value_type = p[0];                                                 \
-    char *key = (char *) malloc(key_len + 1);                              \
-    memcpy(key, p + 1 + key_len_len, key_len);                             \
-    key[key_len] = '\0';                                                   \
-    char *value = (char *) malloc(value_len + 1);                          \
-    memcpy(value, p + 1 + key_len_len + key_len, value_len);               \
+       printf("invalid kv: %d %d %d\n", value_len, key_len, remaining);        \
+        goto next_message;                                                     \
+    }                                                                          \
+                                                                               \
+    int value_type = p[0];                                                     \
+    char *key = (char *) malloc(key_len + 1);                                  \
+    memcpy(key, p + 1 + key_len_len, key_len);                                 \
+    key[key_len] = '\0';                                                       \
+    char *value = (char *) malloc(value_len + 1);                              \
+    memcpy(value, p + 1 + key_len_len + key_len, value_len);                   \
     value[value_len] = '\0';
 
 // Returns 0 on success, or -1 on failure, or 1 if the server is sending
@@ -191,10 +192,11 @@ int TelemataClient::receive_payload(const void *payload, size_t payload_length) 
             case TELEMATA_COMMAND_MSG: {
                 PARSE_KEY_VALUE_MSG(len);
                 // execute_command(key, value);
-                if (value_type == 0x01 /* string */) {
-                    // TODO
+                if (value_type == 0x01 /* string */ && command_callback) {
                     printf("command: %s(\"%s\")\n", key, value);
+                    command_callback(key, value);
                 }
+
                 free(key);
                 free(value);
                 break;
@@ -259,4 +261,8 @@ void TelemataClient::send() {
 
     send_payload((void *) ptr, 1 + len_len + payload.length());
     free(ptr);
+}
+
+void TelemataClient::set_command_callback(void (*callback)(const char *name, const char *arg)) {
+    command_callback = callback;
 }

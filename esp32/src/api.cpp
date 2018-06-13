@@ -1,8 +1,10 @@
+#include <map>
 #include <string.h>
 #include <stdio.h>
 #include <makestack.h>
 #include "telemata.h"
 #include "logger.h"
+#include "api.h"
 
 void print(const char *fmt, ...) {
     char buf[256];
@@ -34,4 +36,24 @@ void publish(const char *event, char *value) {
 
     sprintf((char *) &buf, "@%s %s", event, value);
     telemata->append_log((char *) &buf);
+}
+
+
+static std::map<std::string, command_handler_t> *handlers;
+
+void command(const char *name, command_handler_t handler) {
+    handlers->emplace(std::string(name), handler);
+}
+
+void command_callback(const char *name, const char *arg) {
+    auto it = handlers->find(std::string(name));
+    if (it != handlers->end()) {
+        command_handler_t handler = it->second;
+        handler(String(arg));
+    }
+}
+
+void init_api() {
+    handlers = new std::map<std::string, command_handler_t>();
+    telemata->set_command_callback(command_callback);
 }
