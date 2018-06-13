@@ -3,15 +3,15 @@ language: node_js
 linux_addons: &linux_addons
   apt:
     packages:
-      - git
-      - wget
-      - make
-      – libncurses-dev
-      - flex
-      - bison
-      - gperf
-      - python
-      - python-serial
+      - "git"
+      - "wget"
+      - "make"
+      - "flex"
+      - "bison"
+      - "gperf"
+      - "python"
+      - "libncurses-dev"
+      - "python-serial"
 
 matrix:
   include:
