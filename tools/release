@@ -44,7 +44,7 @@ def compute_version(current, next):
 def bump_npmpkg_versions(version):
     stdout = subprocess.check_output(
         ["npm", "--no-git-tag-version", "version", version],
-         cwd=dir, encoding="utf-8"
+        encoding="utf-8"
     ).rstrip()
 
     if stdout != version:
