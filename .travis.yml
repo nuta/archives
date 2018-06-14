@@ -2,37 +2,53 @@ language: node_js
 
 linux_addons: &linux_addons
   apt:
-    packages:
-      - "git"
-      - "wget"
-      - "make"
-      - "flex"
-      - "bison"
-      - "gperf"
-      - "python"
-      - "libncurses-dev"
-      - "python-serial"
 
-matrix:
+
+jobs:
   include:
-    - os: linux
+    - stage: test
+      os: linux
       node_js: "10"
-      addons: *linux_addons
-    - os: linux
-      node_js: "8"
-      addons: *linux_addons
+      install:
+        - yarn
+      script:
+        - yarn build
+        - yarn coverage
+      addons:
+        apt:
+          packages:
+            - "git"
+            - "wget"
+            - "make"
+            - "flex"
+            - "bison"
+            - "gperf"
+            - "python"
+            - "libncurses-dev"
+            - "python-serial"
+
     - os: osx
       osx_image: xcode9.3
       node_js: "10"
+      install:
+        - yarn
+      script:
+        - yarn build
+        - yarn coverage
+      after_script:
+        - yarn global add codeclimate-test-reporter
+        - yarn nyc report --reporter=text-lcov | codeclimate-test-reporter
 
-install:
-  - yarn
-script:
-  - yarn build
-  - yarn coverage
-after_script:
-  - yarn global add codeclimate-test-reporter
-  - if [[ $TRAVIS_OS_NAME = "osx" ]]; then yarn nyc report --reporter=text-lcov | codeclimate-test-reporter; fi
+    - stage: release
+      script: skip
+      deploy:
+        provider: npm
+        email: nuta@seiya.me
+        api_key: "$NPM_API_KEY"
+        skip_cleanup: true
+        on:
+          tags: true
+
 cache:
   yarn: true
   directories:
