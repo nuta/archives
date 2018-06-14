@@ -35,7 +35,7 @@ export default class HttpAdapter extends Plugin {
                 return;
             }
 
-            res.sendFile(path.resolve(`./firmware.${boardType}.bin`));
+            res.sendFile(path.resolve(`./${boardType}.firmware`));
         };
 
         // cloud

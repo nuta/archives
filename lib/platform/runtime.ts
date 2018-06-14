@@ -122,7 +122,7 @@ export abstract class PlatformRuntime {
                     }
 
                     // TODO: remove this
-                    const firmwarePath = path.resolve(`firmware.${device.state.board}.bin`);
+                    const firmwarePath = path.resolve(`${device.state.board}.firmware`);
                     const firmwareImage = fs.readFileSync(firmwarePath);
                     const appVersion = getFirmwareVersion(firmwareImage);
 

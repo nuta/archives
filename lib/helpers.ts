@@ -4,7 +4,7 @@ import * as path from "path";
 import { logger } from "./logger";
 
 export function generateRandomVersion(): number {
-    return process.hrtime()[0] % 4200000000;
+    return Math.floor(Math.random() * 1000000000);
 }
 
 export function loadConfig(appDir: string, env: string) {
