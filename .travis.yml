@@ -40,6 +40,7 @@ jobs:
         - yarn nyc report --reporter=text-lcov | codeclimate-test-reporter
 
     - stage: release
+      install: skip
       script: skip
       deploy:
         provider: npm
