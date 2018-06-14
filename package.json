@@ -85,6 +85,7 @@
   },
   "homepage": "https://github.com/seiyanuta/makestack#readme",
   "files": [
+      "makestack",
       "dist",
       "lib",
       "tools"
