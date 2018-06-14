@@ -1,8 +1,5 @@
 language: node_js
 
-linux_addons: &linux_addons
-  apt:
-
 
 jobs:
   include:
@@ -40,6 +37,7 @@ jobs:
         - yarn nyc report --reporter=text-lcov | codeclimate-test-reporter
 
     - stage: release
+      node_js: "10"
       install: skip
       script: skip
       deploy:
