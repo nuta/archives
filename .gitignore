@@ -1,5 +1,6 @@
 *.o
 *.log
+*.tgz
 dist
 coverage
 .nyc_output

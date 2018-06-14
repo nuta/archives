@@ -48,6 +48,7 @@
     "typescript": "^2.9.1"
   },
   "scripts": {
+    "prepack": "npm run build",
     "build": "tsc",
     "dev": "tsc -w",
     "test": "mocha",
@@ -82,5 +83,10 @@
   "bugs": {
     "url": "https://github.com/seiyanuta/makestack/issues"
   },
-  "homepage": "https://github.com/seiyanuta/makestack#readme"
+  "homepage": "https://github.com/seiyanuta/makestack#readme",
+  "files": [
+      "dist",
+      "lib",
+      "tools"
+  ]
 }
