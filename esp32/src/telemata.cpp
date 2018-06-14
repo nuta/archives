@@ -63,6 +63,7 @@ TelemataClient::TelemataClient(const char *device_name)
     : log_length(0),
       log_index(0),
       config(),
+      first_send(true),
       device_name(device_name) {
     log_allocated_length = 2048;
     log_buffer = (char *) malloc(log_allocated_length);
@@ -207,6 +208,7 @@ void TelemataClient::send() {
                    strlen((char *) device_name));
 
     struct device_state_msg device_state;
+    device_state.state = first_send ? DEVICE_BOOTED : DEVICE_RUNNING;
     device_state.type = DEVICE_TYPE_ESP32;
     device_state.version = APP_VERSION;
     device_state.ram_free = esp_get_free_heap_size();
@@ -227,6 +229,8 @@ void TelemataClient::send() {
 
     send_payload((void *) ptr, 1 + len_len + payload.length());
     free(ptr);
+
+    first_send = false;
 }
 
 void TelemataClient::set_command_callback(void (*callback)(const char *name, const char *arg)) {

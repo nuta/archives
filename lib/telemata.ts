@@ -144,8 +144,9 @@ export function deserialize(payload: Buffer) {
             }
             case SMMS_DEVICE_STATE_MSG: {
                 messages.deviceState = {
-                    board: getBoardNameByDeviceType(data.readUInt8(2)),
-                    battery: (data.readUInt8(3) > 0xf0) ? null : data.readUInt8(3),
+                    state: (data.readUInt8(0) == 1) ? "booted" : "running",
+                    board: getBoardNameByDeviceType(data.readUInt8(1)),
+                    battery: (data.readUInt8(3) > 0xf0) ? null : data.readUInt8(2),
                     version: data.readUInt32LE(4),
                     ram_free: data.readUInt32LE(8),
                 }
@@ -189,6 +190,12 @@ export async function process(payload: Buffer): Promise<Device> {
     const device = await Device.getByName(deviceName);
     device.state = deviceState;
     const { events } = parseLog(log || "");
+
+    if (deviceState.state === "booted") {
+        for (const callback of callbacks.boot) {
+            callback(device);
+        }
+    }
 
     for (const callback of callbacks.heartbeat) {
         callback(device);

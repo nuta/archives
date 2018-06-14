@@ -14,24 +14,27 @@ int parse_variable_length(uint8_t *buf, int buf_length, int *length);
 #define TELEMATA_DEVICE_STATE_MSG 0x03
 #define TELEMATA_UPDATE_MSG       0x0a
 #define TELEMATA_COMMAND_MSG      0x0b
+#define DEVICE_BOOTED 1
+#define DEVICE_RUNNING 2
 #define DEVICE_TYPE_ESP32 1
 
 struct device_state_msg {
-    uint8_t reserved[2];
+    uint8_t state;
     uint8_t type;
     uint8_t battery;
+    uint8_t reserved;
     uint32_t version;
     uint32_t ram_free;
 } __attribute__((packed));
 
 class TelemataClient {
 private:
-    int state;
     char *log_buffer;
     int log_length;
     int log_index;
     int log_allocated_length;
     std::map<std::string, void *> config;
+    bool first_send;
     void (*command_callback)(const char *name, const char *arg);
 
     virtual void send_payload(const void *payload, size_t length) = 0;
