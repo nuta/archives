@@ -25,7 +25,7 @@ export class Command extends CommandBase {
             cwd: opts.appDir,
             env: Object.assign({}, process.env, {
                 // This points to node_modules or the repo directory.
-                NODE_PATH: path.resolve(__dirname, "../../../.."),
+                NODE_PATH: path.resolve(__dirname, "../../.."),
                 MAKESTACK_PLATFORM: "local",
             }),
         };

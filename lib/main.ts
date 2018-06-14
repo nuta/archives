@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { commands } from "./commands";
 import { logger } from "./logger";
-const { version } = require("../../package.json");
+const { version } = require(path.resolve(__dirname, "../package.json"));
 
 caporal.version(version);
 

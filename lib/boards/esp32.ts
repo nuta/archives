@@ -9,7 +9,7 @@ import { loadPlugins } from "../plugins";
 import { Board, InstallConfig } from "../types";
 import { execCmd } from "../helpers";
 const Gauge = require("gauge");
-const packageJson = require("../../../package.json");
+const packageJson = require(path.resolve(__dirname, "../../package.json"));
 
 function make(isReleaseBuild: boolean, version: number, esp32Dir: string): Promise<any> {
     return new Promise((resolve, reject) => {

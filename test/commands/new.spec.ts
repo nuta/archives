@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import * as mockfs from "mock-fs";
 import { expect } from "chai";
-import { main } from "../..";
+import { main } from "../../lib";
 
 describe("new command", function() {
     beforeEach(function() {

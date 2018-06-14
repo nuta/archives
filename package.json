@@ -2,8 +2,8 @@
   "name": "makestack",
   "version": "1.0.0",
   "description": "A minimalistic IoT framework for super-rapid prototyping.",
-  "main": "dist/lib/index.js",
-  "typings": "dist/lib/index.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "bin": {
     "makestack": "makestack"
   },

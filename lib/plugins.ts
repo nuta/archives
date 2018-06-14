@@ -18,7 +18,7 @@ export class Plugin {
 }
 
 function getBuiltinPlugins(): string[] {
-    const builtinPluginsDir = path.resolve(__dirname, "../../plugins");
+    const builtinPluginsDir = path.resolve(__dirname, "../lib/plugins");
 
     return fs.readdirSync(builtinPluginsDir).map((name) => {
         return path.join(builtinPluginsDir, name);
@@ -70,8 +70,8 @@ export function instantiatePlugins(plugins: string[]): Plugin[] {
         let ctor;
         const name = path.basename(plugin.name); // Remove `@makestack/' prefix.
         if (builtinPlugins.includes(name)) {
-            /* Load from dist/plugins */
-            ctor = require(path.resolve(__dirname, "../plugins/" + name)).default as any;
+            /* a builtin plugin */
+            ctor = require(path.resolve(__dirname, "./plugins/" + name)).default as any;
         } else {
             ctor = require(plugin.dir).default as any;
         }

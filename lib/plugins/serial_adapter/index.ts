@@ -1,8 +1,8 @@
 import * as SerialPort from "serialport";
-import { Plugin, AdapterCallback } from "../../lib/plugins";
-import { parseVariableLength } from "../../lib/telemata";
-import { guessSerialFilePath } from "../../lib/helpers";
-import { logger } from "../../lib/logger";
+import { Plugin, AdapterCallback } from "../../plugins";
+import { parseVariableLength } from "../../telemata";
+import { guessSerialFilePath } from "../../helpers";
+import { logger } from "../../logger";
 
 const PACKET_HEADER = Buffer.from([0xaa, 0xab, 0xff]);
 

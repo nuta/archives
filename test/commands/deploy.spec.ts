@@ -4,7 +4,7 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import * as childProcess from "child_process";
 import { expect } from "chai";
-import { main } from "../..";
+import { main } from "../../lib";
 
 describe("deploy command", function() {
     beforeEach(async function() {

@@ -2,10 +2,10 @@ import * as path from "path";
 import * as fs from "fs-extra";
 import * as express from "express";
 import { Request, Response } from "express";
-import { Plugin, AdapterCallback } from "../../lib/plugins";
-import { parseVariableLength } from "../../lib/telemata";
-import { createFirmwareImage } from "../../lib/firmware";
-import { logger } from "../../lib/logger";
+import { Plugin, AdapterCallback } from "../../plugins";
+import { parseVariableLength } from "../../telemata";
+import { createFirmwareImage } from "../../firmware";
+import { logger } from "../../logger";
 
 export default class HttpAdapter extends Plugin {
     receivedCallback?: AdapterCallback;

@@ -53,8 +53,8 @@ export class FirebasePlatformSdk extends PlatformSdk {
 
         const projDir = path.join(appDir, "build/deploy");
         const pkgDir = path.join(appDir, "build/deploy/functions");
-        const pluginsDir = path.resolve(__dirname, "../../../../plugins");
-        const packageJsonPath = path.resolve(__dirname, "../../../../package.json");
+        const pluginsDir = path.resolve(__dirname, "../plugins");
+        const packageJsonPath = path.resolve(__dirname, "../../../package.json");
         const packageJson = this.preparePackageJsonForDeploy(packageJsonPath, projDir, appDir);
 
         fs.mkdirpSync(pkgDir);
@@ -74,7 +74,7 @@ export class FirebasePlatformSdk extends PlatformSdk {
         execCmd([
             "yarn", "run", "babel", "--presets=es2015,stage-3",
             "--out-dir", path.join(pkgDir, "makestack/dist"),
-            path.resolve(__dirname, "../../../../dist"),
+            path.resolve(__dirname, "../../../dist"),
         ], { cwd: pkgDir });
 
         logger.progress("firebase deploy (it may takes long)");
