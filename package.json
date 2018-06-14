@@ -1,6 +1,6 @@
 {
   "name": "makestack",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A minimalistic IoT framework for super-rapid prototyping.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
