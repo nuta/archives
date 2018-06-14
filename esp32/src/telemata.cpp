@@ -49,7 +49,7 @@ class TelemataPayloadBuilder {
 
     static int fill_variable_length(uint8_t *buf, int buf_length, int length) {
         int i = 0;
-        for (; i < buf_length && i < length; i++) {
+        for (; i < buf_length && length > 0; i++) {
             int digit = length % 0x80;
             length = length / 0x80;
             buf[i] = (uint8_t)((length > 0) ? 0x80 : 0) | digit;
