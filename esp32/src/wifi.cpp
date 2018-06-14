@@ -168,7 +168,6 @@ void update_firmware(WiFiClient *client) {
         return;
     }
 
-    printf("recievd: %x %s\n", header.magic[0], (char *) &header);
     if (header.magic[0] != 0x81 || header.magic[1] != 0xf1
         || header.magic[2] != 0x5c || header.magic[3] != 0x5e) {
         printf("invalid firmware signature\n");

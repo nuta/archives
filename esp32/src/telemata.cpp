@@ -183,7 +183,7 @@ int TelemataClient::receive_payload(const void *payload, size_t payload_length) 
 #else
                 if (APP_VERSION > version) {
 #endif
-                    INFO("Time to update!\n");
+                    INFO("Time to update! (%d -> %d)\n", APP_VERSION, version);
                     download_app(version);
                 }
 
@@ -201,20 +201,10 @@ next_message:
 }
 
 void TelemataClient::send() {
-    int include_device_name = 1; // FIXME
-
     TelemataPayloadBuilder payload;
 
-    if (include_device_name) {
-        payload.append(TELEMATA_DEVICE_NAME_MSG, (void *) device_name,
-                       strlen((char *) device_name));
-    }
-
-    if (log_length > 0) {
-        payload.append(TELEMATA_LOG_MSG, log_buffer, log_length);
-        log_index = 0;
-        log_length = 0;
-    }
+    payload.append(TELEMATA_DEVICE_NAME_MSG, (void *) device_name,
+                   strlen((char *) device_name));
 
     struct device_state_msg device_state;
     device_state.type = DEVICE_TYPE_ESP32;
@@ -223,6 +213,11 @@ void TelemataClient::send() {
     device_state.battery = 0xf0; /* Unsupported */
     payload.append(TELEMATA_DEVICE_STATE_MSG, &device_state, sizeof(device_state));
 
+    if (log_length > 0) {
+        payload.append(TELEMATA_LOG_MSG, log_buffer, log_length);
+        log_index = 0;
+        log_length = 0;
+    }
     // Construct the header.
     uint8_t *ptr = (uint8_t *) malloc(1 + 4 + payload.length());
     ptr[0] = TELEMATA_VERSION << 4;
