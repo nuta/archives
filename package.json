@@ -1,6 +1,6 @@
 {
   "name": "makestack",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimalistic IoT framework for super-rapid prototyping.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -85,9 +85,9 @@
   },
   "homepage": "https://github.com/seiyanuta/makestack#readme",
   "files": [
-      "makestack",
-      "dist",
-      "lib",
-      "tools"
+    "makestack",
+    "dist",
+    "lib",
+    "tools"
   ]
 }
