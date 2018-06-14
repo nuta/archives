@@ -38,7 +38,7 @@ jobs:
 
     - stage: release
       node_js: "10"
-      install: skip
+      install: yarn
       script: skip
       deploy:
         provider: npm
