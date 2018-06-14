@@ -13,6 +13,9 @@ const packageJson = require("../../../package.json");
 
 function make(isReleaseBuild: boolean, version: number, esp32Dir: string): Promise<any> {
     return new Promise((resolve, reject) => {
+        // Update src/component.mk to force rebuild to embed new APP_VERSION.
+        execCmd(["touch", path.join(esp32Dir, "src/component.mk")]);
+
         const makeExecutable = "/usr/bin/make";
         const procs = os.cpus().length;
         const args = [`-j${procs}`];
