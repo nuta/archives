@@ -177,7 +177,7 @@ export function parseLog(log: string): any {
     for (const line of log.split("\n")) {
         const match = eventRegex.exec(line);
         if (match) {
-            events.push({ name: match[0], value: match[1] });
+            events.push({ name: match[1], value: match[2] });
         }
     }
 
@@ -201,13 +201,13 @@ export async function process(payload: Buffer): Promise<Device> {
         callback(device);
     }
 
-    for (const { event, value } of events) {
-        const callback = callbacks.event[event];
+    for (const { name, value } of events) {
+        const callback = callbacks.event[name];
         if (!callback) {
             continue;
         }
 
-        callback(device, event, value);
+        callback(device, name, value);
     }
 
     return device;
