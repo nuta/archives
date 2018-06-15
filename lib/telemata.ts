@@ -207,7 +207,7 @@ export async function process(payload: Buffer): Promise<Device> {
             continue;
         }
 
-        callback(device, name, value);
+        callback(device, value);
     }
 
     return device;

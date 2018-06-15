@@ -4,7 +4,7 @@ import { Device } from "./device";
 export type HTTPCallback = (req: Request, res: Response) => void;
 export type BootCallback = (device: Device) => void;
 export type HeartbeatCallback = (device: Device) => void;
-export type EventCallback = (device: Device, event: string, value: any) => void;
+export type EventCallback = (device: Device, value: any) => void;
 
 export const endpoints: { [name: string]: HTTPCallback } = {};
 export const callbacks = {
