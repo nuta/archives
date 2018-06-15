@@ -23,6 +23,7 @@ void println(const char *fmt, ...) {
     vsnprintf((char *) &buf, sizeof(buf), fmt, vargs);
     telemata->append_log((char *) &buf);
     telemata->append_log('\n');
+    printf("%s\n", (char *) &buf);
     va_end(vargs);
 }
 
@@ -35,6 +36,7 @@ void publish(const char *event, char *value) {
     }
 
     sprintf((char *) &buf, "@%s %s", event, value);
+    printf("%s\n", (char *) &buf);
     telemata->append_log((char *) &buf);
 }
 
