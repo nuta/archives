@@ -27,6 +27,10 @@ const PACKAGE_JSON_TMPL = `\
 {
     "private": true,
     "makestack": {
+        "production": {
+            "platform": "firebase",
+            "firebaseProject": "YOUR_FIREBASE_PROJECT"
+        },
         "plugins": ["http_adapter"],
         "devPlugins": ["serial_adapter", "http_adapter"]
     }
