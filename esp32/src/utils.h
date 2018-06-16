@@ -25,7 +25,7 @@ static inline void to_be32(uint8_t *p, uint32_t v) {
 
 static inline void hexdump(uint8_t *p, size_t length) {
     for (size_t i = 0; i < length; i++) {
-        if (i % 16 == 0) {
+        if (i > 0 && i % 16 == 0) {
             printf("\n");
         }
 
