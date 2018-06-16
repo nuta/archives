@@ -1,14 +1,14 @@
-import * as path from "path";
-import * as fs from "fs-extra";
+import { EWOULDBLOCK } from "constants";
 import * as express from "express";
 import { Request, Response } from "express";
-import { Plugin, AdapterCallback } from "../../plugins";
-import { parseVariableLength } from "../../telemata";
-import { createFirmwareImage } from "../../firmware";
-import { logger } from "../../logger";
-import { EWOULDBLOCK } from "constants";
+import * as fs from "fs-extra";
+import * as path from "path";
 import * as request from "request-promise";
 import { Device } from "../..";
+import { createFirmwareImage } from "../../firmware";
+import { logger } from "../../logger";
+import { AdapterCallback, Plugin } from "../../plugins";
+import { parseVariableLength } from "../../telemata";
 
 function unhexlify(value: string): Buffer {
     let buf = Buffer.alloc(0);
@@ -25,16 +25,16 @@ function hexlify(value: Buffer): string {
 }
 
 export default class SakuraioAdapter extends Plugin {
-    receivedCallback?: AdapterCallback;
+    public receivedCallback?: AdapterCallback;
 
-    async sendPayload(payload: Buffer): Promise<void> {
+    public async sendPayload(payload: Buffer): Promise<void> {
     }
 
-    receivePayload(callback: AdapterCallback) {
+    public receivePayload(callback: AdapterCallback) {
         this.receivedCallback = callback;
     }
 
-    async push(moduleId: string, payload: Buffer) {
+    public async push(moduleId: string, payload: Buffer) {
         const BYTES_PER_CHANNEL = 8;
 
         const hexlified = hexlify(payload);
@@ -46,15 +46,15 @@ export default class SakuraioAdapter extends Plugin {
         }
 
         // [..., "AABBCCDD"] => [..., "AABBCCDD00000000"]
-        data[data.length - 1] = data[data.length - 1].padEnd(8 * 2, '0');
+        data[data.length - 1] = data[data.length - 1].padEnd(8 * 2, "0");
 
         const channels: any[] = data.map((datum, index) => {
             return {
                 channel: index,
                 type: "b",
                 value: datum,
-            }
-        })
+            };
+        });
 
         // Commit
         channels.push({ channel: 16, type: "i", value: 0x55aa });
@@ -63,7 +63,7 @@ export default class SakuraioAdapter extends Plugin {
             type: "channels",
             module: moduleId,
             payload: { channels },
-        }
+        };
 
         try {
             await request({
@@ -77,7 +77,7 @@ export default class SakuraioAdapter extends Plugin {
         }
     }
 
-    server(httpServer: express.Express) {
+    public server(httpServer: express.Express) {
         const telemataHandler = async (req: Request, res: Response) => {
             if (!this.receivedCallback) {
                 throw new Error("received callback is not set");
@@ -89,7 +89,6 @@ export default class SakuraioAdapter extends Plugin {
                 res.status(200);
                 return;
             }
-
 
             let i = 0;
             let payload = Buffer.alloc(0);

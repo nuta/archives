@@ -1,11 +1,11 @@
+import * as EventEmitter from "events";
 import * as fs from "fs-extra";
 import * as path from "path";
-import * as EventEmitter from "events";
 import * as readline from "readline";
-import { PlatformSdk } from "../sdk";
-import { DeployOptions } from "../../types";
-import { execCmdWithPipe, execCmd } from "../../helpers";
+import { execCmd, execCmdWithPipe } from "../../helpers";
 import { logger } from "../../logger";
+import { DeployOptions } from "../../types";
+import { PlatformSdk } from "../sdk";
 const { blue } = require("chalk");
 
 const FIREBASE_JSON_TMPL = JSON.stringify({
@@ -24,7 +24,7 @@ const FIREBASE_JSON_TMPL = JSON.stringify({
 });
 
 export class FirebasePlatformSdk extends PlatformSdk {
-    async command(deviceName: string, command: string, arg: string): Promise<any> {
+    public async command(deviceName: string, command: string, arg: string): Promise<any> {
         // TODO
         return {};
     }
@@ -46,7 +46,7 @@ export class FirebasePlatformSdk extends PlatformSdk {
         };
     }
 
-    async deploy(appDir: string, opts: DeployOptions) {
+    public async deploy(appDir: string, opts: DeployOptions) {
         if (!opts.firebaseProject) {
             throw new Error("--firebase-project is not set.");
         }

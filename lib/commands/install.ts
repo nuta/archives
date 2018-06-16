@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as inquirer from "inquirer";
 import * as path from "path";
 import { board } from "../boards";
-import { Args, CommandBase, Opts, constructEnvOption } from "../cli";
+import { Args, CommandBase, constructEnvOption, Opts } from "../cli";
 import { downloadRepo, generateRandomVersion } from "../helpers";
 import { logger } from "../logger";
 import { InstallConfig } from "../types";

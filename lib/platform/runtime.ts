@@ -2,12 +2,12 @@ import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as fs from "fs-extra";
 import * as path from "path";
+import { Device } from "../device";
 import { getFirmwareVersion } from "../firmware";
 import { logger } from "../logger";
 import { instantiatePlugins } from "../plugins";
 import { endpoints } from "../server";
 import * as telemata from "../telemata";
-import { Device } from "../device";
 import { DeviceData } from "../types";
 
 function basicAuthMiddleware(req: express.Request, res: express.Response, next: Function) {
@@ -51,7 +51,6 @@ function basicAuthMiddleware(req: express.Request, res: express.Response, next: 
     next();
 }
 
-
 function rawBodyMiddleware(req: any, res: express.Response, next: Function) {
     req.rawBody = Buffer.alloc(0);
 
@@ -63,7 +62,6 @@ function rawBodyMiddleware(req: any, res: express.Response, next: Function) {
         next();
     });
 }
-
 
 export abstract class PlatformRuntime {
     public httpServer: express.Express;
@@ -98,7 +96,6 @@ export abstract class PlatformRuntime {
         if (!config) {
             throw new Error("Specify makestack.plugins and makestack.devPlugins in package.json");
         }
-
 
         let requiredPlugins = config.plugins || [];
         if (!process.env.MAKESTACK_PRODUCTION) {

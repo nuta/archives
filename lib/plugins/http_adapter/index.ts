@@ -1,23 +1,23 @@
-import * as path from "path";
-import * as fs from "fs-extra";
 import * as express from "express";
 import { Request, Response } from "express";
-import { Plugin, AdapterCallback } from "../../plugins";
-import { parseVariableLength } from "../../telemata";
+import * as fs from "fs-extra";
+import * as path from "path";
 import { createFirmwareImage } from "../../firmware";
 import { logger } from "../../logger";
+import { AdapterCallback, Plugin } from "../../plugins";
+import { parseVariableLength } from "../../telemata";
 
 export default class HttpAdapter extends Plugin {
-    receivedCallback?: AdapterCallback;
+    public receivedCallback?: AdapterCallback;
 
-    async sendPayload(payload: Buffer): Promise<void> {
+    public async sendPayload(payload: Buffer): Promise<void> {
     }
 
-    receivePayload(callback: AdapterCallback) {
+    public receivePayload(callback: AdapterCallback) {
         this.receivedCallback = callback;
     }
 
-    server(httpServer: express.Express) {
+    public server(httpServer: express.Express) {
         const telemataHandler = async (req: Request, res: Response) => {
             if (!this.receivedCallback) {
                 throw new Error("received callback is not set");

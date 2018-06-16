@@ -1,6 +1,6 @@
-import { DeviceData } from "./types";
 import { getRuntimeInstance } from "./platform/index";
 import { PlatformRuntime } from "./platform/runtime";
+import { DeviceData } from "./types";
 
 function isDeepEqual(obj1: object, obj2: object) {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
@@ -23,7 +23,7 @@ export interface DeviceState {
     board: BoardType;
     ramFree?: number;
     battery?: number;
-};
+}
 
 export class Device {
     public name: string;

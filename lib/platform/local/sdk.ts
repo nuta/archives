@@ -4,7 +4,7 @@ import { logger } from "../../logger";
 import { PlatformSdk } from "../sdk";
 
 export class LocalPlatformSdk extends PlatformSdk {
-    async command(deviceName: string, command: string, arg: string): Promise<any> {
+    public async command(deviceName: string, command: string, arg: string): Promise<any> {
         return new Promise((resolve, reject) => {
             const sock = net.createConnection(path.join("dev.sock"));
 
@@ -41,12 +41,11 @@ export class LocalPlatformSdk extends PlatformSdk {
         });
     }
 
-    async viewLog() {
+    public async viewLog() {
         throw new Error("log command is not available in local platform");
     }
 
-    async deploy() {
+    public async deploy() {
         throw new Error("deploy command is not available in local platform");
     }
 }
-

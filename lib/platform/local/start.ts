@@ -1,6 +1,6 @@
-import { LocalPlatformRuntime } from "./runtime";
-import { logger } from "../../logger";
 import { getRuntimeInstance } from "..";
+import { logger } from "../../logger";
+import { LocalPlatformRuntime } from "./runtime";
 
 function main() {
     const host = process.env.HOST || "0.0.0.0";

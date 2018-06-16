@@ -3,7 +3,7 @@ import * as child_process from "child_process";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { board } from "../boards";
-import { Args, CommandBase, Opts, constructEnvOption } from "../cli";
+import { Args, CommandBase, constructEnvOption, Opts } from "../cli";
 import { downloadRepo, loadConfig } from "../helpers";
 import { logger } from "../logger";
 import { getSdkInstance } from "../platform";

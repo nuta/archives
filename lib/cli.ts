@@ -9,7 +9,7 @@ export function constructEnvOption(defaultValue: "development" | "production") {
         desc: "The environment.",
         default: defaultValue,
         validator: ["development", "production"],
-    }
+    };
 }
 
 export type Validator

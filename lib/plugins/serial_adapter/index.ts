@@ -1,15 +1,15 @@
 import * as SerialPort from "serialport";
-import { Plugin, AdapterCallback } from "../../plugins";
-import { parseVariableLength } from "../../telemata";
 import { guessSerialFilePath } from "../../helpers";
 import { logger } from "../../logger";
+import { AdapterCallback, Plugin } from "../../plugins";
+import { parseVariableLength } from "../../telemata";
 
 const PACKET_HEADER = Buffer.from([0xaa, 0xab, 0xff]);
 
 async function sleep(ms: number): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         setTimeout(() => resolve(), ms);
-    })
+    });
 }
 
 export default class SerialAdapter extends Plugin {
@@ -19,14 +19,14 @@ export default class SerialAdapter extends Plugin {
 
         const serialFilePath = process.env.SERIAL || guessSerialFilePath();
         if (!serialFilePath) {
-            logger.warn("Failed to open a serial device file. Disabling the serial adapter plugin.")
+            logger.warn("Failed to open a serial device file. Disabling the serial adapter plugin.");
             return;
         }
 
         this.serial = new SerialPort(serialFilePath, { baudRate: 115200 });
     }
 
-    async sendChunk(chunk: Buffer): Promise<void> {
+    public async sendChunk(chunk: Buffer): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             if (!this.serial) {
                 resolve();
@@ -35,16 +35,16 @@ export default class SerialAdapter extends Plugin {
 
             this.serial.write(chunk, (error, len) => {
                 if (error) {
-                    console.error('serialport returned error:', error);
+                    console.error("serialport returned error:", error);
                     reject(error);
                 } else {
                     resolve();
                 }
             });
-        })
+        });
     }
 
-    async sendPayload(payload: Buffer): Promise<void> {
+    public async sendPayload(payload: Buffer): Promise<void> {
         const data = Buffer.concat([PACKET_HEADER, payload]);
 
         let i = 0;
@@ -56,20 +56,21 @@ export default class SerialAdapter extends Plugin {
             }
 
             await this.sendChunk(chunk);
-            if (i == 0)
-                await sleep(3000);// ota_begin takes long
+            if (i == 0) {
+                await sleep(3000);
+            }// ota_begin takes long
             await sleep(300);
             i++;
         }
     }
 
-    receivePayload(callback: AdapterCallback) {
+    public receivePayload(callback: AdapterCallback) {
         if (!this.serial) {
             return;
         }
 
         let buf = Buffer.alloc(0);
-        this.serial.on('data', (data: Buffer) => {
+        this.serial.on("data", (data: Buffer) => {
             buf = Buffer.concat([buf, data]);
 
             const offset = buf.indexOf(PACKET_HEADER);
@@ -84,6 +85,6 @@ export default class SerialAdapter extends Plugin {
                 process.stdout.write(buf);
                 buf = Buffer.alloc(0);
             }
-        })
+        });
     }
 }

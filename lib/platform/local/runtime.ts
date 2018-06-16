@@ -1,13 +1,13 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as fs from "fs-extra";
+import * as net from "net";
 import * as path from "path";
+import { Device } from "../../device";
 import { getFirmwareVersion } from "../../firmware";
 import { logger } from "../../logger";
 import { endpoints } from "../../server";
 import * as telemata from "../../telemata";
-import * as net from "net";
-import { Device } from "../../device";
 import { DeviceData } from "../../types";
 import { PlatformRuntime } from "../runtime";
 
@@ -18,7 +18,7 @@ export interface LocalRequest {
         device: string;
         arg: string;
     };
-};
+}
 
 export class LocalPlatformRuntime extends PlatformRuntime {
     private devices: { [deviceName: string]: DeviceData };

@@ -149,7 +149,7 @@ export function deserialize(payload: Buffer) {
                     battery: (data.readUInt8(3) > 0xf0) ? null : data.readUInt8(2),
                     version: data.readUInt32LE(4),
                     ram_free: data.readUInt32LE(8),
-                }
+                };
                 break;
             }
             case SMMS_DEVICE_NAME_MSG:

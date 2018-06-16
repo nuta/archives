@@ -1,13 +1,13 @@
 import { spawn, spawnSync, SpawnSyncReturns } from "child_process";
+import * as ejs from "ejs";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
-import * as ejs from "ejs";
 import { createFirmwareImage, CREDENTIALS_DATA_TEMPLATE, embedCredentials } from "../firmware";
+import { execCmd } from "../helpers";
 import { logger } from "../logger";
 import { loadPlugins } from "../plugins";
 import { Board, InstallConfig } from "../types";
-import { execCmd } from "../helpers";
 const Gauge = require("gauge");
 const packageJson = require(path.resolve(__dirname, "../../package.json"));
 
@@ -68,12 +68,12 @@ function make(isReleaseBuild: boolean, version: number, esp32Dir: string): Promi
 const COMPONENT_MK_TMPL = `\
 COMPONENT_OBJS := <%= objs.join(" ") %>
 CXXFLAGS += -fdiagnostics-color=always
-`
+`;
 
 export class Esp32Board extends Board {
     private copySources(plugins: string[], appDir: string, appComponentDir: string): string[] {
         const sources = [
-            path.join(appDir, "device.cc")
+            path.join(appDir, "device.cc"),
         ];
 
         // Get a list of plugin soruce files.
@@ -137,12 +137,12 @@ export class Esp32Board extends Board {
 
         // Copy app and plugin source files.
         fs.mkdirpSync(appComponentDir);
-        const objs = this.copySources(config.plugins, appDir, appComponentDir)
+        const objs = this.copySources(config.plugins, appDir, appComponentDir);
 
         // Generate component.mk
         fs.writeFileSync(
             path.join(appComponentDir, "component.mk"),
-            ejs.render(COMPONENT_MK_TMPL, { objs })
+            ejs.render(COMPONENT_MK_TMPL, { objs }),
         );
 
         await this.doBuild(isReleaseBuild, version, esp32Dir);

@@ -1,7 +1,7 @@
 // The entry point in Firebase Functions.
 require("babel-polyfill");
-import * as path from "path";
 import * as functions from "firebase-functions";
+import * as path from "path";
 
 process.env.MAKESTACK_PRODUCTION = "1";
 process.env.MAKESTACK_PLATFORM = "firebase";

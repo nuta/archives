@@ -1,9 +1,9 @@
-import { PlatformRuntime } from "./runtime";
-import { PlatformSdk } from "./sdk";
-import { LocalPlatformRuntime } from "./local/runtime";
-import { LocalPlatformSdk } from "./local/sdk";
 import { FirebasePlatformRuntime } from "./firebase/runtime";
 import { FirebasePlatformSdk } from "./firebase/sdk";
+import { LocalPlatformRuntime } from "./local/runtime";
+import { LocalPlatformSdk } from "./local/sdk";
+import { PlatformRuntime } from "./runtime";
+import { PlatformSdk } from "./sdk";
 
 let runtimeInstance: PlatformRuntime;
 
