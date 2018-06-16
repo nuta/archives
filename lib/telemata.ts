@@ -191,7 +191,7 @@ export async function process(payload: Buffer): Promise<Device> {
     device.state = deviceState;
     const { events } = parseLog(log || "");
 
-    if (deviceState.state === "booted") {
+    if (deviceState && deviceState.state === "booted") {
         for (const callback of callbacks.boot) {
             callback(device);
         }
