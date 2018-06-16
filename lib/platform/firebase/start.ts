@@ -11,7 +11,7 @@ process.env.NODE_PATH = __dirname;
 // Allow require("makestack") in the app's server program.
 require("module").Module._initPaths();
 
-const { getRuntimeInstance } = require(path.resolve(__dirname, "./makestack/dist/lib/platform/index"));
+const { getRuntimeInstance } = require(path.resolve(__dirname, "./makestack/dist/platform/index"));
 const platform = getRuntimeInstance();
 platform.init();
 export const makestack = functions.https.onRequest(platform.httpServer);

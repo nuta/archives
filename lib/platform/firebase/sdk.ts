@@ -53,15 +53,14 @@ export class FirebasePlatformSdk extends PlatformSdk {
 
         const projDir = path.join(appDir, "build/deploy");
         const pkgDir = path.join(appDir, "build/deploy/functions");
-        const pluginsDir = path.resolve(__dirname, "../plugins");
+        const pluginsDir = path.resolve(__dirname, "../../../lib/plugins");
         const packageJsonPath = path.resolve(__dirname, "../../../package.json");
-        const packageJson = this.preparePackageJsonForDeploy(packageJsonPath, projDir, appDir);
-
         fs.mkdirpSync(pkgDir);
+        const packageJson = this.preparePackageJsonForDeploy(packageJsonPath, projDir, appDir);
         fs.writeJsonSync(path.join(pkgDir, "package.json"), packageJson);
         fs.mkdirpSync(path.join(pkgDir, "makestack"));
         fs.copySync(packageJsonPath, path.join(pkgDir, "makestack/package.json"));
-        fs.copySync(path.join(pluginsDir), path.join(pkgDir, "makestack/plugins"));
+        fs.copySync(path.join(pluginsDir), path.join(pkgDir, "makestack/lib/plugins"));
         fs.copySync(path.join(appDir, "public"), path.join(projDir, "public"));
         fs.copySync(path.join(appDir, "server.js"), path.join(pkgDir, "server.js"));
         fs.copySync(path.join(appDir, "esp32.firmware"), path.join(pkgDir, "esp32.firmware"));
