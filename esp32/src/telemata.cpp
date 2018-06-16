@@ -158,7 +158,7 @@ int TelemataClient::receive_payload(const void *payload, size_t payload_length) 
 
         p += len_len;
         remaining -= len_len;
-
+        DEBUG("telemata: type=%d, len=%d", type, len);
         switch (type) {
             case TELEMATA_COMMAND_MSG: {
                 PARSE_KEY_VALUE_MSG(len);

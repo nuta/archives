@@ -10,11 +10,12 @@
 #include <sdkconfig.h>
 #include <stdio.h>
 #include <string.h>
+#include <makestack.h>
 #include "uart.h"
 #include "wifi.h"
+#include "sakuraio.h"
 #include "logger.h"
 #include "api.h"
-#include <makestack.h>
 
 esp_err_t system_event_callback(void *ctx, system_event_t *event) {
     if (event->event_id == SYSTEM_EVENT_STA_GOT_IP) {
@@ -34,7 +35,9 @@ struct credentials_struct {
 };
 
 struct credentials_struct *credentials = nullptr;
+WiFiTelemataClient *wifi_telemata = nullptr;
 UartTelemataClient *uart_telemata = nullptr;
+SakuraioTelemataClient *sakuraio_telemata = nullptr;
 TelemataClient *telemata = nullptr;
 
 void uart_adapter_send_task(void *param) {
@@ -51,9 +54,20 @@ void uart_adapter_task(void *param) {
 
 void wifi_adapter_heartbeat_task(void *param) {
     while (1) {
-        telemata->send();
+        wifi_telemata->send();
         vTaskDelay(3000 / portTICK_PERIOD_MS);
     }
+}
+
+void sakuraio_adapter_send_task(void *param) {
+    while (1) {
+        sakuraio_telemata->send();
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+    }
+}
+
+void sakuraio_adapter_recv_task(void *param) {
+    sakuraio_telemata->receive_forever();
 }
 
 void setup();
@@ -85,18 +99,30 @@ extern "C" void app_main() {
     spi_flash_read(0x291000, credentials, CREDENTIALS_SIZE);
 
     if (strcmp(credentials->network_adapter, "wifi") == 0) {
-        telemata = (TelemataClient *) new WiFiTelemataClient(
+        wifi_telemata = new WiFiTelemataClient(
             credentials->wifi_ssid, credentials->wifi_password,
             credentials->server_url, credentials->device_name
         );
+        telemata = (TelemataClient *) wifi_telemata;
 
-        xTaskCreate(&wifi_adapter_heartbeat_task, "heartbeat", 16 * 1024, NULL, 5, NULL);
+        // xTaskCreate(&wifi_adapter_heartbeat_task, "heartbeat", 16 * 1024, NULL, 5, NULL);
     } else if (strcmp(credentials->network_adapter, "serial") == 0) {
         uart_telemata = new UartTelemataClient();
         telemata = (TelemataClient *) uart_telemata;
         xTaskCreate(&uart_adapter_send_task, "uart_send", 16 * 1024, NULL, 5, NULL);
+    } else if (strcmp(credentials->network_adapter, "sakuraio") == 0) {
+        sakuraio_telemata = new SakuraioTelemataClient(credentials->device_name);
+        telemata = (TelemataClient *) sakuraio_telemata;
+        xTaskCreate(&sakuraio_adapter_send_task, "sakura_send", 16 * 1024, NULL, 5, NULL);
+        xTaskCreate(&sakuraio_adapter_recv_task, "sakura_recv", 16 * 1024, NULL, 5, NULL);
     }
 
     init_api();
+
+    if (strcmp(credentials->network_adapter, "sakuraio") == 0) {
+        // sakuraio adapter depends on Wire API, initialized in init_api().
+        sakuraio_telemata->connect();
+    }
+
     xTaskCreate(&app_task, "app", 16 * 1024, NULL, 5, NULL);
 }

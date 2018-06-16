@@ -1,0 +1,11 @@
+{
+    "private": true,
+    "makestack": {
+        "production": {
+            "platform": "firebase",
+            "firebaseProject": "YOUR_FIREBASE_PROJECT"
+        },
+        "plugins": ["sakuraio_adapter"],
+        "devPlugins": ["serial_adapter"]
+    }
+}

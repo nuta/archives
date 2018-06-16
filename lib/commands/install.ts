@@ -30,7 +30,7 @@ async function getOrAsk(opts: { [name: string]: string }, questions: inquirer.Qu
 
 async function getInstallConfigOrAsk(opts: { [name: string]: string }): Promise<InstallConfig> {
     const filled = await getOrAsk(opts, [
-        { name: "adapter", message: "The network adapter", type: "list", choices: ["wifi"] },
+        { name: "adapter", message: "The network adapter", type: "list", choices: ["wifi", "sakuraio"] },
         { name: "wifiSsid", message: "Wi-Fi SSID", type: "input" },
         { name: "wifiPassword", message: "Wi-Fi Password", type: "password" },
         { name: "serverUrl", message: "The server URL", type: "input" },
