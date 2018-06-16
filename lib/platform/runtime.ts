@@ -99,9 +99,10 @@ export abstract class PlatformRuntime {
             throw new Error("Specify makestack.plugins and makestack.devPlugins in package.json");
         }
 
-        const requiredPlugins = (process.env.MAKESTACK_PRODUCTION) ? config.plugins : config.devPlugins;
-        if (!requiredPlugins) {
-            throw new Error("Specify makestack.plugins and makestack.devPlugins in package.json");
+
+        let requiredPlugins = config.plugins || [];
+        if (!process.env.MAKESTACK_PRODUCTION) {
+            requiredPlugins = requiredPlugins.concat(config.devPlugins);
         }
 
         const plugins = instantiatePlugins(requiredPlugins);
