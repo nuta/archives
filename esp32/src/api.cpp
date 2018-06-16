@@ -56,6 +56,8 @@ void command_callback(const char *name, const char *arg) {
 }
 
 void init_api() {
+    Wire.begin();
+
     handlers = new std::map<std::string, command_handler_t>();
     telemata->set_command_callback(command_callback);
 }

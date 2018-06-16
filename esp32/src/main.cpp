@@ -60,7 +60,6 @@ void setup();
 void loop();
 
 void app_task(void *param) {
-    Wire.begin();
     setup();
 
     for (;;) {
@@ -95,7 +94,6 @@ extern "C" void app_main() {
     } else if (strcmp(credentials->network_adapter, "serial") == 0) {
         uart_telemata = new UartTelemataClient();
         telemata = (TelemataClient *) uart_telemata;
-        init_api();
         xTaskCreate(&uart_adapter_send_task, "uart_send", 16 * 1024, NULL, 5, NULL);
     }
 
