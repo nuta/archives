@@ -35,8 +35,8 @@ void publish(const char *event, char *value) {
         return;
     }
 
-    sprintf((char *) &buf, "@%s %s", event, value);
-    printf("%s\n", (char *) &buf);
+    sprintf((char *) &buf, "@%s %s\n", event, value);
+    printf("%s", (char *) &buf);
     telemata->append_log((char *) &buf);
 }
 
