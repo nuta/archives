@@ -1,7 +1,6 @@
 import "mocha";
 import * as sinon from "sinon";
 import * as path from "path";
-import { expect } from "chai";
 import { main } from "../../lib";
 import { board } from "../../lib/boards";
 import * as helpers from "../../lib/helpers";
