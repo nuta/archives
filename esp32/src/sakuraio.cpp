@@ -18,6 +18,8 @@
 #define CMD_RESULT_SUCCESS 0x01
 #define CMD_RESULT_PROCESSING 0x07
 #define CMD_GET_CONNECTION_STATUS 0x01
+#define CMD_GET_SIGNAL_QUALITY 0x02
+#define CMD_GET_DATE_TIME 0x03
 #define CMD_START_FILE_DOWNLOAD 0x40
 #define CMD_GET_FILE_METADATA 0x41
 #define CMD_GET_DOWNLOAD_STATUS 0x42
@@ -29,6 +31,12 @@
 #define CMD_FLUSH_RX_QUEUE 0x33
 #define FILE_CHUNK_SIZE 64
 #define GET_FILE_DATA_RETIES_MAX 30
+#define SIGNAL_QUALITY_NO_SIGNAL 0
+#define SIGNAL_QUALITY_FAINT 1
+#define SIGNAL_QUALITY_POOR 2
+#define SIGNAL_QUALITY_FAIR 3
+#define SIGNAL_QUALITY_GOOD 4
+#define SIGNAL_QUALITY_EXCELLENT 5
 #define APP_IMAGE_FILEID 1
 
 SakuraioTelemataClient::SakuraioTelemataClient(const char *device_name)
@@ -46,13 +54,46 @@ void SakuraioTelemataClient::connect() {
     }
 
     connected = true;
-    INFO("connected to sakura.io");
+    INFO("sakura.io: connected (connection %s)", get_signal_quality_name());
+    INFO("sakura.io: datetime %lld", get_date_time());
 }
 
 uint8_t SakuraioTelemataClient::get_connection_status() {
     uint8_t resp[1];
-    send_command(CMD_GET_CONNECTION_STATUS, nullptr, 0, resp, sizeof(resp));
+    send_command(CMD_GET_CONNECTION_STATUS, nullptr, 0, (uint8_t *) &resp, sizeof(resp));
     return resp[0];
+}
+
+uint8_t SakuraioTelemataClient::get_signal_quality() {
+    uint8_t quality;
+    send_command(CMD_GET_SIGNAL_QUALITY, nullptr, 0, &quality, sizeof(quality));
+    return quality;
+}
+
+const char *SakuraioTelemataClient::get_signal_quality_name() {
+    switch (get_signal_quality()) {
+        case SIGNAL_QUALITY_NO_SIGNAL:
+            return "no signal";
+        case SIGNAL_QUALITY_FAINT:
+            return "faint";
+        case SIGNAL_QUALITY_POOR:
+            return "poor";
+        case SIGNAL_QUALITY_FAIR:
+            return "fair";
+        case SIGNAL_QUALITY_GOOD:
+            return "good";
+        case SIGNAL_QUALITY_EXCELLENT:
+            return "excellent";
+        default:
+            return "unknown";
+    }
+}
+
+/* Returns an unixtime in miliseconds. */
+uint64_t SakuraioTelemataClient::get_date_time() {
+    uint32_t datetime[2];
+    send_command(CMD_GET_DATE_TIME, nullptr, 0, (uint8_t *) datetime, sizeof(datetime));
+    return ((uint64_t) datetime[1] << 32) | datetime[0];
 }
 
 void SakuraioTelemataClient::enqueue_tx(int ch, int type, void *buf, int len) {

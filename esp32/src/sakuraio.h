@@ -17,6 +17,9 @@ private:
     int get_file_data(uint8_t *buf, int len);
     void print_download_status();
     bool is_downloading_file();
+    uint64_t get_date_time();
+    uint8_t get_signal_quality();
+    const char *get_signal_quality_name();
 
 public:
     SakuraioTelemataClient(const char *device_name);
