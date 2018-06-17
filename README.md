@@ -5,3 +5,45 @@ makestack
 [![Maintainability](https://api.codeclimate.com/v1/badges/d185d1942655beb89ab5/maintainability)](https://codeclimate.com/github/seiyanuta/makestack/maintainability)
 
 A minimalistic IoT framework for super-rapid prototyping.
+
+Getting Started
+---------------
+
+1. Install MakeStack.
+```
+$ npm install -g makestack
+```
+
+2. Create a new app.
+```
+$ makestack new helloworld
+$ cd helloworld
+```
+
+4. Flash a firmware to a device.
+```
+$ makestack install
+```
+
+4. Start a local server for development.
+```
+$ makestack new helloworld
+```
+
+5. Edit source files. MakeStack automatically deploys the app remotely.
+
+Deploying to Firebase
+---------------------
+
+1. Update `makestack.production.firebaseProject` in `package.json`.
+2. Deploy
+
+```
+$ makestack deploy
+```
+
+3. Flash a firmware for production.
+
+```
+$ makestack install --production
+```
