@@ -7,9 +7,21 @@ function join(messages: any[]): string {
 export type LoggerSubject = "server" | "device";
 export class Logger {
     private subject?: LoggerSubject;
+    private stdout: boolean;
+    private buffer: string;
 
     constructor(subject?: LoggerSubject) {
         this.subject = subject;
+        this.stdout = false;
+        this.buffer = "";
+    }
+
+    private _log(str: string) {
+        if (this.stdout) {
+            console.log(str);
+        } else {
+            this.buffer += str;
+        }
     }
 
     private log(str: string) {
@@ -20,10 +32,21 @@ export class Logger {
             };
 
             const prefix = colors[this.subject](this.subject.padStart(8) + ":");
-            console.log(prefix + " " + str);
+            this._log(prefix + " " + str);
         } else {
-            console.log(str);
+            this._log(str);
         }
+    }
+
+    public enableStdout() {
+        this.stdout = true;
+        const buffer = this.buffer;
+        this.buffer = "";
+        return buffer;
+    }
+
+    public disableStdout() {
+        this.stdout = false;
     }
 
     public debug(...messages: any[]) {

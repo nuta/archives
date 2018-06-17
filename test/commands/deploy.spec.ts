@@ -1,35 +1,34 @@
 import "mocha";
 import * as sinon from "sinon";
 import * as path from "path";
-import * as fs from "fs-extra";
-import * as childProcess from "child_process";
 import { expect } from "chai";
 import { main } from "../../lib";
+import { board } from "../../lib/boards";
+import * as helpers from "../../lib/helpers";
+import { appdir } from "../helpers";
+import { getSdkInstance } from "../../lib/platform";
+import { logger } from "../../lib/logger";
 
 describe("deploy command", function() {
     beforeEach(async function() {
-        const spawnSync = childProcess.spawnSync;
-        sinon.stub(childProcess, "spawnSync")
-            .callsFake((cmd, args, opts) => {
-                if (cmd === "firebase") {
-                    return spawnSync("echo", ["-n"]);
-                } else {
-                    return spawnSync(cmd, args, opts);
-                }
-            });
+        logger.disableStdout();
 
-        this.cwd = process.cwd()
-        this.appDir = "test-app"
-        fs.removeSync(this.appDir)
-        await main.run(['new', this.appDir])
+        sinon.stub(helpers, "downloadRepo").callsFake((appDir) => {
+            return path.resolve(__dirname, "../..");
+        })
+
+        const sdk = getSdkInstance("firebase");
+        sinon.stub(board, "build").returns(Promise.resolve());
+        sinon.stub(sdk, "deploy").returns(Promise.resolve());
+        this.appdir = await appdir.enter();
     })
 
     afterEach(function() {
-        fs.removeSync(this.appDir)
+        this.appdir.restore();
+        logger.enableStdout();
     })
 
     it("deploys successfully", async function() {
-        // TODO:
-        // await main.run(['deploy', '--app-dir', this.appDir]);
+        await main.run(['deploy', '--app-dir', this.appdir.tmpdir]);
     })
 })

@@ -4,9 +4,11 @@ import * as fs from "fs-extra";
 import * as mockfs from "mock-fs";
 import { expect } from "chai";
 import { main } from "../../lib";
+import { logger } from "../../lib/logger";
 
 describe("new command", function() {
     beforeEach(function() {
+        logger.disableStdout();
         this.appDir = "Development/hello"
         mockfs({
             [path.dirname(this.appDir)]: {}
@@ -14,7 +16,8 @@ describe("new command", function() {
     })
 
     afterEach(function() {
-        mockfs.restore()
+        mockfs.restore();
+        logger.enableStdout();
     })
 
     it("creates a new file", function() {
