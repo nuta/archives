@@ -75,6 +75,7 @@ export function execCmdWithPipe(argv: string[], options: SpawnSyncOptions = {}):
 }
 
 export function downloadRepo(appDir: string): string {
+    console.trace();
     const repoDir = path.join(appDir, "build/repo");
     if (!fs.existsSync(path.join(appDir, "build/repo/.git"))) {
         logger.progress("Downloading the repository");

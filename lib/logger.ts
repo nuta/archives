@@ -12,19 +12,19 @@ export class Logger {
 
     constructor(subject?: LoggerSubject) {
         this.subject = subject;
-        this.stdout = false;
+        this.stdout = true;
         this.buffer = "";
     }
 
-    private _log(str: string) {
-        if (this.stdout) {
+    private _log(str: string, forceStdout: boolean) {
+        if (forceStdout || this.stdout) {
             console.log(str);
         } else {
             this.buffer += str;
         }
     }
 
-    private log(str: string) {
+    private log(str: string, forceStdout: boolean = false) {
         if (this.subject) {
             const colors = {
                 server: blue,
@@ -32,9 +32,9 @@ export class Logger {
             };
 
             const prefix = colors[this.subject](this.subject.padStart(8) + ":");
-            this._log(prefix + " " + str);
+            this._log(prefix + " " + str, forceStdout);
         } else {
-            this._log(str);
+            this._log(str, forceStdout);
         }
     }
 
@@ -46,7 +46,7 @@ export class Logger {
     }
 
     public disableStdout() {
-        this.stdout = false;
+//        this.stdout = false;
     }
 
     public debug(...messages: any[]) {
@@ -62,7 +62,7 @@ export class Logger {
     }
 
     public error(...messages: any[]) {
-        this.log(red.bold(join(messages)));
+        this.log(red.bold(join(messages)), true);
     }
 
     public command(...messages: any[]) {

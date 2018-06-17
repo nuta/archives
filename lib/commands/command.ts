@@ -12,6 +12,7 @@ export class Command extends CommandBase {
     ];
     public static opts = [
         { name: "--device", desc: "The target device.", required: true },
+        { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
         constructEnvOption("development"),
     ];
 
