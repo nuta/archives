@@ -6,6 +6,11 @@ makestack
 
 A minimalistic IoT framework for super-rapid prototyping.
 
+- Develop and deploy device-side, server-side, and web app interface all at once.
+- Log collection, remote firmware update, remote procedure call, and more.
+- Support ESP-32.
+- Fully open sourced (CC0 or MIT).
+
 Getting Started
 ---------------
 
@@ -27,7 +32,7 @@ $ makestack install
 
 4. Start a local server for development.
 ```
-$ makestack new helloworld
+$ makestack dev
 ```
 
 5. Edit source files. MakeStack automatically deploys the app remotely.
