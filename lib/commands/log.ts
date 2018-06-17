@@ -8,12 +8,14 @@ export class Command extends CommandBase {
     public static desc = "";
     public static args = [];
     public static opts = [
+        { name: "--app-dir", desc: "The app directory.", default: process.cwd() },
         constructEnvOption("development"),
     ];
 
     public async run(args: Args, opts: Opts) {
         const config = loadConfig(opts.appDir, opts.env);
         logger.progress(`Reading logs from ${config.platform}`);
-        getSdkInstance(config.platform).viewLog(opts);
+        const sdk = getSdkInstance(config.platform);
+        sdk.viewLog(opts);
     }
 }
