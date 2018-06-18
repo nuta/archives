@@ -54,7 +54,9 @@
     "test": "mocha",
     "coverage": "nyc mocha",
     "test:live": "mocha --watch --watch-extensions ts",
-    "docs": "docsify serve docs/docs"
+    "docs": "docsify serve docs/docs",
+    "lint": "tslint --project tsconfig.json",
+    "lint-fix": "tslint --fix --project tsconfig.json"
   },
   "repository": {
     "type": "git",
