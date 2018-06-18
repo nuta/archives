@@ -92,7 +92,7 @@ export function downloadRepo(appDir: string): string {
 // seriaous vulnerability!
 export function ensurePipInstalled(packages: string[]) {
     for (const name in packages) {
-        if (spawnSync("python", ["-c", `import ${name}`]).status != 0) {
+        if (spawnSync("python", ["-c", `import ${name}`]).status !== 0) {
             throw new Error(`Install pip package "${name}"`);
         }
     }

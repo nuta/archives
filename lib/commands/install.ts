@@ -1,4 +1,3 @@
-const chalk = require("chalk");
 import * as inquirer from "inquirer";
 import { board } from "../boards";
 import { Args, CommandBase, constructEnvOption, Opts } from "../cli";
@@ -51,7 +50,7 @@ export class Command extends CommandBase {
 
     public async run(args: Args, opts: Opts) {
         const repoDir = opts.repoDir || downloadRepo(opts.appDir);
-        const isReleaseBuild = (opts.env == "production") ? true : false;
+        const isReleaseBuild = (opts.env === "production") ? true : false;
 
         // We don't have the latest firmware image in production. Use 0 for now.
         const version = isReleaseBuild ? 0 : generateRandomVersion();

@@ -142,7 +142,7 @@ export function deserialize(payload: Buffer) {
             }
             case SMMS_DEVICE_STATE_MSG: {
                 messages.deviceState = {
-                    state: (data.readUInt8(0) == 1) ? "booted" : "running",
+                    state: (data.readUInt8(0) === 1) ? "booted" : "running",
                     board: getBoardNameByDeviceType(data.readUInt8(1)),
                     battery: (data.readUInt8(3) > 0xf0) ? null : data.readUInt8(2),
                     version: data.readUInt32LE(4),

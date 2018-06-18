@@ -106,11 +106,11 @@ export class Esp32Board extends Board {
 
     private async doBuild(isReleaseBuild: boolean, version: number, esp32Dir: string) {
         const cp = await make(isReleaseBuild, version, esp32Dir);
-        if (cp.status != 0) {
+        if (cp.status !== 0) {
             if (cp.stderr.includes("No rule to make target `cores/esp32/libb64/cencode.o'")) {
                 // FIXME: Try again because the build system is broken.
                 const cp2 = await make(isReleaseBuild, version, esp32Dir);
-                if (cp2.status != 0) {
+                if (cp2.status !== 0) {
                     console.log(cp2.stdout);
                     console.log(cp2.stderr);
                     throw new Error("Failed to build the app.");

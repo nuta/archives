@@ -1,4 +1,3 @@
-const chalk = require("chalk");
 import * as ejs from "ejs";
 import * as fs from "fs-extra";
 import * as path from "path";

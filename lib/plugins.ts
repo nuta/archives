@@ -5,7 +5,7 @@ import * as path from "path";
 export type AdapterCallback = (payload: Buffer) => Promise<Buffer | undefined>;
 
 export class Plugin {
-    public server(express: express.Express): void {
+    public server(server: express.Express): void {
     }
 
     public async sendPayload(payload: Buffer): Promise<void> {

@@ -82,7 +82,7 @@ export abstract class PlatformRuntime {
     }
 
     private loadAppServer() {
-        const app = require(path.resolve(this.appDir, "./server"));
+        require(path.resolve(this.appDir, "./server"));
         for (const [name, callback] of Object.entries(endpoints)) {
             // TODO: support other methods
             this.httpServer.get(name, callback);
@@ -122,7 +122,7 @@ export abstract class PlatformRuntime {
                     const firmwareImage = fs.readFileSync(firmwarePath);
                     const appVersion = getFirmwareVersion(firmwareImage);
 
-                    if (appVersion != device.state.version) {
+                    if (appVersion !== device.state.version) {
                         const update = { type: "bulk", version: appVersion };
                         return telemata.serialize({ update, commands } as any);
                     } else {

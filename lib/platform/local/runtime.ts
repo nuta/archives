@@ -60,7 +60,6 @@ export class LocalPlatformRuntime extends PlatformRuntime {
     private startLocalServer() {
         const sock = net.createServer();
         sock.on("connection", (client) => {
-            const str = "";
             client.on("data", async (data) => {
                 let req;
                 try {

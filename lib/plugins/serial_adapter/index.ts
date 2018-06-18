@@ -51,12 +51,12 @@ export default class SerialAdapter extends Plugin {
         const CHUNK_SIZE = 2048;
         while (true) {
             const chunk = data.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-            if (chunk.length == 0) {
+            if (chunk.length === 0) {
                 break;
             }
 
             await this.sendChunk(chunk);
-            if (i == 0) {
+            if (i === 0) {
                 await sleep(3000);
             }// ota_begin takes long
             await sleep(300);

@@ -87,7 +87,7 @@ export default class SakuraioAdapter extends Plugin {
             let i = 0;
             let payload = Buffer.alloc(0);
             const CHANNELS_MAX = 15;
-            for (i == 0; i < CHANNELS_MAX; i++) {
+            for (; i < CHANNELS_MAX; i++) {
                 for (const { channel, type, value } of json.payload.channels) {
                     if (type === "b" && channel === i) {
                         payload = Buffer.concat([payload, unhexlify(value)]);
