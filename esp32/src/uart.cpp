@@ -76,7 +76,7 @@ void download_firmware() {
 
     int offset = 0;
     while (offset < header.length) {
-        printf("free ram: %dKB\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT) / 1024);
+        printf("free ram: %zuKB\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT) / 1024);
         printf("%d/%d (%d)\n", offset, header.length,  (header.length - offset < buf_size) ? header.length - offset : buf_size);
         // printf("downloading %d/%d KB\n", offset / 1024, header.length / 1024);
         int len = uart_read_bytes(

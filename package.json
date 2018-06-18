@@ -8,6 +8,7 @@
     "makestack": "makestack"
   },
   "dependencies": {
+    "@types/shell-quote": "^1.6.0",
     "babel-cli": "^6.26.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
@@ -23,7 +24,8 @@
     "inquirer": "^6.0.0",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
-    "serialport": "^6.2.0"
+    "serialport": "^6.2.0",
+    "shell-quote": "^1.6.1"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",

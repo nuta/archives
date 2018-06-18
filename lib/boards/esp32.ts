@@ -8,6 +8,7 @@ import { execCmd } from "../helpers";
 import { logger } from "../logger";
 import { loadPlugins } from "../plugins";
 import { Board, InstallConfig } from "../types";
+import { generateCompileCommandsJson } from "../cquery";
 const Gauge = require("gauge");
 const packageJson = require(path.resolve(__dirname, "../../package.json"));
 
@@ -60,6 +61,12 @@ function make(isReleaseBuild: boolean, version: number, esp32Dir: string): Promi
 
         cp.on("exit", (status) => {
             gauge.disable();
+            fs.writeFileSync(
+                path.resolve(__dirname, "../../compile_commands.json"),
+                generateCompileCommandsJson(stdout, [
+                    "-I", path.resolve(__dirname, '../../esp32/deps/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0')
+                ])
+            );
             resolve({ status, stdout, stderr });
         });
     });

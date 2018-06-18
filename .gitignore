@@ -1,6 +1,7 @@
 *.o
 *.log
 *.tgz
+compile_commands.json
 dist
 coverage
 .nyc_output
