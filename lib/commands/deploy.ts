@@ -1,5 +1,4 @@
 const chalk = require("chalk");
-import * as child_process from "child_process";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { board } from "../boards";

@@ -1,4 +1,3 @@
-import * as caporal from "caporal";
 
 export interface Args { [name: string]: any; }
 export interface Opts { [name: string]: any; }

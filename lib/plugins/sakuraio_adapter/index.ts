@@ -1,14 +1,8 @@
-import { EWOULDBLOCK } from "constants";
 import * as express from "express";
 import { Request, Response } from "express";
-import * as fs from "fs-extra";
-import * as path from "path";
 import * as request from "request-promise";
-import { Device } from "../..";
-import { createFirmwareImage } from "../../firmware";
 import { logger } from "../../logger";
 import { AdapterCallback, Plugin } from "../../plugins";
-import { parseVariableLength } from "../../telemata";
 
 function unhexlify(value: string): Buffer {
     let buf = Buffer.alloc(0);

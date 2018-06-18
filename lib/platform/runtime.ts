@@ -1,10 +1,8 @@
-import * as bodyParser from "body-parser";
 import * as express from "express";
 import * as fs from "fs-extra";
 import * as path from "path";
 import { Device } from "../device";
 import { getFirmwareVersion } from "../firmware";
-import { logger } from "../logger";
 import { instantiatePlugins } from "../plugins";
 import { endpoints } from "../server";
 import * as telemata from "../telemata";

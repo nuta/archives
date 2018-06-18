@@ -1,7 +1,6 @@
 import * as path from "path";
-import { scaffold } from "../scaffold";
 import { Args, CommandBase, Opts } from "../cli";
-
+import { scaffold } from "../scaffold";
 
 export class Command extends CommandBase {
     public static command = "new";

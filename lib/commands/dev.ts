@@ -2,7 +2,6 @@ const chalk = require("chalk");
 import * as child_process from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import { App } from "../app";
 import { board } from "../boards";
 import { Args, CommandBase, Opts } from "../cli";
 import { downloadRepo, generateRandomVersion } from "../helpers";

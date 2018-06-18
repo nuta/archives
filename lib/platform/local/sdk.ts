@@ -1,6 +1,5 @@
 import * as net from "net";
 import * as path from "path";
-import { logger } from "../../logger";
 import { PlatformSdk } from "../sdk";
 
 export class LocalPlatformSdk extends PlatformSdk {

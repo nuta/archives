@@ -1,14 +1,13 @@
-import { spawn, spawnSync, SpawnSyncReturns } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import * as ejs from "ejs";
 import * as fs from "fs-extra";
 import * as os from "os";
 import * as path from "path";
+import { generateCompileCommandsJson } from "../cquery";
 import { createFirmwareImage, CREDENTIALS_DATA_TEMPLATE, embedCredentials } from "../firmware";
 import { execCmd } from "../helpers";
-import { logger } from "../logger";
 import { loadPlugins } from "../plugins";
 import { Board, InstallConfig } from "../types";
-import { generateCompileCommandsJson } from "../cquery";
 const Gauge = require("gauge");
 const packageJson = require(path.resolve(__dirname, "../../package.json"));
 
@@ -64,8 +63,8 @@ function make(isReleaseBuild: boolean, version: number, esp32Dir: string): Promi
             fs.writeFileSync(
                 path.resolve(__dirname, "../../compile_commands.json"),
                 generateCompileCommandsJson(stdout, [
-                    "-I", path.resolve(__dirname, '../../esp32/deps/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0')
-                ])
+                    "-I", path.resolve(__dirname, "../../esp32/deps/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0"),
+                ]),
             );
             resolve({ status, stdout, stderr });
         });

@@ -1,5 +1,4 @@
 import * as caporal from "caporal";
-import * as fs from "fs";
 import * as path from "path";
 import { commands } from "./commands";
 import { logger } from "./logger";

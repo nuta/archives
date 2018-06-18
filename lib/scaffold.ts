@@ -71,7 +71,7 @@ export interface ScaffoldArgs {
     name: string;
     dir: string;
     frontend?: string;
-}''
+}"";
 
 export function scaffold(args: ScaffoldArgs) {
     if (!fs.existsSync(args.dir)) {

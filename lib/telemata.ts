@@ -1,6 +1,4 @@
-import * as zlib from "zlib";
 import { Device, getBoardNameByDeviceType } from "./device";
-import { createFirmwareImage } from "./firmware";
 import { logger } from "./logger";
 import { callbacks, HeartbeatCallback } from "./server";
 

@@ -1,6 +1,5 @@
 import { Args, CommandBase, constructEnvOption, Opts } from "../cli";
 import { loadConfig } from "../helpers";
-import { logger } from "../logger";
 import { getSdkInstance } from "../platform";
 
 export class Command extends CommandBase {
