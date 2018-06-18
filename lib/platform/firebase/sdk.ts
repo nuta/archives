@@ -51,10 +51,11 @@ export class FirebasePlatformSdk extends PlatformSdk {
             throw new Error("--firebase-project is not set.");
         }
 
+        const topDir = path.resolve(__dirname, "../../..");
         const projDir = path.join(appDir, "build/deploy");
         const pkgDir = path.join(appDir, "build/deploy/functions");
-        const pluginsDir = path.resolve(__dirname, "../../../lib/plugins");
-        const packageJsonPath = path.resolve(__dirname, "../../../package.json");
+        const pluginsDir = path.resolve(topDir, "lib/plugins");
+        const packageJsonPath = path.resolve(topDir, "package.json");
         fs.mkdirpSync(pkgDir);
         const packageJson = this.preparePackageJsonForDeploy(packageJsonPath, projDir, appDir);
         fs.writeJsonSync(path.join(pkgDir, "package.json"), packageJson);
@@ -64,7 +65,7 @@ export class FirebasePlatformSdk extends PlatformSdk {
         fs.copySync(path.join(appDir, "public"), path.join(projDir, "public"));
         fs.copySync(path.join(appDir, "server.js"), path.join(pkgDir, "server.js"));
         fs.copySync(path.join(appDir, "esp32.firmware"), path.join(pkgDir, "esp32.firmware"));
-        fs.copySync(path.resolve(__dirname, "start.js"), path.join(pkgDir, "index.js"));
+        fs.copySync(path.resolve(topDir, "dist/platform/firebase/start.js"), path.join(pkgDir, "index.js"));
 
         logger.progress("Installing dependencies");
         execCmd(["yarn"], { cwd: pkgDir });
@@ -73,7 +74,7 @@ export class FirebasePlatformSdk extends PlatformSdk {
         execCmd([
             "yarn", "run", "babel", "--presets=es2015,stage-3",
             "--out-dir", path.join(pkgDir, "makestack/dist"),
-            path.resolve(__dirname, "../../../dist"),
+            path.resolve(topDir, "dist"),
         ], { cwd: pkgDir });
 
         logger.progress("firebase deploy (it may takes long)");
