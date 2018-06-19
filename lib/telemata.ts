@@ -76,7 +76,7 @@ export function generateMessage(type: number, payload: any) {
     return msg;
 }
 
-export function serialize({ deviceId, log, reports, configs, update, commands }: PayloadMessages) {
+export function serialize({ log, reports, configs, update, commands }: PayloadMessages) {
     let payload = Buffer.alloc(0);
 
     if (log) {
@@ -130,11 +130,11 @@ export function deserialize(payload: Buffer) {
 
         switch (type) {
             case SMMS_COMMAND_MSG: {
-                const keyLengthOffset = dataOffset;
+                const keyLengthOffset = 1 + dataOffset;
                 const [keyLength, keyLengthLength] = parseVariableLength(payload.slice(keyLengthOffset));
                 const keyOffset = keyLengthOffset + keyLengthLength;
                 const valueOffset = keyOffset + keyLength;
-                const valueLength = length - (valueOffset - keyLengthOffset);
+                const valueLength = length - (valueOffset - keyLengthOffset + 1);
                 const key = payload.slice(keyOffset, keyOffset + keyLength);
                 const value = payload.slice(valueOffset, valueOffset + valueLength);
                 messages.commands[key.toString("utf-8")] = value.toString("utf-8");
