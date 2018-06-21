@@ -79,11 +79,6 @@ export function generateMessage(type: number, payload: any) {
 export function serialize({ log, reports, configs, update, commands }: PayloadMessages) {
     let payload = Buffer.alloc(0);
 
-    if (log) {
-        const logMsg = generateMessage(SMMS_LOG_MSG, log);
-        payload = Buffer.concat([payload, logMsg]);
-    }
-
     if (commands) {
         for (const [key, value] of Object.entries(commands)) {
             const type = Buffer.from([0x01]); /* string */

@@ -13,12 +13,6 @@ describe("telemata", function() {
     })
 
     it("serializes correctly", async function() {
-        const payload = serialize({ log: "abc" });
-        const expected = Buffer.from([0x10, 0x05, 0x02, 0x03, 0x61, 0x62, 0x63]);
-        assert.deepEqual(payload, expected);
-    })
-
-    it("deserializes correctly", async function() {
         const commands = {
             light: "turn_on",
             send_temp: ""
