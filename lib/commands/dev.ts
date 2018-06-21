@@ -60,8 +60,12 @@ export class Command extends CommandBase {
             });
         };
 
-        fs.watch(path.resolve(opts.appDir, "server.js"), (_: string, filepath: string) => reload(filepath));
-        fs.watch(path.resolve(opts.appDir, "device.cc"), (_: string, filepath: string) => reload(filepath));
+        const watchedFiles = [];
+        watchedFiles.push(path.resolve(opts.appDir, "server.js"));
+        watchedFiles.push(path.resolve(opts.appDir, "device.cc"));
+        for (const filepath in watchedFiles) {
+            fs.watch(filepath, (_: string, filepath: string) => reload(filepath));
+        }
 
         logger.info("*** Watching the changes to source code...");
         logger.info("*** Press Ctrl-C to quit");
