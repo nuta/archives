@@ -59,7 +59,6 @@ function parseMarkdown(text) {
     // Enable Emoji.
     md.use(MarkdownEmoji);
     md.renderer.rules.emoji = (token, index) => {
-      console.log(twemoji.parse(token[index].content));
       return twemoji.parse(token[index].content, { folder: "svg", ext: ".svg" });
     };
 
@@ -129,7 +128,7 @@ export default {
             this.loadTheme(front.theme || "simple");
         },
         watchChanges() {
-            console.log("Connecting to the local websocket...");
+            console.log("Connecting to the local server...");
             const ws = new WebSocket("ws://" + location.host);
             ws.onmessage = (ev) => {
                 console.log("Applying changes.");
@@ -139,11 +138,12 @@ export default {
         }
     },
     mounted() {
-//        const container = document.querySelector("#markdown");
-//        let md = container.innerText;
-        // FIXME:
-        const text = require("raw-loader!../examples/intro.md");
-        this.loadMarkdown(text);
+        if (WEBPACK_MODE === "development") {
+            this.loadMarkdown(require("raw-loader!../examples/test.md"));
+        } else {
+            // TODO: production
+        }
+
         this.moveTo(0);
         this.setupShortcuts();
 
