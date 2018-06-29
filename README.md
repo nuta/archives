@@ -1,5 +1,8 @@
 Supershow
 ==========
+[![Build Status](https://travis-ci.com/seiyanuta/supershow.svg?branch=master)](https://travis-ci.com/seiyanuta/supershow)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/9f03488e336796a1956f/test_coverage)](https://codeclimate.com/github/seiyanuta/supershow/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/9f03488e336796a1956f/maintainability)](https://codeclimate.com/github/seiyanuta/supershow/maintainability)
 
 A handy markdown presentation tool.
 
@@ -12,7 +15,7 @@ $ supershow file.md
 
 Markdown
 --------
-```md
+```
 ---
 title: The title of presentation
 ---
