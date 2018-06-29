@@ -65,6 +65,11 @@
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3.1.4"
   },
+  "files": [
+    "dist",
+    "lib",
+    "supershow"
+  ],
   "nyc": {
     "extension": [
       ".ts"
