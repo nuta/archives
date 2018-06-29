@@ -17,6 +17,8 @@ import "highlight.js/styles/solarized-light.css";
 import "./themes/simple.scss";
 import Markdown from "markdown-it";
 import MarkdownKaTeX from "markdown-it-katex";
+import MarkdownEmoji from "markdown-it-emoji";
+import twemoji from "twemoji";
 
 function parseMarkdown(text) {
     let lines = text.split("\n");
@@ -28,9 +30,9 @@ function parseMarkdown(text) {
     // Parse front matter.
     const front = yaml.safeLoad(lines.slice(1, endOfFront).join("\n"));
 
-    // Convert markdown texts into html.
-    // FIXME: Support blank pages (i.e. "---\n---").
-    const pages = lines
+    // Split into slides.
+    // FIXME: Support blank slideTexts (i.e. "---\n---").
+    const slideTexts = lines
         .slice(1 + endOfFront)
         .join("\n")
         .split(/\n---(-*\s*)\n/)
@@ -49,12 +51,22 @@ function parseMarkdown(text) {
             return str;
         }
     });
+
+    // Enable KaTeX.
     md.use(MarkdownKaTeX);
 
-    const slides = pages.map((page, index) => {
+    // Enable Emoji.
+    md.use(MarkdownEmoji);
+    md.renderer.rules.emoji = (token, index) => {
+      console.log(twemoji.parse(token[index].content));
+      return twemoji.parse(token[index].content, { folder: "svg", ext: ".svg" });
+    };
+
+    // Convert markdown texts into html.
+    const slides = slideTexts.map((slideText, index) => {
         return {
             index,
-            html: md.render(page)
+            html: md.render(slideText)
         };
     });
 

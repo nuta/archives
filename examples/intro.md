@@ -4,7 +4,7 @@ theme: simple
 size: "16:9"
 ---
 
-# Introduction to Supershow
+# :tophat: Introduction to Supershow
 A handy markdown presentation tool.
 
 ---
