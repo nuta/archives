@@ -14,6 +14,7 @@
 import yaml from "js-yaml";
 import highlightjs from "highlight.js";
 import "highlight.js/styles/solarized-light.css";
+import "katex/dist/katex.min.css";
 import "./themes/simple.scss";
 import Markdown from "markdown-it";
 import MarkdownKaTeX from "markdown-it-katex";

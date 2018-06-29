@@ -40,6 +40,13 @@ module.exports = {
                     { loader: "style-loader" },
                     { loader: "css-loader" },
                 ]
+            },
+            {
+                test: /\.(woff2?|ttf)$/,
+                loader: 'file-loader',
+                options: {
+                    emitFile: false
+                }
             }
         ]
     },
