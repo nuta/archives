@@ -1,7 +1,13 @@
 <template>
     <div id="app" class="supershow" :data-theme="theme">
         <div class="wallpaper">
-            <div class="container">
+            <div class="presenter" v-if="presenterView">
+                <button @click="exitPresenterView">exit</button>
+                <button @click="moveFromPresenterView(-1)">prev</button>
+                <button @click="moveFromPresenterView(1)">next</button>
+            </div>
+            <div class="container" v-else>
+                <button @click="enterPresenterView">PRESENT</button>
                 <div v-for="slide in slides" v-show="index === slide.index" :key="slide.index"
                  class="slide" :class="'size-' + size" v-html="slide.html"></div>
                 <div class="page-number">{{ index + 1 }} / {{ slides.length }}</div>
@@ -81,6 +87,10 @@ export default {
             slides: [],
             html: "",
             size: null,
+            presentation: null,
+            presentationCon: null,
+            presenterView: false,
+            isPresentationAvailable: false,
         }
     },
     methods: {
@@ -93,6 +103,9 @@ export default {
             this.index = index;
             this.html = slide.html;
         },
+        move(offset) {
+            this.moveTo(this.index + offset);
+        },
         loadTheme(theme) {
             this.theme = theme;
         },
@@ -100,22 +113,22 @@ export default {
             window.onkeyup = (ev) => {
                 switch (ev.code) {
                     case "Enter":
-                        this.moveTo(this.index + 1);
+                        this.move(1);
                         break;
                     case "Space":
-                        this.moveTo(this.index + 1);
+                        this.move(1);
                         break;
                     case "ArrowUp":
-                        this.moveTo(this.index - 1);
+                        this.move(-1);
                         break;
                     case "ArrowDown":
-                        this.moveTo(this.index + 1);
+                        this.move(1);
                         break;
                     case "ArrowLeft":
-                        this.moveTo(this.index - 1);
+                        this.move(-1);
                         break;
                     case "ArrowRight":
-                        this.moveTo(this.index + 1);
+                        this.move(1);
                         break;
                 }
             }
@@ -135,9 +148,66 @@ export default {
                 const { text } = JSON.parse(ev.data);
                 this.loadMarkdown(text);
             }
+        },
+        enterPresenterView() {
+            if (this.isPresentationAvailable) {
+                this.presentation.start().then((con) => {
+                    this.presenterView = true;
+                    con.onconnect = () => {
+                        con.send(JSON.stringify({
+                            action: "opened"
+                        }));
+                    };
+
+                    con.onclose = () => {
+                        this.presenterView = false;
+                        this.presentationCon = null;
+                    };
+
+                    this.presentationCon = con;
+                });
+            }
+        },
+        exitPresenterView() {
+            this.presentationCon.terminate();
+            this.presentationCon.close();
+        },
+        moveFromPresenterView(offset) {
+            this.presentationCon.send(JSON.stringify({
+                action: "move",
+                offset
+            }));
+        },
+        async setupPresenterView() {
+            if (navigator.presentation.receiver) {
+                navigator.presentation.receiver.connectionList.then((list) => {
+                    list.connections.map((con) => {
+                        con.onmessage = ({ data }) => {
+                            const { action, offset } = JSON.parse(data);
+                            switch (action) {
+                                case "move":
+                                    this.move(offset);
+                                    break;
+                            }
+                        }
+                    })
+                });
+            }
+        },
+        async setupPresentationRequest() {
+            const onavailchange = (state) => {
+                console.log("Presentation Availability:", state);
+                this.isPresentationAvailable = state;
+            }
+
+            const request = new PresentationRequest("/");
+            const avail = await request.getAvailability();
+            avail.onchange = function() { onavailchange(this.value) };
+            onavailchange(avail.value);
+            this.presentation = request;
         }
     },
-    mounted() {
+    async mounted() {
         if (WEBPACK_MODE === "development") {
             this.loadMarkdown(require("raw-loader!../examples/test.md"));
         } else {
@@ -146,6 +216,8 @@ export default {
 
         this.moveTo(0);
         this.setupShortcuts();
+        await this.setupPresentationRequest();
+        this.setupPresenterView();
 
         if (["localhost", "127.0.0.1"].includes(location.hostname)) {
             this.watchChanges();
