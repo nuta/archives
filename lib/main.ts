@@ -7,13 +7,18 @@ import * as express from "express";
 import * as WebSocket from "ws";
 import { Request, Response } from "express";
 import { logger } from "./logger";
+import { exportTo } from "./export";
 const { version } = require(path.resolve(__dirname, "../package.json"));
 
 export interface CliArgs {
     file: string;
 }
 
-function doRun(args: CliArgs) {
+export interface CliOpts {
+    export: string;
+}
+
+function serve(args: CliArgs) {
     // Poll for file changes.
     const fileEvent = new Event();
     fs.watch(args.file, (ev) => {
@@ -46,10 +51,21 @@ function doRun(args: CliArgs) {
     });
 }
 
+function doRun(args: CliArgs, opts: CliOpts) {
+
+    if (opts.export) {
+        exportTo(args.file, opts.export);
+    } else {
+        serve(args);
+    }
+}
+
 export function run(args?: string[]) {
-    caporal.version(version);
-    caporal.argument("file", "The markdown file.");
-    caporal.action(doRun as any);
+    caporal
+        .version(version)
+        .argument("file", "The markdown file.")
+        .option("--export <output>", "Export to a file.")
+        .action(doRun as any);
 
     const argv = args ? [process.argv0, "makestack", ...args] : process.argv;
     caporal.parse(argv);
