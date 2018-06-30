@@ -8,8 +8,9 @@
             </div>
             <div class="container" v-else>
                 <button @click="enterPresenterView">PRESENT</button>
-                <div v-for="slide in slides" v-show="index === slide.index" :key="slide.index"
-                 class="slide" :class="'size-' + size" v-html="slide.html"></div>
+                <div v-for="slide in slides" :key="slide.index"
+                 :class="[ (index === slide.index) ? 'current' : '', 'size-' + size]"
+                 class="slide" v-html="slide.html"></div>
                 <div class="page-number">{{ index + 1 }} / {{ slides.length }}</div>
             </div>
         </div>
@@ -25,6 +26,7 @@ import "./themes/simple.scss";
 import Markdown from "markdown-it";
 import MarkdownKaTeX from "markdown-it-katex";
 import MarkdownEmoji from "markdown-it-emoji";
+import MarkdownCjkBreaks from "markdown-it-cjk-breaks";
 import twemoji from "twemoji";
 
 function parseMarkdown(text) {
@@ -61,6 +63,9 @@ function parseMarkdown(text) {
 
     // Enable KaTeX.
     md.use(MarkdownKaTeX);
+
+    // Remove unwanted spaces in CJK sentences.
+    md.use(MarkdownCjkBreaks);
 
     // Enable Emoji.
     md.use(MarkdownEmoji);
@@ -249,7 +254,19 @@ html, body {
     }
 
     .container {
+        page-break-after: always;
+
         .slide {
+            display: none;
+
+            @media print {
+                display: block;
+            }
+
+            &.current {
+                display: block;
+            }
+
             box-sizing: border-box;
             margin: 0 auto;
             width: 100vw;

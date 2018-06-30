@@ -43,6 +43,7 @@
     "js-yaml": "^3.12.0",
     "katex": "^0.10.0-beta",
     "markdown-it": "^8.4.1",
+    "markdown-it-cjk-breaks": "^1.1.0",
     "markdown-it-emoji": "^1.4.0",
     "markdown-it-katex": "^2.0.3",
     "mocha": "^5.2.0",
