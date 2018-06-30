@@ -63,7 +63,7 @@ function parseMarkdown(text) {
     });
 
     // Enable KaTeX.
-    md.use(MarkdownKaTeX);
+    md.use(MarkdownKaTeX, { throwOnError: true });
 
     // Remove unwanted spaces in CJK sentences.
     md.use(MarkdownCjkBreaks);

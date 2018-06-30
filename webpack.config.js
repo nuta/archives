@@ -45,9 +45,6 @@ module.exports = {
             {
                 test: /\.(woff2?|ttf)$/,
                 loader: 'file-loader',
-                options: {
-                    emitFile: false
-                }
             }
         ]
     },
