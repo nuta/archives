@@ -26,6 +26,7 @@ import "./themes/simple.scss";
 import Markdown from "markdown-it";
 import MarkdownKaTeX from "markdown-it-katex";
 import MarkdownEmoji from "markdown-it-emoji";
+import MarkdownFootnote from "markdown-it-footnote";
 import MarkdownCjkBreaks from "markdown-it-cjk-breaks";
 import twemoji from "twemoji";
 
@@ -66,6 +67,9 @@ function parseMarkdown(text) {
 
     // Remove unwanted spaces in CJK sentences.
     md.use(MarkdownCjkBreaks);
+
+    // Remove unwanted spaces in CJK sentences.
+    md.use(MarkdownFootnote);
 
     // Enable Emoji.
     md.use(MarkdownEmoji);
@@ -265,6 +269,24 @@ html, body {
 
             &.current {
                 display: block;
+            }
+
+            .footnote-ref a {
+                color: #333;
+                font-size: 80%;
+                text-decoration: none;
+
+                &:hover {
+                    cursor: initial;
+                }
+            }
+
+            .footnotes-sep, .footnote-backref {
+                display: none;
+            }
+
+            .footnotes {
+                font-size: 70%;
             }
 
             box-sizing: border-box;

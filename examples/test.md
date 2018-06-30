@@ -13,9 +13,12 @@ A handy markdown presentation tool.
 
 ---
 # Math
+This is a equation[^foo].
 $$
 A = \sum (y_i - f(x_i))^2
 $$
+
+[^foo]: This is a footnote.
 
 ---
 # Code
