@@ -152,23 +152,22 @@ export default {
         enterPresenterView() {
             if (this.isPresentationAvailable) {
                 this.presentation.start().then((con) => {
-                    this.presenterView = true;
-                    con.onconnect = () => {
-                        con.send(JSON.stringify({
-                            action: "opened"
-                        }));
-                    };
+                    // We're in the presenter view.
 
                     con.onclose = () => {
+                        // The presentation view is being closed. Go
+                        // back from the presenter view.
                         this.presenterView = false;
                         this.presentationCon = null;
                     };
 
+                    this.presenterView = true;
                     this.presentationCon = con;
                 });
             }
         },
         exitPresenterView() {
+            // Close the presentation view.
             this.presentationCon.terminate();
             this.presentationCon.close();
         },
@@ -183,6 +182,8 @@ export default {
                 navigator.presentation.receiver.connectionList.then((list) => {
                     list.connections.map((con) => {
                         con.onmessage = ({ data }) => {
+                            // We're in the presentation view and have received
+                            // a message from the presenter view.
                             const { action, offset } = JSON.parse(data);
                             switch (action) {
                                 case "move":
