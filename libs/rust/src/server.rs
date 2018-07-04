@@ -26,10 +26,12 @@ macro_rules! serve_forever {
         let mut r1: Payload = 0;
         let mut r2: Payload = 0;
         let mut r3: Payload = 0;
+
         unsafe {
             header = ipc_recv($server.ch.to_cid(), &mut from,
                 &mut a0 as *mut Payload, &mut a1 as *mut Payload, &mut a2 as *mut Payload, &mut a3 as *mut Payload);
         }
+
         loop {
             let from_ch = Channel::from_cid(from);
 

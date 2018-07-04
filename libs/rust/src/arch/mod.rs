@@ -7,6 +7,7 @@ pub const ERROR_OFFSET: u64 = 24;
 pub const MINOR_ID_OFFSET: u64 = 32;
 pub const MAJOR_ID_OFFSET: u64 = 40;
 
+#[derive(Debug)]
 pub enum ErrorCode {
     ErrorNone = 0,
     UnknownMsg = 1,

@@ -259,7 +259,7 @@ pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${rep
 """).substitute(**locals())
 
         stub += Template("""\
-    pub fn $call_name(&self${args}) -> Result<(${rets_def}), GeneralError> {
+    pub fn $call_name(&self${args}) -> ServerResult<(${rets_def})> {
         let mut __r: Payload = 0;
         ${tmps}
 
@@ -291,8 +291,7 @@ pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${rep
 #![allow(unused_parens)]
 
 use core::slice;
-use core::result::{Result};
-use error::{GeneralError};
+use server::{ServerResult};
 use channel::{Channel};
 use arch::{
     CId, Payload,
@@ -300,7 +299,6 @@ use arch::{
     ErrorCode, ERROR_OFFSET,
     ipc_open, ipc_call, ipc_recv, ipc_replyrecv,
 };
-use server::{ServerResult};
 
 pub const SERVICE_ID: u16 = $service_id << 8;
 pub const ${service_name_upper}_SERVICE: u16 = $service_id << 8;

@@ -15,7 +15,6 @@ pub fn align(x: usize, align: usize) -> usize {
 
 pub mod allocator;
 pub mod interfaces;
-pub mod error;
 pub mod arch;
 pub mod lang_items;
 pub mod channel;
