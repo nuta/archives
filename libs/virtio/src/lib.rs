@@ -173,11 +173,10 @@ impl Virtio {
             let used_index = (*queue.used).index;
 
             /* notify the device */
-            println!("kicking");
             self.ioport.out16(IO_QUEUE_NOTIFY, queue.index);
 
             /* Wait for completion. TODO: use interrupt */
-            // while (*queue.used).index == used_index {};
+            while (*queue.used).index == used_index {};
         }
     }
 }
