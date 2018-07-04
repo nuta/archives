@@ -3,9 +3,39 @@ global_asm!(include_str!("../../../resea/arch/x64/syscall.S"));
 #[cfg(target_arch="x86_64")]
 pub mod x64;
 
+pub const ERROR_OFFSET: u64 = 24;
+pub const MINOR_ID_OFFSET: u64 = 32;
+pub const MAJOR_ID_OFFSET: u64 = 40;
+
+pub enum ErrorCode {
+    ErrorNone = 0,
+    UnknownMsg = 1,
+    NotImplemented = 2,
+    NoMemory = 200,
+    InvalidChannel = 201,
+    ChannelNotLinked = 202,
+    ChannelNotTransferred = 203,
+    ChannelInUse = 204,
+}
+
 pub type CId = i64;
 pub type Header = u64;
 pub type Payload = u64;
+
+pub trait HeaderTrait {
+    fn msg_type(&self) -> u16;
+    fn service_type(&self) -> u16;
+}
+
+impl HeaderTrait for Header {
+    fn msg_type(&self) -> u16 {
+        ((self >> MINOR_ID_OFFSET) & 0xff) as u16
+    }
+
+    fn service_type(&self) -> u16 {
+        ((self >> MAJOR_ID_OFFSET) & 0xff) as u16
+    }
+}
 
 extern "C" {
     pub fn ipc_open() -> CId;

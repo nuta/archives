@@ -20,8 +20,10 @@ def get_type_id_by_name(types, name):
     return {
         "channel": CHANNEL_PAYLOAD,
         "string": OOL_PAYLOAD,
+        "buffer": OOL_PAYLOAD,
         "usize": INLINE_PAYLOAD,
         "umax": INLINE_PAYLOAD,
+        "imax": INLINE_PAYLOAD,
         "error": INLINE_PAYLOAD,
         "i8": INLINE_PAYLOAD,
         "i16": INLINE_PAYLOAD,
@@ -125,11 +127,13 @@ def generate_c_stubs(idl_dir, out_dir, interfaces):
 def generate_rust_file(service):
     service_name = service["name"].replace("-", "_")
     stub = ""
+    server = ""
+    handle = ""
     consts = ""
     types = {}
     service_id = service["id"]
     service_name_upper = service_name.upper()
-    service_name_cap = service_name.capitalize()
+    service_name_camel = service["name"].replace("_", " ").title().replace(" ", "")
 
     # Type aliases.
     for type_ in service["types"]:
@@ -139,15 +143,19 @@ def generate_rust_file(service):
 
     def rename_type(type_):
         return {
+            "u16": 'u16',
             "u32": 'u32',
+            "u64": 'u64',
             "uptr": 'usize',
             "channel": 'Channel',
             "usize": "usize",
-            "string": "&[u8]"
+            "string": "&[u8]",
+            "buffer": "&[u8]",
         }[type_]
 
     # RPCs.
     stub += "\n"
+    server += "\n"
     msg_id = 1
     for call in service["calls"]:
         call_name = call["name"]
@@ -158,6 +166,9 @@ def generate_rust_file(service):
         tmps = []
         rets_def = []
         rets = []
+        server_params = []
+        server_rets = []
+        casted_server_rets = []
         skip_next = False
         for i in range(0, 4):
             try:
@@ -183,35 +194,68 @@ def generate_rust_file(service):
 
                 args += f", {name}: {rename_type(type_)}"
 
+        ool_length = False
+        for i in range(0, len(call["args"])):
+            type_ = call["args"][i]["type"]
+            type_id = get_type_id_by_name(types, type_)
+            if ool_length:
+                ool_length = False
+            elif type_id == OOL_PAYLOAD:
+                server_params.append(f"slice::from_raw_parts(a{i} as *const u8, a{i + 1} as usize)")
+                ool_length = True
+            elif type_id == CHANNEL_PAYLOAD:
+                server_params.append(f"Channel::from_cid(a{i} as CId)")
+            else:
+                server_params.append(f"a{i} as {rename_type(type_)}")
+
+        ool_payload = None
         for i in range(0, 4):
             try:
                 name = call["rets"][i]["name"]
                 type_ = call["rets"][i]["type"]
             except IndexError:
                 params += ", &mut __r as *mut Payload"
+                casted_server_rets.append("0")
             else:
                 type_id = get_type_id_by_name(types, type_)
                 reply_header += f" | ({type_id} << {i * 3}u64)"
                 tmps.append(f"let mut {name}: Payload = 0;")
                 params += f", &mut {name} as *mut Payload"
-                rets_def.append(rename_type(type_))
                 if type_id == CHANNEL_PAYLOAD:
                     rets.append(f"Channel::from_cid({name} as CId)")
+                    rets_def.append(rename_type(type_))
+                    server_rets.append(name)
+                    casted_server_rets.append(f"{name}.to_cid() as Payload")
+                elif ool_payload is not None:
+                    rets.append(f"slice::from_raw_parts({ool_payload} as *const u8, {name} as usize)")
+                    casted_server_rets.append(f"{ool_payload}.len() as Payload")
+                    rets_def.append("&[u8]")
+                    ool_payload = None
+                elif type_id == OOL_PAYLOAD:
+                    ool_payload = name
+                    server_rets.append(name)
+                    casted_server_rets.append(f"{name}.as_ptr() as Payload")
                 else:
                     rets.append(f"{name} as {rename_type(type_)}")
+                    server_rets.append(name)
+                    casted_server_rets.append(f"{name} as Payload")
+                    rets_def.append(rename_type(type_))
 
         rets_def = ", ".join(rets_def)
         rets = ", ".join(rets)
         tmps = "\n".join(tmps)
+        server_params = ", ".join(server_params)
+        server_rets = ", ".join(server_rets)
+        casted_server_rets = ", ".join(casted_server_rets)
         msg_name = f"{service_name.upper()}_{call_name.upper()}_MSG"
         reply_msg_name = f"{service_name.upper()}_{call_name.upper()}_REPLY_MSG"
         header_name = f"{service_name.upper()}_{call_name.upper()}_HEADER"
         reply_header_name = f"{service_name.upper()}_{call_name.upper()}_REPLY_HEADER"
         consts += Template("""\
-const ${msg_name}: u16 = ${service_name_upper}_SERVICE | ${msg_id}u16;
-const ${reply_msg_name}: u16 = ${service_name_upper}_SERVICE | ${msg_id}u16 + 1;
-const ${header_name}: u64 = ((${msg_name} as u64) << 32) | ${header};
-const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_header};
+pub const ${msg_name}: u16 = ${service_name_upper}_SERVICE | ${msg_id}u16;
+pub const ${reply_msg_name}: u16 = ${service_name_upper}_SERVICE | ${msg_id}u16 + 1;
+pub const ${header_name}: u64 = ((${msg_name} as u64) << 32) | ${header};
+pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_header};
 """).substitute(**locals())
 
         stub += Template("""\
@@ -221,31 +265,54 @@ const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_h
 
         unsafe {
             ipc_call(self.cid, ${header_name} as Payload${params});
+            Ok((${rets}))
         }
-        Ok((${rets}))
     }
 """).substitute(**locals())
+
+        server += Template("""\
+    fn $call_name(&self, from: Channel${args}) -> ServerResult<(${rets_def})>;
+""").substitute(**locals())
+
+        handle += Template("""\
+            ${msg_name} => {
+                match self.${call_name}(from, ${server_params}) {
+                    Ok((${server_rets})) => (${reply_header_name} | OK_HEADER, ${casted_server_rets}),
+                    Err(err) => (${reply_header_name} | (err as u64) << ERROR_OFFSET, 0, 0, 0, 0),
+                }
+            }
+""").substitute(**locals())
+
+        msg_id += 1
 
     return Template("""\
 #![allow(dead_code)]
 #![allow(unused_imports)]
 #![allow(unused_parens)]
 
+use core::slice;
 use core::result::{Result};
 use error::{GeneralError};
 use channel::{Channel};
-use arch::{ipc_call, CId, Payload};
+use arch::{
+    CId, Payload,
+    Header, HeaderTrait,
+    ErrorCode, ERROR_OFFSET,
+    ipc_open, ipc_call, ipc_recv, ipc_replyrecv,
+};
+use server::{ServerResult};
 
-const ${service_name_upper}_SERVICE: u16 = $service_id << 8;
+pub const SERVICE_ID: u16 = $service_id << 8;
+pub const ${service_name_upper}_SERVICE: u16 = $service_id << 8;
 ${consts}
 
-pub struct $service_name_cap {
+pub struct $service_name_camel {
     cid: CId
 }
 
-impl $service_name_cap {
-    pub fn from_cid(cid: CId) -> $service_name_cap {
-        $service_name_cap {
+impl $service_name_camel {
+    pub fn from_cid(cid: CId) -> $service_name_camel {
+        $service_name_camel {
             cid: cid
         }
     }
@@ -253,6 +320,25 @@ impl $service_name_cap {
     $stub
 }
 
+pub trait Server {
+    $server
+}
+
+impl Server {
+    pub fn handle(&self, from: Channel, header: Header, a0: Payload, a1: Payload, a2: Payload, a3: Payload)
+        -> (Header, Payload, Payload, Payload, Payload) {
+
+        const OK_HEADER: Header = (ErrorCode::ErrorNone as u64) << ERROR_OFFSET;
+        unsafe {
+            match header.msg_type() {
+                $handle
+                _ => {
+                    ((ErrorCode::UnknownMsg as u64) << ERROR_OFFSET, 0, 0, 0, 0)
+                },
+            }
+        }
+    }
+}
 """).substitute(**locals())
 
 def generate_mod_rs(interfaces):

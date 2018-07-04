@@ -20,6 +20,7 @@ pub mod arch;
 pub mod lang_items;
 pub mod channel;
 pub mod print;
+pub mod server;
 
 global_asm!(include_str!("start.S"));
 
