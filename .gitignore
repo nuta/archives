@@ -2,6 +2,7 @@
 build
 *.log
 *.pyc
+**/target
 libs/rust/src/interfaces
 !libs/rust/src/interfaces/.gitkeep
 tools/idl/parser
