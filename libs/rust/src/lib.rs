@@ -8,6 +8,11 @@ extern crate alloc;
 pub use alloc::*;
 pub use core::*;
 
+#[inline(always)]
+pub fn align(x: usize, align: usize) -> usize {
+    (x + align - 1) & !(align - 1)
+}
+
 pub mod allocator;
 pub mod interfaces;
 pub mod error;
