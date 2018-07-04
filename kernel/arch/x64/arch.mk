@@ -4,6 +4,7 @@ arch_objs := startup.o init.o thread.o serial.o gdt.o idt.o tss.o paging.o \
 	idle.o syscall.o usercopy.o vga.o putchar.o
 
 disk_img = $(BUILD_DIR)/$(ARCH_DIR)/disk.img
+QEMU ?= qemu-system-x86_64
 BOCHS ?= bochs
 override CFLAGS += -O2 -g3 --target=x86_64
 override CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=large
@@ -16,14 +17,14 @@ QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw
 run:
 	$(MAKE) build
 	$(MAKE) $(disk_img)
-	qemu-system-x86_64 $(QEMUFLAGS)
+	$(QEMU) $(QEMUFLAGS)
 
 bochs: $(BUILD_DIR)/$(ARCH_DIR)/disk.img
 	rm -f $(ARCH_DIR)/disk.img.lock
 	$(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc
 
 test: $(ARCH_DIR)/disk.img
-	(sleep 3; echo -e "\x01cq") | qemu-system-x86_64 $(QEMUFLAGS) -hda $<
+	(sleep 3; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS) -hda $<
 
 $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.elf: $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.o $(ARCH_DIR)/boot/mbr.ld
 	$(PROGRESS) LD $@
