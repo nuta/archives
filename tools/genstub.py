@@ -90,8 +90,8 @@ def generate_c_file(service):
         header_name = f"{service_name.upper()}_{call_name.upper()}_HEADER"
         reply_header_name = f"{service_name.upper()}_{call_name.upper()}_REPLY_HEADER"
         stub += f"""\
-#define {msg_name}       ({service_name.upper()}_SERVICE | {msg_id}ULL)
-#define {reply_msg_name} ({service_name.upper()}_SERVICE | {msg_id + 1}ULL)
+#define {msg_name}       (({service_name.upper()}_SERVICE << 8) | {msg_id}ULL)
+#define {reply_msg_name} (({service_name.upper()}_SERVICE << 8) | {msg_id + 1}ULL)
 #define {header_name} (({msg_name} << 32ULL) | ({header}))
 #define {reply_header_name} (({reply_msg_name} << 32ULL) | ({reply_header}))
 static inline header_t call_{service_name}_{call_name}(channel_t __server{args}) {{
@@ -108,7 +108,7 @@ static inline header_t call_{service_name}_{call_name}(channel_t __server{args})
 #ifndef __RESEA_STUB_{service_name}_H__
 #define __RESEA_STUB_{service_name}_H__
 
-#define {service_name.upper()}_SERVICE ({service["id"]}U << 8U)
+#define {service_name.upper()}_SERVICE ({service["id"]}U)
 
 {stub}
 
@@ -254,8 +254,8 @@ def generate_rust_file(service):
         header_name = f"{service_name.upper()}_{call_name.upper()}_HEADER"
         reply_header_name = f"{service_name.upper()}_{call_name.upper()}_REPLY_HEADER"
         consts += Template("""\
-pub const ${msg_name}: u16 = ${service_name_upper}_SERVICE | ${msg_id}u16;
-pub const ${reply_msg_name}: u16 = ${service_name_upper}_SERVICE | ${msg_id}u16 + 1;
+pub const ${msg_name}: u16 = (${service_name_upper}_SERVICE  << 8) | ${msg_id}u16;
+pub const ${reply_msg_name}: u16 = (${service_name_upper}_SERVICE  << 8) | ${msg_id}u16 + 1;
 pub const ${header_name}: u64 = ((${msg_name} as u64) << 32) | ${header};
 pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_header};
 """).substitute(**locals())
@@ -303,8 +303,8 @@ use arch::{
     ipc_open, ipc_call, ipc_recv, ipc_replyrecv,
 };
 
-pub const SERVICE_ID: u16 = $service_id << 8;
-pub const ${service_name_upper}_SERVICE: u16 = $service_id << 8;
+pub const SERVICE_ID: u16 = $service_id;
+pub const ${service_name_upper}_SERVICE: u16 = $service_id;
 ${consts}
 
 pub struct $service_name_camel {

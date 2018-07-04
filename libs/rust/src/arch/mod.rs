@@ -30,7 +30,7 @@ pub trait HeaderTrait {
 
 impl HeaderTrait for Header {
     fn msg_type(&self) -> u16 {
-        ((self >> MINOR_ID_OFFSET) & 0xff) as u16
+        ((self >> MINOR_ID_OFFSET) & 0xffff) as u16
     }
 
     fn service_type(&self) -> u16 {
