@@ -1,4 +1,5 @@
-#![feature(lang_items, global_asm, alloc, allocator_api, global_allocator)]
+#![feature(lang_items, panic_implementation, global_asm, alloc, allocator_api, global_allocator)]
+#![feature(pattern_parentheses)]
 #![no_std]
 #![allow(unused_variables)]
 #![feature(asm)]
