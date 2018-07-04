@@ -16,9 +16,10 @@ ifeq ($(lang), rust)
 stubs := $(requires) $(implements) logging io
 stub_dir = libs/rust/src/interfaces
 abs_server_build_dir = $(PWD)/$(server_build_dir)
-$(executable): $(server_build_dir)/$(ARCH)/debug/$(name)
+artifact = $(abspath $(server_build_dir)/$(ARCH)/debug/$(name))
 
-$(server_build_dir)/$(ARCH)/debug/$(name): $(stub_dir)
+$(executable): $(artifact)
+$(artifact): $(stub_dir)/.build
 	mkdir -p $(server_build_dir)
 	$(PROGRESS) GEN $(server_build_dir)/$(ARCH).json
 	./libs/rust/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
@@ -36,11 +37,12 @@ $(server_build_dir)/$(ARCH)/debug/$(name): $(stub_dir)
 	$(PROGRESS) CP $(KFS_DIR)/servers/$(server_name)
 	cp $(BUILD_DIR)/servers/$(server_name)/server.elf $(KFS_DIR)/servers/$(server_name)
 
-$(stub_dir): tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
+$(stub_dir)/.build: tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
 	$(PROGRESS) "GENSTUB" $(stub_dir)
 	./tools/genstub.py --idl-dir interfaces --out-dir $(stub_dir) --lang rust $(stubs)
+	touch $@
 
-include $(wildcard $(server_build_dir)/debug/$(name).d)
+include $(wildcard $(server_build_dir)/$(ARCH)/debug/$(name).d)
 endif
 
 # C projects.
