@@ -53,7 +53,7 @@ static inline error_t handle_{service_name}_{call_name}(channel_t from{args}) {{
             mainloop += f"""\
             case {msg_name}:
                 error_t error = handle_{service_name}_{call_name}(from{params});
-                header = {reply_header_name} | error;
+                header = {reply_header_name} | (error << ERROR_OFFSET);
                 break;
 """
 
