@@ -10,5 +10,17 @@ void printk(const char *fmt, ...);
         printk("PANIC: " fmt "\n", ## __VA_ARGS__); \
         arch_panic(); \
     } while(0)
+#define HEXDUMP(buf, len) do {                    \
+        printk(#buf ":");                         \
+                                                  \
+        for (size_t i = 0; i < len; i++) {        \
+            if (i % 16 == 0) {                    \
+                printk("\n    ");                 \
+            }                                     \
+            printk("%x ", *((u8_t *) buf + i));   \
+        }                                         \
+                                                  \
+        printk("\n");                             \
+    } while (0)
 
 #endif
