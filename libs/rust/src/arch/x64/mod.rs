@@ -1,5 +1,14 @@
 use interfaces::{io};
 
+pub fn pmalloc(vaddr: u64, paddr: u64, len: usize) -> (usize, usize) {
+    // TODO: error handling
+    let server = io::Io::from_cid(1);
+    match server.pmalloc(vaddr as usize, paddr as usize, len) {
+        Ok((vaddr2, paddr2)) => (vaddr2, paddr2),
+        Err(_) => (0, 0)
+    }
+}
+
 pub struct IoPort {
     port: u16
 }
