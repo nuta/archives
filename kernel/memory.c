@@ -118,7 +118,8 @@ void handle_page_fault(uptr_t original_address, bool present, bool user, bool wr
     }
 
 invalid_access:
-    INFO("page fault: invalid page access %p", original_address);
+    INFO("page fault: invalid page access %p (#%d.%d)",
+        original_address, CPUVAR->current->process->pid, CPUVAR->current->tid);
     thread_destroy_current();
 }
 
