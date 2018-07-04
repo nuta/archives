@@ -294,6 +294,7 @@ pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${rep
 use core::slice;
 use server::{ServerResult};
 use channel::{Channel};
+use interfaces::discovery;
 use arch::{
     CId, Payload,
     Header, HeaderTrait,
@@ -313,6 +314,14 @@ impl $service_name_camel {
     pub fn from_cid(cid: CId) -> $service_name_camel {
         $service_name_camel {
             cid: cid
+        }
+    }
+
+    pub fn connect() -> $service_name_camel {
+        let discovery = discovery::Discovery::from_cid(1);
+        let ch = discovery.discover(${service_name_upper}_SERVICE).unwrap();
+        $service_name_camel {
+            cid: ch.to_cid()
         }
     }
 
