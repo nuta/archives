@@ -79,7 +79,6 @@ NORETURN void thread_destroy_current(void) {
 void thread_switch_to(struct thread *next) {
     struct thread *current = CPUVAR->current;
     CPUVAR->current = next;
-    DEBUG("[%d.%d] ==============================", next->process->pid, next->tid);
 
     if (next->process != kernel_process) {
         arch_switch_vmspace(&next->process->vms.arch);
