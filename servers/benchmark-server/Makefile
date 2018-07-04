@@ -2,4 +2,5 @@ name := benchmark-server
 lang := c
 objs := main.o
 libs :=
-requires := discovery benchmark
+requires := discovery
+implements := benchmark

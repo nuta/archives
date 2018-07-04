@@ -13,7 +13,7 @@ endif
 
 # Rust projects.
 ifeq ($(lang), rust)
-stubs := $(requires) logging io
+stubs := $(requires) $(implements) logging io
 stub_dir = libs/rust/src/interfaces
 abs_server_build_dir = $(PWD)/$(server_build_dir)
 $(executable): $(server_build_dir)/$(ARCH)/debug/$(name)
@@ -52,7 +52,7 @@ stub_dir = $(server_build_dir)/stub/c
 server_libs := resea $(filter-out resea, $(libs))
 server_objs := $(foreach obj, $(objs), $(DIR)/$(obj))
 server_include_dirs := $(include_dirs) $(stub_dir)
-stubs := $(requires) logging
+stubs := $(requires) $(implements) logging
 name :=
 objs :=
 libs :=
