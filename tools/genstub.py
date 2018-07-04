@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+from glob import glob
 import os
 from string import Template
 import sys
@@ -363,7 +364,11 @@ def generate_rust_stubs(idl_dir, out_dir, interfaces):
         stub = generate_rust_file(service)
         write_file(os.path.join(out_dir, f"{interface}.rs"), stub)
 
-    stub = generate_mod_rs(interfaces)
+    existing_interfaces = list(filter(lambda m: m != "mod", map(lambda f:
+        os.path.splitext(os.path.basename(f))[0],
+        glob(os.path.join(out_dir, "*.rs")))))
+
+    stub = generate_mod_rs(existing_interfaces)
     write_file(os.path.join(out_dir, f"mod.rs"), stub)
 
 def main():
