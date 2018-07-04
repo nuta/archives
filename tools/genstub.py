@@ -147,6 +147,7 @@ def generate_rust_file(service):
             "u32": 'u32',
             "u64": 'u64',
             "uptr": 'usize',
+            "imax": "isize",
             "channel": 'Channel',
             "usize": "usize",
             "string": "&[u8]",
