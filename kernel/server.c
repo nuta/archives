@@ -96,8 +96,8 @@ static inline error_t handle_io_ioalloc(channel_t from, u32_t base, usize_t leng
 
 
 static inline error_t handle_io_pmalloc(channel_t from, uptr_t vaddr, uptr_t paddr,
-                                        usize_t length, uptr_t *vaddr_allocated) {
-
+                                        usize_t length, uptr_t *vaddr_allocated,
+                                        uptr_t *paddr_allocated) {
     if (vaddr != 0) {
         return ERROR_NOT_IMPLEMENTED;
     }
@@ -108,9 +108,14 @@ static inline error_t handle_io_pmalloc(channel_t from, uptr_t vaddr, uptr_t pad
     length = ROUND_UP(length, PAGE_SIZE);
     vaddr = valloc(vms, length);
 
+    if (paddr == 0) {
+        paddr = alloc_pages(length, KMALLOC_NORMAL);
+    }
+
     arch_link_page(&vms->arch, vaddr, paddr, length / PAGE_SIZE, flags);
 
     *vaddr_allocated = vaddr;
+    *paddr_allocated = paddr;
     return ERROR_NONE;
 }
 
@@ -142,11 +147,11 @@ void kernel_server_mainloop(channel_t server) {
                 break;
             case IO_IOALLOC_MSG:
                 error = handle_io_ioalloc(from, (u32_t) a0, (usize_t) a1);
-                header = IO_IOALLOC_REPLY_HEADER | error;
+                header = IO_IOALLOC_REPLY_HEADER | (error << ERROR_OFFSET);
                 break;
             case IO_PMALLOC_MSG:
-                error = handle_io_pmalloc(from, (uptr_t) a0, (uptr_t) a1, (usize_t) a2, (uptr_t *) &r0);
-                header = IO_PMALLOC_REPLY_HEADER | error;
+                error = handle_io_pmalloc(from, (uptr_t) a0, (uptr_t) a1, (usize_t) a2, (uptr_t *) &r0, (uptr_t *) &r1);
+                header = IO_PMALLOC_REPLY_HEADER | (error << ERROR_OFFSET);
                 break;
             default:
                 /* Unknown message. */
