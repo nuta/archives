@@ -52,7 +52,7 @@ static inline error_t handle_discovery_register(channel_t from, u32_t service_ty
     for (struct client *c = clients; c != NULL;) {
         if (c->service_type == service_type) {
             channel_t client = ipc_connect(service->server);
-            ipc_send(c->ch, DISCOVERY_CONNECT_REPLY_HEADER, client, 0, 0, 0);
+            ipc_send(c->ch, DISCOVERY_DISCOVER_REPLY_HEADER, client, 0, 0, 0);
         }
 
         struct client *next = c->next;
@@ -64,8 +64,8 @@ static inline error_t handle_discovery_register(channel_t from, u32_t service_ty
 }
 
 
-static inline error_t handle_discovery_connect(channel_t from, u32_t service_type, channel_t *client) {
-    DEBUG("discovery.connect: service=%d", service_type);
+static inline error_t handle_discovery_discover(channel_t from, u32_t service_type, channel_t *client) {
+    DEBUG("discovery.discover: service=%d", service_type);
 
     for (struct service *service = services; service != NULL; service = service->next) {
         if (service->service_type == service_type) {
@@ -141,9 +141,9 @@ void kernel_server_mainloop(channel_t server) {
                 error = handle_discovery_register(from, (u32_t) a0, (channel_t) a1);
                 header = DISCOVERY_REGISTER_REPLY_HEADER | (error << ERROR_OFFSET);
                 break;
-            case DISCOVERY_CONNECT_MSG:
-                error = handle_discovery_connect(from, (u32_t) a0, (channel_t *) &r0);
-                header = DISCOVERY_CONNECT_REPLY_HEADER | (error << ERROR_OFFSET);
+            case DISCOVERY_DISCOVER_MSG:
+                error = handle_discovery_discover(from, (u32_t) a0, (channel_t *) &r0);
+                header = DISCOVERY_DISCOVER_REPLY_HEADER | (error << ERROR_OFFSET);
                 break;
             case IO_IOALLOC_MSG:
                 error = handle_io_ioalloc(from, (u32_t) a0, (usize_t) a1);

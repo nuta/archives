@@ -1,4 +1,4 @@
 service "discovery" (3)
 
 register(msg_type: u16, server: channel) -> ();
-connect(msg_type: u16) -> (client: channel);
+discover(msg_type: u16) -> (client: channel);
