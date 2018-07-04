@@ -50,8 +50,9 @@ macro_rules! serve_forever {
             }
 
             unsafe {
-                header = ipc_replyrecv($server.ch.to_cid(), &mut from, header, r0, r1, r2, r3,
-                    &mut a0 as *mut Payload, &mut a1  as *mut Payload, &mut a2 as *mut Payload, &mut a3 as *mut Payload);
+                header = ipc_replyrecv(&mut from, header, r0, r1, r2, r3,
+                    &mut a0 as *mut Payload, &mut a1 as *mut Payload,
+                    &mut a2 as *mut Payload, &mut a3 as *mut Payload);
             }
         }
     };

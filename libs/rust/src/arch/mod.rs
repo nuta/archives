@@ -49,7 +49,7 @@ extern "C" {
                     a2: Payload, a3: Payload) -> Header;
     pub fn ipc_recv(ch: CId, from: *mut CId, a0: *mut Payload, a1: *mut Payload,
                     a2: *mut Payload, a3: *mut Payload) -> Header;
-    pub fn ipc_replyrecv(server: CId, client: *mut CId, header: Header, r0: Payload, r1: Payload,
+    pub fn ipc_replyrecv(client: *mut CId, header: Header, r0: Payload, r1: Payload,
                          r2: Payload, r3: Payload, a0: *mut Payload, a1: *mut Payload,
                          a2: *mut Payload, a3: *mut Payload) -> Header;
 }
