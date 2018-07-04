@@ -1,0 +1,9 @@
+service "fs" (6)
+
+open(path: string, path_length: usize) -> (fd: imax);
+open_dir(path: string, path_length: usize) -> (fd: imax);
+close(fd: imax) -> ();
+read(fd: imax, offset: u64, length: usize) -> (data: buffer);
+write(fd: imax, offset: u64, data: buffer, data_length: usize) -> ();
+readdir(fd: imax, offset: u64) -> (path: string, path_length: usize);
+stat(fd: imax, path: string, path_length: usize) -> (stat: buffer, stat_length: usize);
