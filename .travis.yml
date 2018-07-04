@@ -10,10 +10,10 @@ addons:
   apt:
     sources:
       - llvm-toolchain-trusty-6.0
+      - ubuntu-toolchain-r-test
     packages:
+      - clang-6.0
       - lld-6.0
-      - libllvm6.0
-      - llvm-6.0-dev
       - qemu-system-x86
       - mtools
 
