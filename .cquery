@@ -6,5 +6,5 @@
 -I./libs/resea/include
 -I./libs/resea/include/arch/x64
 -I./kernel/arch/x64
--I./build
+-I./build/stub/c
 -I./
