@@ -3,7 +3,7 @@ pub type ServerResult<T> = Result<T, ErrorCode>;
 
 #[macro_export]
 macro_rules! register_as {
-    ($server:expr, $($service:ident)*) => {
+    ($server:expr, [$($service:ident), *]) => {
         let discovery = resea::interfaces::discovery::Discovery::from_cid(1);
         $(
             discovery.register($service::SERVICE_ID, $server.ch.clone());
@@ -13,7 +13,7 @@ macro_rules! register_as {
 
 #[macro_export]
 macro_rules! serve_forever {
-    ($server:expr, $($service:ident)*) => {
+    ($server:expr, [$($service:ident), *]) => {
         use resea::arch::{
             CId, Payload,
             Header, HeaderTrait,

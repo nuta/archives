@@ -44,6 +44,6 @@ impl BlkDeviceServer for VirtioBlkServer {
 fn main() {
     println!("virtio: starting virtio driver...");
     let server = VirtioBlkServer::new();
-    register_as!(&server, blk_device);
-    serve_forever!(&server, blk_device);
+    register_as!(&server, [blk_device]);
+    serve_forever!(&server, [blk_device]);
 }
