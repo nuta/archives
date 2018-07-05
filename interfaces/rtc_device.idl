@@ -1,0 +1,3 @@
+service "rtc_device" (102)
+
+read() -> (ymd: u32, hms: u32, nsec: u32);
