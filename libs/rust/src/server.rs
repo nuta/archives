@@ -2,6 +2,16 @@ use arch::{ErrorCode};
 pub type ServerResult<T> = Result<T, ErrorCode>;
 
 #[macro_export]
+macro_rules! register_as {
+    ($server:expr, $($service:ident)*) => {
+        let discovery = resea::interfaces::discovery::Discovery::from_cid(1);
+        $(
+            discovery.register($service::SERVICE_ID, $server.ch.clone());
+        )*
+    }
+}
+
+#[macro_export]
 macro_rules! serve_forever {
     ($server:expr, $($service:ident)*) => {
         use resea::arch::{
@@ -10,11 +20,6 @@ macro_rules! serve_forever {
             ErrorCode, ERROR_OFFSET,
             ipc_recv, ipc_replyrecv,
         };
-
-        let discovery = resea::interfaces::discovery::Discovery::from_cid(1);
-        $(
-            discovery.register($service::SERVICE_ID, $server.ch.clone());
-        )*
 
         let mut header: Header = 0;
         let mut from: CId = 0;
