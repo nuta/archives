@@ -26,6 +26,7 @@ typedef u8_t * buffer_t;
 #define ERRTYPE(header) (((header) >> ERROR_OFFSET) & 0xff)
 #define MSG_SERVICE_ID(header) (((header) >> MAJOR_ID_OFFSET) & 0xffff)
 #define MSG_ID(header) (((header) >> MINOR_ID_OFFSET) & 0xff)
+#define NOTIFICATION_MSG ((0ULL << MAJOR_ID_OFFSET) | (1ULL << MINOR_ID_OFFSET))
 
 enum {
     /* Errors returned from the app. */
@@ -63,6 +64,7 @@ struct msg {
 struct thread;
 struct channel {
     int flags;
+    payload_t notifications;
     channel_t cid;
     struct process *process;
     struct channel *linked_to;
@@ -108,6 +110,7 @@ struct msg *sys_replyrecv(
 );
 
 channel_t sys_connect(channel_t server);
+error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask);
 
 static inline header_t ipc_recv(
     channel_t ch,
@@ -192,6 +195,10 @@ static inline header_t ipc_replyrecv(
 
 static inline channel_t ipc_connect(channel_t server) {
     return sys_connect(server);
+}
+
+static inline error_t ipc_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
+    return sys_notify(ch, and_mask, or_mask);
 }
 
 #endif

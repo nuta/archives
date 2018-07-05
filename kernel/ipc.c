@@ -33,6 +33,7 @@ struct channel *channel_create(struct process *process) {
         struct channel *ch = &process->channels[i];
         if (ch->flags == 0) {
             ch->flags = 1;
+            ch->notifications = 0;
             ch->cid = i + 1;
             ch->process = process;
             ch->linked_to = NULL;
@@ -291,6 +292,15 @@ struct msg *sys_recv(channel_t ch) {
         return ERROR_PTR(ERROR_CH_IN_USE);
     }
 
+    if (src->notifications) {
+receive_notification:
+        current_thread->buffer.payloads[0] = NOTIFICATION_MSG;
+        current_thread->buffer.payloads[1] = src->notifications;
+        src->notifications = 0;
+        src->receiver = NULL;
+        return &current_thread->buffer;
+    }
+
     // Wait for the sender.
     // Resume a thread in the wait queue.
     if (likely(src->sender)) {
@@ -305,6 +315,11 @@ struct msg *sys_recv(channel_t ch) {
     }
 
     thread_block_current();
+
+    if (!src->sender) {
+        // We have received a notification. Try again.
+        goto receive_notification;
+    }
 
     // Receiver sent a reply message and resumed the sender thread. Do recv
     // work. Release sender/receiver rights and return the receiver message.
@@ -346,6 +361,24 @@ channel_t sys_transfer(channel_t ch, channel_t dest) {
 channel_t sys_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t ool3) {
     /* TODO */
     return 0;
+}
+
+/* This function would be called in an interrupt context: don't
+  use mutexes and printk nor they cause a dead lock! */
+error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
+    struct channel *dst = get_channel_by_id(ch);
+    if (!ch) {
+        return ERROR_INVALID_CH;
+    }
+
+    dst->notifications = (dst->notifications & and_mask) | or_mask;
+
+    struct thread *receiver = dst->receiver;
+    if (receiver) {
+        thread_resume(receiver);
+    }
+
+    return ERROR_NONE;
 }
 
 
