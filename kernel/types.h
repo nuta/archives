@@ -18,6 +18,9 @@ struct cpuvar {
 #define IS_ERROR_PTR(ptr) ((uptr_t) (ptr) < NULL_PAGE_SIZE)
 #define ERROR_FROM_PTR(ptr) ((int) (ptr))
 
+// Arch is responsible for call this function on an interrupt.
+void handle_irq(int irq);
+
 void arch_init(void);
 void arch_early_init(void);
 void arch_putchar(char ch);
@@ -36,5 +39,6 @@ void arch_link_page(struct arch_vmspace *vms, uptr_t vaddr, paddr_t paddr, size_
                     int attrs);
 void arch_copy_from_user(void *kernel, uptr_t user, size_t length);
 void arch_allow_io(struct arch_thread *arch);
+void arch_accept_irq(int irq);
 
 #endif
