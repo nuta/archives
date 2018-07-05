@@ -118,7 +118,7 @@ impl Virtio {
 
     pub unsafe fn setup_queue(&mut self, queue_index: u8) {
         /* Get the number of queue. */
-        self.ioport.out16(IO_QUEUE_SELECT, queue_index);
+        self.ioport.out16(IO_QUEUE_SELECT, queue_index.into());
         let queue_num = self.ioport.in16(IO_QUEUE_SIZE) as usize;
 
         if queue_num == 0 {
@@ -173,7 +173,7 @@ impl Virtio {
             let used_index = (*queue.used).index;
 
             /* notify the device */
-            self.ioport.out16(IO_QUEUE_NOTIFY, queue.index);
+            self.ioport.out16(IO_QUEUE_NOTIFY, queue.index.into());
 
             /* Wait for completion. TODO: use interrupt */
             while (*queue.used).index == used_index {};
