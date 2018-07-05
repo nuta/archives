@@ -34,13 +34,13 @@ impl IoPort {
     }
 
     #[inline]
-    pub unsafe fn out16(&self, offset: u16, value: u8) {
+    pub unsafe fn out16(&self, offset: u16, value: u16) {
         asm!("outw %ax, %dx" :: "{dx}"(self.port + offset), "{ax}"(value));
     }
 
     #[inline]
-    pub unsafe fn in16(&self, offset: u16) -> u8 {
-        let value: u8;
+    pub unsafe fn in16(&self, offset: u16) -> u16 {
+        let value: u16;
         asm!("inw %dx, %ax" : "={ax}"(value) : "{dx}"(self.port + offset));
         value
     }
