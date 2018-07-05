@@ -3,4 +3,4 @@ lang := rust
 objs :=
 libs :=
 requires := discovery io
-implements := rtc_device
+implements := rtc_device kbd_device
