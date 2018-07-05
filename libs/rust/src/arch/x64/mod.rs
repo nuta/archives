@@ -1,3 +1,4 @@
+use channel::{Channel};
 use interfaces::{io};
 
 pub fn pmalloc(vaddr: u64, paddr: u64, len: usize) -> (usize, usize) {
@@ -8,6 +9,24 @@ pub fn pmalloc(vaddr: u64, paddr: u64, len: usize) -> (usize, usize) {
         Err(_) => (0, 0)
     }
 }
+
+pub struct Irq {
+    irq: u32
+}
+
+impl Irq {
+    pub fn new(irq: u32) -> Irq {
+        Irq {
+            irq: irq
+        }
+    }
+
+    pub fn listen(&self, ch: &Channel) {
+        // TODO: error handling
+        io::Io::from_cid(1).listen_for_irq(self.irq, ch.clone()).ok();
+    }
+}
+
 
 pub struct IoPort {
     port: u16
