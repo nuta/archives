@@ -3,4 +3,5 @@ members = [
     "libs/rust",
     "libs/virtio",
     "servers/virtio-blk",
+    "servers/pc",
 ]
