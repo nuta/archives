@@ -120,6 +120,37 @@ static inline error_t handle_io_pmalloc(channel_t from, uptr_t vaddr, uptr_t pad
 }
 
 
+#define IRQ_MAX 32
+struct irq_listener {
+    channel_t listener;
+};
+
+struct irq_listener irq_listeners[IRQ_MAX];
+
+void handle_irq(int irq) {
+    if (irq >= IRQ_MAX) {
+        return;
+    }
+
+    channel_t listener = irq_listeners[irq].listener;
+    if (listener) {
+        ipc_notify(listener, 0, 1);
+    }
+}
+
+static inline error_t handle_io_listen_for_irq(channel_t from, u32_t irq, channel_t listener) {
+    DEBUG("io.listen_for_irq: irq=%d", irq);
+
+    if (irq >= IRQ_MAX) {
+        return ERROR_INVALID_ARG;
+    }
+
+    arch_accept_irq(irq);
+    irq_listeners[irq].listener = listener;
+    return ERROR_NONE;
+}
+
+
 void kernel_server_mainloop(channel_t server) {
     channel_t from;
     payload_t a0, a1, a2, a3;
@@ -153,6 +184,10 @@ void kernel_server_mainloop(channel_t server) {
                 error = handle_io_pmalloc(from, (uptr_t) a0, (uptr_t) a1, (usize_t) a2, (uptr_t *) &r0, (uptr_t *) &r1);
                 header = IO_PMALLOC_REPLY_HEADER | (error << ERROR_OFFSET);
                 break;
+            case IO_LISTEN_FOR_IRQ_MSG:
+                error = handle_io_listen_for_irq(from, (u32_t) a0, (channel_t) a1);
+                header = IO_LISTEN_FOR_IRQ_REPLY_HEADER | (error << ERROR_OFFSET);
+                break;
             default:
                 /* Unknown message. */
                 DEBUG("kernel: unknown message %d.%d", MSG_SERVICE_ID(header), MSG_ID(header));
@@ -178,6 +213,10 @@ void kernel_server_init(void) {
     service_list_init(&services);
     client_list_init(&clients);
     kmutex_init(&logging_lock, KMUTEX_UNLOCKED);
+
+    for (int i = 0; i < IRQ_MAX; i++) {
+        irq_listeners[i].listener = 0;
+    }
 
     kernel_channel = channel_create(kernel_process);
     if (kernel_channel == NULL) {
