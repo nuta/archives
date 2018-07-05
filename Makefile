@@ -7,7 +7,7 @@ server_dirs := $(wildcard servers/*)
 
 build:
 	@mkdir -p $(KFS_DIR)/servers
-	@for server_dir in $(addprefix servers/, $(SERVERS)); do \
+	@set -e; for server_dir in $(addprefix servers/, $(SERVERS)); do \
 		$(MAKE) $$server_dir; \
 	done
 	$(MAKE) $(BUILD_DIR)/kernel/kernel.elf
