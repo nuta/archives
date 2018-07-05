@@ -32,6 +32,7 @@ enum {
     ERROR_NONE = 0,
     ERROR_UNKNOWN_MSG = 1,
     ERROR_NOT_IMPLEMENTED = 2,
+    ERROR_INVALID_ARG = 3,
 
     /* errors returned by kernel */
     ERROR_NO_MEMORY = 200,
