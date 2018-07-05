@@ -19,6 +19,7 @@
 #define APIC_REG_TIMER_INITCNT 0xfee00380
 #define APIC_REG_TIMER_CURRENT 0xfee00390
 #define APIC_REG_TIMER_DIV     0xfee003e0
+#define APIC_TIMER_VECTOR 32
 
 static inline u32_t x64_read_apic(paddr_t addr) {
 
