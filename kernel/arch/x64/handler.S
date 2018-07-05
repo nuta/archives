@@ -104,7 +104,7 @@ x64_syscall_handler:
 .endm
 
 .macro LEAVE_RECV_SYSCALL
-    cmp rax, 0
+    cmp rax, 0x1000 /* NULL_PAGE_SIZE */
     jb 1f
     mov rdx, [rax + 8]
     mov r8,  [rax + 16]
@@ -141,7 +141,7 @@ ipc_recv_handler:
     push rcx /* user RIP */
     xchg rcx, r10
     call sys_recv
-    cmp rax, 0
+    cmp rax, 0x1000 /* NULL_PAGE_SIZE */
     jb 1f
     mov rdx, [rax + 8]
     mov r8,  [rax + 16]
@@ -155,7 +155,7 @@ ipc_recv_handler:
 ipc_call_handler:
     ENTER_RECV_SYSCALL
     call sys_call
-    cmp rax, 0
+    cmp rax, 0x1000 /* NULL_PAGE_SIZE */
     jb 1f
     mov rdx, [rax + 16]
     mov r8,  [rax + 24]
