@@ -42,6 +42,7 @@ impl HeaderTrait for Header {
 extern "C" {
     pub fn ipc_open() -> CId;
     pub fn ipc_close(cid: CId);
+    pub fn ipc_transfer(ch: CId, dest: CId);
 
     pub fn ipc_call(ch: CId, header: Header, a0: Payload, a1: Payload,
                     a2: Payload, a3: Payload, r0: *mut Payload, r1: *mut Payload,

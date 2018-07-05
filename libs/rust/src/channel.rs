@@ -1,4 +1,4 @@
-use arch::{CId, ipc_open};
+use arch::{CId, ipc_open, ipc_transfer};
 
 #[derive(Debug, Clone)]
 pub struct Channel {
@@ -7,11 +7,7 @@ pub struct Channel {
 
 impl Channel {
     pub fn create() -> Channel {
-        let cid;
-        unsafe {
-            cid =ipc_open();
-        }
-
+        let cid = unsafe { ipc_open() };
         Channel { cid: cid }
     }
 
@@ -21,5 +17,11 @@ impl Channel {
 
     pub fn to_cid(&self) -> CId {
         self.cid
+    }
+
+    pub fn transfer_to(&self, dest: &Channel) {
+        unsafe {
+            ipc_transfer(self.cid, dest.cid);
+        }
     }
 }
