@@ -139,6 +139,9 @@ ipc_link:
 /* header_t ipc_transfer(channel_t ch, channel_t dest); */
 .globl ipc_transfer
 ipc_transfer:
+    xchg rcx, r10
+    mov rax, 8
+    syscall
     ret
 
 /* channel_t ipc_connect(channel_t server); */
