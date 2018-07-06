@@ -59,6 +59,9 @@ void x64_init_smp(void) {
             case MP_BASETABLE_LOCALINT_ASSIGN_ENTRY:
                 size = sizeof(struct mp_localint_assign_entry);
                 break;
+            default:
+                /* FIXME: Unknown entry. Abort for now. */
+                return;
         }
 
         entry_ptr = (void *) ((paddr_t) entry_ptr + (paddr_t) size);
