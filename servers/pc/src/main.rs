@@ -4,12 +4,15 @@
 extern crate resea;
 use core::cell::{RefCell};
 use core::option::{Option};
+use resea::arch::{ErrorCode};
 use resea::channel::{Channel};
 use resea::server::{ServerResult};
 use resea::interfaces::kbd_device;
 use resea::interfaces::kbd_device::{Server as KbdDeviceServer};
 use resea::interfaces::rtc_device;
 use resea::interfaces::rtc_device::{Server as RtcDeviceServer};
+use resea::interfaces::events;
+use resea::interfaces::events::{Server as EventsServer};
 mod rtc;
 mod keyboard;
 use rtc::{Rtc};
@@ -57,11 +60,19 @@ impl KbdDeviceServer for PcServer {
     }
 }
 
+impl EventsServer for PcServer {
+    fn notification(&self, _from: Channel, notification: usize) -> ServerResult<()> {
+        let keycode = self.kbd.get_keycode();
+        // TODO: send to kbd_listener
+        Err(ErrorCode::DontReply)
+    }
+}
+
 fn main() {
     println!("pc: starting pc driver...");
     let server = PcServer::new();
     server.listen_for_irq();
 
     register_as!(&server, [kbd_device]);
-    serve_forever!(&server, [kbd_device]);
+    serve_forever!(&server, [kbd_device, events]);
 }
