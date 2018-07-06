@@ -1,4 +1,4 @@
-global_asm!(include_str!("../../../resea/arch/x64/syscall.S"));
+global_asm!(include_str!("../../../libresea/arch/x64/syscall.S"));
 
 #[cfg(target_arch="x86_64")]
 pub mod x64;

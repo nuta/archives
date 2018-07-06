@@ -3,8 +3,8 @@
 -I./libs/string
 -I./libs/printf
 -I./libs/list
--I./libs/resea/include
--I./libs/resea/include/arch/x64
+-I./libs/libresea/include
+-I./libs/libresea/include/arch/x64
 -I./kernel/arch/x64
 -I./build/stub/c
 -I./

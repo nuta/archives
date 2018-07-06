@@ -12,7 +12,7 @@ TEMPLATES = {
     "linker": "$lld_path",
     "pre-link-args": {
         "ld": [
-            "--script=$repo_dir/libs/rust/app.ld"
+            "--script=$repo_dir/libs/resea/app.ld"
         ]
     },
     "target-endian": "little",

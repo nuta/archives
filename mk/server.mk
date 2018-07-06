@@ -14,7 +14,7 @@ endif
 # Rust projects.
 ifeq ($(lang), rust)
 stubs := $(requires) $(implements) logging io
-stub_dir = libs/rust/src/interfaces
+stub_dir = libs/resea/src/interfaces
 abs_server_build_dir = $(PWD)/$(server_build_dir)
 artifact = $(abspath $(server_build_dir)/$(ARCH)/debug/$(name))
 
@@ -22,7 +22,7 @@ $(executable): $(artifact)
 $(artifact): $(stub_dir)/.build
 	mkdir -p $(server_build_dir)
 	$(PROGRESS) GEN $(server_build_dir)/$(ARCH).json
-	./libs/rust/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
+	./libs/resea/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
 
 	$(PROGRESS) XARGO $(server_build_dir)
 	cd $(DIR) && \
@@ -51,7 +51,7 @@ ifeq ($(lang), c)
 include kernel/arch/$(ARCH)/arch.mk
 
 stub_dir = $(server_build_dir)/stub/c
-server_libs := resea $(filter-out resea, $(libs))
+server_libs := libresea $(filter-out libresea, $(libs))
 server_objs := $(foreach obj, $(objs), $(DIR)/$(obj))
 server_include_dirs := $(include_dirs) $(stub_dir)
 stubs := $(requires) $(implements) logging
@@ -74,7 +74,7 @@ s_objs := $(addprefix $(server_build_dir)/, \
 
 $(executable): $(c_objs) $(s_objs)
 	$(PROGRESS) LD $@
-	$(LD) $(LDFLAGS) --script libs/resea/arch/$(ARCH)/app.ld -o $@ $^
+	$(LD) $(LDFLAGS) --script libs/libresea/arch/$(ARCH)/app.ld -o $@ $^
 	cp $@ $@.debug
 	$(PROGRESS) STRIP $@
 	$(STRIP) $@

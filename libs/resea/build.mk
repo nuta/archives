@@ -1,5 +1,4 @@
-objs := arch/$(ARCH)/start.o arch/$(ARCH)/syscall.o printf.o string.o list.o
-include_dirs := include arch/$(ARCH)
+objs := start.o
 subdirs := arch/$(ARCH)
 
-include libs/lib.mk
+include mk/lib.mk

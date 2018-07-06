@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "libs/rust",
+    "libs/resea",
     "libs/virtio",
     "servers/virtio-blk",
     "servers/pc",
