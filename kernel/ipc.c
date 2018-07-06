@@ -294,8 +294,9 @@ struct msg *sys_recv(channel_t ch) {
 
     if (src->notifications) {
 receive_notification:
-        current_thread->buffer.payloads[0] = NOTIFICATION_MSG;
-        current_thread->buffer.payloads[1] = src->notifications;
+        current_thread->buffer.header = NOTIFICATION_MSG;
+        current_thread->buffer.sent_from = src->cid;
+        current_thread->buffer.payloads[0] = src->notifications;
         src->notifications = 0;
         src->receiver = NULL;
         return &current_thread->buffer;
@@ -317,7 +318,7 @@ receive_notification:
     thread_block_current();
 
     if (!src->sender) {
-        // We have received a notification. Try again.
+        // We have received a notification.
         goto receive_notification;
     }
 
@@ -366,8 +367,14 @@ channel_t sys_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t 
 /* This function would be called in an interrupt context: don't
   use mutexes and printk nor they cause a dead lock! */
 error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
-    struct channel *dst = get_channel_by_id(ch);
-    if (!ch) {
+    struct channel *src = get_channel_by_id(ch);
+    if (!src) {
+        return ERROR_INVALID_CH;
+    }
+
+    struct channel *linked_to = src->linked_to;
+    struct channel *dst = linked_to->transfer_to ?: linked_to;
+    if (!dst) {
         return ERROR_INVALID_CH;
     }
 
@@ -378,6 +385,7 @@ error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
         thread_resume(receiver);
     }
 
+    DEBUG("sys_notify: %p @%d.%d", dst->notifications, dst->process->pid, dst->cid);
     return ERROR_NONE;
 }
 
