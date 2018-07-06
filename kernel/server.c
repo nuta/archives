@@ -166,32 +166,32 @@ void kernel_server_mainloop(channel_t server) {
                 break;
             case LOGGING_EMIT_MSG:
                 error = handle_logging_emit(from, (string_t) a0, (usize_t) a1);
-                header = LOGGING_EMIT_REPLY_HEADER | (error << ERROR_OFFSET);
+                header = LOGGING_EMIT_REPLY_HEADER | error;
                 break;
             case DISCOVERY_REGISTER_MSG:
                 error = handle_discovery_register(from, (u32_t) a0, (channel_t) a1);
-                header = DISCOVERY_REGISTER_REPLY_HEADER | (error << ERROR_OFFSET);
+                header = DISCOVERY_REGISTER_REPLY_HEADER | error;
                 break;
             case DISCOVERY_DISCOVER_MSG:
                 error = handle_discovery_discover(from, (u32_t) a0, (channel_t *) &r0);
-                header = DISCOVERY_DISCOVER_REPLY_HEADER | (error << ERROR_OFFSET);
+                header = DISCOVERY_DISCOVER_REPLY_HEADER | error;
                 break;
             case IO_IOALLOC_MSG:
                 error = handle_io_ioalloc(from, (u32_t) a0, (usize_t) a1);
-                header = IO_IOALLOC_REPLY_HEADER | (error << ERROR_OFFSET);
+                header = IO_IOALLOC_REPLY_HEADER | error;
                 break;
             case IO_PMALLOC_MSG:
                 error = handle_io_pmalloc(from, (uptr_t) a0, (uptr_t) a1, (usize_t) a2, (uptr_t *) &r0, (uptr_t *) &r1);
-                header = IO_PMALLOC_REPLY_HEADER | (error << ERROR_OFFSET);
+                header = IO_PMALLOC_REPLY_HEADER | error;
                 break;
             case IO_LISTEN_FOR_IRQ_MSG:
                 error = handle_io_listen_for_irq(from, (u32_t) a0, (channel_t) a1);
-                header = IO_LISTEN_FOR_IRQ_REPLY_HEADER | (error << ERROR_OFFSET);
+                header = IO_LISTEN_FOR_IRQ_REPLY_HEADER | error;
                 break;
             default:
                 /* Unknown message. */
-                DEBUG("kernel: unknown message %d.%d", MSG_SERVICE_ID(header), MSG_ID(header));
-                header = ERROR_UNKNOWN_MSG << ERROR_OFFSET;
+                DEBUG("kernel: unknown message %d.%d", SRVTYPE(header), MSGTYPE(header));
+                header = ERROR_UNKNOWN_MSG;
                 break;
         }
 

@@ -3,9 +3,9 @@ global_asm!(include_str!("../../../libresea/arch/x64/syscall.S"));
 #[cfg(target_arch="x86_64")]
 pub mod x64;
 
-pub const ERROR_OFFSET: u64 = 24;
-pub const MINOR_ID_OFFSET: u64 = 32;
-pub const MAJOR_ID_OFFSET: u64 = 40;
+pub const ERROR_OFFSET: u64 = 0;
+pub const MINOR_ID_OFFSET: u64 = 16;
+pub const MAJOR_ID_OFFSET: u64 = 24;
 
 #[derive(Debug)]
 pub enum ErrorCode {

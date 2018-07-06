@@ -67,7 +67,7 @@ def generate_c_file(service):
                 params += ", 0"
             else:
                 type_id = get_type_id_by_name(types, type_)
-                header += f" | ({type_id} << {i * 3}ULL)"
+                header += f" | ({type_id} << {i * 2}UL)"
                 args += f", {type_}_t {name}"
                 params += f", (payload_t) {name}"
                 server_params += f", ({type_}_t) a{i}"
@@ -80,7 +80,7 @@ def generate_c_file(service):
                 params += ", &__unused"
             else:
                 type_id = get_type_id_by_name(types, type_)
-                reply_header += f" | ({type_id} << {i * 3}ULL)"
+                reply_header += f" | ({type_id} << {i * 2}UL)"
                 args += f", {type_}_t *{name}"
                 params += f", (payload_t *) {name}"
                 server_params += f", ({type_}_t *) &r{i}"
@@ -90,10 +90,10 @@ def generate_c_file(service):
         header_name = f"{service_name.upper()}_{call_name.upper()}_HEADER"
         reply_header_name = f"{service_name.upper()}_{call_name.upper()}_REPLY_HEADER"
         stub += f"""\
-#define {msg_name}       (({service_name.upper()}_SERVICE << 8) | {msg_id}ULL)
-#define {reply_msg_name} (({service_name.upper()}_SERVICE << 8) | {msg_id + 1}ULL)
-#define {header_name} (({msg_name} << 32ULL) | ({header}))
-#define {reply_header_name} (({reply_msg_name} << 32ULL) | ({reply_header}))
+#define {msg_name}       (({service_name.upper()}_SERVICE << 8) | {msg_id}UL)
+#define {reply_msg_name} (({service_name.upper()}_SERVICE << 8) | {msg_id + 1}UL)
+#define {header_name} (({msg_name} << 16UL) | (({header}) << 8))
+#define {reply_header_name} (({reply_msg_name} << 16UL) | (({reply_header}) << 8))
 static inline header_t call_{service_name}_{call_name}(channel_t __server{args}) {{
     payload_t __unused;
 
@@ -180,7 +180,7 @@ def generate_rust_file(service):
                 params += ", 0"
             else:
                 type_id = get_type_id_by_name(types, type_)
-                header += f" | ({type_id} << {i * 3}u64)"
+                header += f" | ({type_id} << {i * 2}u64)"
                 if skip_next:
                     skip_next = False
                     continue
@@ -220,7 +220,7 @@ def generate_rust_file(service):
                 casted_server_rets.append("0")
             else:
                 type_id = get_type_id_by_name(types, type_)
-                reply_header += f" | ({type_id} << {i * 3}u64)"
+                reply_header += f" | ({type_id} << {i * 2}u64)"
                 tmps.append(f"let mut {name}: Payload = 0;")
                 params += f", &mut {name} as *mut Payload"
                 if type_id == CHANNEL_PAYLOAD:
@@ -256,8 +256,8 @@ def generate_rust_file(service):
         consts += Template("""\
 pub const ${msg_name}: u16 = (${service_name_upper}_SERVICE  << 8) | ${msg_id}u16;
 pub const ${reply_msg_name}: u16 = (${service_name_upper}_SERVICE  << 8) | ${msg_id}u16 + 1;
-pub const ${header_name}: u64 = ((${msg_name} as u64) << 32) | ${header};
-pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 32) | ${reply_header};
+pub const ${header_name}: u64 = ((${msg_name} as u64) << 16) | ((${header}) << 8);
+pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 16) | ((${reply_header}) << 8);
 """).substitute(**locals())
 
         stub += Template("""\

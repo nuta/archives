@@ -197,7 +197,7 @@ static header_t sys_send_slowpath(channel_t ch, header_t header, payload_t a0,
         src->process->pid, src->cid,
         linked_to->process->pid, linked_to->cid,
         dst->process->pid, dst->cid,
-        MSG_SERVICE_ID(header), MSG_ID(header));
+        SRVTYPE(header), MSGTYPE(header));
 
     // Get the sender right.
     while (true) {
@@ -249,12 +249,12 @@ header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
     struct channel *src, *dst, *linked_to;
     struct thread *receiver;
 
-    bool slowpath =  ((header & 0xfff) != 0 /* Are all payloads inlined? */
+    bool slowpath =  PAYLOAD_TYPES(header) != 0 /* Are all payloads inlined? */
                   || (src = get_channel_by_id(ch)) == NULL
                   || (linked_to = src->linked_to) == NULL
                   || (dst = (linked_to->transfer_to ?: linked_to)) == NULL
                   || !atomic_compare_and_swap(&dst->sender, NULL, CPUVAR->current)
-                  || (receiver = dst->receiver) == NULL);
+                  || (receiver = dst->receiver) == NULL;
 
     if (unlikely(slowpath)) {
         return sys_send_slowpath(ch, header, a0, a1, a2, a3);
@@ -264,7 +264,7 @@ header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
         src->process->pid, src->cid,
         linked_to->process->pid, linked_to->cid,
         dst->process->pid, dst->cid,
-        MSG_SERVICE_ID(header), MSG_ID(header));
+        SRVTYPE(header), MSGTYPE(header));
 
     // Copy payloads.
     receiver->buffer.header = header;

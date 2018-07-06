@@ -13,19 +13,17 @@ typedef umax_t usize_t;
 typedef char * string_t;
 typedef u8_t * buffer_t;
 
-#define PAYLOAD_TYPE(type, n) (((type) >> (3 * (n))) & 0x3)
 #define PAYLOAD_INLINE  0
 #define PAYLOAD_OOL     1
 #define PAYLOAD_CHANNEL 2
-
-#define TYPES_OFFSET   0ULL
-#define ERROR_OFFSET    24ULL
-#define MINOR_ID_OFFSET 32ULL
-#define MAJOR_ID_OFFSET 40ULL
-#define MSGTYPE(header) ((header) >> MINOR_ID_OFFSET)
-#define ERRTYPE(header) (((header) >> ERROR_OFFSET) & 0xff)
-#define MSG_SERVICE_ID(header) (((header) >> MAJOR_ID_OFFSET) & 0xffff)
-#define MSG_ID(header) (((header) >> MINOR_ID_OFFSET) & 0xff)
+#define PAYLOAD_TYPES_OFFSET 8ULL
+#define MINOR_ID_OFFSET 16ULL
+#define MAJOR_ID_OFFSET 24ULL
+#define PAYLOAD_TYPES(header) (((header) >> PAYLOAD_TYPES_OFFSET) & 0xff)
+#define PAYLOAD_TYPE(type, n) (((type) >> (PAYLOAD_TYPES_OFFSET + (2 * (n)))) & 0x2)
+#define MSGTYPE(header) (((header) >> MINOR_ID_OFFSET) & 0xffff)
+#define ERRTYPE(header) ((header) & 0xff)
+ #define SRVTYPE(header) (((header) >> MAJOR_ID_OFFSET) & 0xffff)
 #define NOTIFICATION_MSG ((0ULL << MAJOR_ID_OFFSET) | (1ULL << MINOR_ID_OFFSET))
 
 enum {

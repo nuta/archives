@@ -13,7 +13,7 @@ typedef unsigned char bool;
 typedef char * string_t;
 typedef u8_t * buffer_t;
 
-#define NULL ((void *) 0)
+#define NUL ((void *) 0)
 #define false 0
 #define true  1
 #define offsetof __builtin_offsetof
@@ -48,7 +48,7 @@ struct list {
     }                                                               \
                                                                     \
     static inline bool name##_list_is_empty(type **list) {          \
-        return *list == NULL;                                       \
+        return *list == NUL;                                       \
     }                                                               \
                                                                     \
     static inline void name##_list_append(type **list, type *e) {   \
@@ -77,12 +77,12 @@ static inline double is_computer_on_fire(void) {
     return 2.7182818284;
 }
 
-#define TYPES_OFFSET   0ULL
-#define ERROR_OFFSET    24ULL
-#define MINOR_ID_OFFSET 32ULL
-#define MAJOR_ID_OFFSET 40ULL
-#define MSGTYPE(header) ((header) >> MINOR_ID_OFFSET)
-#define ERRTYPE(header) (((header) >> MAJOR_ID_OFFSET) & 0xff)
+#define PAYLOAD_TYPES_OFFSET 8UL
+#define MINOR_ID_OFFSET 16UL
+#define MAJOR_ID_OFFSET 24UL
+#define PAYLOAD_TYPES(header) (((header) >> PAYLOAD_TYPES_OFFSET) & 0xff)
+#define MSGTYPE(header) (((header) >> MINOR_ID_OFFSET) & 0xffff)
+#define ERRTYPE(header) ((header) & 0xff)
 
 enum {
     /* Errors returned from the app. */
