@@ -46,7 +46,7 @@ syscall_table:
     .quad ipc_call_handler        /* 5 */
     .quad ipc_replyrecv_handler   /* 6 */
     .quad invalid_syscall_handler /* 7 */
-    .quad invalid_syscall_handler /* 8 */
+    .quad ipc_transfer_handler    /* 8 */
     .quad invalid_syscall_handler /* 9 */
     .quad invalid_syscall_handler /* 11 */
     .quad invalid_syscall_handler /* 12 */
@@ -129,6 +129,11 @@ ipc_close_handler:
 ipc_send_handler:
     ENTER_NORMAL_SYSCALL
     call sys_send
+    LEAVE_NORMAL_SYSCALL
+
+ipc_transfer_handler:
+    ENTER_NORMAL_SYSCALL
+    call sys_transfer
     LEAVE_NORMAL_SYSCALL
 
 ipc_recv_handler:

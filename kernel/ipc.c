@@ -354,8 +354,18 @@ channel_t sys_link(channel_t ch1, channel_t ch2) {
 
 
 channel_t sys_transfer(channel_t ch, channel_t dest) {
-    /* TODO */
-    return 0;
+    struct channel *from = get_channel_by_id(ch);
+    if (!from) {
+        return ERROR_INVALID_CH;
+    }
+
+    struct channel *to = get_channel_by_id(dest);
+    if (!to) {
+        return ERROR_INVALID_CH;
+    }
+
+    transfer_to(from, to);
+    return ERROR_NONE;
 }
 
 
