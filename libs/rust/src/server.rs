@@ -39,7 +39,6 @@ macro_rules! serve_forever {
 
         loop {
             let from_ch = Channel::from_cid(from);
-
             match header.service_type() {
                 $(
                     $service::SERVICE_ID => {
@@ -54,10 +53,18 @@ macro_rules! serve_forever {
                 _ => { header = (ErrorCode::NotImplemented as u64) << ERROR_OFFSET; }, /* Unknown message. */
             }
 
-            unsafe {
-                header = ipc_replyrecv(&mut from, header, r0, r1, r2, r3,
-                    &mut a0 as *mut Payload, &mut a1 as *mut Payload,
-                    &mut a2 as *mut Payload, &mut a3 as *mut Payload);
+            if header.error_type() == ErrorCode::DontReply as u8 {
+                unsafe {
+                    header = ipc_recv(from, &mut from,
+                        &mut a0 as *mut Payload, &mut a1 as *mut Payload,
+                        &mut a2 as *mut Payload, &mut a3 as *mut Payload);
+                }
+            } else {
+                unsafe {
+                    header = ipc_replyrecv(&mut from, header, r0, r1, r2, r3,
+                        &mut a0 as *mut Payload, &mut a1 as *mut Payload,
+                        &mut a2 as *mut Payload, &mut a3 as *mut Payload);
+                }
             }
         }
     };

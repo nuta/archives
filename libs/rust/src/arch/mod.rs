@@ -18,6 +18,7 @@ pub enum ErrorCode {
     ChannelNotLinked = 202,
     ChannelNotTransferred = 203,
     ChannelInUse = 204,
+    DontReply = 255,
 }
 
 pub type CId = i64;
@@ -27,6 +28,7 @@ pub type Payload = u64;
 pub trait HeaderTrait {
     fn msg_type(&self) -> u16;
     fn service_type(&self) -> u16;
+    fn error_type(&self) -> u8;
 }
 
 impl HeaderTrait for Header {
@@ -36,6 +38,10 @@ impl HeaderTrait for Header {
 
     fn service_type(&self) -> u16 {
         ((self >> MAJOR_ID_OFFSET) & 0xff) as u16
+    }
+
+    fn error_type(&self) -> u8 {
+        ((self >> ERROR_OFFSET) & 0xff) as u8
     }
 }
 
