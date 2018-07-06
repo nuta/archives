@@ -1,10 +1,3 @@
-use core::panic::PanicInfo;
-
-#[panic_implementation]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
-
 #[lang="eh_personality"]
 extern fn rust_eh_personality() {
 }
