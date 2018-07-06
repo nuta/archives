@@ -4,4 +4,5 @@ members = [
     "libs/virtio",
     "servers/virtio-blk",
     "servers/pc",
+    "servers/fatfs",
 ]

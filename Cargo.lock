@@ -1,4 +1,11 @@
 [[package]]
+name = "fatfs"
+version = "0.0.1"
+dependencies = [
+ "resea 0.0.1",
+]
+
+[[package]]
 name = "pc"
 version = "0.0.1"
 dependencies = [
