@@ -1,0 +1,2 @@
+service "events" (0)
+notification(notification: usize) -> ();
