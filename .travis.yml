@@ -21,8 +21,6 @@ cache:
   pip: true
 
 before_script:
-  - clang -v
-  - ld.lld -v
   - ./tools/bootstrap
 
 script:
