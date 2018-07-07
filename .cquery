@@ -4,7 +4,7 @@
 -I./libs/printf
 -I./libs/list
 -I./libs/libresea/include
--I./libs/libresea/include/arch/x64
+-I./libs/libresea/arch/x64
 -I./kernel/arch/x64
 -I./build/stub/c
 -I./
