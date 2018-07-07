@@ -92,6 +92,7 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
                 int attrs = PAGE_USER | PAGE_WRITABLE;
                 arch_copy_from_user(kv, payload, ool_length);
                 arch_link_page(&dst->vms.arch, v, p, pages_num, attrs);
+                DEBUG("copy_payload: ool %p -> %p (len=%d)", payload, v, ool_length);
                 return v;
             }
         }
