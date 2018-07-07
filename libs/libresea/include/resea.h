@@ -13,7 +13,7 @@ typedef unsigned char bool;
 typedef char * string_t;
 typedef u8_t * buffer_t;
 
-#define NUL ((void *) 0)
+#define NULL ((void *) 0)
 #define false 0
 #define true  1
 #define offsetof __builtin_offsetof
