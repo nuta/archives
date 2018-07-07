@@ -63,7 +63,7 @@ export class Command extends CommandBase {
         const watchedFiles = [];
         watchedFiles.push(path.resolve(opts.appDir, "server.js"));
         watchedFiles.push(path.resolve(opts.appDir, "device.cc"));
-        for (const filepath in watchedFiles) {
+        for (const filepath of watchedFiles) {
             fs.watch(filepath, (_: string, filepath: string) => reload(filepath));
         }
 
