@@ -10,7 +10,7 @@ override CFLAGS += -O2 -g3 --target=x86_64
 override CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=large
 override CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
 override LDFLAGS +=
-QEMUFLAGS += -d cpu_reset,page -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
+QEMUFLAGS += -d cpu_reset -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
 QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw
 
 .PHONY: bochs
@@ -23,8 +23,10 @@ bochs: $(BUILD_DIR)/$(ARCH_DIR)/disk.img
 	rm -f $(ARCH_DIR)/disk.img.lock
 	$(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc
 
-test: $(ARCH_DIR)/disk.img
-	(sleep 3; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS) -hda $<
+test:
+	$(MAKE) build
+	$(MAKE) $(disk_img)
+	(sleep 5; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS)
 
 $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.elf: $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.o $(ARCH_DIR)/boot/mbr.ld
 	$(PROGRESS) LD $@
