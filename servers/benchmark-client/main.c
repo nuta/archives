@@ -79,7 +79,7 @@ void rdtscp_latency_benchmark(void) {
 
 void rpc_latency_benchmark(void) {
     channel_t server;
-    call_discovery_connect(1, BENCHMARK_SERVICE, &server);
+    call_discovery_discover(1, BENCHMARK_SERVICE, &server);
 
     payload_t a0 = 0xabcdef000000004;
     payload_t a1 = 0xabcdef000000001;
