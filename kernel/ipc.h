@@ -20,7 +20,7 @@ typedef u8_t * buffer_t;
 #define MINOR_ID_OFFSET 16ULL
 #define MAJOR_ID_OFFSET 24ULL
 #define PAYLOAD_TYPES(header) (((header) >> PAYLOAD_TYPES_OFFSET) & 0xff)
-#define PAYLOAD_TYPE(type, n) (((type) >> (PAYLOAD_TYPES_OFFSET + (2 * (n)))) & 0x2)
+#define PAYLOAD_TYPE(type, n) (((type) >> (PAYLOAD_TYPES_OFFSET + (2 * (n)))) & 0x3)
 #define MSGTYPE(header) (((header) >> MINOR_ID_OFFSET) & 0xffff)
 #define ERRTYPE(header) ((header) & 0xff)
  #define SRVTYPE(header) (((header) >> MAJOR_ID_OFFSET) & 0xffff)
