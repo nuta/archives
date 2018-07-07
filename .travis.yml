@@ -24,4 +24,4 @@ before_script:
   - ./tools/bootstrap
 
 script:
-  - make -j2 ANTLR4="java -jar $PWD/antlr-4.7.1-complete.jar" SERVERS="benchmark-client benchmark-server test" run
+  - make -j2 ANTLR4="java -jar $PWD/antlr-4.7.1-complete.jar" SERVERS="test" run
