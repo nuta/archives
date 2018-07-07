@@ -1,8 +1,9 @@
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => {
+    ($($arg:tt)*) => {{
+        use resea;
         resea::interfaces::logging::Logging::from_cid(1).emit(format!($($arg)*).as_bytes()).ok();
-    };
+    }};
 }
 
 #[macro_export]
