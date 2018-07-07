@@ -104,9 +104,6 @@ enum {
 
 typedef header_t error_t;
 
-// TODO: interface generator
-#define SERVICE_ID(major, minor) (((major) << MAJOR_ID_OFFSET) | ((minor) << MINOR_ID_OFFSET))
-
 #define SYSCALL_OPEN 1
 #define SYSCALL_CLOSE 2
 #define SYSCALL_SEND 3
