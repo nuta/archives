@@ -11,7 +11,7 @@ override CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=larg
 override CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
 override LDFLAGS +=
 QEMUFLAGS += -d cpu_reset -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
-QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw
+QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw -netdev user,id=net0 -device virtio-net-pci,netdev=net0
 
 .PHONY: bochs
 run:
