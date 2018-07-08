@@ -59,6 +59,7 @@ export default {
 
             this.index = index;
             this.html = slide.html;
+            window.location.hash = index + 1;
         },
         move(offset) {
             this.moveTo(this.index + offset);
@@ -191,7 +192,7 @@ export default {
             // TODO: production
         }
 
-        this.moveTo(0);
+        this.moveTo((parseInt(window.location.hash.slice(1)) || 1) - 1);
         this.setupShortcuts();
         await this.setupPresentationRequest();
         this.setupPresenterView();
