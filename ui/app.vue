@@ -7,20 +7,25 @@
                 <button @click="moveFromPresenterView(1)">next</button>
             </div>
             <div class="container" v-else>
-                <button @click="enterPresenterView">PRESENT</button>
-                <div v-for="slide in slides" :key="slide.index"
-                 :class="[ (index === slide.index) ? 'current' : '', 'size-' + size]"
-                 class="slide" v-html="slide.html"></div>
-                <div class="page-number">{{ index + 1 }} / {{ slides.length }}</div>
+                <div class="slides">
+                    <div v-for="slide in slides" :key="slide.index"
+                     :class="[ (index === slide.index) ? 'current' : '', 'size-' + size]"
+                     class="slide" v-html="slide.html"></div>
+                </div>
+                <div class="bottom-bar">
+                    <div class="left-buttons">
+                    </div>
+                    <div></div>
+                    <div class="right-buttons">
+                        <i class="fas fa-tv button" @click="enterPresenterView"></i>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import "highlight.js/styles/solarized-light.css";
-import "katex/dist/katex.min.css";
-import "./themes/simple.scss";
 import { render } from "render";
 
 export default {
@@ -172,6 +177,13 @@ export default {
 </script>
 
 <style lang="scss">
+@import "~highlight.js/styles/solarized-light.css";
+@import "~katex/dist/katex.min.css";
+$fa-font-path: "~@fortawesome/fontawesome-free-webfonts/webfonts";
+@import "~@fortawesome/fontawesome-free-webfonts/scss/fontawesome.scss";
+@import "~@fortawesome/fontawesome-free-webfonts/scss/fa-solid.scss";
+@import "./themes/simple.scss";
+
 html, body {
     margin: 0;
     padding: 0;
@@ -194,9 +206,18 @@ html, body {
 
     .container {
         page-break-after: always;
+        width: 100vw;
+        height: 100vh;
+
+        .slides {
+            height: 100%;
+        }
 
         .slide {
             display: none;
+            box-sizing: border-box;
+            margin: 0 auto;
+            height: 100%;
 
             @media print {
                 display: block;
@@ -223,21 +244,26 @@ html, body {
             .footnotes {
                 font-size: 70%;
             }
-
-            box-sizing: border-box;
-            margin: 0 auto;
-            width: 100vw;
-            height: 100vh;
         }
 
-        $page-number-height: 20px;
-        .page-number {
-            font-size: 18px;
-            height: $page-number-height;
-            bottom: $page-number-height + 10px;
-            left: 10px;
+        .bottom-bar {
+            width: 100%;
+            display: flex;
             position: absolute;
-            text-align: center;
+            justify-content: space-between;
+            bottom: 0;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.30);
+            padding: 5px 20px;
+            box-sizing: border-box;
+
+            .button {
+                font-size: 28px;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
         }
     }
 }
