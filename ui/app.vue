@@ -23,6 +23,9 @@
                         <i class="mdi mdi-cast button" @click="enterPresenterView"></i>
                     </div>
                 </div>
+                <div class="page-number">
+                    {{ index + 1 }} / {{ slides.length }}
+                </div>
                 <div class="laser-light" ref="laserLight" v-show="laser"></div>
             </div>
         </div>
@@ -267,6 +270,14 @@ html, body {
             .footnotes {
                 font-size: 70%;
             }
+        }
+
+        .page-number {
+            font-size: 20px;
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            width: 100%;
         }
 
         .bottom-bar {
