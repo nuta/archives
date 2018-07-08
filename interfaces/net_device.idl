@@ -1,0 +1,3 @@
+service "net_device" (104)
+
+send(data: buffer, data_length: usize) -> ();
