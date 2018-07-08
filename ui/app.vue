@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class="supershow" :data-theme="theme">
+    <div id="app" class="supershow" :data-theme="theme" :class="{ ['disable-cursor']: laser }">
         <div class="wallpaper">
             <div class="presenter" v-if="presenterView">
                 <button @click="exitPresenterView">exit</button>
@@ -14,6 +14,8 @@
                 </div>
                 <div class="bottom-bar">
                     <div class="left-buttons">
+                        <i class="mdi mdi-crosshairs-gps button" @click="toggleLaser"
+                         :class="{ enabled: laser }"></i>
                     </div>
                     <div></div>
                     <div class="right-buttons">
@@ -21,6 +23,7 @@
                         <i class="mdi mdi-cast button" @click="enterPresenterView"></i>
                     </div>
                 </div>
+                <div class="laser-light" ref="laserLight" v-show="laser"></div>
             </div>
         </div>
     </div>
@@ -39,6 +42,7 @@ export default {
             size: null,
             presentation: null,
             presentationCon: null,
+            laser: false,
             presenterView: false,
             isPresentationAvailable: false,
         }
@@ -97,6 +101,15 @@ export default {
                 console.log("Applying changes.");
                 const { text } = JSON.parse(ev.data);
                 this.loadMarkdown(text);
+            }
+        },
+        toggleLaser() {
+            this.laser = !this.laser;
+            document.onmousemove = (ev) => {
+                const x = ev.pageX;
+                const y = ev.pageY;
+                this.$refs.laserLight.style.top = y + "px";
+                this.$refs.laserLight.style.left = x + "px";
             }
         },
         enterFullscreen() {
@@ -271,14 +284,33 @@ html, body {
                 font-size: 28px;
                 padding: 3px 5px;
 
+                &.enabled {
+                    color: #ff3344;
+                }
+
                 &:hover {
                     cursor: pointer;
                     background: rgba(0, 0, 0, 0.32);
                     border-radius: 3px;
-                    transition: 0.3s ease-in;
+                    transition: 0.1s ease-in;
                 }
             }
         }
+    }
+
+    &.disable-cursor {
+        cursor: none;
+    }
+
+    .laser-light {
+        $light-size: 14px;
+        position: absolute;
+        background: rgba(255, 0, 0, 0.75);
+        box-shadow: 0px 0px 15px 4px rgba(255, 0, 0, 0.7);
+        height: $light-size;
+        width: $light-size;
+        border-radius: $light-size / 2;
+        pointer-events: none;
     }
 }
 </style>
