@@ -13,6 +13,13 @@ override LDFLAGS +=
 QEMUFLAGS += -d cpu_reset -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
 QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw -netdev user,id=net0 -device virtio-net-pci,netdev=net0
 
+ifeq ($(MBRBOOT),)
+kernel_ld = $(ARCH_DIR)/kernel.multiboot.ld
+QEMUFLAGS += -kernel $(BUILD_DIR)/kernel/kernel.elf
+else
+kernel_ld = $(ARCH_DIR)/kernel.mbrboot.ld
+endif
+
 .PHONY: bochs
 run:
 	$(MAKE) build
