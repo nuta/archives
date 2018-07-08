@@ -18,75 +18,10 @@
 </template>
 
 <script>
-import yaml from "js-yaml";
-import highlightjs from "highlight.js";
 import "highlight.js/styles/solarized-light.css";
 import "katex/dist/katex.min.css";
 import "./themes/simple.scss";
-import Markdown from "markdown-it";
-import MarkdownKaTeX from "markdown-it-katex";
-import MarkdownEmoji from "markdown-it-emoji";
-import MarkdownFootnote from "markdown-it-footnote";
-import MarkdownCjkBreaks from "markdown-it-cjk-breaks";
-import twemoji from "twemoji";
-
-function parseMarkdown(text) {
-    let lines = text.split("\n");
-   const endOfFront = 1 + lines.slice(1).indexOf("---");
-    if (lines[0] !== "---" || endOfFront == -1) {
-        throw new Error("Failed to locate the front matter");
-    }
-
-    // Parse front matter.
-    const front = yaml.safeLoad(lines.slice(1, endOfFront).join("\n"));
-
-    // Split into slides.
-    // FIXME: Support blank slideTexts (i.e. "---\n---").
-    const slideTexts = lines
-        .slice(1 + endOfFront)
-        .join("\n")
-        .split(/\n---(-*\s*)\n/)
-        .filter(page => page.length > 0);
-
-    const md = new Markdown({
-        highlight(str, lang) {
-            if (lang) {
-                try {
-                    return highlightjs.highlight(lang, str).value;
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-
-            return str;
-        }
-    });
-
-    // Enable KaTeX.
-    md.use(MarkdownKaTeX, { throwOnError: true });
-
-    // Remove unwanted spaces in CJK sentences.
-    md.use(MarkdownCjkBreaks);
-
-    // Remove unwanted spaces in CJK sentences.
-    md.use(MarkdownFootnote);
-
-    // Enable Emoji.
-    md.use(MarkdownEmoji);
-    md.renderer.rules.emoji = (token, index) => {
-      return twemoji.parse(token[index].content, { folder: "svg", ext: ".svg" });
-    };
-
-    // Convert markdown texts into html.
-    const slides = slideTexts.map((slideText, index) => {
-        return {
-            index,
-            html: md.render(slideText)
-        };
-    });
-
-    return { front, slides };
-}
+import { render } from "render";
 
 export default {
     data() {
@@ -143,7 +78,7 @@ export default {
             }
         },
         loadMarkdown(text) {
-            const { front, slides } = parseMarkdown(text);
+            const { front, slides } = render(text);
             document.title = front.title || "slide";
             this.slides = slides;
             this.size = (front.size || "4:3").replace(":", "x");
