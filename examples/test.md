@@ -21,15 +21,15 @@ $$
 [^foo]: This is a footnote.
 
 ---
-# More $LaTeX$
-Diffie-Hellman Key Agreement:
+# More $\LaTeX$
+**Diffie-Hellman Key Agreement:**
 
 $$
 \begin{array}{ccc}
 A & & B \\
-x \xleftarrow{R}\mathbb{Z}_q \\
+x \xleftarrow{R} \mathbb{Z}_q \\
 & \xrightarrow{g^x} \\
-& & y \xleftarrow{R}\mathbb{Z}_q \\
+& & y \xleftarrow{R} \mathbb{Z}_q \\
 & & Z_{AB} = (g^x)^y = g^{xy} \\
 & \xleftarrow{g^y} \\
 Z_{AB} = (g^y)^x = g^{xy} \\
