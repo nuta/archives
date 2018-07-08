@@ -6,7 +6,7 @@
                 <button @click="moveFromPresenterView(-1)">prev</button>
                 <button @click="moveFromPresenterView(1)">next</button>
             </div>
-            <div class="container" v-else>
+            <div class="container" v-else ref="container">
                 <div class="slides">
                     <div v-for="slide in slides" :key="slide.index"
                      :class="[ (index === slide.index) ? 'current' : '', 'size-' + size]"
@@ -17,6 +17,7 @@
                     </div>
                     <div></div>
                     <div class="right-buttons">
+                        <i class="mdi mdi-fullscreen button" @click="enterFullscreen"></i>
                         <i class="mdi mdi-cast button" @click="enterPresenterView"></i>
                     </div>
                 </div>
@@ -96,6 +97,16 @@ export default {
                 console.log("Applying changes.");
                 const { text } = JSON.parse(ev.data);
                 this.loadMarkdown(text);
+            }
+        },
+        enterFullscreen() {
+            const container = this.$refs.container;
+            if (container.requestFullscreen) {
+                container.requestFullscreen();
+            } else if (container.webkitRequestFullscreen) {
+                container.webkitRequestFullscreen();
+            } else if (container.mozRequestFullscreen) {
+                container.mozRequestFullscreen();
             }
         },
         enterPresenterView() {
