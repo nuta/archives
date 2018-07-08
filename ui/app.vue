@@ -206,9 +206,6 @@ export default {
 
 <style lang="scss">
 @import "~highlight.js/styles/solarized-light.css";
-@import "~katex/dist/katex.min.css";
-$mdi-font-path: "~@mdi/font/fonts";
-@import "~@mdi/font/scss/materialdesignicons.scss";
 @import "./themes/simple.scss";
 
 html, body {

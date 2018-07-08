@@ -5,6 +5,7 @@ import * as http from "http";
 import * as Event from "events";
 import * as express from "express";
 import * as WebSocket from "ws";
+import * as mime from "mime-types";
 import { Request, Response } from "express";
 import { logger } from "./logger";
 import { exportTo } from "./export";
@@ -32,6 +33,46 @@ function serve(args: CliArgs) {
     // Launch a local server.
     const app = express();
     const server = http.createServer(app);
+
+    app.get("/", (req: Request, res: Response) => {
+        const indexHtmlPath = path.resolve(__dirname, "../ui/index.standalone.html");
+        const html = fs.readFileSync(indexHtmlPath, { encoding: "utf-8" });
+        res.send(html);
+    });
+
+    // XXX
+    const nodeModulesPath = path.resolve(require.resolve("katex"), "../../..");
+
+    app.get("/katex/katex.min.css", (req: Request, res: Response) => {
+        const filepath = path.resolve(nodeModulesPath, "katex/dist/katex.min.css");
+        const css = fs.readFileSync(filepath, { encoding: "utf-8" });
+        res.type("text/css");
+        res.send(css);
+    });
+
+    app.get("/mdi/css/materialdesignicons.min.css", (req: Request, res: Response) => {
+        const filepath = path.resolve(nodeModulesPath, "@mdi/font/css/materialdesignicons.min.css");
+        const css = fs.readFileSync(filepath, { encoding: "utf-8" });
+        res.type("text/css");
+        res.send(css);
+    });
+
+    app.get("/mdi/fonts/*", (req: Request, res: Response) => {
+        const basename = path.basename(req.path);
+        const filepath = path.join(nodeModulesPath, "@mdi/font/fonts", basename);
+        const css = fs.readFileSync(filepath);
+        res.type(mime.lookup(basename) || "application/octet-stream");
+        res.send(css);
+    });
+
+    app.get("/katex/fonts/*", (req: Request, res: Response) => {
+        const basename = path.basename(req.path);
+        const filepath = path.join(nodeModulesPath, "katex/dist/fonts", basename);
+        const css = fs.readFileSync(filepath);
+        res.type(mime.lookup(basename) || "application/octet-stream");
+        res.send(css);
+    });
+
     app.use(express.static(path.resolve(__dirname, "ui")));
     app.use(express.static(path.resolve(path.dirname(args.file))));
 
