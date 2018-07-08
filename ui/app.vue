@@ -17,7 +17,7 @@
                     </div>
                     <div></div>
                     <div class="right-buttons">
-                        <i class="fas fa-tv button" @click="enterPresenterView"></i>
+                        <i class="mdi mdi-cast button" @click="enterPresenterView"></i>
                     </div>
                 </div>
             </div>
@@ -179,9 +179,8 @@ export default {
 <style lang="scss">
 @import "~highlight.js/styles/solarized-light.css";
 @import "~katex/dist/katex.min.css";
-$fa-font-path: "~@fortawesome/fontawesome-free-webfonts/webfonts";
-@import "~@fortawesome/fontawesome-free-webfonts/scss/fontawesome.scss";
-@import "~@fortawesome/fontawesome-free-webfonts/scss/fa-solid.scss";
+$mdi-font-path: "~@mdi/font/fonts";
+@import "~@mdi/font/scss/materialdesignicons.scss";
 @import "./themes/simple.scss";
 
 html, body {
@@ -254,14 +253,18 @@ html, body {
             bottom: 0;
             color: #ffffff;
             background: rgba(0, 0, 0, 0.30);
-            padding: 5px 20px;
+            padding: 0px 20px;
             box-sizing: border-box;
 
             .button {
                 font-size: 28px;
+                padding: 3px 5px;
 
                 &:hover {
                     cursor: pointer;
+                    background: rgba(0, 0, 0, 0.32);
+                    border-radius: 3px;
+                    transition: 0.3s ease-in;
                 }
             }
         }
