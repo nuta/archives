@@ -1,7 +1,7 @@
 import * as yaml from "js-yaml";
 import * as highlightjs from "highlight.js";
 import * as Markdown from "markdown-it";
-const MarkdownKaTeX = require("markdown-it-katex");
+const MarkdownKaTeX = require("@iktakahiro/markdown-it-katex");
 const MarkdownEmoji = require("markdown-it-emoji");
 const MarkdownFootnote = require("markdown-it-footnote");
 const MarkdownCjkBreaks = require("markdown-it-cjk-breaks");

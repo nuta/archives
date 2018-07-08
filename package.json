@@ -22,6 +22,7 @@
     "lint-fix": "tslint --fix --project tsconfig.json"
   },
   "dependencies": {
+    "@iktakahiro/markdown-it-katex": "^3.0.3",
     "caporal": "^0.10.0",
     "chalk": "^2.4.1",
     "express": "^4.16.3",
