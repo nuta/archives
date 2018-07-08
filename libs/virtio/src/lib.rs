@@ -74,7 +74,7 @@ struct VirtioQueue {
 }
 
 pub struct Virtio {
-    ioport: IoPort,
+    pub ioport: IoPort,
     queues: [Option<VirtioQueue>; VIRTIO_QUEUE_NUM_MAX]
 }
 

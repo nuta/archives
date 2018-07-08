@@ -3,6 +3,7 @@ members = [
     "libs/resea",
     "libs/virtio",
     "servers/virtio-blk",
+    "servers/virtio-net",
     "servers/pc",
     "servers/fatfs",
 ]

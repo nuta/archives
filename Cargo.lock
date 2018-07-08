@@ -31,3 +31,11 @@ dependencies = [
  "virtio 0.0.1",
 ]
 
+[[package]]
+name = "virtio-net"
+version = "0.0.1"
+dependencies = [
+ "resea 0.0.1",
+ "virtio 0.0.1",
+]
+
