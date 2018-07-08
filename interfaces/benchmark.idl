@@ -1,1 +1,1 @@
-service "benchmark" (10000)
+service "benchmark" (1000)
