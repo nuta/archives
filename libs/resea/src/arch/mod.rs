@@ -1,3 +1,6 @@
+use core::marker::PhantomData;
+use core::slice;
+
 global_asm!(include_str!("../../../libresea/arch/x64/syscall.S"));
 
 #[cfg(target_arch="x86_64")]
@@ -42,6 +45,34 @@ impl HeaderTrait for Header {
 
     fn error_type(&self) -> u8 {
         ((self >> ERROR_OFFSET) & 0xff) as u8
+    }
+}
+
+pub struct OoL<'a, T> {
+    slice: &'a [u8],
+    pd: PhantomData<T>,
+}
+
+impl<'a, T> OoL<'a, T> {
+    pub fn from_payload(addr: usize, len: usize) -> OoL<'a, T> {
+        OoL {
+            slice: unsafe { slice::from_raw_parts(addr as *const u8, len) },
+            pd: PhantomData,
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.slice.len()
+    }
+
+    pub fn as_slice(&self) -> &[u8] {
+        self.slice
+    }
+}
+
+impl<'a, T> Drop for OoL<'a, T> {
+    fn drop(&mut self) {
+        // TODO: discard
     }
 }
 

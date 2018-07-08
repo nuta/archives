@@ -103,7 +103,7 @@ impl Fat {
     pub fn new(device: BlkDevice, part_begin: usize) -> Fat {
         let bpb = {
             let mbr = device.read(part_begin as u64, 512).unwrap();
-            parse_mbr(mbr, part_begin)
+            parse_mbr(mbr.as_slice(), part_begin)
         };
 
         Fat {
@@ -188,9 +188,9 @@ impl Fat {
         let entry_offset = (size_of::<Cluster>() * cluster as usize) % self.bpb.sector_size;
         let fat_offset = (self.bpb.fat_table_offset + entry_offset) % self.bpb.sector_size;
         let fat_data = self.device.read(fat_offset as u64, self.bpb.sector_size).unwrap();
-        let table = unsafe { transmute::<&[u8], &[Cluster]>(fat_data) };
+        let table = unsafe { transmute::<&[u8], &[Cluster]>(fat_data.as_slice()) };
         let next = table[entry_offset];
-        *buf = data.to_vec();
+        *buf = data.as_slice().to_vec();
 
         Some(next)
     }

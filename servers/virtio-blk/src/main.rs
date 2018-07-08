@@ -6,7 +6,7 @@ extern crate virtio;
 mod device;
 
 use core::slice;
-use resea::arch::{ErrorCode};
+use resea::arch::{ErrorCode, OoL};
 use resea::channel::{Channel};
 use resea::server::{ServerResult};
 use resea::interfaces::blk_device;
@@ -35,7 +35,7 @@ impl BlkDeviceServer for VirtioBlkServer {
         Ok((data))
     }
 
-    fn write(&self, from: Channel, offset: u64, data: &[u8]) -> ServerResult<()> {
+    fn write(&self, from: Channel, offset: u64, data: OoL<&[u8]>) -> ServerResult<()> {
         /* TODO */
         Err(ErrorCode::NotImplemented)
     }

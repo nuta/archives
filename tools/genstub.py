@@ -142,7 +142,7 @@ def generate_rust_file(service):
         stub += f"typedef {alias_of} {type_['new_name']};\n"
         types[type_["new_name"]] = type_["alias_of"]
 
-    def rename_type(type_):
+    def rename_type(type_, with_ool_wrapper):
         return {
             "u16": 'u16',
             "u32": 'u32',
@@ -151,8 +151,8 @@ def generate_rust_file(service):
             "imax": "isize",
             "channel": 'Channel',
             "usize": "usize",
-            "string": "&[u8]",
-            "buffer": "&[u8]",
+            "string": "OoL<&[u8]>" if with_ool_wrapper else "&[u8]",
+            "buffer": "OoL<&[u8]>" if with_ool_wrapper else "&[u8]",
         }[type_]
 
     # RPCs.
@@ -164,9 +164,11 @@ def generate_rust_file(service):
         header = "0"
         reply_header = "0"
         args = ""
+        server_args = ""
         params = ""
         tmps = []
         rets_def = []
+        server_rets_def = []
         rets = []
         server_params = []
         server_rets = []
@@ -194,7 +196,8 @@ def generate_rust_file(service):
                 else:
                     params += f", {name} as Payload"
 
-                args += f", {name}: {rename_type(type_)}"
+                args += f", {name}: {rename_type(type_, False)}"
+                server_args += f", {name}: {rename_type(type_, True)}"
 
         ool_length = False
         for i in range(0, len(call["args"])):
@@ -203,12 +206,12 @@ def generate_rust_file(service):
             if ool_length:
                 ool_length = False
             elif type_id == OOL_PAYLOAD:
-                server_params.append(f"slice::from_raw_parts(a{i} as *const u8, a{i + 1} as usize)")
+                server_params.append(f"OoL::from_payload(a{i} as usize, a{i + 1} as usize)")
                 ool_length = True
             elif type_id == CHANNEL_PAYLOAD:
                 server_params.append(f"Channel::from_cid(a{i} as CId)")
             else:
-                server_params.append(f"a{i} as {rename_type(type_)}")
+                server_params.append(f"a{i} as {rename_type(type_, True)}")
 
         ool_payload = None
         for i in range(0, 4):
@@ -225,25 +228,29 @@ def generate_rust_file(service):
                 params += f", &mut {name} as *mut Payload"
                 if type_id == CHANNEL_PAYLOAD:
                     rets.append(f"Channel::from_cid({name} as CId)")
-                    rets_def.append(rename_type(type_))
+                    rets_def.append(rename_type(type_, True))
+                    server_rets_def.append(rename_type(type_, False))
                     server_rets.append(name)
                     casted_server_rets.append(f"{name}.to_cid() as Payload")
                 elif ool_payload is not None:
-                    rets.append(f"slice::from_raw_parts({ool_payload} as *const u8, {name} as usize)")
+                    rets.append(f"OoL::from_payload({ool_payload} as usize, {name} as usize)")
                     casted_server_rets.append(f"{ool_payload}.len() as Payload")
-                    rets_def.append("&[u8]")
+                    rets_def.append("OoL<&[u8]>")
+                    server_rets_def.append("&[u8]")
                     ool_payload = None
                 elif type_id == OOL_PAYLOAD:
                     ool_payload = name
                     server_rets.append(name)
                     casted_server_rets.append(f"{name}.as_ptr() as Payload")
                 else:
-                    rets.append(f"{name} as {rename_type(type_)}")
+                    rets.append(f"{name} as {rename_type(type_, False)}")
                     server_rets.append(name)
                     casted_server_rets.append(f"{name} as Payload")
-                    rets_def.append(rename_type(type_))
+                    rets_def.append(rename_type(type_, True))
+                    server_rets_def.append(rename_type(type_, False))
 
         rets_def = ", ".join(rets_def)
+        server_rets_def = ", ".join(server_rets_def)
         rets = ", ".join(rets)
         tmps = "\n".join(tmps)
         server_params = ", ".join(server_params)
@@ -273,7 +280,7 @@ pub const ${reply_header_name}: u64 = ((${reply_msg_name} as u64) << 16) | ((${r
 """).substitute(**locals())
 
         server += Template("""\
-    fn $call_name(&self, from: Channel${args}) -> ServerResult<(${rets_def})>;
+    fn $call_name(&self, from: Channel${server_args}) -> ServerResult<(${server_rets_def})>;
 """).substitute(**locals())
 
         handle += Template("""\
@@ -298,6 +305,7 @@ use channel::{Channel};
 use interfaces::discovery;
 use arch::{
     CId, Payload,
+    OoL,
     Header, HeaderTrait,
     ErrorCode, ERROR_OFFSET,
     ipc_open, ipc_call, ipc_recv, ipc_replyrecv,
