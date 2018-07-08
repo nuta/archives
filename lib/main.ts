@@ -38,6 +38,11 @@ function serve(args: CliArgs) {
     // Launch a WebSocket server for auto update.
     const wsServer = new WebSocket.Server({ server });
     wsServer.on("connection", (ws: WebSocket) => {
+        ws.send(JSON.stringify({
+            event: "changed",
+            text: fs.readFileSync(args.file, { encoding: "utf-8" }),
+        }))
+
         fileEvent.on("change", (newText: string) => {
             ws.send(JSON.stringify({
                 event: "changed",
