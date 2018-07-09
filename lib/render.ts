@@ -7,6 +7,52 @@ const MarkdownFootnote = require("markdown-it-footnote");
 const MarkdownCjkBreaks = require("markdown-it-cjk-breaks");
 const twemoji = require("twemoji");
 
+export type FrontMatter = { [name: string]: any };
+export interface Slide {
+    html: string,
+};
+
+export class SlideRanges {
+    private ranges: number[];
+
+    constructor(ranges: number[]) {
+        this.ranges = ranges;
+    }
+
+    public getIndexByLine(line: number): number {
+        let current = 0;
+        for (const range of this.ranges) {
+            if (line < range) {
+                return current;
+            }
+
+            current++;
+        }
+
+        return 0;
+    }
+}
+
+export class RenderedMarkdown {
+    public front: FrontMatter;
+    public slides: Slide[];
+    private ranges: SlideRanges;
+
+    constructor(front: FrontMatter, slides: Slide[], ranges: SlideRanges) {
+        this.front = front;
+        this.slides = slides;
+        this.ranges = ranges;
+    }
+
+    public html(index: number): string {
+        return this.slides[index].html;
+    }
+
+    public htmlByLine(line: number): string {
+        return this.html(this.ranges.getIndexByLine(line));
+    }
+}
+
 export function render(text: string) {
     let lines = text.split("\n");
    const endOfFront = 1 + lines.slice(1).indexOf("---");
@@ -28,11 +74,7 @@ export function render(text: string) {
     const md = new Markdown({
         highlight(str: string, lang?: string) {
             if (lang) {
-                try {
-                    return highlightjs.highlight(lang, str).value;
-                } catch (e) {
-                    console.error(e);
-                }
+                return highlightjs.highlight(lang, str).value;
             }
 
             return str;
@@ -55,12 +97,15 @@ export function render(text: string) {
     };
 
     // Convert markdown texts into html.
+    const ranges: number[] = [];
     const slides = slideTexts.map((slideText, index) => {
+        ranges.push((ranges[ranges.length - 1] || 0) + slideText.split("\n").length + endOfFront);
+
         return {
-            index,
             html: md.render(slideText)
         };
     });
 
-    return { front, slides };
+    const range = new SlideRanges(ranges);
+    return new RenderedMarkdown(front, slides, range);
 }

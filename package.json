@@ -5,11 +5,16 @@
   "bin": {
     "supershow": "supershow"
   },
+  "engines": {
+    "vscode": "^1.24.0"
+  },
   "main": "dist/index.js",
   "repository": "https://github.com/seiyanuta/supershow",
   "author": "Seiya Nuta <nuta@seiya.me>",
+  "publisher": "seiyanuta",
   "license": "CC0-1.0 OR MIT",
   "scripts": {
+    "postinstall": "npm_package_engines_vscode=1.24.0 node ./node_modules/vscode/bin/install",
     "prepack": "npm run build",
     "build": "tsc && WEBPACK_MODE=production webpack",
     "dev": "tsc -w",
@@ -64,6 +69,7 @@
     "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
     "typescript": "^2.9.2",
+    "vscode": "^1.1.18",
     "vue": "^2.5.16",
     "vue-loader": "^15.2.4",
     "vue-style-loader": "^4.1.0",
@@ -90,5 +96,17 @@
     ],
     "sourceMap": true,
     "all": true
+  },
+  "activationEvents": [
+    "onLanguage:markdown",
+    "onCommand:supershow.preview"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "supershow.preview",
+        "title": "Supershow: Preview the presentation"
+      }
+    ]
   }
 }

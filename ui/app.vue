@@ -92,11 +92,11 @@ export default {
             }
         },
         loadMarkdown(text) {
-            const { front, slides } = render(text);
-            document.title = front.title || "slide";
-            this.slides = slides;
-            this.size = (front.size || "4:3").replace(":", "x");
-            this.loadTheme(front.theme || "simple");
+            const rendered = render(text);
+            document.title = rendered.front.title || "slide";
+            this.slides = rendered.slides;
+            this.size = (rendered.front.size || "4:3").replace(":", "x");
+            this.loadTheme(rendered.front.theme || "simple");
         },
         watchChanges() {
             console.log("Connecting to the local server...");
