@@ -1,5 +1,12 @@
 import * as main from "./main";
-import { activate, deactivate } from "./vscode";
+
+let activate, deactivate;
+try {
+    const vscode = require("./vscode");
+    activate = vscode.activate;
+    deactivate = vscode.deactivate;
+} catch(e) {
+}
 
 export {
     main,
