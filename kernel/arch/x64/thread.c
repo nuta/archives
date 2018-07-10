@@ -5,6 +5,7 @@
 #include "switch.h"
 #include "asm.h"
 #include "msr.h"
+#include "fpu.h"
 
 
 void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
@@ -47,6 +48,10 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
         arch->gs = USER_DS | USER_RPL;
         arch->is_user = true;
     }
+
+    // TODO: ensure that the pointer is aligned to 64 or XSAVE raises #GP.
+    arch->xstate_ptr = (u64_t) kmalloc(XSTATE_SIZE, KMALLOC_ZEROED | KMALLOC_NORMAL);
+    arch->xstate_mask = x64_xsave_mask;
 }
 
 void arch_allow_io(struct arch_thread *arch) {

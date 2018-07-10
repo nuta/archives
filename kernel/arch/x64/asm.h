@@ -49,6 +49,22 @@ static inline u64_t asm_read_cr2(void) {
     return value;
 }
 
+static inline u64_t asm_get_cr4(void) {
+    u64_t value;
+    INLINE_ASM("mov %%cr4, %0" : "=r"(value));
+    return value;
+}
+
+static inline void asm_set_cr4(u64_t value) {
+    INLINE_ASM("mov %0, %%cr4" :: "r"(value) : "memory");
+}
+
+static inline void asm_set_xcr(u32_t reg, u64_t value) {
+    u32_t low = value;
+    u32_t hi = value >> 32;
+    INLINE_ASM("xsetbv" :: "c"(reg), "a"(low), "d"(hi));
+}
+
 static inline void asm_wrmsr(u32_t reg, u64_t value) {
     u32_t low = value & 0xffffffff;
     u32_t hi = value >> 32;
@@ -65,6 +81,10 @@ static inline void asm_invlpg(u64_t vaddr) {
     // Specify "memory" in clobber list to prevent memory
     // access reordering.
     INLINE_ASM("invlpg (%0)" :: "b"(vaddr) : "memory");
+}
+
+static inline void asm_cpuid(u32_t id, u32_t *eax, u32_t *ebx, u32_t *ecx, u32_t *edx) {
+    INLINE_ASM("cpuid" : "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx) : "a"(id));
 }
 
 #endif

@@ -1,6 +1,7 @@
 /* TODO: rewrite in Intel syntax */
 #define ATT_SYNTAX
 #include "asmdefs.h"
+#include "arch_thread.h"
 #include "msr.h"
 
 .globl start_kernel_thread
@@ -35,13 +36,26 @@ enter_userspace:
     /* Current GS base is kernel one. Swap as the timer ISR does. */
     swapgs
 
+    /* Set default values to floating point registers. */
+    fninit
+
     /* TODO: sanitize other registers */
     iretq
 
 /* void arch_switch(struct arch_thread *prev, struct arch_thread *next); */
+.extern x64_xsave_mask
 .globl arch_switch
 arch_switch:
-    /* TODO: save and restore FPU registers and debug registers. */
+    /* Set XCR0, save and restore floating point registers. */
+    mov GS_XSTATE_MASK(%rdi), %rax
+    xor %edx, %edx
+    xor %ecx, %ecx
+    xchg %bx,%bx
+    xsetbv
+    mov GS_XSTATE_PTR(%rdi), %rcx
+    xsave (%rcx)
+    mov GS_XSTATE_PTR(%rsi), %rcx
+    xrstor (%rcx)
 
     /* Switch GS register. TODO: save GS register. */
     mov 32(%rsi), %rax

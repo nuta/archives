@@ -13,6 +13,7 @@
 #include "vga.h"
 #include "smp.h"
 #include "syscall.h"
+#include "fpu.h"
 
 
 /* The bootstarap processor (the first processor) initialization. */
@@ -31,20 +32,18 @@ void arch_early_init(void) {
 
     INFO("x64: initializing paging");
     x64_init_paging();
-
     INFO("x64: initializing Local APIC");
     x64_init_apic();
-
     INFO("x64: initializing cpuvar");
     x64_init_cpuvar();
-
     INFO("x64: initializing GDT");
     x64_init_gdt();
     INFO("x64: initializing TSS");
     x64_init_tss();
     INFO("x64: initializing IDT");
     x64_init_idt();
-
+    INFO("x64: initializing FPU");
+    x64_init_fpu();
     INFO("x64: initializing SMP");
     x64_init_smp();
     INFO("x64: initializing Local APIC Timer");

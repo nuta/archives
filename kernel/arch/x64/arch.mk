@@ -1,7 +1,7 @@
 arch_include_dirs := .
 arch_objs := startup.o init.o thread.o serial.o gdt.o idt.o tss.o paging.o \
 	smp.o apic.o ioapic.o handler.o irq.o exception.o pic.o switch.o cpuvar.o \
-	idle.o syscall.o usercopy.o vga.o putchar.o
+	idle.o syscall.o usercopy.o vga.o putchar.o fpu.o
 
 disk_img = $(BUILD_DIR)/$(ARCH_DIR)/disk.img
 QEMU ?= qemu-system-x86_64

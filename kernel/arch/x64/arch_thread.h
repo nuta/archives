@@ -6,6 +6,8 @@
 #define GS_RSP0          40
 #define GS_KSTACK        48
 #define GS_RFLAGS_ORMASK 56
+#define GS_XSTATE_MASK   64
+#define GS_XSTATE_PTR    72
 
 #ifndef __ASSEMBLER__
 
@@ -20,6 +22,8 @@ struct arch_thread {
     u64_t rsp0;          // 40: kstack + sizeof(kstack)
     u64_t kstack;        // 48
     u64_t rflags_ormask; // 56
+    u64_t xstate_mask;   // 64
+    u64_t xstate_ptr;    // 72
 };
 
 #endif
