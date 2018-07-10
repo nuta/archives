@@ -26,7 +26,9 @@ run:
 	$(MAKE) $(disk_img)
 	$(QEMU) $(QEMUFLAGS)
 
-bochs: $(BUILD_DIR)/$(ARCH_DIR)/disk.img
+bochs:
+	$(MAKE) build
+	$(MAKE) $(disk_img)
 	rm -f $(ARCH_DIR)/disk.img.lock
 	$(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc
 
