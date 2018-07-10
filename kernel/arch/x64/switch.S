@@ -50,7 +50,6 @@ arch_switch:
     mov GS_XSTATE_MASK(%rdi), %rax
     xor %edx, %edx
     xor %ecx, %ecx
-    xchg %bx,%bx
     xsetbv
     mov GS_XSTATE_PTR(%rdi), %rcx
     xsave (%rcx)
