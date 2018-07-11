@@ -22,7 +22,7 @@ include_dirs := $(PWD) $(addprefix $(ARCH_DIR)/, $(arch_include_dirs)) \
 
 $(BUILD_DIR)/kernel/kernel.elf: $(objs) $(kernel_ld)
 	$(PROGRESS) "LD" $@
-	$(LD) $(LDFLAGS) --Map=$(BUILD_DIR)/kernel/kernel.map --script $(kernel_ld) -o $@ $(objs)
+	$(LD) $(LDFLAGS) -o $@ $(objs)
 
 $(BUILD_DIR)/%.o: %.S Makefile
 	mkdir -p $(dir $@)
