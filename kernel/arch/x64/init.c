@@ -14,6 +14,7 @@
 #include "smp.h"
 #include "syscall.h"
 #include "fpu.h"
+#include "pmc.h"
 
 
 /* The bootstarap processor (the first processor) initialization. */
@@ -44,6 +45,8 @@ void arch_early_init(void) {
     x64_init_idt();
     DEBUG("x64: initializing FPU");
     x64_init_fpu();
+    DEBUG("x64: initializing PMC");
+    x64_init_pmc();
     DEBUG("x64: initializing SMP");
     x64_init_smp();
     DEBUG("x64: initializing Local APIC Timer");
