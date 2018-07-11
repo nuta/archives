@@ -24,7 +24,7 @@
                     </div>
                 </div>
                 <div class="page-number">
-                    {{ index + 1 }} / {{ slides.length }}
+                    {{ index }} / {{ slides.length }}
                 </div>
                 <div class="laser-light" ref="laserLight" v-show="laser"></div>
             </div>
@@ -52,14 +52,14 @@ export default {
     },
     methods: {
         moveTo(index) {
-            const slide = this.slides[index];
+            const slide = this.slides[index - 1];
             if (!slide) {
                 return;
             }
 
             this.index = index;
             this.html = slide.html;
-            window.location.hash = index + 1;
+            window.location.hash = index;
         },
         move(offset) {
             this.moveTo(this.index + offset);
@@ -192,7 +192,7 @@ export default {
             // TODO: production
         }
 
-        this.moveTo((parseInt(window.location.hash.slice(1)) || 1) - 1);
+        this.moveTo(parseInt(window.location.hash.slice(1)) || 1);
         this.setupShortcuts();
         await this.setupPresentationRequest();
         this.setupPresenterView();
@@ -279,6 +279,7 @@ html, body {
         }
 
         .bottom-bar {
+            z-index: 1000;
             width: 100%;
             display: flex;
             position: absolute;

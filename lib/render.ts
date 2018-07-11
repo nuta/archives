@@ -9,6 +9,7 @@ const twemoji = require("twemoji");
 
 export type FrontMatter = { [name: string]: any };
 export interface Slide {
+    index: number, // 1-origin
     html: string,
 };
 
@@ -102,6 +103,7 @@ export function render(text: string) {
         ranges.push((ranges[ranges.length - 1] || 0) + slideText.split("\n").length + endOfFront);
 
         return {
+            index: index + 1,
             html: md.render(slideText)
         };
     });
