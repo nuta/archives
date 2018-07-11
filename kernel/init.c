@@ -62,18 +62,18 @@ static void elf_create_process(const void *image, UNUSED size_t length, pager_t 
 
     /* check out the magic number */
     if (strncmp((const char *) &ehdr->e_ident, ELF_MAGIC, 4) != 0) {
-        INFO("%s: invalid elf magic, skipping...", image);
+        WARN("%s: invalid elf magic, skipping...", image);
         return;
     }
 
     if (ehdr->e_ident[4] != ELFCLASS64 || ehdr->e_machine != EM_X86_64) {
-        INFO("%s: unsupported type, skipping...", image);
+        WARN("%s: unsupported type, skipping...", image);
         return;
     }
 
     struct process *process = process_create();
     channel_connect(kernel_channel, process);
-    INFO("elf: created process #%d", process->pid);
+    DEBUG("elf: created process #%d", process->pid);
 
     /* Load program headers. */
     for (int i = 0; i < ehdr->e_phnum; i++) {
@@ -104,7 +104,7 @@ static void launch_servers(void) {
     kfs_opendir(&dir);
     while (kfs_readdir(&dir, &file) != NULL) {
         if (!strncmp("/servers/", file.name, 9)) {
-            INFO("kernel: starting %s", file.name);
+            DEBUG("kernel: starting %s", file.name);
             elf_create_process(file.data, file.length, kfs_pager, file.pager_arg);
         }
     }
@@ -113,24 +113,24 @@ static void launch_servers(void) {
 
 void kernel_init(void) {
     INFO("Starting Resea...");
-    INFO("kernel: initializing memory system");
+    DEBUG("kernel: initializing memory system");
     memory_init();
     arch_early_init();
 
-    INFO("kernel: initializing process system");
+    DEBUG("kernel: initializing process system");
     process_init();
 
-    INFO("kernel: initializing thread system");
+    DEBUG("kernel: initializing thread system");
     thread_init();
 
-    INFO("kernel: initializing kfs system");
+    DEBUG("kernel: initializing kfs system");
     kfs_init();
     arch_init();
 
-    INFO("kernel: lauching kernel servers");
+    DEBUG("kernel: lauching kernel servers");
     kernel_server_init();
 
-    INFO("kernel: lauching servers in kfs");
+    DEBUG("kernel: lauching servers in kfs");
     launch_servers();
 
     if (thread_list_is_empty(&kernel_process->threads)) {

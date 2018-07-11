@@ -111,7 +111,7 @@ void handle_page_fault(uptr_t original_address, bool present, bool user, bool wr
                 thread_destroy_current();
             }
 
-            INFO("filling %p -> %p %p    ", paddr, address, area->flags);
+            DEBUG("filling %p -> %p %p    ", paddr, address, area->flags);
             arch_link_page(&vms->arch, address, paddr, 1, area->flags);
             return;
         }

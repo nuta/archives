@@ -30,25 +30,25 @@ void x64_init_bsp(void) {
 void arch_early_init(void) {
     // Now we are able to use kernel memory allocator.
 
-    INFO("x64: initializing paging");
+    DEBUG("x64: initializing paging");
     x64_init_paging();
-    INFO("x64: initializing Local APIC");
+    DEBUG("x64: initializing Local APIC");
     x64_init_apic();
-    INFO("x64: initializing cpuvar");
+    DEBUG("x64: initializing cpuvar");
     x64_init_cpuvar();
-    INFO("x64: initializing GDT");
+    DEBUG("x64: initializing GDT");
     x64_init_gdt();
-    INFO("x64: initializing TSS");
+    DEBUG("x64: initializing TSS");
     x64_init_tss();
-    INFO("x64: initializing IDT");
+    DEBUG("x64: initializing IDT");
     x64_init_idt();
-    INFO("x64: initializing FPU");
+    DEBUG("x64: initializing FPU");
     x64_init_fpu();
-    INFO("x64: initializing SMP");
+    DEBUG("x64: initializing SMP");
     x64_init_smp();
-    INFO("x64: initializing Local APIC Timer");
+    DEBUG("x64: initializing Local APIC Timer");
     x64_init_apic_timer();
-    INFO("x64: initializing SYSCALL/SYSRET");
+    DEBUG("x64: initializing SYSCALL/SYSRET");
     x64_init_syscall();
 }
 
