@@ -6,22 +6,26 @@ notifications:
   on_success: change
   on_failure: change
 
-addons:
-  apt:
-    sources:
-      - llvm-toolchain-trusty-6.0
-      - ubuntu-toolchain-r-test
-    packages:
-      - clang-6.0
-      - lld-6.0
-      - qemu-system-x86
-      - mtools
+kernel: &kernel
+  env: M=kernel ARCH=x64
+  addons:
+    apt:
+      sources:
+        - llvm-toolchain-trusty-6.0
+        - ubuntu-toolchain-r-test
+      packages:
+        - clang-6.0
+        - lld-6.0
+        - qemu-system-x86
+        - mtools
+  before_script:
+    - ./tools/bootstrap
+  script:
+    - make -j2 build ANTLR4="java -jar $PWD/antlr-4.7.1-complete.jar" SERVERS="test" CC=clang-6.0 LD=ld.lld-6.0
+
+matrix:
+  include:
+    - *kernel
 
 cache:
   pip: true
-
-before_script:
-  - ./tools/bootstrap
-
-script:
-  - make -j2 build ANTLR4="java -jar $PWD/antlr-4.7.1-complete.jar" SERVERS="test" CC=clang-6.0 LD=ld.lld-6.0
