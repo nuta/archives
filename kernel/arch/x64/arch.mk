@@ -9,7 +9,8 @@ BOCHS ?= bochs
 override CFLAGS += -O2 -g3 --target=x86_64
 override CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=large
 override CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
-override LDFLAGS += --Map=$(BUILD_DIR)/kernel/kernel.map --script $(kernel_ld)
+override LDFLAGS +=
+KERNEL_LDFLAGS += --Map=$(BUILD_DIR)/kernel/kernel.map --script $(kernel_ld)
 QEMUFLAGS += -d cpu_reset -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
 QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw -netdev user,id=net0 -device virtio-net-pci,netdev=net0
 
