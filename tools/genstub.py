@@ -77,7 +77,7 @@ def generate_c_file(service):
                 name = call["rets"][i]["name"]
                 type_ = call["rets"][i]["type"]
             except IndexError:
-                params += ", &__unused"
+                params += ", &__tmp"
             else:
                 type_id = get_type_id_by_name(types, type_)
                 reply_header += f" | ({type_id} << {i * 2}UL)"
@@ -95,7 +95,7 @@ def generate_c_file(service):
 #define {header_name} (({msg_name} << 16UL) | (({header}) << 8))
 #define {reply_header_name} (({reply_msg_name} << 16UL) | (({reply_header}) << 8))
 static inline header_t call_{service_name}_{call_name}(channel_t __server{args}) {{
-    payload_t __unused;
+    payload_t __tmp;
 
     return ipc_call(
         __server, {header_name}{params}
