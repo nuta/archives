@@ -18,6 +18,8 @@ struct cpuvar {
 #define IS_ERROR_PTR(ptr) ((uptr_t) (ptr) < NULL_PAGE_SIZE)
 #define ERROR_FROM_PTR(ptr) ((int) (ptr))
 
+void kernel_init(void);
+
 // Arch is responsible for call this function on an interrupt.
 void handle_irq(int irq);
 

@@ -75,6 +75,4 @@ struct kfs_file {
     struct kfs_file_header *pager_arg;
 };
 
-void kernel_init(void);
-
 #endif
