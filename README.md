@@ -13,4 +13,4 @@ make -j8
 
 License
 -------
-CC0 or MIT excluding external dependencies in `deps`.
+CC0 or MIT.
