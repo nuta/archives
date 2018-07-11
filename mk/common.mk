@@ -34,6 +34,11 @@ TAR = gtar
 TOOLCHAIN_PREFIX = g
 endif
 
+ifeq ($(ARCH), posix)
+CC = clang
+LD = clang
+endif
+
 PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
 
 tools/idl/parser/idlParser.py: tools/idl/idl.g4

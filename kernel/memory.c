@@ -123,8 +123,12 @@ invalid_access:
     thread_destroy_current();
 }
 
-
 void memory_init(void) {
+#ifdef ARCH_POSIX
+    allocated = (paddr_t) malloc(0x1000 * 1024);
+    v_allocated = 0;
+#else
     allocated = 0x001000000;
     v_allocated = 0xa00000000;
+#endif
 }
