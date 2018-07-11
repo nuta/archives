@@ -44,10 +44,10 @@ void kfree(UNUSED void *ptr) {
 void add_vmarea(
     struct vmspace *vms,
     uptr_t address,
-    uptr_t pager_offset,
+    off_t pager_offset,
     size_t length,
     int flags,
-    paddr_t (*pager)(void *arg, uptr_t offset, size_t length),
+    pager_t *pager,
     void *pager_arg
 ) {
     struct vmarea *area = kmalloc(sizeof(*area), KMALLOC_NORMAL);
