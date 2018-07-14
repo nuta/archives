@@ -26,6 +26,10 @@ typedef uintptr_t uptr_t;
 typedef uintmax_t umax_t;
 typedef intmax_t imax_t;
 
+#ifdef __linux__
+typedef umax_t off_t;
+#endif
+
 #else
 
 typedef char i8_t;
