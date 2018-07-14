@@ -4,7 +4,7 @@ stubs := discovery exit logging io
 ARCH_DIR = kernel/arch/$(ARCH)
 KFS_DIR = $(BUILD_DIR)/kernel/kfs
 C_STUB_DIR = $(BUILD_DIR)/stub/c
-include mk/version.mk
+include VERSION
 include $(ARCH_DIR)/arch.mk
 
 kernel_objs := $(addprefix kernel/, $(objs)) $(addprefix $(ARCH_DIR)/, $(arch_objs))
