@@ -4,7 +4,7 @@ ENTRY(x64_startup);
 MEMORY {
     startup(rx): ORIGIN = 0x00100000, LENGTH = 1K
     /* FIXME: isolate .data and make this readonly */
-    rom(rwx): ORIGIN = 0xffff800000110000, LENGTH = 800K
+    rom(rwx): ORIGIN = 0xffff800000110000, LENGTH = 8M
     ram(rw): ORIGIN = 0xffff800000080000, LENGTH = 256K
 }
 
