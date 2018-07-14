@@ -4,6 +4,7 @@ stubs := discovery exit logging io
 ARCH_DIR = kernel/arch/$(ARCH)
 KFS_DIR = $(BUILD_DIR)/kernel/kfs
 C_STUB_DIR = $(BUILD_DIR)/stub/c
+include mk/version.mk
 include $(ARCH_DIR)/arch.mk
 
 kernel_objs := $(addprefix kernel/, $(objs)) $(addprefix $(ARCH_DIR)/, $(arch_objs))
@@ -32,7 +33,7 @@ $(BUILD_DIR)/%.o: %.S Makefile
 $(BUILD_DIR)/%.o: %.c Makefile $(C_STUB_DIR)
 	mkdir -p $(dir $@)
 	$(PROGRESS) "CC" $@
-	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -c -o $@ $<
+	$(CC) $(CFLAGS) '-DVERSION="$(VERSION)"' $(addprefix -I, $(include_dirs)) -c -o $@ $<
 	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -MF $(@:.o=.deps) -MT $(BUILD_DIR)/$(<:.c=.o) -MM $<
 
 $(C_STUB_DIR): tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)

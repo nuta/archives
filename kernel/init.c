@@ -111,7 +111,7 @@ static void launch_servers(void) {
 
 
 void kernel_init(void) {
-    INFO("Starting Resea...");
+    INFO("Starting Resea version " VERSION);
     DEBUG("kernel: initializing memory system");
     memory_init();
     arch_early_init();
