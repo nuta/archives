@@ -12,7 +12,8 @@ override CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
 override LDFLAGS +=
 KERNEL_LDFLAGS += --Map=$(BUILD_DIR)/kernel/kernel.map --script $(kernel_ld)
 QEMUFLAGS += -d cpu_reset -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
-QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw -netdev user,id=net0 -device virtio-net-pci,netdev=net0
+QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw
+QEMUFLAGS += -netdev user,id=net0 -device virtio-net-pci,netdev=net0 -object filter-dump,id=qemu,netdev=net0,file=qemu.pcap
 
 ifeq ($(MBRBOOT),)
 kernel_ld = $(ARCH_DIR)/kernel.multiboot.ld
