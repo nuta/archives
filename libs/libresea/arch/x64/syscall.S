@@ -28,6 +28,9 @@ ipc_close:
  */
 .globl ipc_send
 ipc_send:
+    xchg rcx, r10
+    mov rax, 3
+    syscall
     ret
 
 /*
