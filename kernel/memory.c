@@ -5,28 +5,52 @@
 #include "process.h"
 #include "memory.h"
 
-paddr_t allocated;
-int used = 0;
-paddr_t alloc_pages(size_t size, UNUSED int flags) {
-    size = ROUND_UP(size, PAGE_SIZE);
-    paddr_t addr = allocated;
-    allocated += size;
+paddr_t allocated_pages_start;
+static struct page *pages;
 
-    // XXX: The page could be not mapped.
-    if (flags & KMALLOC_ZEROED) {
-        memset(from_paddr(addr), 0, size);
+paddr_t alloc_pages(size_t size, UNUSED int flags) {
+    size_t num, start;
+
+retry:
+    num = ROUND_UP(size, PAGE_SIZE) / PAGE_SIZE;
+    start = 0;
+    for (size_t i = 0; i < phypages_num; i++) {
+        size_t j;
+        for (j = 0; i + j < phypages_num && j < num; j++) {
+            if (pages[i + j].ref_count != 0) {
+                break;
+            }
+        }
+
+        if (j == num) {
+            /* Found a large enough space. Mark pages as used. */
+            for (j = start; j < start + num; j++) {
+                if (!atomic_compare_and_swap(&pages[i + j].ref_count, 0, 1)) {
+                    /* Failed to mark as used. Deallocate pages and try again. */
+                    for (size_t k = start; k < j; k++) {
+                        atomic_compare_and_swap(&pages[i + j].ref_count, 1, 0);
+                    }
+
+                    goto retry;
+                }
+            }
+
+            return allocated_pages_start + (i * PAGE_SIZE);
+        }
     }
 
-    used += size;
-//    DEBUG("kernel: allocated %d bytes at %p (%dKB used)",
-//        size, addr, used / 1024);
-
-    return addr;
+    PANIC("run out of memory");
 }
 
 
 void *kmalloc(size_t size, int flags) {
-    return from_paddr(alloc_pages(size, flags));
+    void *ptr = from_paddr(alloc_pages(size, flags));
+
+    if (flags & KMALLOC_ZEROED) {
+        memset(ptr, 0, size);
+    }
+
+    return ptr;
 }
 
 
@@ -124,11 +148,9 @@ invalid_access:
 }
 
 void memory_init(void) {
-#ifdef ARCH_POSIX
-    allocated = (paddr_t) malloc(0x1000 * 1024);
-    v_allocated = 0;
-#else
-    allocated = 0x001000000;
+    pages = (struct page *) from_paddr(phypages_start);
+    size_t phypages_size = sizeof(struct page) * phypages_num;
+    memset(pages, 0, phypages_size);
+    allocated_pages_start = ROUND_UP(phypages_start + phypages_size, PAGE_SIZE);
     v_allocated = 0xa00000000;
-#endif
 }

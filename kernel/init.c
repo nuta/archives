@@ -50,7 +50,6 @@ static paddr_t kfs_pager(void *arg, off_t offset, size_t length) {
 
 static void kfs_init(void) {
     struct kfs_header *header = (struct kfs_header *) &__kfs;
-
     if (strcmp(KFS_MAGIC, (const char *) &header->magic) != 0) {
         PANIC("kfs: invalid magic");
     }

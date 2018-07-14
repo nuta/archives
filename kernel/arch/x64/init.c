@@ -16,10 +16,17 @@
 #include "fpu.h"
 #include "pmc.h"
 
+paddr_t phypages_start;
+size_t phypages_num;
 
 /* The bootstarap processor (the first processor) initialization. */
 void x64_init_bsp(void) {
     // Note that the kernel memory allocator is not initialized yet.
+
+    /* TODO: Read memory map. */
+    phypages_start = 0x1000000;
+    phypages_num = (256 * 1024 * 1024) / PAGE_SIZE;
+
     x64_vga_init();
     x64_init_serial();
     x64_init_pic();

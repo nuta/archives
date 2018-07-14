@@ -11,6 +11,10 @@ struct cpuvar {
     kmutex_t runqueue_lock;
 };
 
+struct page {
+    int ref_count;
+};
+
 // 0 - NULL_PAGE_SIZE are not allocated for both kernel and user. Pointers points
 // to the range as invalid.
 #define NULL_PAGE_SIZE (0x1000)
@@ -42,5 +46,8 @@ void arch_link_page(struct arch_vmspace *vms, uptr_t vaddr, paddr_t paddr, size_
 void arch_copy_from_user(void *kernel, uptr_t user, size_t length);
 void arch_allow_io(struct arch_thread *arch);
 void arch_accept_irq(int irq);
+
+extern paddr_t phypages_start;
+extern size_t phypages_num;
 
 #endif
