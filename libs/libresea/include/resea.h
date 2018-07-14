@@ -90,6 +90,7 @@ enum {
     ERROR_UNKNOWN_MSG = 1,
     ERROR_NOT_IMPLEMENTED = 2,
     ERROR_INVALID_ARG = 3,
+    ERROR_INVALID_MSG = 4,
 
     /* errors returned by kernel */
     ERROR_NO_MEMORY = 200,

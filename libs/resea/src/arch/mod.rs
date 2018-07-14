@@ -16,6 +16,7 @@ pub enum ErrorCode {
     UnknownMsg = 1,
     NotImplemented = 2,
     InvalidArg = 3,
+    InvalidMsg = 4,
     NoMemory = 200,
     InvalidChannel = 201,
     ChannelNotLinked = 202,
