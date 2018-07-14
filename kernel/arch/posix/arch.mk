@@ -8,3 +8,8 @@ override LDFLAGS +=
 run:
 	$(MAKE) build
 	./build/kernel/kernel.elf
+
+.PHONY: test
+test:
+	$(MAKE) build
+	./build/kernel/kernel.elf
