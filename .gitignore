@@ -1,6 +1,7 @@
 .cache
 build
 *.log
+*.pcap
 *.pyc
 **/target
 libs/resea/src/interfaces
