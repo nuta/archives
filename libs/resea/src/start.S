@@ -16,17 +16,34 @@ _Unwind_Resume:
 /* void *memcpy(void *dst, const void *src, size_t n); */
 .globl memcpy
 memcpy:
-    mov rax, rdi
     xchg rcx, rdx
+    mov rax, rdi
     cld
+    rep movsb
+    ret
+
+/* void *memmove(void *dst, const void *src, size_t n); */
+.globl memmove
+memmove:
+    xchg rcx, rdx
+    mov rax, rdi
+    cmp rdi, rsi
+    ja 1f
+    cld /* Copy forwards. */
+    rep movsb
+    ret
+1:
+    add rdi, rcx
+    add rsi, rcx
+    std /* Copy backwards. */
     rep movsb
     ret
 
 /* void *memset(void *ptr, int value, size_t n); */
 .globl memset
 memset:
-    mov r8, rdi
     xchg rcx, rdx
+    mov r8, rdi
     mov al, sil
     cld
     rep stosb
