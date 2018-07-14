@@ -132,9 +132,11 @@ void handle_irq(int irq) {
         return;
     }
 
+    /* Use do_notify instead of ipc_notify because we're in an interrupt context;
+       that is, the current process is not kernel process. */
     channel_t listener = irq_listeners[irq].listener;
     if (listener) {
-        ipc_notify(listener, 0, 1);
+        do_notify(kernel_process, listener, 0, 1);
     }
 }
 

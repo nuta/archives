@@ -13,10 +13,9 @@ static inline void transfer_to(struct channel *from, struct channel *to) {
     from->transfer_to = to;
 }
 
-
-struct channel *get_channel_by_id(channel_t cid) {
-    size_t channels_max = CPUVAR->current->process->channels_max;
-    struct channel *channels = (struct channel *) &CPUVAR->current->process->channels;
+static struct channel *get_channel_by_id_of(struct process *proc, channel_t cid) {
+    size_t channels_max = proc->channels_max;
+    struct channel *channels = (struct channel *) &proc->channels;
 
     if (cid == 0 || cid > channels_max) {
         return NULL;
@@ -24,6 +23,10 @@ struct channel *get_channel_by_id(channel_t cid) {
 
     struct channel *ch = &channels[cid - 1];
     return (ch->flags == 0) ? NULL : ch;
+}
+
+struct channel *get_channel_by_id(channel_t cid) {
+    return get_channel_by_id_of(CPUVAR->current->process, cid);
 }
 
 struct channel *channel_create(struct process *process) {
@@ -377,8 +380,8 @@ channel_t sys_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t 
 
 /* This function would be called in an interrupt context: don't
   use mutexes and printk nor they cause a dead lock! */
-error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
-    struct channel *src = get_channel_by_id(ch);
+error_t do_notify(struct process *proc, channel_t ch, payload_t and_mask, payload_t or_mask) {
+    struct channel *src = get_channel_by_id_of(proc, ch);
     if (!src) {
         return ERROR_INVALID_CH;
     }
@@ -396,8 +399,14 @@ error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
         thread_resume(receiver);
     }
 
-    DEBUG("sys_notify: %p @%d.%d", dst->notifications, dst->process->pid, dst->cid);
+    DEBUG("notify: %p @%d.%d", dst->notifications, dst->process->pid, dst->cid);
     return ERROR_NONE;
+}
+
+/* This function would be called in an interrupt context: don't
+  use mutexes and printk nor they cause a dead lock! */
+error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
+    return do_notify(CPUVAR->current->process, ch, and_mask, or_mask);
 }
 
 
