@@ -28,7 +28,7 @@ posix_kernel: &posix_kernel
   before_script:
     - ./tools/bootstrap
   script:
-    - make -j2 ARCH=posix ANTLR4="java -jar $PWD/antlr-4.7.1-complete.jar" run
+    - make -j2 build ARCH=posix ANTLR4="java -jar $PWD/antlr-4.7.1-complete.jar"
 
 matrix:
   include:
