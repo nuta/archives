@@ -25,6 +25,7 @@ endif
 .PHONY: bochs
 run:
 	$(MAKE) build
+	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
 	$(MAKE) $(disk_img)
 	$(QEMU) $(QEMUFLAGS)
 
@@ -36,6 +37,7 @@ bochs:
 
 test:
 	$(MAKE) build
+	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
 	$(MAKE) $(disk_img)
 	(sleep 5; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS)
 
