@@ -11,9 +11,11 @@ ifeq ($(lang),)
 $(error "$(DIR)/Makefile: lang is not set")
 endif
 
+# FIXME:
+stubs := $(notdir $(basename $(wildcard interfaces/*.idl)))
+
 # Rust projects.
 ifeq ($(lang), rust)
-stubs := $(requires) $(implements) logging io
 stub_dir = libs/resea/src/interfaces
 abs_server_build_dir = $(PWD)/$(server_build_dir)
 artifact = $(abspath $(server_build_dir)/$(ARCH)/debug/$(name))
