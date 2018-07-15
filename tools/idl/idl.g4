@@ -3,11 +3,12 @@ NUM: [0-9]+;
 NAME: [a-z][a-zA-Z0-9_]*;
 WS: [ \t\r\n]+ -> skip ;
 
-idl: service stmt*;
-service: 'service' '"' NAME '"' '(' NUM ')';
+idl: typeDef* interfaceDef*;
+attrList: '[' attr (',' attr) * ']';
+attr: 'id' '(' NUM ')';
+typeDef: 'type' NAME '=' NAME ';';
+
+interfaceDef: attrList 'interface' NAME '{' callDef* '}';
 arg: NAME ':' NAME;
 argList: (arg  (',' arg) *) ?;
-
-stmt: callDef | typeDef;
-callDef: NAME '(' argList ')' '->' '(' argList ')' ';';
-typeDef: 'type' NAME '=' NAME ';';
+callDef: attrList NAME '(' argList ')' '->' '(' argList ')' ';';

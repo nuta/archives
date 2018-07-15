@@ -1,3 +1,4 @@
-service "net_device" (104)
-
-send(data: buffer, data_length: usize) -> ();
+[id(104)]
+interface net_device {
+    [id(1)] send(data: buffer, data_length: usize) -> ();
+}

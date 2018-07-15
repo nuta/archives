@@ -1,3 +1,5 @@
-service "exit" (1)
+[id(1)]
+interface exit {
+    [id(1)] exit(exit_code: u8) -> ();
+}
 
-exit(exit_code: error) -> ();

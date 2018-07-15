@@ -1,4 +1,5 @@
-service "discovery" (3)
-
-register(msg_type: u16, server: channel) -> ();
-discover(msg_type: u16) -> (client: channel);
+[id(3)]
+interface discovery {
+    [id(1)] register(msg_type: u16, server: channel) -> ();
+    [id(3)] discover(msg_type: u16) -> (client: channel);
+}

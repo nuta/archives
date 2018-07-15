@@ -1,3 +1,4 @@
-service "logging" (2)
-
-emit(str: string, str_length: usize) -> ();
+[id(2)]
+interface logging {
+    [id(1)] emit(str: string, str_length: usize) -> ();
+}

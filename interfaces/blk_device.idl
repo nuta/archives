@@ -1,4 +1,5 @@
-service "blk_device" (100)
-
-read(offset: u64, length: usize) -> (data: buffer, data_length: usize);
-write(offset: u64, data: buffer, data_length: usize) -> ();
+[id(100)]
+interface blk_device {
+    [id(1)] read(offset: u64, length: usize) -> (data: buffer, data_length: usize);
+    [id(3)] write(offset: u64, data: buffer, data_length: usize) -> ();
+}

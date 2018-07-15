@@ -1,5 +1,6 @@
-service "io" (4)
-
-ioalloc(base: u32, length: usize) -> ();
-pmalloc(vaddr: uptr, paddr: uptr, length: usize) -> (vaddr_allocated: uptr, paddr_allocated: uptr);
-listen_for_irq(irq: u32, listener: channel) -> ();
+[id(4)]
+interface io {
+    [id(1)] ioalloc(base: u32, length: usize) -> ();
+    [id(3)] pmalloc(vaddr: uptr, paddr: uptr, length: usize) -> (vaddr_allocated: uptr, paddr_allocated: uptr);
+    [id(5)] listen_for_irq(irq: u32, listener: channel) -> ();
+}

@@ -1,3 +1,4 @@
-service "kbd_device" (101)
-
-listen(listener: channel) -> ();
+[id(101)]
+interface kbd_device {
+    [id(1)] listen(listener: channel) -> ();
+}
