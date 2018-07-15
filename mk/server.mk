@@ -11,17 +11,13 @@ ifeq ($(lang),)
 $(error "$(DIR)/Makefile: lang is not set")
 endif
 
-# FIXME:
-stubs := $(notdir $(basename $(wildcard interfaces/*.idl)))
-
 # Rust projects.
 ifeq ($(lang), rust)
-stub_dir = libs/resea/src/interfaces
 abs_server_build_dir = $(PWD)/$(server_build_dir)
 artifact = $(abspath $(server_build_dir)/$(ARCH)/debug/$(name))
 
 $(executable): $(artifact)
-$(artifact): $(stub_dir)/.build
+$(artifact):
 	mkdir -p $(server_build_dir)
 	$(PROGRESS) GEN $(server_build_dir)/$(ARCH).json
 	./libs/resea/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
@@ -39,11 +35,6 @@ $(artifact): $(stub_dir)/.build
 	$(PROGRESS) CP $(KFS_DIR)/servers/$(server_name)
 	cp $(BUILD_DIR)/servers/$(server_name)/server.elf $(KFS_DIR)/servers/$(server_name)
 
-$(stub_dir)/.build: tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
-	$(PROGRESS) "GENSTUB" $(stub_dir)
-	./tools/genstub.py --idl-dir interfaces --out-dir $(stub_dir) --lang rust $(stubs)
-	touch $@
-
 include $(wildcard $(server_build_dir)/$(ARCH)/debug/$(name).d)
 endif
 
@@ -52,7 +43,7 @@ ifeq ($(lang), c)
 # FIXME: define CFLAGS by ourselves
 include kernel/arch/$(ARCH)/arch.mk
 
-stub_dir = $(server_build_dir)/stub/c
+stub_dir = $(BUILD_DIR)/stubs/c
 server_libs := libresea $(filter-out libresea, $(libs))
 server_objs := $(foreach obj, $(objs), $(DIR)/$(obj))
 server_include_dirs := $(include_dirs) $(stub_dir)
@@ -83,7 +74,7 @@ $(executable): $(c_objs) $(s_objs)
 	$(PROGRESS) CP $(KFS_DIR)/servers/$(server_name)
 	cp $(BUILD_DIR)/servers/$(server_name)/server.elf $(KFS_DIR)/servers/$(server_name)
 
-$(c_objs): $(server_build_dir)/%.o: %.c $(stub_dir)
+$(c_objs): $(server_build_dir)/%.o: %.c
 	$(PROGRESS) CC $@
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(addprefix -I, $(server_include_dirs)) -c -o $@ $<
@@ -93,10 +84,6 @@ $(s_objs): $(server_build_dir)/%.o: %.S
 	$(PROGRESS) CC $@
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(addprefix -I, $(server_include_dirs)) -c -o $@ $<
-
-$(stub_dir): tools/idl/parser/idlParser.py tools/genstub.py $(foreach stub, $(stubs), interfaces/$(stub).idl)
-	$(PROGRESS) "GENSTUB" $@
-	./tools/genstub.py --idl-dir interfaces --out-dir $@ --lang c $(stubs)
 
 include $(wildcard $(c_objs:.o=.deps))
 endif
