@@ -5,12 +5,6 @@
 
 static bool pmc_enabled = false;
 
-
-static inline u64_t rdpmc(u32_t reg) {
-    u32_t low, high;
-    __asm__ __volatile__("rdpmc" : "=a"(low), "=d"(high) : "c"(reg));
-    return ((u64_t) high << 32) | low;
-}
 void x64_init_pmc(void) {
     // Ensure that perfotmance monitor features are supported.
     u32_t eax, ebx, ecx, edx;
