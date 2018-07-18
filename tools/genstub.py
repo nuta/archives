@@ -45,15 +45,23 @@ C_TEMPLATE = """\
 #define {{ interface_name | upper }}_SERVICE ({{interface_id }}U)
 
 {%- for call in calls %}
-#define {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG          (({{ interface_name | upper }}_SERVICE << 8) | {{ call["attrs"]["id"] }}UL)
-#define {{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_MSG    (({{ interface_name | upper }}_SERVICE << 8) | ({{ call["attrs"]["id"] }}UL + 1))
+#define {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG          (({{ interface_name | upper }}_SERVICE << 8) | {{ call["id"] }}UL)
 #define {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER       (({{ interface_name | upper }}_{{ call["name"] | upper }}_MSG << 16UL) | (({{ call["args"] | header }}) << 8))
+
+{%- if call["oneway"] %}
+static inline header_t send_{{ interface_name }}_{{ call["name"] }}(channel_t __server{{ call | c_args }}) {
+    return ipc_send(__server, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER{{ call | c_params }});
+}
+
+{% else %}
+#define {{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_MSG    (({{ interface_name | upper }}_SERVICE << 8) | ({{ call["id"] }}UL + 1))
 #define {{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER (({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_MSG << 16UL) | (({{ call["rets"] | header }}) << 8))
 static inline header_t call_{{ interface_name }}_{{ call["name"] }}(channel_t __server{{ call | c_args }}) {
     payload_t __tmp;
 
     return ipc_call(__server, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER{{ call | c_params }});
 }
+{% endif %}
 {% endfor %}
 
 #endif
@@ -75,8 +83,9 @@ def generate_c_file(types, interface):
         s = ""
         for arg in call["args"]:
             s += f", {rename_type(arg['type'])} {arg['name']}"
-        for ret in call["rets"]:
-            s += f", {rename_type(ret['type'])}* {ret['name']}"
+        if not call["oneway"]:
+            for ret in call["rets"]:
+                s += f", {rename_type(ret['type'])}* {ret['name']}"
         return s
 
     def c_params(call):
@@ -88,12 +97,13 @@ def generate_c_file(types, interface):
         for _ in range(len(call["args"]), 4):
             s += ", 0"
 
-        for ret in call["rets"]:
-            s += f", (payload_t *) {ret['name']}"
+        if not call["oneway"]:
+            for ret in call["rets"]:
+                s += f", (payload_t *) {ret['name']}"
 
-        # Handle unused message payloads.
-        for _ in range(len(call["rets"]), 4):
-            s += ", &__tmp"
+            # Handle unused message payloads.
+            for _ in range(len(call["rets"]), 4):
+                s += ", &__tmp"
 
         return s
 
@@ -112,7 +122,7 @@ def generate_c_stubs(out_dir, idl_files):
     for idl_file in idl_files:
         try:
             defs = idl.parse(idl_file)
-        except Exception as e:
+        except idl.ParseError as e:
             sys.exit(f"failed to parse {idl_file}:" + str(e))
 
         types = defs["types"]
@@ -130,15 +140,17 @@ use server::{ServerResult};
 use channel::{Channel};
 use interfaces::discovery;
 use arch::{CId, Payload, OoL, Header, HeaderTrait, ErrorCode, ERROR_OFFSET};
-use arch::{ipc_open, ipc_call, ipc_recv, ipc_replyrecv};
+use arch::{ipc_open, ipc_call, ipc_send, ipc_recv, ipc_replyrecv};
 
 pub const SERVICE_ID: u16 = {{ interface_id }};
 pub const {{interface_name | upper }}_SERVICE: u16 = {{ interface_id }};
 {%- for call in calls %}
-pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG: u16 = ({{ interface_id | upper }}_SERVICE  << 8) | {{ call["attrs"]["id"] }}u16;
-pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_MSG: u16 = ({{ interface_id | upper }}_SERVICE  << 8) | {{ call["attrs"]["id"] }}u16 + 1;
-pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER: u64 = (({{ interface_name | upper }}_{{ call["name"] }}_MSG as u64) << 16) | {{ call["args"] | header }}u64 << 8);
-pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER: u64 = (({{ interface_name | upper }}_{{ call["name"] }}_REPLY_MSG as u64) << 16) | {{ call["rets"] | header }}u64 << 8);
+pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG: u16 = ({{ interface_name | upper }}_SERVICE  << 8) | {{ call["id"] }}u16;
+pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER: u64 = (({{ interface_name | upper }}_{{ call["name"] | upper }}_MSG as u64) << 16) | ({{ call["args"] | header }}u64 << 8);
+{%- if not call["oneway"] %}
+pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_MSG: u16 = ({{ interface_name | upper }}_SERVICE  << 8) | {{ call["id"] }}u16 + 1;
+pub const {{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER: u64 = (({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_MSG as u64) << 16) | ({{ call["rets"] | header }}u64 << 8);
+{% endif %}
 {% endfor %}
 
 pub struct {{ interface_name | camel }} {
@@ -160,7 +172,7 @@ impl {{ interface_name | camel }} {
 
     pub fn connect() -> {{ interface_name | camel }} {
         let discovery = discovery::Discovery::from_cid(1);
-        let ch = discovery.discover({{ interface_id | upper }}_SERVICE).unwrap();
+        let ch = discovery.discover({{ interface_name | upper }}_SERVICE).unwrap();
         {{ interface_name | camel }} {
             cid: ch.to_cid()
         }
@@ -168,23 +180,36 @@ impl {{ interface_name | camel }} {
 
     // Stubs
 {%-for call in calls %}
-    pub fn {{ call["name"] }}(&self{{ call["args"] | rust_args(true) }}) -> ServerResult<({{ call["rets"] | rust_types }})> {
+{%- if call["oneway"] %}
+    pub fn {{ call["name"] }}(&self{{ call["args"] | rust_args }}) -> ServerResult<()> {
+        unsafe {
+            ipc_send(self.cid, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER as Payload{{ call | rust_params }});
+            Ok(())
+        }
+    }
+{% else %}
+    pub fn {{ call["name"] }}(&self{{ call["args"] | rust_args }}) -> ServerResult<({{ call["rets"] | rust_types(true) }})> {
         let mut __r: Payload = 0;
         {%- for ret in call["rets"] %}
-        let mut ret["name"]: Payload = 0;
+        let mut {{ ret["name"] }}: Payload = 0;
         {% endfor %}
 
         unsafe {
-            ipc_call(self.cid, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER as Payload{{ call["args"] | rust_params }});
-            Ok(({{ rets | rust_rets }}))
+            ipc_call(self.cid, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER as Payload{{ call | rust_params }});
+            Ok(({{ call["rets"] | rust_rets }}))
         }
     }
+{% endif %}
 {% endfor %}
 }
 
 pub trait Server {
 {%-for call in calls %}
-    fn {{ call["name"] }}(&self, from: Channel{{ call["args"] | rust_args }}) -> ServerResult<({{ call["rets"] | rust_types(true) }})>;
+{%- if call["oneway"] %}
+    fn {{ call["name"] }}(&self, from: Channel{{ call["args"] | rust_args(true) }});
+{% else %}
+    fn {{ call["name"] }}(&self, from: Channel{{ call["args"] | rust_args(true) }}) -> ServerResult<({{ call["rets"] | rust_types }})>;
+{% endif %}
 {% endfor %}
 }
 
@@ -196,12 +221,19 @@ impl Server {
         unsafe {
             match header.msg_type() {
 {%-for call in calls %}
+{%- if call["oneway"] %}
+                {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG => {
+                    self.{{ call["name"] }}(from{{ call["args"] | rust_server_params }});
+                    ((ErrorCode::DontReply as u64) << ERROR_OFFSET, 0, 0, 0, 0)
+                },
+{%- else %}
                 {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG => {
                     match self.{{ call["name"] }}(from{{ call["args"] | rust_server_params }}) {
-                        Ok(({{ call["rets"] | rust_ids }})) => ({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_MSG | OK_HEADER{{ call["rets"] | rust_server_rets }}),
-                        Err(err) => (${reply_header_name} | (err as u64) << ERROR_OFFSET, 0, 0, 0, 0),
+                        Ok(({{ call["rets"] | rust_ids }})) => ({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER | OK_HEADER{{ call["rets"] | rust_server_rets }}),
+                        Err(err) => ({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER | (err as u64) << ERROR_OFFSET, 0, 0, 0, 0),
                     }
                 },
+{%- endif %}
 {%- endfor %}
                 _ => {
                     ((ErrorCode::UnknownMsg as u64) << ERROR_OFFSET, 0, 0, 0, 0)
@@ -236,26 +268,50 @@ def generate_rust_file(types, interface):
 
     def rust_args(args, with_ool_wrapper=False):
         s = ""
+        skip_next = False
         for arg in args:
+            if skip_next:
+                skip_next = False
+                continue
+
+            if get_type_id_by_name(types, arg["type"]) == OOL_PAYLOAD:
+                skip_next = True
+
             s += f", {arg['name']}: {rename_type(arg['type'], with_ool_wrapper)}"
         return s
 
     def rust_types(args, with_ool_wrapper=False):
-        s = ""
+        ts = []
+        skip_next = False
         for arg in args:
-            s += f", {rename_type(arg['type'], with_ool_wrapper)}"
-        return s
+            if skip_next:
+                skip_next = False
+                continue
+
+            if get_type_id_by_name(types, arg["type"]) == OOL_PAYLOAD:
+                skip_next = True
+
+            ts.append(f"{rename_type(arg['type'], with_ool_wrapper)}")
+        return ", ".join(ts)
 
     def rust_ids(args):
         ids = []
+        skip_next = False
         for arg in args:
+            if skip_next:
+                skip_next = False
+                continue
+
+            if get_type_id_by_name(types, arg["type"]) == OOL_PAYLOAD:
+                skip_next = True
+
             ids.append(arg['name'])
         return ", ".join(ids)
 
-    def rust_params(args):
+    def rust_params(call):
         s = ""
         skip_next = False
-        for arg in args:
+        for arg in call["args"]:
             type_id = get_type_id_by_name(types, arg["type"])
             if skip_next:
                 skip_next = False
@@ -271,8 +327,16 @@ def generate_rust_file(types, interface):
                 s += f", {arg['name']} as Payload"
 
         # Append unused message payloads.
-        for _ in range(len(args), 4):
+        for _ in range(len(call["args"]), 4):
             s += ", 0"
+
+        if not call["oneway"]:
+            for ret in call["rets"]:
+                s += f", &mut {ret['name']}"
+
+            # Append unused message payloads.
+            for _ in range(len(call["rets"]), 4):
+                s += ", &mut __r"
 
         return s
 
@@ -294,16 +358,18 @@ def generate_rust_file(types, interface):
 
     def rust_rets(rets):
         rs = []
+        ool_payload = None
         for ret in rets:
-            type_id = get_type_id_by_name(types, type_)
+            type_id = get_type_id_by_name(types, ret["type"])
             if type_id == CHANNEL_PAYLOAD:
                 rs.append(f"Channel::from_cid({ret['name']} as CId)")
             elif ool_payload is not None:
                 rs.append(f"OoL::from_payload({ool_payload} as usize, {ret['name']} as usize)")
             elif type_id == OOL_PAYLOAD:
-                ool_payload = name
+                ool_payload = ret["name"]
             else:
                 rs.append(f"{ret['name']} as {rename_type(ret['type'], False)}")
+
         return ", ".join(rs)
 
     def rust_server_rets(rets):
@@ -312,15 +378,19 @@ def generate_rust_file(types, interface):
         for ret in rets:
             type_id = get_type_id_by_name(types, ret["type"])
             if type_id == CHANNEL_PAYLOAD:
-                s += f"{ret['name']}.to_cid() as Payload"
+                s += f", {ret['name']}.to_cid() as Payload"
             elif ool_payload is not None:
-                s += f"{ool_payload}.len() as Payload"
+                s += f", {ool_payload}.len() as Payload"
                 ool_payload = None
             elif type_id == OOL_PAYLOAD:
                 ool_payload = ret["name"]
-                s += f"{ret['name']}.as_ptr() as Payload"
+                s += f", {ret['name']}.as_ptr() as Payload"
             else:
-                s += f"{ret['name']} as Payload"
+                s += f", {ret['name']} as Payload"
+
+        for _ in range(len(rets), 4):
+            s += ", 0"
+
         return s
 
     env = jinja2.Environment()
@@ -345,7 +415,7 @@ def generate_rust_stubs(out_dir, idl_files):
     for idl_file in idl_files:
         try:
             defs = idl.parse(idl_file)
-        except Exception as e:
+        except idl.ParseError as e:
             sys.exit(f"failed to parse {idl_file}:" + str(e))
 
         types = defs["types"]

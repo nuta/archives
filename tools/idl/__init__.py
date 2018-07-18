@@ -15,12 +15,19 @@ class Listener(idlListener):
             child = ctx.getChild(i)
             if isinstance(child, TerminalNode):
                 continue
-
             ctx.attrs[child.name] = child.value
 
     def exitAttr(self, ctx):
-        ctx.name = str(ctx.getChild(0))
+        ctx.name = ctx.getChild(0).name
+        ctx.value = ctx.getChild(0).value
+
+    def exitIdAttr(self, ctx):
+        ctx.name = "id"
         ctx.value = str(ctx.getChild(2))
+
+    def exitOnewayAttr(self, ctx):
+        ctx.name = "oneway"
+        ctx.value = None
 
     def exitInterfaceDef(self, ctx):
         calls = []
@@ -34,7 +41,9 @@ class Listener(idlListener):
 
             calls.append({
                 "name": child.name,
-                "attrs": child.attrs[0],
+                "attrs": child.attrs,
+                "id": child.id,
+                "oneway": child.oneway,
                 "args": child.args,
                 "rets": child.rets
             })
@@ -47,9 +56,12 @@ class Listener(idlListener):
 
     def exitCallDef(self, ctx):
         ctx.name = str(ctx.getChild(1))
-        ctx.attrs = ctx.getChild(0).attrs,
+        ctx.attrs = ctx.getChild(0).attrs
+        ctx.id = ctx.attrs["id"]
+        ctx.oneway = "oneway" in ctx.attrs
         ctx.args = ctx.getChild(3).args
-        ctx.rets = ctx.getChild(7).args
+        rets = ctx.getChild(7)
+        ctx.rets = None if rets is None else rets.args
 
     def exitArgList(self, ctx):
         ctx.args = []
@@ -89,7 +101,7 @@ class ErrorListener(error.ErrorListener.ErrorListener):
     def __init__(self):
         super()
 
-    def syntaxError(self, unused1, unused2, line, col, msg, unused):
+    def syntaxError(self, unused1, unused2, line, col, msg, unused3):
         raise ParseError(line, col, msg)
 
 def parse(filepath):
