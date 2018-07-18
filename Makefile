@@ -18,7 +18,7 @@ stubs: tools/idl/parser/idlParser.py tools/genstub.py $(stubs)
 	$(PROGRESS) "GENSTUB" $(STUBS_DIR)/c
 	./tools/genstub.py --out-dir $(STUBS_DIR)/c --lang c $(stubs)
 	$(PROGRESS) "GENSTUB" $(STUBS_DIR)/rust
-	./tools/genstub.py --out-dir $(STUBS_DIR)/rust --lang rust $(stubs)
+	./tools/genstub.py --out-dir libs/resea/src/interfaces --lang rust $(stubs)
 
 build:
 	$(MAKE) stubs
