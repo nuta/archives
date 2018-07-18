@@ -41,6 +41,12 @@ test:
 	$(MAKE) $(disk_img)
 	(sleep 5; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS)
 
+kernel-test:
+	KERNEL_TEST=1 $(MAKE) build
+	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
+	$(MAKE) $(disk_img)
+	(sleep 5; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS)
+
 $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.elf: $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.o $(ARCH_DIR)/boot/mbr.ld
 	$(PROGRESS) LD $@
 	$(LD) $(LDFLAGS) --script $(ARCH_DIR)/boot/mbr.ld -o $@ $<

@@ -6,6 +6,7 @@
 #include "memory.h"
 
 paddr_t allocated_pages_start;
+size_t allocated_pages = 0;
 static struct page *pages;
 
 paddr_t alloc_pages(size_t size, UNUSED int flags) {
@@ -35,6 +36,7 @@ retry:
                 }
             }
 
+            allocated_pages += num;
             return allocated_pages_start + (i * PAGE_SIZE);
         }
     }
@@ -145,6 +147,10 @@ invalid_access:
     INFO("page fault: invalid page access %p (#%d.%d)",
         original_address, CPUVAR->current->process->pid, CPUVAR->current->tid);
     thread_destroy_current();
+}
+
+size_t get_allocated_pages(void) {
+    return allocated_pages;
 }
 
 void memory_init(void) {

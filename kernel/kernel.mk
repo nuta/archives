@@ -1,23 +1,20 @@
-objs := init.o memory.o process.o thread.o ipc.o server.o printk.o string.o list.o
+objs := init.o memory.o process.o thread.o ipc.o server.o printk.o string.o list.o kfs.o
 
 ARCH_DIR = kernel/arch/$(ARCH)
 KFS_DIR = $(BUILD_DIR)/kernel/kfs
 include VERSION
 include $(ARCH_DIR)/arch.mk
 
-kernel_objs := $(addprefix kernel/, $(objs)) $(addprefix $(ARCH_DIR)/, $(arch_objs))
-libs := $(libs)
+ifeq ($(KERNEL_TEST),1)
+override CFLAGS += -DKERNEL_TEST
+objs := init.o memory.o process.o thread.o ipc.o printk.o string.o list.o test.o
+endif
+
+objs := $(addprefix $(BUILD_DIR)/kernel/, $(objs)) $(addprefix $(BUILD_DIR)/$(ARCH_DIR)/, $(arch_objs))
 kfs_files := $(addprefix $(KFS_DIR)/servers/, $(SERVERS))
 
 # Load libs.
-all_objs :=
-all_libs :=
-all_include_dirs :=
-included_subdirs :=
-include $(foreach lib, $(libs), libs/$(lib)/build.mk)
-objs := $(addprefix $(BUILD_DIR)/, $(kernel_objs) $(all_objs))
-include_dirs := $(PWD) $(addprefix $(ARCH_DIR)/, $(arch_include_dirs)) \
-	$(all_include_dirs) $(BUILD_DIR)/stubs/c
+include_dirs := $(PWD) $(addprefix $(ARCH_DIR)/, $(arch_include_dirs)) $(BUILD_DIR)/stubs/c
 
 $(BUILD_DIR)/kernel/kernel.elf: $(objs) $(kernel_ld)
 	$(PROGRESS) "LD" $@
