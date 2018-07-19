@@ -10,11 +10,10 @@ size_t allocated_pages = 0;
 static struct page *pages;
 
 paddr_t alloc_pages(size_t size, UNUSED int flags) {
-    size_t num, start;
+    size_t num;
 
 retry:
     num = ROUND_UP(size, PAGE_SIZE) / PAGE_SIZE;
-    start = 0;
     for (size_t i = 0; i < phypages_num; i++) {
         size_t j;
         for (j = 0; i + j < phypages_num && j < num; j++) {
@@ -25,10 +24,10 @@ retry:
 
         if (j == num) {
             /* Found a large enough space. Mark pages as used. */
-            for (j = start; j < start + num; j++) {
+            for (j = 0; j < num; j++) {
                 if (!atomic_compare_and_swap(&pages[i + j].ref_count, 0, 1)) {
                     /* Failed to mark as used. Deallocate pages and try again. */
-                    for (size_t k = start; k < j; k++) {
+                    for (size_t k = 0; k < j; k++) {
                         atomic_compare_and_swap(&pages[i + j].ref_count, 1, 0);
                     }
 
