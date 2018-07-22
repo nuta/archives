@@ -15,7 +15,7 @@ endif
 ifeq ($(lang), rust)
 abs_server_build_dir = $(PWD)/$(server_build_dir)
 artifact = $(abspath $(server_build_dir)/$(ARCH)/debug/$(name))
-
+RUSTFLAGS = --emit=link,dep-info -Z external-macro-backtrace
 $(executable): $(artifact)
 $(artifact):
 	mkdir -p $(server_build_dir)
@@ -26,7 +26,7 @@ $(artifact):
 	cd $(DIR) && \
 	CARGO_TARGET_DIR=$(abs_server_build_dir) \
 	RUST_TARGET_PATH=$(abs_server_build_dir) \
-	RUSTFLAGS=--emit=link,dep-info \
+	RUSTFLAGS="$(RUSTFLAGS)" \
 		xargo build --target $(ARCH)
 	cp $(server_build_dir)/$(ARCH)/debug/$(name) $(executable).debug
 	cp $(executable).debug $(executable)
