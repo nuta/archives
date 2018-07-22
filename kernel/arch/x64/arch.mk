@@ -13,7 +13,7 @@ override LDFLAGS +=
 KERNEL_LDFLAGS += --Map=$(BUILD_DIR)/kernel/kernel.map --script $(kernel_ld)
 QEMUFLAGS += -d cpu_reset -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
 QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw
-QEMUFLAGS += -netdev user,id=net0 -device virtio-net-pci,netdev=net0 -object filter-dump,id=qemu,netdev=net0,file=qemu.pcap
+QEMUFLAGS += -netdev user,id=net0,net=10.0.7.0/24,dhcpstart=10.0.7.15 -device virtio-net-pci,netdev=net0 -object filter-dump,id=qemu,netdev=net0,file=qemu.pcap
 
 ifeq ($(MBRBOOT),)
 kernel_ld = $(ARCH_DIR)/kernel.multiboot.ld
