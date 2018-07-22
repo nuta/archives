@@ -3,7 +3,7 @@ include mk/common.mk
 include kernel/kernel.mk
 
 server_dirs := $(wildcard servers/*)
-.PHONY: default build clean run test $(server_dirs)
+.PHONY: default build stubs clean run test $(server_dirs)
 
 STUBS_DIR := $(BUILD_DIR)/stubs
 stubs := $(wildcard interfaces/*.idl)
@@ -21,7 +21,6 @@ stubs: tools/idl/parser/idlParser.py tools/genstub.py $(stubs)
 	./tools/genstub.py --out-dir libs/resea/src/interfaces --lang rust $(stubs)
 
 build:
-	$(MAKE) stubs
 	@mkdir -p $(KFS_DIR)/servers
 	@set -e; for server_dir in $(addprefix servers/, $(SERVERS)); do \
 		$(MAKE) $$server_dir; \
