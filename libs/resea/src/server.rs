@@ -55,7 +55,7 @@ macro_rules! serve_forever {
 
             if header.error_type() == ErrorCode::DontReply as u8 {
                 unsafe {
-                    header = ipc_recv(from, &mut from,
+                    header = ipc_recv($server.ch.to_cid(), &mut from,
                         &mut a0 as *mut Payload, &mut a1 as *mut Payload,
                         &mut a2 as *mut Payload, &mut a3 as *mut Payload);
                 }
