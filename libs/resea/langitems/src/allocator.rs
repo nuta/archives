@@ -1,4 +1,4 @@
-use core::alloc::{GlobalAlloc, Layout, Opaque};
+use core::alloc::{GlobalAlloc, Layout};
 
 pub struct MyAllocator {
 }
@@ -6,13 +6,13 @@ pub struct MyAllocator {
 static mut NEXT_MALLOC: u64 = 0xc0000000;
 
 unsafe impl GlobalAlloc for MyAllocator {
-    unsafe fn alloc(&self, layout: Layout) -> *mut Opaque {
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let addr = NEXT_MALLOC;
         NEXT_MALLOC += layout.size() as u64;
-        addr as *mut Opaque
+        addr as *mut u8
     }
 
-    unsafe fn dealloc(&self, ptr: *mut Opaque, layout: Layout) {
+    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
 
     }
 }

@@ -1,12 +1,9 @@
-use arch::{ErrorCode};
-pub type ServerResult<T> = Result<T, ErrorCode>;
-
 #[macro_export]
 macro_rules! register_as {
     ($server:expr, [$($service:ident), *]) => {
         let discovery = resea::interfaces::discovery::Discovery::from_cid(1);
         $(
-            discovery.register($service::SERVICE_ID, $server.ch.clone());
+            discovery.register($service::SERVICE_ID, $server.ch.clone()).expect("discovery.register error");
         )*
     }
 }
@@ -14,14 +11,11 @@ macro_rules! register_as {
 #[macro_export]
 macro_rules! serve_forever {
     ($server:expr, [$($service:ident), *]) => {
-        use resea::arch::{
-            CId, Payload,
-            Header, HeaderTrait,
-            ErrorCode, ERROR_OFFSET,
-            ipc_recv, ipc_replyrecv,
-        };
+        use resea::{ErrorCode};
+        use resea::arch::x64::prelude::{CId, Payload, Header, HeaderTrait, ERROR_OFFSET};
+        use resea::syscalls::{ipc_recv, ipc_replyrecv};
 
-        let mut header: Header = 0;
+        let mut header: Header;
         let mut from: CId = 0;
         let mut a0: Payload = 0;
         let mut a1: Payload = 0;
@@ -39,6 +33,7 @@ macro_rules! serve_forever {
 
         loop {
             let from_ch = Channel::from_cid(from);
+
             match header.service_type() {
                 $(
                     $service::SERVICE_ID => {

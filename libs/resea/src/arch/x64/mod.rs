@@ -1,5 +1,8 @@
+pub mod prelude;
 use channel::{Channel};
 use interfaces::{io};
+
+global_asm!(include_str!("../../../../libresea/arch/x64/syscall.S"));
 
 pub fn pmalloc(vaddr: u64, paddr: u64, len: usize) -> (usize, usize) {
     // TODO: error handling

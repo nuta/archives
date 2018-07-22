@@ -1,4 +1,5 @@
-use arch::{CId, ipc_open, ipc_transfer};
+use self::super::{CId};
+use syscalls::{ipc_open, ipc_transfer};
 
 #[derive(Debug, Clone)]
 pub struct Channel {

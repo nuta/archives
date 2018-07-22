@@ -1,41 +1,67 @@
-#![feature(lang_items, panic_implementation, global_asm, alloc, allocator_api, global_allocator)]
-#![feature(pattern_parentheses)]
-#![feature(panic_info_message)]
+#![feature(global_asm, alloc, pattern_parentheses)]
 #![no_std]
 #![allow(unused_variables)]
 #![feature(asm)]
 
+#[macro_use]
 extern crate alloc;
-pub use alloc::*;
-pub use core::*;
+use core::*;
 
-#[inline(always)]
-pub fn align(x: usize, align: usize) -> usize {
-    (x + align - 1) & !(align - 1)
+pub mod arch;
+pub use arch::prelude::*;
+mod channel;
+pub use channel::Channel;mod print;
+mod server;
+pub mod syscalls;
+pub mod interfaces;
+
+pub type Result<T> = core::result::Result<T, u8>;
+
+#[derive(Debug)]
+pub enum ErrorCode {
+    ErrorNone = 0,
+    UnknownMsg = 1,
+    NotImplemented = 2,
+    InvalidArg = 3,
+    InvalidMsg = 4,
+    NoMemory = 200,
+    InvalidChannel = 201,
+    ChannelNotLinked = 202,
+    ChannelNotTransferred = 203,
+    ChannelInUse = 204,
+    DontReply = 255,
 }
 
-pub mod interfaces;
-pub mod allocator;
-pub mod arch;
-pub mod lang_items;
-pub mod channel;
-pub mod print;
-pub mod server;
+impl Into<u8> for ErrorCode {
+    fn into(self) -> u8 {
+        self as u8
+    }
+}
 
-global_asm!(include_str!("start.S"));
+pub struct OoL {
+    addr: usize,
+    len: usize,
+}
 
-#[global_allocator]
-static GLOBAL_ALLOCATOR: allocator::MyAllocator = allocator::MyAllocator {};
+impl<'a> OoL {
+    pub fn from_payload(addr: usize, len: usize) -> OoL {
+        OoL {
+            addr: addr,
+            len: len,
+        }
+    }
 
+    pub fn len(&self) -> usize {
+        self.len
+    }
 
-#[panic_implementation]
-fn panic(info: &panic::PanicInfo) -> ! {
-    let msg = if let Some(message) = info.message() {
-        format!("panic: {:}\n", message)
-    } else {
-        format!("panic: (without message)\n")
-    };
+    pub fn as_slice(&'a self) -> &'a [u8] {
+        unsafe { slice::from_raw_parts(self.addr as *const u8, self.len) }
+    }
+}
 
-    interfaces::logging::Logging::from_cid(1).emit(msg.as_bytes()).ok();
-    loop {}
+impl Drop for OoL {
+    fn drop(&mut self) {
+        // TODO: discard
+    }
 }
