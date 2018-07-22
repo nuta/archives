@@ -30,11 +30,11 @@ impl FatFsServer {
 }
 
 impl FsServer for FatFsServer {
-    fn open(&self, from: Channel, path: OoL<&[u8]>) -> ServerResult<(isize)> {
+    fn open(&self, from: Channel, path: OoL) -> ServerResult<(isize)> {
         Err(ErrorCode::NotImplemented)
     }
 
-    fn open_dir(&self, from: Channel, path: OoL<&[u8]>) -> ServerResult<(isize)> {
+    fn open_dir(&self, from: Channel, path: OoL) -> ServerResult<(isize)> {
         Err(ErrorCode::NotImplemented)
     }
 
@@ -46,7 +46,7 @@ impl FsServer for FatFsServer {
         Err(ErrorCode::NotImplemented)
     }
 
-    fn write(&self, from: Channel, fd: isize, offset: u64, data: OoL<&[u8]>) -> ServerResult<()> {
+    fn write(&self, from: Channel, fd: isize, offset: u64, data: OoL) -> ServerResult<()> {
         Err(ErrorCode::NotImplemented)
     }
 
@@ -54,7 +54,7 @@ impl FsServer for FatFsServer {
         Err(ErrorCode::NotImplemented)
     }
 
-    fn stat(&self, from: Channel, fd: isize, path: OoL<&[u8]>) -> ServerResult<(&[u8])> {
+    fn stat(&self, from: Channel, fd: isize, path: OoL) -> ServerResult<(&[u8])> {
         Err(ErrorCode::NotImplemented)
     }
 }
