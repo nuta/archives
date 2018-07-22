@@ -5,6 +5,5 @@ build
 *.pyc
 **/target
 libs/resea/src/interfaces
-!libs/resea/src/interfaces/.gitkeep
 tools/idl/parser
 tools/idl/.antlr
