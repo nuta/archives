@@ -136,11 +136,9 @@ RUST_TEMPLATE = """\
 #![allow(unused_parens)]
 
 use core::slice;
-use server::{ServerResult};
-use channel::{Channel};
+use {Channel, Result as ServerResult, OoL, ErrorCode, CId, Payload, Header, HeaderTrait, ERROR_OFFSET};
 use interfaces::discovery;
-use arch::{CId, Payload, OoL, Header, HeaderTrait, ErrorCode, ERROR_OFFSET};
-use arch::{ipc_open, ipc_call, ipc_send, ipc_recv, ipc_replyrecv};
+use syscalls::{ipc_open, ipc_call, ipc_send, ipc_recv, ipc_replyrecv};
 
 pub const SERVICE_ID: u16 = {{ interface_id }};
 pub const {{interface_name | upper }}_SERVICE: u16 = {{ interface_id }};
@@ -183,8 +181,12 @@ impl {{ interface_name | camel }} {
 {%- if call["oneway"] %}
     pub fn {{ call["name"] }}(&self{{ call["args"] | rust_args }}) -> ServerResult<()> {
         unsafe {
-            ipc_send(self.cid, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER as Payload{{ call | rust_params }});
-            Ok(())
+            let __header = ipc_send(self.cid, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER as Payload{{ call | rust_params }});
+            if __header.error_type() == ErrorCode::ErrorNone as u8 {
+                Ok(())
+            } else {
+                Err(__header.error_type())
+            }
         }
     }
 {% else %}
@@ -195,8 +197,12 @@ impl {{ interface_name | camel }} {
         {% endfor %}
 
         unsafe {
-            ipc_call(self.cid, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER as Payload{{ call | rust_params }});
-            Ok(({{ call["rets"] | rust_rets }}))
+            let __header: Header = ipc_call(self.cid, {{ interface_name | upper }}_{{ call["name"] | upper }}_HEADER as Payload{{ call | rust_params }});
+            if __header.error_type() == ErrorCode::ErrorNone as u8 {
+                Ok(({{ call["rets"] | rust_rets }}))
+            } else {
+                Err(__header.error_type())
+            }
         }
     }
 {% endif %}
@@ -218,27 +224,25 @@ impl Server {
         -> (Header, Payload, Payload, Payload, Payload) {
 
         const OK_HEADER: Header = (ErrorCode::ErrorNone as u64) << ERROR_OFFSET;
-        unsafe {
-            match header.msg_type() {
+        match header.msg_type() {
 {%-for call in calls %}
 {%- if call["oneway"] %}
-                {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG => {
-                    self.{{ call["name"] }}(from{{ call["args"] | rust_server_params }});
-                    ((ErrorCode::DontReply as u64) << ERROR_OFFSET, 0, 0, 0, 0)
-                },
+            {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG => {
+                self.{{ call["name"] }}(from{{ call["args"] | rust_server_params }});
+                ((ErrorCode::DontReply as u64) << ERROR_OFFSET, 0, 0, 0, 0)
+            },
 {%- else %}
-                {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG => {
-                    match self.{{ call["name"] }}(from{{ call["args"] | rust_server_params }}) {
-                        Ok(({{ call["rets"] | rust_ids }})) => ({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER | OK_HEADER{{ call["rets"] | rust_server_rets }}),
-                        Err(err) => ({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER | (err as u64) << ERROR_OFFSET, 0, 0, 0, 0),
-                    }
-                },
+            {{ interface_name | upper }}_{{ call["name"] | upper }}_MSG => {
+                match self.{{ call["name"] }}(from{{ call["args"] | rust_server_params }}) {
+                    Ok(({{ call["rets"] | rust_ids }})) => ({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER | OK_HEADER{{ call["rets"] | rust_server_rets }}),
+                    Err(err) => ({{ interface_name | upper }}_{{ call["name"] | upper }}_REPLY_HEADER | (err as u64) << ERROR_OFFSET, 0, 0, 0, 0),
+                }
+            },
 {%- endif %}
 {%- endfor %}
-                _ => {
-                    ((ErrorCode::UnknownMsg as u64) << ERROR_OFFSET, 0, 0, 0, 0)
-                },
-            }
+            _ => {
+                ((ErrorCode::UnknownMsg as u64) << ERROR_OFFSET, 0, 0, 0, 0)
+            },
         }
     }
 }
@@ -255,8 +259,8 @@ def generate_rust_file(types, interface):
             "imax": "isize",
             "channel": 'Channel',
             "usize": "usize",
-            "string": "OoL<&[u8]>" if with_ool_wrapper else "&[u8]",
-            "buffer": "OoL<&[u8]>" if with_ool_wrapper else "&[u8]",
+            "string": "OoL" if with_ool_wrapper else "&[u8]",
+            "buffer": "OoL" if with_ool_wrapper else "&[u8]",
         }[type_]
 
     def header(args):
