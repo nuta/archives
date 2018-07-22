@@ -6,6 +6,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "net"
+version = "0.0.1"
+dependencies = [
+ "netstack 0.0.1",
+ "resea 0.0.1",
+ "resea_langitems 0.0.1",
+]
+
+[[package]]
+name = "netstack"
+version = "0.0.1"
+dependencies = [
+ "resea 0.0.1",
+ "resea_langitems 0.0.1",
+]
+
+[[package]]
 name = "pc"
 version = "0.0.1"
 dependencies = [
@@ -15,6 +32,21 @@ dependencies = [
 [[package]]
 name = "resea"
 version = "0.0.1"
+
+[[package]]
+name = "resea_langitems"
+version = "0.0.1"
+dependencies = [
+ "resea 0.0.1",
+]
+
+[[package]]
+name = "session"
+version = "0.0.1"
+dependencies = [
+ "resea 0.0.1",
+ "resea_langitems 0.0.1",
+]
 
 [[package]]
 name = "virtio"
@@ -36,6 +68,7 @@ name = "virtio-net"
 version = "0.0.1"
 dependencies = [
  "resea 0.0.1",
+ "resea_langitems 0.0.1",
  "virtio 0.0.1",
 ]
 
