@@ -2,5 +2,5 @@ name := virtio-net
 lang := rust
 objs :=
 libs :=
-requires := discovery
+requires := discovery io events
 implements := net_device

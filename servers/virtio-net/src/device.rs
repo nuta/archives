@@ -1,12 +1,11 @@
+use core::mem::size_of;
 use core::intrinsics::copy_nonoverlapping;
-use virtio::{Virtio, VirtioRequest, VIRTIO_DESC_F_READ_ONLY};
+use virtio::{Virtio, VirtioRequest, VIRTIO_DESC_F_READ_ONLY, IO_DEVICE_SPECIFIC};
 use resea::arch::x64::{pmalloc};
-use resea::mem::size_of;
 
-const VIRTIO_NET_RX_QUEUE: u8 = 1;
+const VIRTIO_NET_RX_QUEUE: u8 = 0;
 const VIRTIO_NET_TX_QUEUE: u8 = 1;
-const VIRTIO_NET_CTRL_QUEUE: u8 = 1;
-const VIRTIO_NET_IO_MAC_ADDR: u16 = 0x14;
+const VIRTIO_NET_IO_MAC_ADDR: u16 = IO_DEVICE_SPECIFIC;
 
 #[repr(packed)]
 struct VirtioNetHeader {
@@ -18,26 +17,20 @@ struct VirtioNetHeader {
   checksum_offset: u16,
 }
 
-struct VirtioNetStatus {
-    status: u8
-}
-
 pub struct VirtioNet {
-    virtio: Virtio
+    virtio: Virtio,
+    hwaddr: [u8; 6],
 }
 
 impl VirtioNet {
     pub fn new(bar0: u16) -> VirtioNet {
         let mut virtio = Virtio::new(bar0);
-
-        unsafe {
-            virtio.setup();
-            let feats = virtio.get_features();
-            virtio.set_features(feats);
-            virtio.setup_queue(VIRTIO_NET_RX_QUEUE);
-            virtio.setup_queue(VIRTIO_NET_TX_QUEUE);
-            virtio.setup_queue(VIRTIO_NET_CTRL_QUEUE);
-        }
+        virtio.setup();
+        let feats = virtio.get_features();
+        virtio.set_features(feats);
+        virtio.setup_queue(VIRTIO_NET_RX_QUEUE, true);
+        virtio.setup_queue(VIRTIO_NET_TX_QUEUE, false);
+        virtio.activate();
 
         let macaddr: [u8; 6] = unsafe {
             [
@@ -50,14 +43,15 @@ impl VirtioNet {
             ]
         };
 
-        unsafe {
-            virtio.activate();
-        }
-
         println!(">>> macaddr: {:?}", macaddr);
         VirtioNet {
-             virtio: virtio
+             virtio: virtio,
+             hwaddr: macaddr,
         }
+    }
+
+    pub fn get_hwaddr(&self) -> &[u8] {
+        &self.hwaddr
     }
 
     pub fn send(&self, data: &[u8]) -> Result<(), ()> {
@@ -91,9 +85,22 @@ impl VirtioNet {
             },
         ];
 
-        self.virtio.request(VIRTIO_NET_TX_QUEUE, &rs);
+        self.virtio.enqueue_request(VIRTIO_NET_TX_QUEUE, &rs);
+        self.virtio.kick_request(VIRTIO_NET_TX_QUEUE);
 
         // TODO: free pmalloc'ed areas
         Ok(())
+    }
+
+    pub fn recv(&self) -> Option<&[u8]> {
+        let data = if let Some(data) = self.virtio.dequeue_response(VIRTIO_NET_RX_QUEUE) {
+            let header_len = 10; /* sizeof(struct virtio_net_hdr) */
+            Some(&data[header_len..])
+        } else {
+            None
+        };
+
+        self.virtio.ack_interrupt();
+        data
     }
 }
