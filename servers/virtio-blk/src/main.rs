@@ -35,7 +35,7 @@ impl BlkDeviceServer for VirtioBlkServer {
         Ok((data))
     }
 
-    fn write(&self, from: Channel, offset: u64, data: OoL<&[u8]>) -> ServerResult<()> {
+    fn write(&self, from: Channel, offset: u64, data: OoL) -> ServerResult<()> {
         /* TODO */
         Err(ErrorCode::NotImplemented)
     }

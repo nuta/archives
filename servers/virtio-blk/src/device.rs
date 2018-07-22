@@ -25,14 +25,11 @@ pub struct VirtioBlk {
 impl VirtioBlk {
     pub fn new(bar0: u16) -> VirtioBlk {
         let mut virtio = Virtio::new(bar0);
-
-        unsafe {
-            virtio.setup();
-            let feats = virtio.get_features();
-            virtio.set_features(feats);
-            virtio.setup_queue(VIRTIO_BLK_RQUEUE);
-            virtio.activate();
-        }
+        virtio.setup();
+        let feats = virtio.get_features();
+        virtio.set_features(feats);
+        virtio.setup_queue(VIRTIO_BLK_RQUEUE);
+        virtio.activate();
 
         VirtioBlk {
              virtio: virtio
