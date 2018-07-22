@@ -2,4 +2,3 @@
 interface exit {
     [id(1)] exit(exit_code: u8) -> ();
 }
-

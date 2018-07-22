@@ -1,4 +1,6 @@
+// Event listeners (user processes)
 [id(0)]
 interface events {
-    [id(1)] notification(notification: usize) -> ();
+    [id(1), oneway] notification(notification: usize);
 }
+
