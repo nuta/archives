@@ -13,16 +13,10 @@ void x64_handle_unkown_irq(void) {
 
 
 void x64_handle_irq(UNUSED u8_t vector) {
-    static int tick = 0;
-
     x64_ack_interrupt();
 
     if (vector == APIC_TIMER_VECTOR) {
-        tick++;
-        if (tick > THREAD_SWITCH_INTERVAL) {
-            tick = 0;
-            thread_switch();
-        }
+        tick_timer();
     } else {
         handle_irq(vector - VECTOR_IRQ_BASE);
     }

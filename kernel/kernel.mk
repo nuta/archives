@@ -1,4 +1,4 @@
-objs := init.o memory.o process.o thread.o ipc.o server.o printk.o string.o list.o kfs.o
+objs := init.o memory.o process.o thread.o ipc.o timer.o server.o printk.o string.o list.o kfs.o
 
 ARCH_DIR = kernel/arch/$(ARCH)
 KFS_DIR = $(BUILD_DIR)/kernel/kfs

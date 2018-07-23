@@ -24,6 +24,9 @@ struct page {
 
 void kernel_init(void);
 
+// Arch is responsible for call this every 1/TICK_HZ sec.
+void tick_timer(void);
+
 // Arch is responsible for call this function on an interrupt.
 void handle_irq(int irq);
 
