@@ -58,4 +58,5 @@ void x64_vga_init(void) {
     vga_addr = from_paddr(0xb8000);
     current_x = 0;
     current_y = 0;
+    memset(vga_addr, 0x00, sizeof(u8_t) * Y_MAX * X_MAX * 2);
 }
