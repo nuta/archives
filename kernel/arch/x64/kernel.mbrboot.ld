@@ -5,7 +5,7 @@ MEMORY {
     startup(rx): ORIGIN = 0x00010000, LENGTH = 1K
     /* FIXME: isolate .data and make this readonly */
     rom(rwx): ORIGIN = 0xffff800000011000, LENGTH = 400K
-    ram(rw): ORIGIN = 0xffff800000080000, LENGTH = 256K
+    ram(rw): ORIGIN = 0xffff800000080000, LENGTH = 64K
 }
 
 SECTIONS {

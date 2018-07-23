@@ -5,7 +5,7 @@ MEMORY {
     startup(rx): ORIGIN = 0x00100000, LENGTH = 1K
     /* FIXME: isolate .data and make this readonly */
     rom(rwx): ORIGIN = 0xffff800000110000, LENGTH = 12M /* Don't forget to update phypages_start! */
-    ram(rw): ORIGIN = 0xffff800000080000, LENGTH = 256K
+    ram(rw): ORIGIN = 0xffff800000080000, LENGTH = 64K
 }
 
 SECTIONS {
