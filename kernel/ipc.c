@@ -102,13 +102,13 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
         case PAYLOAD_CHANNEL: {
             struct channel *ch = get_channel_by_id(payload);
             if (!ch) {
-                DEBUG("copy_payload: invalid ch %d", payload);
+                WARN("copy_payload: invalid ch %d", payload);
                 return 0; // TODO: return error
             }
 
             struct channel *new_ch = channel_create(dst);
             if (!new_ch) {
-                DEBUG("copy_payload: failed to create channel");
+                WARN("copy_payload: failed to create channel");
                 return 0;
             }
 
@@ -138,7 +138,7 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
 channel_t sys_open(void) {
     struct channel *ch = channel_create(CPUVAR->current->process);
     if(!ch) {
-        DEBUG("sys_open: failed to allocate #%d", CPUVAR->current->process->pid);
+        WARN("sys_open: failed to allocate #%d", CPUVAR->current->process->pid);
         return ERROR_NO_MEMORY;
     }
 
@@ -289,7 +289,7 @@ slowpath:
 struct msg *sys_recv(channel_t ch) {
     struct channel *src = get_channel_by_id(ch);
     if (unlikely(!src)) {
-        DEBUG("sys_recv: @%d no such channel", ch);
+        WARN("sys_recv: @%d no such channel", ch);
         return ERROR_PTR(ERROR_INVALID_CH);
     }
 
@@ -414,6 +414,6 @@ error_t sys_notify(channel_t ch, payload_t and_mask, payload_t or_mask) {
 
 
 header_t invalid_syscall(void) {
-    INFO("invalid syscall");
+    WARN("invalid syscall");
     return 0;
 }
