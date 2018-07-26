@@ -9,11 +9,8 @@ paddr_t allocated_pages_start;
 size_t allocated_pages = 0;
 static struct page *pages;
 
-paddr_t alloc_pages(size_t size, UNUSED int flags) {
-    size_t num;
-
+paddr_t alloc_pages(size_t num, UNUSED int flags) {
 retry:
-    num = ROUND_UP(size, PAGE_SIZE) / PAGE_SIZE;
     for (size_t i = 0; i < phypages_num; i++) {
         size_t j;
         for (j = 0; i + j < phypages_num && j < num; j++) {
@@ -43,9 +40,24 @@ retry:
     PANIC("run out of memory");
 }
 
+void free_pages(paddr_t addr, size_t num) {
+    size_t offset = addr - allocated_pages_start;
+    if (offset % PAGE_SIZE != 0) {
+        BUG("free_pages: addr (%p) is not aligned to PAGE_SIZE", addr);
+        return;
+    }
+
+    size_t start = offset / PAGE_SIZE;
+    for (size_t i = 0; i < num; i++) {
+        atomic_fetch_and_sub(&pages[start + i].ref_count, 1);
+    }
+
+    allocated_pages -= num;
+}
+
 
 void *kmalloc(size_t size, int flags) {
-    void *ptr = from_paddr(alloc_pages(size, flags));
+    void *ptr = from_paddr(alloc_pages(GET_PAGE_NUM(size), flags));
 
     if (flags & KMALLOC_ZEROED) {
         memset(ptr, 0, size);
@@ -99,7 +111,7 @@ void memory_destroy_vmspace(UNUSED struct vmspace *vms) {
 }
 
 paddr_t zeroed_pager(void *arg, off_t offset, size_t length) {
-    return alloc_pages(length, KMALLOC_NORMAL);
+    return alloc_pages(GET_PAGE_NUM(length), KMALLOC_NORMAL);
 }
 
 

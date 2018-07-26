@@ -105,11 +105,10 @@ static inline error_t handle_io_pmalloc(channel_t from, uptr_t vaddr, uptr_t pad
     struct process *proc = get_callee_process(from);
     struct vmspace *vms = &proc->vms;
     int flags = PAGE_WRITABLE | (IS_KERNEL_PROCESS(proc) ? 0 : PAGE_USER);
-    length = ROUND_UP(length, PAGE_SIZE);
     vaddr = valloc(vms, length);
 
     if (paddr == 0) {
-        paddr = alloc_pages(length, KMALLOC_NORMAL);
+        paddr = alloc_pages(GET_PAGE_NUM(length), KMALLOC_NORMAL);
     }
 
     arch_link_page(&vms->arch, vaddr, paddr, length / PAGE_SIZE, flags);

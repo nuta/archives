@@ -19,7 +19,8 @@ static void lookup_page_entry(struct arch_vmspace *vms, uptr_t v, bool allocate,
             /* the PDPT, PD or PT is not allocated so allocate it */
             if (allocate) {
                 paddr_t paddr;
-                paddr = alloc_pages(PAGE_SIZE, KMALLOC_NORMAL);
+                paddr = alloc_pages(GET_PAGE_NUM(PAGE_SIZE), KMALLOC_NORMAL);
+                memset(from_paddr(paddr), 0, PAGE_SIZE);
                 entries[idx] = paddr;
             } else {
                 *table = NULL;
@@ -45,7 +46,7 @@ static void lookup_page_entry(struct arch_vmspace *vms, uptr_t v, bool allocate,
 
 void arch_create_vmspace(struct arch_vmspace *vms) {
     size_t pml4_size = PAGE_SIZE;
-    paddr_t pml4_addr = alloc_pages(pml4_size, KMALLOC_NORMAL);
+    paddr_t pml4_addr = alloc_pages(GET_PAGE_NUM(pml4_size), KMALLOC_NORMAL);
     u64_t *pml4 = from_paddr(pml4_addr);
 
     // Copy kernel space page entries.
@@ -99,15 +100,18 @@ void x64_init_paging(void) {
 
     /* Construct kernel space mappings. */
     u64_t flags = PAGE_PRESENT | PAGE_WRITABLE;
-    paddr_t pml4_addr = alloc_pages(PAGE_SIZE, KMALLOC_NORMAL);
+    paddr_t pml4_addr = alloc_pages(GET_PAGE_NUM(PAGE_SIZE), KMALLOC_NORMAL);
     kernel_pml4 = from_paddr(pml4_addr);
+    memset((void *) kernel_pml4, 0, PAGE_SIZE);
 
-    paddr_t pdpt_addr = alloc_pages(PAGE_SIZE, KMALLOC_NORMAL);
+    paddr_t pdpt_addr = alloc_pages(GET_PAGE_NUM(PAGE_SIZE), KMALLOC_NORMAL);
     u64_t *pdpt = from_paddr(pdpt_addr);
+    memset((void *) pdpt, 0, PAGE_SIZE);
 
     for (u64_t i = 0; i < PAGE_ENTRY_NUM; i++) {
-        paddr_t pd_addr = alloc_pages(PAGE_SIZE, KMALLOC_NORMAL);
+        paddr_t pd_addr = alloc_pages(GET_PAGE_NUM(PAGE_SIZE), KMALLOC_NORMAL);
         u64_t *pd = from_paddr(pd_addr);
+        memset((void *) pd, 0, PAGE_SIZE);
 
         for (u64_t j = 0; j < PAGE_ENTRY_NUM; j++) {
             paddr_t paddr = i * (1024 * 1024 * 1024) + j * (2 * 1024 * 1024);

@@ -18,7 +18,7 @@ void handle_irq(int irq) {
 void kernel_test(void) {
     size_t allocated = get_allocated_pages();
 
-    paddr_t addr = alloc_pages(PAGE_SIZE, KMALLOC_NORMAL);
+    paddr_t addr = alloc_pages(GET_PAGE_NUM(PAGE_SIZE), KMALLOC_NORMAL);
     assert_eq("All pages should be freed.", allocated, get_allocated_pages());
     PANIC("Finished all tests.");
 }

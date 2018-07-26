@@ -27,6 +27,7 @@ struct vmspace {
     struct vmarea *vma;
 };
 
+#define GET_PAGE_NUM(len) (ROUND_UP((len), PAGE_SIZE) / PAGE_SIZE)
 
 paddr_t alloc_pages(size_t size, int flags);
 uptr_t valloc(struct vmspace *vms, size_t size);

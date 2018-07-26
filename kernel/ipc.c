@@ -2,7 +2,7 @@
 #include "thread.h"
 #include "process.h"
 #include "ipc.h"
-
+#define DEBUG(...)
 static inline void link_channels(struct channel *ch1, struct channel *ch2) {
     ch1->linked_to = ch2;
     ch2->linked_to = ch1;
@@ -87,8 +87,8 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
                 arch_copy_from_user(kv, payload, ool_length);
                 return (payload_t) kv;
             } else {
-                size_t allocated_size = ROUND_UP(ool_length, PAGE_SIZE);
-                size_t pages_num = allocated_size / PAGE_SIZE;
+                size_t pages_num = GET_PAGE_NUM(ool_length);
+                size_t allocated_size = pages_num * PAGE_SIZE;
                 paddr_t p = alloc_pages(pages_num, KMALLOC_NORMAL);
                 void *kv = from_paddr(p);
                 uptr_t v = valloc(&dst->vms, allocated_size);
