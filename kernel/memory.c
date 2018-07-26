@@ -94,7 +94,6 @@ retry:
             }
 
             vms->dyn_pages[i + num - 1] = DYN_PAGE_END;
-            INFO("va: %p", DYN_PAGE_BASE_ADDR + i * PAGE_SIZE);
             return DYN_PAGE_BASE_ADDR + i * PAGE_SIZE;
         }
     }
