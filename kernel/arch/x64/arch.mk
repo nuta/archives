@@ -27,13 +27,13 @@ run:
 	$(MAKE) build
 	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
 	$(MAKE) $(disk_img)
-	$(QEMU) $(QEMUFLAGS)
+	./tools/run-emulator.py $(QEMU) $(QEMUFLAGS)
 
 bochs:
 	$(MAKE) build
 	$(MAKE) $(disk_img)
 	rm -f $(ARCH_DIR)/disk.img.lock
-	$(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc
+	./tools/run-emulator.py $(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc
 
 test:
 	$(MAKE) build

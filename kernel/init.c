@@ -9,7 +9,9 @@
 #include "kfs.h"
 
 void kernel_init(void) {
+    printk("\r\n");
     INFO("Starting Resea version " VERSION);
+
     memory_init();
     arch_early_init();
     process_init();
