@@ -191,7 +191,7 @@ void kernel_server_mainloop(channel_t server) {
                 break;
             default:
                 /* Unknown message. */
-                DEBUG("kernel: unknown message %d.%d", SRVTYPE(header), MSGTYPE(header));
+                DEBUG("kernel: unknown message %d.%d", IFTYPE(header), METHODTYPE(header));
                 header = ERROR_UNKNOWN_MSG;
                 break;
         }

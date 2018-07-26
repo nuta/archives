@@ -190,7 +190,7 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
         src->process->pid, src->cid,
         linked_to->process->pid, linked_to->cid,
         dst->process->pid, dst->cid,
-        SRVTYPE(header), MSGTYPE(header));
+        IFTYPE(header), METHODTYPE(header));
 
     // Get the sender right.
     while (true) {
@@ -264,11 +264,11 @@ header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
         goto slowpath;
     }
 
-    DEBUG("sys_fast_send: @%d.%d -> @%d.%d ~> @%d.%d (heqader=%d.%d)",
+    DEBUG("sys_fast_send: @%d.%d -> @%d.%d ~> @%d.%d (header=%d.%d)",
         src->process->pid, src->cid,
         linked_to->process->pid, linked_to->cid,
         dst->process->pid, dst->cid,
-        SRVTYPE(header), MSGTYPE(header));
+        IFTYPE(header), METHODTYPE(header));
 
     // Copy payloads.
     receiver->buffer.header = header;

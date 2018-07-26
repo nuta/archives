@@ -23,7 +23,8 @@ typedef u8_t * buffer_t;
 #define PAYLOAD_TYPE(type, n) (((type) >> (PAYLOAD_TYPES_OFFSET + (2 * (n)))) & 0x3)
 #define MSGTYPE(header) (((header) >> MINOR_ID_OFFSET) & 0xffff)
 #define ERRTYPE(header) ((header) & 0xff)
- #define SRVTYPE(header) (((header) >> MAJOR_ID_OFFSET) & 0xffff)
+#define IFTYPE(header) (((header) >> MAJOR_ID_OFFSET) & 0xff)
+#define METHODTYPE(header) (((header) >> MINOR_ID_OFFSET) & 0xff)
 #define NOTIFICATION_MSG ((0ULL << MAJOR_ID_OFFSET) | (1ULL << MINOR_ID_OFFSET))
 
 enum {
