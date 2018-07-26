@@ -6,5 +6,5 @@
 -I./libs/libresea/include
 -I./libs/libresea/arch/x64
 -I./kernel/arch/x64
--I./build/stub/c
+-I./build/stubs/c
 -I./
