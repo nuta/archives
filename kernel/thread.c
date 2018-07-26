@@ -32,7 +32,7 @@ struct thread *thread_create(struct process *process, uptr_t start, uptr_t arg) 
 
     thread->process = process;
     thread->tid = allocate_tid();
-    thread->flags = THREAD_BLOCKED;
+    thread->state = THREAD_BLOCKED;
     thread->resumed_count = 0;
     thread->rq.thread = thread;
 
@@ -51,7 +51,7 @@ void thread_destroy(struct thread *thread) {
         PANIC("idle thread can't be destroyied");
     }
 
-    // XXX: lock
+    kmutex_state_t irq_state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
     for (struct runqueue *rq = CPUVAR->runqueue; rq != NULL; rq = rq->next) {
         if (rq->thread == thread) {
             runqueue_list_remove(&CPUVAR->runqueue, rq);
@@ -59,8 +59,12 @@ void thread_destroy(struct thread *thread) {
             break;
         }
     }
+    kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, irq_state);
 
+    irq_state = kmutex_lock_irq_disabled(&thread->process->lock);
     thread_list_remove(&thread->process->threads, thread);
+    kmutex_unlock_restore_irq(&thread->process->lock, irq_state);
+
     arch_destroy_thread(&thread->arch);
     kfree(thread);
 }
@@ -91,7 +95,7 @@ void thread_switch_to(struct thread *next) {
 void thread_resume(struct thread *thread) {
     int prev = atomic_fetch_and_add(&thread->resumed_count, 1);
     if (prev == 0) {
-        thread->flags = (thread->flags & ~3) | THREAD_RUNNABLE;
+        thread->state = THREAD_RUNNABLE;
         kmutex_state_t state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
         runqueue_list_append(&CPUVAR->runqueue, &thread->rq);
         kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, state);
@@ -102,7 +106,7 @@ void thread_resume(struct thread *thread) {
 void thread_block(struct thread *thread) {
     int prev = atomic_fetch_and_sub(&thread->resumed_count, 1);
     if (prev == 1) {
-        thread->flags = (thread->flags & ~3) | THREAD_BLOCKED;
+        thread->state = THREAD_BLOCKED;
     }
 }
 
@@ -110,7 +114,7 @@ void thread_block_current(void) {
     struct thread *current = CPUVAR->current;
     atomic_fetch_and_sub(&current->resumed_count, 1);
     if (current->resumed_count <= 0) {
-        current->flags = (current->flags & ~3) | THREAD_BLOCKED;
+        current->state = THREAD_BLOCKED;
         thread_switch();
     }
 }
@@ -124,16 +128,17 @@ void thread_switch(void) {
     kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, state);
 
     if (next) {
-        if (thread_get_state(CPUVAR->current) == THREAD_RUNNABLE) {
+        if (CPUVAR->current->state == THREAD_RUNNABLE) {
             // Add the current thread to the runqueue.
             thread_block(CPUVAR->current);
             thread_resume(CPUVAR->current);
         }
 
         thread_switch_to(next->thread);
+        return;
     }
 
-    if (thread_get_state(CPUVAR->current) == THREAD_RUNNABLE) {
+    if (CPUVAR->current->state == THREAD_RUNNABLE) {
         // No other thread to run. Resume the current thread.
         return;
     }

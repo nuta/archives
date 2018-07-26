@@ -25,7 +25,7 @@ struct process;
 struct thread {
     struct thread *next;
     struct process *process;
-    u32_t flags;
+    int state;
     tid_t tid;
     struct arch_thread arch;
     int resumed_count; /* runnable if resumed_count > 0 */
@@ -48,9 +48,5 @@ void thread_init(void);
 void thread_resume(struct thread *thread);
 void thread_block(struct thread *thread);
 void thread_block_current(void);
-
-static inline int thread_get_state(struct thread *thread) {
-    return thread->flags & 3;
-}
 
 #endif
