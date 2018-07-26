@@ -40,7 +40,7 @@ struct channel *channel_create(struct process *process) {
             ch->cid = i + 1;
             ch->process = process;
             ch->linked_to = NULL;
-            ch->transfer_to = NULL;
+            ch->transfer_to = ch;
             ch->receiver = NULL;
             ch->sender = NULL;
             waitqueue_list_init(&ch->wq);
@@ -180,22 +180,11 @@ struct msg *sys_replyrecv(channel_t client, header_t header, payload_t r0,
 }
 
 
-static header_t sys_send_slowpath(channel_t ch, header_t header, payload_t a0,
+static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to, header_t header, payload_t a0,
                                   payload_t a1, payload_t a2, payload_t a3) {
-    struct channel *src = get_channel_by_id(ch);
-    if (unlikely(!src)) {
-        DEBUG("sys_send: @%d no such channel", ch);
-        return ERROR_INVALID_CH;
-    }
 
-    struct channel *linked_to = src->linked_to;
-    if (unlikely(!linked_to)) {
-        DEBUG("sys_send: @%d not linked", ch);
-        return ERROR_CH_NOT_LINKED;
-    }
-
+    struct channel *dst = linked_to->transfer_to;
     struct thread *current_thread = CPUVAR->current;
-    struct channel *dst = (linked_to->transfer_to) ? linked_to->transfer_to : linked_to;
 
     DEBUG("sys_send: @%d.%d -> @%d.%d ~> @%d.%d (header=%d.%d)",
         src->process->pid, src->cid,
@@ -249,22 +238,33 @@ static header_t sys_send_slowpath(channel_t ch, header_t header, payload_t a0,
 
 header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
                   payload_t a2, payload_t a3) {
-    // Get the sender right.
-    struct channel *src, *dst, *linked_to;
-    struct thread *receiver;
 
-    bool slowpath =  PAYLOAD_TYPES(header) != 0 /* Are all payloads inlined? */
-                  || (src = get_channel_by_id(ch)) == NULL
-                  || (linked_to = src->linked_to) == NULL
-                  || (dst = (linked_to->transfer_to ?: linked_to)) == NULL
-                  || !atomic_compare_and_swap(&dst->sender, NULL, CPUVAR->current)
-                  || (receiver = dst->receiver) == NULL;
-
-    if (unlikely(slowpath)) {
-        return sys_send_slowpath(ch, header, a0, a1, a2, a3);
+    struct channel *src = get_channel_by_id(ch);
+    if (unlikely(!src)) {
+        return ERROR_INVALID_CH;
     }
 
-    DEBUG("sys_fast_send: @%d.%d -> @%d.%d ~> @%d.%d (header=%d.%d)",
+    struct channel *linked_to = src->linked_to;
+    if (unlikely(!linked_to)) {
+        return ERROR_CH_NOT_LINKED;
+    }
+
+    /* Are all payloads inlined? */
+    if (unlikely(PAYLOAD_TYPES(header) != 0)) {
+        goto slowpath;
+    }
+
+    struct channel *dst = linked_to->transfer_to;
+    if (unlikely(!atomic_compare_and_swap(&dst->sender, NULL, CPUVAR->current))) {
+        goto slowpath;
+    }
+
+    struct thread *receiver = dst->receiver;
+    if (unlikely(!receiver)) {
+        goto slowpath;
+    }
+
+    DEBUG("sys_fast_send: @%d.%d -> @%d.%d ~> @%d.%d (heqader=%d.%d)",
         src->process->pid, src->cid,
         linked_to->process->pid, linked_to->cid,
         dst->process->pid, dst->cid,
@@ -280,6 +280,9 @@ header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
 
     thread_resume(receiver);
     return ERROR_NONE;
+
+slowpath:
+    return sys_send_slowpath(src, linked_to, header, a0, a1, a2, a3);
 }
 
 
@@ -296,7 +299,7 @@ struct msg *sys_recv(channel_t ch) {
         return ERROR_PTR(ERROR_CH_IN_USE);
     }
 
-    if (src->notifications) {
+    if (unlikely(src->notifications)) {
 receive_notification:
         current_thread->buffer.header = NOTIFICATION_MSG;
         current_thread->buffer.sent_from = src->cid;
