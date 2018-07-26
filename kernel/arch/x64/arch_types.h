@@ -61,7 +61,8 @@ struct tss {
 // For debugging on Bochs.
 #define MAGICBREAK __asm__ __volatile__("xchgw %bx,%bx");
 
-#define KERNEL_BASE_ADDR 0xffff800000000000
+#define KERNEL_BASE_ADDR   0xffff800000000000
+#define DYN_PAGE_BASE_ADDR 0x00000000a0000000
 #define PAGE_SIZE 4096
 #define PAGE_PRESENT  (1 << 0)
 #define PAGE_WRITABLE (1 << 1)

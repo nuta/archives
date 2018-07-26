@@ -22,9 +22,16 @@ struct vmarea {
 
 DEFINE_LIST(vmarea, struct vmarea)
 
+#define DEFAULT_DYN_PAGES_MAX (PAGE_SIZE * 4)
+#define DYN_PAGE_UNUSED 0
+#define DYN_PAGE_USING  1
+#define DYN_PAGE_END    2
+
 struct vmspace {
     struct arch_vmspace arch;
     struct vmarea *vma;
+    u8_t *dyn_pages;
+    size_t dyn_pages_max;
 };
 
 #define GET_PAGE_NUM(len) (ROUND_UP((len), PAGE_SIZE) / PAGE_SIZE)

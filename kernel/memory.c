@@ -67,12 +67,51 @@ void *kmalloc(size_t size, int flags) {
 }
 
 
-paddr_t v_allocated;
-uptr_t valloc(struct vmspace *vms, size_t size) {
-    // XXX
-    uptr_t v = v_allocated;
-    v_allocated += ROUND_UP(size, PAGE_SIZE);
-    return v;
+/* Allocates a *virtual* memory pages. Caller must link them with
+   physical pages by arch_link_page(). */
+uptr_t valloc(struct vmspace *vms, size_t num) {
+retry:
+    for (size_t i = 0; i < vms->dyn_pages_max; i++) {
+        size_t j;
+        for (j = 0; i + j < vms->dyn_pages_max && j < num; j++) {
+            if (vms->dyn_pages[i + j] != 0) {
+                /* The page is being used; try again from the beginning. */
+                break;
+            }
+        }
+
+        if (j == num) {
+            /* Found a large enough space. Mark pages as used. */
+            for (j = 0; j < num; j++) {
+                if (!atomic_compare_and_swap(&vms->dyn_pages[i + j], 0, DYN_PAGE_USING)) {
+                    /* Failed to mark as used. Deallocate pages and try again. */
+                    for (size_t k = 0; k < j; k++) {
+                        atomic_compare_and_swap(&vms->dyn_pages[i + j], DYN_PAGE_USING, 0);
+                    }
+
+                    goto retry;
+                }
+            }
+
+            vms->dyn_pages[i + num - 1] = DYN_PAGE_END;
+            INFO("va: %p", DYN_PAGE_BASE_ADDR + i * PAGE_SIZE);
+            return DYN_PAGE_BASE_ADDR + i * PAGE_SIZE;
+        }
+    }
+
+    return 0;
+}
+
+void vfree(struct vmspace *vms, uptr_t vaddr) {
+    size_t start = (vaddr - DYN_PAGE_BASE_ADDR) / PAGE_SIZE;
+
+    for (size_t i = start; i < vms->dyn_pages_max; i++) {
+        u8_t type = vms->dyn_pages[i];
+        vms->dyn_pages[i] = DYN_PAGE_UNUSED;
+        if (type == DYN_PAGE_END) {
+            break;
+        }
+    }
 }
 
 void kfree(UNUSED void *ptr) {
@@ -99,7 +138,9 @@ void add_vmarea(
 
 
 void memory_create_vmspace(struct vmspace *vms) {
-
+    vms->dyn_pages_max = DEFAULT_DYN_PAGES_MAX;
+    vms->dyn_pages = (u8_t *) kmalloc(DEFAULT_DYN_PAGES_MAX * sizeof(u8_t),
+                                      KMALLOC_NORMAL | KMALLOC_ZEROED);
     vmarea_list_init(&vms->vma);
     arch_create_vmspace(&vms->arch);
 }
@@ -169,5 +210,4 @@ void memory_init(void) {
     size_t phypages_size = sizeof(struct page) * phypages_num;
     memset(pages, 0, phypages_size);
     allocated_pages_start = ROUND_UP(phypages_start + phypages_size, PAGE_SIZE);
-    v_allocated = 0xa00000000;
 }
