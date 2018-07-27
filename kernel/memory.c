@@ -57,7 +57,7 @@ void free_pages(paddr_t addr, size_t num) {
 
 
 void *kmalloc(size_t size, int flags) {
-    void *ptr = from_paddr(alloc_pages(GET_PAGE_NUM(size), flags));
+    void *ptr = from_paddr(alloc_pages(LEN_TO_PAGE_NUM(size), flags));
 
     if (flags & KMALLOC_ZEROED) {
         memset(ptr, 0, size);
@@ -151,7 +151,7 @@ void memory_destroy_vmspace(UNUSED struct vmspace *vms) {
 }
 
 paddr_t zeroed_pager(void *arg, off_t offset, size_t length) {
-    return alloc_pages(GET_PAGE_NUM(length), KMALLOC_NORMAL);
+    return alloc_pages(LEN_TO_PAGE_NUM(length), KMALLOC_NORMAL);
 }
 
 

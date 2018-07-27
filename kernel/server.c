@@ -105,7 +105,7 @@ static inline error_t handle_io_pmalloc(channel_t from, uptr_t vaddr, uptr_t pad
     struct process *proc = get_callee_process(from);
     struct vmspace *vms = &proc->vms;
     int flags = PAGE_WRITABLE | (IS_KERNEL_PROCESS(proc) ? 0 : PAGE_USER);
-    size_t pages_num = GET_PAGE_NUM(length);
+    size_t pages_num = LEN_TO_PAGE_NUM(length);
     vaddr = valloc(vms, pages_num);
 
     if (!vaddr) {

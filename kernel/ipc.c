@@ -87,7 +87,7 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
                 arch_copy_from_user(kv, payload, ool_length);
                 return (payload_t) kv;
             } else {
-                size_t pages_num = GET_PAGE_NUM(ool_length);
+                size_t pages_num = LEN_TO_PAGE_NUM(ool_length);
                 paddr_t p = alloc_pages(pages_num, KMALLOC_NORMAL);
                 void *kv = from_paddr(p);
                 uptr_t v = valloc(&dst->vms, pages_num);

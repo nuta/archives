@@ -40,7 +40,7 @@ struct kfs_file *kfs_readdir(struct kfs_dir *dir, struct kfs_file *file) {
 static paddr_t kfs_pager(void *arg, off_t offset, size_t length) {
     struct kfs_file_header *header = arg;
     void *data = (void *) ((uptr_t) arg + sizeof(struct kfs_file_header) + offset);
-    paddr_t paddr = alloc_pages(GET_PAGE_NUM(length), KMALLOC_NORMAL);
+    paddr_t paddr = alloc_pages(LEN_TO_PAGE_NUM(length), KMALLOC_NORMAL);
     void *ptr = from_paddr(paddr);
 
     // FIXME: This may perform memcpy beyond the file data if offset > 0.
