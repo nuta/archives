@@ -4,6 +4,7 @@
 #include <kernel/string.h>
 #include "paging.h"
 #include "asm.h"
+#include "cr.h"
 
 
 u64_t *kernel_pml4 = NULL;
@@ -99,7 +100,7 @@ void x64_init_paging(void) {
         "Page size must be >= the size of PML4/PDPT/PD.");
 
     /* Construct kernel space mappings. */
-    u64_t flags = PAGE_PRESENT | PAGE_WRITABLE;
+    u64_t flags = PAGE_PRESENT | PAGE_WRITABLE | PAGE_GLOBAL;
     paddr_t pml4_addr = alloc_pages(GET_PAGE_NUM(PAGE_SIZE), KMALLOC_NORMAL);
     kernel_pml4 = from_paddr(pml4_addr);
     memset((void *) kernel_pml4, 0, PAGE_SIZE);
@@ -124,7 +125,9 @@ void x64_init_paging(void) {
         pdpt[PDPT_INDEX(vaddr)] = pd_addr | flags;
     }
 
-    kernel_pml4[PML4_INDEX(KERNEL_BASE_ADDR)] = pdpt_addr |flags;
+    kernel_pml4[PML4_INDEX(KERNEL_BASE_ADDR)] = pdpt_addr | flags;
+
+    asm_set_cr4(asm_get_cr4() | CR4_PGE);
 
     // Reload the created page table.
     asm_set_cr3(pml4_addr);

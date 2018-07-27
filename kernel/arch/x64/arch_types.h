@@ -66,6 +66,7 @@ struct tss {
 #define PAGE_SIZE 4096
 #define PAGE_PRESENT  (1 << 0)
 #define PAGE_WRITABLE (1 << 1)
+#define PAGE_GLOBAL (1 << 8)
 #define PAGE_USER (1 << 2)
 
 #define TICK_HZ 1000 /* Fires tick_timer() every 1/TICK_HZ sec. */
