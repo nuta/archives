@@ -140,6 +140,9 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
 }
 
 channel_t sys_open(void) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     struct channel *ch = channel_create(CPUVAR->current->process);
     if(!ch) {
         WARN("sys_open: failed to allocate #%d", CPUVAR->current->process->pid);
@@ -147,7 +150,10 @@ channel_t sys_open(void) {
     }
 
     DEBUG("sys_open: #%d allocate @%d", CPUVAR->current->process->pid, ch->cid);
-    return ch->cid;
+    channel_t cid = ch->cid;
+
+    restore_irq(&irqstate);
+    return cid;
 }
 
 
@@ -158,11 +164,16 @@ void sys_close(channel_t ch) {
 struct msg *sys_call(channel_t ch, header_t header, payload_t a0,
                      payload_t a1, payload_t a2, payload_t a3) {
 
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     header_t error = sys_send(ch, header, a0, a1, a2, a3);
     if (unlikely(error != ERROR_NONE)) {
+        restore_irq(&irqstate);
         return ERROR_PTR(error);
     }
 
+    restore_irq(&irqstate);
     return sys_recv(ch);
 }
 
@@ -170,22 +181,32 @@ struct msg *sys_call(channel_t ch, header_t header, payload_t a0,
 struct msg *sys_replyrecv(channel_t client, header_t header, payload_t r0,
                           payload_t r1, payload_t r2, payload_t r3) {
 
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     header_t error = sys_send(client, header, r0, r1, r2, r3);
     if (unlikely(error != ERROR_NONE)) {
+        restore_irq(&irqstate);
         return ERROR_PTR(error);
     }
 
     struct channel *server = get_channel_by_id(client)->transfer_to;
     if (unlikely(!server)) {
+        restore_irq(&irqstate);
         return ERROR_PTR(ERROR_CH_NOT_TRANSFERED);
     }
 
-    return sys_recv(server->cid);
+    struct msg *m = sys_recv(server->cid);
+    restore_irq(&irqstate);
+    return m;
 }
 
 
 static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to, header_t header, payload_t a0,
                                   payload_t a1, payload_t a2, payload_t a3) {
+
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
 
     struct channel *dst = linked_to->transfer_to;
     struct thread *current_thread = CPUVAR->current;
@@ -236,6 +257,7 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
     receiver->buffer.payloads[3] = copy_payload(PAYLOAD_TYPE(header, 3), src_process, dst_process, a3, 0);
 
     thread_resume(dst->receiver);
+    restore_irq(&irqstate);
     return ERROR_NONE;
 }
 
@@ -243,13 +265,18 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
 header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
                   payload_t a2, payload_t a3) {
 
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     struct channel *src = get_channel_by_id(ch);
     if (unlikely(!src)) {
+        restore_irq(&irqstate);
         return ERROR_INVALID_CH;
     }
 
     struct channel *linked_to = src->linked_to;
     if (unlikely(!linked_to)) {
+        restore_irq(&irqstate);
         return ERROR_CH_NOT_LINKED;
     }
 
@@ -283,23 +310,33 @@ header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
     receiver->buffer.payloads[3] = a3;
 
     thread_resume(receiver);
+    restore_irq(&irqstate);
     return ERROR_NONE;
 
 slowpath:
-    return sys_send_slowpath(src, linked_to, header, a0, a1, a2, a3);
+    {
+        header_t result = sys_send_slowpath(src, linked_to, header, a0, a1, a2, a3);
+        restore_irq(&irqstate);
+        return result;
+    }
 }
 
 
 struct msg *sys_recv(channel_t ch) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     struct channel *src = get_channel_by_id(ch);
     if (unlikely(!src)) {
         WARN("sys_recv: @%d no such channel", ch);
+        restore_irq(&irqstate);
         return ERROR_PTR(ERROR_INVALID_CH);
     }
 
     // Try to get the receiver right.
     struct thread *current_thread = CPUVAR->current;
     if (unlikely(!atomic_compare_and_swap(&src->receiver, NULL, current_thread))) {
+        restore_irq(&irqstate);
         return ERROR_PTR(ERROR_CH_IN_USE);
     }
 
@@ -310,6 +347,7 @@ receive_notification:
         current_thread->buffer.payloads[0] = src->notifications;
         src->notifications = 0;
         src->receiver = NULL;
+        restore_irq(&irqstate);
         return &current_thread->buffer;
     }
 
@@ -337,23 +375,30 @@ receive_notification:
     // work. Release sender/receiver rights and return the receiver message.
     src->receiver = NULL;
     src->sender = NULL;
+    restore_irq(&irqstate);
     return &current_thread->buffer;
 }
 
 
 channel_t sys_connect(channel_t server) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     struct channel *ch = get_channel_by_id(server);
     if (!ch) {
         DEBUG("sys_connect: @%d no such channel", server);
+        restore_irq(&irqstate);
         return ERROR_INVALID_CH;
     }
 
     struct channel *linked_to = ch->linked_to;
     if (!linked_to) {
         DEBUG("sys_connect: @%d not linked", ch);
+        restore_irq(&irqstate);
         return ERROR_CH_NOT_LINKED;
     }
 
+    restore_irq(&irqstate);
     return channel_connect(linked_to, CPUVAR->current->process);
 }
 
@@ -365,6 +410,9 @@ channel_t sys_link(channel_t ch1, channel_t ch2) {
 
 
 channel_t sys_transfer(channel_t ch, channel_t dest) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     struct channel *from = get_channel_by_id(ch);
     if (!from) {
         return ERROR_INVALID_CH;
@@ -376,6 +424,7 @@ channel_t sys_transfer(channel_t ch, channel_t dest) {
     }
 
     transfer_to(from, to);
+    restore_irq(&irqstate);
     return ERROR_NONE;
 }
 
@@ -388,6 +437,9 @@ channel_t sys_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t 
 /* This function would be called in an interrupt context: don't
   use mutexes and printk nor they cause a dead lock! */
 error_t do_notify(struct process *proc, channel_t ch, payload_t and_mask, payload_t or_mask) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
     struct channel *src = get_channel_by_id_of(proc, ch);
     if (!src) {
         return ERROR_INVALID_CH;
@@ -407,6 +459,7 @@ error_t do_notify(struct process *proc, channel_t ch, payload_t and_mask, payloa
     }
 
     DEBUG("notify: %p @%d.%d", dst->notifications, dst->process->pid, dst->cid);
+    restore_irq(&irqstate);
     return ERROR_NONE;
 }
 

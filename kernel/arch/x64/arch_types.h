@@ -76,6 +76,7 @@ struct tss {
 #define KMUTEX_LOCKED 1
 typedef u32_t kmutex_t;
 typedef u64_t kmutex_state_t;
+typedef u64_t irqstate_t;
 
 static inline void kmutex_init(kmutex_t *lock, int init) {
     *lock = init;
@@ -106,6 +107,23 @@ static inline void kmutex_unlock_restore_irq(kmutex_t *lock, kmutex_state_t stat
         "movl %1, %0  \n"
     : "=m"(lock)
     : "r"(KMUTEX_UNLOCKED), "r"(state)
+    );
+}
+
+static inline void save_and_disable_irq(irqstate_t *state) {
+    INLINE_ASM(
+        "    pushfq                \n"
+        "    pop %%rax             \n"
+        "    cli                   \n"
+    : "=a"(*state)
+    );
+}
+
+static inline void restore_irq(irqstate_t *state) {
+    INLINE_ASM(
+        "push %0      \n"
+        "popfq        \n"
+    :: "r"(*state)
     );
 }
 
