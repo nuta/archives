@@ -72,6 +72,7 @@ struct channel {
     struct thread *receiver;
     struct thread *sender;
     struct waitqueue *wq;
+    kmutex_t lock;
 };
 
 struct channel *channel_create(struct process *process);

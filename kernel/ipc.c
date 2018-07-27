@@ -44,6 +44,7 @@ struct channel *channel_create(struct process *process) {
             ch->receiver = NULL;
             ch->sender = NULL;
             waitqueue_list_init(&ch->wq);
+            kmutex_init(&ch->lock, KMUTEX_UNLOCKED);
             kmutex_unlock_restore_irq(&process->lock, state);
             return ch;
         }
@@ -229,19 +230,18 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
             break;
         }
 
-        // XXX: lock the wait queue or current thread will never wake up
-
         // Another thread is sending to the destination. Add current thread
         // to wait queue. A receiver thread will resume it.
-        struct waitqueue *wq = kmalloc(sizeof(*wq), KMALLOC_NORMAL);
-        wq->thread = current_thread;
-
-        waitqueue_list_append(&dst->wq, wq);
+        kmutex_state_t irq_state = kmutex_lock_irq_disabled(&dst->lock);
+        waitqueue_list_append(&dst->wq, &current_thread->wq);
+        kmutex_unlock_restore_irq(&dst->lock, irq_state);
+        current_thread->sending = dst;
         thread_block_current();
     }
 
     // Wait for the receiver.
     if (likely(!dst->receiver)) {
+        current_thread->sending = dst;
         thread_block_current();
     }
 
@@ -257,6 +257,7 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
     receiver->buffer.payloads[3] = copy_payload(PAYLOAD_TYPE(header, 3), src_process, dst_process, a3, 0);
 
     thread_resume(dst->receiver);
+    current_thread->sending = NULL;
     restore_irq(&irqstate);
     return ERROR_NONE;
 }
@@ -364,6 +365,7 @@ receive_notification:
         }
     }
 
+    current_thread->receiving = src;
     thread_block_current();
 
     if (!src->sender) {
@@ -375,6 +377,7 @@ receive_notification:
     // work. Release sender/receiver rights and return the receiver message.
     src->receiver = NULL;
     src->sender = NULL;
+    current_thread->receiving = NULL;
     restore_irq(&irqstate);
     return &current_thread->buffer;
 }

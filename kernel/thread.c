@@ -11,6 +11,23 @@ tid_t allocate_tid(void) {
     return atomic_fetch_and_add(&last_tid, 1);
 }
 
+void free_tid(tid_t tid) {
+    // TODO:
+}
+
+
+/*
+ *  Wait until the all CPUs have escaped the ciritical section. Callee
+ *  must *not* in a critical section.
+ */
+void sync_ciritical_section(void) {
+#ifdef SMP
+#error "not yet implemented" // TODO:
+#else
+    // Do noting in UP systems.
+#endif
+}
+
 
 struct thread *thread_create(struct process *process, uptr_t start, uptr_t arg) {
     bool is_kernel_thread = process == kernel_process;
@@ -33,8 +50,12 @@ struct thread *thread_create(struct process *process, uptr_t start, uptr_t arg) 
     thread->process = process;
     thread->tid = allocate_tid();
     thread->state = THREAD_BLOCKED;
+    thread->stack = stack;
     thread->resumed_count = 0;
     thread->rq.thread = thread;
+    thread->wq.thread = thread;
+    thread->sending = NULL;
+    thread->receiving = NULL;
 
     arch_create_thread(&thread->arch, is_kernel_thread,
         start, arg, stack, stack_size);
@@ -46,49 +67,87 @@ struct thread *thread_create(struct process *process, uptr_t start, uptr_t arg) 
 }
 
 
-void thread_destroy(struct thread *thread) {
-    if (thread == CPUVAR->idle_thread) {
-        PANIC("idle thread can't be destroyied");
+static void do_thread_destroy(struct thread *thread) {
+    if (!atomic_compare_and_swap(&thread->state, THREAD_WAIT_DESTROY, THREAD_DESTROYED)) {
+        // The destruction is (being) done by other CPU. I think it won't be
+        // happen if runqueue is CPU-local.
+        return;
     }
 
+    // Remove from the runqueue.
     kmutex_state_t irq_state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
-    for (struct runqueue *rq = CPUVAR->runqueue; rq != NULL; rq = rq->next) {
-        if (rq->thread == thread) {
-            runqueue_list_remove(&CPUVAR->runqueue, rq);
-            kfree(rq);
-            break;
-        }
-    }
+    runqueue_list_remove(&CPUVAR->runqueue, &thread->rq);
     kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, irq_state);
 
+    // Remove from the thread list of its process.
     irq_state = kmutex_lock_irq_disabled(&thread->process->lock);
     thread_list_remove(&thread->process->threads, thread);
     kmutex_unlock_restore_irq(&thread->process->lock, irq_state);
 
+    // FIXME: Do we need to disable interrupts here?
+    // Release the receiver right if the thread has.
+    if (thread->receiving) {
+        atomic_compare_and_swap(&thread->receiving->receiver, thread, NULL);
+    }
+
+    // Release the sender right and remove from the wait queue if exists.
+    if (thread->sending) {
+        atomic_compare_and_swap(&thread->sending->sender, thread, NULL);
+
+        irq_state = kmutex_lock_irq_disabled(&thread->sending->lock);
+        waitqueue_list_remove(&thread->sending->wq, &thread->wq);
+        kmutex_unlock_restore_irq(&thread->sending->lock, irq_state);
+    }
+
+    // Wait until the all CPUs have escaped the ciritical section so that
+    // there are no references to the thread.
+    sync_ciritical_section();
+
+    // Release allocated resources.
+    free_tid(thread->tid);
+    if (thread->process == kernel_process) {
+        kfree((void *) thread->stack);
+    }
+
+    // Release remaining resources and finish the destruction.
     arch_destroy_thread(&thread->arch);
     kfree(thread);
 }
 
+static void append_to_runqueue(struct thread *thread) {
+    kmutex_state_t state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
+    runqueue_list_append(&CPUVAR->runqueue, &thread->rq);
+    kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, state);
+}
 
-NORETURN void thread_destroy_current(void) {
-    struct thread *thread = CPUVAR->current;
+
+void thread_destroy(struct thread *thread) {
+    // TODO: Determine if `thread' is an idle thread by
+    // testing flags in MP.
     if (thread == CPUVAR->idle_thread) {
         PANIC("idle thread can't be destroyied");
     }
 
-    PANIC("%s: not yet implemented", __func__);
+    thread->state = THREAD_WAIT_DESTROY;
+    append_to_runqueue(thread);
+}
+
+struct thread destroyed_thread;
+NORETURN void thread_destroy_current(void) {
+    CPUVAR->current = &destroyed_thread;
+    thread_destroy(CPUVAR->current);
+    thread_switch();
 }
 
 
-void thread_switch_to(struct thread *next) {
-    struct thread *current = CPUVAR->current;
+static void thread_switch_to(struct thread *prev, struct thread *next) {
     CPUVAR->current = next;
 
     if (next->process != kernel_process) {
         arch_switch_vmspace(&next->process->vms.arch);
     }
 
-    arch_switch(&current->arch, &next->arch);
+    arch_switch((prev == &destroyed_thread) ? NULL : &prev->arch, &next->arch);
 }
 
 
@@ -96,9 +155,7 @@ void thread_resume(struct thread *thread) {
     int prev = atomic_fetch_and_add(&thread->resumed_count, 1);
     if (prev == 0) {
         thread->state = THREAD_RUNNABLE;
-        kmutex_state_t state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
-        runqueue_list_append(&CPUVAR->runqueue, &thread->rq);
-        kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, state);
+        append_to_runqueue(thread);
     }
 }
 
@@ -122,19 +179,25 @@ void thread_block_current(void) {
 
 void thread_switch(void) {
     // TODO: implement a fair and smart scheduler
-
-    kmutex_state_t state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
-    struct runqueue *next = runqueue_list_pop(&CPUVAR->runqueue);
+    kmutex_state_t state;
+    struct runqueue *next;
+retry:
+    state = kmutex_lock_irq_disabled(&CPUVAR->runqueue_lock);
+    next = runqueue_list_pop(&CPUVAR->runqueue);
     kmutex_unlock_restore_irq(&CPUVAR->runqueue_lock, state);
 
     if (next) {
         if (CPUVAR->current->state == THREAD_RUNNABLE) {
             // Add the current thread to the runqueue.
-            thread_block(CPUVAR->current);
-            thread_resume(CPUVAR->current);
+            append_to_runqueue(CPUVAR->current);
         }
 
-        thread_switch_to(next->thread);
+        if (next->thread->state == THREAD_WAIT_DESTROY) {
+            do_thread_destroy(next->thread);
+            goto retry;
+        }
+
+        thread_switch_to(CPUVAR->current, next->thread);
         return;
     }
 
@@ -143,11 +206,8 @@ void thread_switch(void) {
         return;
     }
 
-    // No threads are runnable. Resume the idle thread. Assuming `runqueue` points
-    // to the idle thread.
-    struct thread *current_thread = CPUVAR->current;
-    CPUVAR->current = CPUVAR->idle_thread;
-    arch_switch(&current_thread->arch, &CPUVAR->idle_thread->arch);
+    // No threads are runnable. Resume the idle thread.
+    thread_switch_to(CPUVAR->current, CPUVAR->idle_thread);
 }
 
 
