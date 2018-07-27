@@ -1,4 +1,3 @@
-include mk/common.mk
 include $(DIR)/Makefile
 server_name := $(name)
 server_build_dir := $(BUILD_DIR)/$(DIR)
@@ -20,7 +19,7 @@ $(executable): $(artifact)
 $(artifact):
 	mkdir -p $(server_build_dir)
 	$(PROGRESS) GEN $(server_build_dir)/$(ARCH).json
-	./libs/resea/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
+	./servers/libs/resea/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
 
 	$(PROGRESS) XARGO $(server_build_dir)
 	cd $(DIR) && \

@@ -1,4 +1,4 @@
 objs := start.o
 subdirs := arch/$(ARCH)
 
-include mk/lib.mk
+include servers/libs/lib.mk
