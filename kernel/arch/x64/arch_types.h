@@ -89,8 +89,9 @@ static inline kmutex_state_t kmutex_lock_irq_disabled(kmutex_t *lock) {
         "    pause                 \n"
         "    lock cmpxchgl %1, %2  \n"
         "    jnz 1b                \n"
-        "    pushfq                \n "
+        "    pushfq                \n"
         "    pop %%rax             \n"
+        "    cli                   \n"
     : "=a"(state)
     : "r"(KMUTEX_UNLOCKED), "m"(lock)
     );
@@ -100,7 +101,7 @@ static inline kmutex_state_t kmutex_lock_irq_disabled(kmutex_t *lock) {
 
 static inline void kmutex_unlock_restore_irq(kmutex_t *lock, kmutex_state_t state) {
     INLINE_ASM(
-        "push $2      \n"
+        "push %2      \n"
         "popfq        \n"
         "movl %1, %0  \n"
     : "=m"(lock)
