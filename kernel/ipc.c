@@ -227,6 +227,18 @@ channel_t sys_open(void) {
 
 
 void sys_close(channel_t ch) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
+
+    struct channel *channel = get_channel_by_id(ch);
+    if (unlikely(!channel)) {
+        restore_irq(&irqstate);
+        return;
+    }
+
+    channel_close(channel);
+    restore_irq(&irqstate);
 }
 
 
