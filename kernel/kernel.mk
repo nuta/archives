@@ -35,7 +35,6 @@ $(BUILD_DIR)/%.o: %.c Makefile
 $(BUILD_DIR)/kernel/init.o: $(BUILD_DIR)/kernel/kfs.bin
 
 $(BUILD_DIR)/kernel/kfs.bin: $(kfs_files) tools/mkkfs.py
-	rm $(filter-out $(kfs_files), $(wildcard $(KFS_DIR)/*))
 	$(PROGRESS) MKKFS $@
 	./tools/mkkfs.py $@ $(KFS_DIR)
 
