@@ -98,6 +98,7 @@ enum {
     ERROR_CH_NOT_LINKED = 202,
     ERROR_CH_NOT_TRANSFERED = 203,
     ERROR_CH_IN_USE = 204,
+    ERROR_CH_CLOSED = 205,
 
     /* Internally used in the server. */
     ERROR_DONT_REPLY = 255

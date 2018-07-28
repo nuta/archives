@@ -29,6 +29,7 @@ pub enum ErrorCode {
     ChannelNotLinked = 202,
     ChannelNotTransferred = 203,
     ChannelInUse = 204,
+    ChannelClosed = 205,
     DontReply = 255,
 }
 

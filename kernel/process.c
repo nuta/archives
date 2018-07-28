@@ -12,7 +12,7 @@ struct process *process_create(void) {
     process->channels_max = DEFAULT_CHANNELS_NUM;
 
     for (size_t i = 0; i < DEFAULT_CHANNELS_NUM; i++) {
-        process->channels[i].flags = 0;
+        process->channels[i].state = CHANNEL_UNUSED;
    }
 
 

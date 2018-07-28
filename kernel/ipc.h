@@ -41,6 +41,7 @@ enum {
     ERROR_CH_NOT_LINKED = 202,
     ERROR_CH_NOT_TRANSFERED = 203,
     ERROR_CH_IN_USE = 204,
+    ERROR_CH_CLOSED = 205,
 
     /* Internally used in the server. */
     ERROR_DONT_REPLY = 255,
@@ -61,9 +62,13 @@ struct msg {
     payload_t payloads[4];
 };
 
+#define CHANNEL_UNUSED 0
+#define CHANNEL_OPENED 1
+#define CHANNEL_CLOSED 2
+
 struct thread;
 struct channel {
-    int flags;
+    int state;
     payload_t notifications;
     channel_t cid;
     struct process *process;
@@ -73,9 +78,11 @@ struct channel {
     struct thread *sender;
     struct waitqueue *wq;
     kmutex_t lock;
+    int refs;
 };
 
 struct channel *channel_create(struct process *process);
+void channel_close(struct channel *ch);
 error_t channel_connect(struct channel *server, struct process *client);
 struct channel *get_channel_by_id(channel_t cid);
 error_t do_notify(struct process *proc, channel_t cid, payload_t and_mask, payload_t or_mask);

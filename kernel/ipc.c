@@ -6,11 +6,14 @@
 static inline void link_channels(struct channel *ch1, struct channel *ch2) {
     ch1->linked_to = ch2;
     ch2->linked_to = ch1;
+    ch1->refs++;
+    ch2->refs++;
 }
 
 
 static inline void transfer_to(struct channel *from, struct channel *to) {
     from->transfer_to = to;
+    to->refs++;
 }
 
 static struct channel *get_channel_by_id_of(struct process *proc, channel_t cid) {
@@ -22,7 +25,7 @@ static struct channel *get_channel_by_id_of(struct process *proc, channel_t cid)
     }
 
     struct channel *ch = &channels[cid - 1];
-    return (ch->flags == 0) ? NULL : ch;
+    return (ch->state == CHANNEL_OPENED) ? ch : NULL;
 }
 
 struct channel *get_channel_by_id(channel_t cid) {
@@ -34,8 +37,9 @@ struct channel *channel_create(struct process *process) {
     size_t channels_max = process->channels_max;
     for (size_t i = 0; i < channels_max; i++) {
         struct channel *ch = &process->channels[i];
-        if (ch->flags == 0) {
-            ch->flags = 1;
+        if (ch->state == CHANNEL_UNUSED) {
+            ch->state = CHANNEL_OPENED;
+            ch->refs = 1;
             ch->notifications = 0;
             ch->cid = i + 1;
             ch->process = process;
@@ -55,6 +59,75 @@ struct channel *channel_create(struct process *process) {
 }
 
 
+static error_t channel_notify(struct channel *ch, payload_t and_mask, payload_t or_mask) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
+    ch->notifications = (ch->notifications & and_mask) | or_mask;
+
+    struct thread *receiver = ch->receiver;
+    if (receiver) {
+        thread_resume(receiver);
+    }
+
+    DEBUG("notify: %p @%d.%d", ch->notifications, ch->process->pid, ch->cid);
+    restore_irq(&irqstate);
+    return ERROR_NONE;
+}
+
+
+void channel_close(struct channel *ch) {
+    ch->state = CHANNEL_CLOSED;
+
+    // Wait until no threads are updating the thread.
+    sync_ciritical_section();
+
+    // Wake all waiting threads.
+    struct waitqueue *wq;
+    while ((wq = waitqueue_list_pop(&ch->wq)) != NULL) {
+        wq->thread->state = THREAD_CHANNEL_CLOSED;
+        thread_resume(wq->thread);
+    }
+
+    struct thread *sender = ch->sender;
+    if (sender) {
+        sender->state = THREAD_CHANNEL_CLOSED;
+        thread_resume(sender);
+    }
+
+    struct thread *receiver = ch->receiver;
+    if (receiver) {
+        receiver->state = THREAD_CHANNEL_CLOSED;
+        thread_resume(receiver);
+    }
+
+    struct channel *linked_to = ch->linked_to;
+    if (linked_to && atomic_compare_and_swap(&linked_to->linked_to, ch, NULL)) {
+        // Wait until no threads have references to the channel.
+        sync_ciritical_section();
+
+        ch->refs--;
+        linked_to->refs--;
+        if (linked_to->refs == 0) {
+            channel_close(linked_to);
+        }
+    }
+
+    struct channel *transfer_to = ch->transfer_to;
+    if (transfer_to) {
+        transfer_to->refs--;
+        if (transfer_to->refs == 0) {
+            channel_close(transfer_to);
+        }
+    }
+
+    ch->refs--;
+    if (ch->refs == 0) {
+        ch->state = CHANNEL_OPENED;
+    }
+}
+
+
 channel_t channel_connect(struct channel *server, struct process *client) {
     struct channel *server_side = channel_create(server->process);
     struct channel *client_side = channel_create(client);
@@ -68,11 +141,6 @@ channel_t channel_connect(struct channel *server, struct process *client) {
         server->process->pid, server->cid);
 
     return client_side->cid;
-}
-
-
-static inline void close_channel(struct channel *ch) {
-    ch->flags = 0;
 }
 
 
@@ -123,7 +191,7 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
                     new_ch->process->pid, new_ch->cid);
                 ch->linked_to->linked_to = new_ch;
                 new_ch->linked_to = ch->linked_to;
-                close_channel(ch);
+                channel_close(ch);
             } else {
                 DEBUG("copy_payload: link @%d.%d <-> @%d.%d",
                     ch->process->pid, ch->cid,
@@ -235,8 +303,16 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
         kmutex_state_t irq_state = kmutex_lock_irq_disabled(&dst->lock);
         waitqueue_list_append(&dst->wq, &current_thread->wq);
         kmutex_unlock_restore_irq(&dst->lock, irq_state);
+
         current_thread->sending = dst;
         thread_block_current();
+
+        if (unlikely(current_thread->state == THREAD_CHANNEL_CLOSED)) {
+            // The `dst' channel is being closed. Abort the operation.
+            current_thread->state = THREAD_RUNNABLE;
+            restore_irq(&irqstate);
+            return ERROR_CH_CLOSED;
+        }
     }
 
     // Wait for the receiver.
@@ -358,7 +434,9 @@ receive_notification:
         // The sender waits for us. Resume it and wait for it.
         thread_resume(src->sender);
     } else {
+        kmutex_state_t irq_state = kmutex_lock_irq_disabled(&src->lock);
         struct waitqueue *wq = waitqueue_list_pop(&src->wq);
+        kmutex_unlock_restore_irq(&src->lock, irq_state);
         if (wq) {
             thread_resume(wq->thread);
             kfree(wq);
@@ -367,6 +445,13 @@ receive_notification:
 
     current_thread->receiving = src;
     thread_block_current();
+
+    if (current_thread->state == THREAD_CHANNEL_CLOSED) {
+        // The `src' channel is being closed. Abort the operation.
+        current_thread->state = THREAD_RUNNABLE;
+        restore_irq(&irqstate);
+        return ERROR_PTR(ERROR_CH_CLOSED);
+    }
 
     if (!src->sender) {
         // We have received a notification.
@@ -438,7 +523,7 @@ channel_t sys_discard(payload_t ool0, payload_t ool1, payload_t ool2, payload_t 
 }
 
 /* This function would be called in an interrupt context: don't
-  use mutexes and printk nor they cause a dead lock! */
+  use lock nor they cause a dead lock! */
 error_t do_notify(struct process *proc, channel_t ch, payload_t and_mask, payload_t or_mask) {
     irqstate_t irqstate;
     save_and_disable_irq(&irqstate);
@@ -454,14 +539,7 @@ error_t do_notify(struct process *proc, channel_t ch, payload_t and_mask, payloa
         return ERROR_INVALID_CH;
     }
 
-    dst->notifications = (dst->notifications & and_mask) | or_mask;
-
-    struct thread *receiver = dst->receiver;
-    if (receiver) {
-        thread_resume(receiver);
-    }
-
-    DEBUG("notify: %p @%d.%d", dst->notifications, dst->process->pid, dst->cid);
+    channel_notify(dst, and_mask, or_mask);
     restore_irq(&irqstate);
     return ERROR_NONE;
 }
