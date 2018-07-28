@@ -61,8 +61,8 @@ tools/idl/parser/idlParser.py: tools/idl/idl.g4
 stubs: tools/idl/parser/idlParser.py tools/genstub.py $(stubs)
 	$(PROGRESS) "GENSTUB" $(STUBS_DIR)/c
 	./tools/genstub.py --out-dir $(STUBS_DIR)/c --lang c $(stubs)
-	$(PROGRESS) "GENSTUB" $(STUBS_DIR)/rust
-	./tools/genstub.py --out-dir libs/resea/src/interfaces --lang rust $(stubs)
+	$(PROGRESS) "GENSTUB" servers/libs/resea/src/interfaces
+	./tools/genstub.py --out-dir servers/libs/resea/src/interfaces --lang rust $(stubs)
 
 build:
 	@rm -rf $(KFS_DIR)
