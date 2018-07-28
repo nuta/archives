@@ -6,7 +6,7 @@ BUILD_DIR ?= build
 
 override LDFLAGS := $(LDFLAGS)
 override CFLAGS := $(CFLAGS) \
-	-std=c11 \
+	-std=c17 \
     -Wall \
 	-Werror=implicit-function-declaration \
 	-Werror=int-conversion \
