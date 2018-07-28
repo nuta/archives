@@ -18,7 +18,7 @@ def test_kernel(arch):
     )
 
 def test_lib(lib):
-    subprocess.run(["cargo", "test"], cwd=os.path.join("libs", lib), check=True)
+    subprocess.run(["cargo", "test"], cwd=os.path.join("servers/libs", lib), check=True)
 
 def main():
     subprocess.run(["make", "stubs", "ANTLR4=" + antlr], check=True)
