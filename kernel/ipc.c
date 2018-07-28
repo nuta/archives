@@ -123,7 +123,7 @@ void channel_close(struct channel *ch) {
 
     ch->refs--;
     if (ch->refs == 0) {
-        ch->state = CHANNEL_OPENED;
+        ch->state = CHANNEL_UNUSED;
     }
 }
 
