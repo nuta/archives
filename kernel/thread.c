@@ -22,7 +22,21 @@ void free_tid(tid_t tid) {
  */
 void sync_ciritical_section(void) {
 #ifdef SMP
-#error "not yet implemented" // TODO:
+#error "not yet implemented"
+    //  TODO:
+    //
+    //  Add `set_cpu_var(left_critical_section, 1)' in thread_switch() and wait for them:
+    //
+    //  for_each_cpu(cpu) {
+    //      set_cpu_var(left_critical_section, 0);
+    //  }
+    //
+    //  for_each_cpu(cpu) {
+    //      while (read_cpu_var(left_critical_section) == 0) {
+    //          thread_switch();
+    //      }
+    //  }
+    //
 #else
     // Do noting in UP systems.
 #endif
