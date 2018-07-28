@@ -24,9 +24,27 @@ struct process *process_create(void) {
 }
 
 
-void process_destroy(UNUSED struct process *process) {
+void process_destroy(struct process *process) {
+    kmutex_init(&process->lock, KMUTEX_LOCKED);
 
-    PANIC("%s: not yet implemented", __func__);
+    // Close all channels.
+    for (size_t i = 0; i < process->channels_max; i++) {
+        if (process->channels[i].state == CHANNEL_OPENED) {
+            channel_close(process->channels);
+        }
+    }
+
+    // Destroy all threads.
+    struct thread *thread = process->threads;
+    while (thread != NULL) {
+        struct thread *next = thread->next;
+        thread_destroy(thread);
+        thread = next;
+    }
+
+    // Release resources.
+    arch_destroy_vmspace(&process->vms.arch);
+    free_tid(process->pid);
 }
 
 
