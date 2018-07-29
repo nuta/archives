@@ -3,7 +3,7 @@
 #include "process.h"
 #include "ipc.h"
 
-static inline void link_channels(struct channel *ch1, struct channel *ch2) {
+void channel_link(struct channel *ch1, struct channel *ch2) {
     ch1->linked_to = ch2;
     ch2->linked_to = ch1;
     ch1->refs++;
@@ -132,7 +132,7 @@ channel_t channel_connect(struct channel *server, struct process *client) {
     struct channel *server_side = channel_create(server->process);
     struct channel *client_side = channel_create(client);
     // TODO: error check
-    link_channels(server_side, client_side);
+    channel_link(server_side, client_side);
     transfer_to(server_side, server);
 
     DEBUG("sys.connect: @%d.%d -> @%d.%d ~> @%d.%d",

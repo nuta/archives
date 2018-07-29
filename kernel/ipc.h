@@ -81,6 +81,7 @@ struct channel {
     int refs;
 };
 
+void channel_link(struct channel *ch1, struct channel *ch2);
 struct channel *channel_create(struct process *process);
 void channel_close(struct channel *ch);
 error_t channel_connect(struct channel *server, struct process *client);

@@ -146,9 +146,11 @@ void thread_destroy(struct thread *thread) {
     append_to_runqueue(thread);
 }
 
-struct thread destroyed_thread;
+// `destroyed_thread' will never be run. Used for simplify arch_switch() implementation.
+struct thread *destroyed_thread;
+
 NORETURN void thread_destroy_current(void) {
-    CPUVAR->current = &destroyed_thread;
+    CPUVAR->current = destroyed_thread;
     thread_destroy(CPUVAR->current);
     thread_switch();
 }
@@ -161,7 +163,7 @@ static void thread_switch_to(struct thread *prev, struct thread *next) {
         arch_switch_vmspace(&next->process->vms.arch);
     }
 
-    arch_switch((prev == &destroyed_thread) ? NULL : &prev->arch, &next->arch);
+    arch_switch(&prev->arch, &next->arch);
 }
 
 
@@ -233,4 +235,5 @@ void thread_init(void) {
     // be used.
     CPUVAR->idle_thread = thread_create(kernel_process, (uptr_t) NULL, 0);
     CPUVAR->current = CPUVAR->idle_thread;
+    destroyed_thread = thread_create(kernel_process, (uptr_t) NULL, 0);
 }

@@ -37,6 +37,7 @@ struct vmspace {
 #define LEN_TO_PAGE_NUM(len) (ROUND_UP((len), PAGE_SIZE) / PAGE_SIZE)
 
 paddr_t alloc_pages(size_t size, int flags);
+void free_pages(paddr_t addr, size_t num);
 uptr_t valloc(struct vmspace *vms, size_t size);
 void *kmalloc(size_t size, int flags);
 void kfree(void *ptr);
