@@ -61,6 +61,9 @@ def run(args):
                 p.kill()
                 if failed == 0:
                     print(colorama.Style.BRIGHT + colorama.Fore.GREEN + f"Passed all {passed} tests.")
+                    timeout_thread.cancel()
+                    p.wait()
+                    sys.exit()
                 else:
                     print(colorama.Style.BRIGHT + colorama.Fore.RED + f"Failed {failed} tests.")
                 continue
