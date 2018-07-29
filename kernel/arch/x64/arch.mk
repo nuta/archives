@@ -27,25 +27,19 @@ run:
 	$(MAKE) build
 	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
 	$(MAKE) $(disk_img)
-	./tools/run-emulator.py $(QEMU) $(QEMUFLAGS)
+	./tools/run-emulator.py "$(QEMU) $(QEMUFLAGS)"
 
 bochs:
 	$(MAKE) build
 	$(MAKE) $(disk_img)
 	rm -f $(ARCH_DIR)/disk.img.lock
-	./tools/run-emulator.py $(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc
+	./tools/run-emulator.py "$(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc"
 
 test:
-	$(MAKE) build
-	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
-	$(MAKE) $(disk_img)
-	(sleep 5; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS)
-
-kernel-test:
 	KERNEL_TEST=1 $(MAKE) build
 	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
 	$(MAKE) $(disk_img)
-	(sleep 5; echo -e "\x01cq") | $(QEMU) $(QEMUFLAGS)
+	./tools/run-emulator.py --test "$(QEMU) $(QEMUFLAGS)"
 
 $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.elf: $(BUILD_DIR)/$(ARCH_DIR)/boot/mbr.o $(ARCH_DIR)/boot/mbr.ld
 	$(PROGRESS) LD $@
