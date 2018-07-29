@@ -4,6 +4,6 @@ build
 *.pcap
 *.pyc
 **/target
-libs/resea/src/interfaces
+servers/libs/resea/src/interfaces
 tools/idl/parser
 tools/idl/.antlr
