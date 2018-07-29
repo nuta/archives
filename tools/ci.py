@@ -7,7 +7,7 @@ antlr = "java -jar {}/antlr-4.7.1-complete.jar".format(os.getcwd())
 def test_kernel(arch):
     subprocess.run(
         [
-            "make", "-j2", "build",
+            "make", "-j2", "test",
             "ARCH=" + arch,
             "ANTLR4=" + antlr,
             "SERVERS=test",
