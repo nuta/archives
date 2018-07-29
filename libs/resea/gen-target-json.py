@@ -12,7 +12,7 @@ TEMPLATES = {
     "linker": "$lld_path",
     "pre-link-args": {
         "ld": [
-            "--script=$repo_dir/servers/libs/resea/app.ld"
+            "--script=$repo_dir/libs/resea/app.ld"
         ]
     },
     "target-endian": "little",
@@ -32,7 +32,7 @@ TEMPLATES = {
 def generate(arch):
     return Template(TEMPLATES[arch]).substitute(
         lld_path="/usr/local/opt/llvm/bin/ld.lld",
-        repo_dir=os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+        repo_dir=os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     )
 
 def main():

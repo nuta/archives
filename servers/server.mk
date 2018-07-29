@@ -19,7 +19,7 @@ $(executable): $(artifact)
 $(artifact):
 	mkdir -p $(server_build_dir)
 	$(PROGRESS) GEN $(server_build_dir)/$(ARCH).json
-	./servers/libs/resea/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
+	./libs/resea/gen-target-json.py $(ARCH) $(abs_server_build_dir)/$(ARCH).json
 
 	$(PROGRESS) XARGO $(server_build_dir)
 	cd $(DIR) && \
@@ -55,7 +55,7 @@ all_objs :=
 all_libs :=
 all_include_dirs :=
 included_subdirs :=
-include $(foreach lib, $(server_libs), servers/libs/$(lib)/build.mk)
+include $(foreach lib, $(server_libs), libs/$(lib)/build.mk)
 server_include_dirs += $(server_build_dir) $(all_include_dirs)
 
 objs := $(server_objs) $(all_objs)
@@ -66,7 +66,7 @@ s_objs := $(addprefix $(server_build_dir)/, \
 
 $(executable): $(c_objs) $(s_objs)
 	$(PROGRESS) LD $@
-	$(LD) $(LDFLAGS) --script servers/libs/libresea/arch/$(ARCH)/app.ld -o $@ $^
+	$(LD) $(LDFLAGS) --script libs/libresea/arch/$(ARCH)/app.ld -o $@ $^
 	cp $@ $@.debug
 	$(PROGRESS) STRIP $@
 	$(STRIP) $@

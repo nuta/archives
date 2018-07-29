@@ -1,9 +1,9 @@
 [workspace]
 members = [
-    "servers/libs/resea",
-    "servers/libs/resea/langitems",
-    "servers/libs/virtio",
-    "servers/libs/session",
+    "libs/resea",
+    "libs/resea/langitems",
+    "libs/virtio",
+    "libs/session",
     "servers/virtio-blk",
     "servers/virtio-net",
     "servers/pc",

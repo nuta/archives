@@ -5,7 +5,7 @@ build
 *.pyc
 *.xz
 **/target
-servers/libs/resea/src/interfaces
+libs/resea/src/interfaces
 tools/idl/parser
 tools/idl/.antlr
 qemu
