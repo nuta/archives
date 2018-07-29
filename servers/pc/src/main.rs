@@ -2,21 +2,21 @@
 
 #[macro_use]
 extern crate resea;
-use core::cell::{RefCell};
-use core::option::{Option};
-use resea::arch::{ErrorCode};
-use resea::channel::{Channel};
-use resea::server::{ServerResult};
-use resea::interfaces::kbd_device;
-use resea::interfaces::kbd_device::{Server as KbdDeviceServer};
-use resea::interfaces::rtc_device;
-use resea::interfaces::rtc_device::{Server as RtcDeviceServer};
+use core::cell::RefCell;
+use core::option::Option;
+use resea::arch::ErrorCode;
+use resea::channel::Channel;
 use resea::interfaces::events;
-use resea::interfaces::events::{Server as EventsServer};
-mod rtc;
+use resea::interfaces::events::Server as EventsServer;
+use resea::interfaces::kbd_device;
+use resea::interfaces::kbd_device::Server as KbdDeviceServer;
+use resea::interfaces::rtc_device;
+use resea::interfaces::rtc_device::Server as RtcDeviceServer;
+use resea::server::ServerResult;
 mod keyboard;
-use rtc::{Rtc};
-use keyboard::{Keyboard};
+mod rtc;
+use keyboard::Keyboard;
+use rtc::Rtc;
 
 struct PcServer {
     ch: Channel,
@@ -47,7 +47,8 @@ impl RtcDeviceServer for PcServer {
     fn read(&self, _from: Channel) -> ServerResult<(u32, u32, u32)> {
         let date = self.rtc.read();
         let ymd: u32 = ((date.year as u32) << 16) | ((date.month as u32) << 8) | date.day as u32;
-        let hms: u32 = ((date.hour as u32) << 24) | ((date.min as u32) << 16) | ((date.sec as u32) << 8);
+        let hms: u32 =
+            ((date.hour as u32) << 24) | ((date.min as u32) << 16) | ((date.sec as u32) << 8);
         let nsec = 0; // TODO:
         Ok((ymd, hms, nsec))
     }

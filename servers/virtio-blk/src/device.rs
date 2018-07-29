@@ -1,6 +1,6 @@
-use virtio::{Virtio, VirtioRequest, VIRTIO_DESC_F_READ_ONLY, VIRTIO_DESC_F_WRITE_ONLY};
-use resea::arch::x64::{pmalloc};
+use resea::arch::x64::pmalloc;
 use resea::mem::size_of;
+use virtio::{Virtio, VirtioRequest, VIRTIO_DESC_F_READ_ONLY, VIRTIO_DESC_F_WRITE_ONLY};
 
 pub const SECTOR_SIZE: usize = 512;
 const VIRTIO_BLK_RQUEUE: u8 = 0;
@@ -9,17 +9,17 @@ const VIRTIO_BLK_READ: u32 = 0;
 
 #[repr(packed)]
 struct VirtioBlkHeader {
-  type_: u32,     /* VIRTIO_READ or VIRTIO_BLK_WRITE */
-  priority: u32, /* priority (0 is lowest)  */
-  sector: u64   /* where to read/write */
+    type_: u32,    /* VIRTIO_READ or VIRTIO_BLK_WRITE */
+    priority: u32, /* priority (0 is lowest)  */
+    sector: u64,   /* where to read/write */
 }
 
 struct VirtioBlkStatus {
-    status: u8
+    status: u8,
 }
 
 pub struct VirtioBlk {
-    virtio: Virtio
+    virtio: Virtio,
 }
 
 impl VirtioBlk {
@@ -31,9 +31,7 @@ impl VirtioBlk {
         virtio.setup_queue(VIRTIO_BLK_RQUEUE);
         virtio.activate();
 
-        VirtioBlk {
-             virtio: virtio
-        }
+        VirtioBlk { virtio: virtio }
     }
 
     pub fn read(&self, sector: u64, len: usize) -> *const u8 {
@@ -45,26 +43,26 @@ impl VirtioBlk {
         let status = status_vaddr as *mut VirtioBlkStatus;
 
         unsafe {
-            (*header).type_  = VIRTIO_BLK_READ;
+            (*header).type_ = VIRTIO_BLK_READ;
             (*header).sector = sector;
         }
 
         let rs = [
             VirtioRequest {
-                data:  header_paddr,
-                len:   size_of::<VirtioBlkHeader>(),
+                data: header_paddr,
+                len: size_of::<VirtioBlkHeader>(),
                 flags: VIRTIO_DESC_F_READ_ONLY,
             },
             VirtioRequest {
-                data:  data_paddr,
-                len:   len,
+                data: data_paddr,
+                len: len,
                 flags: VIRTIO_DESC_F_WRITE_ONLY,
             },
             VirtioRequest {
-                data:  status_paddr,
-                len:   size_of::<VirtioBlkStatus>(),
+                data: status_paddr,
+                len: size_of::<VirtioBlkStatus>(),
                 flags: VIRTIO_DESC_F_WRITE_ONLY,
-            }
+            },
         ];
 
         self.virtio.request(VIRTIO_BLK_RQUEUE, &rs);

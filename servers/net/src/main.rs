@@ -5,14 +5,15 @@
 extern crate alloc;
 #[macro_use]
 extern crate resea;
-#[cfg(not(test))] extern crate resea_langitems;
 extern crate netstack;
+#[cfg(not(test))]
+extern crate resea_langitems;
 
-use resea::{Channel, ErrorCode, OoL, Result as ServerResult};
-use resea::interfaces::net_device::{NetDevice};
+use netstack::{IpAddr, Ipv4Addr, Stack};
 use resea::interfaces::net;
-use resea::interfaces::net::{Server as NetServer};
-use netstack::{Stack, Ipv4Addr, IpAddr};
+use resea::interfaces::net::Server as NetServer;
+use resea::interfaces::net_device::NetDevice;
+use resea::{Channel, ErrorCode, OoL, Result as ServerResult};
 
 struct Server {
     ch: Channel,
@@ -49,8 +50,8 @@ impl NetServer for Server {
 }
 
 mod net_device_listener {
-    use resea::{Channel, Payload, Header, OoL, ErrorCode, HeaderTrait};
     use resea::interfaces::net_device;
+    use resea::{Channel, ErrorCode, Header, HeaderTrait, OoL, Payload};
     pub const SERVICE_ID: u16 = net_device::SERVICE_ID;
 
     pub trait Server {
@@ -58,17 +59,22 @@ mod net_device_listener {
     }
 
     impl Server {
-        pub fn handle(&self, from: Channel, header: Header, a0: Payload, a1: Payload, _a2: Payload, _a3: Payload)
-            -> (Header, Payload, Payload, Payload, Payload) {
-                match header.msg_type() {
-                    net_device::NET_DEVICE_RECEIVED_MSG => {
-                        self.received(from, OoL::from_payload(a0 as usize, a1 as usize));
-                        (ErrorCode::DontReply as u64 , 0, 0, 0, 0)
-                    },
-                    _ => {
-                        (ErrorCode::DontReply as u64 , 0, 0, 0, 0)
-                    }
+        pub fn handle(
+            &self,
+            from: Channel,
+            header: Header,
+            a0: Payload,
+            a1: Payload,
+            _a2: Payload,
+            _a3: Payload,
+        ) -> (Header, Payload, Payload, Payload, Payload) {
+            match header.msg_type() {
+                net_device::NET_DEVICE_RECEIVED_MSG => {
+                    self.received(from, OoL::from_payload(a0 as usize, a1 as usize));
+                    (ErrorCode::DontReply as u64, 0, 0, 0, 0)
                 }
+                _ => (ErrorCode::DontReply as u64, 0, 0, 0, 0),
+            }
         }
     }
 }

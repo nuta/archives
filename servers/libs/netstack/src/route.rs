@@ -1,10 +1,10 @@
-use core::cell::RefCell;
-use alloc::vec::Vec;
 use alloc::rc::Rc;
-use netif::NetIf;
+use alloc::vec::Vec;
 use arp::MacAddr;
+use core::cell::RefCell;
 use ip::{IpAddr, Network};
 use ipv4::{Ipv4Addr, Netmask};
+use netif::NetIf;
 
 #[derive(Clone)]
 pub struct Route {
@@ -21,7 +21,7 @@ pub struct Routes {
 impl Routes {
     pub fn new() -> Routes {
         Routes {
-            routes: RefCell::new(Vec::new())
+            routes: RefCell::new(Vec::new()),
         }
     }
 
@@ -39,7 +39,7 @@ impl Routes {
     pub fn get_by_mac_addr(&self, mac_addr: &MacAddr) -> Option<Route> {
         for route in &*self.routes.borrow() {
             if *mac_addr == route.netif.mac_addr {
-                return Some(route.clone())
+                return Some(route.clone());
             }
         }
 
@@ -48,7 +48,7 @@ impl Routes {
 
     pub fn route_ipv4(&self, dst: &Ipv4Addr) -> Option<Route> {
         for route in &*self.routes.borrow() {
-            return Some(route.clone())
+            return Some(route.clone());
         }
 
         None
@@ -66,7 +66,7 @@ impl Routes {
                         return true;
                     }
                 }
-            },
+            }
             _ => (),
         };
 

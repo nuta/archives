@@ -6,12 +6,12 @@ extern crate virtio;
 mod device;
 
 use core::slice;
-use resea::arch::{ErrorCode, OoL};
-use resea::channel::{Channel};
-use resea::server::{ServerResult};
-use resea::interfaces::blk_device;
-use resea::interfaces::blk_device::{Server as BlkDeviceServer};
 use device::{VirtioBlk, SECTOR_SIZE};
+use resea::arch::{ErrorCode, OoL};
+use resea::channel::Channel;
+use resea::interfaces::blk_device;
+use resea::interfaces::blk_device::Server as BlkDeviceServer;
+use resea::server::ServerResult;
 
 struct VirtioBlkServer {
     device: VirtioBlk,

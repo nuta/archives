@@ -1,16 +1,16 @@
-use core::slice;
-use core::mem;
-use core::cell::Cell;
 use alloc::rc::Rc;
 use alloc::vec::Vec;
+use arp::MacAddr;
+use core::cell::Cell;
+use core::mem;
+use core::slice;
+use endian::EndianExt;
 use ip::IpAddr;
 use ipv4::{Ipv4Addr, Netmask};
 use netif::NetIf;
 use route::Route;
-use endian::EndianExt;
-use arp::MacAddr;
 use socket::Socket;
-use {Result, Error};
+use {Error, Result};
 
 #[derive(Clone, Copy)]
 pub enum DhcpClientState {
@@ -59,19 +59,23 @@ impl DhcpClient {
                         if opt.data.len() == 1 {
                             msg_type = opt.data[0];
                         };
-                    },
+                    }
                     OPT_SUBNET_MASK => {
                         if opt.data.len() == 4 {
-                            let value = (unsafe { *mem::transmute::<*const u8, *const u32>(opt.data.as_ptr()) }).to_he();
+                            let value = (unsafe {
+                                *mem::transmute::<*const u8, *const u32>(opt.data.as_ptr())
+                            }).to_he();
                             netmask = Some(Netmask::from_u32(value));
                         };
-                    },
+                    }
                     OPT_ROUTER => {
                         if opt.data.len() == 4 {
-                            let value = (unsafe { *mem::transmute::<*const u8, *const u32>(opt.data.as_ptr()) }).to_he();
+                            let value = (unsafe {
+                                *mem::transmute::<*const u8, *const u32>(opt.data.as_ptr())
+                            }).to_he();
                             gateway = Some(Ipv4Addr::from_u32(value));
                         };
-                    },
+                    }
                     _ => (),
                 }
             }
@@ -82,7 +86,7 @@ impl DhcpClient {
                     if let Some(addr) = msg.your_ipaddr {
                         self.request(&addr).ok();
                     }
-                },
+                }
                 DhcpClientState::WaitingForAck if msg_type == DhcpMessageType::Ack as u8 => {
                     if let Some(addr) = msg.your_ipaddr {
                         if netmask.is_none() {
@@ -96,7 +100,7 @@ impl DhcpClient {
                         }
 
                         self.state.replace(DhcpClientState::Done);
-                        return Ok((addr, netmask.unwrap(), gateway.unwrap()))
+                        return Ok((addr, netmask.unwrap(), gateway.unwrap()));
                     }
                 }
                 _ => (), /* Invalid. */
@@ -109,10 +113,14 @@ impl DhcpClient {
     }
 
     fn discover(&self) -> Result<()> {
-        let msg = DhcpMessage::new(self.xid, &self.route.netif.mac_addr, &[
-            DhcpOption::new(OPT_TYPE, &[DhcpMessageType::Discover as u8]),
-            DhcpOption::new(OPT_PARAMETER_LIST, &DHCP_PARAMS)
-        ]);
+        let msg = DhcpMessage::new(
+            self.xid,
+            &self.route.netif.mac_addr,
+            &[
+                DhcpOption::new(OPT_TYPE, &[DhcpMessageType::Discover as u8]),
+                DhcpOption::new(OPT_PARAMETER_LIST, &DHCP_PARAMS),
+            ],
+        );
 
         println!("DHCP: sending discover");
         self.state.replace(DhcpClientState::WaitingForOffer);
@@ -120,20 +128,22 @@ impl DhcpClient {
             Some(&self.route),
             IpAddr::from_ipv4_addr(Ipv4Addr::BROADCAST.clone()),
             67,
-            msg.as_slice()
+            msg.as_slice(),
         )
     }
 
     fn request(&self, requested_addr: &Ipv4Addr) -> Result<()> {
-        let addr_arr = unsafe {
-            mem::transmute::<u32, [u8; 4]>(requested_addr.as_u32().to_ne())
-        };
+        let addr_arr = unsafe { mem::transmute::<u32, [u8; 4]>(requested_addr.as_u32().to_ne()) };
 
-        let msg = DhcpMessage::new(self.xid, &self.route.netif.mac_addr, &[
-            DhcpOption::new(OPT_TYPE, &[DhcpMessageType::Request as u8]),
-            DhcpOption::new(DHCP_REQUESTED_IP_ADDR, &addr_arr),
-            DhcpOption::new(OPT_PARAMETER_LIST, &DHCP_PARAMS)
-        ]);
+        let msg = DhcpMessage::new(
+            self.xid,
+            &self.route.netif.mac_addr,
+            &[
+                DhcpOption::new(OPT_TYPE, &[DhcpMessageType::Request as u8]),
+                DhcpOption::new(DHCP_REQUESTED_IP_ADDR, &addr_arr),
+                DhcpOption::new(OPT_PARAMETER_LIST, &DHCP_PARAMS),
+            ],
+        );
 
         println!("DHCP: sending request");
         self.state.replace(DhcpClientState::WaitingForAck);
@@ -141,7 +151,7 @@ impl DhcpClient {
             Some(&self.route),
             IpAddr::from_ipv4_addr(Ipv4Addr::BROADCAST.clone()),
             67,
-            msg.as_slice()
+            msg.as_slice(),
         )
     }
 }
@@ -166,9 +176,13 @@ struct DhcpMessage<'a> {
 }
 
 impl<'a> DhcpMessage<'a> {
-    pub fn new(xid: DhcpTransactionId, macaddr: &MacAddr, options: &[DhcpOption<'a>]) -> DhcpMessage<'a> {
+    pub fn new(
+        xid: DhcpTransactionId,
+        macaddr: &MacAddr,
+        options: &[DhcpOption<'a>],
+    ) -> DhcpMessage<'a> {
         let header = DhcpHeader {
-            op: 1, /* Boot Request */
+            op: 1,    /* Boot Request */
             htype: 1, /* Ethernet */
             hlen: 6,
             hops: 0,

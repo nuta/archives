@@ -6,34 +6,34 @@ extern crate resea;
 #[macro_use]
 extern crate alloc;
 
-use core::option::Option;
-use core::sync;
-use core::slice;
-use core::mem::size_of;
-use core::cell::RefCell;
 use alloc::vec::Vec;
+use core::cell::RefCell;
+use core::mem::size_of;
+use core::option::Option;
+use core::slice;
+use core::sync;
 use resea::arch::x64::{pmalloc, IoPort};
 
 const VIRTIO_QUEUE_NUM_MAX: usize = 4;
 
-const VIRTIO_STATUS_ACK: u8          = 1;
-const VIRTIO_STATUS_DRIVER: u8       = 2;
-const VIRTIO_STATUS_DRIVER_OK: u8    = 4;
-const VIRTIO_STATUS_FEATURES_OK: u8  = 8;
+const VIRTIO_STATUS_ACK: u8 = 1;
+const VIRTIO_STATUS_DRIVER: u8 = 2;
+const VIRTIO_STATUS_DRIVER_OK: u8 = 4;
+const VIRTIO_STATUS_FEATURES_OK: u8 = 8;
 
 const VIRTIO_IOSPACE_LENGTH: u16 = 0x40;
-const IO_DEVICE_FEATS: u16    = 0x00;
-const IO_GUEST_FEATS: u16     = 0x04;
+const IO_DEVICE_FEATS: u16 = 0x00;
+const IO_GUEST_FEATS: u16 = 0x04;
 pub const IO_DEVICE_SPECIFIC: u16 = 0x14;
-const IO_QUEUE_ADDR: u16      = 0x08;
-const IO_QUEUE_SIZE: u16      = 0x0c;
-const IO_QUEUE_SELECT: u16    = 0x0e;
-const IO_QUEUE_NOTIFY: u16    = 0x10;
-const IO_DEVICE_STATUS: u16   = 0x12;
-const IO_PCI_ISR: u16         = 0x13;
+const IO_QUEUE_ADDR: u16 = 0x08;
+const IO_QUEUE_SIZE: u16 = 0x0c;
+const IO_QUEUE_SELECT: u16 = 0x0e;
+const IO_QUEUE_NOTIFY: u16 = 0x10;
+const IO_DEVICE_STATUS: u16 = 0x12;
+const IO_PCI_ISR: u16 = 0x13;
 const QUEUE_ALIGN: usize = 0x1000;
 
-pub const VIRTIO_DESC_F_NEXT: u16 =  1;
+pub const VIRTIO_DESC_F_NEXT: u16 = 1;
 pub const VIRTIO_DESC_F_READ_ONLY: u16 = 0;
 pub const VIRTIO_DESC_F_WRITE_ONLY: u16 = 2; /* write-only from the host  */
 
@@ -59,32 +59,32 @@ struct VirtioUsedRing {
 
 #[repr(packed)]
 struct VirtioAvailRing {
-    index: u16
+    index: u16,
 }
 
 #[repr(packed)]
 struct VirtioAvail {
-  flags: u16,
-  index: u16
+    flags: u16,
+    index: u16,
 }
 
 #[repr(packed)]
 struct VirtioUsed {
-  flags: u16,
-  index: u16,
+    flags: u16,
+    index: u16,
 }
 
 struct VirtioQueue {
-  desc: *mut VirtioDesc,
-  avail: *mut VirtioAvail,
-  avail_ring: *mut VirtioAvailRing,
-  used: *mut VirtioUsed,
-  used_ring: *mut VirtioUsedRing,
-  index: u8,
-  last_used_index: RefCell<u16>,
-  queue_num: usize,
-  dma_vaddr: usize,
-  dma_paddr: usize,
+    desc: *mut VirtioDesc,
+    avail: *mut VirtioAvail,
+    avail_ring: *mut VirtioAvailRing,
+    used: *mut VirtioUsed,
+    used_ring: *mut VirtioUsedRing,
+    index: u8,
+    last_used_index: RefCell<u16>,
+    queue_num: usize,
+    dma_vaddr: usize,
+    dma_paddr: usize,
 }
 
 pub struct Virtio {
@@ -118,28 +118,29 @@ impl Virtio {
             self.ioport.in8(IO_DEVICE_STATUS);
 
             /* Tell the device that we know how to use it. */
-            self.ioport.out8(IO_DEVICE_STATUS, VIRTIO_STATUS_ACK | VIRTIO_STATUS_DRIVER);
+            self.ioport
+                .out8(IO_DEVICE_STATUS, VIRTIO_STATUS_ACK | VIRTIO_STATUS_DRIVER);
         }
     }
 
     pub fn get_features(&self) -> u32 {
-        unsafe {
-            self.ioport.in32(IO_DEVICE_FEATS)
-        }
+        unsafe { self.ioport.in32(IO_DEVICE_FEATS) }
     }
 
     pub fn set_features(&self, features: u32) {
         unsafe {
             self.ioport.out32(IO_GUEST_FEATS, features);
             let old = self.ioport.in8(IO_DEVICE_STATUS);
-            self.ioport.out8(IO_DEVICE_STATUS, VIRTIO_STATUS_FEATURES_OK | old);
+            self.ioport
+                .out8(IO_DEVICE_STATUS, VIRTIO_STATUS_FEATURES_OK | old);
         }
     }
 
     pub fn activate(&self) {
         unsafe {
             let old = self.ioport.in8(IO_DEVICE_STATUS);
-            self.ioport.out8(IO_DEVICE_STATUS, VIRTIO_STATUS_DRIVER_OK | old);
+            self.ioport
+                .out8(IO_DEVICE_STATUS, VIRTIO_STATUS_DRIVER_OK | old);
         }
     }
 
@@ -158,8 +159,7 @@ impl Virtio {
         let desc_size = size_of::<VirtioDesc>() * queue_num;
         let avail_size = size_of::<VirtioAvail>() + size_of::<VirtioAvailRing>() * queue_num;
         let used_size = size_of::<VirtioUsed>() + size_of::<VirtioUsedRing>() * queue_num;
-        let queue_size = align(desc_size + avail_size, QUEUE_ALIGN)
-                       + used_size;
+        let queue_size = align(desc_size + avail_size, QUEUE_ALIGN) + used_size;
 
         let (mut vaddr, paddr) = pmalloc(0, 0, queue_size);
 
@@ -168,7 +168,10 @@ impl Virtio {
         let avail = vaddr as *mut VirtioAvail;
         vaddr += size_of::<VirtioAvail>();
         let avail_ring = vaddr as *mut VirtioAvailRing;
-        vaddr = align(vaddr + size_of::<VirtioAvailRing>() * queue_num, QUEUE_ALIGN);
+        vaddr = align(
+            vaddr + size_of::<VirtioAvailRing>() * queue_num,
+            QUEUE_ALIGN,
+        );
         let used = vaddr as *mut VirtioUsed;
         vaddr += size_of::<VirtioUsed>();
         let used_ring = vaddr as *mut VirtioUsedRing;
@@ -253,7 +256,7 @@ impl Virtio {
                 /* notify the device */
                 self.ioport.out16(IO_QUEUE_NOTIFY, queue.index.into());
                 /* Wait for completion. TODO: use interrupt */
-                while (*queue.used).index == used_index {};
+                while (*queue.used).index == used_index {}
             }
         }
     }
@@ -283,26 +286,30 @@ impl VirtioQueue {
         unsafe {
             println!("rs #: {}", rs.len());
             for i in 0..(rs.len()) {
-                println!("#{}: addr={:x}, len={:x}, flags={:x}", desc_index, rs[i].data, rs[i].len, rs[i].flags);
+                println!(
+                    "#{}: addr={:x}, len={:x}, flags={:x}",
+                    desc_index, rs[i].data, rs[i].len, rs[i].flags
+                );
                 let desc = self.desc.offset(desc_index as isize);
 
-                let (flags, mut next_desc_index) =
-                    if i == rs.len() - 1 {
-                      // the final desc
-                      (rs[i].flags, 0)
-                    } else {
-                      (rs[i].flags | VIRTIO_DESC_F_NEXT, self.alloc_desc().unwrap())
-                    };
+                let (flags, mut next_desc_index) = if i == rs.len() - 1 {
+                    // the final desc
+                    (rs[i].flags, 0)
+                } else {
+                    (rs[i].flags | VIRTIO_DESC_F_NEXT, self.alloc_desc().unwrap())
+                };
 
                 (*desc).flags = flags;
                 (*desc).addr = rs[i].data as u64;
-                (*desc).len  = rs[i].len as u32;
+                (*desc).len = rs[i].len as u32;
                 (*desc).next = next_desc_index as u16;
                 desc_index = next_desc_index;
             }
 
             /* append the index of the first queue_desc to avail ring */
-            let avail_elem = self.avail_ring.offset((*self.avail).index as isize % self.queue_num as isize);
+            let avail_elem = self
+                .avail_ring
+                .offset((*self.avail).index as isize % self.queue_num as isize);
             (*avail_elem).index = first_desc_index as u16;
 
             /* increment the index in avail_ring */

@@ -1,6 +1,6 @@
 pub mod prelude;
-use channel::{Channel};
-use interfaces::{io};
+use channel::Channel;
+use interfaces::io;
 
 global_asm!(include_str!("../../../../libresea/arch/x64/syscall.S"));
 
@@ -9,30 +9,29 @@ pub fn pmalloc(vaddr: u64, paddr: u64, len: usize) -> (usize, usize) {
     let server = io::Io::from_cid(1);
     match server.pmalloc(vaddr as usize, paddr as usize, len) {
         Ok((vaddr2, paddr2)) => (vaddr2, paddr2),
-        Err(_) => (0, 0)
+        Err(_) => (0, 0),
     }
 }
 
 pub struct Irq {
-    irq: u32
+    irq: u32,
 }
 
 impl Irq {
     pub fn new(irq: u32) -> Irq {
-        Irq {
-            irq: irq
-        }
+        Irq { irq: irq }
     }
 
     pub fn listen(&self, ch: &Channel) {
         // TODO: error handling
-        io::Io::from_cid(1).listen_for_irq(self.irq, ch.clone()).ok();
+        io::Io::from_cid(1)
+            .listen_for_irq(self.irq, ch.clone())
+            .ok();
     }
 }
 
-
 pub struct IoPort {
-    port: u16
+    port: u16,
 }
 
 impl IoPort {

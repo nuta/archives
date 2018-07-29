@@ -1,14 +1,14 @@
-use core::fmt;
-use core::mem::{size_of};
-use core::cell::RefCell;
-use alloc::vec::Vec;
 use alloc::collections::BTreeMap;
-use {Result};
-use ipv4::{Ipv4Addr};
-use netif::NetIf;
+use alloc::vec::Vec;
+use core::cell::RefCell;
+use core::fmt;
+use core::mem::size_of;
 use endian::EndianExt;
+use ipv4::Ipv4Addr;
+use netif::NetIf;
 use packet::Packet;
 use route::Routes;
+use Result;
 
 enum Operation {
     ArpRequest = 1,
@@ -38,7 +38,9 @@ impl MacAddr {
 
 impl fmt::Display for MacAddr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
+        write!(
+            f,
+            "{:02x}:{:02x}:{:02x}:{:02x}:{:02x}:{:02x}",
             self.0[0], self.0[1], self.0[2], self.0[3], self.0[4], self.0[5]
         )
     }
@@ -80,7 +82,7 @@ impl Arp {
 
         let cache = self.cache.borrow();
         if let Some(entry) = cache.get(addr) {
-            if let Some (ref mac_addr) = entry.mac_addr {
+            if let Some(ref mac_addr) = entry.mac_addr {
                 return Some(mac_addr.clone());
             }
         }
@@ -104,7 +106,7 @@ impl Arp {
         queue.push((addr.clone(), pkt));
         let entry = CacheEntry {
             mac_addr: None,
-            queue: RefCell::new(queue)
+            queue: RefCell::new(queue),
         };
         self.cache.borrow_mut().insert(addr.clone(), entry);
         self.construct_packet(netif, addr, &Ipv4Addr::BROADCAST)
@@ -124,7 +126,10 @@ impl Arp {
             (op, sender_ipaddr, sender_macaddr)
         };
 
-        println!("ARP: op={}, sender_ipaddr={:} sender_macaddr={:}", op, sender_ipaddr, sender_macaddr);
+        println!(
+            "ARP: op={}, sender_ipaddr={:} sender_macaddr={:}",
+            op, sender_ipaddr, sender_macaddr
+        );
         if op == Operation::ArpResponse as u16 {
             if let Some(entry) = self.cache.borrow_mut().get_mut(&sender_ipaddr) {
                 /* Send queued packets. */
@@ -138,23 +143,34 @@ impl Arp {
         }
     }
 
-    fn construct_packet(&self, netif: &NetIf, addr: &Ipv4Addr, sender: &Ipv4Addr) -> Result<Packet> {
+    fn construct_packet(
+        &self,
+        netif: &NetIf,
+        addr: &Ipv4Addr,
+        sender: &Ipv4Addr,
+    ) -> Result<Packet> {
         let pkt = Packet::new();
         let payload = Self::construct_ipv4_over_ethernet(
             Operation::ArpRequest,
             &MacAddr::new(&[0, 0, 0, 0, 0, 0]),
             addr,
             &MacAddr::new(&[0, 0, 0, 0, 0, 0]),
-            sender
+            sender,
         );
         pkt.append_header(&payload);
 
         Ok(pkt)
     }
 
-    fn construct_ipv4_over_ethernet(op: Operation, target: &MacAddr, target_ipaddr: &Ipv4Addr, sender: &MacAddr, sender_ipaddr: &Ipv4Addr) -> ArpPacket {
+    fn construct_ipv4_over_ethernet(
+        op: Operation,
+        target: &MacAddr,
+        target_ipaddr: &Ipv4Addr,
+        sender: &MacAddr,
+        sender_ipaddr: &Ipv4Addr,
+    ) -> ArpPacket {
         ArpPacket {
-            hw_type: 1u16.to_ne(), // Ethernet
+            hw_type: 1u16.to_ne(),         // Ethernet
             proto_type: 0x0800u16.to_ne(), // Ipv4
             hw_len: 6,
             proto_len: 4,

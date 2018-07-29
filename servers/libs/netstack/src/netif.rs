@@ -1,8 +1,8 @@
-use {Result, Error};
-use resea::interfaces::net_device::NetDevice;
-use arp::{MacAddr};
-use packet::Packet;
+use arp::MacAddr;
 use endian::EndianExt;
+use packet::Packet;
+use resea::interfaces::net_device::NetDevice;
+use {Error, Result};
 
 #[repr(C, packed)]
 pub struct EthernetHeader {

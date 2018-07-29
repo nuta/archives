@@ -1,5 +1,5 @@
-#[cfg(target_arch="x86_64")]
+#[cfg(target_arch = "x86_64")]
 pub mod x64;
 
-#[cfg(target_arch="x86_64")]
-pub use self::x64::prelude as prelude;
+#[cfg(target_arch = "x86_64")]
+pub use self::x64::prelude;

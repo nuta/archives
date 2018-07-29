@@ -12,15 +12,15 @@ extern crate resea_langitems;
 extern crate virtio;
 mod device;
 
-use core::option::Option;
 use core::cell::RefCell;
-use resea::{Channel, OoL, Result as ServerResult};
-use resea::arch::x64::{Irq};
-use resea::interfaces::net_device;
-use resea::interfaces::net_device::{Server as NetDeviceServer};
+use core::option::Option;
+use device::VirtioNet;
+use resea::arch::x64::Irq;
 use resea::interfaces::events;
-use resea::interfaces::events::{Server as EventsServer};
-use device::{VirtioNet};
+use resea::interfaces::events::Server as EventsServer;
+use resea::interfaces::net_device;
+use resea::interfaces::net_device::Server as NetDeviceServer;
+use resea::{Channel, OoL, Result as ServerResult};
 
 struct VirtioNetServer {
     device: VirtioNet,
@@ -60,15 +60,16 @@ impl NetDeviceServer for VirtioNetServer {
         Ok(())
     }
 
-    fn received(&self, _from: Channel, _data: OoL) {
-    }
- }
+    fn received(&self, _from: Channel, _data: OoL) {}
+}
 
 impl EventsServer for VirtioNetServer {
     fn notification(&self, _from: Channel, _notification: usize) {
         if let Some(payload) = self.device.recv() {
             if let Some(ref listener) = *self.listener.borrow() {
-                net_device::NetDevice::from_channel(listener).received(payload).unwrap();
+                net_device::NetDevice::from_channel(listener)
+                    .received(payload)
+                    .unwrap();
             }
         }
     }

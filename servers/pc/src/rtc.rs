@@ -1,4 +1,4 @@
-use resea::arch::x64::{IoPort};
+use resea::arch::x64::IoPort;
 
 #[derive(Debug)]
 pub struct DateTime {
@@ -7,7 +7,7 @@ pub struct DateTime {
     pub day: u8,
     pub hour: u8,
     pub min: u8,
-    pub sec: u8
+    pub sec: u8,
 }
 
 const RTC_IO_BASE: u16 = 0x70;
@@ -87,7 +87,7 @@ impl Rtc {
             day: day,
             hour: hour,
             min: min,
-            sec: sec
+            sec: sec,
         }
     }
 }

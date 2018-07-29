@@ -1,6 +1,5 @@
 #![no_std]
- #![feature(alloc)]
-
+#![feature(alloc)]
 
 #[cfg(test)]
 extern crate std;
@@ -14,33 +13,33 @@ extern crate resea_langitems;
 #[macro_use]
 extern crate alloc;
 
-mod route;
-mod endian;
-mod packet;
-mod ethernet;
-mod netif;
 mod arp;
+mod dhcp;
+mod endian;
+mod ethernet;
 mod ip;
 mod ipv4;
+mod netif;
+mod packet;
+mod route;
+mod socket;
 mod transport;
 mod udp;
-mod socket;
-mod dhcp;
 
-pub use ipv4::{Ipv4Addr};
-pub use ip::IpAddr;
-pub use netif::{NetIf, NetIfType};
-use arp::{Arp, MacAddr};
-use route::{Routes, Route};
-use ip::Network;
-use socket::{Socket, Sockets, SocketInner, SocketUser};
-use transport::Transport;
-use dhcp::{DhcpClient, DhcpTransactionId};
-use packet::{Packet, PacketInfo};
-use core::cell::{Cell, RefCell};
-use alloc::rc::Rc;
 use alloc::collections::BTreeMap;
-use resea::interfaces::net_device::{NetDevice};
+use alloc::rc::Rc;
+use arp::{Arp, MacAddr};
+use core::cell::{Cell, RefCell};
+use dhcp::{DhcpClient, DhcpTransactionId};
+pub use ip::IpAddr;
+use ip::Network;
+pub use ipv4::Ipv4Addr;
+pub use netif::{NetIf, NetIfType};
+use packet::{Packet, PacketInfo};
+use resea::interfaces::net_device::NetDevice;
+use route::{Route, Routes};
+use socket::{Socket, SocketInner, SocketUser, Sockets};
+use transport::Transport;
 
 #[derive(Debug)]
 pub enum Error {
@@ -81,11 +80,12 @@ impl Stack {
     }
 
     pub fn bind_udp(&self, addr: &IpAddr, port: u16) -> Rc<Socket> {
-        self.sockets.add(addr, Transport::Udp, SocketUser::User, port)
+        self.sockets
+            .add(addr, Transport::Udp, SocketUser::User, port)
     }
 
     pub fn add_ethernet_device(&self, device: NetDevice, dhcp: bool) {
-        let hwaddr =  {
+        let hwaddr = {
             let result = device.get_hwaddr().unwrap();
             let slice = result.as_slice();
             let mut addr = [0; 6];
@@ -105,7 +105,7 @@ impl Stack {
                 &IpAddr::from_ipv4_addr(Ipv4Addr::UNSPECIFIED),
                 Transport::Udp,
                 SocketUser::DhcpClient { xid: xid },
-                68
+                68,
             );
 
             let client = DhcpClient::new(xid, sock, netif.clone());
@@ -117,53 +117,55 @@ impl Stack {
         }
     }
 
-    pub fn send_packet(&self, route: Option<Route>, pktinfo: PacketInfo, mut pkt: Packet) -> Result<()> {
+    pub fn send_packet(
+        &self,
+        route: Option<Route>,
+        pktinfo: PacketInfo,
+        mut pkt: Packet,
+    ) -> Result<()> {
         // Look for the route.
         let route = if route.is_some() {
             route.unwrap()
         } else {
-            try!(
-                match pktinfo.network {
-                    Network::Ipv4 =>
-                        if let Some(route) = self.routes.route_ipv4(&pktinfo.dst.ipv4_addr()) {
-                            Ok(route)
-                        } else {
-                            Err(Error::NoRoute)
-                        },
-                    _ => Err(Error::Unreachable),
+            try!(match pktinfo.network {
+                Network::Ipv4 => {
+                    if let Some(route) = self.routes.route_ipv4(&pktinfo.dst.ipv4_addr()) {
+                        Ok(route)
+                    } else {
+                        Err(Error::NoRoute)
+                    }
                 }
-            )
+                _ => Err(Error::Unreachable),
+            })
         };
 
         // Construct UDP/TCP header.
-        try!(
-            match pktinfo.transport {
-                Transport::Udp => udp::construct(&mut pkt, pktinfo.dst_port, pktinfo.src_port),
-            }
-        );
+        try!(match pktinfo.transport {
+            Transport::Udp => udp::construct(&mut pkt, pktinfo.dst_port, pktinfo.src_port),
+        });
 
         // Construct IP header.
-        try!(
-            match pktinfo.network {
-                Network::Ipv4 => ipv4::construct(&mut pkt, pktinfo.transport.clone(), pktinfo.dst.ipv4_addr(), &route.src),
-                _ => Err(Error::Unreachable),
-            }
-        );
+        try!(match pktinfo.network {
+            Network::Ipv4 => ipv4::construct(
+                &mut pkt,
+                pktinfo.transport.clone(),
+                pktinfo.dst.ipv4_addr(),
+                &route.src
+            ),
+            _ => Err(Error::Unreachable),
+        });
 
-        try!(
-            match pktinfo.network {
-                Network::Ipv4 =>
-                    if let Some(dst_hwaddr) = self.arp.lookup(pktinfo.dst.ipv4_addr()) {
-                        route.netif.send(0x800, &dst_hwaddr, pkt)
-                    } else {
-                        /* The destination hardware address does not exists in the ARP cache
+        try!(match pktinfo.network {
+            Network::Ipv4 => if let Some(dst_hwaddr) = self.arp.lookup(pktinfo.dst.ipv4_addr()) {
+                route.netif.send(0x800, &dst_hwaddr, pkt)
+            } else {
+                /* The destination hardware address does not exists in the ARP cache
                            table. Enqueue the packet and send a ARP request. */
-                        let arp_pkt = try!(self.arp.resolve(&route.netif, pktinfo.dst.ipv4_addr(), pkt));
-                        route.netif.send(0x806, &MacAddr::BROADCAST, arp_pkt)
-                    },
-                _ => Err(Error::Unreachable),
-            }
-        );
+                let arp_pkt = try!(self.arp.resolve(&route.netif, pktinfo.dst.ipv4_addr(), pkt));
+                route.netif.send(0x806, &MacAddr::BROADCAST, arp_pkt)
+            },
+            _ => Err(Error::Unreachable),
+        });
 
         Ok(())
     }
@@ -175,7 +177,7 @@ impl Stack {
                     while let Some((route, pktinfo, pkt)) = tx.borrow_mut().pop() {
                         self.send_packet(route, pktinfo, pkt).ok();
                     }
-                },
+                }
                 _ => (),
             }
         }
@@ -206,11 +208,9 @@ impl Stack {
             let payload = &frame[trans_start..(trans_start + len)];
 
             match &sock.user {
-                SocketUser::User => {
-                    match &sock.inner {
-                        SocketInner::Datagram { tx: _, rx } => {
-                            rx.borrow_mut().push((src, src_port, payload.to_vec()));
-                        }
+                SocketUser::User => match &sock.inner {
+                    SocketInner::Datagram { tx: _, rx } => {
+                        rx.borrow_mut().push((src, src_port, payload.to_vec()));
                     }
                 },
                 SocketUser::DhcpClient { xid } => {
@@ -218,7 +218,10 @@ impl Stack {
                     println!("DHCP: xid={}", xid);
                     if let Some((netif, client)) = self.dhcp_clients.borrow().get(&xid) {
                         if let Ok((addr, netmask, gateway)) = client.input(payload) {
-                            println!("DHCP: Done! (addr={}, netmask={}, gateway={})", addr, netmask, gateway);
+                            println!(
+                                "DHCP: Done! (addr={}, netmask={}, gateway={})",
+                                addr, netmask, gateway
+                            );
                             self.routes.add_ipv4(netif.clone(), addr, netmask, gateway);
                             delete = true;
                         } else {
@@ -232,7 +235,6 @@ impl Stack {
                 }
             }
         }
-
 
         Ok(())
     }

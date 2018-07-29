@@ -1,11 +1,11 @@
 use core::fmt;
-use core::slice;
 use core::mem;
-use {Result, Error};
+use core::slice;
+use endian::EndianExt;
+use ip::IpAddr;
 use packet::Packet;
 use transport::Transport;
-use ip::{IpAddr};
-use endian::EndianExt;
+use {Error, Result};
 
 const DEFAULT_TTL: u8 = 32;
 
@@ -28,7 +28,7 @@ fn compute_checksum(header: &Ipv4Header) -> u16 {
     let u16slice = unsafe {
         slice::from_raw_parts(
             header as *const _ as *const u16,
-            mem::size_of::<Ipv4Header>() / mem::size_of::<u16>()
+            mem::size_of::<Ipv4Header>() / mem::size_of::<u16>(),
         )
     };
 
@@ -51,16 +51,16 @@ impl Ipv4Addr {
     pub const BROADCAST: Ipv4Addr = Ipv4Addr(0xffffffff);
 
     pub fn new(addr: &[u8]) -> Ipv4Addr {
-        Ipv4Addr (
-            (addr[0] as u32) << 24 |
-            (addr[1] as u32) << 16 |
-            (addr[2] as u32) << 8  |
-            (addr[3] as u32)
+        Ipv4Addr(
+            (addr[0] as u32) << 24
+                | (addr[1] as u32) << 16
+                | (addr[2] as u32) << 8
+                | (addr[3] as u32),
         )
     }
 
     pub fn from_u32(addr: u32) -> Ipv4Addr {
-        Ipv4Addr (addr)
+        Ipv4Addr(addr)
     }
 
     pub fn as_u32(&self) -> u32 {
@@ -70,7 +70,9 @@ impl Ipv4Addr {
 
 impl fmt::Display for Ipv4Addr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}.{}.{}.{}",
+        write!(
+            f,
+            "{}.{}.{}.{}",
             (self.0 >> 24) & 0xff,
             (self.0 >> 16) & 0xff,
             (self.0 >> 8) & 0xff,
@@ -90,7 +92,9 @@ impl Netmask {
 
 impl fmt::Display for Netmask {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}.{}.{}.{}",
+        write!(
+            f,
+            "{}.{}.{}.{}",
             (self.0 >> 24) & 0xff,
             (self.0 >> 16) & 0xff,
             (self.0 >> 8) & 0xff,
@@ -100,7 +104,12 @@ impl fmt::Display for Netmask {
 }
 
 pub fn construct(pkt: &mut Packet, proto: Transport, dst: &Ipv4Addr, src: &Ipv4Addr) -> Result<()> {
-    let mut header = construct_header(dst, src, mem::size_of::<Ipv4Header>() + pkt.total_len(), proto);
+    let mut header = construct_header(
+        dst,
+        src,
+        mem::size_of::<Ipv4Header>() + pkt.total_len(),
+        proto,
+    );
     header.checksum = compute_checksum(&header);
     pkt.append_header(&header);
     Ok(())

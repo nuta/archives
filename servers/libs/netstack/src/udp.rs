@@ -1,7 +1,7 @@
 use core::mem;
-use {Result, Error};
 use endian::EndianExt;
-use packet::{Packet};
+use packet::Packet;
+use {Error, Result};
 
 #[repr(C, packed)]
 pub struct UdpHeader {
@@ -12,7 +12,11 @@ pub struct UdpHeader {
 }
 
 pub fn construct(pkt: &mut Packet, dst_port: u16, src_port: u16) -> Result<()> {
-    let header = construct_header(dst_port, src_port, mem::size_of::<UdpHeader>() + pkt.data_len());
+    let header = construct_header(
+        dst_port,
+        src_port,
+        mem::size_of::<UdpHeader>() + pkt.data_len(),
+    );
     pkt.append_header(&header);
     Ok(())
 }

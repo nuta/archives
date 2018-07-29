@@ -1,7 +1,7 @@
-use core::mem::size_of;
 use core::intrinsics::copy_nonoverlapping;
-use virtio::{Virtio, VirtioRequest, VIRTIO_DESC_F_READ_ONLY, IO_DEVICE_SPECIFIC};
-use resea::arch::x64::{pmalloc};
+use core::mem::size_of;
+use resea::arch::x64::pmalloc;
+use virtio::{Virtio, VirtioRequest, IO_DEVICE_SPECIFIC, VIRTIO_DESC_F_READ_ONLY};
 
 const VIRTIO_NET_RX_QUEUE: u8 = 0;
 const VIRTIO_NET_TX_QUEUE: u8 = 1;
@@ -9,12 +9,12 @@ const VIRTIO_NET_IO_MAC_ADDR: u16 = IO_DEVICE_SPECIFIC;
 
 #[repr(packed)]
 struct VirtioNetHeader {
-  gso_type: u8,
-  flags: u8,
-  header_len: u16,
-  gso_len: u16,
-  checksum_start: u16,
-  checksum_offset: u16,
+    gso_type: u8,
+    flags: u8,
+    header_len: u16,
+    gso_len: u16,
+    checksum_start: u16,
+    checksum_offset: u16,
 }
 
 pub struct VirtioNet {
@@ -45,8 +45,8 @@ impl VirtioNet {
 
         println!(">>> macaddr: {:?}", macaddr);
         VirtioNet {
-             virtio: virtio,
-             hwaddr: macaddr,
+            virtio: virtio,
+            hwaddr: macaddr,
         }
     }
 
@@ -74,13 +74,13 @@ impl VirtioNet {
 
         let rs = [
             VirtioRequest {
-                data:  header_paddr,
-                len:   size_of::<VirtioNetHeader>(),
+                data: header_paddr,
+                len: size_of::<VirtioNetHeader>(),
                 flags: VIRTIO_DESC_F_READ_ONLY,
             },
             VirtioRequest {
-                data:  data_paddr,
-                len:   data.len(),
+                data: data_paddr,
+                len: data.len(),
                 flags: VIRTIO_DESC_F_READ_ONLY,
             },
         ];

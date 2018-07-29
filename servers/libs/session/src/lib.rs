@@ -1,18 +1,20 @@
 #![no_std]
 #![feature(alloc)]
 
-#[cfg(test)] extern crate std;
-#[cfg(not(test))] extern crate core as std;
 extern crate alloc;
-#[cfg(not(test))] extern crate resea_langitems;
+#[cfg(not(test))]
+extern crate core as std;
 extern crate resea;
+#[cfg(not(test))]
+extern crate resea_langitems;
+#[cfg(test)]
+extern crate std;
 
-
-use resea::{CId};
 use alloc::rc::Rc;
+use alloc::BTreeMap;
+use resea::CId;
 use std::cell::RefCell;
 use std::sync::atomic::{AtomicUsize, Ordering};
-use alloc::BTreeMap;
 
 pub type SessionId = usize;
 
@@ -45,8 +47,10 @@ impl<T> SessionManager<T> {
             }
         };
 
-
-        let sess = Rc::new(Session{ id: id, value: value });
+        let sess = Rc::new(Session {
+            id: id,
+            value: value,
+        });
         (*self.sessions.borrow_mut()).insert(id, sess.clone());
         sess
     }

@@ -1,7 +1,6 @@
 use core::alloc::{GlobalAlloc, Layout};
 
-pub struct MyAllocator {
-}
+pub struct MyAllocator {}
 
 static mut NEXT_MALLOC: u64 = 0xc0000000;
 
@@ -12,7 +11,5 @@ unsafe impl GlobalAlloc for MyAllocator {
         addr as *mut u8
     }
 
-    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {
-
-    }
+    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout) {}
 }

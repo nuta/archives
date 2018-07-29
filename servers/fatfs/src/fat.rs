@@ -1,12 +1,11 @@
-use core::str;
-use core::option::{Option};
-use core::cmp::{min};
+use core::cmp::min;
 use core::mem::{size_of, transmute};
-use resea::vec::{Vec};
-use resea::arch::{ErrorCode};
-use resea::server::{ServerResult};
-use resea::interfaces::blk_device::{BlkDevice};
-
+use core::option::Option;
+use core::str;
+use resea::arch::ErrorCode;
+use resea::interfaces::blk_device::BlkDevice;
+use resea::server::ServerResult;
+use resea::vec::Vec;
 
 #[repr(C, packed)]
 #[derive(Clone, Debug)]
@@ -81,7 +80,8 @@ fn parse_mbr(mbr: &[u8], part_begin: usize) -> Bpb {
     let fat_table_offset = part_begin + fat_table_sector_start * sector_size;
     let number_of_fats = unsafe { (*bpb).number_of_fats as usize };
     let sectors_per_fat = unsafe { (*bpb).sectors_per_fat32 as usize };
-    let cluster_start_offset = part_begin + (fat_table_sector_start + number_of_fats * sectors_per_fat) * sector_size;
+    let cluster_start_offset =
+        part_begin + (fat_table_sector_start + number_of_fats * sectors_per_fat) * sector_size;
     let root_dir_cluster = unsafe { (*bpb).root_dir_cluster };
     Bpb {
         cluster_size: cluster_size,
@@ -150,7 +150,13 @@ impl Fat {
         None
     }
 
-    pub fn read_file(&self, buf: &mut Vec<u8>, cluster: Cluster, offset: usize, len: usize) -> ServerResult<usize> {
+    pub fn read_file(
+        &self,
+        buf: &mut Vec<u8>,
+        cluster: Cluster,
+        offset: usize,
+        len: usize,
+    ) -> ServerResult<usize> {
         let mut current = cluster;
         let mut data = Vec::new();
         let mut total_len = 0;
@@ -182,12 +188,19 @@ impl Fat {
         }
 
         let cluster_start = 2; // XXX: FAT32
-        let cluster_offset = self.bpb.cluster_start_offset + ((cluster as usize - cluster_start) * self.bpb.cluster_size);
-        let data = self.device.read(cluster_offset as u64, self.bpb.cluster_size).unwrap();
+        let cluster_offset = self.bpb.cluster_start_offset
+            + ((cluster as usize - cluster_start) * self.bpb.cluster_size);
+        let data = self
+            .device
+            .read(cluster_offset as u64, self.bpb.cluster_size)
+            .unwrap();
 
         let entry_offset = (size_of::<Cluster>() * cluster as usize) % self.bpb.sector_size;
         let fat_offset = (self.bpb.fat_table_offset + entry_offset) % self.bpb.sector_size;
-        let fat_data = self.device.read(fat_offset as u64, self.bpb.sector_size).unwrap();
+        let fat_data = self
+            .device
+            .read(fat_offset as u64, self.bpb.sector_size)
+            .unwrap();
         let table = unsafe { transmute::<&[u8], &[Cluster]>(fat_data.as_slice()) };
         let next = table[entry_offset];
         *buf = data.as_slice().to_vec();

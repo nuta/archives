@@ -1,10 +1,10 @@
-use core::slice;
-use core::mem::{transmute, size_of};
-use core::option::Option;
-use core::cell::{RefCell};
 use alloc::vec::Vec;
+use core::cell::RefCell;
+use core::mem::{size_of, transmute};
+use core::option::Option;
+use core::slice;
+use ip::{IpAddr, Network};
 use transport::Transport;
-use ip::{Network, IpAddr};
 
 pub struct Packet {
     header: RefCell<Vec<u8>>,
@@ -27,7 +27,7 @@ impl Packet {
         }
     }
 
-    pub fn set_data_from_slice(&self, data: & [u8]) {
+    pub fn set_data_from_slice(&self, data: &[u8]) {
         let mut v = Vec::new();
         v.extend_from_slice(data);
         self.data.replace(Some(v));
@@ -45,7 +45,11 @@ impl Packet {
     }
 
     pub fn data_len(&self) -> usize {
-        if let Some(ref data) = *self.data.borrow() { data.len() } else { 0 }
+        if let Some(ref data) = *self.data.borrow() {
+            data.len()
+        } else {
+            0
+        }
     }
 
     pub fn total_len(&self) -> usize {
@@ -64,7 +68,13 @@ impl Packet {
 }
 
 impl PacketInfo {
-    pub fn new(transport: Transport, network: Network, dst: IpAddr, dst_port: u16, src_port: u16) -> PacketInfo {
+    pub fn new(
+        transport: Transport,
+        network: Network,
+        dst: IpAddr,
+        dst_port: u16,
+        src_port: u16,
+    ) -> PacketInfo {
         PacketInfo {
             transport: transport,
             network: network,

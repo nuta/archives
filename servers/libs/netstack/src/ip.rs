@@ -1,4 +1,4 @@
-use ipv4::{Ipv4Addr};
+use ipv4::Ipv4Addr;
 
 #[derive(Debug, Clone)]
 pub enum Network {

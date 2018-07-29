@@ -4,13 +4,13 @@
 extern crate resea;
 
 use resea::arch::{ErrorCode, OoL};
-use resea::channel::{Channel};
-use resea::server::{ServerResult};
-use resea::interfaces::blk_device::{BlkDevice};
+use resea::channel::Channel;
+use resea::interfaces::blk_device::BlkDevice;
 use resea::interfaces::fs;
-use resea::interfaces::fs::{Server as FsServer};
+use resea::interfaces::fs::Server as FsServer;
+use resea::server::ServerResult;
 mod fat;
-use fat::{Fat};
+use fat::Fat;
 
 struct FatFsServer {
     ch: Channel,

@@ -1,8 +1,8 @@
 //
 //  8042 Keyboard Controller
 //
-use resea::channel::{Channel};
 use resea::arch::x64::{IoPort, Irq};
+use resea::channel::Channel;
 
 pub type KeyCode = u8;
 const KEYBOARD_IO_BASE: u16 = 0x60;

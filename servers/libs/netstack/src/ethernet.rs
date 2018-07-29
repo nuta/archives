@@ -1,8 +1,8 @@
-use core::mem::{size_of};
-use endian::EndianExt;
-use {Result, Error};
-use ip::Network;
 use arp::MacAddr;
+use core::mem::size_of;
+use endian::EndianExt;
+use ip::Network;
+use {Error, Result};
 
 #[repr(C, packed)]
 pub struct EthernetHeader {

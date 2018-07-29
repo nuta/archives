@@ -22,6 +22,6 @@ impl HeaderTrait for Header {
     }
 
     fn error_type(&self) -> u8 {
-          ((self >> ERROR_OFFSET) & 0xff) as u8
+        ((self >> ERROR_OFFSET) & 0xff) as u8
     }
 }

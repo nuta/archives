@@ -10,10 +10,11 @@ use core::*;
 pub mod arch;
 pub use arch::prelude::*;
 mod channel;
-pub use channel::Channel;mod print;
+pub use channel::Channel;
+pub mod interfaces;
+mod print;
 mod server;
 pub mod syscalls;
-pub mod interfaces;
 
 pub type Result<T> = core::result::Result<T, u8>;
 
