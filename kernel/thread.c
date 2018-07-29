@@ -153,6 +153,7 @@ NORETURN void thread_destroy_current(void) {
     CPUVAR->current = destroyed_thread;
     thread_destroy(CPUVAR->current);
     thread_switch();
+    PANIC("thread_switch() returned to thread_destroy_current()");
 }
 
 
