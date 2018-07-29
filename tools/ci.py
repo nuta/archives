@@ -3,6 +3,7 @@ import os
 import subprocess
 
 antlr = "java -jar {}/antlr-4.7.1-complete.jar".format(os.getcwd())
+qemu = "{}/qemu/x86_64-softmmu/qemu-system-x86_64".format(os.getcwd())
 
 def test_kernel(arch):
     subprocess.run(
@@ -12,7 +13,8 @@ def test_kernel(arch):
             "ANTLR4=" + antlr,
             "SERVERS=test",
             "CC=clang-6.0",
-            "LD=ld.lld-6.0"
+            "LD=ld.lld-6.0",
+            "QEMU=" + qemu
         ],
         check=True
     )
