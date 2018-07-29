@@ -11,7 +11,7 @@ void channel_link(struct channel *ch1, struct channel *ch2) {
 }
 
 
-static inline void transfer_to(struct channel *from, struct channel *to) {
+void channel_transfer(struct channel *from, struct channel *to) {
     from->transfer_to = to;
     to->refs++;
 }
@@ -133,7 +133,7 @@ channel_t channel_connect(struct channel *server, struct process *client) {
     struct channel *client_side = channel_create(client);
     // TODO: error check
     channel_link(server_side, client_side);
-    transfer_to(server_side, server);
+    channel_transfer(server_side, server);
 
     DEBUG("sys.connect: @%d.%d -> @%d.%d ~> @%d.%d",
         client_side->process->pid, client_side->cid,
@@ -300,11 +300,6 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
 
     // Get the sender right.
     while (true) {
-        if (likely(dst->sender == current_thread)) {
-            // We've already got a sender right in sys_send.
-            break;
-        }
-
         if (likely(atomic_compare_and_swap(&dst->sender, NULL, current_thread))) {
             // Now we have a sender right (dst->sender == current_thread).
             break;
@@ -381,6 +376,11 @@ header_t sys_send(channel_t ch, header_t header, payload_t a0, payload_t a1,
 
     struct thread *receiver = dst->receiver;
     if (unlikely(!receiver)) {
+        // Release the sender right for now; we'll try to aquire it soon in
+        // sys_send_slowpath(). This is because in sys_send_slowpath() we cannot
+        // determine whether the sender right is aquired in this send or
+        // in the previous one.
+        atomic_compare_and_swap(&dst->sender, CPUVAR->current, NULL);
         goto slowpath;
     }
 
@@ -523,7 +523,7 @@ channel_t sys_transfer(channel_t ch, channel_t dest) {
         return ERROR_INVALID_CH;
     }
 
-    transfer_to(from, to);
+    channel_transfer(from, to);
     restore_irq(&irqstate);
     return ERROR_NONE;
 }

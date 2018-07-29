@@ -26,12 +26,15 @@ void memory_test(void) {
     /* alloc_pages test */
     paddr_t addr = alloc_pages(8, KMALLOC_NORMAL);
     free_pages(addr, 8);
-    assert_eq("All pages should be freed.", allocated, get_allocated_pages());
+    assert_eq("free_pages() frees pages.", allocated, get_allocated_pages());
 }
 
 struct channel *thread_ch;
 void thread1_func(uptr_t thread_arg) {
-    error_t err = ipc_send(thread_ch->cid, 0, thread_arg, 0, 0, 0);
+    error_t err = ipc_send(thread_ch->cid, 0, thread_arg, 1, 0, 0);
+    assert_eq("ipc_send() returns ERROR_NONE", err, ERROR_NONE);
+    INFO("Time to send");
+    err = ipc_send(thread_ch->cid, 0, thread_arg, 2, 0, 0);
     assert_eq("ipc_send() returns ERROR_NONE", err, ERROR_NONE);
     thread_destroy_current();
 }
@@ -47,11 +50,19 @@ void ipc_test(void) {
 
     channel_t from;
     payload_t a0, a1, a2, a3;
-    header_t header = ipc_recv(our_ch->cid, &from, &a0, &a1, &a2, &a3);
+    header_t header;
 
+    header = ipc_recv(our_ch->cid, &from, &a0, &a1, &a2, &a3);
     assert_eq("ipc_recv() returns ERROR_NONE", ERRTYPE(header), ERROR_NONE);
     assert_eq("ipc_recv() set correct `from'", from, our_ch->cid);
     assert_eq("ipc_recv() returns correct `a0'", a0, thread_arg);
+    assert_eq("ipc_recv() returns correct `a1'", a1, 1);
+
+    header = ipc_recv(our_ch->cid, &from, &a0, &a1, &a2, &a3);
+    assert_eq("ipc_recv() returns ERROR_NONE", ERRTYPE(header), ERROR_NONE);
+    assert_eq("ipc_recv() set correct `from'", from, our_ch->cid);
+    assert_eq("ipc_recv() returns correct `a0'", a0, thread_arg);
+    assert_eq("ipc_recv() returns correct `a1'", a1, 2);
 }
 
 static void kernel_test_thread(void) {
