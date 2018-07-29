@@ -7,7 +7,7 @@ include $(ARCH_DIR)/arch.mk
 
 ifeq ($(KERNEL_TEST),1)
 override CFLAGS += -DKERNEL_TEST
-objs := init.o memory.o process.o thread.o ipc.o printk.o string.o list.o test.o
+objs := init.o memory.o process.o thread.o ipc.o printk.o string.o list.o test.o timer.o
 endif
 
 objs := $(addprefix $(BUILD_DIR)/kernel/, $(objs)) $(addprefix $(BUILD_DIR)/$(ARCH_DIR)/, $(arch_objs))
