@@ -3,6 +3,8 @@
 
 #include <kernel/prelude.h>
 
+#define DYN_PAGE_BASE_ADDR 0
+#define TICK_HZ 0
 #define PAGE_SIZE 4096
 #define PAGE_PRESENT  (1 << 0)
 #define PAGE_WRITABLE (1 << 1)
@@ -45,6 +47,14 @@ static inline void kmutex_unlock_restore_irq(kmutex_t *lock, kmutex_state_t stat
     );
 }
 
+typedef int irqstate_t;
+
+static inline void save_and_disable_irq(irqstate_t *state) {
+}
+
+static inline void restore_irq(irqstate_t *state) {
+}
+
 static inline void *from_paddr(paddr_t addr) {
     return (void *) addr;
 }
@@ -53,7 +63,15 @@ static inline paddr_t to_paddr(void *addr) {
     return (uptr_t) addr;
 }
 
+#ifdef __LP64__
+typedef u64_t reg_t;
+#else
+#error "unsupported cpu"
+#endif
+
 struct arch_thread {
+    reg_t ip;
+    reg_t sp;
 };
 
 struct arch_vmspace {
