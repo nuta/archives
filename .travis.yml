@@ -5,6 +5,8 @@ sudo: false
 
 cache:
   pip: true
+  directories:
+    - qemu
 
 notifications:
   on_success: change
