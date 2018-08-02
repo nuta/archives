@@ -3,6 +3,7 @@ name = "fatfs"
 version = "0.0.1"
 dependencies = [
  "resea 0.0.1",
+ "resea_langitems 0.0.1",
 ]
 
 [[package]]
@@ -60,6 +61,7 @@ name = "virtio-blk"
 version = "0.0.1"
 dependencies = [
  "resea 0.0.1",
+ "resea_langitems 0.0.1",
  "virtio 0.0.1",
 ]
 
