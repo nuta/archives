@@ -4,8 +4,11 @@ build
 *.pcap
 *.pyc
 *.xz
+*.profraw
+*.profdata
 **/target
 libs/resea/src/interfaces
 tools/idl/parser
 tools/idl/.antlr
 qemu
+coverage

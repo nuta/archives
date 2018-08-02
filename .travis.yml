@@ -24,6 +24,8 @@ matrix:
   include:
     - env: M=kernel ARCH=x64
       addons: *kernel_addons
+    - env: M=kernel ARCH=posix
+      addons: *kernel_addons
     - env: M=lib LIB=netstack
 
 before_script:

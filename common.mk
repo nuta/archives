@@ -27,8 +27,9 @@ CC = clang
 LD = ld.lld
 
 ifeq ($(shell uname), Darwin)
-CC = /usr/local/opt/llvm/bin/clang
-LD = /usr/local/opt/llvm/bin/ld.lld
+LLVM_DIR = /usr/local/opt/llvm/bin
+CC = $(LLVM_DIR)/clang
+LD = $(LLVM_DIR)/ld.lld
 DD = gdd
 TAR = gtar
 TOOLCHAIN_PREFIX = g

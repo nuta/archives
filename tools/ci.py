@@ -6,9 +6,14 @@ antlr = "java -jar {}/antlr-4.7.1-complete.jar".format(os.getcwd())
 qemu = "{}/qemu/x86_64-softmmu/qemu-system-x86_64".format(os.getcwd())
 
 def test_kernel(arch):
+    if arch == "posix":
+        target = "coverage"
+    else:
+        target = "test"
+
     subprocess.run(
         [
-            "make", "-j2", "test",
+            "make", "-j2", target,
             "ARCH=" + arch,
             "ANTLR4=" + antlr,
             "SERVERS=test",
