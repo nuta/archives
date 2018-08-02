@@ -5,4 +5,5 @@ authors = ["Seiya Nuta <nuta@seiya.me>"]
 
 [dependencies]
 resea = { path = "../../libs/resea" }
+resea_langitems = { path = "../../libs/resea/langitems" }
 virtio = { path = "../../libs/virtio" }

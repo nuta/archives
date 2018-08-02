@@ -1,5 +1,5 @@
+use core::mem::size_of;
 use resea::arch::x64::pmalloc;
-use resea::mem::size_of;
 use virtio::{Virtio, VirtioRequest, VIRTIO_DESC_F_READ_ONLY, VIRTIO_DESC_F_WRITE_ONLY};
 
 pub const SECTOR_SIZE: usize = 512;
@@ -28,7 +28,7 @@ impl VirtioBlk {
         virtio.setup();
         let feats = virtio.get_features();
         virtio.set_features(feats);
-        virtio.setup_queue(VIRTIO_BLK_RQUEUE);
+        virtio.setup_queue(VIRTIO_BLK_RQUEUE, false);
         virtio.activate();
 
         VirtioBlk { virtio: virtio }
@@ -65,7 +65,8 @@ impl VirtioBlk {
             },
         ];
 
-        self.virtio.request(VIRTIO_BLK_RQUEUE, &rs);
+        self.virtio.enqueue_request(VIRTIO_BLK_RQUEUE, &rs);
+        self.virtio.kick_request(VIRTIO_BLK_RQUEUE);
 
         // TODO: free pmalloc'ed areas
         data_vaddr as *const u8

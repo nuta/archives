@@ -1,17 +1,23 @@
 #![no_std]
+#![feature(alloc)]
 
 #[macro_use]
 extern crate resea;
+
+#[cfg(not(test))]
+extern crate resea_langitems;
+
+#[macro_use]
+extern crate alloc;
+
 extern crate virtio;
 mod device;
 
 use core::slice;
 use device::{VirtioBlk, SECTOR_SIZE};
-use resea::arch::{ErrorCode, OoL};
-use resea::channel::Channel;
+use resea::{ErrorCode, OoL, Channel, Result as ServerResult};
 use resea::interfaces::blk_device;
 use resea::interfaces::blk_device::Server as BlkDeviceServer;
-use resea::server::ServerResult;
 
 struct VirtioBlkServer {
     device: VirtioBlk,
@@ -32,12 +38,12 @@ impl BlkDeviceServer for VirtioBlkServer {
         let sector = offset / SECTOR_SIZE as u64;
         let ptr = self.device.read(sector, length);
         let data = unsafe { slice::from_raw_parts(ptr, length) };
-        Ok((data))
+        Ok(data)
     }
 
     fn write(&self, from: Channel, offset: u64, data: OoL) -> ServerResult<()> {
         /* TODO */
-        Err(ErrorCode::NotImplemented)
+        Err(ErrorCode::NotImplemented as u8)
     }
 }
 
