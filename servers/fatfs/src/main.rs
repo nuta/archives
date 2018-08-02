@@ -1,14 +1,19 @@
 #![no_std]
+#![feature(alloc)]
 
 #[macro_use]
 extern crate resea;
 
-use resea::arch::{ErrorCode, OoL};
-use resea::channel::Channel;
+#[cfg(not(test))]
+extern crate resea_langitems;
+
+#[macro_use]
+extern crate alloc;
+
+use resea::{Channel, ErrorCode, OoL, Result as ServerResult};
 use resea::interfaces::blk_device::BlkDevice;
 use resea::interfaces::fs;
 use resea::interfaces::fs::Server as FsServer;
-use resea::server::ServerResult;
 mod fat;
 use fat::Fat;
 
@@ -30,38 +35,46 @@ impl FatFsServer {
 }
 
 impl FsServer for FatFsServer {
-    fn open(&self, from: Channel, path: OoL) -> ServerResult<(isize)> {
-        Err(ErrorCode::NotImplemented)
+    fn open(&self, _from: Channel, _path: OoL) -> ServerResult<(isize)> {
+        Err(ErrorCode::NotImplemented as u8)
     }
 
-    fn open_dir(&self, from: Channel, path: OoL) -> ServerResult<(isize)> {
-        Err(ErrorCode::NotImplemented)
+    fn open_dir(&self, _from: Channel, _path: OoL) -> ServerResult<(isize)> {
+        Err(ErrorCode::NotImplemented as u8)
     }
 
-    fn close(&self, from: Channel, fd: isize) -> ServerResult<()> {
-        Err(ErrorCode::NotImplemented)
+    fn close(&self, _from: Channel, _fd: isize) -> ServerResult<()> {
+        Err(ErrorCode::NotImplemented as u8)
     }
 
-    fn read(&self, from: Channel, fd: isize, offset: u64, length: usize) -> ServerResult<(&[u8])> {
-        Err(ErrorCode::NotImplemented)
+    fn read(&self, _from: Channel, _fd: isize, _offset: u64, _length: usize) -> ServerResult<(&[u8])> {
+        Err(ErrorCode::NotImplemented as u8)
     }
 
-    fn write(&self, from: Channel, fd: isize, offset: u64, data: OoL) -> ServerResult<()> {
-        Err(ErrorCode::NotImplemented)
+    fn write(&self, _from: Channel, _fd: isize, _offset: u64, _data: OoL) -> ServerResult<()> {
+        Err(ErrorCode::NotImplemented as u8)
     }
 
-    fn readdir(&self, from: Channel, fd: isize, offset: u64) -> ServerResult<(&[u8])> {
-        Err(ErrorCode::NotImplemented)
+    fn readdir(&self, _from: Channel, _fd: isize, _offset: u64) -> ServerResult<(&[u8])> {
+        Err(ErrorCode::NotImplemented as u8)
     }
 
-    fn stat(&self, from: Channel, fd: isize, path: OoL) -> ServerResult<(&[u8])> {
-        Err(ErrorCode::NotImplemented)
+    fn stat(&self, _from: Channel, _fd: isize, _path: OoL) -> ServerResult<(&[u8])> {
+        Err(ErrorCode::NotImplemented as u8)
     }
 }
 
 fn main() {
     println!("fatfs: starting fatfs server...");
     let server = FatFsServer::new();
+
+    println!("running...");
+    use alloc::vec::Vec;
+    let clus = server.fs.look_for_file("kernel.elf").unwrap();
+    let mut buf = Vec::new();
+    server.fs.read_file(&mut buf, clus, 0, 8);
+    println!("==> {:?}", buf);
+
     register_as!(&server, [fs]);
     serve_forever!(&server, [fs]);
 }

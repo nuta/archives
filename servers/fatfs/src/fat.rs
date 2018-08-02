@@ -2,10 +2,9 @@ use core::cmp::min;
 use core::mem::{size_of, transmute};
 use core::option::Option;
 use core::str;
-use resea::arch::ErrorCode;
+use resea::{ErrorCode, Result as ServerResult};
 use resea::interfaces::blk_device::BlkDevice;
-use resea::server::ServerResult;
-use resea::vec::Vec;
+use alloc::vec::Vec;
 
 #[repr(C, packed)]
 #[derive(Clone, Debug)]
@@ -179,7 +178,7 @@ impl Fat {
             current = next;
         }
 
-        Err(ErrorCode::NotImplemented)
+        Err(ErrorCode::NotImplemented as u8)
     }
 
     fn read_cluster(&self, buf: &mut Vec<u8>, cluster: Cluster) -> Option<Cluster> {
