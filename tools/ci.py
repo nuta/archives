@@ -8,15 +8,17 @@ qemu = "{}/qemu/x86_64-softmmu/qemu-system-x86_64".format(os.getcwd())
 def test_kernel(arch):
     if arch == "posix":
         target = "coverage"
+        servers = ""
     else:
         target = "test"
+        servers = "test"
 
     subprocess.run(
         [
             "make", "-j2", target,
             "ARCH=" + arch,
             "ANTLR4=" + antlr,
-            "SERVERS=test",
+            "SERVERS=" + servers,
             "CC=clang-6.0",
             "LD=ld.lld-6.0",
             "QEMU=" + qemu
