@@ -21,7 +21,6 @@ stubs: tools/idl/parser/idlParser.py tools/genstub.py $(stubs)
 	./tools/genstub.py --out-dir libs/resea/src/interfaces --lang rust $(stubs)
 
 build:
-	@rm -rf $(KFS_DIR)
 	@mkdir -p $(KFS_DIR)/servers
 	@set -e; for server_dir in $(addprefix servers/, $(SERVERS)); do \
 		$(MAKE) $$server_dir; \

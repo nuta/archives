@@ -32,10 +32,11 @@ $(BUILD_DIR)/%.o: %.c Makefile
 	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -MF $(@:.o=.deps) -MT $(BUILD_DIR)/$(<:.c=.o) -MM $<
 
 # KFS
-$(BUILD_DIR)/kernel/init.o: $(BUILD_DIR)/kernel/kfs.bin
+$(BUILD_DIR)/kernel/kfs.o: $(BUILD_DIR)/kernel/kfs.bin
 
 $(BUILD_DIR)/kernel/kfs.bin: $(kfs_files) tools/mkkfs.py
 	$(PROGRESS) MKKFS $@
+	echo $(KFS_DIR) $(kfs_files)
 	./tools/mkkfs.py $@ $(KFS_DIR)
 
 include $(wildcard $(objs:.o=.deps))
