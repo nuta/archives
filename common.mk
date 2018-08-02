@@ -35,8 +35,7 @@ TOOLCHAIN_PREFIX = g
 endif
 
 ifeq ($(ARCH), posix)
-CC = clang
-LD = clang
+LD = $(CC)
 endif
 
 PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
