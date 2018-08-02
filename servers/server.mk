@@ -1,3 +1,4 @@
+include common.mk
 include $(DIR)/Makefile
 server_name := $(name)
 server_build_dir := $(BUILD_DIR)/$(DIR)
