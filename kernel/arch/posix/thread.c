@@ -9,8 +9,11 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
 
     INFO("stack=%p", stack + stack_size);
     arch->ip = start;
-    arch->sp = stack + stack_size;
     arch->arg = arg;
+
+    // XXX: substract 8 to prevent a segfault caused by unaligned memory
+    // access with XMM registers.
+    arch->sp = stack + stack_size - 8;
 }
 
 void arch_switch(struct arch_thread *prev, struct arch_thread *next) {
