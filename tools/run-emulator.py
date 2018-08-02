@@ -5,6 +5,7 @@ import subprocess
 import threading
 import sys
 import shlex
+import signal
 import re
 import colorama
 
@@ -34,11 +35,11 @@ def prettify_line(line):
 def run(args):
     p = subprocess.Popen(shlex.split(args.command), stdin=sys.stdin, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     def timeout_handler():
-        print("timeout :(")
-        p.kill()
+        if args.test:
+            print("timeout :(")
+            p.kill()
 
-    timeout = 3 if args.test else sys.maxsize
-    timeout_thread = threading.Timer(timeout, timeout_handler)
+    timeout_thread = threading.Timer(3, timeout_handler)
     timeout_thread.start()
 
     passed = 0
@@ -47,9 +48,13 @@ def run(args):
     printk_line = False
     while True:
         data = p.stdout.read(1)
-        if len(data) == 0 and p.poll() is not None:
+        exit_code = p.poll()
+        if len(data) == 0 and exit_code is not None:
             timeout_thread.cancel()
-            sys.exit(p.poll())
+            if exit_code == -signal.SIGSEGV:
+                sys.exit( colorama.Style.BRIGHT + colorama.Fore.RED + \
+                    "The process caused segmentation fault." + colorama.Style.RESET_ALL)
+            sys.exit(1)
 
         ch = data.decode("utf-8", errors="ignore")
         if ch == "\n":
