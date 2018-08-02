@@ -10,6 +10,7 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
     INFO("stack=%p", stack + stack_size);
     arch->ip = start;
     arch->sp = stack + stack_size;
+    arch->arg = arg;
 }
 
 void arch_switch(struct arch_thread *prev, struct arch_thread *next) {
@@ -18,10 +19,11 @@ void arch_switch(struct arch_thread *prev, struct arch_thread *next) {
         "movq %%rax, %0     \n"
         "movq %%rsp, %1     \n"
         "movq %3, %%rsp     \n"
+        "movq %4, %%rdi     \n"
         "jmpq *%2           \n"
         "1:                 \n"
     : "=m"(prev->ip), "=m"(prev->sp)
-    : "r"(next->ip), "r"(next->sp)
+    : "r"(next->ip), "r"(next->sp), "m"(next->arg)
     : "%rax"
     );
 }

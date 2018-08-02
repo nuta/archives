@@ -72,6 +72,7 @@ typedef u64_t reg_t;
 struct arch_thread {
     reg_t ip;
     reg_t sp;
+    reg_t arg;
 };
 
 struct arch_vmspace {
