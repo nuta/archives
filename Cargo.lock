@@ -28,6 +28,7 @@ name = "pc"
 version = "0.0.1"
 dependencies = [
  "resea 0.0.1",
+ "resea_langitems 0.0.1",
 ]
 
 [[package]]

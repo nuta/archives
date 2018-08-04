@@ -1,21 +1,25 @@
 #![no_std]
+#![feature(alloc)]
 
 #[macro_use]
 extern crate resea;
+
+#[cfg(not(test))]
+extern crate resea_langitems;
+
+#[macro_use]
+extern crate alloc;
+
 use core::cell::RefCell;
-use core::option::Option;
-use resea::arch::ErrorCode;
-use resea::channel::Channel;
+use resea::{Channel, Result as ServerResult};
 use resea::interfaces::events;
 use resea::interfaces::events::Server as EventsServer;
 use resea::interfaces::kbd_device;
 use resea::interfaces::kbd_device::Server as KbdDeviceServer;
-use resea::interfaces::rtc_device;
 use resea::interfaces::rtc_device::Server as RtcDeviceServer;
-use resea::server::ServerResult;
 mod keyboard;
 mod rtc;
-use keyboard::Keyboard;
+use keyboard::{Keyboard, KeyEvent};
 use rtc::Rtc;
 
 struct PcServer {
@@ -55,17 +59,28 @@ impl RtcDeviceServer for PcServer {
 }
 
 impl KbdDeviceServer for PcServer {
-    fn listen(&self, from: Channel, listener: Channel) -> ServerResult<()> {
+    fn listen(&self, _from: Channel, listener: Channel) -> ServerResult<()> {
         self.kbd_listener.replace(Some(listener));
         Ok(())
+    }
+
+    fn keydown(&self, _from: Channel, _keycode: u16) {
+    }
+
+    fn keyup(&self, _from: Channel, _keycode: u16) {
     }
 }
 
 impl EventsServer for PcServer {
-    fn notification(&self, _from: Channel, notification: usize) -> ServerResult<()> {
+    fn notification(&self, _from: Channel, _notification: usize) {
         let keycode = self.kbd.get_keycode();
-        // TODO: send to kbd_listener
-        Err(ErrorCode::DontReply)
+        if let Some(ref ch) = *self.kbd_listener.borrow() {
+            let listener = kbd_device::KbdDevice::from_channel(&ch);
+            match keycode {
+                KeyEvent::KeyDown(code) => listener.keydown(code).unwrap(),
+                KeyEvent::KeyUp(code) => listener.keyup(code).unwrap(),
+            }
+        }
     }
 }
 
