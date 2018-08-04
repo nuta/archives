@@ -33,13 +33,11 @@ enter_userspace:
     xor %r14, %r14
     xor %r15, %r15
 
-    /* Current GS base is kernel one. Swap as the timer ISR does. */
-    swapgs
-
     /* Set default values to floating point registers. */
     fninit
 
-    /* TODO: sanitize other registers */
+    cli /* Prevent interrupts between swapgs and iretq. */
+    swapgs /* Set user gs. */
     iretq
 
 /* void arch_switch(struct arch_thread *prev, struct arch_thread *next); */
