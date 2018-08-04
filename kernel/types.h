@@ -58,6 +58,10 @@ void arch_copy_from_user(void *kernel, uptr_t user, size_t length);
 void arch_allow_io(struct arch_thread *arch);
 void arch_accept_irq(int irq);
 
+#ifdef LAYER
+void layer_init(void);
+#endif
+
 extern paddr_t phypages_start;
 extern size_t phypages_num;
 

@@ -25,6 +25,10 @@ void kernel_init(void) {
     launch_servers();
 #endif
 
+#ifdef LAYER
+    layer_init();
+#endif
+
     if (thread_list_is_empty(&kernel_process->threads)) {
         PANIC("No threads to run.");
     }

@@ -1,3 +1,9 @@
+ifneq ($(LAYER),)
+override CFLAGS += -DLAYER="$(LAYER)"
+LAYER_DIR := layers/$(LAYER)
+include $(LAYER_DIR)/kext/kext.mk
+endif
+
 objs := init.o memory.o process.o thread.o ipc.o timer.o server.o printk.o string.o list.o kfs.o
 
 ARCH_DIR = kernel/arch/$(ARCH)
@@ -10,7 +16,9 @@ override CFLAGS += -DKERNEL_TEST
 objs := init.o memory.o process.o thread.o ipc.o printk.o string.o list.o test.o timer.o
 endif
 
-objs := $(addprefix $(BUILD_DIR)/kernel/, $(objs)) $(addprefix $(BUILD_DIR)/$(ARCH_DIR)/, $(arch_objs))
+objs := $(addprefix $(BUILD_DIR)/kernel/, $(objs)) \
+	$(addprefix $(BUILD_DIR)/$(ARCH_DIR)/, $(arch_objs)) \
+	$(addprefix $(BUILD_DIR)/$(LAYER_DIR)/kext/, $(kext_objs))
 kfs_files := $(addprefix $(KFS_DIR)/servers/, $(SERVERS))
 
 # Load libs.
