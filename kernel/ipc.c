@@ -2,6 +2,7 @@
 #include "thread.h"
 #include "process.h"
 #include "ipc.h"
+#define DEBUG(...)
 
 void channel_link(struct channel *ch1, struct channel *ch2) {
     ch1->linked_to = ch2;
@@ -43,7 +44,7 @@ struct channel *channel_create(struct process *process) {
             ch->notifications = 0;
             ch->cid = i + 1;
             ch->process = process;
-            ch->linked_to = NULL;
+            ch->linked_to = ch;
             ch->transfer_to = ch;
             ch->receiver = NULL;
             ch->sender = NULL;
@@ -108,7 +109,7 @@ void channel_close(struct channel *ch) {
 
         ch->refs--;
         linked_to->refs--;
-        if (linked_to->refs == 0) {
+        if (linked_to->refs == 0 && linked_to != ch) {
             channel_close(linked_to);
         }
     }
@@ -116,7 +117,7 @@ void channel_close(struct channel *ch) {
     struct channel *transfer_to = ch->transfer_to;
     if (transfer_to) {
         transfer_to->refs--;
-        if (transfer_to->refs == 0) {
+        if (transfer_to->refs == 0 && transfer_to != ch) {
             channel_close(transfer_to);
         }
     }
@@ -141,6 +142,78 @@ channel_t channel_connect(struct channel *server, struct process *client) {
         server->process->pid, server->cid);
 
     return client_side->cid;
+}
+
+
+struct msg *channel_recv(struct channel *ch) {
+    irqstate_t irqstate;
+    save_and_disable_irq(&irqstate);
+
+    // Try to get the receiver right.
+    struct thread *current_thread = CPUVAR->current;
+    if (unlikely(!atomic_compare_and_swap(&ch->receiver, NULL, current_thread))) {
+        restore_irq(&irqstate);
+        return ERROR_PTR(ERROR_CH_IN_USE);
+    }
+
+    if (unlikely(ch->notifications)) {
+receive_notification:
+        current_thread->buffer.header = NOTIFICATION_MSG;
+        current_thread->buffer.sent_from = ch->cid;
+        current_thread->buffer.payloads[0] = ch->notifications;
+        atomic_compare_and_swap(&ch->notifications, current_thread->buffer.payloads[0], 0);
+        ch->receiver = NULL;
+        current_thread->receiving = NULL;
+        restore_irq(&irqstate);
+        return &current_thread->buffer;
+    }
+
+    // Wait for the sender.
+    // Resume a thread in the wait queue.
+    if (likely(ch->sender)) {
+        // The sender waits for us. Resume it and wait for it.
+        thread_resume(ch->sender);
+    } else {
+        kmutex_state_t irq_state = kmutex_lock_irq_disabled(&ch->lock);
+        struct waitqueue *wq = waitqueue_list_pop(&ch->wq);
+        kmutex_unlock_restore_irq(&ch->lock, irq_state);
+        if (wq) {
+            thread_resume(wq->thread);
+            kfree(wq);
+        }
+    }
+
+    current_thread->receiving = ch;
+wait:
+    thread_block_current();
+
+    if (current_thread->state == THREAD_CHANNEL_CLOSED) {
+        // The `ch' channel is being closed. Abort the operation.
+        current_thread->state = THREAD_RUNNABLE;
+        restore_irq(&irqstate);
+        return ERROR_PTR(ERROR_CH_CLOSED);
+    }
+
+    if (!ch->sender) {
+        if (ch->notifications) {
+            // We have received a notification.
+            goto receive_notification;
+        } else {
+            // Multiple notifications are sent to the channel and senders
+            // resumed the current thread multiple times and we already have
+            // received all at once in receive_notification. Wait for the next
+            // notification or message.
+            goto wait;
+        }
+    }
+
+    // Receiver sent a reply message and resumed the sender thread. Do recv
+    // work. Release sender/receiver rights and return the receiver message.
+    ch->receiver = NULL;
+    ch->sender = NULL;
+    current_thread->receiving = NULL;
+    restore_irq(&irqstate);
+    return &current_thread->buffer;
 }
 
 
@@ -185,7 +258,7 @@ static payload_t copy_payload(int type, struct process *src, struct process *dst
                 return 0;
             }
 
-            if (ch->linked_to) {
+            if (ch->linked_to && ch->linked_to != ch) {
                 DEBUG("copy_payload: link @%d.%d <-> @%d.%d",
                     ch->linked_to->process->pid, ch->linked_to->cid,
                     new_ch->process->pid, new_ch->cid);
@@ -292,12 +365,6 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
     struct channel *dst = linked_to->transfer_to;
     struct thread *current_thread = CPUVAR->current;
 
-    DEBUG("sys_send: @%d.%d -> @%d.%d ~> @%d.%d (header=%d.%d)",
-        src->process->pid, src->cid,
-        linked_to->process->pid, linked_to->cid,
-        dst->process->pid, dst->cid,
-        IFTYPE(header), METHODTYPE(header));
-
     // Get the sender right.
     while (true) {
         if (likely(atomic_compare_and_swap(&dst->sender, NULL, current_thread))) {
@@ -327,6 +394,12 @@ static header_t sys_send_slowpath(struct channel *src, struct channel *linked_to
         current_thread->sending = dst;
         thread_block_current();
     }
+
+    DEBUG("sys_send: @%d.%d -> @%d.%d ~> @%d.%d (header=%d.%d)",
+        src->process->pid, src->cid,
+        linked_to->process->pid, linked_to->cid,
+        dst->process->pid, dst->cid,
+        IFTYPE(header), METHODTYPE(header));
 
     // Copy payloads.
     struct process *src_process = CPUVAR->current->process;
@@ -422,61 +495,9 @@ struct msg *sys_recv(channel_t ch) {
         return ERROR_PTR(ERROR_INVALID_CH);
     }
 
-    // Try to get the receiver right.
-    struct thread *current_thread = CPUVAR->current;
-    if (unlikely(!atomic_compare_and_swap(&src->receiver, NULL, current_thread))) {
-        restore_irq(&irqstate);
-        return ERROR_PTR(ERROR_CH_IN_USE);
-    }
-
-    if (unlikely(src->notifications)) {
-receive_notification:
-        current_thread->buffer.header = NOTIFICATION_MSG;
-        current_thread->buffer.sent_from = src->cid;
-        current_thread->buffer.payloads[0] = src->notifications;
-        src->notifications = 0;
-        src->receiver = NULL;
-        restore_irq(&irqstate);
-        return &current_thread->buffer;
-    }
-
-    // Wait for the sender.
-    // Resume a thread in the wait queue.
-    if (likely(src->sender)) {
-        // The sender waits for us. Resume it and wait for it.
-        thread_resume(src->sender);
-    } else {
-        kmutex_state_t irq_state = kmutex_lock_irq_disabled(&src->lock);
-        struct waitqueue *wq = waitqueue_list_pop(&src->wq);
-        kmutex_unlock_restore_irq(&src->lock, irq_state);
-        if (wq) {
-            thread_resume(wq->thread);
-            kfree(wq);
-        }
-    }
-
-    current_thread->receiving = src;
-    thread_block_current();
-
-    if (current_thread->state == THREAD_CHANNEL_CLOSED) {
-        // The `src' channel is being closed. Abort the operation.
-        current_thread->state = THREAD_RUNNABLE;
-        restore_irq(&irqstate);
-        return ERROR_PTR(ERROR_CH_CLOSED);
-    }
-
-    if (!src->sender) {
-        // We have received a notification.
-        goto receive_notification;
-    }
-
-    // Receiver sent a reply message and resumed the sender thread. Do recv
-    // work. Release sender/receiver rights and return the receiver message.
-    src->receiver = NULL;
-    src->sender = NULL;
-    current_thread->receiving = NULL;
+    struct msg *m = channel_recv(src);
     restore_irq(&irqstate);
-    return &current_thread->buffer;
+    return m;
 }
 
 
@@ -546,7 +567,7 @@ error_t do_notify(struct process *proc, channel_t ch, payload_t and_mask, payloa
     }
 
     struct channel *linked_to = src->linked_to;
-    struct channel *dst = linked_to->transfer_to ?: linked_to;
+    struct channel *dst = linked_to->transfer_to;
     if (!dst) {
         return ERROR_INVALID_CH;
     }

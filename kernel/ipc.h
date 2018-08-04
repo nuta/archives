@@ -85,6 +85,7 @@ void channel_link(struct channel *ch1, struct channel *ch2);
 void channel_transfer(struct channel *from, struct channel *to);
 struct channel *channel_create(struct process *process);
 void channel_close(struct channel *ch);
+struct msg *channel_recv(struct channel *ch);
 error_t channel_connect(struct channel *server, struct process *client);
 struct channel *get_channel_by_id(channel_t cid);
 error_t do_notify(struct process *proc, channel_t cid, payload_t and_mask, payload_t or_mask);
