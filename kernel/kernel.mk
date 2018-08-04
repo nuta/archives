@@ -23,7 +23,7 @@ $(BUILD_DIR)/kernel/kernel.elf: $(objs) $(kernel_ld)
 $(BUILD_DIR)/%.o: %.S Makefile
 	mkdir -p $(dir $@)
 	$(PROGRESS) "CC" $@
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(addprefix -I, $(include_dirs)) -c -o $@ $<
 
 $(BUILD_DIR)/%.o: %.c Makefile
 	mkdir -p $(dir $@)
@@ -36,7 +36,6 @@ $(BUILD_DIR)/kernel/kfs.o: $(BUILD_DIR)/kernel/kfs.bin
 
 $(BUILD_DIR)/kernel/kfs.bin: $(kfs_files) tools/mkkfs.py
 	$(PROGRESS) MKKFS $@
-	echo $(KFS_DIR) $(kfs_files)
 	./tools/mkkfs.py $@ $(KFS_DIR)
 
 include $(wildcard $(objs:.o=.deps))
