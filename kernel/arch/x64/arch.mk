@@ -11,7 +11,7 @@ override CFLAGS += -ffreestanding -fno-builtin -nostdinc -nostdlib -mcmodel=larg
 override CFLAGS += -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -mno-avx -mno-avx2
 override LDFLAGS +=
 KERNEL_LDFLAGS += --Map=$(BUILD_DIR)/kernel/kernel.map --script $(kernel_ld)
-QEMUFLAGS += -d cpu_reset -D qemu.log -nographic -cpu SandyBridge,rdtscp -rtc base=utc
+QEMUFLAGS += -d cpu_reset -D qemu.log -cpu SandyBridge,rdtscp -rtc base=utc
 QEMUFLAGS += -drive file=$(disk_img),if=virtio,format=raw
 QEMUFLAGS += -netdev user,id=net0,net=10.0.7.0/24,dhcpstart=10.0.7.15 -device virtio-net-pci,netdev=net0 -object filter-dump,id=qemu,netdev=net0,file=qemu.pcap
 
@@ -22,8 +22,14 @@ else
 kernel_ld = $(ARCH_DIR)/kernel.mbrboot.ld
 endif
 
-.PHONY: bochs
+.PHONY: run run-gui test bochs
 run:
+	$(MAKE) build
+	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
+	$(MAKE) $(disk_img)
+	./tools/run-emulator.py "$(QEMU) $(QEMUFLAGS) -nographic"
+
+run-gui:
 	$(MAKE) build
 	./$(ARCH_DIR)/tweak-elf-header.py $(BUILD_DIR)/kernel/kernel.elf
 	$(MAKE) $(disk_img)
@@ -32,8 +38,8 @@ run:
 bochs:
 	$(MAKE) build
 	$(MAKE) $(disk_img)
-	rm -f $(ARCH_DIR)/disk.img.lock
-	./tools/run-emulator.py "$(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc"
+	rm -f $(disk_img).lock
+	$(BOCHS) -qf $(ARCH_DIR)/boot/bochsrc
 
 test:
 	KERNEL_TEST=1 $(MAKE) build
