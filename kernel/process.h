@@ -20,6 +20,7 @@ struct process {
     struct channel channels[DEFAULT_CHANNELS_NUM];
     size_t channels_max;
     kmutex_t lock;
+    void (*syscall_handler)(void);
 };
 
 extern struct process *kernel_process;
@@ -27,5 +28,6 @@ extern struct process *kernel_process;
 struct process *process_create(void);
 void process_destroy(struct process *process);
 void process_init(void);
+void process_set_syscall_handler(struct process *process, void (*handler)(void));
 
 #endif

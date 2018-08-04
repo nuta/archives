@@ -60,6 +60,11 @@ syscall_table_addr:
 .extern handle_syscall
 .globl x64_syscall_handler
 x64_syscall_handler:
+    swapgs
+    cmp qword ptr gs:[GS_SYSCALL_HANDLER], 0
+    je 1f
+    jmp gs:[GS_SYSCALL_HANDLER]
+1:
     /*
      *  RAX: syscall number
      *  RDI: 1st argument
@@ -79,7 +84,6 @@ x64_syscall_handler:
 
 .macro ENTER_NORMAL_SYSCALL
     /* Switch to the kernel stack. */
-    swapgs
     mov rax, rsp
     mov rsp, gs:[GS_RSP0]
     push rax /* user RSP */
@@ -94,7 +98,6 @@ x64_syscall_handler:
 
 .macro ENTER_RECV_SYSCALL
     /* Switch to the kernel stack. */
-    swapgs
     mov rax, rsp
     mov rsp, gs:[GS_RSP0]
     push rax /* user RSP */
@@ -138,22 +141,9 @@ ipc_transfer_handler:
 
 ipc_recv_handler:
     /* Switch to the kernel stack. */
-    swapgs
-    mov rax, rsp
-    mov rsp, gs:[GS_RSP0]
-    push rax /* user RSP */
-    push r11 /* user RFLAGS */
-    push rcx /* user RIP */
-    xchg rcx, r10
+    ENTER_RECV_SYSCALL
     call sys_recv
-    cmp rax, 0x1000 /* NULL_PAGE_SIZE */
-    jb 1f
-    mov rdx, [rax + 8]
-    mov r8,  [rax + 16]
-    mov r9,  [rax + 24]
-    mov r10, [rax + 32]
-    mov rsi, [rax + 40]
-    mov rax, [rax]
+    LEAVE_RECV_SYSCALL
 1:
     jmp return_from_syscall
 

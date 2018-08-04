@@ -71,8 +71,10 @@ struct thread *thread_create(struct process *process, uptr_t start, uptr_t arg) 
     thread->sending = NULL;
     thread->receiving = NULL;
 
-    arch_create_thread(&thread->arch, is_kernel_thread,
-        start, arg, stack, stack_size);
+    arch_create_thread(
+        process, &thread->arch, is_kernel_thread,
+        start, arg, stack, stack_size
+    );
     thread_list_append(&process->threads, thread);
 
     DEBUG("kernel: created a thread #%d process=%p, start=%p (%s)",

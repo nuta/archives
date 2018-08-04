@@ -10,6 +10,7 @@ struct process *process_create(void) {
     process->pid = allocate_tid();
     process->next_stack_start = STACK_ADDR;
     process->channels_max = DEFAULT_CHANNELS_NUM;
+    process->syscall_handler = NULL;
 
     for (size_t i = 0; i < DEFAULT_CHANNELS_NUM; i++) {
         process->channels[i].state = CHANNEL_UNUSED;
@@ -51,4 +52,8 @@ void process_destroy(struct process *process) {
 struct process *kernel_process = NULL;
 void process_init(void) {
     kernel_process = process_create();
+}
+
+void process_set_syscall_handler(struct process *process, void (*handler)(void)) {
+    process->syscall_handler = handler;
 }

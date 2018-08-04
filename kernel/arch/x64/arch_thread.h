@@ -8,6 +8,7 @@
 #define GS_RFLAGS_ORMASK 56
 #define GS_XSTATE_MASK   64
 #define GS_XSTATE_PTR    72
+#define GS_SYSCALL_HANDLER 80
 
 #ifndef __ASSEMBLER__
 
@@ -24,6 +25,7 @@ struct arch_thread {
     u64_t rflags_ormask; // 56
     u64_t xstate_mask;   // 64
     u64_t xstate_ptr;    // 72
+    u64_t syscall_handler; // 80
 };
 
 #endif

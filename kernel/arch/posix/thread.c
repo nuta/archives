@@ -3,10 +3,15 @@
 #include <kernel/types.h>
 #include <kernel/printk.h>
 
-void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
-                    uptr_t start, umax_t arg,
-                    uptr_t stack, size_t stack_size) {
-
+void arch_create_thread(
+    struct process *process,
+    struct arch_thread *arch,
+    bool is_kernel_thread,
+    uptr_t start,
+    umax_t arg,
+    uptr_t stack,
+    size_t stack_size
+) {
     INFO("stack=%p", stack + stack_size);
     arch->ip = start;
     arch->arg = arg;

@@ -35,9 +35,17 @@ void arch_early_init(void);
 void arch_putchar(char ch);
 NORETURN void arch_panic(void);
 void arch_idle(void);
-void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
-                    uptr_t start, umax_t arg,
-                    uptr_t stack, size_t stack_size);
+
+struct process;
+void arch_create_thread(
+    struct process *process,
+    struct arch_thread *arch,
+    bool is_kernel_thread,
+    uptr_t start,
+    umax_t arg,
+    uptr_t stack,
+    size_t stack_size
+);
 void arch_destroy_thread(struct arch_thread *arch);
 void arch_switch(struct arch_thread *prev, struct arch_thread *next);
 

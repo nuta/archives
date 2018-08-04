@@ -1,6 +1,7 @@
 #include <kernel/types.h>
 #include <kernel/memory.h>
 #include <kernel/thread.h>
+#include <kernel/process.h>
 #include "thread.h"
 #include "switch.h"
 #include "asm.h"
@@ -8,9 +9,15 @@
 #include "fpu.h"
 
 
-void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
-                    uptr_t start, umax_t arg,
-                    uptr_t stack, size_t stack_size) {
+void arch_create_thread(
+    struct process *process,
+    struct arch_thread *arch,
+    bool is_kernel_thread,
+    uptr_t start,
+    umax_t arg,
+    uptr_t stack,
+    size_t stack_size
+) {
 
     if (is_kernel_thread) {
         // Temporarily use the stack to pass `start` and `arg`
@@ -52,6 +59,7 @@ void arch_create_thread(struct arch_thread *arch, bool is_kernel_thread,
     // TODO: ensure that the pointer is aligned to 64 or XSAVE raises #GP.
     arch->xstate_ptr = (u64_t) kmalloc(XSTATE_SIZE, KMALLOC_ZEROED | KMALLOC_NORMAL);
     arch->xstate_mask = x64_xsave_mask;
+    arch->syscall_handler = (u64_t) process->syscall_handler;
 }
 
 void arch_allow_io(struct arch_thread *arch) {
