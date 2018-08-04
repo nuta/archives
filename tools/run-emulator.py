@@ -24,7 +24,7 @@ def prettify_line(line):
         }.get(level)
 
         if level in ["PANIC", "BUG", "WARN"]:
-            label = colorama.Style.BRIGHT + level + ": " + colorama.Style.NORMAL
+            label = colorama.Style.BRIGHT + level + ": "
         else:
             label = ""
 
@@ -38,53 +38,55 @@ def run(args):
         if args.test:
             print("timeout :(")
             p.kill()
+    try:
+        timeout_thread = threading.Timer(3, timeout_handler)
+        timeout_thread.start()
 
-    timeout_thread = threading.Timer(3, timeout_handler)
-    timeout_thread.start()
+        passed = 0
+        failed = 0
+        line = ""
+        printk_line = False
+        while True:
+            data = p.stdout.read(1)
+            exit_code = p.poll()
+            if len(data) == 0 and exit_code is not None:
+                timeout_thread.cancel()
+                if exit_code == -signal.SIGSEGV:
+                    sys.exit( colorama.Style.BRIGHT + colorama.Fore.RED + \
+                        "The process caused segmentation fault." + colorama.Style.RESET_ALL)
+                sys.exit(1)
 
-    passed = 0
-    failed = 0
-    line = ""
-    printk_line = False
-    while True:
-        data = p.stdout.read(1)
-        exit_code = p.poll()
-        if len(data) == 0 and exit_code is not None:
-            timeout_thread.cancel()
-            if exit_code == -signal.SIGSEGV:
-                sys.exit( colorama.Style.BRIGHT + colorama.Fore.RED + \
-                    "The process caused segmentation fault." + colorama.Style.RESET_ALL)
-            sys.exit(1)
-
-        ch = data.decode("utf-8", errors="ignore")
-        if ch == "\n":
-            if "PASS: " in line:
-                passed += 1
-            if "FAIL: " in line:
-                failed += 1
-            if "Finished all tests" in line:
-                p.kill()
-                if failed == 0:
-                    print(colorama.Style.BRIGHT + colorama.Fore.GREEN + f"Passed all {passed} tests.")
-                    timeout_thread.cancel()
-                    p.wait()
-                    sys.exit()
-                else:
-                    print(colorama.Style.BRIGHT + colorama.Fore.RED + f"Failed {failed} tests.")
-                continue
-            print(prettify_line(line))
-            sys.stdout.flush()
-            line = ""
-            printk_line = False
-        elif printk_line:
-            line += ch
-        elif len(line) == 0 and ch == ">":
-            printk_line = True
-            line += ch
-        else:
-            print(ch, end="")
-            sys.stdout.flush()
-
+            ch = data.decode("utf-8", errors="ignore")
+            if ch == "\n":
+                if "PASS: " in line:
+                    passed += 1
+                if "FAIL: " in line:
+                    failed += 1
+                if "Finished all tests" in line:
+                    p.kill()
+                    if failed == 0:
+                        print(colorama.Style.BRIGHT + colorama.Fore.GREEN + f"Passed all {passed} tests.")
+                        timeout_thread.cancel()
+                        p.wait()
+                        sys.exit()
+                    else:
+                        print(colorama.Style.BRIGHT + colorama.Fore.RED + f"Failed {failed} tests.")
+                    continue
+                print(prettify_line(line))
+                sys.stdout.flush()
+                line = ""
+                printk_line = False
+            elif printk_line:
+                line += ch
+            elif len(line) == 0 and ch == ">":
+                printk_line = True
+                line += ch
+            else:
+                print(ch, end="")
+                sys.stdout.flush()
+    except KeyboardInterrupt:
+        p.kill()
+        timeout_thread.cancel()
 
 def main():
     parser = argparse.ArgumentParser()
