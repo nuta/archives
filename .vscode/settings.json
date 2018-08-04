@@ -1,3 +1,6 @@
 {
-    "cquery.cacheDirectory": "${workspaceFolder}/.cache/cquery"
+    "cquery.cacheDirectory": "${workspaceFolder}/.cache/cquery",
+    "files.associations": {
+        "**/*.h": "c",
+    }
 }
