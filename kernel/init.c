@@ -4,7 +4,6 @@
 #include "thread.h"
 #include "server.h"
 #include "string.h"
-#include "init.h"
 #include "test.h"
 #include "kfs.h"
 

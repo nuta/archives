@@ -4,7 +4,6 @@
 #include "thread.h"
 #include "server.h"
 #include "string.h"
-#include "init.h"
 #include "kfs.h"
 
 extern char __kfs[];
@@ -16,7 +15,7 @@ void kfs_container(void) {
 }
 
 
-static void kfs_opendir(struct kfs_dir *dir) {
+void kfs_opendir(struct kfs_dir *dir) {
     dir->current = (struct kfs_file_header *) ((uptr_t) &__kfs + sizeof(struct kfs_header));
 }
 
@@ -37,7 +36,7 @@ struct kfs_file *kfs_readdir(struct kfs_dir *dir, struct kfs_file *file) {
 }
 
 
-static paddr_t kfs_pager(void *arg, off_t offset, size_t length) {
+paddr_t kfs_pager(void *arg, off_t offset, size_t length) {
     struct kfs_file_header *header = arg;
     void *data = (void *) ((uptr_t) arg + sizeof(struct kfs_file_header) + offset);
     paddr_t paddr = alloc_pages(LEN_TO_PAGE_NUM(length), KMALLOC_NORMAL);
@@ -57,7 +56,13 @@ void kfs_init(void) {
 }
 
 
-static void elf_create_process(const void *image, UNUSED size_t length, pager_t *pager, void *pager_arg) {
+void elf_launch_process(
+    struct process *process,
+    const void *image,
+    size_t length,
+    pager_t *pager,
+    void *pager_arg
+) {
     struct elf64_ehdr *ehdr = (struct elf64_ehdr *) image;
 
     /* check out the magic number */
@@ -70,10 +75,6 @@ static void elf_create_process(const void *image, UNUSED size_t length, pager_t 
         WARN("%s: unsupported type, skipping...", image);
         return;
     }
-
-    struct process *process = process_create();
-    channel_connect(kernel_channel, process);
-    DEBUG("elf: created process #%d", process->pid);
 
     /* Load program headers. */
     for (int i = 0; i < ehdr->e_phnum; i++) {
@@ -105,7 +106,10 @@ void launch_servers(void) {
     while (kfs_readdir(&dir, &file) != NULL) {
         if (!strncmp("/servers/", file.name, 9)) {
             DEBUG("kernel: starting %s", file.name);
-            elf_create_process(file.data, file.length, kfs_pager, file.pager_arg);
+            struct process *proc = process_create();
+            channel_connect(kernel_channel, proc);
+            DEBUG("elf: created process #%d", proc->pid);
+            elf_launch_process(proc, file.data, file.length, kfs_pager, file.pager_arg);
         }
     }
 }
