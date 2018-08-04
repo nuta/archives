@@ -1,5 +1,6 @@
 .cache
 build
+*.o
 *.log
 *.pcap
 *.pyc
