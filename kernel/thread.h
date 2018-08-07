@@ -10,7 +10,7 @@ typedef u32_t tid_t;
 // The interval must be long enough. A short interval leads to
 // recursive timer interrupt handling, kernel stack starvation,
 // and eventually a nasty bug.
-#define THREAD_SWITCH_INTERVAL ((20 * 1000) / TICK_HZ)  /* 20 msec. */
+#define THREAD_SWITCH_INTERVAL ((50 * 1000) / TICK_HZ)
 
 #define THREAD_RUNNABLE 1
 #define THREAD_BLOCKED 2
