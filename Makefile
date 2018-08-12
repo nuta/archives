@@ -22,6 +22,7 @@ stubs: tools/idl/parser/idlParser.py tools/genstub.py $(stubs)
 
 build:
 	@mkdir -p $(KFS_DIR)/servers
+	@if [ ! -d $(STUBS_DIR) ]; then $(MAKE) stubs; fi
 	@set -e; for server_dir in $(addprefix servers/, $(SERVERS)); do \
 		$(MAKE) $$server_dir; \
 	done
