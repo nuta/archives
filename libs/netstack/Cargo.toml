@@ -1,8 +1,0 @@
-[package]
-name = "netstack"
-version = "0.0.1"
-authors = ["Seiya Nuta <nuta@seiya.me>"]
-
-[dependencies]
-resea = { path = "../resea" }
-resea_langitems = { path = "../resea/langitems" }

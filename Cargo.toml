@@ -8,5 +8,4 @@ members = [
     "servers/virtio-net",
     "servers/pc",
     "servers/fatfs",
-    "servers/net",
 ]
