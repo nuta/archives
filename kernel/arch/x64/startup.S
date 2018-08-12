@@ -5,7 +5,17 @@
 /* Boot from mbr.S */
 .globl x64_startup
 x64_startup:
-    .byte 0x0f, 0x20, 0xc0 /* mov eax, cr0 */
+    /*
+     *  There are two following conditions:
+     *
+     *    - Booted from mbr.S: We're in the real mode
+     *    - Booted from GRUB: We're in the protected mode
+     *
+     *  The following instructions written by `.byte's determine
+     *  the condition and go into the appropriate boot code.
+     *
+     */
+     .byte 0x0f, 0x20, 0xc0 /* mov eax, cr0 */
 
     /*
      * In protected mode there instructions are decoded as: test eax, 0xd740001
