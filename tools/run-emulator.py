@@ -39,7 +39,7 @@ def run(args):
             print("timeout :(")
             p.kill()
     try:
-        timeout_thread = threading.Timer(3, timeout_handler)
+        timeout_thread = threading.Timer(7, timeout_handler)
         timeout_thread.start()
 
         passed = 0
