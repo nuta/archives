@@ -1,0 +1,26 @@
+{
+    "name": "ena-vscode",
+    "displayName": "ena",
+    "description": "The ena programming language.",
+    "version": "0.0.1",
+    "publisher": "seiyanuta",
+    "engines": {
+        "vscode": "^1.26.0"
+    },
+    "categories": [
+        "Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "ena",
+            "aliases": ["ena", "ena"],
+            "extensions": [".ena"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "ena",
+            "scopeName": "source.ena",
+            "path": "./syntaxes/ena.tmLanguage.json"
+        }]
+    }
+}

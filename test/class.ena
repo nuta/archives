@@ -1,0 +1,12 @@
+class User {
+    func new(age) {
+        self.user_age = age;
+    }
+
+    func age() {
+        return self.user_age - 3;
+    }
+}
+
+var mike = User(24);
+var ans = mike.age();

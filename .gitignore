@@ -1,0 +1,14 @@
+*.pyc
+*.o
+*.a
+*.profraw
+*.profdata
+/ena
+/compile_commands.json
+/.vscode/cquery_cached_index
+/doxygen
+/coverage
+/clang-static-analyzer
+/benchmark/results.json
+/windows/.vs
+/windows/Debug

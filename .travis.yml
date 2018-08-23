@@ -1,0 +1,66 @@
+language: c
+compiler: clang
+
+jobs:
+  include:
+    - stage: test
+      name: test
+      os: linux
+      dist: trusty
+      sudo: false
+      install:
+        - pyenv global 3.6.3
+        - pip3 install -r tools/requirements.txt
+      script:
+        - make test CC=clang
+
+    - name: test
+      os: osx
+      osx_image: xcode9.3
+      install:
+        - brew upgrade python
+        - pip3 install -r tools/requirements.txt
+      script:
+        - make
+        - make test
+
+    - name: coverage
+      os: linux
+      dist: trusty
+      sudo: false
+      install:
+        - pyenv global 3.6.3
+        - pip3 install -r tools/requirements.txt
+      script:
+        - make coverage CC=clang
+
+    - name: benchmark
+      os: linux
+      dist: trusty
+      sudo: false
+      addons:
+        apt:
+          packages:
+            - lua5.2
+            - luajit
+      install:
+        - pyenv global 3.6.3
+        - pip3 install -r tools/requirements.txt
+      script:
+        - make benchmark CC=clang RELEASE=1
+
+    - name: valgrind
+      os: linux
+      dist: trusty
+      sudo: falsea
+      addons:
+        apt:
+          packages:
+            - valgrind
+      script:
+        - make CC=clang
+        - valgrind --leak-check=full ./ena test/fib.ena
+
+notifications:
+  on_success: change
+  on_failure: change

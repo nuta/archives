@@ -1,0 +1,62 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "ena",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#comments"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [
+				{
+					"name": "keyword.control.ena",
+					"match": "\\b(var|func|if|while|for|return|break|continue)\\b"
+				},
+				{
+					"name": "constant.language.ena",
+					"match": "\\b(true|false|null)\\b"
+				},
+				{
+					"name": "keyword.operator.ena",
+					"match": "\\b(not|and|or)\\b"
+				},
+				{
+					"name": "variable.other.ena",
+					"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)"
+				},
+				{
+					"name": "keyword.operator.ena",
+					"match": "\\+|-|\\*|\\/[^\\/]"
+				}
+			]
+		},
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.double-slash.ena",
+					"begin": "//",
+					"end": "$"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.ena",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.ena",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.ena"
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ena Benchmark Results</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.17/vue.min.js" integrity="sha256-FtWfRI+thWlNz2sB3SJbwKx5PgMyKIVgwHCTwa3biXc=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js" integrity="sha256-CfcERD4Ov4+lKbWbYqXD6aFM9M51gN4GUEtDhkWABMo=" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Open Sans', sans-serif;
+        }
+
+        #app {
+            max-width: 1000px;
+            margin: 20px auto 0px;
+        }
+
+        table, tr, th, td {
+            border: 1px solid #555;
+            border-collapse: collapse;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        th, td {
+            padding: 5px 10px;
+        }
+
+        .chart {
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <h1>Benchmarks</h1>
+    <table>
+        <tr>
+            <th>Platform</th>
+            <td>{{ platform }}</td>
+        </tr>
+        <tr>
+            <th>CPU</th>
+            <td>{{ cpu }} ({{ num_cpus }} cores)</td>
+        </tr>
+        <tr v-for="version, name in interpreters">
+            <th>{{ name }} version</th>
+            <td>{{ version }}</td>
+        </tr>
+    </table>
+
+    <div v-for="results, benchmark in benchmarks">
+        <h2>{{ benchmark }}</h2>
+        <canvas :id="benchmark + '-chart'" class="chart"></canvas>
+    </div>
+</div>
+
+<script>
+new Vue({
+    el: "#app",
+    data: {
+        platform: "",
+        cpu: "",
+        num_cpus: null,
+        benchmarks: []
+    },
+    mounted() {
+         fetch("results.json").then(r => r.json()).then(results => {
+            this.platform = results.platform;
+            this.cpu = results.cpu;
+            this.interpreters = results.interpreters;
+            this.num_cpus = results.num_cpus;
+            this.benchmarks = results.results;
+            this.$forceUpdate();
+            console.log("fetched!!");
+         });
+    },
+    updated() {
+        console.log("mounted", this.benchmarks);
+        const colors = []
+
+        for (const [benchmark, results] of Object.entries(this.benchmarks)) {
+            const ctx = document.getElementById(benchmark + "-chart").getContext('2d');
+            new Chart(ctx, {
+                type: "horizontalBar",
+                data: {
+                    labels: Object.keys(results),
+                    datasets: [
+                        {
+                            label: benchmark,
+                            data: Object.values(results),
+                        }
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                }
+            });
+        }
+    }
+});
+</script>
+</body>
+</html>
