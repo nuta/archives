@@ -190,7 +190,7 @@ void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t n
 }
 
 void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value) {
-    ena_define_var_in(vm, vm->current, name, value);
+    ena_define_var_in(vm, vm->current_scope, name, value);
 }
 
 ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name) {

@@ -92,7 +92,7 @@ struct ena_vm {
     struct ena_hash_table ident2cstr;
     struct ena_hash_table cstr2ident;
     struct ena_module *main_module;
-    struct ena_scope *current;
+    struct ena_scope *current_scope;
     struct ena_savepoint *current_savepoint;
     struct ena_class *current_class;
     struct ena_instance *current_instance;

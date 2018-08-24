@@ -82,7 +82,7 @@ EVAL_NODE(OP_ASSIGN) {
             NOT_YET_IMPLEMENTED();
         }
     } else {
-        struct ena_hash_entry *entry = lookup_var(vm->current, name);
+        struct ena_hash_entry *entry = lookup_var(vm->current_scope, name);
         if (!entry) {
             RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
         }
@@ -103,7 +103,7 @@ EVAL_NODE(FUNC) {
     func->name = name;
     func->param_names = param_names;
     func->stmts = stmts;
-    func->scope = vm->current;
+    func->scope = vm->current_scope;
 
     uint32_t type;
     struct ena_hash_table *table;
@@ -113,7 +113,7 @@ EVAL_NODE(FUNC) {
         type = FUNC_FLAGS_METHOD;
     } else {
         // A function definition.
-        table = &vm->current->vars;
+        table = &vm->current_scope->vars;
         type = FUNC_FLAGS_FUNC;
     }
 
@@ -142,7 +142,7 @@ static ena_value_t eval_func_call(
     }
 
     // Evaluate and fill arguments into the newly created scope.
-    struct ena_scope *caller_scope = vm->current;
+    struct ena_scope *caller_scope = vm->current_scope;
     struct ena_node *args = expr_list->child;
     struct ena_scope *new_scope = create_scope(func->scope);
     for (int i = 0; i < num_args; i++) {
@@ -159,7 +159,7 @@ static ena_value_t eval_func_call(
     DEBUG(">>> call %s", ena_ident2cstr(vm, func->name));
     ena_hash_dump_ident_value_table(vm, &new_scope->parent->vars);
 
-        vm->current = new_scope;
+        vm->current_scope = new_scope;
         vm->current_instance = instance;
         eval_node(vm, func->stmts);
     } else {
@@ -172,7 +172,7 @@ static ena_value_t eval_func_call(
     }
 
     // Returned from the function.
-    vm->current = caller_scope;
+    vm->current_scope = caller_scope;
     vm->current_instance = NULL;
     POP_SAVEPOINT();
     return ret_value;
@@ -224,7 +224,7 @@ static ena_value_t eval_instantiate(struct ena_vm *vm, struct ena_node *node, st
 EVAL_NODE(CALL) {
     if (node->child[0].type == ENA_NODE_ID) {
         ena_value_t func_name = ena_cstr2ident(vm, node->child[0].token->str);
-        ena_value_t func = get_var_value(vm->current, func_name);
+        ena_value_t func = get_var_value(vm->current_scope, func_name);
         switch (ena_get_type(func)) {
             case ENA_T_FUNC:
                 return eval_func_call(vm, &node->child[1], NULL, (struct ena_func *) func);
@@ -240,12 +240,12 @@ EVAL_NODE(CALL) {
 
 EVAL_NODE(RETURN) {
     ena_value_t ret_value = eval_node(vm, node->child);
-    if (vm->current == NULL) {
+    if (vm->current_scope == NULL) {
         RUNTIME_ERROR("return from the top level");
         return ENA_UNDEFINED;
     }
 
-    vm->current = vm->current->parent;
+    vm->current_scope = vm->current_scope->parent;
     vm->current_savepoint->ret_value = ret_value;
     UNWIND_SAVEPOINT(ENA_UNWIND_RETURN);
 
@@ -273,7 +273,7 @@ EVAL_NODE(CLASS) {
 
 EVAL_NODE(ID) {
     ena_value_t name = ena_cstr2ident(vm, node->token->str);
-    ena_value_t value = get_var_value(vm->current, name);
+    ena_value_t value = get_var_value(vm->current_scope, name);
     if (value == ENA_UNDEFINED) {
         RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
     }
@@ -411,7 +411,7 @@ bool ena_eval(struct ena_vm *vm, char *script) {
     }
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
-        vm->current = (struct ena_scope *) vm->main_module;
+        vm->current_scope = (struct ena_scope *) vm->main_module;
         eval_node(vm, ast->tree);
     } else {
         return false;
