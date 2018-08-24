@@ -57,8 +57,10 @@ void ena_dump_tokens(struct ena_vm *vm, const char *script) {
 
     for (;;) {
         struct ena_token *token = ena_get_next_token(vm);
+        enum ena_token_type type = token->type;
         DEBUG("%s: '%s'", ena_get_token_name(token->type), token->str);
-        if (token->type == ENA_TOKEN_EOF) {
+        ena_destroy_token(token);
+        if (type == ENA_TOKEN_EOF) {
             break;
         }
     }
@@ -318,4 +320,9 @@ return_token:;
     token->line = vm->lexer.current_line;
     token->column = vm->lexer.current_column;
     return token;
+}
+
+void ena_destroy_token(struct ena_token *token) {
+    ena_free(token->str);
+    ena_free(token);
 }

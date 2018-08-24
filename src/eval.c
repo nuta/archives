@@ -3,16 +3,31 @@
 #include "eval.h"
 #include "internal.h"
 #include "malloc.h"
+#include "gc.h"
 
 #define EVAL_NODE(name) static ena_value_t eval_##name(UNUSED struct ena_vm *vm, UNUSED struct ena_node *node)
 #define EVAL_BINOP_NODE(op_name, result_type, c_op) \
     EVAL_NODE(op_name) { \
-        struct ena_int *lhs = ena_cast_to_int(eval_node(vm, &node->child[0])); \
-        struct ena_int *rhs = ena_cast_to_int(eval_node(vm, &node->child[1])); \
-        return ena_create_##result_type(lhs->value c_op rhs->value); \
+        ena_value_t lhs = eval_node(vm, &node->child[0]); \
+        ena_value_t rhs = eval_node(vm, &node->child[1]); \
+        struct ena_int *lhs_obj = ena_cast_to_int(lhs); \
+        struct ena_int *rhs_obj = ena_cast_to_int(rhs); \
+        ena_value_t result = ena_create_##result_type(lhs_obj->value c_op rhs_obj->value); \
+        ena_delete(lhs); \
+        ena_delete(rhs); \
+        return result; \
     }
 
 static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node);
+
+static ena_value_t copy_if_immutable(ena_value_t value) {
+    switch (ena_get_type(value)) {
+        case ENA_T_INT:
+            return ena_create_int(ena_cast_to_int(value)->value);
+        default:
+            return value;
+    }
+}
 
 void init_scope(struct ena_scope *scope, struct ena_scope *parent) {
     scope->flags = SCOPE_FLAG_LOCALS;
@@ -272,7 +287,7 @@ EVAL_NODE(ID) {
         RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
     }
 
-    return value;
+    return copy_if_immutable(value);
 }
 
 EVAL_NODE(PROP) {

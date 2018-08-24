@@ -92,8 +92,10 @@ static struct ena_node *create_node_with_token(enum ena_node_type type, struct e
     return node;
 }
 
+/// @warning `child` will be freed.
 static inline void set_nth_child(struct ena_node *array, int nth, struct ena_node *child) {
     ena_memcpy(&array[nth], child, sizeof(*child));
+    ena_free(child);
 }
 
 
@@ -481,6 +483,21 @@ struct ena_ast *ena_parse(struct ena_vm *vm, const char *script) {
     return ast;
 }
 
+static void destroy_node(struct ena_node *node) {
+    for (int i = 0; i < node->num_childs; i++) {
+        destroy_node(&node->child[i]);
+    }
+
+    if (node->token) {
+        ena_destroy_token(node->token);
+    }
+
+    if (node->child) {
+        ena_free(node->child);
+    }
+}
+
 void ena_destroy_ast(struct ena_ast *ast) {
+    destroy_node(ast->tree);
     ena_free(ast);
 }

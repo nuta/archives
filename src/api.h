@@ -26,6 +26,7 @@ enum ena_value_type {
 // too low memory address (< 0x1000). Typically the page is never used in order to
 // detect NULL pointer dereferences and in an embedded software (MMU is disabled)
 // important data strctures like interrupt table exist.
+#define ENA_IS_IN_HEAP(value) (((uintptr_t) (value)) >= 0x1000)
 #define ENA_UNDEFINED 0
 #define ENA_NULL      (1 << 1)
 #define ENA_TRUE      (2 << 1)
@@ -44,6 +45,7 @@ enum ena_error_type {
 struct ena_vm;
 typedef ena_value_t ena_native_func_t(struct ena_vm *vm, int argc, ...);
 struct ena_vm *ena_create_vm();
+void ena_destroy_vm(struct ena_vm *vm);
 bool ena_eval(struct ena_vm *vm, char *script);
 const char *ena_get_error_cstr(struct ena_vm *vm);
 

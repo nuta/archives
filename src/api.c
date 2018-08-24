@@ -72,3 +72,7 @@ struct ena_vm *ena_create_vm() {
     ena_hash_init_cstr_table(&vm->cstr2ident);
     return vm;
 }
+
+void ena_destroy_vm(struct ena_vm *vm) {
+    ena_free(vm);
+}

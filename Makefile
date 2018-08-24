@@ -29,7 +29,7 @@ override CFLAGS += -fprofile-instr-generate -fcoverage-mapping
 override LDFLAGS += -fprofile-instr-generate -fcoverage-mapping
 endif
 
-objs := src/api.o src/lexer.o src/parser.o src/eval.o src/hash.o src/internal.o src/malloc.o
+objs := src/api.o src/lexer.o src/parser.o src/eval.o src/gc.o src/hash.o src/internal.o src/malloc.o
 ifeq ($(RELEASE),)
 override CFLAGS += -DENA_DEBUG_BUILD -DENA_WITH_TEST
 objs += src/test.o

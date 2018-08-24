@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="..\src\api.h" />
     <ClInclude Include="..\src\eval.h" />
+    <ClInclude Include="..\src\gc.h" />
     <ClInclude Include="..\src\hash.h" />
     <ClInclude Include="..\src\internal.h" />
     <ClInclude Include="..\src\lexer.h" />
@@ -165,6 +166,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\api.c" />
     <ClCompile Include="..\src\eval.c" />
+    <ClCompile Include="..\src\gc.c" />
     <ClCompile Include="..\src\hash.c" />
     <ClCompile Include="..\src\lexer.c" />
     <ClCompile Include="..\src\malloc.c" />
