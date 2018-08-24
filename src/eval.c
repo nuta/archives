@@ -117,9 +117,6 @@ EVAL_NODE(FUNC) {
         type = FUNC_FLAGS_FUNC;
     }
 
-    DEBUG(">>> func def %s", ena_ident2cstr(vm, name));
-    ena_hash_dump_ident_value_table(vm, table);
-
     func->flags = FUNC_FLAGS_METHOD;
     if (ena_hash_search_or_insert(table, (void *) name, (void *) func)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
@@ -156,9 +153,6 @@ static ena_value_t eval_func_call(
     int unwind_type;
     ena_value_t ret_value = ENA_UNDEFINED;
     if ((unwind_type = EXEC_SAVEPOINT()) == 0) {
-    DEBUG(">>> call %s", ena_ident2cstr(vm, func->name));
-    ena_hash_dump_ident_value_table(vm, &new_scope->parent->vars);
-
         vm->current_scope = new_scope;
         vm->current_instance = instance;
         eval_node(vm, func->stmts);
