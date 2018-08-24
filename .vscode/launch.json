@@ -101,5 +101,17 @@
             "externalConsole": true,
             "MIMode": "lldb"
         },
+        {
+            "name": "comment",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ena",
+            "args": ["test/comment.ena"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
     ]
 }

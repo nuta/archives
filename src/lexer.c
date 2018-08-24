@@ -254,10 +254,37 @@ retry:;
         //
         case '/':
             switch (NEXT_CHAR()) {
+                case '*': {
+                    // Block comment. Nested comments are allowed.
+                    int depth = 0;
+                    char prevc = '/';
+                    for (;;) {
+                        if ((nextc = ena_get_next_char(vm)) == 0) {
+                            type = ENA_TOKEN_EOF;
+                            goto return_token;
+                        }
+
+                        if (prevc == '/' && nextc == '*') {
+                            depth++;
+                        }
+
+                        if (prevc == '*' && nextc == '/') {
+                            depth--;
+                            if (!depth) {
+                                // End of the comment.
+                                break;
+                            }
+                        }
+
+                        prevc = nextc;
+                    }
+                    goto retry;
+                    break;
+                }
                 case '/':
                     // Discard until a newline.
                     do {
-                        if ((nextc = ena_get_next_char(vm))  == 0) {
+                        if ((nextc = ena_get_next_char(vm)) == 0) {
                             type = ENA_TOKEN_EOF;
                             goto return_token;
                         }
