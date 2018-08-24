@@ -131,13 +131,12 @@ const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);
 // TODO: Move these functions to an appropriate file.
 struct ena_module *ena_create_module(void);
 struct ena_int *ena_cast_to_int(ena_value_t value);
-ena_value_t lookup_var(struct ena_scope *scope, ena_ident_t name);
+ena_value_t get_var_value(struct ena_scope *scope, ena_ident_t name);
+struct ena_hash_entry *lookup_var(struct ena_scope *scope, ena_ident_t name);
 void ena_assign_to_var(struct ena_vm *vm, struct ena_hash_table *table, ena_ident_t name, ena_value_t value, bool allow_undefined);
 void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
 void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value);
 void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
-struct ena_node;
-void ena_define_func(struct ena_vm *vm, struct ena_hash_table *table, ena_ident_t name, struct ena_node *param_names,  struct ena_node *stmts, int type);
 ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name);
 
 #endif

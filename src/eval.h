@@ -20,6 +20,7 @@ struct ena_func {
     struct ena_object header;
     uint32_t flags;
     ena_ident_t name;
+    struct ena_scope *scope;
     struct ena_node *stmts;
     struct ena_node *param_names;
 };

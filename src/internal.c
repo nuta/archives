@@ -193,20 +193,6 @@ void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value) {
     ena_define_var_in(vm, vm->current, name, value);
 }
 
-void ena_define_func(struct ena_vm *vm, struct ena_hash_table *table, ena_ident_t name, struct ena_node *param_names,  struct ena_node *stmts, int type) {
-    struct ena_func *obj = (struct ena_func *) ena_malloc(sizeof(*obj));
-    obj->header.type = ENA_T_FUNC;
-    obj->header.refcount = 1;
-    obj->flags |= type;
-    obj->name = name;
-    obj->param_names = param_names;
-    obj->stmts = stmts;
-
-    if (ena_hash_search_or_insert(table, (void *) name, (void *) obj)) {
-        RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
-    }
-}
-
 ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name) {
     struct ena_hash_entry *e = ena_hash_search(table, (void *) name);
     if (e) {
@@ -216,33 +202,20 @@ ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name) {
     return ENA_UNDEFINED;
 }
 
-ena_value_t lookup_var(struct ena_scope *scope, ena_ident_t name) {
+struct ena_hash_entry *lookup_var(struct ena_scope *scope, ena_ident_t name) {
     while (scope) {
-        ena_value_t value = get_var_from(&scope->vars, name);
-        if (value != ENA_UNDEFINED) {
-            return value;
+        struct ena_hash_entry *e = ena_hash_search(&scope->vars, (void *) name);
+        if (e) {
+            return e;
         }
 
         scope = scope->parent;
     }
 
-    return ENA_UNDEFINED;
+    return NULL;
 }
 
-void ena_assign_to_var(struct ena_vm *vm, struct ena_hash_table *table, ena_ident_t name, ena_value_t value, bool allow_undefined) {
-    struct ena_hash_entry *e;
-    if (allow_undefined) {
-        e = ena_hash_search_or_insert(table, (void *) name, (void *) value);
-        if (!e) {
-            // Successfully defined a new variable.
-            return;
-        }
-    } else {
-        e = ena_hash_search(table, (void *) name);
-        if (!e) {
-            RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
-        }
-    }
-
-    e->value = (void *) value;
+ena_value_t get_var_value(struct ena_scope *scope, ena_ident_t name) {
+    struct ena_hash_entry *e = lookup_var(scope, name);
+    return e ? ((ena_value_t) e->value) : ENA_UNDEFINED;
 }

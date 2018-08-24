@@ -89,5 +89,17 @@
             "externalConsole": true,
             "MIMode": "lldb"
         },
+        {
+            "name": "closure",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ena",
+            "args": ["test/closure.ena"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
     ]
 }

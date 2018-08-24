@@ -62,8 +62,6 @@ EVAL_NODE(OP_ASSIGN) {
     ena_ident_t name = ena_cstr2ident(vm, node->child[0].token->str);
     ena_value_t rvalue = eval_node(vm, &node->child[1]);
 
-    bool allow_undefined;
-    struct ena_hash_table *table;
     if (node->child[0].type == ENA_NODE_PROP) {
         struct ena_node *obj = node->child[0].child;
         if (!ena_strcmp(obj->token->str, "self")) {
@@ -71,17 +69,27 @@ EVAL_NODE(OP_ASSIGN) {
                 RUNTIME_ERROR("self is not available");
             }
 
-            allow_undefined = true;
+            struct ena_hash_table *table;
+            struct ena_hash_entry *entry;
             table = &vm->current_instance->props;
+            entry = ena_hash_search_or_insert(table, (void *) name, (void *) rvalue);
+            if (entry) {
+                // Already defined in self. Replace its value intead of
+                // inserting a new variable.
+                entry->value = (void *) rvalue;
+            }
         } else {
             NOT_YET_IMPLEMENTED();
         }
     } else {
-        table = &vm->current->vars;
-        allow_undefined = false;
+        struct ena_hash_entry *entry = lookup_var(vm->current, name);
+        if (!entry) {
+            RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
+        }
+
+        entry->value = (void *) rvalue;
     }
 
-    ena_assign_to_var(vm, table, name, rvalue, allow_undefined);
     return rvalue;
 }
 
@@ -89,13 +97,32 @@ EVAL_NODE(FUNC) {
     ena_ident_t name = ena_cstr2ident(vm, node->token->str);
     struct ena_node *param_names = &node->child[0];
     struct ena_node *stmts = &node->child[1];
+    struct ena_func *func = (struct ena_func *) ena_malloc(sizeof(*func));
+    func->header.type = ENA_T_FUNC;
+    func->header.refcount = 1;
+    func->name = name;
+    func->param_names = param_names;
+    func->stmts = stmts;
+    func->scope = vm->current;
 
+    uint32_t type;
+    struct ena_hash_table *table;
     if (vm->current_class) {
         // A method definition.
-        ena_define_func(vm, &vm->current_class->methods, name, param_names, stmts, FUNC_FLAGS_METHOD);
+        table = &vm->current_class->methods;
+        type = FUNC_FLAGS_METHOD;
     } else {
         // A function definition.
-        ena_define_func(vm, &vm->current->vars, name, param_names, stmts, FUNC_FLAGS_FUNC);
+        table = &vm->current->vars;
+        type = FUNC_FLAGS_FUNC;
+    }
+
+    DEBUG(">>> func def %s", ena_ident2cstr(vm, name));
+    ena_hash_dump_ident_value_table(vm, table);
+
+    func->flags = FUNC_FLAGS_METHOD;
+    if (ena_hash_search_or_insert(table, (void *) name, (void *) func)) {
+        RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
     }
 
     return ENA_UNDEFINED;
@@ -115,8 +142,9 @@ static ena_value_t eval_func_call(
     }
 
     // Evaluate and fill arguments into the newly created scope.
+    struct ena_scope *caller_scope = vm->current;
     struct ena_node *args = expr_list->child;
-    struct ena_scope *new_scope = create_scope(vm->current);
+    struct ena_scope *new_scope = create_scope(func->scope);
     for (int i = 0; i < num_args; i++) {
         ena_ident_t param_name = ena_cstr2ident(vm, func->param_names->child[i].token->str);
         ena_value_t arg_value = eval_node(vm, &args[i]);
@@ -128,6 +156,9 @@ static ena_value_t eval_func_call(
     int unwind_type;
     ena_value_t ret_value = ENA_UNDEFINED;
     if ((unwind_type = EXEC_SAVEPOINT()) == 0) {
+    DEBUG(">>> call %s", ena_ident2cstr(vm, func->name));
+    ena_hash_dump_ident_value_table(vm, &new_scope->parent->vars);
+
         vm->current = new_scope;
         vm->current_instance = instance;
         eval_node(vm, func->stmts);
@@ -141,6 +172,7 @@ static ena_value_t eval_func_call(
     }
 
     // Returned from the function.
+    vm->current = caller_scope;
     vm->current_instance = NULL;
     POP_SAVEPOINT();
     return ret_value;
@@ -192,7 +224,7 @@ static ena_value_t eval_instantiate(struct ena_vm *vm, struct ena_node *node, st
 EVAL_NODE(CALL) {
     if (node->child[0].type == ENA_NODE_ID) {
         ena_value_t func_name = ena_cstr2ident(vm, node->child[0].token->str);
-        ena_value_t func = lookup_var(vm->current, func_name);
+        ena_value_t func = get_var_value(vm->current, func_name);
         switch (ena_get_type(func)) {
             case ENA_T_FUNC:
                 return eval_func_call(vm, &node->child[1], NULL, (struct ena_func *) func);
@@ -241,7 +273,7 @@ EVAL_NODE(CLASS) {
 
 EVAL_NODE(ID) {
     ena_value_t name = ena_cstr2ident(vm, node->token->str);
-    ena_value_t value = lookup_var(vm->current, name);
+    ena_value_t value = get_var_value(vm->current, name);
     if (value == ENA_UNDEFINED) {
         RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
     }

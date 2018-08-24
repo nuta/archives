@@ -1,0 +1,14 @@
+func returnCounter() {
+    var i = 0;
+    func counter() {
+        i = i + 1;
+        return i;
+    }
+
+    return counter;
+}
+
+var f = returnCounter();
+f(); // 1
+f(); // 2
+var ans = f(); // 3
