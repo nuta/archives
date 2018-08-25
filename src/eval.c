@@ -62,7 +62,6 @@ EVAL_NODE(PROGRAM) {
 
 EVAL_NODE(VAR) {
     ena_value_t initial = ENA_UNDEFINED;
-    DEBUG("==> node '%s'",node->token->str);
     ena_ident_t name = ena_cstr2ident(vm, node->token->str);
     if (node->num_childs == 1) {
         // Variable declaration with initializer (e.g. var x = expr).
@@ -77,7 +76,6 @@ EVAL_NODE(VAR) {
 EVAL_NODE(OP_ASSIGN) {
     ena_ident_t name = ena_cstr2ident(vm, node->child[0].token->str);
     ena_value_t rvalue = eval_node(vm, &node->child[1]);
-    DEBUG("--> '%s'",node->child[0].token->str);
 
     if (node->child[0].type == ENA_NODE_PROP) {
         struct ena_node *obj = node->child[0].child;
