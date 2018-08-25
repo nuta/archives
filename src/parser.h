@@ -52,6 +52,7 @@ struct ena_node {
 };
 
 struct ena_ast {
+    struct ena_ast *next;
     struct ena_node *tree;
 };
 

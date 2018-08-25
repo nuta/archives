@@ -47,6 +47,7 @@ int file_main(FILE *f) {
     }
 #endif
 
+    ena_destroy_vm(vm);
     return 0;
 }
 

@@ -122,7 +122,7 @@ void ena_skip_tokens(struct ena_vm *vm, int num) {
     }
 }
 
-struct ena_token *ena_consume_token(struct ena_vm *vm, enum ena_token_type expected_type) {
+struct ena_token *ena_expect_token(struct ena_vm *vm, enum ena_token_type expected_type) {
     struct ena_token *token = ena_get_next_token(vm);
     if (token->type != expected_type) {
         SYNTAX_ERROR(

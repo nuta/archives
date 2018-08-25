@@ -15,7 +15,8 @@
 #define NEXT_TYPE() ena_fetch_next_token_type(vm)
 #define GET_NEXT() ena_get_next_token(vm)
 #define FETCH_NEXT() ena_fetch_next_token(vm)
-#define CONSUME(expected_type) ena_consume_token(vm, ENA_TOKEN_##expected_type)
+#define EXPECT(expected_type) ena_expect_token(vm, ENA_TOKEN_##expected_type)
+#define CONSUME(expected_type) ena_destroy_token(ena_expect_token(vm, ENA_TOKEN_##expected_type))
 
 const char *ena_get_node_name(enum ena_node_type type) {
 #define DEFINE_NODE_NAME(name) [ENA_NODE_##name] = "NODE_" #name
@@ -174,7 +175,7 @@ PARSE_RULE(unary) {
             }
             case ENA_TOKEN_DOT: {
                 SKIP(1);
-                struct ena_token *prop = CONSUME(ID);
+                struct ena_token *prop = EXPECT(ID);
                 lhs = create_node_with_token(ENA_NODE_PROP, prop, lhs, 1);
                 break;
             }
@@ -276,7 +277,7 @@ PARSE_RULE(id_list) {
         }
 
         REALLOC_NODE_ARRAY(childs, num_childs + 1);
-        struct ena_token *token = CONSUME(ID);
+        struct ena_token *token = EXPECT(ID);
         struct ena_node *id = create_node_with_token(ENA_NODE_ID, token, NULL, 0);
         set_nth_child(childs, num_childs, id);
         num_childs++;
@@ -293,7 +294,7 @@ PARSE_RULE(id_list) {
 // Childs: stmts (stmts)
 PARSE_RULE(class_stmt) {
     CONSUME(CLASS);
-    struct ena_token *name_token = CONSUME(ID);
+    struct ena_token *name_token = EXPECT(ID);
     CONSUME(LBRACKET);
     struct ena_node *stmts = PARSE(stmts);
     CONSUME(RBRACKET);
@@ -303,7 +304,7 @@ PARSE_RULE(class_stmt) {
 // Childs: args (id_list), stmts (stmts)
 PARSE_RULE(func_stmt) {
     CONSUME(FUNC);
-    struct ena_token *name_token = CONSUME(ID);
+    struct ena_token *name_token = EXPECT(ID);
 
     CONSUME(LPAREN);
     struct ena_node *args = PARSE(id_list);
@@ -326,8 +327,7 @@ PARSE_RULE(func_stmt) {
 ///   initializer? : expr
 PARSE_RULE(var_stmt) {
     CONSUME(VAR);
-    struct ena_token *name_token = CONSUME(ID);
-
+    struct ena_token *name_token = EXPECT(ID);
     if (NEXT_TYPE() == ENA_TOKEN_EQ) {
         SKIP(1);
         struct ena_node *initializer = PARSE(expr);

@@ -96,6 +96,7 @@ struct ena_vm {
     struct ena_savepoint *current_savepoint;
     struct ena_class *current_class;
     struct ena_instance *current_instance;
+    struct ena_ast *ast_list;
 };
 
 typedef uintptr_t ena_ident_t;

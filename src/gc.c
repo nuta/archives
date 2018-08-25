@@ -16,14 +16,33 @@ void ena_delete(ena_value_t value) {
     }
 }
 
+/// Increments the reference count of scope.
+/// @arg scope The scope.
+void ena_share_scope(struct ena_scope *scope) {
+    scope->refcount++;
+}
+
+/// Decrements the reference count of scope.
+/// @arg scope The scope.
+void ena_delete_scope(struct ena_scope *scope) {
+    scope->refcount--;
+    if (scope->refcount == 0) {
+        ena_delete_table(&scope->vars);
+        ena_free(scope);
+    }
+}
+
 /// Decrements the reference counts in the specified table.
 /// @arg table The table which values are ena_value_t.
 void ena_delete_table(struct ena_hash_table *table) {
     for (int i = 0; i < table->num_buckets; i++) {
         struct ena_hash_entry *e = table->buckets[i];
         while (e) {
+            struct ena_int *inter = (struct ena_int *) e;
             ena_delete((ena_value_t) e->value);
             e = e->next;
         }
     }
+
+    ena_hash_free_table(table);
 }

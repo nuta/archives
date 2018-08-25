@@ -62,6 +62,7 @@ EVAL_NODE(PROGRAM) {
 
 EVAL_NODE(VAR) {
     ena_value_t initial = ENA_UNDEFINED;
+    DEBUG("==> node '%s'",node->token->str);
     ena_ident_t name = ena_cstr2ident(vm, node->token->str);
     if (node->num_childs == 1) {
         // Variable declaration with initializer (e.g. var x = expr).
@@ -76,6 +77,7 @@ EVAL_NODE(VAR) {
 EVAL_NODE(OP_ASSIGN) {
     ena_ident_t name = ena_cstr2ident(vm, node->child[0].token->str);
     ena_value_t rvalue = eval_node(vm, &node->child[1]);
+    DEBUG("--> '%s'",node->child[0].token->str);
 
     if (node->child[0].type == ENA_NODE_PROP) {
         struct ena_node *obj = node->child[0].child;
@@ -130,6 +132,7 @@ EVAL_NODE(FUNC) {
         // A function definition.
         table = &vm->current_scope->vars;
         type = FUNC_FLAGS_FUNC;
+        ena_share_scope(vm->current_scope);
     }
 
     func->flags = FUNC_FLAGS_METHOD;
@@ -183,6 +186,7 @@ static ena_value_t eval_func_call(
     // Returned from the function.
     vm->current_scope = caller_scope;
     vm->current_instance = NULL;
+    ena_delete_scope(new_scope);
     POP_SAVEPOINT();
     return ret_value;
 }
@@ -418,6 +422,14 @@ bool ena_eval(struct ena_vm *vm, char *script) {
     } else {
         return false;
     }
+
+    // Append to the vm->ast_list.
+    struct ena_ast **ast_entry = &vm->ast_list;
+    while (*ast_entry != NULL) {
+        ast_entry = &(*ast_entry)->next;
+    }
+    ast->next = NULL;
+    *ast_entry = ast;
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         vm->current_scope = (struct ena_scope *) vm->main_module;

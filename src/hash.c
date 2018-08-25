@@ -31,6 +31,12 @@ void ena_hash_init_table(struct ena_hash_table *table, struct ena_hash_methods *
     }
 }
 
+/// Frees a hash table.
+/// @arg table The hash table.
+void ena_hash_free_table(struct ena_hash_table *table) {
+    ena_free(table->buckets);
+}
+
 /// Searches the table for a given key.
 /// @arg table The hash table.
 /// @arg key The key.

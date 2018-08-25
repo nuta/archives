@@ -63,6 +63,7 @@ const char *ena_get_error_cstr(struct ena_vm *vm) {
 struct ena_vm *ena_create_vm() {
     struct ena_vm *vm = ena_malloc(sizeof(*vm));
     vm->next_ident = 1;
+    vm->ast_list = NULL;
     vm->current_instance = NULL;
     vm->current_class = NULL;
     vm->current_savepoint = NULL;
@@ -74,5 +75,9 @@ struct ena_vm *ena_create_vm() {
 }
 
 void ena_destroy_vm(struct ena_vm *vm) {
+    for (struct ena_ast *ast = vm->ast_list; ast != NULL; ast = ast->next) {
+        ena_destroy_ast(ast);
+    }
+
     ena_free(vm);
 }
