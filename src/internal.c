@@ -176,7 +176,7 @@ struct ena_module *ena_create_module(void) {
 }
 
 struct ena_int *ena_cast_to_int(ena_value_t value) {
-    if (!ENA_IS_TYPE(value, ENA_T_INT)) {
+    if (ena_get_type(value) != ENA_T_INT) {
         // Invalid cast: `value` is not an int.
         return NULL;
     }
@@ -185,7 +185,7 @@ struct ena_int *ena_cast_to_int(ena_value_t value) {
 }
 
 struct ena_string *ena_cast_to_string(ena_value_t value) {
-    if (!ENA_IS_TYPE(value, ENA_T_STRING)) {
+    if (ena_get_type(value) != ENA_T_STRING) {
         // Invalid cast: `value` is not a string.
         return NULL;
     }

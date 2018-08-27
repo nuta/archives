@@ -97,15 +97,6 @@ static inline enum ena_value_type ena_get_type_from_object(struct ena_object *ob
 #define ENA_IS_INSTANCE(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_INSTANCE)
 
-#define ENA_IS_TYPE(value, type) \
-    ((type) == ENA_T_UNDEFINED) ? ENA_IS_UNDEFINED(value)  : \
-    ((type) == ENA_T_INT)       ? ENA_IS_INT(value)        : \
-    ((type) == ENA_T_STRING)    ? ENA_IS_STRING(value)     : \
-    ((type) == ENA_T_BOOL)      ? ENA_IS_BOOL(value)       : \
-    ((type) == ENA_T_NULL)      ? ENA_IS_NULL(value)       : \
-    ((type) == ENA_T_FUNC)      ? ENA_IS_FUNC(value)       : \
-    0
-
 #define SCOPE_FLAG_MODULE 1
 #define SCOPE_FLAG_LOCALS 0
 struct ena_scope {
