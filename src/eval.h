@@ -14,15 +14,37 @@ struct ena_int {
     int value;
 };
 
-#define FUNC_FLAGS_METHOD 1
-#define FUNC_FLAGS_FUNC 0
+#define STRING_FLAG_STORED 0
+#define STRING_FLAG_IDENT  1
+struct ena_string {
+    struct ena_object header;
+    uint32_t flags;
+    const char *str;
+    ena_ident_t ident;
+    size_t size_in_bytes;
+};
+
+#define FUNC_FLAGS_METHOD  (1 << 0)
+#define FUNC_FLAGS_FUNC    (0 << 0)
+#define FUNC_FLAGS_NATIVE  (1 << 1)
+#define FUNC_FLAGS_ENA     (0 << 1)
 struct ena_func {
     struct ena_object header;
     uint32_t flags;
     ena_ident_t name;
     struct ena_scope *scope;
-    struct ena_node *stmts;
-    struct ena_node *param_names;
+    union {
+        // flags & FUNC_FLAGS_NATIVE != 0
+        struct {
+            ena_native_method_t native_method;
+            ena_native_func_t native_func;
+        };
+        // flags & FUNC_FLAGS_NATIVE == 0
+        struct {
+            struct ena_node *stmts;
+            struct ena_node *param_names;
+        };
+    };
 };
 
 struct ena_class {
@@ -61,6 +83,10 @@ static inline enum ena_value_type ena_get_type_from_object(struct ena_object *ob
 #define ENA_IS_INT(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_INT)
 
+// String
+#define ENA_IS_STRING(value) \
+    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_STRING)
+
 // Func
 #define ENA_IS_FUNC(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_FUNC)
@@ -74,6 +100,7 @@ static inline enum ena_value_type ena_get_type_from_object(struct ena_object *ob
 #define ENA_IS_TYPE(value, type) \
     ((type) == ENA_T_UNDEFINED) ? ENA_IS_UNDEFINED(value)  : \
     ((type) == ENA_T_INT)       ? ENA_IS_INT(value)        : \
+    ((type) == ENA_T_STRING)    ? ENA_IS_STRING(value)     : \
     ((type) == ENA_T_BOOL)      ? ENA_IS_BOOL(value)       : \
     ((type) == ENA_T_NULL)      ? ENA_IS_NULL(value)       : \
     ((type) == ENA_T_FUNC)      ? ENA_IS_FUNC(value)       : \

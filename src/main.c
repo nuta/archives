@@ -39,7 +39,7 @@ int file_main(FILE *f) {
     DEBUG("\nResult:");
     char buf[64];
     ena_stringify(buf, sizeof(buf), get_var_value(vm->current_scope, ena_cstr2ident(vm, "ans")));
-    DEBUG("%s", buf);
+    DEBUG("ans = %s", buf);
 #else
     if (!ena_eval(vm, script)) {
         fprintf(stderr, "%s", ena_get_error_cstr(vm));

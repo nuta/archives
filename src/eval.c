@@ -24,6 +24,8 @@ static ena_value_t copy_if_immutable(ena_value_t value) {
     switch (ena_get_type(value)) {
         case ENA_T_INT:
             return ena_create_int(ena_cast_to_int(value)->value);
+        case ENA_T_STRING:
+            return ena_share(value);
         default:
             return value;
     }
@@ -80,13 +82,17 @@ EVAL_NODE(OP_ASSIGN) {
     if (node->child[0].type == ENA_NODE_PROP) {
         struct ena_node *obj = node->child[0].child;
         if (!ena_strcmp(obj->token->str, "self")) {
-            if (!vm->current_instance) {
+            if (vm->self == ENA_UNDEFINED) {
                 RUNTIME_ERROR("self is not available");
+            }
+
+            if (ena_get_type(vm->self) != ENA_T_INSTANCE) {
+                RUNTIME_ERROR("self is not an instance");
             }
 
             struct ena_hash_table *table;
             struct ena_hash_entry *entry;
-            table = &vm->current_instance->props;
+            table = &((struct ena_instance *) vm->self)->props;
             entry = ena_hash_search_or_insert(table, (void *) name, (void *) rvalue);
             if (entry) {
                 // Already defined in self. Replace its value intead of
@@ -147,31 +153,48 @@ static ena_value_t eval_func_call(
     struct ena_instance *instance,
     struct ena_func *func
 ) {
-    int num_params = func->param_names->num_childs;
     int num_args = expr_list->num_childs;
-    if (num_args != num_params) {
-        RUNTIME_ERROR("incorrect # of arguments");
-        return ENA_UNDEFINED;
-    }
 
-    // Evaluate and fill arguments into the newly created scope.
     struct ena_scope *caller_scope = vm->current_scope;
     struct ena_node *args = expr_list->child;
     struct ena_scope *new_scope = create_scope(func->scope);
-    for (int i = 0; i < num_args; i++) {
-        ena_ident_t param_name = ena_cstr2ident(vm, func->param_names->child[i].token->str);
-        ena_value_t arg_value = eval_node(vm, &args[i]);
-        ena_define_var_in(vm, new_scope, param_name, arg_value);
-    }
 
     // Enther the scope and execute the body.
     PUSH_SAVEPOINT();
     int unwind_type;
     ena_value_t ret_value = ENA_UNDEFINED;
     if ((unwind_type = EXEC_SAVEPOINT()) == 0) {
-        vm->current_scope = new_scope;
-        vm->current_instance = instance;
-        eval_node(vm, func->stmts);
+        if (func->flags & FUNC_FLAGS_NATIVE) {
+            ena_value_t *arg_array = ena_malloc(sizeof(ena_value_t) * num_args);
+            for (int i = 0; i < num_args; i++) {
+                arg_array[i] = eval_node(vm, &args[i]);
+            }
+
+            if (func->flags & FUNC_FLAGS_METHOD) {
+                ena_value_t self = (ena_value_t) instance;
+                ret_value = func->native_method(vm, self, arg_array, num_args);
+            } else {
+                ret_value = func->native_func(vm, arg_array, num_args);
+            }
+            ena_free(arg_array);
+        } else {
+            int num_params = func->param_names->num_childs;
+            if (num_args != num_params) {
+                RUNTIME_ERROR("incorrect # of arguments");
+                return ENA_UNDEFINED;
+            }
+
+            // Evaluate and fill arguments into the newly created scope.
+            for (int i = 0; i < num_args; i++) {
+                ena_ident_t param_name = ena_cstr2ident(vm, func->param_names->child[i].token->str);
+                ena_value_t arg_value = eval_node(vm, &args[i]);
+                ena_define_var_in(vm, new_scope, param_name, arg_value);
+            }
+
+            vm->current_scope = new_scope;
+            vm->self = (ena_value_t) instance;
+            eval_node(vm, func->stmts);
+        }
     } else {
         // UNWIND_SAVEPOINT() is invoked in the callee.
         switch (unwind_type) {
@@ -183,7 +206,7 @@ static ena_value_t eval_func_call(
 
     // Returned from the function.
     vm->current_scope = caller_scope;
-    vm->current_instance = NULL;
+    vm->self = ENA_UNDEFINED;
     ena_delete_scope(new_scope);
     POP_SAVEPOINT();
     return ret_value;
@@ -198,17 +221,29 @@ static struct ena_func *lookup_method(struct ena_class *cls, ena_ident_t name) {
     return NULL;
 }
 
+
 static ena_value_t eval_method_call(struct ena_vm *vm, struct ena_node *node) {
     struct ena_node *prop_node = &node->child[0];
     ena_ident_t method_name = ena_cstr2ident(vm, prop_node->token->str);
     ena_value_t lhs = eval_node(vm, node->child[0].child);
-    if (ena_get_type(lhs) != ENA_T_INSTANCE) {
-        RUNTIME_ERROR("lhs is not an instance");
+
+    struct ena_class *cls;
+    struct ena_instance *instance;
+    switch (ena_get_type(lhs)) {
+        case ENA_T_INSTANCE:
+            instance = (struct ena_instance *) lhs;
+            cls = instance->cls;
+            break;
+        case ENA_T_STRING:
+            cls = vm->string_class;
+            instance = (void *) lhs;
+            break;
+        default:
+            RUNTIME_ERROR("lhs is not class");
     }
 
     // Invoke the method.
-    struct ena_instance *instance = (struct ena_instance *) lhs;
-    struct ena_func *method = lookup_method(instance->cls, method_name);
+    struct ena_func *method = lookup_method(cls, method_name);
     if (!method) {
         RUNTIME_ERROR("method %s is not defined", ena_ident2cstr(vm, method_name));
     }
@@ -268,10 +303,7 @@ EVAL_NODE(CLASS) {
     struct ena_node *stmts = node->child;
 
     // Create a new class.
-    struct ena_class *cls = ena_malloc(sizeof(*cls));
-    cls->header.type = ENA_T_CLASS;
-    cls->header.refcount = 1;
-    ena_hash_init_ident_table(&cls->methods);
+    struct ena_class *cls = ena_create_class();
 
     // Evaluate the content.
     vm->current_class = cls;
@@ -295,7 +327,10 @@ EVAL_NODE(ID) {
 EVAL_NODE(PROP) {
     struct ena_instance *obj;
     if (!ena_strcmp(node->child->token->str, "self")) {
-        obj = vm->current_instance;
+        if (ena_get_type(vm->self) != ENA_T_INSTANCE) {
+            RUNTIME_ERROR("self is not instance");
+        }
+        obj = (struct ena_instance *) vm->self;
     } else {
         NOT_YET_IMPLEMENTED();
     }
@@ -368,6 +403,14 @@ EVAL_NODE(INT_LIT) {
     return ena_create_int(value);
 }
 
+EVAL_NODE(STRING_LIT) {
+    // The string in `node->token->str` is enclosed by doublequote. Remove
+    // them by tweaking the pointer and size.
+    const char *str = node->token->str + 1;
+    size_t size = ena_strlen(node->token->str) - 2;
+    return ena_create_string(vm, str, size);
+}
+
 EVAL_NODE(TRUE) {
     return ENA_TRUE;
 }
@@ -394,6 +437,7 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
         EVAL_CASE(VAR);
         EVAL_CASE(FUNC);
         EVAL_CASE(INT_LIT);
+        EVAL_CASE(STRING_LIT);
         EVAL_CASE(TRUE);
         EVAL_CASE(FALSE);
         EVAL_CASE(CALL);

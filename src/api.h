@@ -14,6 +14,7 @@ enum ena_value_type {
     ENA_T_UNDEFINED, // used internally
     ENA_T_NULL,
     ENA_T_INT,
+    ENA_T_STRING,
     ENA_T_BOOL,
     ENA_T_FUNC,
     ENA_T_CLASS,
@@ -41,23 +42,28 @@ enum ena_error_type {
     ENA_ERROR_RUNTIME,
 };
 
-/// An ena interpreter instance.
 struct ena_vm;
-typedef ena_value_t ena_native_func_t(struct ena_vm *vm, int argc, ...);
+typedef ena_value_t (*ena_native_method_t)(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args);
+typedef ena_value_t (*ena_native_func_t)(struct ena_vm *vm, ena_value_t *args, int num_args);
+
+/// An ena interpreter instance.
 struct ena_vm *ena_create_vm();
 void ena_destroy_vm(struct ena_vm *vm);
 bool ena_eval(struct ena_vm *vm, char *script);
 const char *ena_get_error_cstr(struct ena_vm *vm);
 
-struct ena_module *ena_create_module(void);
+struct ena_class;
+void ena_define_native_method(struct ena_vm *vm, struct ena_class *cls, const char *name, ena_native_method_t method);
 
 enum ena_value_type ena_get_type(ena_value_t value);
 void ena_stringify(char *buf, size_t buf_len, ena_value_t value);
 
 /// To value.
 ena_value_t ena_create_int(int value);
+ena_value_t ena_create_string(struct ena_vm *vm, const char *str, size_t size);
 ena_value_t ena_create_bool(int condition);
 ena_value_t ena_create_func(ena_native_func_t *func);
+struct ena_module *ena_create_module(void);
 
 ena_value_t ena_get_var(struct ena_vm *vm, struct ena_module *module, const char *name);
 

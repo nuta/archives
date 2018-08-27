@@ -31,6 +31,7 @@ enum ena_node_type {
     ENA_NODE_TRUE,
     ENA_NODE_FALSE,
     ENA_NODE_INT_LIT,
+    ENA_NODE_STRING_LIT,
     ENA_NODE_ID,
     ENA_NODE_OP_ASSIGN,
     ENA_NODE_OP_ADD,

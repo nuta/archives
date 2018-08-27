@@ -6,12 +6,6 @@
 #include "api.h"
 #include "internal.h"
 
-#define INITIAL_NUM_BUCKETS 32
-#define REHASH_THRESHOLD 8
-#define REHASH_NEEDED(table) (((table)->num_entries / (table)->num_buckets) > REHASH_THRESHOLD)
-#define ENTRY_EQUALS(table, entry, digest, key) \
-        ((digest) == (table)->methods->hash(key) && (table)->methods->equals(key, (entry)->key))
-
 /// Reduce the number of entries in a bucket.
 /// @arg table The hash table.
 static void rehash(UNUSED struct ena_hash_table *table) {

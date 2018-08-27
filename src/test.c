@@ -1,6 +1,6 @@
 #include "api.h"
-#include "internal.h"
 #include "malloc.h"
+#include "string.h"
 
 static int tests_failed = 0;
 
@@ -83,12 +83,44 @@ UNITTEST(ident) {
     ASSERT_EQ(ena_strcmp(str1, str2), 0);
 }
 
+// ena_strlen() used for computing the length of a UTF-8 byte sequence.
+#define UTF8_TEST_EQ(func, string, expected, ...) \
+    do { \
+        const char *str = string; \
+        ASSERT_EQ(func(str, ena_strlen(str), ##__VA_ARGS__), expected); \
+    } while (0)
+
+UNITTEST(string) {
+    UTF8_TEST_EQ( utf8_validate, u8"", true);
+    UTF8_TEST_EQ(utf8_validate, u8"This is an ASCII string.", true);
+    UTF8_TEST_EQ(utf8_strlen, u8"", 0);
+    UTF8_TEST_EQ(utf8_strlen, u8"Hello World!", 12);
+    UTF8_TEST_EQ(utf8_strlen, u8"すき焼き", 4);
+    UTF8_TEST_EQ(utf8_strlen, u8"I wanna go to a 🍣 bar.", 22);
+    UTF8_TEST_EQ(utf8_strlen, u8"あらゆる現実を全て自分の方へねじ曲げたのだ", 21);
+    UTF8_TEST_EQ(utf8_char_at, u8"A 🍔.", 0x1f354, 2);
+    UTF8_TEST_EQ(utf8_char_at, u8"Enaga is 鳥.", 0x9ce5, 9);
+    UTF8_TEST_EQ(utf8_char_at, u8"Petit déjeuner.", 0xe9, 7);
+}
+
+UNITTEST(hash) {
+    struct ena_hash_table table;
+    ena_hash_init_ident_table(&table);
+    ena_hash_insert(&table, (void *) 0, "string1");
+    ena_hash_insert(&table, (void *) 1, "string3");
+    ena_hash_insert(&table, (void *) INITIAL_NUM_BUCKETS, "string2");
+    ena_hash_insert(&table, (void *) (INITIAL_NUM_BUCKETS * 2), "string3");
+    ena_hash_insert(&table, (void *) (INITIAL_NUM_BUCKETS * 3), "string4");
+}
+
 int ena_unittests(void) {
     fprintf(stderr, "unit tests");
     fflush(stderr);
 
     test_internal();
     test_ident();
+    test_string();
+    test_hash();
 
     if (tests_failed) {
         DEBUG("\n### %d tests failed ###", tests_failed);

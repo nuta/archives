@@ -155,6 +155,7 @@
     <ClInclude Include="..\src\eval.h" />
     <ClInclude Include="..\src\gc.h" />
     <ClInclude Include="..\src\hash.h" />
+    <ClInclude Include="..\src\string.h" />
     <ClInclude Include="..\src\internal.h" />
     <ClInclude Include="..\src\lexer.h" />
     <ClInclude Include="..\src\malloc.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="..\src\eval.c" />
     <ClCompile Include="..\src\gc.c" />
     <ClCompile Include="..\src\hash.c" />
+    <ClCompile Include="..\src\string.c" />
     <ClCompile Include="..\src\lexer.c" />
     <ClCompile Include="..\src\malloc.c" />
     <ClCompile Include="..\src\parser.c" />

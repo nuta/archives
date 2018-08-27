@@ -54,18 +54,18 @@ void *ena_memcpy(void *dst, const void *src, size_t len) {
     return dst;
 }
 
-int ena_memcmp(void *dst, const void *src, size_t len) {
-    uint8_t *dst_p = dst;
-    uint8_t *src_p = (uint8_t *) src;
+int ena_memcmp(void *ptr1, const void *ptr2, size_t len) {
+    uint8_t *ptr2_p = (uint8_t *) ptr2;
+    uint8_t *ptr1_p = (uint8_t *) ptr1;
 
     while (len > 0) {
-        int tmp = *dst_p - *src_p;
+        int tmp = *ptr2_p - *ptr1_p;
         if (tmp) {
             return tmp;
         }
 
-        dst_p++;
-        src_p++;
+        ptr1_p++;
+        ptr2_p++;
         len--;
     }
 
@@ -138,7 +138,7 @@ char *ena_strndup(const char *str, size_t len) {
 /// @retruns The ident associated with the `str`.
 ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str) {
     struct ena_hash_entry *e;
-    e = ena_hash_search_or_insert(&vm->cstr2ident, (void *) str, (void *) vm->next_ident);
+    e = ena_hash_search(&vm->cstr2ident, (void *) str);
 
     ena_hash_digest_t ident;
     if (e) {
@@ -150,6 +150,7 @@ ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str) {
         // The `str` is no longer available after returing from this
         // function. Copy it to store in the `ident2cstr` table.
         char *new_str = ena_strdup(str);
+        ena_hash_insert(&vm->cstr2ident, (void *) new_str, (void *) ident);
         ena_hash_insert(&vm->ident2cstr, (void *) ident, (void *) new_str);
         vm->next_ident++;
     }
@@ -181,6 +182,15 @@ struct ena_int *ena_cast_to_int(ena_value_t value) {
     }
 
     return (struct ena_int *) value;
+}
+
+struct ena_string *ena_cast_to_string(ena_value_t value) {
+    if (!ENA_IS_TYPE(value, ENA_T_STRING)) {
+        // Invalid cast: `value` is not a string.
+        return NULL;
+    }
+
+    return (struct ena_string *) value;
 }
 
 void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value) {
@@ -218,4 +228,12 @@ struct ena_hash_entry *lookup_var(struct ena_scope *scope, ena_ident_t name) {
 ena_value_t get_var_value(struct ena_scope *scope, ena_ident_t name) {
     struct ena_hash_entry *e = lookup_var(scope, name);
     return e ? ((ena_value_t) e->value) : ENA_UNDEFINED;
+}
+
+struct ena_class *ena_create_class(void) {
+    struct ena_class *cls = ena_malloc(sizeof(*cls));
+    cls->header.type = ENA_T_CLASS;
+    cls->header.refcount = 0;
+    ena_hash_init_ident_table(&cls->methods);
+    return cls;
 }

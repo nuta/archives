@@ -1,0 +1,4 @@
+var s1 = "Hello, ";
+//var s2 = s1.contains(" ");
+var s3 = s1.concat("World");
+var ans = s3;

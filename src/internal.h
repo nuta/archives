@@ -18,6 +18,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <setjmp.h>
+#include <string.h>
+#define ena_memchr memchr
 #define ena_snprintf snprintf
 #define ENA_ASSERT assert
 #define ena_setjmp setjmp
@@ -95,8 +97,9 @@ struct ena_vm {
     struct ena_scope *current_scope;
     struct ena_savepoint *current_savepoint;
     struct ena_class *current_class;
-    struct ena_instance *current_instance;
+    ena_value_t self;
     struct ena_ast *ast_list;
+    struct ena_class *string_class;
 };
 
 typedef uintptr_t ena_ident_t;
@@ -118,7 +121,7 @@ static inline int ena_isalnum(int c) {
 }
 
 void *ena_memcpy(void *dst, const void *src, size_t len);
-int ena_memcmp(void *dst, const void *src, size_t len);
+int ena_memcmp(void *ptr1, const void *ptr2, size_t len);
 int ena_strcmp(const char *s1, const char *s2);
 int ena_strncmp(const char *s1, const char *s2, size_t n);
 size_t ena_strlen(const char *str);
@@ -132,6 +135,7 @@ const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);
 // TODO: Move these functions to an appropriate file.
 struct ena_module *ena_create_module(void);
 struct ena_int *ena_cast_to_int(ena_value_t value);
+struct ena_string *ena_cast_to_string(ena_value_t value);
 ena_value_t get_var_value(struct ena_scope *scope, ena_ident_t name);
 struct ena_hash_entry *lookup_var(struct ena_scope *scope, ena_ident_t name);
 void ena_assign_to_var(struct ena_vm *vm, struct ena_hash_table *table, ena_ident_t name, ena_value_t value, bool allow_undefined);
@@ -139,5 +143,6 @@ void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
 void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value);
 void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
 ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name);
+struct ena_class *ena_create_class(void);
 
 #endif

@@ -17,6 +17,7 @@ const char *ena_get_token_name(enum ena_token_type type) {
         DEFINE_TOKEN_NAME(EOF),
         DEFINE_TOKEN_NAME(ID),
         DEFINE_TOKEN_NAME(INT_LIT),
+        DEFINE_TOKEN_NAME(STRING_LIT),
         DEFINE_TOKEN_NAME(PLUS),
         DEFINE_TOKEN_NAME(MINUS),
         DEFINE_TOKEN_NAME(SLASH),
@@ -220,6 +221,28 @@ retry:;
             // because `nextc` points to the beginning of next token.
             PUSHBACK_CHARS(1);
             goto return_token;
+        }
+    }
+
+    // String literal
+    if (nextc == '"') {
+        type = ENA_TOKEN_STRING_LIT;
+        str_len = 0;
+        char prevc = 0;
+        for (;;) {
+            str_len++;
+            if((nextc = ena_get_next_char(vm)) == 0) {
+                goto return_token;
+            }
+
+            if (nextc == '"') {
+                if (prevc != '\\') {
+                    str_len++; // include the trailing '"'
+                    goto return_token;
+                }
+            }
+
+            prevc = nextc;
         }
     }
 

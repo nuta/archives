@@ -1,6 +1,12 @@
 #ifndef __ENA_HASH_H__
 #define __ENA_HASH_H__
 
+#define INITIAL_NUM_BUCKETS 32
+#define REHASH_THRESHOLD 8
+#define REHASH_NEEDED(table) (((table)->num_entries / (table)->num_buckets) > REHASH_THRESHOLD)
+#define ENTRY_EQUALS(table, entry, digest, key) \
+        ((digest) == (table)->methods->hash(key) && (table)->methods->equals(key, (entry)->key))
+
 typedef uintptr_t ena_hash_digest_t;
 
 struct ena_hash_methods {

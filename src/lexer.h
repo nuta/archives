@@ -6,6 +6,7 @@ enum ena_token_type {
     ENA_TOKEN_EOF,
     ENA_TOKEN_ID,              // eg. qsort, tmp, index
     ENA_TOKEN_INT_LIT,         // eg. 123, 938129
+    ENA_TOKEN_STRING_LIT,      // eg. "Hello, World!"
     ENA_TOKEN_PLUS,            // +
     ENA_TOKEN_MINUS,           // -
     ENA_TOKEN_ASTERISK,        // *

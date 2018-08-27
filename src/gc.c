@@ -1,6 +1,19 @@
 #include "gc.h"
 #include "malloc.h"
 
+/// Increments the reference count.
+/// @arg obj The object.
+ena_value_t ena_share(ena_value_t value) {
+    if (!ENA_IS_IN_HEAP(value)) {
+        // Not an object allocated in the heap.
+        return value;
+    }
+
+    struct ena_object *obj = (struct ena_object *) value;
+    obj->refcount++;
+    return value;
+}
+
 /// Decrements the reference count and delete the object if needed.
 /// @arg obj The object.
 void ena_delete(ena_value_t value) {
@@ -38,7 +51,6 @@ void ena_delete_table(struct ena_hash_table *table) {
     for (int i = 0; i < table->num_buckets; i++) {
         struct ena_hash_entry *e = table->buckets[i];
         while (e) {
-            struct ena_int *inter = (struct ena_int *) e;
             ena_delete((ena_value_t) e->value);
             e = e->next;
         }

@@ -35,6 +35,7 @@ const char *ena_get_node_name(enum ena_node_type type) {
         DEFINE_NODE_NAME(FALSE),
         DEFINE_NODE_NAME(ID),
         DEFINE_NODE_NAME(INT_LIT),
+        DEFINE_NODE_NAME(STRING_LIT),
         DEFINE_NODE_NAME(CALL),
         DEFINE_NODE_NAME(OP_ASSIGN),
         DEFINE_NODE_NAME(OP_ADD),
@@ -148,6 +149,8 @@ PARSE_RULE(primary) {
             return create_node(ENA_NODE_FALSE, NULL, 0);
         case ENA_TOKEN_INT_LIT:
             return create_node_with_token(ENA_NODE_INT_LIT, token, NULL, 0);
+        case ENA_TOKEN_STRING_LIT:
+            return create_node_with_token(ENA_NODE_STRING_LIT, token, NULL, 0);
         case ENA_TOKEN_ID:
             return create_node_with_token(ENA_NODE_ID, token, NULL, 0);
         default:
