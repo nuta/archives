@@ -144,5 +144,6 @@ void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t n
 void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
 ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name);
 struct ena_class *ena_create_class(void);
+void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
 
 #endif

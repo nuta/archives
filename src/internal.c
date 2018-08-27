@@ -237,3 +237,64 @@ struct ena_class *ena_create_class(void) {
     ena_hash_init_ident_table(&cls->methods);
     return cls;
 }
+
+static const char *get_type_name(enum ena_value_type type) {
+    switch (type) {
+        case ENA_T_INT:
+            return "int";
+        case ENA_T_STRING:
+            return "string";
+        case ENA_T_LIST:
+            return "list";
+        case ENA_T_BOOL:
+            return "bool";
+        case ENA_T_FUNC:
+            return "func";
+        case ENA_T_NULL:
+            return "null";
+        case ENA_T_CLASS:
+            return "class";
+        case ENA_T_INSTANCE:
+            return "instance";
+        case ENA_T_UNDEFINED:
+            return "(undefined)";
+    }
+
+    return NULL;
+}
+
+void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args) {
+    char *r = (char *) rule;
+    int arg_index = 0;
+    while (*r) {
+        enum ena_value_type expected_type;
+        switch (*r) {
+            case 's':
+                expected_type = ENA_T_STRING;
+                break;
+        }
+
+        r++;
+        int expected_num;
+        switch (*r) {
+            default:
+                expected_num = 1;
+        }
+
+        if (num_args < expected_num) {
+            RUNTIME_ERROR("%s takes at least %d argument (%d given)", name, expected_num, num_args);
+        }
+
+        enum ena_value_type type = ena_get_type(args[arg_index]);
+        if (type != expected_type) {
+            RUNTIME_ERROR("%s %d%s argument must be %s (%s given)",
+                name,
+                arg_index,
+                (arg_index == 1) ? "st" : ((arg_index == 2) ? "nd" : ((arg_index ==3) ? "rd" : "th")),
+                get_type_name(expected_type), get_type_name(type));
+        }
+
+        r++;
+        arg_index++;
+    }
+}
