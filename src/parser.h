@@ -42,6 +42,8 @@ enum ena_node_type {
     ENA_NODE_CLASS,
     ENA_NODE_PROP,
     ENA_NODE_LIST_LIT,
+    ENA_NODE_MAP_LIT,
+    ENA_NODE_MAP_ENTRY,
 
     ENA_NODE_MAX_NUM // Must be last one.
 };

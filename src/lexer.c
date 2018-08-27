@@ -22,6 +22,7 @@ const char *ena_get_token_name(enum ena_token_type type) {
         DEFINE_TOKEN_NAME(MINUS),
         DEFINE_TOKEN_NAME(SLASH),
         DEFINE_TOKEN_NAME(ASTERISK),
+        DEFINE_TOKEN_NAME(DOUBLECOLON),
         DEFINE_TOKEN_NAME(SEMICOLON),
         DEFINE_TOKEN_NAME(LPAREN),
         DEFINE_TOKEN_NAME(RPAREN),
@@ -256,6 +257,7 @@ retry:;
     str_len = 1;
     switch (nextc) {
         NEXTC_CASE(';', SEMICOLON)
+        NEXTC_CASE(':', DOUBLECOLON)
         NEXTC_CASE('+', PLUS)
         NEXTC_CASE('-', MINUS)
         NEXTC_CASE('*', ASTERISK)

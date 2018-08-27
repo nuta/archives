@@ -137,5 +137,17 @@
             "externalConsole": true,
             "MIMode": "lldb"
         },
+        {
+            "name": "map",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ena",
+            "args": ["test/map.ena"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
     ]
 }

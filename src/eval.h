@@ -66,6 +66,11 @@ struct ena_list {
     size_t num_elems;
 };
 
+struct ena_map {
+    struct ena_object header;
+    struct ena_hash_table entries;
+};
+
 static inline enum ena_value_type ena_get_type_from_object(struct ena_object *obj) {
     return obj->type;
 }
@@ -100,6 +105,10 @@ static inline enum ena_value_type ena_get_type_from_object(struct ena_object *ob
 // List
 #define ENA_IS_LIST(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_LIST)
+
+// Map
+#define ENA_IS_MAP(value) \
+    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_MAP)
 
 // Class
 #define ENA_IS_CLASS(value) \

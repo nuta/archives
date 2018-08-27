@@ -101,6 +101,7 @@ struct ena_vm {
     struct ena_ast *ast_list;
     struct ena_class *string_class;
     struct ena_class *list_class;
+    struct ena_class *map_class;
 };
 
 typedef uintptr_t ena_ident_t;
@@ -146,5 +147,6 @@ void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
 ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name);
 struct ena_class *ena_create_class(void);
 void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
+bool ena_is_equal(ena_value_t v1, ena_value_t v2);
 
 #endif

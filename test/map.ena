@@ -1,0 +1,7 @@
+var movie = {
+    "name": "Back to the Future",
+    "released_date": "July 3, 1985",
+//    "running_time": 116,
+};
+
+var ans = movie.get("name");

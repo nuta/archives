@@ -226,6 +226,7 @@ static ena_value_t eval_method_call(struct ena_vm *vm, struct ena_node *node) {
     struct ena_node *prop_node = &node->child[0];
     ena_ident_t method_name = ena_cstr2ident(vm, prop_node->token->str);
     ena_value_t lhs = eval_node(vm, node->child[0].child);
+    struct ena_object *lhs_o = (void *) lhs;
 
     struct ena_class *cls;
     struct ena_instance *instance;
@@ -240,6 +241,10 @@ static ena_value_t eval_method_call(struct ena_vm *vm, struct ena_node *node) {
             break;
         case ENA_T_LIST:
             cls = vm->list_class;
+            instance = (void *) lhs;
+            break;
+        case ENA_T_MAP:
+            cls = vm->map_class;
             instance = (void *) lhs;
             break;
         default:
@@ -431,6 +436,21 @@ EVAL_NODE(LIST_LIT) {
     return ENA_OBJ2VALUE(list);
 }
 
+EVAL_NODE(MAP_LIT) {
+    struct ena_map *map = ena_malloc(sizeof(*map));
+    map->header.type = ENA_T_MAP;
+    map->header.refcount = 1;
+    ena_hash_init_value_table(&map->entries);
+
+    for (int i = 0; i < node->num_childs; i++) {
+        ena_value_t key = eval_node(vm, &node->child[i].child[0]);
+        ena_value_t value = eval_node(vm, &node->child[i].child[1]);
+        ena_hash_insert(&map->entries, (void *) key, (void *) value);
+    }
+
+    return ENA_OBJ2VALUE(map);
+}
+
 EVAL_NODE(TRUE) {
     return ENA_TRUE;
 }
@@ -459,6 +479,7 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
         EVAL_CASE(INT_LIT);
         EVAL_CASE(STRING_LIT);
         EVAL_CASE(LIST_LIT);
+        EVAL_CASE(MAP_LIT);
         EVAL_CASE(TRUE);
         EVAL_CASE(FALSE);
         EVAL_CASE(CALL);

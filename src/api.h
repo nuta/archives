@@ -16,6 +16,7 @@ enum ena_value_type {
     ENA_T_INT,
     ENA_T_STRING,
     ENA_T_LIST,
+    ENA_T_MAP,
     ENA_T_BOOL,
     ENA_T_FUNC,
     ENA_T_CLASS,

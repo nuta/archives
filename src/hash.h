@@ -39,6 +39,7 @@ void ena_hash_remove_all(struct ena_hash_table *table, void *key);
 
 void ena_hash_init_ident_table(struct ena_hash_table *table);
 void ena_hash_init_cstr_table(struct ena_hash_table *table);
+void ena_hash_init_value_table(struct ena_hash_table *table);
 
 struct ena_vm;
 void ena_hash_dump_ident_value_table(struct ena_vm *vm, struct ena_hash_table *table);

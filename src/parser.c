@@ -19,7 +19,7 @@
 #define CONSUME(expected_type) ena_destroy_token(ena_expect_token(vm, ENA_TOKEN_##expected_type))
 
 const char *ena_get_node_name(enum ena_node_type type) {
-#define DEFINE_NODE_NAME(name) [ENA_NODE_##name] = "NODE_" #name
+#define DEFINE_NODE_NAME(name) [ENA_NODE_##name] = #name
 
     static const char *names[ENA_NODE_MAX_NUM] = {
         DEFINE_NODE_NAME(PROGRAM),
@@ -49,6 +49,8 @@ const char *ena_get_node_name(enum ena_node_type type) {
         DEFINE_NODE_NAME(BREAK),
         DEFINE_NODE_NAME(CONTINUE),
         DEFINE_NODE_NAME(LIST_LIT),
+        DEFINE_NODE_NAME(MAP_LIT),
+        DEFINE_NODE_NAME(MAP_ENTRY),
     };
 
     ENA_ASSERT(type < ENA_NODE_MAX_NUM);
@@ -128,6 +130,46 @@ PARSE_RULE(list_lit) {
     return create_node(ENA_NODE_LIST_LIT, elems, 1);
 }
 
+PARSE_RULE(map_lit) {
+    // LBRACE is already consumed.
+    size_t num_entries = 0;
+    struct ena_node *entries = NULL;
+
+    for (;;) {
+        if (NEXT_TYPE() == ENA_TOKEN_RBRACE) {
+            break;
+        }
+
+        REALLOC_NODE_ARRAY(entries, num_entries + 1);
+        struct ena_node *key = PARSE(expr);
+        if (key == NULL) {
+            break;
+        }
+
+        CONSUME(DOUBLECOLON);
+
+        struct ena_node *value = PARSE(expr);
+        if (value == NULL) {
+            SYNTAX_ERROR("expected an expression");
+        }
+
+        struct ena_node *childs = NULL;
+        REALLOC_NODE_ARRAY(childs, 2);
+        set_nth_child(childs, 0, key);
+        set_nth_child(childs, 1, value);
+        struct ena_node *entry = create_node(ENA_NODE_MAP_ENTRY, childs, 2);
+        set_nth_child(entries, num_entries, entry);
+        num_entries++;
+
+        if (NEXT_TYPE() == ENA_TOKEN_COMMA) {
+            CONSUME(COMMA);
+        }
+    }
+
+    CONSUME(RBRACE);
+    return create_node(ENA_NODE_MAP_LIT, entries, num_entries);
+}
+
 /// expr: boolean_or;
 /// boolean_or: boolean_and ('or' expr)? ;
 /// boolean_and: equality ('and' expr)? ;
@@ -161,6 +203,8 @@ PARSE_RULE(primary) {
             return create_node_with_token(ENA_NODE_STRING_LIT, token, NULL, 0);
         case ENA_TOKEN_LBRACKET:
             return PARSE(list_lit);
+        case ENA_TOKEN_LBRACE:
+            return PARSE(map_lit);
         case ENA_TOKEN_ID:
             return create_node_with_token(ENA_NODE_ID, token, NULL, 0);
         default:

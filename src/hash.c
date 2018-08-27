@@ -4,6 +4,7 @@
 #include "malloc.h"
 #include "hash.h"
 #include "api.h"
+#include "eval.h"
 #include "internal.h"
 
 /// Reduce the number of entries in a bucket.
@@ -177,6 +178,33 @@ static struct ena_hash_methods cstr_hash_methods = {
 /// @arg methods The hash methods.
 void ena_hash_init_cstr_table(struct ena_hash_table *table) {
     ena_hash_init_table(table, &cstr_hash_methods);
+}
+
+static bool value_equals(void *key1, void *key2) {
+    return ena_is_equal((ena_value_t) key1, (ena_value_t) key2);
+}
+
+static ena_hash_digest_t value_hash(void *key) {
+    switch (ena_get_type((ena_value_t) key)) {
+        case ENA_T_INT:
+            return ((struct ena_int *) key)->value;
+        case ENA_T_STRING:
+            return ((struct ena_string *) key)->size_in_bytes;
+        default:
+            return 0;
+    }
+}
+
+static struct ena_hash_methods value_hash_methods = {
+    .equals = value_equals,
+    .hash = value_hash,
+};
+
+/// Initializes a value hash table.
+/// @arg table The hash table.
+/// @arg methods The hash methods.
+void ena_hash_init_value_table(struct ena_hash_table *table) {
+    ena_hash_init_table(table, &value_hash_methods);
 }
 
 /// Print all entries in a hash<ena_ident_t, ena_value_t>.

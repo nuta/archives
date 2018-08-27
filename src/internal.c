@@ -246,6 +246,8 @@ static const char *get_type_name(enum ena_value_type type) {
             return "string";
         case ENA_T_LIST:
             return "list";
+        case ENA_T_MAP:
+            return "map";
         case ENA_T_BOOL:
             return "bool";
         case ENA_T_FUNC:
@@ -258,6 +260,9 @@ static const char *get_type_name(enum ena_value_type type) {
             return "instance";
         case ENA_T_UNDEFINED:
             return "(undefined)";
+        default:
+            // Must be a bug.
+            return "(unknown)";
     }
 
     return NULL;
@@ -304,4 +309,22 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
         r++;
         arg_index++;
     }
+}
+
+bool ena_is_equal(ena_value_t v1, ena_value_t v2) {
+    if (ena_get_type(v1) != ena_get_type(v2)) {
+        return false;
+    }
+
+    switch (ena_get_type(v1)) {
+        case ENA_T_BOOL:
+        case ENA_T_NULL:
+            return v1 == v2;
+        case ENA_T_INT:
+            return ((struct ena_int *) v1)->value - ((struct ena_int *) v2)->value;
+        case ENA_T_STRING:
+            return ((struct ena_string *) v1)->ident == ((struct ena_string *) v2)->ident;
+    }
+
+    return false;
 }
