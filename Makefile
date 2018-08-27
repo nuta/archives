@@ -79,7 +79,7 @@ autotest:
 		--patterns="*.c;*.h;*.ena;*.py" \
 		--ignore-patterns="*.vscode/*" \
 		--recursive \
-		--command="make -j8 && ./tools/test.py --ignore-fails $(TESTS)"
+		--command="echo =============================; make -j8 && ./tools/test.py --ignore-fails $(TESTS)"
 
 doxygen:
 	$(PROGRESS) doxygen

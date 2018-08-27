@@ -57,7 +57,6 @@ def main():
             for file_ in files:
                 tests.append(os.path.join(root, file_))
 
-    cprint("=" * 50, "cyan", attrs=["bold"])
     for filepath in tests:
         run_test(filepath)
 
