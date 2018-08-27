@@ -2,24 +2,5 @@
     "cquery.cacheDirectory": "${workspaceFolder}/.vscode/cquery_cached_index/",
     "files.associations": {
         "*.h": "c",
-        "typeinfo": "c",
-        "__bit_reference": "c",
-        "__functional_base": "c",
-        "atomic": "c",
-        "bitset": "c",
-        "chrono": "c",
-        "functional": "c",
-        "iterator": "c",
-        "limits": "c",
-        "locale": "c",
-        "memory": "c",
-        "ratio": "c",
-        "system_error": "c",
-        "tuple": "c",
-        "type_traits": "c",
-        "__functional_03": "c",
-        "__functional_base_03": "c",
-        "__tuple": "c",
-        "utility": "c"
     }
 }
