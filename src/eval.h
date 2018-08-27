@@ -60,6 +60,12 @@ struct ena_instance {
     struct ena_hash_table props;
 };
 
+struct ena_list {
+    struct ena_object header;
+    ena_value_t *elems;
+    size_t num_elems;
+};
+
 static inline enum ena_value_type ena_get_type_from_object(struct ena_object *obj) {
     return obj->type;
 }
@@ -90,6 +96,10 @@ static inline enum ena_value_type ena_get_type_from_object(struct ena_object *ob
 // Func
 #define ENA_IS_FUNC(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_FUNC)
+
+// List
+#define ENA_IS_LIST(value) \
+    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_LIST)
 
 // Class
 #define ENA_IS_CLASS(value) \

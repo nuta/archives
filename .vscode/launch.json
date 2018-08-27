@@ -125,5 +125,17 @@
             "externalConsole": true,
             "MIMode": "lldb"
         },
+        {
+            "name": "list",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ena",
+            "args": ["test/list.ena"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
     ]
 }

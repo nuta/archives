@@ -7,6 +7,7 @@
 #include "malloc.h"
 #include "eval.h"
 #include "string.h"
+#include "list.h"
 
 ena_value_t ena_create_int(int value) {
     struct ena_int *obj = (struct ena_int *) ena_malloc(sizeof(*obj));
@@ -99,6 +100,9 @@ void ena_stringify(char *buf, size_t buf_len, ena_value_t value) {
         case ENA_T_INSTANCE:
             ena_snprintf(buf, buf_len, "instance");
             break;
+        case ENA_T_LIST:
+            ena_snprintf(buf, buf_len, "list");
+            break;
         case ENA_T_UNDEFINED:
             ena_snprintf(buf, buf_len, "(undefined)");
             break;
@@ -111,6 +115,7 @@ enum ena_value_type ena_get_type(ena_value_t v) {
            (ENA_IS_BOOL(v))      ? ENA_T_BOOL       :
            (ENA_IS_INT(v))       ? ENA_T_INT        :
            (ENA_IS_STRING(v))    ? ENA_T_STRING     :
+           (ENA_IS_LIST(v))      ? ENA_T_LIST       :
            (ENA_IS_FUNC(v))      ? ENA_T_FUNC       :
            (ENA_IS_CLASS(v))     ? ENA_T_CLASS      :
            (ENA_IS_INSTANCE(v))  ? ENA_T_INSTANCE   :
@@ -137,6 +142,7 @@ struct ena_vm *ena_create_vm() {
     ena_hash_init_ident_table(&vm->ident2cstr);
     ena_hash_init_cstr_table(&vm->cstr2ident);
     vm->string_class = ena_create_string_class(vm);
+    vm->list_class = ena_create_list_class(vm);
     return vm;
 }
 

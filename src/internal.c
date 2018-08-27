@@ -272,6 +272,9 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
             case 's':
                 expected_type = ENA_T_STRING;
                 break;
+            case 'x':
+                expected_type = ENA_T_ANY;
+                break;
         }
 
         r++;
@@ -281,17 +284,21 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
                 expected_num = 1;
         }
 
-        if (num_args < expected_num) {
-            RUNTIME_ERROR("%s takes at least %d argument (%d given)", name, expected_num, num_args);
+        if (num_args < arg_index + expected_num) {
+            RUNTIME_ERROR("%s takes at least %d argument (%d given)", name, arg_index + expected_num, num_args);
         }
 
         enum ena_value_type type = ena_get_type(args[arg_index]);
-        if (type != expected_type) {
+        if (expected_type != ENA_T_ANY && type != expected_type) {
             RUNTIME_ERROR("%s %d%s argument must be %s (%s given)",
                 name,
                 arg_index,
                 (arg_index == 1) ? "st" : ((arg_index == 2) ? "nd" : ((arg_index ==3) ? "rd" : "th")),
                 get_type_name(expected_type), get_type_name(type));
+        }
+
+        if (!*r) {
+            return;
         }
 
         r++;

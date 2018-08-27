@@ -100,6 +100,7 @@ struct ena_vm {
     ena_value_t self;
     struct ena_ast *ast_list;
     struct ena_class *string_class;
+    struct ena_class *list_class;
 };
 
 typedef uintptr_t ena_ident_t;

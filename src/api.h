@@ -15,10 +15,12 @@ enum ena_value_type {
     ENA_T_NULL,
     ENA_T_INT,
     ENA_T_STRING,
+    ENA_T_LIST,
     ENA_T_BOOL,
     ENA_T_FUNC,
     ENA_T_CLASS,
     ENA_T_INSTANCE,
+    ENA_T_ANY,
 };
 
 #define ENA_VALUE2OBJ(type, value) ((struct ena_##type *) (value))

@@ -14,6 +14,8 @@ enum ena_token_type {
     ENA_TOKEN_SEMICOLON,       // ;
     ENA_TOKEN_LPAREN,          // (
     ENA_TOKEN_RPAREN,          // )
+    ENA_TOKEN_LBRACKET,        // [
+    ENA_TOKEN_RBRACKET,        //
     ENA_TOKEN_LBRACE,          // {
     ENA_TOKEN_RBRACE,          // }
     ENA_TOKEN_DOT,             // .

@@ -48,6 +48,7 @@ const char *ena_get_node_name(enum ena_node_type type) {
         DEFINE_NODE_NAME(WHILE),
         DEFINE_NODE_NAME(BREAK),
         DEFINE_NODE_NAME(CONTINUE),
+        DEFINE_NODE_NAME(LIST_LIT),
     };
 
     ENA_ASSERT(type < ENA_NODE_MAX_NUM);
@@ -120,6 +121,13 @@ PARSE_RULE(stmt);
 PARSE_RULE(stmts);
 PARSE_RULE(program);
 
+PARSE_RULE(list_lit) {
+    // LBRACKET is already consumed.
+    struct ena_node *elems = PARSE(expr_list);
+    CONSUME(RBRACKET);
+    return create_node(ENA_NODE_LIST_LIT, elems, 1);
+}
+
 /// expr: boolean_or;
 /// boolean_or: boolean_and ('or' expr)? ;
 /// boolean_and: equality ('and' expr)? ;
@@ -151,6 +159,8 @@ PARSE_RULE(primary) {
             return create_node_with_token(ENA_NODE_INT_LIT, token, NULL, 0);
         case ENA_TOKEN_STRING_LIT:
             return create_node_with_token(ENA_NODE_STRING_LIT, token, NULL, 0);
+        case ENA_TOKEN_LBRACKET:
+            return PARSE(list_lit);
         case ENA_TOKEN_ID:
             return create_node_with_token(ENA_NODE_ID, token, NULL, 0);
         default:
@@ -482,6 +492,7 @@ struct ena_ast *ena_parse(struct ena_vm *vm, const char *script) {
     vm->lexer.current_column = 1;
     vm->lexer.script = ena_strdup(script);
 
+    // XXX: setjmp here
     ast->tree = parse_program(vm);
     return ast;
 }

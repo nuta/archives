@@ -45,6 +45,9 @@
     <ClInclude Include="..\src\string.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\list.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\api.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -72,6 +75,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\string.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\list.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\internal.c">

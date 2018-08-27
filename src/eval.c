@@ -238,6 +238,10 @@ static ena_value_t eval_method_call(struct ena_vm *vm, struct ena_node *node) {
             cls = vm->string_class;
             instance = (void *) lhs;
             break;
+        case ENA_T_LIST:
+            cls = vm->list_class;
+            instance = (void *) lhs;
+            break;
         default:
             RUNTIME_ERROR("lhs is not class");
     }
@@ -411,6 +415,22 @@ EVAL_NODE(STRING_LIT) {
     return ena_create_string(vm, str, size);
 }
 
+EVAL_NODE(LIST_LIT) {
+    struct ena_node *expr_list = node->child;
+    struct ena_list *list = ena_malloc(sizeof(*list));
+    list->header.type = ENA_T_LIST;
+    list->header.refcount = 1;
+
+    size_t num_elems = expr_list->num_childs;
+    list->elems = ena_malloc(sizeof(ena_value_t) * num_elems);
+    list->num_elems = num_elems;
+    for (size_t i = 0; i < num_elems; i++) {
+        list->elems[i] = eval_node(vm, &expr_list->child[i]);
+    }
+
+    return ENA_OBJ2VALUE(list);
+}
+
 EVAL_NODE(TRUE) {
     return ENA_TRUE;
 }
@@ -438,6 +458,7 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
         EVAL_CASE(FUNC);
         EVAL_CASE(INT_LIT);
         EVAL_CASE(STRING_LIT);
+        EVAL_CASE(LIST_LIT);
         EVAL_CASE(TRUE);
         EVAL_CASE(FALSE);
         EVAL_CASE(CALL);
