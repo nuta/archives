@@ -25,8 +25,8 @@ const char *ena_get_token_name(enum ena_token_type type) {
         DEFINE_TOKEN_NAME(SEMICOLON),
         DEFINE_TOKEN_NAME(LPAREN),
         DEFINE_TOKEN_NAME(RPAREN),
-        DEFINE_TOKEN_NAME(LBRACKET),
-        DEFINE_TOKEN_NAME(RBRACKET),
+        DEFINE_TOKEN_NAME(LBRACE),
+        DEFINE_TOKEN_NAME(RBRACE),
         DEFINE_TOKEN_NAME(DOT),
         DEFINE_TOKEN_NAME(COMMA),
         DEFINE_TOKEN_NAME(EQ),
@@ -259,8 +259,8 @@ retry:;
         NEXTC_CASE('*', ASTERISK)
         NEXTC_CASE('(', LPAREN)
         NEXTC_CASE(')', RPAREN)
-        NEXTC_CASE('{', LBRACKET)
-        NEXTC_CASE('}', RBRACKET)
+        NEXTC_CASE('{', LBRACE)
+        NEXTC_CASE('}', RBRACE)
         NEXTC_CASE('.', DOT)
         NEXTC_CASE(',', COMMA)
         NEXTC_CASE('<', LT)

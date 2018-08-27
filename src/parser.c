@@ -298,9 +298,9 @@ PARSE_RULE(id_list) {
 PARSE_RULE(class_stmt) {
     CONSUME(CLASS);
     struct ena_token *name_token = EXPECT(ID);
-    CONSUME(LBRACKET);
+    CONSUME(LBRACE);
     struct ena_node *stmts = PARSE(stmts);
-    CONSUME(RBRACKET);
+    CONSUME(RBRACE);
     return create_node_with_token(ENA_NODE_CLASS, name_token, stmts, 1);
 }
 
@@ -313,9 +313,9 @@ PARSE_RULE(func_stmt) {
     struct ena_node *args = PARSE(id_list);
     CONSUME(RPAREN);
 
-    CONSUME(LBRACKET);
+    CONSUME(LBRACE);
     struct ena_node *stmts = PARSE(stmts);
-    CONSUME(RBRACKET);
+    CONSUME(RBRACE);
 
     struct ena_node *childs = NULL;
     REALLOC_NODE_ARRAY(childs, 2);
@@ -355,19 +355,19 @@ PARSE_RULE(return_stmt) {
 PARSE_RULE(if_stmt) {
     CONSUME(IF);
     struct ena_node *condition = PARSE(expr);
-    CONSUME(LBRACKET);
+    CONSUME(LBRACE);
 
     struct ena_node *then_stmts = PARSE(stmts);
-    CONSUME(RBRACKET);
+    CONSUME(RBRACE);
 
     int num_childs;
     struct ena_node *childs = NULL;
     if (NEXT_TYPE() == ENA_TOKEN_ELSE) {
         // Found else part.
         SKIP(1);
-        CONSUME(LBRACKET);
+        CONSUME(LBRACE);
         struct ena_node *else_stmts = PARSE(stmts);
-        CONSUME(RBRACKET);
+        CONSUME(RBRACE);
         num_childs = 3; // condition, then part, and else part
         REALLOC_NODE_ARRAY(childs, num_childs);
         set_nth_child(childs, 2, else_stmts);
@@ -386,9 +386,9 @@ PARSE_RULE(if_stmt) {
 PARSE_RULE(while_stmt) {
     CONSUME(WHILE);
     struct ena_node *condition = PARSE(expr);
-    CONSUME(LBRACKET);
+    CONSUME(LBRACE);
     struct ena_node *stmts = PARSE(stmts);
-    CONSUME(RBRACKET);
+    CONSUME(RBRACE);
 
     struct ena_node *childs = NULL;
     REALLOC_NODE_ARRAY(childs, 2);
@@ -435,7 +435,7 @@ PARSE_RULE(stmt) {
         case ENA_TOKEN_BREAK:    return PARSE(break_stmt);
         case ENA_TOKEN_CONTINUE: return PARSE(continue_stmt);
         case ENA_TOKEN_EOF:
-        case ENA_TOKEN_RBRACKET:
+        case ENA_TOKEN_RBRACE:
             return NULL;
         default: {
             // Maybe an expression.
