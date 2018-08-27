@@ -5,7 +5,7 @@
 #include "hash.h"
 
 struct ena_object {
-    uint32_t type:3; // enum ena_value_type
+    uint32_t type; // enum ena_value_type
     uint32_t refcount;
 };
 
