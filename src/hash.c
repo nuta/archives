@@ -29,7 +29,40 @@ void ena_hash_init_table(struct ena_hash_table *table, struct ena_hash_methods *
 /// Frees a hash table.
 /// @arg table The hash table.
 void ena_hash_free_table(struct ena_hash_table *table) {
+    for (int i = 0; i < table->num_buckets; i++) {
+        struct ena_hash_entry *e = table->buckets[i];
+        while (e) {
+            struct ena_hash_entry *next = e->next;
+            ena_free(e);
+            e = next;
+        }
+    }
+
     ena_free(table->buckets);
+}
+
+/// For each key perform ena_free(key).
+/// @arg table The hash table.
+void ena_hash_free_keys(struct ena_hash_table *table) {
+    for (int i = 0; i < table->num_buckets; i++) {
+        struct ena_hash_entry *e = table->buckets[i];
+        while (e) {
+            ena_free(e->key);
+            e = e->next;
+        }
+    }
+}
+
+/// For each value perform ena_free(value).
+/// @arg table The hash table.
+void ena_hash_free_values(struct ena_hash_table *table) {
+    for (int i = 0; i < table->num_buckets; i++) {
+        struct ena_hash_entry *e = table->buckets[i];
+        while (e) {
+            ena_free(e->value);
+            e = e->next;
+        }
+    }
 }
 
 /// Searches the table for a given key.

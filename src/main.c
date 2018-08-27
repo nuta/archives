@@ -28,7 +28,13 @@ int file_main(FILE *f) {
     ena_dump_tokens(vm, script);
 
     DEBUG("\nParser:");
-    ena_dump_node(ena_parse(vm, script)->tree);
+    struct ena_ast *ast = ena_parse(vm, script);
+    if (!ast) {
+        fprintf(stderr, "%s", ena_get_error_cstr(vm));
+        return 1;
+    }
+    ena_dump_node(ast->tree);
+    ena_destroy_ast(ast);
 
     DEBUG("\nEvaluate:");
     if (!ena_eval(vm, script)) {

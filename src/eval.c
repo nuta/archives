@@ -31,20 +31,6 @@ static ena_value_t copy_if_immutable(ena_value_t value) {
     }
 }
 
-void init_scope(struct ena_scope *scope, struct ena_scope *parent) {
-    scope->flags = SCOPE_FLAG_LOCALS;
-    scope->parent = parent;
-    scope->refcount = 1;
-    ena_hash_init_ident_table(&scope->vars);
-}
-
-static struct ena_scope *create_scope(struct ena_scope *parent) {
-    // TODO: Allocate a scope by alloca().
-    struct ena_scope *scope = ena_malloc(sizeof(*scope));
-    init_scope(scope, parent);
-    return scope;
-}
-
 EVAL_BINOP_NODE(OP_ADD, int, +)
 EVAL_BINOP_NODE(OP_SUB, int, -)
 EVAL_BINOP_NODE(OP_LT,  bool, <)
@@ -157,7 +143,7 @@ static ena_value_t eval_func_call(
 
     struct ena_scope *caller_scope = vm->current_scope;
     struct ena_node *args = expr_list->child;
-    struct ena_scope *new_scope = create_scope(func->scope);
+    struct ena_scope *new_scope = ena_create_scope(func->scope);
 
     // Enther the scope and execute the body.
     PUSH_SAVEPOINT();
@@ -516,7 +502,7 @@ bool ena_eval(struct ena_vm *vm, char *script) {
     *ast_entry = ast;
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
-        vm->current_scope = (struct ena_scope *) vm->main_module;
+        vm->current_scope = vm->main_module->scope;
         eval_node(vm, ast->tree);
     } else {
         return false;

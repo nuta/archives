@@ -477,9 +477,7 @@ PARSE_RULE(continue_stmt) {
 //     | expr ';'
 //     ;
 PARSE_RULE(stmt) {
-    struct ena_token *token = FETCH_NEXT();
-
-    switch (token->type) {
+    switch (NEXT_TYPE()) {
         case ENA_TOKEN_CLASS:    return PARSE(class_stmt);
         case ENA_TOKEN_FUNC:     return PARSE(func_stmt);
         case ENA_TOKEN_IF:       return PARSE(if_stmt);
@@ -528,17 +526,20 @@ PARSE_RULE(program) {
 
 
 struct ena_ast *ena_parse(struct ena_vm *vm, const char *script) {
-    struct ena_ast *ast = ena_malloc(sizeof(*ast));
-
     // Initialize lexer state.
     vm->lexer.next_pos = 0;
     vm->lexer.current_line = 1;
     vm->lexer.current_column = 1;
     vm->lexer.script = ena_strdup(script);
 
-    // XXX: setjmp here
-    ast->tree = parse_program(vm);
-    return ast;
+    if (ena_setjmp(vm->panic_jmpbuf) == 0) {
+        struct ena_node *tree = parse_program(vm);
+        struct ena_ast *ast = ena_malloc(sizeof(*ast));
+        ast->tree = tree;
+        return ast;
+    }
+
+    return NULL;
 }
 
 static void destroy_node(struct ena_node *node) {

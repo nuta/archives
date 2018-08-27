@@ -31,6 +31,8 @@ struct ena_hash_table {
 
 void ena_hash_init_table(struct ena_hash_table *table, struct ena_hash_methods *methods);
 void ena_hash_free_table(struct ena_hash_table *table);
+void ena_hash_free_keys(struct ena_hash_table *table);
+void ena_hash_free_values(struct ena_hash_table *table);
 struct ena_hash_entry *ena_hash_search(struct ena_hash_table *table, void *key);
 void ena_hash_insert(struct ena_hash_table *table, void *key, void *value);
 struct ena_hash_entry *ena_hash_search_or_insert(struct ena_hash_table *table, void *key, void *value);

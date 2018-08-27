@@ -21,6 +21,7 @@ enum ena_value_type {
     ENA_T_FUNC,
     ENA_T_CLASS,
     ENA_T_INSTANCE,
+    ENA_T_MODULE,
     ENA_T_ANY,
 };
 

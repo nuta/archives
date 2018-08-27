@@ -112,17 +112,21 @@ struct ena_token *ena_fetch_next_token(struct ena_vm *vm) {
 
 enum ena_token_type ena_fetch_next_token_type(struct ena_vm *vm) {
     struct ena_token *token = ena_get_next_token(vm);
+    enum ena_token_type type;
     if (token) {
+        type = token->type;
         ena_pushback_token(vm, token);
-        return token->type;
     } else {
-        return ENA_TOKEN_EOF;
+        type = ENA_TOKEN_EOF;
     }
+
+    ena_destroy_token(token);
+    return type;
 }
 
 void ena_skip_tokens(struct ena_vm *vm, int num) {
     for (int i = 0; i < num; i++) {
-        ena_get_next_token(vm);
+        ena_destroy_token(ena_get_next_token(vm));
     }
 }
 

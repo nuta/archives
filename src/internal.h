@@ -135,6 +135,7 @@ ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str);
 const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);
 
 // TODO: Move these functions to an appropriate file.
+struct ena_scope *ena_create_scope(struct ena_scope *parent);
 struct ena_module *ena_create_module(void);
 struct ena_int *ena_cast_to_int(ena_value_t value);
 struct ena_string *ena_cast_to_string(ena_value_t value);

@@ -110,16 +110,17 @@ static inline enum ena_value_type ena_get_type_from_object(struct ena_object *ob
 #define ENA_IS_MAP(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_MAP)
 
+// Module
+#define ENA_IS_MODULE(value) \
+    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_MODULE)
+
 // Class
 #define ENA_IS_CLASS(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_CLASS)
 #define ENA_IS_INSTANCE(value) \
     (ena_get_type_from_object((struct ena_object *) value) == ENA_T_INSTANCE)
 
-#define SCOPE_FLAG_MODULE 1
-#define SCOPE_FLAG_LOCALS 0
 struct ena_scope {
-    uint32_t flags;
     /// ena_ident_t -> ena_value_t
     struct ena_hash_table vars;
     /// For closures.
@@ -129,9 +130,8 @@ struct ena_scope {
 };
 
 struct ena_module {
-    /// This must be the first element so that we can cast module into a
-    /// struct ena_scope.
-    struct ena_scope scope;
+    struct ena_object header;
+    struct ena_scope *scope;
 };
 
 enum ena_unwind_type {

@@ -9,6 +9,7 @@
 #include "string.h"
 #include "list.h"
 #include "map.h"
+#include "gc.h"
 
 ena_value_t ena_create_int(int value) {
     struct ena_int *obj = (struct ena_int *) ena_malloc(sizeof(*obj));
@@ -107,6 +108,9 @@ void ena_stringify(char *buf, size_t buf_len, ena_value_t value) {
         case ENA_T_MAP:
             ena_snprintf(buf, buf_len, "map");
             break;
+        case ENA_T_MODULE:
+            ena_snprintf(buf, buf_len, "module");
+            break;
         case ENA_T_UNDEFINED:
             ena_snprintf(buf, buf_len, "(undefined)");
             break;
@@ -124,6 +128,7 @@ enum ena_value_type ena_get_type(ena_value_t v) {
            (ENA_IS_FUNC(v))      ? ENA_T_FUNC       :
            (ENA_IS_CLASS(v))     ? ENA_T_CLASS      :
            (ENA_IS_INSTANCE(v))  ? ENA_T_INSTANCE   :
+           (ENA_IS_MODULE(v))    ? ENA_T_MODULE     :
            ENA_T_UNDEFINED;
 }
 
@@ -159,6 +164,16 @@ void ena_destroy_vm(struct ena_vm *vm) {
         ena_destroy_ast(ast);
         ast = next;
     }
+
+    ena_hash_free_values(&vm->ident2cstr);
+    ena_hash_free_table(&vm->ident2cstr);
+    // Key strings of `vm->cstr2ident` are freed by freeing
+    // ident2cstr values; they are identical pointers.
+    ena_hash_free_table(&vm->cstr2ident);
+    ena_destroy_object((struct ena_object *) vm->main_module);
+    ena_destroy_object((struct ena_object *) vm->string_class);
+    ena_destroy_object((struct ena_object *) vm->list_class);
+    ena_destroy_object((struct ena_object *) vm->map_class);
 
     ena_free(vm);
 }

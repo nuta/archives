@@ -166,12 +166,20 @@ const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident) {
     return (const char *) ena_hash_search(&vm->ident2cstr, (void *) ident)->value;
 }
 
+struct ena_scope *ena_create_scope(struct ena_scope *parent) {
+    // TODO: Allocate a scope by alloca().
+    struct ena_scope *scope = ena_malloc(sizeof(*scope));
+    scope->parent = parent;
+    scope->refcount = 1;
+    ena_hash_init_ident_table(&scope->vars);
+    return scope;
+}
 
-void init_scope(struct ena_scope *scope, struct ena_scope *parent);
 struct ena_module *ena_create_module(void) {
     struct ena_module *module = ena_malloc(sizeof(*module));
-    init_scope(&module->scope, NULL);
-    module->scope.flags = SCOPE_FLAG_MODULE;
+    module->header.type = ENA_T_MODULE;
+    module->header.refcount = 1;
+    module->scope = ena_create_scope(NULL);
     return module;
 }
 
@@ -258,6 +266,8 @@ static const char *get_type_name(enum ena_value_type type) {
             return "class";
         case ENA_T_INSTANCE:
             return "instance";
+        case ENA_T_MODULE:
+            return "module";
         case ENA_T_UNDEFINED:
             return "(undefined)";
         default:
