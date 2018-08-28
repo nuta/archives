@@ -5,4 +5,5 @@ var users = [
 ];
 
 users.append([1, 2, 3]);
-var ans = users;
+users.append(774);
+var ans = users.pop();
