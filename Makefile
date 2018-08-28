@@ -17,6 +17,7 @@ override LDFLAGS =
 override CFLAGS += \
 	-g3 -Isrc/include -DENA_VERSION='"$(VERSION)"' \
 	-std=c11 -Wall -Wextra \
+	-D_XOPEN_SOURCE=700 \
 	-Werror=implicit-function-declaration \
 	-Werror=int-conversion \
 	-Werror=incompatible-pointer-types \
