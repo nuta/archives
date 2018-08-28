@@ -31,6 +31,7 @@ int file_main(FILE *f) {
     struct ena_ast *ast = ena_parse(vm, script);
     if (!ast) {
         fprintf(stderr, "%s", ena_get_error_cstr(vm));
+        free(script);
         return 1;
     }
     ena_dump_node(ast->tree);
@@ -54,6 +55,7 @@ int file_main(FILE *f) {
 #endif
 
     ena_destroy_vm(vm);
+    free(script);
     return 0;
 }
 

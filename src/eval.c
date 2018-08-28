@@ -125,7 +125,7 @@ EVAL_NODE(FUNC) {
         ena_share_scope(vm->current_scope);
     }
 
-    func->flags = FUNC_FLAGS_METHOD;
+    func->flags = type;
     if (ena_hash_search_or_insert(table, (void *) name, (void *) func)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
     }
@@ -212,7 +212,6 @@ static ena_value_t eval_method_call(struct ena_vm *vm, struct ena_node *node) {
     struct ena_node *prop_node = &node->child[0];
     ena_ident_t method_name = ena_cstr2ident(vm, prop_node->token->str);
     ena_value_t lhs = eval_node(vm, node->child[0].child);
-    struct ena_object *lhs_o = (void *) lhs;
 
     struct ena_class *cls;
     struct ena_instance *instance;

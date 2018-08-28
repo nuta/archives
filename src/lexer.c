@@ -356,6 +356,11 @@ return_token:;
 }
 
 void ena_destroy_token(struct ena_token *token) {
+    if (!token) {
+        DEBUG("%s: token is NULL", __func__);
+        return;
+    }
+
     ena_free(token->str);
     ena_free(token);
 }
