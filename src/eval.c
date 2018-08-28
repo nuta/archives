@@ -164,7 +164,7 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
         struct ena_class *cls = get_builtin_class_by_type(vm, lhs_type); \
         struct ena_func *method = lookup_method(cls, ena_cstr2ident(vm, method_name)); \
         if (!method) { \
-            RUNTIME_ERROR("method `" method_name "' is not defined"); \
+            RUNTIME_ERROR("method `%s' is not defined", method_name); \
         } \
         ena_value_t args[] = { rhs }; \
         ena_value_t result = call_func(vm, (ena_value_t *) &args, 1, lhs, method);  \
@@ -175,8 +175,15 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
 
 EVAL_BINOP_NODE(OP_ADD, "+")
 EVAL_BINOP_NODE(OP_SUB, "-")
-EVAL_BINOP_NODE(OP_LT,  "<")
+EVAL_BINOP_NODE(OP_MUL, "*")
+EVAL_BINOP_NODE(OP_DIV, "/")
+EVAL_BINOP_NODE(OP_MOD, "%")
 EVAL_BINOP_NODE(OP_EQ,  "==")
+EVAL_BINOP_NODE(OP_NEQ, "!=")
+EVAL_BINOP_NODE(OP_LT,  "<")
+EVAL_BINOP_NODE(OP_LTE, "<=")
+EVAL_BINOP_NODE(OP_GT,  ">")
+EVAL_BINOP_NODE(OP_GTE, ">=")
 
 EVAL_NODE(STMTS) {
     for (int i = 0; i < node->num_childs; i++) {
@@ -470,8 +477,15 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
         EVAL_CASE(STMTS);
         EVAL_CASE(OP_ADD);
         EVAL_CASE(OP_SUB);
-        EVAL_CASE(OP_LT);
+        EVAL_CASE(OP_DIV);
+        EVAL_CASE(OP_MUL);
+        EVAL_CASE(OP_MOD);
         EVAL_CASE(OP_EQ);
+        EVAL_CASE(OP_NEQ);
+        EVAL_CASE(OP_LT);
+        EVAL_CASE(OP_LTE);
+        EVAL_CASE(OP_GT);
+        EVAL_CASE(OP_GTE);
         EVAL_CASE(OP_ASSIGN);
         EVAL_CASE(VAR);
         EVAL_CASE(FUNC);

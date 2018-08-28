@@ -21,6 +21,7 @@ const char *ena_get_token_name(enum ena_token_type type) {
         DEFINE_TOKEN_NAME(PLUS),
         DEFINE_TOKEN_NAME(MINUS),
         DEFINE_TOKEN_NAME(SLASH),
+        DEFINE_TOKEN_NAME(PERCENT),
         DEFINE_TOKEN_NAME(ASTERISK),
         DEFINE_TOKEN_NAME(DOUBLECOLON),
         DEFINE_TOKEN_NAME(SEMICOLON),
@@ -34,7 +35,11 @@ const char *ena_get_token_name(enum ena_token_type type) {
         DEFINE_TOKEN_NAME(COMMA),
         DEFINE_TOKEN_NAME(EQ),
         DEFINE_TOKEN_NAME(DOUBLE_EQ),
+        DEFINE_TOKEN_NAME(NEQ),
         DEFINE_TOKEN_NAME(LT),
+        DEFINE_TOKEN_NAME(LTE),
+        DEFINE_TOKEN_NAME(GT),
+        DEFINE_TOKEN_NAME(GTE),
         DEFINE_TOKEN_NAME(VAR),
         DEFINE_TOKEN_NAME(IF),
         DEFINE_TOKEN_NAME(ELSE),
@@ -60,12 +65,16 @@ void ena_dump_tokens(struct ena_vm *vm, const char *script) {
     vm->lexer.script = script;
 
     for (;;) {
-        struct ena_token *token = ena_get_next_token(vm);
-        enum ena_token_type type = token->type;
-        DEBUG("%s: '%s'", ena_get_token_name(token->type), token->str);
-        ena_destroy_token(token);
-        if (type == ENA_TOKEN_EOF) {
-            break;
+        if (ena_setjmp(vm->panic_jmpbuf) == 0) {
+            struct ena_token *token = ena_get_next_token(vm);
+            enum ena_token_type type = token->type;
+            DEBUG("%s: '%s'", ena_get_token_name(token->type), token->str);
+            ena_destroy_token(token);
+            if (type == ENA_TOKEN_EOF) {
+                break;
+            }
+        } else {
+            fprintf(stderr, "%s", ena_get_error_cstr(vm));
         }
     }
 }
@@ -265,6 +274,7 @@ retry:;
         NEXTC_CASE('+', PLUS)
         NEXTC_CASE('-', MINUS)
         NEXTC_CASE('*', ASTERISK)
+        NEXTC_CASE('%', PERCENT)
         NEXTC_CASE('(', LPAREN)
         NEXTC_CASE(')', RPAREN)
         NEXTC_CASE('[', LBRACKET)
@@ -273,7 +283,31 @@ retry:;
         NEXTC_CASE('}', RBRACE)
         NEXTC_CASE('.', DOT)
         NEXTC_CASE(',', COMMA)
-        NEXTC_CASE('<', LT)
+        case '!':
+            if (NEXT_CHAR() == '=') {
+                type = ENA_TOKEN_NEQ;
+                str_len = 2;
+                SKIP_CHARS(1);
+            }
+            break;
+        case '<':
+            if (NEXT_CHAR() == '=') {
+                type = ENA_TOKEN_LTE;
+                str_len = 2;
+                SKIP_CHARS(1);
+            } else {
+                type = ENA_TOKEN_LT;
+            }
+            break;
+        case '>':
+            if (NEXT_CHAR() == '=') {
+                type = ENA_TOKEN_GTE;
+                str_len = 2;
+                SKIP_CHARS(1);
+            } else {
+                type = ENA_TOKEN_GT;
+            }
+            break;
         case '=':
             if (NEXT_CHAR() == '=') {
                 type = ENA_TOKEN_DOUBLE_EQ;
@@ -327,7 +361,6 @@ retry:;
                     goto retry;
                 default:
                     type = ENA_TOKEN_SLASH;
-                    SKIP_CHARS(1);
             }
             break;
 

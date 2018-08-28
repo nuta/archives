@@ -11,6 +11,7 @@ enum ena_token_type {
     ENA_TOKEN_MINUS,           // -
     ENA_TOKEN_ASTERISK,        // *
     ENA_TOKEN_SLASH,           // /
+    ENA_TOKEN_PERCENT,         // %
     ENA_TOKEN_DOUBLECOLON,     // :
     ENA_TOKEN_SEMICOLON,       // ;
     ENA_TOKEN_LPAREN,          // (
@@ -23,7 +24,11 @@ enum ena_token_type {
     ENA_TOKEN_COMMA,           // ,
     ENA_TOKEN_EQ,              // =
     ENA_TOKEN_DOUBLE_EQ,       // ==
+    ENA_TOKEN_NEQ,             // !=
     ENA_TOKEN_LT,              // <
+    ENA_TOKEN_LTE,             // <=
+    ENA_TOKEN_GT,              // >
+    ENA_TOKEN_GTE,             // >=
     ENA_TOKEN_VAR,             // var
     ENA_TOKEN_FUNC,            // func
     ENA_TOKEN_WHILE,           // while

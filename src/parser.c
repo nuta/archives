@@ -41,8 +41,14 @@ const char *ena_get_node_name(enum ena_node_type type) {
         DEFINE_NODE_NAME(OP_ADD),
         DEFINE_NODE_NAME(OP_SUB),
         DEFINE_NODE_NAME(OP_MUL),
-        DEFINE_NODE_NAME(OP_LT),
+        DEFINE_NODE_NAME(OP_DIV),
+        DEFINE_NODE_NAME(OP_MOD),
         DEFINE_NODE_NAME(OP_EQ),
+        DEFINE_NODE_NAME(OP_NEQ),
+        DEFINE_NODE_NAME(OP_LT),
+        DEFINE_NODE_NAME(OP_LTE),
+        DEFINE_NODE_NAME(OP_GT),
+        DEFINE_NODE_NAME(OP_GTE),
         DEFINE_NODE_NAME(PROP),
         DEFINE_NODE_NAME(CLASS),
         DEFINE_NODE_NAME(WHILE),
@@ -248,6 +254,8 @@ PARSE_RULE(multiplication) {
     for (;;) {
         switch (NEXT_TYPE()) {
             BIN_OP(ASTERISK, OP_MUL)
+            BIN_OP(SLASH, OP_DIV)
+            BIN_OP(PERCENT, OP_MOD)
             default:;
                 return lhs;
         }
@@ -271,6 +279,9 @@ PARSE_RULE(comparison) {
     for (;;) {
         switch (NEXT_TYPE()) {
             BIN_OP(LT, OP_LT)
+            BIN_OP(LTE, OP_LTE)
+            BIN_OP(GT, OP_GT)
+            BIN_OP(GTE, OP_GTE)
             default:;
                 return lhs;
         }
@@ -282,6 +293,7 @@ PARSE_RULE(equality) {
     for (;;) {
         switch (NEXT_TYPE()) {
             BIN_OP(DOUBLE_EQ, OP_EQ)
+            BIN_OP(NEQ, OP_NEQ)
             default:;
                 return lhs;
         }
