@@ -22,8 +22,8 @@
 #define ena_memchr memchr
 #define ena_snprintf snprintf
 #define ENA_ASSERT assert
-#define ena_setjmp setjmp
-#define ena_longjmp longjmp
+#define ena_setjmp _setjmp
+#define ena_longjmp _longjmp
 #define ena_jmpbuf jmp_buf
 
 #ifdef ENA_DEBUG_BUILD
