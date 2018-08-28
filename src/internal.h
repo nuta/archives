@@ -168,6 +168,15 @@ static inline struct ena_map *ena_to_map_object(ena_value_t value) {
     return (struct ena_map *) value;
 }
 
+static inline struct ena_instance *ena_to_instance_object(ena_value_t value) {
+    if (ena_get_type(value) != ENA_T_INSTANCE) {
+        // Invalid cast: `value` is not a string.
+        return NULL;
+    }
+
+    return (struct ena_instance *) value;
+}
+
 void *ena_memcpy(void *dst, const void *src, size_t len);
 int ena_memcmp(void *ptr1, const void *ptr2, size_t len);
 int ena_strcmp(const char *s1, const char *s2);

@@ -1,6 +1,13 @@
+class Car {
+    func gas() {
+        return 10;
+    }
+}
+
 class User {
     func new(age) {
         self.user_age = age;
+        self.my_car = Car();
     }
 
     func age() {
@@ -9,4 +16,5 @@ class User {
 }
 
 var mike = User(24);
-var ans = mike.age();
+var age = mike.age();
+var ans = mike.my_car.gas();

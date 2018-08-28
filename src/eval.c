@@ -332,7 +332,12 @@ EVAL_NODE(CLASS) {
 EVAL_NODE(ID) {
     ena_value_t name = ena_cstr2ident(vm, node->token->str);
     ena_value_t value = get_var_value(vm->current_scope, name);
+
     if (value == ENA_UNDEFINED) {
+        if (name == ena_cstr2ident(vm, "self")) {
+            return vm->self;
+        }
+
         RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
     }
 
@@ -341,20 +346,19 @@ EVAL_NODE(ID) {
 
 EVAL_NODE(PROP) {
     struct ena_instance *obj;
-    if (!ena_strcmp(node->child->token->str, "self")) {
-        if (ena_get_type(vm->self) != ENA_T_INSTANCE) {
-            RUNTIME_ERROR("self is not instance");
-        }
-        obj = (struct ena_instance *) vm->self;
-    } else {
-        NOT_YET_IMPLEMENTED();
+    ena_value_t prop_name = ena_cstr2ident(vm, node->token->str);
+
+    ena_value_t self_value = eval_node(vm, node->child);
+    if (ena_get_type(self_value) != ENA_T_INSTANCE) {
+        RUNTIME_ERROR("self is not instance");
     }
 
-    ena_value_t prop_name = ena_cstr2ident(vm, node->token->str);
-    ena_value_t value = get_var_from(&obj->props, prop_name);
+    struct ena_instance *self = ena_to_instance_object(self_value);
+    ena_value_t value = get_var_from(&self->props, prop_name);
     if (value == ENA_UNDEFINED) {
         RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, prop_name));
     }
+
     return value;
 }
 
