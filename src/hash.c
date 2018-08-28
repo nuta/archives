@@ -220,9 +220,9 @@ static bool value_equals(void *key1, void *key2) {
 static ena_hash_digest_t value_hash(void *key) {
     switch (ena_get_type((ena_value_t) key)) {
         case ENA_T_INT:
-            return ((struct ena_int *) key)->value;
+            return ena_to_int_object((ena_value_t) key)->value;
         case ENA_T_STRING:
-            return ((struct ena_string *) key)->size_in_bytes;
+            return ena_to_string_object((ena_value_t) key)->size_in_bytes;
         default:
             return 0;
     }

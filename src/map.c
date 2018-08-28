@@ -6,7 +6,7 @@
 
 ena_value_t map_get(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "get()", "x", args, num_args);
-    struct ena_map *self_map = (struct ena_map *) self;
+    struct ena_map *self_map = ena_to_map_object(self);
     ena_value_t key = args[0];
 
     struct ena_hash_entry *entry = ena_hash_search(&self_map->entries, (void *) key);

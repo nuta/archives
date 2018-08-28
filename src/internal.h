@@ -99,6 +99,7 @@ struct ena_vm {
     struct ena_class *current_class;
     ena_value_t self;
     struct ena_ast *ast_list;
+    struct ena_class *int_class;
     struct ena_class *string_class;
     struct ena_class *list_class;
     struct ena_class *map_class;
@@ -122,6 +123,51 @@ static inline int ena_isalnum(int c) {
     return ena_isdigit(c) || ena_isalpha(c);
 }
 
+static inline struct ena_int *ena_to_int_object(ena_value_t value) {
+    if (ena_get_type(value) != ENA_T_INT) {
+        // Invalid cast: `value` is not an int.
+        return NULL;
+    }
+
+    return (struct ena_int *) value;
+}
+
+static inline struct ena_string *ena_to_string_object(ena_value_t value) {
+    if (ena_get_type(value) != ENA_T_STRING) {
+        // Invalid cast: `value` is not a string.
+        return NULL;
+    }
+
+    return (struct ena_string *) value;
+}
+
+static inline struct ena_bool *ena_to_bool_object(ena_value_t value) {
+    if (ena_get_type(value) != ENA_T_BOOL) {
+        // Invalid cast: `value` is not a string.
+        return NULL;
+    }
+
+    return (struct ena_bool *) value;
+}
+
+static inline struct ena_list *ena_to_list_object(ena_value_t value) {
+    if (ena_get_type(value) != ENA_T_LIST) {
+        // Invalid cast: `value` is not a string.
+        return NULL;
+    }
+
+    return (struct ena_list *) value;
+}
+
+static inline struct ena_map *ena_to_map_object(ena_value_t value) {
+    if (ena_get_type(value) != ENA_T_MAP) {
+        // Invalid cast: `value` is not a string.
+        return NULL;
+    }
+
+    return (struct ena_map *) value;
+}
+
 void *ena_memcpy(void *dst, const void *src, size_t len);
 int ena_memcmp(void *ptr1, const void *ptr2, size_t len);
 int ena_strcmp(const char *s1, const char *s2);
@@ -137,8 +183,6 @@ const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);
 // TODO: Move these functions to an appropriate file.
 struct ena_scope *ena_create_scope(struct ena_scope *parent);
 struct ena_module *ena_create_module(void);
-struct ena_int *ena_cast_to_int(ena_value_t value);
-struct ena_string *ena_cast_to_string(ena_value_t value);
 ena_value_t get_var_value(struct ena_scope *scope, ena_ident_t name);
 struct ena_hash_entry *lookup_var(struct ena_scope *scope, ena_ident_t name);
 void ena_assign_to_var(struct ena_vm *vm, struct ena_hash_table *table, ena_ident_t name, ena_value_t value, bool allow_undefined);
@@ -149,5 +193,6 @@ ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name);
 struct ena_class *ena_create_class(void);
 void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
 bool ena_is_equal(ena_value_t v1, ena_value_t v2);
+struct ena_class *ena_create_int_class(struct ena_vm *vm);
 
 #endif

@@ -6,7 +6,7 @@
 
 ena_value_t list_append(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "append()", "x", args, num_args);
-    struct ena_list *self_list = (struct ena_list *) self;
+    struct ena_list *self_list = ena_to_list_object(self);
     ena_value_t item = args[0];
 
     size_t new_num_elems = self_list->num_elems + 1;

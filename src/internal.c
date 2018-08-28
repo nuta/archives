@@ -183,24 +183,6 @@ struct ena_module *ena_create_module(void) {
     return module;
 }
 
-struct ena_int *ena_cast_to_int(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_INT) {
-        // Invalid cast: `value` is not an int.
-        return NULL;
-    }
-
-    return (struct ena_int *) value;
-}
-
-struct ena_string *ena_cast_to_string(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_STRING) {
-        // Invalid cast: `value` is not a string.
-        return NULL;
-    }
-
-    return (struct ena_string *) value;
-}
-
 void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value) {
     if (ena_hash_search_or_insert(&scope->vars, (void *) name, (void *) value)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
@@ -331,10 +313,33 @@ bool ena_is_equal(ena_value_t v1, ena_value_t v2) {
         case ENA_T_NULL:
             return v1 == v2;
         case ENA_T_INT:
-            return ((struct ena_int *) v1)->value - ((struct ena_int *) v2)->value;
+            return ena_to_int_object(v1)->value - ena_to_int_object(v2)->value;
         case ENA_T_STRING:
-            return ((struct ena_string *) v1)->ident == ((struct ena_string *) v2)->ident;
+            return ena_to_string_object(v1)->ident == ena_to_string_object(v2)->ident;
+        default:;
+            /* TODO: BUG() */
     }
 
     return false;
+}
+
+#define DEFINE_BINOP(name, type, c_op) \
+    ena_value_t int_##name(UNUSED struct ena_vm *vm, ena_value_t self, ena_value_t *args, UNUSED int num_args) { \
+        struct ena_int *lhs = ena_to_int_object(self); \
+        struct ena_int *rhs = ena_to_int_object(args[0]); \
+        return ena_create_##type(lhs->value c_op rhs->value); \
+    }
+
+DEFINE_BINOP(add, int, +)
+DEFINE_BINOP(sub, int, -)
+DEFINE_BINOP(lt, bool, <)
+DEFINE_BINOP(eq, bool, ==)
+
+struct ena_class *ena_create_int_class(struct ena_vm *vm) {
+    struct ena_class *cls = ena_create_class();
+    ena_define_native_method(vm, cls, "+", int_add);
+    ena_define_native_method(vm, cls, "-", int_sub);
+    ena_define_native_method(vm, cls, "<", int_lt);
+    ena_define_native_method(vm, cls, "==", int_eq);
+    return cls;
 }

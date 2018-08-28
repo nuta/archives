@@ -82,10 +82,10 @@ ena_value_t ena_create_string(struct ena_vm *vm, const char *str, size_t size) {
 void ena_stringify(char *buf, size_t buf_len, ena_value_t value) {
     switch (ena_get_type(value)) {
         case ENA_T_INT:
-            ena_snprintf(buf, buf_len, "int(%d)", ena_cast_to_int(value)->value);
+            ena_snprintf(buf, buf_len, "int(%d)", ena_to_int_object(value)->value);
             break;
         case ENA_T_STRING:
-            ena_snprintf(buf, buf_len, "string(%s)", ena_cast_to_string(value)->str);
+            ena_snprintf(buf, buf_len, "string(%s)", ena_to_string_object(value)->str);
             break;
         case ENA_T_BOOL:
             ena_snprintf(buf, buf_len, "bool(%s)", value == ENA_TRUE ? "true" : "false");
@@ -113,6 +113,9 @@ void ena_stringify(char *buf, size_t buf_len, ena_value_t value) {
             break;
         case ENA_T_UNDEFINED:
             ena_snprintf(buf, buf_len, "(undefined)");
+            break;
+        default:
+            ena_snprintf(buf, buf_len, "(invalid)");
             break;
     }
 }
@@ -151,6 +154,7 @@ struct ena_vm *ena_create_vm() {
     vm->error.type = ENA_ERROR_NONE;
     ena_hash_init_ident_table(&vm->ident2cstr);
     ena_hash_init_cstr_table(&vm->cstr2ident);
+    vm->int_class = ena_create_int_class(vm);
     vm->string_class = ena_create_string_class(vm);
     vm->list_class = ena_create_list_class(vm);
     vm->map_class = ena_create_map_class(vm);
@@ -171,6 +175,7 @@ void ena_destroy_vm(struct ena_vm *vm) {
     // ident2cstr values; they are identical pointers.
     ena_hash_free_table(&vm->cstr2ident);
     ena_destroy_object((struct ena_object *) vm->main_module);
+    ena_destroy_object((struct ena_object *) vm->int_class);
     ena_destroy_object((struct ena_object *) vm->string_class);
     ena_destroy_object((struct ena_object *) vm->list_class);
     ena_destroy_object((struct ena_object *) vm->map_class);
