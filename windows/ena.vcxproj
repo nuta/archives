@@ -155,10 +155,12 @@
     <ClInclude Include="..\src\eval.h" />
     <ClInclude Include="..\src\gc.h" />
     <ClInclude Include="..\src\hash.h" />
+    <ClInclude Include="..\src\builtins.h" />
     <ClInclude Include="..\src\string.h" />
     <ClInclude Include="..\src\list.h" />
     <ClInclude Include="..\src\map.h" />
     <ClInclude Include="..\src\internal.h" />
+    <ClInclude Include="..\src\utils.h" />
     <ClInclude Include="..\src\lexer.h" />
     <ClInclude Include="..\src\malloc.h" />
     <ClInclude Include="..\src\parser.h" />
@@ -171,6 +173,7 @@
     <ClCompile Include="..\src\eval.c" />
     <ClCompile Include="..\src\gc.c" />
     <ClCompile Include="..\src\hash.c" />
+    <ClCompile Include="..\src\builtins.c" />
     <ClCompile Include="..\src\string.c" />
     <ClCompile Include="..\src\list.c" />
     <ClCompile Include="..\src\map.c" />
@@ -178,6 +181,7 @@
     <ClCompile Include="..\src\malloc.c" />
     <ClCompile Include="..\src\parser.c" />
     <ClCompile Include="..\src\internal.c" />
+    <ClCompile Include="..\src\utils.c" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

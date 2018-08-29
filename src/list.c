@@ -4,7 +4,7 @@
 #include "malloc.h"
 #include "eval.h"
 
-ena_value_t list_append(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
+static ena_value_t list_append(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "append()", "x", args, num_args);
     struct ena_list *self_list = ena_to_list_object(self);
     ena_value_t item = args[0];
@@ -19,7 +19,7 @@ ena_value_t list_append(struct ena_vm *vm, ena_value_t self, ena_value_t *args, 
     return ENA_UNDEFINED;
 }
 
-ena_value_t list_prepend(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
+static ena_value_t list_prepend(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "prepend()", "x", args, num_args);
     struct ena_list *self_list = ena_to_list_object(self);
     ena_value_t item = args[0];
@@ -34,7 +34,7 @@ ena_value_t list_prepend(struct ena_vm *vm, ena_value_t self, ena_value_t *args,
     return ENA_UNDEFINED;
 }
 
-ena_value_t list_pop(UNUSED struct ena_vm *vm, ena_value_t self, UNUSED ena_value_t *args, UNUSED int num_args) {
+static ena_value_t list_pop(UNUSED struct ena_vm *vm, ena_value_t self, UNUSED ena_value_t *args, UNUSED int num_args) {
     struct ena_list *self_list = ena_to_list_object(self);
 
     if (self_list->num_elems == 0) {
@@ -47,9 +47,9 @@ ena_value_t list_pop(UNUSED struct ena_vm *vm, ena_value_t self, UNUSED ena_valu
 }
 
 struct ena_class *ena_create_list_class(struct ena_vm *vm) {
-    struct ena_class *cls = ena_create_class();
-    ena_define_native_method(vm, cls, "append", list_append);
-    ena_define_native_method(vm, cls, "prepend", list_prepend);
-    ena_define_native_method(vm, cls, "pop", list_pop);
-    return cls;
+    ena_value_t cls = ena_create_class();
+    ena_define_method(vm, cls, "append", list_append);
+    ena_define_method(vm, cls, "prepend", list_prepend);
+    ena_define_method(vm, cls, "pop", list_pop);
+    return ena_to_class_object(cls);
 }

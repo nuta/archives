@@ -4,27 +4,6 @@
 #include "api.h"
 #include "hash.h"
 #include "lexer.h"
-#include "parser.h"
-
-#ifdef _MSC_VER
-#define UNUSED
-#define UNREACHABLE
-#else
-#define UNUSED __attribute__((unused))
-#define UNREACHABLE  __builtin_unreachable()
-#endif
-
-/// TODO: implement by ourselves
-#include <stdio.h>
-#include <assert.h>
-#include <setjmp.h>
-#include <string.h>
-#define ena_memchr memchr
-#define ena_snprintf snprintf
-#define ENA_ASSERT assert
-#define ena_setjmp _setjmp
-#define ena_longjmp _longjmp
-#define ena_jmpbuf jmp_buf
 
 #ifdef ENA_DEBUG_BUILD
 // Including non-freestanding libraries are allowed in debug build.
@@ -61,23 +40,13 @@
         __FILE__, __func__, __LINE__ \
     )
 
-#define PUSH_SAVEPOINT() \
-    do { \
-        struct ena_savepoint *sp = ena_malloc(sizeof(*sp)); \
-        sp->prev = vm->current_savepoint; \
-        vm->current_savepoint = sp; \
-    } while(0)
-#define EXEC_SAVEPOINT() ena_setjmp(vm->current_savepoint->jmpbuf)
-#define UNWIND_SAVEPOINT(unwind_type) ena_longjmp(vm->current_savepoint->jmpbuf, unwind_type); UNREACHABLE
-#define POP_SAVEPOINT() \
-    do { \
-        struct ena_savepoint *current_sp = vm->current_savepoint; \
-        if (!current_sp) { \
-            BUG("pop savepoint in the top level"); \
-        } \
-        vm->current_savepoint = current_sp->prev; \
-        ena_free(current_sp); \
-    } while(0)
+#define ENA_VALUE2OBJ(type, value) ((struct ena_##type *) (value))
+
+// Assuming that there are no insane memory allocators in this world which returns
+// too low memory address (< 0x1000). Typically the page is never used in order to
+// detect NULL pointer dereferences and in an embedded software (MMU is disabled)
+// important data strctures like interrupt table exist.
+#define ENA_IS_IN_HEAP(value) (((uintptr_t) (value)) >= 0x1000)
 
 struct ena_error {
     ena_error_type_t type;
@@ -107,101 +76,28 @@ struct ena_vm {
 
 typedef uintptr_t ena_ident_t;
 
-static inline int ena_isdigit(int c) {
-    return '0' <= c && c <= '9';
-}
-
-static inline int ena_isalpha(int c) {
-    return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z');
-}
-
-static inline int ena_isupper(int c) {
-    return 'A' <= c && c <= 'Z';
-}
-
-static inline int ena_isalnum(int c) {
-    return ena_isdigit(c) || ena_isalpha(c);
-}
-
-static inline struct ena_int *ena_to_int_object(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_INT) {
-        // Invalid cast: `value` is not an int.
-        return NULL;
+#define DEFINE_VALUE2OBJ_FUNC(type_name, type_id) \
+    static inline struct ena_##type_name *ena_to_##type_name##_object(ena_value_t value) { \
+        if (ena_get_type(value) != type_id) { \
+            return NULL; \
+        } \
+     \
+        return (struct ena_##type_name *) value; \
     }
-
-    return (struct ena_int *) value;
-}
-
-static inline struct ena_string *ena_to_string_object(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_STRING) {
-        // Invalid cast: `value` is not a string.
-        return NULL;
-    }
-
-    return (struct ena_string *) value;
-}
-
-static inline struct ena_bool *ena_to_bool_object(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_BOOL) {
-        // Invalid cast: `value` is not a string.
-        return NULL;
-    }
-
-    return (struct ena_bool *) value;
-}
-
-static inline struct ena_list *ena_to_list_object(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_LIST) {
-        // Invalid cast: `value` is not a string.
-        return NULL;
-    }
-
-    return (struct ena_list *) value;
-}
-
-static inline struct ena_map *ena_to_map_object(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_MAP) {
-        // Invalid cast: `value` is not a string.
-        return NULL;
-    }
-
-    return (struct ena_map *) value;
-}
-
-static inline struct ena_instance *ena_to_instance_object(ena_value_t value) {
-    if (ena_get_type(value) != ENA_T_INSTANCE) {
-        // Invalid cast: `value` is not a string.
-        return NULL;
-    }
-
-    return (struct ena_instance *) value;
-}
-
-void *ena_memcpy(void *dst, const void *src, size_t len);
-int ena_memcmp(void *ptr1, const void *ptr2, size_t len);
-int ena_strcmp(const char *s1, const char *s2);
-int ena_strncmp(const char *s1, const char *s2, size_t n);
-size_t ena_strlen(const char *str);
-int ena_str2int(const char *str);
-char *ena_strdup(const char *str);
-char *ena_strndup(const char *str, size_t len);
+DEFINE_VALUE2OBJ_FUNC(int, ENA_T_INT)
+DEFINE_VALUE2OBJ_FUNC(string, ENA_T_STRING)
+DEFINE_VALUE2OBJ_FUNC(bool, ENA_T_BOOL)
+DEFINE_VALUE2OBJ_FUNC(list, ENA_T_LIST)
+DEFINE_VALUE2OBJ_FUNC(map, ENA_T_MAP)
+DEFINE_VALUE2OBJ_FUNC(instance, ENA_T_INSTANCE)
+DEFINE_VALUE2OBJ_FUNC(class, ENA_T_CLASS)
 
 ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str);
 const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);
-
-// TODO: Move these functions to an appropriate file.
-struct ena_scope *ena_create_scope(struct ena_scope *parent);
-struct ena_module *ena_create_module(void);
-ena_value_t get_var_value(struct ena_scope *scope, ena_ident_t name);
-struct ena_hash_entry *lookup_var(struct ena_scope *scope, ena_ident_t name);
-void ena_assign_to_var(struct ena_vm *vm, struct ena_hash_table *table, ena_ident_t name, ena_value_t value, bool allow_undefined);
-void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
-void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value);
-void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value);
-ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name);
-struct ena_class *ena_create_class(void);
+void ena_define_var(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value);
+ena_value_t ena_get_var_value(struct ena_scope *scope, ena_ident_t name);
+bool ena_set_var_value(struct ena_scope *scope, ena_ident_t name, ena_value_t new_value);
 void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
 bool ena_is_equal(ena_value_t v1, ena_value_t v2);
-struct ena_class *ena_create_int_class(struct ena_vm *vm);
 
 #endif

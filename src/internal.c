@@ -2,134 +2,17 @@
 #include "eval.h"
 #include "internal.h"
 
-/// Converts an ASCII string into an integer. Supports hexadecimal string
-/// (prefixed by 0x) and decimal string.
-int ena_str2int(const char *str) {
-    char *s = (char *) str;
-    int base = 10;
-    size_t i;
-    if (str[0] != '\0' && str[1] != '\0' && str[0] == '0') {
-        switch (str[1]) {
-            case 'x':
-                /* 0x123, 0xabc, ... */
-                base = 16;
-                i = 2; // Remove `0x' prefix.
-                break;
-            default:
-                // Invalid string.
-                return 0;
-        }
-    } else {
-        i = 0;
-    }
-
-    int r = 0;
-    while (str[i] != '\0') {
-        char ch = s[i];
-        int value;
-        if (ena_isalpha(ch)) {
-            value = (ena_isupper(ch) ? ch - 'A' : ch - 'a') + 10;
-        } else {
-            value = ch - '0';
+static ena_value_t *lookup_var(struct ena_scope *scope, ena_ident_t name) {
+    while (scope) {
+        struct ena_hash_entry *e = ena_hash_search(&scope->vars, (void *) name);
+        if (e) {
+            return (ena_value_t *) &e->value;
         }
 
-        r = r * base + value;
-        i++;
+        scope = scope->parent;
     }
 
-    return r;
-}
-
-void *ena_memcpy(void *dst, const void *src, size_t len) {
-    uint8_t *dst_p = dst;
-    uint8_t *src_p = (uint8_t *) src;
-
-    while (len > 0) {
-        *dst_p = *src_p;
-        dst_p++;
-        src_p++;
-        len--;
-    }
-
-    return dst;
-}
-
-int ena_memcmp(void *ptr1, const void *ptr2, size_t len) {
-    uint8_t *ptr2_p = (uint8_t *) ptr2;
-    uint8_t *ptr1_p = (uint8_t *) ptr1;
-
-    while (len > 0) {
-        int tmp = *ptr2_p - *ptr1_p;
-        if (tmp) {
-            return tmp;
-        }
-
-        ptr1_p++;
-        ptr2_p++;
-        len--;
-    }
-
-    return 0;
-}
-
-int ena_strcmp(const char *s1, const char *s2) {
-    while (*s1 != '\0' && *s2 != '\0') {
-        int tmp = *s1 - *s2;
-        if (tmp) {
-            return tmp;
-        }
-
-        s1++;
-        s2++;
-    }
-
-    return *s1 - *s2;
-}
-
-int ena_strncmp(const char *s1, const char *s2, size_t n) {
-    while (*s1 != '\0' && *s2 != '\0') {
-        int tmp = *s1 - *s2;
-        if (tmp) {
-            return tmp;
-        }
-
-        n--;
-        if (n == 0) {
-            break;
-        }
-
-        s1++;
-        s2++;
-    }
-
-    return *s1 - *s2;
-}
-
-size_t ena_strlen(const char *str) {
-    size_t len = 0;
-    while (*str != '\0') {
-        str++;
-        len++;
-    }
-
-    return len;
-}
-
-char *ena_strdup(const char *str) {
-    size_t len = ena_strlen(str);
-    char *new_str = ena_malloc(len + 1);
-    ena_memcpy(new_str, str, len);
-    new_str[len] = '\0';
-    return new_str;
-}
-
-char *ena_strndup(const char *str, size_t len) {
-    size_t str_len = ena_strlen(str);
-    size_t actual_len = (str_len < len) ? str_len : len;
-    char *new_str = ena_malloc(actual_len + 1);
-    ena_memcpy(new_str, str, actual_len);
-    new_str[len] = '\0';
-    return new_str;
+    return NULL;
 }
 
 /// Get the ident associated with a C string.
@@ -166,66 +49,25 @@ const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident) {
     return (const char *) ena_hash_search(&vm->ident2cstr, (void *) ident)->value;
 }
 
-struct ena_scope *ena_create_scope(struct ena_scope *parent) {
-    // TODO: Allocate a scope by alloca().
-    struct ena_scope *scope = ena_malloc(sizeof(*scope));
-    scope->parent = parent;
-    scope->refcount = 1;
-    ena_hash_init_ident_table(&scope->vars);
-    return scope;
-}
-
-struct ena_module *ena_create_module(void) {
-    struct ena_module *module = ena_malloc(sizeof(*module));
-    module->header.type = ENA_T_MODULE;
-    module->header.refcount = 1;
-    module->scope = ena_create_scope(NULL);
-    return module;
-}
-
-void ena_define_var_in(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value) {
+void ena_define_var(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value) {
     if (ena_hash_search_or_insert(&scope->vars, (void *) name, (void *) value)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
     }
 }
 
-void ena_define_var(struct ena_vm *vm, ena_ident_t name, ena_value_t value) {
-    ena_define_var_in(vm, vm->current_scope, name, value);
+ena_value_t ena_get_var_value (struct ena_scope *scope, ena_ident_t name) {
+    ena_value_t *value = lookup_var(scope, name);
+    return value ? *value : ENA_UNDEFINED;
 }
 
-ena_value_t get_var_from(struct ena_hash_table *table, ena_ident_t name) {
-    struct ena_hash_entry *e = ena_hash_search(table, (void *) name);
-    if (e) {
-        return (ena_value_t) e->value;
+bool ena_set_var_value(struct ena_scope *scope, ena_ident_t name, ena_value_t new_value) {
+    ena_value_t *value = lookup_var(scope, name);
+    if (!value) {
+        return false;
     }
 
-    return ENA_UNDEFINED;
-}
-
-struct ena_hash_entry *lookup_var(struct ena_scope *scope, ena_ident_t name) {
-    while (scope) {
-        struct ena_hash_entry *e = ena_hash_search(&scope->vars, (void *) name);
-        if (e) {
-            return e;
-        }
-
-        scope = scope->parent;
-    }
-
-    return NULL;
-}
-
-ena_value_t get_var_value(struct ena_scope *scope, ena_ident_t name) {
-    struct ena_hash_entry *e = lookup_var(scope, name);
-    return e ? ((ena_value_t) e->value) : ENA_UNDEFINED;
-}
-
-struct ena_class *ena_create_class(void) {
-    struct ena_class *cls = ena_malloc(sizeof(*cls));
-    cls->header.type = ENA_T_CLASS;
-    cls->header.refcount = 0;
-    ena_hash_init_ident_table(&cls->methods);
-    return cls;
+    *value = new_value;
+    return true;
 }
 
 static const char *get_type_name(ena_value_type_t type) {
@@ -321,51 +163,4 @@ bool ena_is_equal(ena_value_t v1, ena_value_t v2) {
     }
 
     return false;
-}
-
-#define DEFINE_BINOP(name, type, c_op) \
-    ena_value_t int_##name(UNUSED struct ena_vm *vm, ena_value_t self, ena_value_t *args, UNUSED int num_args) { \
-        struct ena_int *lhs = ena_to_int_object(self); \
-        struct ena_int *rhs = ena_to_int_object(args[0]); \
-        DEBUG("%d %s %d", lhs->value, #c_op, rhs->value); \
-        return ena_create_##type(lhs->value c_op rhs->value); \
-    }
-
-#define DEFINE_BINOP_DIV(name, type, c_op) \
-    ena_value_t int_##name(UNUSED struct ena_vm *vm, ena_value_t self, ena_value_t *args, UNUSED int num_args) { \
-        struct ena_int *lhs = ena_to_int_object(self); \
-        struct ena_int *rhs = ena_to_int_object(args[0]); \
-        if (rhs->value == 0) { \
-            RUNTIME_ERROR("divide by zero"); \
-        } \
-        DEBUG("%d %s %d", lhs->value, #c_op, rhs->value); \
-        return ena_create_##type(lhs->value c_op rhs->value); \
-    }
-
-DEFINE_BINOP(add, int, +)
-DEFINE_BINOP(sub, int, -)
-DEFINE_BINOP(mul, int, *)
-DEFINE_BINOP_DIV(div, int, /)
-DEFINE_BINOP_DIV(mod, int, %)
-DEFINE_BINOP(lt, bool, <)
-DEFINE_BINOP(lte, bool, <=)
-DEFINE_BINOP(gt, bool, >)
-DEFINE_BINOP(gte, bool, >=)
-DEFINE_BINOP(eq, bool, ==)
-DEFINE_BINOP(neq, bool, !=)
-
-struct ena_class *ena_create_int_class(struct ena_vm *vm) {
-    struct ena_class *cls = ena_create_class();
-    ena_define_native_method(vm, cls, "+", int_add);
-    ena_define_native_method(vm, cls, "-", int_sub);
-    ena_define_native_method(vm, cls, "*", int_mul);
-    ena_define_native_method(vm, cls, "/", int_div);
-    ena_define_native_method(vm, cls, "%", int_mod);
-    ena_define_native_method(vm, cls, "<", int_lt);
-    ena_define_native_method(vm, cls, "<=", int_lte);
-    ena_define_native_method(vm, cls, ">", int_gte);
-    ena_define_native_method(vm, cls, ">=", int_gte);
-    ena_define_native_method(vm, cls, "!=", int_neq);
-    ena_define_native_method(vm, cls, "==", int_eq);
-    return cls;
 }

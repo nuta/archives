@@ -2,7 +2,28 @@
 #define __ENA_EVAL_H__
 
 #include "internal.h"
-#include "hash.h"
+
+/// 1 if `v` is true in `if (v)` or 0 otherwise.
+#define ENA_TEST(v) ((v) == ENA_TRUE)
+#define ENA_OBJ2VALUE(obj) ((ena_value_t) (obj))
+
+#define PUSH_SAVEPOINT() \
+    do { \
+        struct ena_savepoint *sp = ena_malloc(sizeof(*sp)); \
+        sp->prev = vm->current_savepoint; \
+        vm->current_savepoint = sp; \
+    } while(0)
+#define EXEC_SAVEPOINT() ena_setjmp(vm->current_savepoint->jmpbuf)
+#define UNWIND_SAVEPOINT(unwind_type) ena_longjmp(vm->current_savepoint->jmpbuf, unwind_type); UNREACHABLE
+#define POP_SAVEPOINT() \
+    do { \
+        struct ena_savepoint *current_sp = vm->current_savepoint; \
+        if (!current_sp) { \
+            BUG("pop savepoint in the top level"); \
+        } \
+        vm->current_savepoint = current_sp->prev; \
+        ena_free(current_sp); \
+    } while(0)
 
 struct ena_object {
     uint32_t type; // enum ena_value_type
@@ -56,8 +77,7 @@ struct ena_class {
 struct ena_instance {
     struct ena_object header;
     struct ena_class *cls;
-    /// Method table. (ena_ident_t -> ena_value_t)
-    struct ena_hash_table props;
+    struct ena_scope *props;
 };
 
 struct ena_list {
@@ -70,55 +90,6 @@ struct ena_map {
     struct ena_object header;
     struct ena_hash_table entries;
 };
-
-static inline ena_value_type_t ena_get_type_from_object(struct ena_object *obj) {
-    return obj->type;
-}
-
-/// 1 if `v` is true in `if (v)` or 0 otherwise.
-#define ENA_TEST(v) ((v) == ENA_TRUE)
-
-// Object-related macros.
-#define ENA_OBJ2VALUE(obj) ((ena_value_t) (obj))
-
-// Undefined
-#define ENA_IS_UNDEFINED(value) ((value) == ENA_UNDEFINED)
-
-// Null
-#define ENA_IS_NULL(value) ((value) == ENA_NULL)
-
-// Bool
-#define ENA_IS_BOOL(value) ((value) == ENA_TRUE || (value) == ENA_FALSE)
-
-// Int
-#define ENA_IS_INT(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_INT)
-
-// String
-#define ENA_IS_STRING(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_STRING)
-
-// Func
-#define ENA_IS_FUNC(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_FUNC)
-
-// List
-#define ENA_IS_LIST(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_LIST)
-
-// Map
-#define ENA_IS_MAP(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_MAP)
-
-// Module
-#define ENA_IS_MODULE(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_MODULE)
-
-// Class
-#define ENA_IS_CLASS(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_CLASS)
-#define ENA_IS_INSTANCE(value) \
-    (ena_get_type_from_object((struct ena_object *) value) == ENA_T_INSTANCE)
 
 struct ena_scope {
     /// ena_ident_t -> ena_value_t

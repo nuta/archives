@@ -91,16 +91,16 @@ UNITTEST(ident) {
     } while (0)
 
 UNITTEST(string) {
-    UTF8_TEST_EQ( utf8_validate, u8"", true);
-    UTF8_TEST_EQ(utf8_validate, u8"This is an ASCII string.", true);
-    UTF8_TEST_EQ(utf8_strlen, u8"", 0);
-    UTF8_TEST_EQ(utf8_strlen, u8"Hello World!", 12);
-    UTF8_TEST_EQ(utf8_strlen, u8"すき焼き", 4);
-    UTF8_TEST_EQ(utf8_strlen, u8"I wanna go to a 🍣 bar.", 22);
-    UTF8_TEST_EQ(utf8_strlen, u8"あらゆる現実を全て自分の方へねじ曲げたのだ", 21);
-    UTF8_TEST_EQ(utf8_char_at, u8"A 🍔.", 0x1f354, 2);
-    UTF8_TEST_EQ(utf8_char_at, u8"Enaga is 鳥.", 0x9ce5, 9);
-    UTF8_TEST_EQ(utf8_char_at, u8"Petit déjeuner.", 0xe9, 7);
+    UTF8_TEST_EQ(ena_utf8_validate, u8"", true);
+    UTF8_TEST_EQ(ena_utf8_validate, u8"This is an ASCII string.", true);
+    UTF8_TEST_EQ(ena_utf8_strlen, u8"", 0);
+    UTF8_TEST_EQ(ena_utf8_strlen, u8"Hello World!", 12);
+    UTF8_TEST_EQ(ena_utf8_strlen, u8"すき焼き", 4);
+    UTF8_TEST_EQ(ena_utf8_strlen, u8"I wanna go to a 🍣 bar.", 22);
+    UTF8_TEST_EQ(ena_utf8_strlen, u8"あらゆる現実を全て自分の方へねじ曲げたのだ", 21);
+    UTF8_TEST_EQ(ena_utf8_char_at, u8"A 🍔.", 0x1f354, 2);
+    UTF8_TEST_EQ(ena_utf8_char_at, u8"Enaga is 鳥.", 0x9ce5, 9);
+    UTF8_TEST_EQ(ena_utf8_char_at, u8"Petit déjeuner.", 0xe9, 7);
 }
 
 UNITTEST(hash) {

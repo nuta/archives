@@ -36,10 +36,27 @@ static ena_value_t copy_if_immutable(ena_value_t value) {
     }
 }
 
+static struct ena_scope *create_scope(struct ena_scope *parent) {
+    // TODO: Allocate a scope by alloca().
+    struct ena_scope *scope = ena_malloc(sizeof(*scope));
+    scope->parent = parent;
+    scope->refcount = 1;
+    ena_hash_init_ident_table(&scope->vars);
+    return scope;
+}
+
+static struct ena_module *create_module(void) {
+    struct ena_module *module = ena_malloc(sizeof(*module));
+    module->header.type = ENA_T_MODULE;
+    module->header.refcount = 1;
+    module->scope = create_scope(NULL);
+    return module;
+}
+
 static ena_value_t call_func(struct ena_vm *vm, ena_value_t *args, int num_args, ena_value_t instance, struct ena_func *func) {
     // Enther the scope and execute the body.
     struct ena_scope *caller_scope = vm->current_scope;
-    struct ena_scope *new_scope = ena_create_scope(func->scope);
+    struct ena_scope *new_scope = create_scope(func->scope);
     PUSH_SAVEPOINT();
     int unwind_type;
     ena_value_t ret_value = ENA_UNDEFINED;
@@ -61,7 +78,7 @@ static ena_value_t call_func(struct ena_vm *vm, ena_value_t *args, int num_args,
             // Evaluate and fill arguments into the newly created scope.
             for (int i = 0; i < num_args; i++) {
                 ena_ident_t param_name = ena_cstr2ident(vm, func->param_names->child[i].token->str);
-                ena_define_var_in(vm, new_scope, param_name, args[i]);
+                ena_define_var(vm, new_scope, param_name, args[i]);
             }
 
             vm->current_scope = new_scope;
@@ -140,7 +157,7 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
     instance->header.type = ENA_T_INSTANCE;
     instance->cls = cls;
     instance->header.refcount = 1;
-    ena_hash_init_ident_table(&instance->props);
+    instance->props = create_scope(NULL);
 
     // Call the constructor if it exists.
     struct ena_func *new_method = lookup_method(cls, ena_cstr2ident(vm, "new"));
@@ -206,7 +223,7 @@ EVAL_NODE(VAR) {
         initial = eval_node(vm, node->child);
     }
 
-    ena_define_var(vm, name, initial);
+    ena_define_var(vm, vm->current_scope, name, initial);
     return ENA_UNDEFINED;
 }
 
@@ -216,6 +233,7 @@ EVAL_NODE(OP_ASSIGN) {
 
     if (node->child[0].type == ENA_NODE_PROP) {
         struct ena_node *obj = node->child[0].child;
+        // FIXME:
         if (!ena_strcmp(obj->token->str, "self")) {
             if (vm->self == ENA_UNDEFINED) {
                 RUNTIME_ERROR("self is not available");
@@ -225,25 +243,17 @@ EVAL_NODE(OP_ASSIGN) {
                 RUNTIME_ERROR("self is not an instance");
             }
 
-            struct ena_hash_table *table;
-            struct ena_hash_entry *entry;
-            table = &((struct ena_instance *) vm->self)->props;
-            entry = ena_hash_search_or_insert(table, (void *) name, (void *) rvalue);
-            if (entry) {
-                // Already defined in self. Replace its value intead of
-                // inserting a new variable.
-                entry->value = (void *) rvalue;
+            struct ena_instance *self = (struct ena_instance *) vm->self;
+            if (!ena_set_var_value(self->props, name, rvalue)) {
+                ena_define_var(vm, self->props, name, rvalue);
             }
         } else {
             NOT_YET_IMPLEMENTED();
         }
     } else {
-        struct ena_hash_entry *entry = lookup_var(vm->current_scope, name);
-        if (!entry) {
+        if (!ena_set_var_value(vm->current_scope, name, rvalue)) {
             RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
         }
-
-        entry->value = (void *) rvalue;
     }
 
     return rvalue;
@@ -285,7 +295,7 @@ EVAL_NODE(FUNC) {
 EVAL_NODE(CALL) {
     if (node->child[0].type == ENA_NODE_ID) {
         ena_value_t func_name = ena_cstr2ident(vm, node->child[0].token->str);
-        ena_value_t func = get_var_value(vm->current_scope, func_name);
+        ena_value_t func = ena_get_var_value (vm->current_scope, func_name);
         switch (ena_get_type(func)) {
             case ENA_T_FUNC:
                 return call_func_by_nodes(vm, &node->child[1], ENA_UNDEFINED, (struct ena_func *) func);
@@ -318,20 +328,20 @@ EVAL_NODE(CLASS) {
     struct ena_node *stmts = node->child;
 
     // Create a new class.
-    struct ena_class *cls = ena_create_class();
+    ena_value_t cls = ena_create_class();
 
     // Evaluate the content.
-    vm->current_class = cls;
+    vm->current_class = ena_to_class_object(cls);
     eval_node(vm, stmts);
     vm->current_class = NULL;
 
-    ena_define_var(vm, name, (ena_value_t) cls);
+    ena_define_var(vm, vm->current_scope, name, cls);
     return ENA_UNDEFINED;
 }
 
 EVAL_NODE(ID) {
     ena_value_t name = ena_cstr2ident(vm, node->token->str);
-    ena_value_t value = get_var_value(vm->current_scope, name);
+    ena_value_t value = ena_get_var_value (vm->current_scope, name);
 
     if (value == ENA_UNDEFINED) {
         if (name == ena_cstr2ident(vm, "self")) {
@@ -345,16 +355,14 @@ EVAL_NODE(ID) {
 }
 
 EVAL_NODE(PROP) {
-    struct ena_instance *obj;
     ena_value_t prop_name = ena_cstr2ident(vm, node->token->str);
-
     ena_value_t self_value = eval_node(vm, node->child);
     if (ena_get_type(self_value) != ENA_T_INSTANCE) {
         RUNTIME_ERROR("self is not instance");
     }
 
     struct ena_instance *self = ena_to_instance_object(self_value);
-    ena_value_t value = get_var_from(&self->props, prop_name);
+    ena_value_t value = ena_get_var_value(self->props, prop_name);
     if (value == ENA_UNDEFINED) {
         RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, prop_name));
     }
@@ -531,6 +539,10 @@ bool ena_eval(struct ena_vm *vm, char *script) {
     }
     ast->next = NULL;
     *ast_entry = ast;
+
+    if (!vm->main_module) {
+        vm->main_module = create_module();
+    }
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         vm->current_scope = vm->main_module->scope;

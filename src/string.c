@@ -3,23 +3,86 @@
 #include "string.h"
 #include "malloc.h"
 #include "eval.h"
+#include "utils.h"
 
-static bool isascii(char ch) {
-    return !(!!(ch & 0x80));
+static char *search(struct ena_string *haystack, struct ena_string *needle) {
+    size_t pos = 0;
+    for (;;) {
+        void *begin;
+        if ((begin = ena_memchr(&haystack->str[pos], needle->str[0], haystack->size_in_bytes - pos)) == NULL) {
+            break;
+        }
+
+        // Found the first character.
+        size_t offset = (uintptr_t) begin - (uintptr_t) haystack->str;
+        size_t remaining = haystack->size_in_bytes - offset;
+        if (remaining < needle->size_in_bytes) {
+            return NULL;
+        }
+
+        if (ena_memcmp(begin, needle->str, needle->size_in_bytes) == 0) {
+            return begin;
+        }
+
+        pos += offset;
+    }
+
+    return NULL;
+}
+
+/// Handles escape sequences and copy the string.
+/// @arg str The string terminated by NUL.
+/// @arg size The size of the string in bytes.
+/// @returns The NUL-terminated newly allocated string.
+static const char *handle_escape_sequence(const char *str, size_t size) {
+    char *str2 = ena_malloc(size + 1);
+    size_t str2_i = 0;
+    size_t str_i = 0;
+    while (str_i < size) {
+        if (str[str_i] == '\\') {
+            ENA_ASSERT(str_i + 1 <= size);
+            switch (str[str_i + 1]) {
+                case 't':
+                    str2[str2_i] = '\t';
+                    str_i += 2; // skip backslash and `t'
+                    str2_i++;
+                    goto next_char;
+                case 'n':
+                    str2[str2_i] = '\n';
+                    str_i += 2; // skip backslash and `n'
+                    str2_i++;
+                    goto next_char;
+                case '"':
+                    str2[str2_i] = '"';
+                    str_i += 2; // skip backslash and `"'
+                    str2_i++;
+                    goto next_char;
+            }
+        } else {
+            str2[str2_i] = str[str_i];
+            str2_i++;
+            str_i++;
+        }
+
+next_char:;
+    }
+
+    str2[str2_i] = '\0';
+    return str2;
 }
 
 /// Validate if str is a valid UTF-8 sequence.
 /// @arg str The byte sequence. It may contain NUL character.
 /// @arg size The size of str in bytes.
 /// @returns `true` if str is a valid UTF-8 sequence.
-bool utf8_validate(const char *str, size_t size) {
+bool ena_utf8_validate(const char *str, size_t size) {
     size_t i = 0;
     for (;;) {
         if (i >= size) {
             break;
         }
 
-        if (isascii(str[i])) {
+        if (ena_isascii(str[i])) {
             i++;
         } else {
             // TODO: Conform https://tools.ietf.org/html/rfc3629
@@ -35,7 +98,7 @@ bool utf8_validate(const char *str, size_t size) {
 /// @arg size The size of str in bytes.
 /// @warning `str` must be a valid UTF-8 sequence.
 /// @returns The length.
-size_t utf8_strlen(const char *str, size_t size) {
+size_t ena_utf8_strlen(const char *str, size_t size) {
     size_t i = 0;
     size_t len = 0;
     for (;;) {
@@ -68,7 +131,7 @@ size_t utf8_strlen(const char *str, size_t size) {
 /// @note O(n)
 /// @warning `str` must be a valid UTF-8 sequence.
 /// @returns The character at `index`.
-uint32_t utf8_char_at(const char *str, size_t size, size_t index) {
+uint32_t ena_utf8_char_at(const char *str, size_t size, size_t index) {
     size_t i = 0;
     for (;;) {
         if (i >= size) {
@@ -114,7 +177,26 @@ uint32_t utf8_char_at(const char *str, size_t size, size_t index) {
     return FFFD_CHAR;
 }
 
-ena_value_t string_concat(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
+// @note Assumes that `str` does not contain NUL (verified by utf8_validate()).
+ena_value_t ena_create_string(struct ena_vm *vm, const char *str, size_t size) {
+    struct ena_string *obj = (struct ena_string *) ena_malloc(sizeof(*obj));
+    obj->header.type = ENA_T_STRING;
+    obj->header.refcount = 1;
+    obj->flags = STRING_FLAG_IDENT;
+
+    if (!ena_utf8_validate(str, size)) {
+        RUNTIME_ERROR("Invalid utf-8 byte sequence.");
+    }
+
+    const char *buf = handle_escape_sequence(str, size);
+    obj->ident = ena_cstr2ident(vm, buf);
+    obj->str = ena_ident2cstr(vm, obj->ident);
+    obj->size_in_bytes = size;
+    ena_free((void *) buf);
+    return ENA_OBJ2VALUE(obj);
+}
+
+static ena_value_t string_concat(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "concat()", "ss", args, num_args);
     struct ena_string *self_str = (struct ena_string *) self;
     struct ena_string *str = (struct ena_string *) args[0];
@@ -128,32 +210,7 @@ ena_value_t string_concat(struct ena_vm *vm, ena_value_t self, ena_value_t *args
     return ena_create_string(vm, new_str, new_str_size);
 }
 
-char *search(struct ena_string *haystack, struct ena_string *needle) {
-    size_t pos = 0;
-    for (;;) {
-        void *begin;
-        if ((begin = ena_memchr(&haystack->str[pos], needle->str[0], haystack->size_in_bytes - pos)) == NULL) {
-            break;
-        }
-
-        // Found the first character.
-        size_t offset = (uintptr_t) begin - (uintptr_t) haystack->str;
-        size_t remaining = haystack->size_in_bytes - offset;
-        if (remaining < needle->size_in_bytes) {
-            return NULL;
-        }
-
-        if (ena_memcmp(begin, needle->str, needle->size_in_bytes) == 0) {
-            return begin;
-        }
-
-        pos += offset;
-    }
-
-    return NULL;
-}
-
-ena_value_t string_contains(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
+static ena_value_t string_contains(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "contains()", "s", args, num_args);
     struct ena_string *self_str = (struct ena_string *) self;
     struct ena_string *needle = (struct ena_string *) args[0];
@@ -162,8 +219,8 @@ ena_value_t string_contains(struct ena_vm *vm, ena_value_t self, ena_value_t *ar
 }
 
 struct ena_class *ena_create_string_class(struct ena_vm *vm) {
-    struct ena_class *cls = ena_create_class();
-    ena_define_native_method(vm, cls, "concat", string_concat);
-    ena_define_native_method(vm, cls, "contains", string_contains);
-    return cls;
+    ena_value_t cls = ena_create_class();
+    ena_define_method(vm, cls, "concat", string_concat);
+    ena_define_method(vm, cls, "contains", string_contains);
+    return ena_to_class_object(cls);
 }

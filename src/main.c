@@ -10,7 +10,7 @@
 int ena_unittests(void);
 #endif
 
-int file_main(FILE *f) {
+static int file_main(FILE *f) {
     size_t script_len = 0;
     char *script = realloc(NULL, 1);
     int ch;
@@ -45,7 +45,7 @@ int file_main(FILE *f) {
 
     DEBUG("\nResult:");
     char buf[64];
-    ena_stringify(buf, sizeof(buf), get_var_value(vm->current_scope, ena_cstr2ident(vm, "ans")));
+    ena_stringify(buf, sizeof(buf), ena_get_var_value (vm->current_scope, ena_cstr2ident(vm, "ans")));
     DEBUG("ans = %s", buf);
 #else
     if (!ena_eval(vm, script)) {
@@ -59,7 +59,7 @@ int file_main(FILE *f) {
     return 0;
 }
 
-int repl_main(void) {
+static int repl_main(void) {
     struct ena_vm *vm = ena_create_vm();
     for (;;) {
         printf(">>> ");
