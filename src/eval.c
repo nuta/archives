@@ -8,7 +8,7 @@
 #define EVAL_NODE(name) static ena_value_t eval_##name(UNUSED struct ena_vm *vm, UNUSED struct ena_node *node)
 static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node);
 
-static inline struct ena_class *get_builtin_class_by_type(struct ena_vm *vm, enum ena_value_type type) {
+static inline struct ena_class *get_builtin_class_by_type(struct ena_vm *vm, ena_value_type_t type) {
     switch (type) {
         case ENA_T_INT:
             return vm->int_class;
@@ -112,7 +112,7 @@ static ena_value_t invoke_method(struct ena_vm *vm, struct ena_node *node) {
     ena_value_t instance = eval_node(vm, node->child[0].child);
 
     struct ena_class *cls;
-    enum ena_value_type lhs_type = ena_get_type(instance);
+    ena_value_type_t lhs_type = ena_get_type(instance);
     switch (lhs_type) {
         case ENA_T_INSTANCE:
             cls = ((struct ena_instance *) instance)->cls;
@@ -156,8 +156,8 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
     EVAL_NODE(op_name) { \
         ena_value_t lhs = eval_node(vm, &node->child[0]); \
         ena_value_t rhs = eval_node(vm, &node->child[1]); \
-        enum ena_value_type lhs_type = ena_get_type(lhs); \
-        enum ena_value_type rhs_type = ena_get_type(rhs); \
+        ena_value_type_t lhs_type = ena_get_type(lhs); \
+        ena_value_type_t rhs_type = ena_get_type(rhs); \
         if (lhs_type != rhs_type) { \
             TYPE_ERROR("type mismatch"); \
         } \

@@ -228,7 +228,7 @@ struct ena_class *ena_create_class(void) {
     return cls;
 }
 
-static const char *get_type_name(enum ena_value_type type) {
+static const char *get_type_name(ena_value_type_t type) {
     switch (type) {
         case ENA_T_INT:
             return "int";
@@ -264,7 +264,7 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
     char *r = (char *) rule;
     int arg_index = 0;
     while (*r) {
-        enum ena_value_type expected_type;
+        ena_value_type_t expected_type;
         switch (*r) {
             case 's':
                 expected_type = ENA_T_STRING;
@@ -285,7 +285,7 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
             RUNTIME_ERROR("%s takes at least %d argument (%d given)", name, arg_index + expected_num, num_args);
         }
 
-        enum ena_value_type type = ena_get_type(args[arg_index]);
+        ena_value_type_t type = ena_get_type(args[arg_index]);
         if (expected_type != ENA_T_ANY && type != expected_type) {
             RUNTIME_ERROR("%s %d%s argument must be %s (%s given)",
                 name,

@@ -5,7 +5,7 @@
 
 struct ena_token {
     // The type of token.
-    enum ena_token_type type;
+    ena_token_type_t type;
     // The token string (terminated by NUL).
     char *str;
     // The position in `script`.
@@ -13,7 +13,7 @@ struct ena_token {
     int column;
 };
 
-enum ena_node_type {
+typedef enum {
     ENA_NODE_UNKNOWN, // used internally
     ENA_NODE_PROGRAM,
     ENA_NODE_STMTS,
@@ -52,10 +52,10 @@ enum ena_node_type {
     ENA_NODE_MAP_ENTRY,
 
     ENA_NODE_MAX_NUM // Must be last one.
-};
+} ena_node_type_t;
 
 struct ena_node {
-    enum ena_node_type type;
+    ena_node_type_t type;
     struct ena_token *token;
     struct ena_node *child;
     int num_childs;
@@ -69,7 +69,7 @@ struct ena_ast {
 struct ena_vm;
 struct ena_ast *ena_parse(struct ena_vm *vm, const char *script);
 void ena_destroy_ast(struct ena_ast *ast);
-const char *ena_get_node_name(enum ena_node_type type);
+const char *ena_get_node_name(ena_node_type_t type);
 void ena_dump_node(struct ena_node *node);
 
 #endif

@@ -71,7 +71,7 @@ struct ena_map {
     struct ena_hash_table entries;
 };
 
-static inline enum ena_value_type ena_get_type_from_object(struct ena_object *obj) {
+static inline ena_value_type_t ena_get_type_from_object(struct ena_object *obj) {
     return obj->type;
 }
 
@@ -134,14 +134,14 @@ struct ena_module {
     struct ena_scope *scope;
 };
 
-enum ena_unwind_type {
+typedef enum {
     // Don't use this type; `0' is bad for the second argument of longjmp.
     ENA_UNWIND_UNUSED_TYPE = 0,
 
     ENA_UNWIND_RETURN = 1,
     ENA_UNWIND_BREAK = 2,
     ENA_UNWIND_CONTINUE = 3,
-};
+} ena_unwind_type_t;
 
 struct ena_savepoint {
     struct ena_savepoint *prev;

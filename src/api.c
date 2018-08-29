@@ -120,7 +120,7 @@ void ena_stringify(char *buf, size_t buf_len, ena_value_t value) {
     }
 }
 
-enum ena_value_type ena_get_type(ena_value_t v) {
+ena_value_type_t ena_get_type(ena_value_t v) {
     return (ENA_IS_UNDEFINED(v)) ? ENA_T_UNDEFINED  :
            (ENA_IS_NULL(v))      ? ENA_T_NULL       :
            (ENA_IS_BOOL(v))      ? ENA_T_BOOL       :

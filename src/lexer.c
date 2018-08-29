@@ -9,7 +9,7 @@
 #define PUSHBACK_CHARS(num) pushback_chars(vm, num)
 #define SKIP_CHARS(num) skip_chars(vm, num)
 
-const char *ena_get_token_name(enum ena_token_type type) {
+const char *ena_get_token_name(ena_token_type_t type) {
 #define DEFINE_TOKEN_NAME(name) [ENA_TOKEN_##name] = #name
 
     static const char *names[ENA_TOKEN_MAX_NUM] = {
@@ -67,7 +67,7 @@ void ena_dump_tokens(struct ena_vm *vm, const char *script) {
     for (;;) {
         if (ena_setjmp(vm->panic_jmpbuf) == 0) {
             struct ena_token *token = ena_get_next_token(vm);
-            enum ena_token_type type = token->type;
+            ena_token_type_t type = token->type;
             DEBUG("%s: '%s'", ena_get_token_name(token->type), token->str);
             ena_destroy_token(token);
             if (type == ENA_TOKEN_EOF) {
@@ -119,9 +119,9 @@ struct ena_token *ena_fetch_next_token(struct ena_vm *vm) {
     return token;
 }
 
-enum ena_token_type ena_fetch_next_token_type(struct ena_vm *vm) {
+ena_token_type_t ena_fetch_next_token_type(struct ena_vm *vm) {
     struct ena_token *token = ena_get_next_token(vm);
-    enum ena_token_type type;
+    ena_token_type_t type;
     if (token) {
         type = token->type;
         ena_pushback_token(vm, token);
@@ -139,7 +139,7 @@ void ena_skip_tokens(struct ena_vm *vm, int num) {
     }
 }
 
-struct ena_token *ena_expect_token(struct ena_vm *vm, enum ena_token_type expected_type) {
+struct ena_token *ena_expect_token(struct ena_vm *vm, ena_token_type_t expected_type) {
     struct ena_token *token = ena_get_next_token(vm);
     if (token->type != expected_type) {
         SYNTAX_ERROR(
@@ -153,7 +153,7 @@ struct ena_token *ena_expect_token(struct ena_vm *vm, enum ena_token_type expect
 }
 
 struct ena_token *ena_get_next_token(struct ena_vm *vm) {
-    enum ena_token_type type = ENA_TOKEN_UNKNOWN;
+    ena_token_type_t type = ENA_TOKEN_UNKNOWN;
 
 retry:;
     size_t start = vm->lexer.next_pos;

@@ -80,7 +80,7 @@
     } while(0)
 
 struct ena_error {
-    enum ena_error_type type;
+    ena_error_type_t type;
     char str[256];
     int line;
     int column;

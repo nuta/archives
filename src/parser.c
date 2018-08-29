@@ -18,7 +18,7 @@
 #define EXPECT(expected_type) ena_expect_token(vm, ENA_TOKEN_##expected_type)
 #define CONSUME(expected_type) ena_destroy_token(ena_expect_token(vm, ENA_TOKEN_##expected_type))
 
-const char *ena_get_node_name(enum ena_node_type type) {
+const char *ena_get_node_name(ena_node_type_t type) {
 #define DEFINE_NODE_NAME(name) [ENA_NODE_##name] = #name
 
     static const char *names[ENA_NODE_MAX_NUM] = {
@@ -85,7 +85,7 @@ void ena_dump_node(struct ena_node *node) {
 }
 
 
-static struct ena_node *create_node(enum ena_node_type type, struct ena_node *child, int num_childs) {
+static struct ena_node *create_node(ena_node_type_t type, struct ena_node *child, int num_childs) {
     struct ena_node *node = ena_malloc(sizeof(*node));
     node->type = type;
     node->token = NULL;
@@ -94,7 +94,7 @@ static struct ena_node *create_node(enum ena_node_type type, struct ena_node *ch
     return node;
 }
 
-static struct ena_node *create_node_with_token(enum ena_node_type type, struct ena_token *token, struct ena_node *child, int num_childs) {
+static struct ena_node *create_node_with_token(ena_node_type_t type, struct ena_token *token, struct ena_node *child, int num_childs) {
     struct ena_node *node = ena_malloc(sizeof(*node));
     node->type = type;
     node->token = token;

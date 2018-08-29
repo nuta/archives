@@ -10,7 +10,7 @@
 // We use only lower 32-bit and MSB.
 typedef uintptr_t ena_value_t;
 
-enum ena_value_type {
+typedef enum {
     ENA_T_UNDEFINED, // used internally
     ENA_T_NULL,
     ENA_T_INT,
@@ -23,7 +23,7 @@ enum ena_value_type {
     ENA_T_INSTANCE,
     ENA_T_MODULE,
     ENA_T_ANY,
-};
+} ena_value_type_t;
 
 #define ENA_VALUE2OBJ(type, value) ((struct ena_##type *) (value))
 
@@ -37,14 +37,14 @@ enum ena_value_type {
 #define ENA_TRUE      (2 << 1)
 #define ENA_FALSE     (3 << 1)
 
-enum ena_error_type {
+typedef enum {
     ENA_ERROR_NONE,
     ENA_ERROR_NOT_YET_IMPLEMENTED,
     ENA_ERROR_INVALID_SYNTAX,
     ENA_ERROR_BUG,
     ENA_ERROR_TYPE,
     ENA_ERROR_RUNTIME,
-};
+} ena_error_type_t;
 
 struct ena_vm;
 typedef ena_value_t (*ena_native_method_t)(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args);
@@ -59,7 +59,7 @@ const char *ena_get_error_cstr(struct ena_vm *vm);
 struct ena_class;
 void ena_define_native_method(struct ena_vm *vm, struct ena_class *cls, const char *name, ena_native_method_t method);
 
-enum ena_value_type ena_get_type(ena_value_t value);
+ena_value_type_t ena_get_type(ena_value_t value);
 void ena_stringify(char *buf, size_t buf_len, ena_value_t value);
 
 /// To value.
