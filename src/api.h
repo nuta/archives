@@ -42,7 +42,7 @@ typedef ena_value_t (*ena_native_func_t)(struct ena_vm *vm, ena_value_t *args, i
 /// An ena interpreter instance.
 struct ena_vm *ena_create_vm();
 void ena_destroy_vm(struct ena_vm *vm);
-bool ena_eval(struct ena_vm *vm, ena_value_t module, char *script);
+bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char *script);
 ena_error_type_t ena_get_error_type(struct ena_vm *vm);
 const char *ena_get_error_cstr(struct ena_vm *vm);
 

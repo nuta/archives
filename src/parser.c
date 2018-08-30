@@ -537,11 +537,13 @@ PARSE_RULE(program) {
 }
 
 
-struct ena_ast *ena_parse(struct ena_vm *vm, const char *script) {
+struct ena_ast *ena_parse(struct ena_vm *vm, const char *filepath, const char *script) {
     // Initialize lexer state.
     vm->lexer.next_pos = 0;
     vm->lexer.current_line = 1;
     vm->lexer.current_column = 1;
+    vm->lexer.current_token = NULL;
+    vm->lexer.filepath = filepath;
     vm->lexer.script = ena_strdup(script);
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {

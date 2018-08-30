@@ -30,8 +30,11 @@
     ENA_PANIC(ENA_ERROR_TYPE, "Type Error: " fmt, ## __VA_ARGS__)
 #define RUNTIME_ERROR(fmt, ...) \
     ENA_PANIC(ENA_ERROR_RUNTIME, "Runtime Error: " fmt, ## __VA_ARGS__)
+
 #define SYNTAX_ERROR(fmt, ...) \
-    ENA_PANIC(ENA_ERROR_INVALID_SYNTAX, "Syntax Error: " fmt, ## __VA_ARGS__)
+    ENA_PANIC(ENA_ERROR_INVALID_SYNTAX, \
+        "%s: line %d: Syntax Error: " fmt, \
+        vm->lexer.filepath, vm->lexer.current_token->line, ## __VA_ARGS__)
 
 #define NOT_YET_IMPLEMENTED() \
     ENA_PANIC( \

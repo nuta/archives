@@ -27,7 +27,7 @@ static ena_value_t assert_eq_handler(UNUSED struct ena_vm *vm, ena_value_t *args
     return ENA_NULL;
 }
 
-static int file_main(FILE *f) {
+static int file_main(const char *filepath, FILE *f) {
     size_t script_len = 0;
     char *script = realloc(NULL, 1);
     int ch;
@@ -45,7 +45,7 @@ static int file_main(FILE *f) {
     ena_dump_tokens(vm, script);
 
     DEBUG("\nParser:");
-    struct ena_ast *ast = ena_parse(vm, script);
+    struct ena_ast *ast = ena_parse(vm, filepath, script);
     if (!ast) {
         fprintf(stderr, "%s", ena_get_error_cstr(vm));
         free(script);
@@ -57,7 +57,7 @@ static int file_main(FILE *f) {
     ena_add_to_module(vm, main_module, "assert_eq", assert_eq);
 
     DEBUG("\nEvaluate:");
-    if (!ena_eval(vm, main_module, script)) {
+    if (!ena_eval(vm, main_module, filepath, script)) {
         fprintf(stderr, "%s", ena_get_error_cstr(vm));
         return 1;
     }
@@ -101,7 +101,7 @@ static int repl_main(void) {
         }
 
         script[script_len - 1] = '\0';
-        if (!ena_eval(vm, main_module, script)) {
+        if (!ena_eval(vm, main_module, "(stdin)", script)) {
             fprintf(stderr, "%s", ena_get_error_cstr(vm));
             return 1;
         }
@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
             return repl_main();
         } else {
             // $ cat program.ena | ena
-            return file_main(stdin);
+            return file_main("(stdin)", stdin);
         }
     } else {
 #ifdef ENA_WITH_TEST
@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
             return 1;
         }
 
-        return file_main(f);
+        return file_main(argv[1], f);
     }
 
     /* UNREACHABLE */

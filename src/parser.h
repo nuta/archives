@@ -67,7 +67,7 @@ struct ena_ast {
 };
 
 struct ena_vm;
-struct ena_ast *ena_parse(struct ena_vm *vm, const char *script);
+struct ena_ast *ena_parse(struct ena_vm *vm, const char *filepath, const char *script);
 void ena_destroy_ast(struct ena_ast *ast);
 const char *ena_get_node_name(ena_node_type_t type);
 void ena_dump_node(struct ena_node *node);

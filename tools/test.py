@@ -4,6 +4,7 @@ import subprocess
 import os
 import sys
 import threading
+import yaml
 from termcolor import cprint
 
 test_proc = None
@@ -20,11 +21,19 @@ def run_test(filepath):
     print(f"{filepath}...", end="")
     sys.stdout.flush()
 
+    front_matter = ""
+    for line in open(filepath).readlines():
+        if not line.startswith("//"):
+            break
+        front_matter += line.split("//", 2)[1]
+    testinfo = yaml.safe_load(front_matter)
+
     test_proc = subprocess.Popen(
         ['./ena', filepath],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
     )
+    stdout = test_proc.stdout.read().decode("utf-8")
 
     kill_timer = threading.Timer(1, kill_process, args=(filepath,))
     kill_timer.start()
@@ -35,10 +44,19 @@ def run_test(filepath):
     else:
         if exit_code == -11:
             cprint("Segumentation Fault", "red", attrs=["bold"])
+        elif "error" in testinfo:
+            error_type = ""
+            if "Syntax Error" in stdout:
+                error_type = "syntax"
+
+            if testinfo["error"] != error_type:
+                cprint(f"{error_type} error (expected {testinfo['error']})", "red", attrs=["bold"])
+                cprint(stdout, "yellow")
+                failed += 1
         else:
             cprint(f"exited with {exit_code}", "red", attrs=["bold"])
-        cprint(test_proc.stdout.read().decode("utf-8"), "yellow")
-        failed += 1
+            cprint(stdout, "yellow")
+            failed += 1
 
     total += 1
 
@@ -61,9 +79,9 @@ def main():
         run_test(filepath)
 
     if failed == 0:
-        cprint(f"Passed {total} tests", "green")
+        cprint(f"\nPassed {total} tests", "green")
     else:
-        cprint(f"Failed {failed}/{total} tests", "red", attrs=["bold"])
+        cprint(f"\nFailed {failed}/{total} tests", "red", attrs=["bold"])
         if not args.ignore_fails:
             sys.exit(1)
 

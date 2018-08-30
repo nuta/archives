@@ -62,6 +62,8 @@ void ena_dump_tokens(struct ena_vm *vm, const char *script) {
     vm->lexer.next_pos = 0;
     vm->lexer.current_line = 1;
     vm->lexer.current_column = 1;
+    vm->lexer.current_token = NULL;
+    vm->lexer.filepath = NULL;
     vm->lexer.script = script;
 
     for (;;) {
@@ -385,6 +387,7 @@ return_token:;
     token->str = (char *) ena_strndup(&vm->lexer.script[start], str_len);
     token->line = vm->lexer.current_line;
     token->column = vm->lexer.current_column;
+    vm->lexer.current_token = token;
     return token;
 }
 

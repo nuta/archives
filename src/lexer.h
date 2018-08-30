@@ -51,6 +51,10 @@ struct ena_lexer {
     int current_line, current_column;
     // The script string (terminated by NULL).
     const char *script;
+    // The file path the source file (terminated by NULL).
+    const char *filepath;
+    /// The last used token by parser.
+    struct ena_token *current_token;
 };
 
 #define REMAINING_TOKEN() DEBUG("REMAINING: %s", &lexer.script[lexer.next_pos])

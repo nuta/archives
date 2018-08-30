@@ -1,3 +1,4 @@
 termcolor
 termgraph
 watchdog
+pyyaml

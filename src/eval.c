@@ -507,10 +507,10 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
 }
 
 /// @returns true on success or false on panic (e.g. syntax error).
-bool ena_eval(struct ena_vm *vm, ena_value_t module, char *script) {
+bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char *script) {
     struct ena_ast *ast;
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
-        ast = ena_parse(vm, script);
+        ast = ena_parse(vm, filepath, script);
     } else {
         return false;
     }
