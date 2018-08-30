@@ -17,4 +17,4 @@ class User {
 
 var mike = User(24);
 var age = mike.age();
-var ans = mike.my_car.gas();
+assert_eq(mike.my_car.gas(), 10);

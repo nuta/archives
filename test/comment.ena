@@ -1,11 +1,11 @@
-// var ans = 0;
-// var ans = 124;
+// ans(0;
+// ans(124;
 
 /*
-var ans = 4;
-var ans = 5;
-var ans = 6;
+123;
+123;
+123;
 */
 
 /* /* / // / */ */
-var ans = 123;
+assert_eq(123, 123);

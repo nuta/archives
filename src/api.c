@@ -88,6 +88,14 @@ ena_value_t ena_create_class(void) {
     return ENA_OBJ2VALUE(cls);
 }
 
+ena_value_t ena_create_module(void) {
+    struct ena_module *module = ena_malloc(sizeof(*module));
+    module->header.type = ENA_T_MODULE;
+    module->header.refcount = 1;
+    module->scope = ena_create_scope(NULL);
+    return ENA_OBJ2VALUE(module);
+}
+
 ena_error_type_t ena_get_error_type(struct ena_vm *vm) {
     return vm->error.type;
 }
@@ -98,7 +106,7 @@ const char *ena_get_error_cstr(struct ena_vm *vm) {
 
 struct ena_vm *ena_create_vm() {
     struct ena_vm *vm = ena_malloc(sizeof(*vm));
-    vm->next_ident = 1;
+    vm->next_ident = IDENT_START;
     vm->ast_list = NULL;
     vm->self = ENA_UNDEFINED;
     vm->current_class = NULL;
@@ -136,17 +144,54 @@ void ena_destroy_vm(struct ena_vm *vm) {
     ena_free(vm);
 }
 
-void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena_native_method_t method) {
+void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena_native_method_t native_method) {
     ena_ident_t ident = ena_cstr2ident(vm, name);
     struct ena_func *func = (struct ena_func *) ena_malloc(sizeof(*func));
     func->header.type = ENA_T_FUNC;
     func->header.refcount = 1;
     func->name = ident;
     func->stmts = NULL;
-    func->native_method = method;
+    func->native_method = native_method;
     func->scope = vm->current_scope;
     func->flags = FUNC_FLAGS_NATIVE | FUNC_FLAGS_METHOD;
     if (ena_hash_search_or_insert(&ena_to_class_object(cls)->methods, (void *) ident, (void *) func)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, ident));
     }
+}
+
+ena_value_t ena_create_func(ena_native_func_t native_func) {
+    struct ena_func *func = (struct ena_func *) ena_malloc(sizeof(*func));
+    func->header.type = ENA_T_FUNC;
+    func->header.refcount = 1;
+    func->name = IDENT_ANONYMOUS;
+    func->stmts = NULL;
+    func->native_func = native_func;
+    func->scope = NULL;
+    func->flags = FUNC_FLAGS_NATIVE;
+    return ENA_OBJ2VALUE(func);
+}
+
+void ena_add_to_module(struct ena_vm *vm, ena_value_t module, const char *name, ena_value_t value) {
+    struct ena_module *m = ena_to_module_object(module);
+    ena_define_var(vm, m->scope, ena_cstr2ident(vm, name), value);
+}
+
+bool ena_is_equal(ena_value_t v1, ena_value_t v2) {
+    if (ena_get_type(v1) != ena_get_type(v2)) {
+        return false;
+    }
+
+    switch (ena_get_type(v1)) {
+        case ENA_T_BOOL:
+        case ENA_T_NULL:
+            return v1 == v2;
+        case ENA_T_INT:
+            return ena_to_int_object(v1)->value == ena_to_int_object(v2)->value;
+        case ENA_T_STRING:
+            return ena_to_string_object(v1)->ident == ena_to_string_object(v2)->ident;
+        default:;
+            /* TODO: BUG() */
+    }
+
+    return false;
 }

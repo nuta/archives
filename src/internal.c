@@ -15,6 +15,15 @@ static ena_value_t *lookup_var(struct ena_scope *scope, ena_ident_t name) {
     return NULL;
 }
 
+struct ena_scope *ena_create_scope(struct ena_scope *parent) {
+    // TODO: Allocate a scope by alloca().
+    struct ena_scope *scope = ena_malloc(sizeof(*scope));
+    scope->parent = parent;
+    scope->refcount = 1;
+    ena_hash_init_ident_table(&scope->vars);
+    return scope;
+}
+
 /// Get the ident associated with a C string.
 /// @arg vm  The VM.
 /// @arg str The string.
@@ -46,6 +55,10 @@ ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str) {
 /// @arg ident The ident.
 /// @retruns The string associated with `ident` if successful or NUL otherwise.
 const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident) {
+    if (ident == IDENT_ANONYMOUS) {
+        return "(anonymous)";
+    }
+
     return (const char *) ena_hash_search(&vm->ident2cstr, (void *) ident)->value;
 }
 
@@ -143,24 +156,4 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
         r++;
         arg_index++;
     }
-}
-
-bool ena_is_equal(ena_value_t v1, ena_value_t v2) {
-    if (ena_get_type(v1) != ena_get_type(v2)) {
-        return false;
-    }
-
-    switch (ena_get_type(v1)) {
-        case ENA_T_BOOL:
-        case ENA_T_NULL:
-            return v1 == v2;
-        case ENA_T_INT:
-            return ena_to_int_object(v1)->value - ena_to_int_object(v2)->value;
-        case ENA_T_STRING:
-            return ena_to_string_object(v1)->ident == ena_to_string_object(v2)->ident;
-        default:;
-            /* TODO: BUG() */
-    }
-
-    return false;
 }

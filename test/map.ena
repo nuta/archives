@@ -4,4 +4,4 @@ var movie = {
 //    "running_time": 116,
 };
 
-var ans = movie.get("name");
+assert_eq(movie.get("name"), "Back to the Future");

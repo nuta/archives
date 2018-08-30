@@ -1,5 +1,5 @@
 var i = 0;
-var ans = 2;
+var ans = 0;
 
 // ans += 3
 i = 0;
@@ -32,4 +32,4 @@ while i < 4 {
     i = i + 1;
 }
 
-// ans == 2 + 3 + 1 + 5 == 11
+assert_eq(ans, 10);

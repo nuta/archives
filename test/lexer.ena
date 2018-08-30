@@ -1,4 +1,4 @@
-var ans = 123 +      // This
-          39 - 4 +   //     is
+assert_eq(123 +      // This
+          39 + 4 +   //     is
                 321  //        a comment.
-;
+, 487);

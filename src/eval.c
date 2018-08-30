@@ -36,27 +36,10 @@ static ena_value_t copy_if_immutable(ena_value_t value) {
     }
 }
 
-static struct ena_scope *create_scope(struct ena_scope *parent) {
-    // TODO: Allocate a scope by alloca().
-    struct ena_scope *scope = ena_malloc(sizeof(*scope));
-    scope->parent = parent;
-    scope->refcount = 1;
-    ena_hash_init_ident_table(&scope->vars);
-    return scope;
-}
-
-static struct ena_module *create_module(void) {
-    struct ena_module *module = ena_malloc(sizeof(*module));
-    module->header.type = ENA_T_MODULE;
-    module->header.refcount = 1;
-    module->scope = create_scope(NULL);
-    return module;
-}
-
 static ena_value_t call_func(struct ena_vm *vm, ena_value_t *args, int num_args, ena_value_t instance, struct ena_func *func) {
     // Enther the scope and execute the body.
     struct ena_scope *caller_scope = vm->current_scope;
-    struct ena_scope *new_scope = create_scope(func->scope);
+    struct ena_scope *new_scope = ena_create_scope(func->scope);
     PUSH_SAVEPOINT();
     int unwind_type;
     ena_value_t ret_value = ENA_UNDEFINED;
@@ -157,7 +140,7 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
     instance->header.type = ENA_T_INSTANCE;
     instance->cls = cls;
     instance->header.refcount = 1;
-    instance->props = create_scope(NULL);
+    instance->props = ena_create_scope(NULL);
 
     // Call the constructor if it exists.
     struct ena_func *new_method = lookup_method(cls, ena_cstr2ident(vm, "new"));
@@ -524,7 +507,7 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
 }
 
 /// @returns true on success or false on panic (e.g. syntax error).
-bool ena_eval(struct ena_vm *vm, char *script) {
+bool ena_eval(struct ena_vm *vm, ena_value_t module, char *script) {
     struct ena_ast *ast;
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         ast = ena_parse(vm, script);
@@ -541,7 +524,7 @@ bool ena_eval(struct ena_vm *vm, char *script) {
     *ast_entry = ast;
 
     if (!vm->main_module) {
-        vm->main_module = create_module();
+        vm->main_module = ena_to_module_object(module);
     }
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {

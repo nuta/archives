@@ -75,6 +75,8 @@ struct ena_vm {
 };
 
 typedef uintptr_t ena_ident_t;
+#define IDENT_ANONYMOUS ((ena_ident_t) 1)
+#define IDENT_START     ((ena_ident_t) 100)
 
 #define DEFINE_VALUE2OBJ_FUNC(type_name, type_id) \
     static inline struct ena_##type_name *ena_to_##type_name##_object(ena_value_t value) { \
@@ -91,6 +93,7 @@ DEFINE_VALUE2OBJ_FUNC(list, ENA_T_LIST)
 DEFINE_VALUE2OBJ_FUNC(map, ENA_T_MAP)
 DEFINE_VALUE2OBJ_FUNC(instance, ENA_T_INSTANCE)
 DEFINE_VALUE2OBJ_FUNC(class, ENA_T_CLASS)
+DEFINE_VALUE2OBJ_FUNC(module, ENA_T_MODULE)
 
 ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str);
 const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);
@@ -98,6 +101,6 @@ void ena_define_var(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name
 ena_value_t ena_get_var_value(struct ena_scope *scope, ena_ident_t name);
 bool ena_set_var_value(struct ena_scope *scope, ena_ident_t name, ena_value_t new_value);
 void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
-bool ena_is_equal(ena_value_t v1, ena_value_t v2);
+struct ena_scope *ena_create_scope(struct ena_scope *parent);
 
 #endif

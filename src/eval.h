@@ -56,7 +56,7 @@ struct ena_func {
     struct ena_scope *scope;
     union {
         // flags & FUNC_FLAGS_NATIVE != 0
-        struct {
+        union {
             ena_native_method_t native_method;
             ena_native_func_t native_func;
         };

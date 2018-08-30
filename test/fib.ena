@@ -6,4 +6,4 @@ func fib(n) {
     return fib(n - 1) + fib(n - 2);
 }
 
-var ans = fib(7);
+assert_eq(fib(7), 13);
