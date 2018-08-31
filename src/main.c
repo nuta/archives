@@ -63,8 +63,8 @@ static int file_main(const char *filepath, FILE *f) {
         return 1;
     }
 #else
-    ena_register_module(vm. "main", main_module);
-    if (!ena_eval(vm, main_module, script)) {
+    ena_register_module(vm, "main", main_module);
+    if (!ena_eval(vm, main_module, filepath, script)) {
         fprintf(stderr, "%s", ena_get_error_cstr(vm));
         return 1;
     }
