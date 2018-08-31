@@ -145,7 +145,7 @@ void ena_hash_remove_all(struct ena_hash_table *table, void *key) {
 }
 
 void ena_hash_foreach_value(struct ena_hash_table *table, void (*cb)(void *value)) {
-    for (size_t i = 0; i < table->num_buckets; i++) {
+    for (int i = 0; i < table->num_buckets; i++) {
         struct ena_hash_entry *e = table->buckets[i];
         while (e) {
             cb(e->value);
