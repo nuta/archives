@@ -44,6 +44,14 @@ static void arch_load_regs(uintptr_t *regs) {
     "=m"(regs[13])
     );
 }
+#elif __EMSCRIPTEN__
+#define ARCH_NUM_REGS 0
+static inline uintptr_t arch_get_stack_bottom() {
+    return 0;
+}
+
+static void arch_load_regs(uintptr_t *regs) {
+}
 #else
 #error "unsupported arch"
 #endif
