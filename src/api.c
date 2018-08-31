@@ -84,10 +84,41 @@ ena_value_t ena_create_class(struct ena_vm *vm) {
     return ENA_OBJ2VALUE(cls);
 }
 
+static ena_value_t print_func_handler(UNUSED struct ena_vm *vm, ena_value_t *args, int num_args) {
+    for (int i = 0; i < num_args; i++) {
+        ena_value_t value = args[i];
+        switch (ena_get_type(value)) {
+            case ENA_T_INT:
+                printf("%d ", ena_to_int_object(value)->value);
+                break;
+            case ENA_T_STRING:
+                printf("%s ", ena_to_string_object(value)->str);
+                break;
+            case ENA_T_BOOL:
+                printf("%s ", value == ENA_TRUE ? "true" : "false");
+                break;
+            case ENA_T_NULL:
+                printf("null ");
+                break;
+            default:;
+                printf("(unprintable) ");
+        }
+    }
+
+    printf("\n");
+    return ENA_NULL;
+}
+
 ena_value_t ena_create_module(struct ena_vm *vm) {
     struct ena_module *module = (struct ena_module *) ena_alloc_object(vm, ENA_T_MODULE);
     module->scope = ena_create_scope(NULL);
     module->next = NULL;
+
+#ifndef ENA_NO_PRINT
+    ena_value_t print_func = ena_create_func(vm, print_func_handler);
+    ena_define_var(vm, module->scope, ena_cstr2ident(vm, "print"), print_func);
+#endif
+
     return ENA_OBJ2VALUE(module);
 }
 
