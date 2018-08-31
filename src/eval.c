@@ -412,6 +412,10 @@ EVAL_NODE(BREAK) {
     return ENA_UNDEFINED;
 }
 
+EVAL_NODE(NULL) {
+    return ENA_NULL;
+}
+
 EVAL_NODE(INT_LIT) {
     int value = ena_str2int(node->token->str);
     return ena_create_int(vm, value);
@@ -484,6 +488,7 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
         EVAL_CASE(OP_ASSIGN);
         EVAL_CASE(VAR);
         EVAL_CASE(FUNC);
+        EVAL_CASE(NULL);
         EVAL_CASE(INT_LIT);
         EVAL_CASE(STRING_LIT);
         EVAL_CASE(LIST_LIT);

@@ -16,6 +16,7 @@ const char *ena_get_token_name(ena_token_type_t type) {
         DEFINE_TOKEN_NAME(UNKNOWN),
         DEFINE_TOKEN_NAME(EOF),
         DEFINE_TOKEN_NAME(ID),
+        DEFINE_TOKEN_NAME(NULL),
         DEFINE_TOKEN_NAME(INT_LIT),
         DEFINE_TOKEN_NAME(STRING_LIT),
         DEFINE_TOKEN_NAME(PLUS),
@@ -200,6 +201,7 @@ retry:;
                     break;
                 case 4:
                     SPECIAL_ID_TOKEN("if", ENA_TOKEN_IF, 4);
+                    SPECIAL_ID_TOKEN("null", ENA_TOKEN_NULL, 4);
                     SPECIAL_ID_TOKEN("true", ENA_TOKEN_TRUE, 4);
                     SPECIAL_ID_TOKEN("func", ENA_TOKEN_FUNC, 4);
                     break;

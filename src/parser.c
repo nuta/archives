@@ -57,6 +57,7 @@ const char *ena_get_node_name(ena_node_type_t type) {
         DEFINE_NODE_NAME(LIST_LIT),
         DEFINE_NODE_NAME(MAP_LIT),
         DEFINE_NODE_NAME(MAP_ENTRY),
+        DEFINE_NODE_NAME(NULL),
     };
 
     ENA_ASSERT(type < ENA_NODE_MAX_NUM);
@@ -199,6 +200,9 @@ PARSE_RULE(primary) {
             CONSUME(RPAREN);
             return expr;
         }
+        case ENA_TOKEN_NULL:
+            ena_destroy_token(token);
+            return create_node(ENA_NODE_NULL, NULL, 0);
         case ENA_TOKEN_TRUE:
             ena_destroy_token(token);
             return create_node(ENA_NODE_TRUE, NULL, 0);

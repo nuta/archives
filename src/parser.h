@@ -30,6 +30,7 @@ typedef enum {
     ENA_NODE_RETURN,
     ENA_NODE_TRUE,
     ENA_NODE_FALSE,
+    ENA_NODE_NULL,
     ENA_NODE_INT_LIT,
     ENA_NODE_STRING_LIT,
     ENA_NODE_ID,

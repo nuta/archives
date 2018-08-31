@@ -40,6 +40,7 @@ typedef enum {
     ENA_TOKEN_TRUE,            // true
     ENA_TOKEN_FALSE,           // false
     ENA_TOKEN_CLASS,           // class
+    ENA_TOKEN_NULL,        // null
 
     ENA_TOKEN_MAX_NUM // Must be last one.
 } ena_token_type_t;
