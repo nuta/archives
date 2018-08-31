@@ -18,7 +18,7 @@ var mike = User(23);
 
 - Dynamically-typed, class-based, and object-oriented.
 - Clean and familiar syntax inspired by Swift and Rust.
-- Small and portable implementation (tree-walk, reference counting).
+- Small and portable implementation (tree-walk, mark-and-sweep/conservative GC).
 
 Building
 --------
@@ -43,6 +43,7 @@ $ make coverage    # Measure test coverage.
 $ make doxygen     # Generate source code references (docs/src).
 $ make scan-build  # Run Clang Static Analyzer to find bugs. (macOS only)
 $ make valgrind    # Run tests in Valgrind to find memory leaks. (requires Docker)
+$ make emscripten  # Compile into wasm.
 ```
 
 License
