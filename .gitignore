@@ -6,6 +6,8 @@
 /ena
 /compile_commands.json
 /.vscode/cquery_cached_index
+/docs/ena.js
+/docs/ena.wasm
 /doxygen
 /coverage
 /clang-static-analyzer

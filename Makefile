@@ -30,19 +30,19 @@ override CFLAGS += -fprofile-instr-generate -fcoverage-mapping
 override LDFLAGS += -fprofile-instr-generate -fcoverage-mapping
 endif
 
-objs := src/api.o src/lexer.o src/parser.o src/eval.o src/gc.o \
-	src/builtins.o src/string.o src/list.o src/map.o \
-	src/hash.o src/internal.o src/malloc.o src/utils.o
+SOURCES := src/api.c src/lexer.c src/parser.c src/eval.c src/gc.c \
+	src/builtins.c src/string.c src/list.c src/map.c \
+	src/hash.c src/internal.c src/malloc.c src/utils.c
 ifeq ($(RELEASE),)
 override CFLAGS += -DENA_DEBUG_BUILD -DENA_WITH_TEST
-objs += src/test.o
+SOURCES += src/test.c
 endif
 
 
 $(V).SILENT:
 .SECONDARY:
 .SUFFIXES:
-.PHONY: build test coverage benchmark autotest clean doxygen scan-build valgrind
+.PHONY: build test coverage benchmark autotest clean doxygen scan-build valgrind wasm
 build: ena
 
 clean:
@@ -105,13 +105,16 @@ valgrind:
 	docker run -v $(PWD):/ena -it ena-valgrind sh -c "cd /ena && make clean && make -j2 && valgrind --leak-check=full --show-leak-kinds=all ./ena $(TEST)"
 	make clean
 
+wasm:
+	 emcc -g4 $(SOURCES) -o docs/ena.js -s "EXPORTED_FUNCTIONS=['_ena_create_vm', '_ena_create_module', '_ena_register_module', '_ena_eval']" -s SAFE_HEAP=1 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['writeStringToMemory']"
+
 ena: libena.a src/main.o Makefile
 	$(PROGRESS) LD $@
 	$(LD) $(LDFLAGS) -o $@ src/main.o libena.a
 
-libena.a: $(objs) Makefile
+libena.a: $(SOURCES:.c=.o) Makefile
 	$(PROGRESS) AR $@
-	ar rcs $@ $(objs)
+	ar rcs $@ $(SOURCES:.c=.o)
 
 %.o: %.c $(wildcard src/*.h) Makefile
 	$(PROGRESS) CC $@
