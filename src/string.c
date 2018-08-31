@@ -6,22 +6,34 @@
 #include "gc.h"
 #include "utils.h"
 
-static char *search(struct ena_string *haystack, struct ena_string *needle) {
-    size_t pos = 0;
+/// Searches haystack for needle.
+/// @arg start The needle is searched from haystack{start].
+/// @arg haystack The UTF-8 string.
+/// @arg haystack_size The size in bytes of haystack.
+/// @arg needle The UTF-8 string.
+/// @arg needle_size The size in bytes of needle.
+/// @returns The beginning of the first occurence in haystack if it is found
+///          or NULL otherwise.
+static char *search(const char *haystack, size_t start, size_t haystack_size, const char *needle, size_t needle_size) {
+    if (needle_size == 0) {
+        return NULL;
+    }
+
+    size_t pos = start;
     for (;;) {
         void *begin;
-        if ((begin = ena_memchr(&haystack->str[pos], needle->str[0], haystack->size_in_bytes - pos)) == NULL) {
+        if ((begin = ena_memchr(&haystack[pos], needle[0], haystack_size - pos)) == NULL) {
             break;
         }
 
         // Found the first character.
-        size_t offset = (uintptr_t) begin - (uintptr_t) haystack->str;
-        size_t remaining = haystack->size_in_bytes - offset;
-        if (remaining < needle->size_in_bytes) {
+        size_t offset = (uintptr_t) begin - (uintptr_t) haystack;
+        size_t remaining = haystack_size - offset;
+        if (remaining < needle_size) {
             return NULL;
         }
 
-        if (ena_memcmp(begin, needle->str, needle->size_in_bytes) == 0) {
+        if (ena_memcmp(begin, needle, needle_size) == 0) {
             return begin;
         }
 
@@ -195,18 +207,22 @@ ena_value_t ena_create_string(struct ena_vm *vm, const char *str, size_t size) {
     return ENA_OBJ2VALUE(obj);
 }
 
+static ena_value_t concat(struct ena_vm *vm,
+                          const char *str1, size_t str1_size,
+                          const char *str2, size_t str2_size) {
+    size_t new_str_size = str1_size + str2_size;
+    char *new_str = ena_malloc(new_str_size + 1);
+    ena_memcpy(new_str, str1, str1_size);
+    ena_memcpy(&new_str[str1_size], str2, str2_size);
+    new_str[new_str_size] = '\0';
+    return ena_create_string(vm, new_str, new_str_size);
+}
+
 static ena_value_t string_concat(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
-    ena_check_args(vm, "concat()", "ss", args, num_args);
+    ena_check_args(vm, "concat()", "s", args, num_args);
     struct ena_string *self_str = (struct ena_string *) self;
     struct ena_string *str = (struct ena_string *) args[0];
-
-    size_t new_str_size = self_str->size_in_bytes + str->size_in_bytes;
-    char *new_str = ena_malloc(new_str_size + 1);
-    ena_memcpy(new_str, self_str->str, self_str->size_in_bytes);
-    ena_memcpy(&new_str[self_str->size_in_bytes], str->str, str->size_in_bytes);
-    new_str[new_str_size] = '\0';
-
-    return ena_create_string(vm, new_str, new_str_size);
+    return concat(vm, self_str->str, self_str->size_in_bytes, str->str, str->size_in_bytes);
 }
 
 static ena_value_t string_contains(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
@@ -214,12 +230,59 @@ static ena_value_t string_contains(struct ena_vm *vm, ena_value_t self, ena_valu
     struct ena_string *self_str = (struct ena_string *) self;
     struct ena_string *needle = (struct ena_string *) args[0];
 
-    return (search(self_str, needle) == NULL) ? ENA_FALSE : ENA_TRUE;
+    char *pos = search(self_str->str, 0, self_str->size_in_bytes, needle->str, needle->size_in_bytes);
+    return (pos == NULL) ? ENA_FALSE : ENA_TRUE;
+}
+
+static ena_value_t string_find(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
+    ena_check_args(vm, "find()", "s", args, num_args);
+    struct ena_string *self_str = (struct ena_string *) self;
+    struct ena_string *needle = (struct ena_string *) args[0];
+
+    char *pos = search(self_str->str, 0, self_str->size_in_bytes, needle->str, needle->size_in_bytes);
+    return (pos == NULL) ? -1 : ((uintptr_t) pos - (uintptr_t) self_str->str);
+}
+
+static ena_value_t string_replace(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
+    ena_check_args(vm, "replace()", "ss", args, num_args);
+    struct ena_string *self_str = (struct ena_string *) self;
+    struct ena_string *old_str = (struct ena_string *) args[0];
+    struct ena_string *new_str = (struct ena_string *) args[1];
+    struct ena_string *new_self = (struct ena_string *) ena_create_string(vm, "", 0);
+
+    size_t index = 0;
+    size_t size = 0;
+    for (;;) {
+        if (index >= self_str->size_in_bytes) {
+            break;
+        }
+
+        char *pos = search(self_str->str, index, self_str->size_in_bytes,
+            old_str->str, old_str->size_in_bytes);
+
+        if (pos == NULL) {
+            break;
+        }
+
+        size_t match = (uintptr_t) pos - (uintptr_t) self_str->str;
+        // Copy substring before the matched position and append new_str.
+        new_self = (struct ena_string *) concat(vm, new_self->str, new_self->size_in_bytes, &self_str->str[index], match - index);
+        new_self = (struct ena_string *) concat(vm, new_self->str, new_self->size_in_bytes, new_str->str, new_str->size_in_bytes);
+        index = match + old_str->size_in_bytes;
+    }
+
+    // Copy trailing substring.
+    new_self = (struct ena_string *) concat(vm, new_self->str, new_self->size_in_bytes, &self_str->str[index], self_str->size_in_bytes - index);
+
+    return ENA_OBJ2VALUE(new_self);
 }
 
 struct ena_class *ena_create_string_class(struct ena_vm *vm) {
     ena_value_t cls = ena_create_class(vm);
+    ena_define_method(vm, cls, "+", string_concat);
     ena_define_method(vm, cls, "concat", string_concat);
     ena_define_method(vm, cls, "contains", string_contains);
+    ena_define_method(vm, cls, "replace", string_replace);
+    ena_define_method(vm, cls, "find", string_find);
     return ena_to_class_object(cls);
 }

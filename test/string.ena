@@ -1,4 +1,5 @@
-var s1 = "Hello, ";
-//var s2 = s1.contains(" ");
-var s3 = s1.concat("World");
-assert_eq(s3, "Hello, World");
+var s = "Hello, ";
+s = s.concat("World");
+s = s.replace(", World", " ");
+s = s + ":)";
+assert_eq(s, "Hello :)");
