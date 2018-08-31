@@ -14,7 +14,7 @@ static ena_value_t map_get(struct ena_vm *vm, ena_value_t self, ena_value_t *arg
 }
 
 struct ena_class *ena_create_map_class(struct ena_vm *vm) {
-    ena_value_t cls = ena_create_class();
+    ena_value_t cls = ena_create_class(vm);
     ena_define_method(vm, cls, "get", map_get);
     return ena_to_class_object(cls);
 }

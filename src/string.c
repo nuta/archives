@@ -3,6 +3,7 @@
 #include "string.h"
 #include "malloc.h"
 #include "eval.h"
+#include "gc.h"
 #include "utils.h"
 
 static char *search(struct ena_string *haystack, struct ena_string *needle) {
@@ -179,9 +180,7 @@ uint32_t ena_utf8_char_at(const char *str, size_t size, size_t index) {
 
 // @note Assumes that `str` does not contain NUL (verified by utf8_validate()).
 ena_value_t ena_create_string(struct ena_vm *vm, const char *str, size_t size) {
-    struct ena_string *obj = (struct ena_string *) ena_malloc(sizeof(*obj));
-    obj->header.type = ENA_T_STRING;
-    obj->header.refcount = 1;
+    struct ena_string *obj = (struct ena_string *) ena_alloc_object(vm, ENA_T_STRING);
     obj->flags = STRING_FLAG_IDENT;
 
     if (!ena_utf8_validate(str, size)) {
@@ -219,7 +218,7 @@ static ena_value_t string_contains(struct ena_vm *vm, ena_value_t self, ena_valu
 }
 
 struct ena_class *ena_create_string_class(struct ena_vm *vm) {
-    ena_value_t cls = ena_create_class();
+    ena_value_t cls = ena_create_class(vm);
     ena_define_method(vm, cls, "concat", string_concat);
     ena_define_method(vm, cls, "contains", string_contains);
     return ena_to_class_object(cls);

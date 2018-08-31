@@ -58,6 +58,12 @@ struct ena_error {
     int column;
 };
 
+struct ena_module;
+struct ena_scope;
+struct ena_savepoint;
+struct ena_class;
+struct ena_object;
+struct ena_ast;
 struct ena_vm {
     struct ena_error error;
     ena_jmpbuf panic_jmpbuf;
@@ -65,12 +71,15 @@ struct ena_vm {
     struct ena_lexer lexer;
     struct ena_hash_table ident2cstr;
     struct ena_hash_table cstr2ident;
-    struct ena_module *main_module;
+    struct ena_module *modules;
     struct ena_scope *current_scope;
     struct ena_savepoint *current_savepoint;
     struct ena_class *current_class;
     ena_value_t self;
     struct ena_ast *ast_list;
+    uintptr_t stack_end;
+    struct ena_object *value_pool;
+    size_t num_free;
     struct ena_class *int_class;
     struct ena_class *string_class;
     struct ena_class *list_class;
@@ -84,6 +93,7 @@ typedef uintptr_t ena_ident_t;
 #define DEFINE_VALUE2OBJ_FUNC(type_name, type_id) \
     static inline struct ena_##type_name *ena_to_##type_name##_object(ena_value_t value) { \
         if (ena_get_type(value) != type_id) { \
+            DEBUG("value2obj error"); \
             return NULL; \
         } \
      \

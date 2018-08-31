@@ -27,6 +27,8 @@ def run_test(filepath):
             break
         front_matter += line.split("//", 2)[1]
     testinfo = yaml.safe_load(front_matter)
+    if testinfo is None:
+        testinfo = {}
 
     test_proc = subprocess.Popen(
         ['./ena', filepath],
@@ -53,6 +55,8 @@ def run_test(filepath):
                 cprint(f"{error_type} error (expected {testinfo['error']})", "red", attrs=["bold"])
                 cprint(stdout, "yellow")
                 failed += 1
+            print("PASS")
+            kill_timer.cancel()
         else:
             cprint(f"exited with {exit_code}", "red", attrs=["bold"])
             cprint(stdout, "yellow")
@@ -79,9 +83,9 @@ def main():
         run_test(filepath)
 
     if failed == 0:
-        cprint(f"\nPassed {total} tests", "green")
+        cprint(f"Passed {total} tests", "green")
     else:
-        cprint(f"\nFailed {failed}/{total} tests", "red", attrs=["bold"])
+        cprint(f"Failed {failed}/{total} tests", "red", attrs=["bold"])
         if not args.ignore_fails:
             sys.exit(1)
 

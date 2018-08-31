@@ -47,7 +47,7 @@ static ena_value_t list_pop(UNUSED struct ena_vm *vm, ena_value_t self, UNUSED e
 }
 
 struct ena_class *ena_create_list_class(struct ena_vm *vm) {
-    ena_value_t cls = ena_create_class();
+    ena_value_t cls = ena_create_class(vm);
     ena_define_method(vm, cls, "append", list_append);
     ena_define_method(vm, cls, "prepend", list_prepend);
     ena_define_method(vm, cls, "pop", list_pop);

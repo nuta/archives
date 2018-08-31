@@ -39,7 +39,7 @@ static int file_main(const char *filepath, FILE *f) {
     script[script_len - 1] = '\0';
 
     struct ena_vm *vm = ena_create_vm();
-    ena_value_t main_module = ena_create_module();
+    ena_value_t main_module = ena_create_module(vm);
 #ifdef ENA_DEBUG_BUILD
     DEBUG("Lexer:");
     ena_dump_tokens(vm, script);
@@ -53,8 +53,9 @@ static int file_main(const char *filepath, FILE *f) {
     }
     ena_dump_node(ast->tree);
     ena_destroy_ast(ast);
-    ena_value_t assert_eq = ena_create_func(assert_eq_handler);
+    ena_value_t assert_eq = ena_create_func(vm, assert_eq_handler);
     ena_add_to_module(vm, main_module, "assert_eq", assert_eq);
+    ena_register_module(vm, "main", main_module);
 
     DEBUG("\nEvaluate:");
     if (!ena_eval(vm, main_module, filepath, script)) {
@@ -62,6 +63,7 @@ static int file_main(const char *filepath, FILE *f) {
         return 1;
     }
 #else
+    ena_register_module(vm. "main", main_module);
     if (!ena_eval(vm, main_module, script)) {
         fprintf(stderr, "%s", ena_get_error_cstr(vm));
         return 1;
@@ -70,6 +72,7 @@ static int file_main(const char *filepath, FILE *f) {
 
     ena_destroy_vm(vm);
     free(script);
+    fclose(f);
 
     if (failed > 0) {
         return 1;
@@ -80,7 +83,8 @@ static int file_main(const char *filepath, FILE *f) {
 
 static int repl_main(void) {
     struct ena_vm *vm = ena_create_vm();
-    ena_value_t main_module = ena_create_module();
+    ena_value_t main_module = ena_create_module(vm);
+    ena_register_module(vm, "main", main_module);
     for (;;) {
         printf(">>> ");
         fflush(stdout);

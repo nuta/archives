@@ -30,14 +30,13 @@ struct ena_hash_table {
 };
 
 void ena_hash_init_table(struct ena_hash_table *table, struct ena_hash_methods *methods);
-void ena_hash_free_table(struct ena_hash_table *table);
-void ena_hash_free_keys(struct ena_hash_table *table);
-void ena_hash_free_values(struct ena_hash_table *table);
+void ena_hash_free_table(struct ena_hash_table *table, void (*free_value)(void *value));
 struct ena_hash_entry *ena_hash_search(struct ena_hash_table *table, void *key);
 void ena_hash_insert(struct ena_hash_table *table, void *key, void *value);
 struct ena_hash_entry *ena_hash_search_or_insert(struct ena_hash_table *table, void *key, void *value);
 bool ena_hash_remove(struct ena_hash_table *table, void *key);
 void ena_hash_remove_all(struct ena_hash_table *table, void *key);
+void ena_hash_foreach_value(struct ena_hash_table *table, void (*cb)(void *value));
 
 void ena_hash_init_ident_table(struct ena_hash_table *table);
 void ena_hash_init_cstr_table(struct ena_hash_table *table);

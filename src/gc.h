@@ -2,13 +2,7 @@
 #define __ENA_GC_H__
 
 #include "internal.h"
-#include "eval.h"
 
-ena_value_t ena_share(ena_value_t value);
-void ena_delete(ena_value_t value);
-void ena_destroy_object(struct ena_object *obj);
-void ena_share_scope(struct ena_scope *scope);
-void ena_delete_scope(struct ena_scope *scope);
-void ena_delete_table(struct ena_hash_table *table);
+struct ena_object *ena_alloc_object(struct ena_vm *vm, ena_value_type_t type);
 
 #endif

@@ -1,4 +1,5 @@
 #include "api.h"
+#include "eval.h"
 #include "malloc.h"
 #include "string.h"
 
@@ -113,6 +114,20 @@ UNITTEST(hash) {
     ena_hash_insert(&table, (void *) (INITIAL_NUM_BUCKETS * 3), "string4");
 }
 
+UNITTEST(gc) {
+    struct ena_vm *vm = ena_create_vm();
+    ena_value_t mod = ena_create_module(vm);
+    struct ena_int *pi = (struct ena_int *) ena_create_int(vm, 3);
+    struct ena_int *unused1 = (struct ena_int *) ena_create_int(vm, 1);
+    struct ena_int *unused2 = (struct ena_int *) ena_create_int(vm, 2);
+    ena_add_to_module(vm, mod, "pi", ENA_OBJ2VALUE(pi));
+    ena_register_module(vm, "mod", mod);
+    ena_gc(vm);
+    ASSERT_NOT_EQ(pi->header.flags, 0);
+    ASSERT_EQ(unused1->header.flags, 0);
+    ASSERT_EQ(unused2->header.flags, 0);
+}
+
 int ena_unittests(void) {
     fprintf(stderr, "unit tests");
     fflush(stderr);
@@ -121,6 +136,7 @@ int ena_unittests(void) {
     test_ident();
     test_string();
     test_hash();
+    test_gc();
 
     if (tests_failed) {
         DEBUG("\n### %d tests failed ###", tests_failed);

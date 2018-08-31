@@ -7,7 +7,7 @@
         struct ena_int *lhs = ena_to_int_object(self); \
         struct ena_int *rhs = ena_to_int_object(args[0]); \
         DEBUG("%d %s %d", lhs->value, #c_op, rhs->value); \
-        return ena_create_##type(lhs->value c_op rhs->value); \
+        return ena_create_##type(vm, lhs->value c_op rhs->value); \
     }
 
 #define DEFINE_BINOP_DIV(name, type, c_op) \
@@ -17,8 +17,7 @@
         if (rhs->value == 0) { \
             RUNTIME_ERROR("divide by zero"); \
         } \
-        DEBUG("%d %s %d", lhs->value, #c_op, rhs->value); \
-        return ena_create_##type(lhs->value c_op rhs->value); \
+        return ena_create_##type(vm, lhs->value c_op rhs->value); \
     }
 
 DEFINE_BINOP(add, int, +)
@@ -34,7 +33,7 @@ DEFINE_BINOP(eq, bool, ==)
 DEFINE_BINOP(neq, bool, !=)
 
 struct ena_class *ena_create_int_class(struct ena_vm *vm) {
-    ena_value_t cls = ena_create_class();
+    ena_value_t cls = ena_create_class(vm);
     ena_define_method(vm, cls, "+", int_add);
     ena_define_method(vm, cls, "-", int_sub);
     ena_define_method(vm, cls, "*", int_mul);

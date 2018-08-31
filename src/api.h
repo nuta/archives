@@ -3,6 +3,9 @@
 
 #include "utils.h"
 
+#define ENA_MAX_NUM_VALUES 1024
+#define ENA_GC_THRESHOLD   512
+
 // We use only lower 32-bit and MSB.
 typedef uintptr_t ena_value_t;
 
@@ -43,6 +46,7 @@ typedef ena_value_t (*ena_native_func_t)(struct ena_vm *vm, ena_value_t *args, i
 struct ena_vm *ena_create_vm();
 void ena_destroy_vm(struct ena_vm *vm);
 bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char *script);
+void ena_gc(struct ena_vm *vm);
 ena_error_type_t ena_get_error_type(struct ena_vm *vm);
 const char *ena_get_error_cstr(struct ena_vm *vm);
 
@@ -50,13 +54,14 @@ ena_value_type_t ena_get_type(ena_value_t value);
 void ena_stringify(char *buf, size_t buf_len, ena_value_t value);
 
 /// To value.
-ena_value_t ena_create_int(int value);
+ena_value_t ena_create_int(struct ena_vm *vm, int value);
 ena_value_t ena_create_string(struct ena_vm *vm, const char *str, size_t size);
-ena_value_t ena_create_bool(int condition);
-ena_value_t ena_create_func(ena_native_func_t native_func);
-ena_value_t ena_create_class(void);
+ena_value_t ena_create_bool(struct ena_vm *vm, int condition);
+ena_value_t ena_create_func(struct ena_vm *vm, ena_native_func_t native_func);
+ena_value_t ena_create_class(struct ena_vm *vm);
 void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena_native_method_t method);
-ena_value_t ena_create_module(void);
+ena_value_t ena_create_module(struct ena_vm *vm);
+void ena_register_module(struct ena_vm *vm, const char *name, ena_value_t module);
 void ena_add_to_module(struct ena_vm *vm, ena_value_t module, const char *name, ena_value_t value);
 bool ena_is_equal(ena_value_t v1, ena_value_t v2);
 

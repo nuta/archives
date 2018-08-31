@@ -25,20 +25,21 @@
         ena_free(current_sp); \
     } while(0)
 
-struct ena_object {
-    uint32_t type; // enum ena_value_type
-    uint32_t refcount;
+struct ena_object_header {
+#define OBJECT_FLAG_TYPE_MASK 0xff
+#define OBJECT_FLAG_MARKED    (1 << 16)
+    uint32_t flags;
 };
 
 struct ena_int {
-    struct ena_object header;
+    struct ena_object_header header;
     int value;
 };
 
 #define STRING_FLAG_STORED 0
 #define STRING_FLAG_IDENT  1
 struct ena_string {
-    struct ena_object header;
+    struct ena_object_header header;
     uint32_t flags;
     const char *str;
     ena_ident_t ident;
@@ -50,7 +51,7 @@ struct ena_string {
 #define FUNC_FLAGS_NATIVE  (1 << 1)
 #define FUNC_FLAGS_ENA     (0 << 1)
 struct ena_func {
-    struct ena_object header;
+    struct ena_object_header header;
     uint32_t flags;
     ena_ident_t name;
     struct ena_scope *scope;
@@ -69,25 +70,25 @@ struct ena_func {
 };
 
 struct ena_class {
-    struct ena_object header;
+    struct ena_object_header header;
     /// Method table. (ena_ident_t -> ena_value_t)
     struct ena_hash_table methods;
 };
 
 struct ena_instance {
-    struct ena_object header;
+    struct ena_object_header header;
     struct ena_class *cls;
     struct ena_scope *props;
 };
 
 struct ena_list {
-    struct ena_object header;
+    struct ena_object_header header;
     ena_value_t *elems;
     size_t num_elems;
 };
 
 struct ena_map {
-    struct ena_object header;
+    struct ena_object_header header;
     struct ena_hash_table entries;
 };
 
@@ -101,8 +102,23 @@ struct ena_scope {
 };
 
 struct ena_module {
-    struct ena_object header;
+    struct ena_object_header header;
+    struct ena_module *next;
     struct ena_scope *scope;
+};
+
+struct ena_object {
+    struct ena_object_header header;
+    union {
+        struct ena_int i;
+        struct ena_string string;
+        struct ena_func func;
+        struct ena_class cls;
+        struct ena_instance instance;
+        struct ena_list list;
+        struct ena_map map;
+        struct ena_module module;
+    };
 };
 
 typedef enum {

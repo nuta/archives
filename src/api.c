@@ -62,37 +62,32 @@ ena_value_type_t ena_get_type(ena_value_t v) {
     }
 
     if (ENA_IS_IN_HEAP(v)) {
-        return ((struct ena_object *) v)->type;
+        return ((struct ena_object *) v)->header.flags & OBJECT_FLAG_TYPE_MASK;
     }
 
     return ENA_T_UNDEFINED;
 }
 
-ena_value_t ena_create_bool(int condition) {
+ena_value_t ena_create_bool(UNUSED struct ena_vm *vm, int condition) {
     return (condition) ? ENA_TRUE : ENA_FALSE;
 }
 
-ena_value_t ena_create_int(int value) {
-    struct ena_int *obj = (struct ena_int *) ena_malloc(sizeof(*obj));
-    obj->header.type = ENA_T_INT;
-    obj->header.refcount = 1;
+ena_value_t ena_create_int(struct ena_vm *vm, int value) {
+    struct ena_int *obj = (struct ena_int *) ena_alloc_object(vm, ENA_T_INT);
     obj->value = value;
     return ENA_OBJ2VALUE(obj);
 }
 
-ena_value_t ena_create_class(void) {
-    struct ena_class *cls = ena_malloc(sizeof(*cls));
-    cls->header.type = ENA_T_CLASS;
-    cls->header.refcount = 0;
+ena_value_t ena_create_class(struct ena_vm *vm) {
+    struct ena_class *cls = (struct ena_class *) ena_alloc_object(vm, ENA_T_CLASS);
     ena_hash_init_ident_table(&cls->methods);
     return ENA_OBJ2VALUE(cls);
 }
 
-ena_value_t ena_create_module(void) {
-    struct ena_module *module = ena_malloc(sizeof(*module));
-    module->header.type = ENA_T_MODULE;
-    module->header.refcount = 1;
+ena_value_t ena_create_module(struct ena_vm *vm) {
+    struct ena_module *module = (struct ena_module *) ena_alloc_object(vm, ENA_T_MODULE);
     module->scope = ena_create_scope(NULL);
+    module->next = NULL;
     return ENA_OBJ2VALUE(module);
 }
 
@@ -111,8 +106,12 @@ struct ena_vm *ena_create_vm() {
     vm->self = ENA_UNDEFINED;
     vm->current_class = NULL;
     vm->current_savepoint = NULL;
-    vm->main_module = NULL;
+    vm->modules = NULL;
     vm->error.type = ENA_ERROR_NONE;
+    vm->stack_end = 0;
+    vm->value_pool = ena_malloc(sizeof(struct ena_object) * ENA_MAX_NUM_VALUES);
+    ena_memset(vm->value_pool, 0, sizeof(struct ena_object) * ENA_MAX_NUM_VALUES);
+    vm->num_free = ENA_MAX_NUM_VALUES;
     ena_hash_init_ident_table(&vm->ident2cstr);
     ena_hash_init_cstr_table(&vm->cstr2ident);
     vm->int_class = ena_create_int_class(vm);
@@ -130,25 +129,17 @@ void ena_destroy_vm(struct ena_vm *vm) {
         ast = next;
     }
 
-    ena_hash_free_values(&vm->ident2cstr);
-    ena_hash_free_table(&vm->ident2cstr);
     // Key strings of `vm->cstr2ident` are freed by freeing
     // ident2cstr values; they are identical pointers.
-    ena_hash_free_table(&vm->cstr2ident);
-    ena_destroy_object((struct ena_object *) vm->main_module);
-    ena_destroy_object((struct ena_object *) vm->int_class);
-    ena_destroy_object((struct ena_object *) vm->string_class);
-    ena_destroy_object((struct ena_object *) vm->list_class);
-    ena_destroy_object((struct ena_object *) vm->map_class);
-
+    ena_hash_free_table(&vm->ident2cstr, ena_free);
+    ena_hash_free_table(&vm->cstr2ident, NULL);
+    ena_free(vm->value_pool);
     ena_free(vm);
 }
 
 void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena_native_method_t native_method) {
     ena_ident_t ident = ena_cstr2ident(vm, name);
-    struct ena_func *func = (struct ena_func *) ena_malloc(sizeof(*func));
-    func->header.type = ENA_T_FUNC;
-    func->header.refcount = 1;
+    struct ena_func *func = (struct ena_func *) ena_alloc_object(vm, ENA_T_FUNC);
     func->name = ident;
     func->stmts = NULL;
     func->native_method = native_method;
@@ -159,16 +150,26 @@ void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena
     }
 }
 
-ena_value_t ena_create_func(ena_native_func_t native_func) {
-    struct ena_func *func = (struct ena_func *) ena_malloc(sizeof(*func));
-    func->header.type = ENA_T_FUNC;
-    func->header.refcount = 1;
+ena_value_t ena_create_func(struct ena_vm *vm, ena_native_func_t native_func) {
+    struct ena_func *func = (struct ena_func *) ena_alloc_object(vm, ENA_T_FUNC);
     func->name = IDENT_ANONYMOUS;
     func->stmts = NULL;
     func->native_func = native_func;
     func->scope = NULL;
     func->flags = FUNC_FLAGS_NATIVE;
     return ENA_OBJ2VALUE(func);
+}
+
+void ena_register_module(struct ena_vm *vm, UNUSED const char *name, ena_value_t module) {
+    struct ena_module **entry = &vm->modules;
+    for (;;) {
+        if (*entry == NULL) {
+            *entry = ena_to_module_object(module);
+            return;
+        }
+
+        entry = &(*entry)->next;
+    }
 }
 
 void ena_add_to_module(struct ena_vm *vm, ena_value_t module, const char *name, ena_value_t value) {

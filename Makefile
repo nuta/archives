@@ -102,7 +102,7 @@ valgrind:
 	$(PROGRESS) DOCKER_BUILD ena-valgrind
 	docker build -t ena-valgrind -f tools/valgrind/Dockerfile .
 	$(PROGRESS) DOCKER_RUN ena-valgrind
-	docker run -v $(PWD):/ena -it ena-valgrind sh -c "cd /ena && make clean && make -j2 && valgrind --leak-check=full ./ena $(TEST)"
+	docker run -v $(PWD):/ena -it ena-valgrind sh -c "cd /ena && make clean && make -j2 && valgrind --leak-check=full --show-leak-kinds=all ./ena $(TEST)"
 	make clean
 
 ena: libena.a src/main.o Makefile

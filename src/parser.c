@@ -200,22 +200,27 @@ PARSE_RULE(primary) {
             return expr;
         }
         case ENA_TOKEN_TRUE:
+            ena_destroy_token(token);
             return create_node(ENA_NODE_TRUE, NULL, 0);
         case ENA_TOKEN_FALSE:
+            ena_destroy_token(token);
             return create_node(ENA_NODE_FALSE, NULL, 0);
         case ENA_TOKEN_INT_LIT:
             return create_node_with_token(ENA_NODE_INT_LIT, token, NULL, 0);
         case ENA_TOKEN_STRING_LIT:
             return create_node_with_token(ENA_NODE_STRING_LIT, token, NULL, 0);
         case ENA_TOKEN_LBRACKET:
+            ena_destroy_token(token);
             return PARSE(list_lit);
         case ENA_TOKEN_LBRACE:
+            ena_destroy_token(token);
             return PARSE(map_lit);
         case ENA_TOKEN_ID:
             return create_node_with_token(ENA_NODE_ID, token, NULL, 0);
         default:
             // Reached to the end of expression.
             PUSHBACK(token);
+            ena_destroy_token(token);
             return NULL;
     }
 }
@@ -549,6 +554,7 @@ struct ena_ast *ena_parse(struct ena_vm *vm, const char *filepath, const char *s
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         struct ena_node *tree = parse_program(vm);
         struct ena_ast *ast = ena_malloc(sizeof(*ast));
+        ast->script = vm->lexer.script;
         ast->tree = tree;
         return ast;
     }
@@ -572,5 +578,7 @@ static void destroy_node(struct ena_node *node) {
 
 void ena_destroy_ast(struct ena_ast *ast) {
     destroy_node(ast->tree);
+    ena_free(ast->tree);
+    ena_free((void *) ast->script);
     ena_free(ast);
 }

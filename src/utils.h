@@ -21,6 +21,7 @@
 #include <setjmp.h>
 #include <string.h>
 #define ena_memchr memchr
+#define ena_memset memset
 #define ena_snprintf snprintf
 #define ENA_ASSERT assert
 #define ena_setjmp _setjmp
