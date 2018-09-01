@@ -43,7 +43,7 @@ $ make coverage    # Measure test coverage.
 $ make doxygen     # Generate source code references (docs/src).
 $ make scan-build  # Run Clang Static Analyzer to find bugs. (macOS only)
 $ make valgrind    # Run tests in Valgrind to find memory leaks. (requires Docker)
-$ make emscripten  # Compile into wasm.
+$ make wasm        # Compile into wasm.
 ```
 
 License
