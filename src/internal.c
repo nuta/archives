@@ -1,5 +1,6 @@
 #include "malloc.h"
 #include "eval.h"
+#include "gc.h"
 #include "internal.h"
 
 static ena_value_t *lookup_var(struct ena_scope *scope, ena_ident_t name) {
@@ -15,11 +16,10 @@ static ena_value_t *lookup_var(struct ena_scope *scope, ena_ident_t name) {
     return NULL;
 }
 
-struct ena_scope *ena_create_scope(struct ena_scope *parent) {
+struct ena_scope *ena_create_scope(struct ena_vm *vm, struct ena_scope *parent) {
     // TODO: Allocate a scope by alloca().
-    struct ena_scope *scope = ena_malloc(sizeof(*scope));
+    struct ena_scope *scope = (struct ena_scope *) ena_alloc_object(vm, ENA_T_SCOPE);
     scope->parent = parent;
-    scope->refcount = 1;
     ena_hash_init_ident_table(&scope->vars);
     return scope;
 }

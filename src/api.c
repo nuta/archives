@@ -111,7 +111,7 @@ static ena_value_t print_func_handler(UNUSED struct ena_vm *vm, ena_value_t *arg
 
 ena_value_t ena_create_module(struct ena_vm *vm) {
     struct ena_module *module = (struct ena_module *) ena_alloc_object(vm, ENA_T_MODULE);
-    module->scope = ena_create_scope(NULL);
+    module->scope = ena_create_scope(vm, NULL);
     module->next = NULL;
 
 #ifndef ENA_NO_PRINT

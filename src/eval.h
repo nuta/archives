@@ -93,10 +93,9 @@ struct ena_map {
 };
 
 struct ena_scope {
+    struct ena_object_header header;
     /// ena_ident_t -> ena_value_t
     struct ena_hash_table vars;
-    /// For closures.
-    int refcount;
     /// The parent scope.
     struct ena_scope *parent;
 };

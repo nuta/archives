@@ -8,19 +8,6 @@
 #define EVAL_NODE(name) static ena_value_t eval_##name(UNUSED struct ena_vm *vm, UNUSED struct ena_node *node)
 static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node);
 
-static void ena_share_scope(struct ena_scope *scope) {
-    scope->refcount++;
-}
-
-/// Decrements the reference count of scope.
-/// @arg scope The scope.
-static void ena_delete_scope(struct ena_scope *scope) {
-    scope->refcount--;
-    if (scope->refcount == 0) {
-        ena_free(scope);
-    }
-}
-
 static inline struct ena_class *get_builtin_class_by_type(struct ena_vm *vm, ena_value_type_t type) {
     switch (type) {
         case ENA_T_INT:
@@ -50,7 +37,7 @@ static ena_value_t copy_if_immutable(struct ena_vm *vm, ena_value_t value) {
 static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_args, ena_value_t self, struct ena_func *func) {
     // Enther the scope and execute the body.
     struct ena_scope *caller_scope = vm->current_scope;
-    struct ena_scope *new_scope = ena_create_scope(func->scope);
+    struct ena_scope *new_scope = ena_create_scope(vm, func->scope);
     PUSH_SAVEPOINT();
 
     int unwind_type;
@@ -91,7 +78,6 @@ static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_ar
     vm->current_scope = caller_scope;
     vm->self = ENA_UNDEFINED;
     POP_SAVEPOINT();
-    ena_delete_scope(new_scope);
     return ret_value;
 }
 
@@ -148,7 +134,7 @@ static ena_value_t invoke_method(struct ena_vm *vm, struct ena_node *node) {
 static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct ena_class *cls) {
     struct ena_instance *instance = (struct ena_instance *) ena_alloc_object(vm, ENA_T_INSTANCE);
     instance->cls = cls;
-    instance->props = ena_create_scope(NULL);
+    instance->props = ena_create_scope(vm, NULL);
 
     // Call the constructor if it exists.
     struct ena_func *new_method = lookup_method(cls, ena_cstr2ident(vm, "new"));
@@ -268,7 +254,6 @@ EVAL_NODE(FUNC) {
         // A function definition.
         table = &vm->current_scope->vars;
         type = FUNC_FLAGS_FUNC;
-        ena_share_scope(vm->current_scope);
     }
 
     func->flags = type;

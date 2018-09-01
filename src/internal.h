@@ -114,6 +114,6 @@ void ena_define_var(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name
 ena_value_t ena_get_var_value(struct ena_scope *scope, ena_ident_t name);
 bool ena_set_var_value(struct ena_scope *scope, ena_ident_t name, ena_value_t new_value);
 void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
-struct ena_scope *ena_create_scope(struct ena_scope *parent);
+struct ena_scope *ena_create_scope(struct ena_vm *vm, struct ena_scope *parent);
 
 #endif

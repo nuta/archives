@@ -57,31 +57,40 @@ static void arch_load_regs(uintptr_t *regs) {
 #endif
 
 
-static inline void mark_class(ena_value_t value);
-static inline void mark_instance(ena_value_t value);
-static inline void mark_map(ena_value_t value);
-static inline void mark_list(ena_value_t value);
+static inline void mark_func(struct ena_func *func);
+static inline void mark_class(struct ena_class *cls);
+static inline void mark_instance(struct ena_instance *instance);
+static inline void mark_map(struct ena_map *map);
+static inline void mark_list(struct ena_list *list);
+static inline void mark_scope(struct ena_scope *scope);
+
+static inline void mark_object(struct ena_object *obj) {
+    obj->header.flags |= OBJECT_FLAG_MARKED;
+}
 
 static void mark(ena_value_t value) {
     switch (ena_get_type(value)) {
         case ENA_T_INT:
-        case ENA_T_FUNC:
-        case ENA_T_STRING: {
-            struct ena_object *obj = (struct ena_object *) value;
-            obj->header.flags |= OBJECT_FLAG_MARKED;
+        case ENA_T_STRING:
+            mark_object((struct ena_object *) value);
             break;
-        }
+        case ENA_T_FUNC:
+            mark_func((struct ena_func *) value);
+            break;
+        case ENA_T_SCOPE:
+            mark_scope((struct ena_scope *) value);
+            break;
         case ENA_T_CLASS:
-            mark_class(value);
+            mark_class((struct ena_class *) value);
             break;
         case ENA_T_INSTANCE:
-            mark_instance(value);
+            mark_instance((struct ena_instance *) value);
             break;
         case ENA_T_MAP:
-            mark_map(value);
+            mark_map((struct ena_map *) value);
             break;
         case ENA_T_LIST:
-            mark_list(value);
+            mark_list((struct ena_list *) value);
             break;
         default:;
     }
@@ -91,46 +100,52 @@ static inline void mark_hash_with_value_values(struct ena_hash_table *table) {
     ena_hash_foreach_value(table, (void (*)(void *)) mark);
 }
 
-static inline void mark_class(ena_value_t value) {
-    struct ena_class *cls = (struct ena_class *) value;
-    mark(value);
+static inline void mark_func(struct ena_func *func) {
+    mark_object((struct ena_object *) func);
+
+    if (func->scope) {
+        mark_scope(func->scope);
+    }
+}
+
+static inline void mark_class(struct ena_class *cls) {
+    mark_object((struct ena_object *) cls);
     mark_hash_with_value_values(&cls->methods);
 }
 
-static inline void mark_list(ena_value_t value) {
-    struct ena_list *list = (struct ena_list *) value;
-    mark(value);
+static inline void mark_list(struct ena_list *list) {
+    mark_object((struct ena_object *) list);
     for (size_t i = 0; i < list->num_elems; i++) {
         mark(list->elems[i]);
     }
 }
 
-static inline void mark_map(ena_value_t value) {
-    struct ena_map *map = (struct ena_map *) value;
-    mark(value);
+static inline void mark_map(struct ena_map *map) {
+    mark_object((struct ena_object *) map);
     mark_hash_with_value_values(&map->entries);
 }
 
 static inline void mark_scope(struct ena_scope *scope) {
+    if (scope->parent) {
+        mark_scope(scope->parent);
+    }
     mark_hash_with_value_values(&scope->vars);
 }
 
-static inline void mark_instance(ena_value_t value) {
-    struct ena_instance *instance = (struct ena_instance *) value;
-    mark(value);
-    mark_class(ENA_OBJ2VALUE(instance->cls));
+static inline void mark_instance(struct ena_instance *instance) {
+    mark_object((struct ena_object *) instance);
+    mark_class(instance->cls);
     mark_scope(instance->props);
 }
 
-static inline void mark_module(ena_value_t value) {
-    struct ena_module *module = (struct ena_module *) value;
-    mark(value);
+static inline void mark_module(struct ena_module *module) {
+    mark_object((struct ena_object *) module);
     mark_scope(module->scope);
 }
 
 static inline void mark_modules(struct ena_vm *vm) {
     for (struct ena_module *module = vm->modules; module != NULL; module = module->next) {
-        mark_module(ENA_OBJ2VALUE(module));
+        mark_module(module);
     }
 }
 

@@ -21,7 +21,8 @@ typedef enum {
     ENA_T_CLASS,
     ENA_T_INSTANCE,
     ENA_T_MODULE,
-    ENA_T_ANY,
+    ENA_T_ANY, // used internally
+    ENA_T_SCOPE, // used internally
 } ena_value_type_t;
 
 #define ENA_UNDEFINED 0
