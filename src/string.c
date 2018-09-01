@@ -251,7 +251,6 @@ static ena_value_t string_replace(struct ena_vm *vm, ena_value_t self, ena_value
     struct ena_string *new_self = (struct ena_string *) ena_create_string(vm, "", 0);
 
     size_t index = 0;
-    size_t size = 0;
     for (;;) {
         if (index >= self_str->size_in_bytes) {
             break;
@@ -284,5 +283,5 @@ struct ena_class *ena_create_string_class(struct ena_vm *vm) {
     ena_define_method(vm, cls, "contains", string_contains);
     ena_define_method(vm, cls, "replace", string_replace);
     ena_define_method(vm, cls, "find", string_find);
-    return ena_to_class_object(cls);
+    return ena_to_class_object(vm, cls);
 }

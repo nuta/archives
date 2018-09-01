@@ -105,13 +105,14 @@ UNITTEST(string) {
 }
 
 UNITTEST(hash) {
+    struct ena_vm *vm = ena_create_vm();
     struct ena_hash_table table;
-    ena_hash_init_ident_table(&table);
-    ena_hash_insert(&table, (void *) 0, "string1");
-    ena_hash_insert(&table, (void *) 1, "string3");
-    ena_hash_insert(&table, (void *) INITIAL_NUM_BUCKETS, "string2");
-    ena_hash_insert(&table, (void *) (INITIAL_NUM_BUCKETS * 2), "string3");
-    ena_hash_insert(&table, (void *) (INITIAL_NUM_BUCKETS * 3), "string4");
+    ena_hash_init_ident_table(vm, &table);
+    ena_hash_insert(vm, &table, (void *) 0, "string1");
+    ena_hash_insert(vm, &table, (void *) 1, "string3");
+    ena_hash_insert(vm, &table, (void *) INITIAL_NUM_BUCKETS, "string2");
+    ena_hash_insert(vm, &table, (void *) (INITIAL_NUM_BUCKETS * 2), "string3");
+    ena_hash_insert(vm, &table, (void *) (INITIAL_NUM_BUCKETS * 3), "string4");
 }
 
 UNITTEST(gc) {

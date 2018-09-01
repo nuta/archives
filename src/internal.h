@@ -45,12 +45,6 @@
 
 #define ENA_VALUE2OBJ(type, value) ((struct ena_##type *) (value))
 
-// Assuming that there are no insane memory allocators in this world which returns
-// too low memory address (< 0x1000). Typically the page is never used in order to
-// detect NULL pointer dereferences and in an embedded software (MMU is disabled)
-// important data strctures like interrupt table exist.
-#define ENA_IS_IN_HEAP(value) (((uintptr_t) (value)) >= 0x1000)
-
 struct ena_error {
     ena_error_type_t type;
     char str[256];
@@ -91,8 +85,8 @@ typedef uintptr_t ena_ident_t;
 #define IDENT_START     ((ena_ident_t) 100)
 
 #define DEFINE_VALUE2OBJ_FUNC(type_name, type_id) \
-    static inline struct ena_##type_name *ena_to_##type_name##_object(ena_value_t value) { \
-        if (ena_get_type(value) != type_id) { \
+    static inline struct ena_##type_name *ena_to_##type_name##_object(struct ena_vm *vm, ena_value_t value) { \
+        if (ena_get_type(vm, value) != type_id) { \
             DEBUG("value2obj error"); \
             return NULL; \
         } \
@@ -111,8 +105,8 @@ DEFINE_VALUE2OBJ_FUNC(module, ENA_T_MODULE)
 ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str);
 const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);
 void ena_define_var(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value);
-ena_value_t ena_get_var_value(struct ena_scope *scope, ena_ident_t name);
-bool ena_set_var_value(struct ena_scope *scope, ena_ident_t name, ena_value_t new_value);
+ena_value_t ena_get_var_value(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name);
+bool ena_set_var_value(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t new_value);
 void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
 struct ena_scope *ena_create_scope(struct ena_vm *vm, struct ena_scope *parent);
 

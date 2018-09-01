@@ -17,6 +17,7 @@
 
 /// TODO: implement by ourselves
 #include <stdio.h>
+#include <alloca.h>
 #include <assert.h>
 #include <setjmp.h>
 #include <string.h>
@@ -27,6 +28,17 @@
 #define ena_setjmp setjmp
 #define ena_longjmp longjmp
 #define ena_jmpbuf jmp_buf
+#define ena_alloca alloca
+
+#ifdef __x86_64__
+#   define ARCH_NUM_REGS 14
+#elif __EMSCRIPTEN__
+#   define ARCH_NUM_REGS 0
+#endif
+
+uintptr_t arch_get_stack_bottom(void);
+void arch_load_regs(uintptr_t *regs);
+
 
 void *ena_memcpy(void *dst, const void *src, size_t len);
 int ena_memcmp(void *ptr1, const void *ptr2, size_t len);

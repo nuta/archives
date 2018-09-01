@@ -15,10 +15,10 @@ static ena_value_t assert_eq_handler(UNUSED struct ena_vm *vm, ena_value_t *args
     ena_check_args(vm, "assert_eq()", "xx", args, num_args);
     ena_value_t x = args[0];
     ena_value_t y = args[1];
-    if (!ena_is_equal(x, y)) {
+    if (!ena_is_equal(vm, x, y)) {
         char buf_x[64], buf_y[64];
-        ena_stringify(buf_x, sizeof(buf_x), x);
-        ena_stringify(buf_y, sizeof(buf_y), y);
+        ena_stringify(vm, buf_x, sizeof(buf_x), x);
+        ena_stringify(vm, buf_y, sizeof(buf_y), y);
         fprintf(stderr, "assert_eq: %s != %s\n", buf_x, buf_y);
         failed++;
         return ENA_NULL;
@@ -47,7 +47,7 @@ static int file_main(const char *filepath, FILE *f) {
     DEBUG("\nParser:");
     struct ena_ast *ast = ena_parse(vm, filepath, script);
     if (!ast) {
-        fprintf(stderr, "%s", ena_get_error_cstr(vm));
+        fprintf(stderr, "%s\n", ena_get_error_cstr(vm));
         free(script);
         return 1;
     }
@@ -59,13 +59,13 @@ static int file_main(const char *filepath, FILE *f) {
 
     DEBUG("\nEvaluate:");
     if (!ena_eval(vm, main_module, filepath, script)) {
-        fprintf(stderr, "%s", ena_get_error_cstr(vm));
+        fprintf(stderr, "%s\n", ena_get_error_cstr(vm));
         return 1;
     }
 #else
     ena_register_module(vm, "main", main_module);
     if (!ena_eval(vm, main_module, filepath, script)) {
-        fprintf(stderr, "%s", ena_get_error_cstr(vm));
+        fprintf(stderr, "%s\n", ena_get_error_cstr(vm));
         return 1;
     }
 #endif
@@ -106,7 +106,7 @@ static int repl_main(void) {
 
         script[script_len - 1] = '\0';
         if (!ena_eval(vm, main_module, "(stdin)", script)) {
-            fprintf(stderr, "%s", ena_get_error_cstr(vm));
+            fprintf(stderr, "%s\n", ena_get_error_cstr(vm));
             return 1;
         }
 

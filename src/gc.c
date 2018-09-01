@@ -1,167 +1,114 @@
 #include "gc.h"
 #include "eval.h"
 #include "malloc.h"
+#include "utils.h"
 
-#ifdef __x86_64__
-#define ARCH_NUM_REGS 14
-
-static inline uintptr_t arch_get_stack_bottom() {
-    uintptr_t bottom;
-    __asm__ __volatile__("movq %%rsp, %0" : "=m"(bottom));
-    return bottom;
-}
-
-static void arch_load_regs(uintptr_t *regs) {
-    __asm__ __volatile__(
-        "movq %%rax, %0 \n"
-        "movq %%rbx, %1 \n"
-        "movq %%rcx, %2 \n"
-        "movq %%rdx, %3 \n"
-        "movq %%rdi, %4 \n"
-        "movq %%rsi, %5 \n"
-        "movq %%r8,  %6 \n"
-        "movq %%r9,  %7 \n"
-        "movq %%r10, %8 \n"
-        "movq %%r11, %9 \n"
-        "movq %%r12, %10 \n"
-        "movq %%r13, %11 \n"
-        "movq %%r14, %12 \n"
-        "movq %%r15, %13 \n"
-    :
-    "=m"(regs[0]),
-    "=m"(regs[1]),
-    "=m"(regs[2]),
-    "=m"(regs[3]),
-    "=m"(regs[4]),
-    "=m"(regs[5]),
-    "=m"(regs[6]),
-    "=m"(regs[7]),
-    "=m"(regs[8]),
-    "=m"(regs[9]),
-    "=m"(regs[10]),
-    "=m"(regs[11]),
-    "=m"(regs[12]),
-    "=m"(regs[13])
-    );
-}
-#elif __EMSCRIPTEN__
-#define ARCH_NUM_REGS 0
-static inline uintptr_t arch_get_stack_bottom() {
-    return 0;
-}
-
-static void arch_load_regs(uintptr_t *regs) {
-}
-#else
-#error "unsupported arch"
-#endif
-
-
-static inline void mark_func(struct ena_func *func);
-static inline void mark_class(struct ena_class *cls);
-static inline void mark_instance(struct ena_instance *instance);
-static inline void mark_map(struct ena_map *map);
-static inline void mark_list(struct ena_list *list);
-static inline void mark_scope(struct ena_scope *scope);
+static inline void mark_func(struct ena_vm *vm, struct ena_func *func);
+static inline void mark_class(struct ena_vm *vm, struct ena_class *cls);
+static inline void mark_instance(struct ena_vm *vm, struct ena_instance *instance);
+static inline void mark_map(struct ena_vm *vm, struct ena_map *map);
+static inline void mark_list(struct ena_vm *vm, struct ena_list *list);
+static inline void mark_scope(struct ena_vm *vm, struct ena_scope *scope);
 
 static inline void mark_object(struct ena_object *obj) {
     obj->header.flags |= OBJECT_FLAG_MARKED;
 }
 
-static void mark(ena_value_t value) {
-    switch (ena_get_type(value)) {
+static void mark(struct ena_vm *vm, ena_value_t value) {
+     if (ena_is_in_heap(vm, value)) {
+        struct ena_object *obj = (struct ena_object *) value;
+        if (obj->header.flags & OBJECT_FLAG_MARKED) {
+            return;
+        }
+    }
+
+    switch (ena_get_type(vm, value)) {
         case ENA_T_INT:
         case ENA_T_STRING:
             mark_object((struct ena_object *) value);
             break;
         case ENA_T_FUNC:
-            mark_func((struct ena_func *) value);
+            mark_func(vm, (struct ena_func *) value);
             break;
         case ENA_T_SCOPE:
-            mark_scope((struct ena_scope *) value);
+            mark_scope(vm, (struct ena_scope *) value);
             break;
         case ENA_T_CLASS:
-            mark_class((struct ena_class *) value);
+            mark_class(vm, (struct ena_class *) value);
             break;
         case ENA_T_INSTANCE:
-            mark_instance((struct ena_instance *) value);
+            mark_instance(vm, (struct ena_instance *) value);
             break;
         case ENA_T_MAP:
-            mark_map((struct ena_map *) value);
+            mark_map(vm, (struct ena_map *) value);
             break;
         case ENA_T_LIST:
-            mark_list((struct ena_list *) value);
+            mark_list(vm, (struct ena_list *) value);
             break;
         default:;
     }
 }
 
-static inline void mark_hash_with_value_values(struct ena_hash_table *table) {
-    ena_hash_foreach_value(table, (void (*)(void *)) mark);
+static inline void mark_hash_with_value_values(struct ena_vm *vm, struct ena_hash_table *table) {
+    ena_hash_foreach_value(vm, table, (void (*)(struct ena_vm *vm, void *)) mark);
 }
 
-static inline void mark_func(struct ena_func *func) {
+static inline void mark_func(struct ena_vm *vm, struct ena_func *func) {
     mark_object((struct ena_object *) func);
 
     if (func->scope) {
-        mark_scope(func->scope);
+        mark_scope(vm, func->scope);
     }
 }
 
-static inline void mark_class(struct ena_class *cls) {
+static inline void mark_class(struct ena_vm *vm, struct ena_class *cls) {
     mark_object((struct ena_object *) cls);
-    mark_hash_with_value_values(&cls->methods);
+    mark_hash_with_value_values(vm, &cls->methods);
 }
 
-static inline void mark_list(struct ena_list *list) {
+static inline void mark_list(struct ena_vm *vm, struct ena_list *list) {
     mark_object((struct ena_object *) list);
     for (size_t i = 0; i < list->num_elems; i++) {
-        mark(list->elems[i]);
+        mark(vm, list->elems[i]);
     }
 }
 
-static inline void mark_map(struct ena_map *map) {
+static inline void mark_map(struct ena_vm *vm, struct ena_map *map) {
     mark_object((struct ena_object *) map);
-    mark_hash_with_value_values(&map->entries);
+    mark_hash_with_value_values(vm, &map->entries);
 }
 
-static inline void mark_scope(struct ena_scope *scope) {
+static inline void mark_scope(struct ena_vm *vm, struct ena_scope *scope) {
+    mark_object((struct ena_object *) scope);
+    mark_hash_with_value_values(vm, &scope->vars);
     if (scope->parent) {
-        mark_scope(scope->parent);
+        mark_scope(vm, scope->parent);
     }
-    mark_hash_with_value_values(&scope->vars);
 }
 
-static inline void mark_instance(struct ena_instance *instance) {
+static inline void mark_instance(struct ena_vm *vm, struct ena_instance *instance) {
     mark_object((struct ena_object *) instance);
-    mark_class(instance->cls);
-    mark_scope(instance->props);
+    mark_class(vm, instance->cls);
+    mark_scope(vm, instance->props);
 }
 
-static inline void mark_module(struct ena_module *module) {
+static inline void mark_module(struct ena_vm *vm, struct ena_module *module) {
     mark_object((struct ena_object *) module);
-    mark_scope(module->scope);
+    mark_scope(vm, module->scope);
 }
 
-static inline void mark_modules(struct ena_vm *vm) {
-    for (struct ena_module *module = vm->modules; module != NULL; module = module->next) {
-        mark_module(module);
-    }
-}
-
-static inline void try_mark(struct ena_vm *vm, void *ptr) {
+static inline void try_mark(struct ena_vm *vm, ena_value_t ptr) {
     bool aligned = ((uintptr_t) ptr - (uintptr_t) vm->value_pool) % sizeof(struct ena_object) == 0;
-    if (ENA_IS_IN_HEAP(ptr) && aligned) {
-        mark((ena_value_t) ptr);
+    if (ena_is_in_heap(vm, ptr) && aligned) {
+        mark(vm, ptr);
     }
 }
-
 
 static void mark_regs(struct ena_vm *vm) {
     uintptr_t regs[ARCH_NUM_REGS];
     arch_load_regs((uintptr_t *) &regs);
     for (int i = 0; i < ARCH_NUM_REGS; i++) {
-        try_mark(vm, (void *) regs[i]);
+        try_mark(vm, regs[i]);
     }
 }
 
@@ -173,8 +120,35 @@ static void mark_stack(struct ena_vm *vm) {
 
     // Assumes that stack grows downward.
     while ((uintptr_t) ptr < vm->stack_end) {
-        try_mark(vm, ptr);
+        try_mark(vm, (ena_value_t) *ptr);
         ptr++;
+    }
+}
+
+static inline void destroy_scope(struct ena_vm *vm, struct ena_scope *scope) {
+    ena_hash_free_table(vm, &scope->vars, NULL);
+}
+
+static inline void destroy_class(struct ena_vm *vm, struct ena_class *cls) {
+    ena_hash_free_table(vm, &cls->methods, NULL);
+}
+
+static inline void destroy_map(struct ena_vm *vm, struct ena_map *map) {
+    ena_hash_free_table(vm, &map->entries, NULL);
+}
+
+static void destroy(struct ena_vm *vm, ena_value_t value) {
+    switch (ena_get_type(vm, value)) {
+        case ENA_T_SCOPE:
+            destroy_scope(vm, (struct ena_scope *) value);
+            break;
+        case ENA_T_CLASS:
+            destroy_class(vm, (struct ena_class *) value);
+            break;
+        case ENA_T_MAP:
+            destroy_map(vm, (struct ena_map *) value);
+            break;
+        default:;
     }
 }
 
@@ -188,6 +162,7 @@ static void sweep(struct ena_vm *vm) {
                 obj->header.flags &= ~OBJECT_FLAG_MARKED;
             } else {
                 // The object is no longer referenced. Mark it as unused.
+                destroy(vm, ENA_OBJ2VALUE(obj));
                 obj->header.flags = 0;
                 vm->num_free++;
             }
@@ -196,9 +171,31 @@ static void sweep(struct ena_vm *vm) {
 }
 
 void ena_gc(struct ena_vm *vm) {
-    mark_modules(vm);
+#ifdef __EMSCRIPTEN__
+    // TODO: We can't implement mark_regs and mark_stack properly I think.
+    return;
+#endif
+
     mark_regs(vm);
     mark_stack(vm);
+
+    for (struct ena_module *module = vm->modules; module != NULL; module = module->next) {
+        mark_module(vm, module);
+    }
+
+    if (vm->current_scope) {
+        mark_scope(vm, vm->current_scope);
+    }
+
+    if (vm->current_class) {
+        mark_class(vm, vm->current_class);
+    }
+
+    mark_class(vm, vm->int_class);
+    mark_class(vm, vm->string_class);
+    mark_class(vm, vm->list_class);
+    mark_class(vm, vm->map_class);
+
     sweep(vm);
 }
 

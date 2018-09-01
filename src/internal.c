@@ -3,9 +3,9 @@
 #include "gc.h"
 #include "internal.h"
 
-static ena_value_t *lookup_var(struct ena_scope *scope, ena_ident_t name) {
+static ena_value_t *lookup_var(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name) {
     while (scope) {
-        struct ena_hash_entry *e = ena_hash_search(&scope->vars, (void *) name);
+        struct ena_hash_entry *e = ena_hash_search(vm, &scope->vars, (void *) name);
         if (e) {
             return (ena_value_t *) &e->value;
         }
@@ -20,7 +20,7 @@ struct ena_scope *ena_create_scope(struct ena_vm *vm, struct ena_scope *parent) 
     // TODO: Allocate a scope by alloca().
     struct ena_scope *scope = (struct ena_scope *) ena_alloc_object(vm, ENA_T_SCOPE);
     scope->parent = parent;
-    ena_hash_init_ident_table(&scope->vars);
+    ena_hash_init_ident_table(vm, &scope->vars);
     return scope;
 }
 
@@ -30,7 +30,7 @@ struct ena_scope *ena_create_scope(struct ena_vm *vm, struct ena_scope *parent) 
 /// @retruns The ident associated with the `str`.
 ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str) {
     struct ena_hash_entry *e;
-    e = ena_hash_search(&vm->cstr2ident, (void *) str);
+    e = ena_hash_search(vm, &vm->cstr2ident, (void *) str);
 
     ena_hash_digest_t ident;
     if (e) {
@@ -42,8 +42,8 @@ ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str) {
         // The `str` is no longer available after returing from this
         // function. Copy it to store in the `ident2cstr` table.
         char *new_str = ena_strdup(str);
-        ena_hash_insert(&vm->cstr2ident, (void *) new_str, (void *) ident);
-        ena_hash_insert(&vm->ident2cstr, (void *) ident, (void *) new_str);
+        ena_hash_insert(vm, &vm->cstr2ident, (void *) new_str, (void *) ident);
+        ena_hash_insert(vm, &vm->ident2cstr, (void *) ident, (void *) new_str);
         vm->next_ident++;
     }
 
@@ -59,22 +59,22 @@ const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident) {
         return "(anonymous)";
     }
 
-    return (const char *) ena_hash_search(&vm->ident2cstr, (void *) ident)->value;
+    return (const char *) ena_hash_search(vm,&vm->ident2cstr, (void *) ident)->value;
 }
 
 void ena_define_var(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t value) {
-    if (ena_hash_search_or_insert(&scope->vars, (void *) name, (void *) value)) {
+    if (ena_hash_search_or_insert(vm, &scope->vars, (void *) name, (void *) value)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
     }
 }
 
-ena_value_t ena_get_var_value (struct ena_scope *scope, ena_ident_t name) {
-    ena_value_t *value = lookup_var(scope, name);
+ena_value_t ena_get_var_value(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name) {
+    ena_value_t *value = lookup_var(vm, scope, name);
     return value ? *value : ENA_UNDEFINED;
 }
 
-bool ena_set_var_value(struct ena_scope *scope, ena_ident_t name, ena_value_t new_value) {
-    ena_value_t *value = lookup_var(scope, name);
+bool ena_set_var_value(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t new_value) {
+    ena_value_t *value = lookup_var(vm, scope, name);
     if (!value) {
         return false;
     }
@@ -140,7 +140,7 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
             RUNTIME_ERROR("%s takes at least %d argument (%d given)", name, arg_index + expected_num, num_args);
         }
 
-        ena_value_type_t type = ena_get_type(args[arg_index]);
+        ena_value_type_t type = ena_get_type(vm, args[arg_index]);
         if (expected_type != ENA_T_ANY && type != expected_type) {
             RUNTIME_ERROR("%s %d%s argument must be %s (%s given)",
                 name,

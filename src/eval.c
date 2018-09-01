@@ -26,9 +26,9 @@ static inline struct ena_class *get_builtin_class_by_type(struct ena_vm *vm, ena
 }
 
 static ena_value_t copy_if_immutable(struct ena_vm *vm, ena_value_t value) {
-    switch (ena_get_type(value)) {
+    switch (ena_get_type(vm, value)) {
         case ENA_T_INT:
-            return ena_create_int(vm, ena_to_int_object(value)->value);
+            return ena_create_int(vm, ena_to_int_object(vm, value)->value);
         default:
             return value;
     }
@@ -83,18 +83,19 @@ static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_ar
 
 static ena_value_t call_func(struct ena_vm *vm, struct ena_node *expr_list, ena_value_t self, struct ena_func *func) {
     int num_args = expr_list->num_childs;
-    ena_value_t *args = ena_malloc(sizeof(ena_value_t) * num_args);
+
+    // Use ena_alloca() instead of ena_malloc() or GC would destroys args.
+    ena_value_t *args = ena_alloca(sizeof(ena_value_t) * num_args);
     for (int i = 0; i < num_args; i++) {
         args[i] = eval_node(vm, &expr_list->child[i]);
     }
 
     ena_value_t ret_value = do_call_func(vm, args, num_args, self, func);
-    ena_free(args);
     return ret_value;
 }
 
-static struct ena_func *lookup_method(struct ena_class *cls, ena_ident_t name) {
-    struct ena_hash_entry *e = ena_hash_search(&cls->methods, (void *) name);
+static struct ena_func *lookup_method(struct ena_vm *vm, struct ena_class *cls, ena_ident_t name) {
+    struct ena_hash_entry *e = ena_hash_search(vm, &cls->methods, (void *) name);
     if (e) {
         return (struct ena_func *) e->value;
     }
@@ -108,7 +109,7 @@ static ena_value_t invoke_method(struct ena_vm *vm, struct ena_node *node) {
     ena_value_t instance = eval_node(vm, node->child[0].child);
 
     struct ena_class *cls;
-    ena_value_type_t lhs_type = ena_get_type(instance);
+    ena_value_type_t lhs_type = ena_get_type(vm, instance);
     switch (lhs_type) {
         case ENA_T_INSTANCE:
             cls = ((struct ena_instance *) instance)->cls;
@@ -123,7 +124,7 @@ static ena_value_t invoke_method(struct ena_vm *vm, struct ena_node *node) {
     }
 
     // Invoke the method.
-    struct ena_func *method = lookup_method(cls, method_name);
+    struct ena_func *method = lookup_method(vm, cls, method_name);
     if (!method) {
         RUNTIME_ERROR("method %s is not defined", ena_ident2cstr(vm, method_name));
     }
@@ -132,12 +133,13 @@ static ena_value_t invoke_method(struct ena_vm *vm, struct ena_node *node) {
 }
 
 static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct ena_class *cls) {
+    struct ena_scope *scope = ena_create_scope(vm, NULL);
     struct ena_instance *instance = (struct ena_instance *) ena_alloc_object(vm, ENA_T_INSTANCE);
     instance->cls = cls;
-    instance->props = ena_create_scope(vm, NULL);
+    instance->props = scope;
 
     // Call the constructor if it exists.
-    struct ena_func *new_method = lookup_method(cls, ena_cstr2ident(vm, "new"));
+    struct ena_func *new_method = lookup_method(vm, cls, ena_cstr2ident(vm, "new"));
     if (new_method) {
         call_func(vm, &node->child[1], ENA_OBJ2VALUE(instance), new_method);
     }
@@ -150,13 +152,13 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
     EVAL_NODE(op_name) { \
         ena_value_t lhs = eval_node(vm, &node->child[0]); \
         ena_value_t rhs = eval_node(vm, &node->child[1]); \
-        ena_value_type_t lhs_type = ena_get_type(lhs); \
-        ena_value_type_t rhs_type = ena_get_type(rhs); \
+        ena_value_type_t lhs_type = ena_get_type(vm, lhs); \
+        ena_value_type_t rhs_type = ena_get_type(vm, rhs); \
         if (lhs_type != rhs_type) { \
-            TYPE_ERROR("type mismatch"); \
+            TYPE_ERROR("%s: type mismatch", method_name); \
         } \
         struct ena_class *cls = get_builtin_class_by_type(vm, lhs_type); \
-        struct ena_func *method = lookup_method(cls, ena_cstr2ident(vm, method_name)); \
+        struct ena_func *method = lookup_method(vm, cls, ena_cstr2ident(vm, method_name)); \
         if (!method) { \
             RUNTIME_ERROR("method `%s' is not defined", method_name); \
         } \
@@ -214,19 +216,19 @@ EVAL_NODE(OP_ASSIGN) {
                 RUNTIME_ERROR("self is not available");
             }
 
-            if (ena_get_type(vm->self) != ENA_T_INSTANCE) {
+            if (ena_get_type(vm, vm->self) != ENA_T_INSTANCE) {
                 RUNTIME_ERROR("self is not an instance");
             }
 
             struct ena_instance *self = (struct ena_instance *) vm->self;
-            if (!ena_set_var_value(self->props, name, rvalue)) {
+            if (!ena_set_var_value(vm, self->props, name, rvalue)) {
                 ena_define_var(vm, self->props, name, rvalue);
             }
         } else {
             NOT_YET_IMPLEMENTED();
         }
     } else {
-        if (!ena_set_var_value(vm->current_scope, name, rvalue)) {
+        if (!ena_set_var_value(vm, vm->current_scope, name, rvalue)) {
             RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
         }
     }
@@ -257,7 +259,7 @@ EVAL_NODE(FUNC) {
     }
 
     func->flags = type;
-    if (ena_hash_search_or_insert(table, (void *) name, (void *) func)) {
+    if (ena_hash_search_or_insert(vm, table, (void *) name, (void *) func)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, name));
     }
 
@@ -267,8 +269,8 @@ EVAL_NODE(FUNC) {
 EVAL_NODE(CALL) {
     if (node->child[0].type == ENA_NODE_ID) {
         ena_value_t func_name = ena_cstr2ident(vm, node->child[0].token->str);
-        ena_value_t func = ena_get_var_value (vm->current_scope, func_name);
-        switch (ena_get_type(func)) {
+        ena_value_t func = ena_get_var_value(vm, vm->current_scope, func_name);
+        switch (ena_get_type(vm, func)) {
             case ENA_T_FUNC:
                 return call_func(vm, &node->child[1], ENA_UNDEFINED, (struct ena_func *) func);
             case ENA_T_CLASS:
@@ -303,7 +305,7 @@ EVAL_NODE(CLASS) {
     ena_value_t cls = ena_create_class(vm);
 
     // Evaluate the content.
-    vm->current_class = ena_to_class_object(cls);
+    vm->current_class = ena_to_class_object(vm, cls);
     eval_node(vm, stmts);
     vm->current_class = NULL;
 
@@ -313,7 +315,7 @@ EVAL_NODE(CLASS) {
 
 EVAL_NODE(ID) {
     ena_value_t name = ena_cstr2ident(vm, node->token->str);
-    ena_value_t value = ena_get_var_value(vm->current_scope, name);
+    ena_value_t value = ena_get_var_value(vm, vm->current_scope, name);
 
     if (value == ENA_UNDEFINED) {
         if (name == ena_cstr2ident(vm, "self")) {
@@ -329,12 +331,12 @@ EVAL_NODE(ID) {
 EVAL_NODE(PROP) {
     ena_value_t prop_name = ena_cstr2ident(vm, node->token->str);
     ena_value_t self_value = eval_node(vm, node->child);
-    if (ena_get_type(self_value) != ENA_T_INSTANCE) {
+    if (ena_get_type(vm, self_value) != ENA_T_INSTANCE) {
         RUNTIME_ERROR("self is not instance");
     }
 
-    struct ena_instance *self = ena_to_instance_object(self_value);
-    ena_value_t value = ena_get_var_value(self->props, prop_name);
+    struct ena_instance *self = ena_to_instance_object(vm, self_value);
+    ena_value_t value = ena_get_var_value(vm, self->props, prop_name);
     if (value == ENA_UNDEFINED) {
         RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, prop_name));
     }
@@ -430,12 +432,12 @@ EVAL_NODE(LIST_LIT) {
 
 EVAL_NODE(MAP_LIT) {
     struct ena_map *map = (struct ena_map *) ena_alloc_object(vm, ENA_T_MAP);
-    ena_hash_init_value_table(&map->entries);
+    ena_hash_init_value_table(vm, &map->entries);
 
     for (int i = 0; i < node->num_childs; i++) {
         ena_value_t key = eval_node(vm, &node->child[i].child[0]);
         ena_value_t value = eval_node(vm, &node->child[i].child[1]);
-        ena_hash_insert(&map->entries, (void *) key, (void *) value);
+        ena_hash_insert(vm, &map->entries, (void *) key, (void *) value);
     }
 
     return ENA_OBJ2VALUE(map);
@@ -498,10 +500,13 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
 
 /// @returns true on success or false on panic (e.g. syntax error).
 bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char *script) {
+    vm->stack_end = arch_get_stack_bottom();
+
     struct ena_ast *ast;
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         ast = ena_parse(vm, filepath, script);
     } else {
+        vm->stack_end = 0;
         return false;
     }
 
@@ -514,11 +519,13 @@ bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char 
     *ast_entry = ast;
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
-        vm->current_scope = ena_to_module_object(module)->scope;
+        vm->current_scope = ena_to_module_object(vm, module)->scope;
         eval_node(vm, ast->tree);
     } else {
+        vm->stack_end = 0;
         return false;
     }
 
+    vm->stack_end = 0;
     return true;
 }

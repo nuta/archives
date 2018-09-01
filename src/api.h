@@ -3,8 +3,13 @@
 
 #include "utils.h"
 
-#define ENA_MAX_NUM_VALUES 1024
-#define ENA_GC_THRESHOLD   512
+#define ENA_MAX_NUM_VALUES 4096
+#ifdef ENA_DEBUG_BUILD
+// Run GC frequently to discover GC bugs.
+#   define ENA_GC_THRESHOLD   4060
+#else
+#   define ENA_GC_THRESHOLD   1024
+#endif
 
 // We use only lower 32-bit and MSB.
 typedef uintptr_t ena_value_t;
@@ -21,8 +26,8 @@ typedef enum {
     ENA_T_CLASS,
     ENA_T_INSTANCE,
     ENA_T_MODULE,
-    ENA_T_ANY, // used internally
     ENA_T_SCOPE, // used internally
+    ENA_T_ANY, // used internally
 } ena_value_type_t;
 
 #define ENA_UNDEFINED 0
@@ -51,8 +56,8 @@ void ena_gc(struct ena_vm *vm);
 ena_error_type_t ena_get_error_type(struct ena_vm *vm);
 const char *ena_get_error_cstr(struct ena_vm *vm);
 
-ena_value_type_t ena_get_type(ena_value_t value);
-void ena_stringify(char *buf, size_t buf_len, ena_value_t value);
+ena_value_type_t ena_get_type(struct ena_vm *vm, ena_value_t value);
+void ena_stringify(struct ena_vm *vm, char *buf, size_t buf_len, ena_value_t value);
 
 /// To value.
 ena_value_t ena_create_int(struct ena_vm *vm, int value);
@@ -64,6 +69,6 @@ void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena
 ena_value_t ena_create_module(struct ena_vm *vm);
 void ena_register_module(struct ena_vm *vm, const char *name, ena_value_t module);
 void ena_add_to_module(struct ena_vm *vm, ena_value_t module, const char *name, ena_value_t value);
-bool ena_is_equal(ena_value_t v1, ena_value_t v2);
+bool ena_is_equal(struct ena_vm *vm, ena_value_t v1, ena_value_t v2);
 
 #endif

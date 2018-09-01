@@ -107,8 +107,8 @@ struct ena_module {
 };
 
 struct ena_object {
-    struct ena_object_header header;
     union {
+        struct ena_object_header header;
         struct ena_int i;
         struct ena_string string;
         struct ena_func func;

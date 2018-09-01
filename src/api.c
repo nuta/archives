@@ -12,13 +12,13 @@
 #include "map.h"
 #include "gc.h"
 
-void ena_stringify(char *buf, size_t buf_len, ena_value_t value) {
-    switch (ena_get_type(value)) {
+void ena_stringify(UNUSED struct ena_vm *vm, char *buf, size_t buf_len, ena_value_t value) {
+    switch (ena_get_type(vm, value)) {
         case ENA_T_INT:
-            ena_snprintf(buf, buf_len, "int(%d)", ena_to_int_object(value)->value);
+            ena_snprintf(buf, buf_len, "int(%d)", ena_to_int_object(vm, value)->value);
             break;
         case ENA_T_STRING:
-            ena_snprintf(buf, buf_len, "string(%s)", ena_to_string_object(value)->str);
+            ena_snprintf(buf, buf_len, "string(%s)", ena_to_string_object(vm, value)->str);
             break;
         case ENA_T_BOOL:
             ena_snprintf(buf, buf_len, "bool(%s)", value == ENA_TRUE ? "true" : "false");
@@ -53,7 +53,7 @@ void ena_stringify(char *buf, size_t buf_len, ena_value_t value) {
     }
 }
 
-ena_value_type_t ena_get_type(ena_value_t v) {
+ena_value_type_t ena_get_type(struct ena_vm *vm, ena_value_t v) {
     if (v == ENA_NULL) {
         return ENA_T_NULL;
     }
@@ -61,7 +61,7 @@ ena_value_type_t ena_get_type(ena_value_t v) {
         return ENA_T_BOOL;
     }
 
-    if (ENA_IS_IN_HEAP(v)) {
+    if (ena_is_in_heap(vm, v)) {
         return ((struct ena_object *) v)->header.flags & OBJECT_FLAG_TYPE_MASK;
     }
 
@@ -80,19 +80,19 @@ ena_value_t ena_create_int(struct ena_vm *vm, int value) {
 
 ena_value_t ena_create_class(struct ena_vm *vm) {
     struct ena_class *cls = (struct ena_class *) ena_alloc_object(vm, ENA_T_CLASS);
-    ena_hash_init_ident_table(&cls->methods);
+    ena_hash_init_ident_table(vm, &cls->methods);
     return ENA_OBJ2VALUE(cls);
 }
 
 static ena_value_t print_func_handler(UNUSED struct ena_vm *vm, ena_value_t *args, int num_args) {
     for (int i = 0; i < num_args; i++) {
         ena_value_t value = args[i];
-        switch (ena_get_type(value)) {
+        switch (ena_get_type(vm, value)) {
             case ENA_T_INT:
-                printf("%d ", ena_to_int_object(value)->value);
+                printf("%d ", ena_to_int_object(vm, value)->value);
                 break;
             case ENA_T_STRING:
-                printf("%s ", ena_to_string_object(value)->str);
+                printf("%s ", ena_to_string_object(vm, value)->str);
                 break;
             case ENA_T_BOOL:
                 printf("%s ", value == ENA_TRUE ? "true" : "false");
@@ -110,8 +110,9 @@ static ena_value_t print_func_handler(UNUSED struct ena_vm *vm, ena_value_t *arg
 }
 
 ena_value_t ena_create_module(struct ena_vm *vm) {
+    struct ena_scope *scope = ena_create_scope(vm, NULL);
     struct ena_module *module = (struct ena_module *) ena_alloc_object(vm, ENA_T_MODULE);
-    module->scope = ena_create_scope(vm, NULL);
+    module->scope = scope;
     module->next = NULL;
 
 #ifndef ENA_NO_PRINT
@@ -135,6 +136,7 @@ struct ena_vm *ena_create_vm() {
     vm->next_ident = IDENT_START;
     vm->ast_list = NULL;
     vm->self = ENA_UNDEFINED;
+    vm->current_scope = NULL;
     vm->current_class = NULL;
     vm->current_savepoint = NULL;
     vm->modules = NULL;
@@ -143,8 +145,8 @@ struct ena_vm *ena_create_vm() {
     vm->value_pool = ena_malloc(sizeof(struct ena_object) * ENA_MAX_NUM_VALUES);
     ena_memset(vm->value_pool, 0, sizeof(struct ena_object) * ENA_MAX_NUM_VALUES);
     vm->num_free = ENA_MAX_NUM_VALUES;
-    ena_hash_init_ident_table(&vm->ident2cstr);
-    ena_hash_init_cstr_table(&vm->cstr2ident);
+    ena_hash_init_ident_table(vm, &vm->ident2cstr);
+    ena_hash_init_cstr_table(vm, &vm->cstr2ident);
     vm->int_class = ena_create_int_class(vm);
     vm->string_class = ena_create_string_class(vm);
     vm->list_class = ena_create_list_class(vm);
@@ -162,8 +164,8 @@ void ena_destroy_vm(struct ena_vm *vm) {
 
     // Key strings of `vm->cstr2ident` are freed by freeing
     // ident2cstr values; they are identical pointers.
-    ena_hash_free_table(&vm->ident2cstr, ena_free);
-    ena_hash_free_table(&vm->cstr2ident, NULL);
+    ena_hash_free_table(vm, &vm->ident2cstr, ena_free);
+    ena_hash_free_table(vm, &vm->cstr2ident, NULL);
     ena_free(vm->value_pool);
     ena_free(vm);
 }
@@ -176,7 +178,7 @@ void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena
     func->native_method = native_method;
     func->scope = vm->current_scope;
     func->flags = FUNC_FLAGS_NATIVE | FUNC_FLAGS_METHOD;
-    if (ena_hash_search_or_insert(&ena_to_class_object(cls)->methods, (void *) ident, (void *) func)) {
+    if (ena_hash_search_or_insert(vm, &ena_to_class_object(vm, cls)->methods, (void *) ident, (void *) func)) {
         RUNTIME_ERROR("%s is already defined", ena_ident2cstr(vm, ident));
     }
 }
@@ -195,7 +197,7 @@ void ena_register_module(struct ena_vm *vm, UNUSED const char *name, ena_value_t
     struct ena_module **entry = &vm->modules;
     for (;;) {
         if (*entry == NULL) {
-            *entry = ena_to_module_object(module);
+            *entry = ena_to_module_object(vm, module);
             return;
         }
 
@@ -204,23 +206,23 @@ void ena_register_module(struct ena_vm *vm, UNUSED const char *name, ena_value_t
 }
 
 void ena_add_to_module(struct ena_vm *vm, ena_value_t module, const char *name, ena_value_t value) {
-    struct ena_module *m = ena_to_module_object(module);
+    struct ena_module *m = ena_to_module_object(vm, module);
     ena_define_var(vm, m->scope, ena_cstr2ident(vm, name), value);
 }
 
-bool ena_is_equal(ena_value_t v1, ena_value_t v2) {
-    if (ena_get_type(v1) != ena_get_type(v2)) {
+bool ena_is_equal(struct ena_vm *vm, ena_value_t v1, ena_value_t v2) {
+    if (ena_get_type(vm, v1) != ena_get_type(vm, v2)) {
         return false;
     }
 
-    switch (ena_get_type(v1)) {
+    switch (ena_get_type(vm, v1)) {
         case ENA_T_BOOL:
         case ENA_T_NULL:
             return v1 == v2;
         case ENA_T_INT:
-            return ena_to_int_object(v1)->value == ena_to_int_object(v2)->value;
+            return ena_to_int_object(vm, v1)->value == ena_to_int_object(vm, v2)->value;
         case ENA_T_STRING:
-            return ena_to_string_object(v1)->ident == ena_to_string_object(v2)->ident;
+            return ena_to_string_object(vm, v1)->ident == ena_to_string_object(vm, v2)->ident;
         default:;
             /* TODO: BUG() */
     }
