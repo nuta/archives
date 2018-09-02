@@ -42,6 +42,18 @@
             "MIMode": "lldb"
         },
         {
+            "name": "assignment_ops",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ena",
+            "args": ["test/assignment_ops.ena"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
+        {
             "name": "if",
             "type": "cppdbg",
             "request": "launch",

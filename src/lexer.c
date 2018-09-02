@@ -35,6 +35,11 @@ const char *ena_get_token_name(ena_token_type_t type) {
         DEFINE_TOKEN_NAME(DOT),
         DEFINE_TOKEN_NAME(COMMA),
         DEFINE_TOKEN_NAME(EQ),
+        DEFINE_TOKEN_NAME(ADD_ASSIGN),
+        DEFINE_TOKEN_NAME(SUB_ASSIGN),
+        DEFINE_TOKEN_NAME(MUL_ASSIGN),
+        DEFINE_TOKEN_NAME(DIV_ASSIGN),
+        DEFINE_TOKEN_NAME(MOD_ASSIGN),
         DEFINE_TOKEN_NAME(DOUBLE_EQ),
         DEFINE_TOKEN_NAME(NEQ),
         DEFINE_TOKEN_NAME(LT),
@@ -275,10 +280,6 @@ retry:;
     switch (nextc) {
         NEXTC_CASE(';', SEMICOLON)
         NEXTC_CASE(':', DOUBLECOLON)
-        NEXTC_CASE('+', PLUS)
-        NEXTC_CASE('-', MINUS)
-        NEXTC_CASE('*', ASTERISK)
-        NEXTC_CASE('%', PERCENT)
         NEXTC_CASE('(', LPAREN)
         NEXTC_CASE(')', RPAREN)
         NEXTC_CASE('[', LBRACKET)
@@ -292,6 +293,42 @@ retry:;
                 type = ENA_TOKEN_NEQ;
                 str_len = 2;
                 SKIP_CHARS(1);
+            }
+            break;
+        case '+':
+            if (NEXT_CHAR() == '=') {
+                type = ENA_TOKEN_ADD_ASSIGN;
+                str_len = 2;
+                SKIP_CHARS(1);
+            } else {
+                type = ENA_TOKEN_PLUS;
+            }
+            break;
+        case '-':
+            if (NEXT_CHAR() == '=') {
+                type = ENA_TOKEN_SUB_ASSIGN;
+                str_len = 2;
+                SKIP_CHARS(1);
+            } else {
+                type = ENA_TOKEN_MINUS;
+            }
+            break;
+        case '*':
+            if (NEXT_CHAR() == '=') {
+                type = ENA_TOKEN_MUL_ASSIGN;
+                str_len = 2;
+                SKIP_CHARS(1);
+            } else {
+                type = ENA_TOKEN_ASTERISK;
+            }
+            break;
+        case '%':
+            if (NEXT_CHAR() == '=') {
+                type = ENA_TOKEN_MOD_ASSIGN;
+                str_len = 2;
+                SKIP_CHARS(1);
+            } else {
+                type = ENA_TOKEN_PERCENT;
             }
             break;
         case '<':
@@ -363,6 +400,11 @@ retry:;
                         }
                     } while (nextc != '\n');
                     goto retry;
+                case '=':
+                    type = ENA_TOKEN_DIV_ASSIGN;
+                    str_len = 2;
+                    SKIP_CHARS(1);
+                    break;
                 default:
                     type = ENA_TOKEN_SLASH;
             }
@@ -391,6 +433,15 @@ return_token:;
     token->column = vm->lexer.current_column;
     vm->lexer.current_token = token;
     return token;
+}
+
+struct ena_token *ena_copy_token(struct ena_token *token) {
+    struct ena_token *new_token = ena_malloc(sizeof(*new_token));
+    new_token->type = token->type;
+    new_token->str = (char *) ena_strdup(token->str);
+    new_token->line = token->line;
+    new_token->column = token->column;
+    return new_token;
 }
 
 void ena_destroy_token(struct ena_token *token) {

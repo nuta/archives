@@ -106,6 +106,23 @@ static struct ena_node *create_node_with_token(ena_node_type_t type, struct ena_
     return node;
 }
 
+static struct ena_node *create_int_literal_node(ena_node_type_t type, int value) {
+    struct ena_node *node = ena_malloc(sizeof(*node));
+    node->type = type;
+    node->token = NULL;
+    node->child = NULL;
+    node->num_childs = 0;
+    node->literal = value;
+    return node;
+}
+
+static inline void copy_nth_child(struct ena_node *array, int nth, struct ena_node *child) {
+    ena_memcpy(&array[nth], child, sizeof(*child));
+    if (child->token) {
+        child->token = ena_copy_token(child->token);
+    }
+}
+
 /// @warning `child` will be freed.
 static inline void set_nth_child(struct ena_node *array, int nth, struct ena_node *child) {
     ena_memcpy(&array[nth], child, sizeof(*child));
@@ -318,11 +335,36 @@ PARSE_RULE(equality) {
     }
 }
 
+// Expands to lhs = lhs + rhs.
+#define ASSIGN_OP(token_type, op_type) \
+    case ENA_TOKEN_##token_type: { \
+        SKIP(1); \
+        struct ena_node *lhs = expr; \
+        struct ena_node *rhs = PARSE(expr); \
+        struct ena_node *rvalue = NULL; \
+        struct ena_node *childs = NULL; \
+        struct ena_node *rvalue_childs = NULL; \
+        REALLOC_NODE_ARRAY(rvalue_childs, 2); \
+        copy_nth_child(rvalue_childs, 0, lhs); \
+        set_nth_child(rvalue_childs, 1, rhs); \
+        rvalue = create_node(ENA_NODE_##op_type, rvalue_childs, 2); \
+        REALLOC_NODE_ARRAY(childs, 2); \
+        set_nth_child(childs, 0, lhs); \
+        set_nth_child(childs, 1, rvalue); \
+        expr = create_node(ENA_NODE_OP_ASSIGN, childs, 2); \
+        break; \
+    }
+
 PARSE_RULE(expr) {
     struct ena_node *expr = PARSE(equality);
     for (;;) {
         switch (NEXT_TYPE()) {
             BIN_OP_RIGHT_ASSOC(EQ, OP_ASSIGN)
+            ASSIGN_OP(ADD_ASSIGN, OP_ADD)
+            ASSIGN_OP(SUB_ASSIGN, OP_SUB)
+            ASSIGN_OP(MUL_ASSIGN, OP_MUL)
+            ASSIGN_OP(DIV_ASSIGN, OP_DIV)
+            ASSIGN_OP(MOD_ASSIGN, OP_MOD)
             default:
                 return expr;
         }

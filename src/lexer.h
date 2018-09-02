@@ -23,6 +23,11 @@ typedef enum {
     ENA_TOKEN_DOT,             // .
     ENA_TOKEN_COMMA,           // ,
     ENA_TOKEN_EQ,              // =
+    ENA_TOKEN_ADD_ASSIGN,      // +=
+    ENA_TOKEN_SUB_ASSIGN,      // -=
+    ENA_TOKEN_MUL_ASSIGN,      // /=
+    ENA_TOKEN_DIV_ASSIGN,      // *=
+    ENA_TOKEN_MOD_ASSIGN,      // %=
     ENA_TOKEN_DOUBLE_EQ,       // ==
     ENA_TOKEN_NEQ,             // !=
     ENA_TOKEN_LT,              // <
@@ -72,5 +77,6 @@ ena_token_type_t ena_fetch_next_token_type(struct ena_vm *vm);
 struct ena_token *ena_fetch_next_token(struct ena_vm *vm);
 struct ena_token *ena_expect_token(struct ena_vm *vm, ena_token_type_t expected_type);
 void ena_destroy_token(struct ena_token *token);
+struct ena_token *ena_copy_token(struct ena_token *token);
 
 #endif
