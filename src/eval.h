@@ -49,7 +49,6 @@ struct ena_string {
 #define FUNC_FLAGS_METHOD  (1 << 0)
 #define FUNC_FLAGS_FUNC    (0 << 0)
 #define FUNC_FLAGS_NATIVE  (1 << 1)
-#define FUNC_FLAGS_ENA     (0 << 1)
 struct ena_func {
     struct ena_object_header header;
     uint32_t flags;

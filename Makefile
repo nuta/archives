@@ -1,7 +1,13 @@
-V =        # Set 1 to verbose output.
-COVERAGE = # Set 1 to build with coverage collector.
-RELEASE =  # Set 1 for release build.
-TESTS =    # Test files.
+# Set 1 to verbose output.
+V =
+# Set 1 to build with coverage collector.
+COVERAGE =
+# Set 1 for release build.
+RELEASE =
+# Test files.
+TESTS =
+# avaiable ports: x64
+PORT = x64
 BENCHMARKS ?= fib startup-time
 
 VERSION = $(shell git rev-parse HEAD)
@@ -17,7 +23,7 @@ override LDFLAGS =
 override CFLAGS += \
 	-g3 -Isrc/include -DENA_VERSION='"$(VERSION)"' \
 	-std=c11 -Wall -Wextra \
-	-D_XOPEN_SOURCE=700 \
+	-DENA_PORT_$(PORT) \
 	-Werror=implicit-function-declaration \
 	-Werror=int-conversion \
 	-Werror=incompatible-pointer-types \
@@ -30,9 +36,13 @@ override CFLAGS += -fprofile-instr-generate -fcoverage-mapping
 override LDFLAGS += -fprofile-instr-generate -fcoverage-mapping
 endif
 
-SOURCES := src/api.c src/lexer.c src/parser.c src/eval.c src/gc.c \
+COMMON_SOURCES := src/api.c src/lexer.c src/parser.c src/eval.c src/gc.c \
 	src/builtins.c src/string.c src/list.c src/map.c \
 	src/hash.c src/internal.c src/malloc.c src/utils.c
+
+SOURCES := $(COMMON_SOURCES) src/port/$(PORT).c
+WASM_SOURCES := $(COMMON_SOURCES) src/port/emscripten.c
+
 ifeq ($(RELEASE),)
 override CFLAGS += -DENA_DEBUG_BUILD -DENA_WITH_TEST
 SOURCES += src/test.c
@@ -106,7 +116,7 @@ valgrind:
 	make clean
 
 wasm:
-	 emcc -g4 $(SOURCES) -o docs/ena.js --source-map-base http://localhost:8000/ -s "SINGLE_FILE=1" -s "EXPORTED_FUNCTIONS=['_ena_create_vm', '_ena_create_module', '_ena_register_module', '_ena_eval', '_ena_get_error_cstr']" -s SAFE_HEAP=1 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']"
+	 emcc -DENA_PORT_emscripten -g4 $(WASM_SOURCES) -o docs/ena.js -s "SINGLE_FILE=1" -s "EXPORTED_FUNCTIONS=['_ena_create_vm', '_ena_create_module', '_ena_register_module', '_ena_eval', '_ena_get_error_cstr']" -s SAFE_HEAP=1 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']"
 
 ena: libena.a src/main.o Makefile
 	$(PROGRESS) LD $@

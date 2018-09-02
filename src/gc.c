@@ -2,6 +2,7 @@
 #include "eval.h"
 #include "malloc.h"
 #include "utils.h"
+#include "port.h"
 
 static inline void mark_func(struct ena_vm *vm, struct ena_func *func);
 static inline void mark_class(struct ena_vm *vm, struct ena_class *cls);

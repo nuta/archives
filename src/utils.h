@@ -13,6 +13,7 @@
 #else
 #define UNUSED __attribute__((unused))
 #define UNREACHABLE  __builtin_unreachable()
+#define ena_alloca __builtin_alloca
 #endif
 
 /// TODO: implement by ourselves
@@ -23,18 +24,12 @@
 #include <string.h>
 #define ena_memchr memchr
 #define ena_memset memset
-#define ena_snprintf snprintf
 #define ENA_ASSERT assert
+#define ena_snprintf snprintf
+
 #define ena_setjmp setjmp
 #define ena_longjmp longjmp
 #define ena_jmpbuf jmp_buf
-#define ena_alloca alloca
-
-#ifdef __x86_64__
-#   define ARCH_NUM_REGS 14
-#elif __EMSCRIPTEN__
-#   define ARCH_NUM_REGS 0
-#endif
 
 uintptr_t arch_get_stack_bottom(void);
 void arch_load_regs(uintptr_t *regs);
