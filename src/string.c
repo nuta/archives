@@ -240,7 +240,7 @@ static ena_value_t string_find(struct ena_vm *vm, ena_value_t self, ena_value_t 
     struct ena_string *needle = (struct ena_string *) args[0];
 
     char *pos = search(self_str->str, 0, self_str->size_in_bytes, needle->str, needle->size_in_bytes);
-    return (pos == NULL) ? -1 : ((uintptr_t) pos - (uintptr_t) self_str->str);
+    return ena_create_int(vm, (pos == NULL) ? -1 : (int) ((uintptr_t) pos - (uintptr_t) self_str->str));
 }
 
 static ena_value_t string_replace(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
