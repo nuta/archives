@@ -404,8 +404,7 @@ EVAL_NODE(NULL) {
 }
 
 EVAL_NODE(INT_LIT) {
-    int value = ena_str2int(node->token->str);
-    return ena_create_int(vm, value);
+    return ena_create_int(vm, node->literal);
 }
 
 EVAL_NODE(STRING_LIT) {

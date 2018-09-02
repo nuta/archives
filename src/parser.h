@@ -60,6 +60,7 @@ struct ena_node {
     struct ena_token *token;
     struct ena_node *child;
     int num_childs;
+    int literal;
 };
 
 struct ena_ast {

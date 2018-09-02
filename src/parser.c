@@ -92,6 +92,7 @@ static struct ena_node *create_node(ena_node_type_t type, struct ena_node *child
     node->token = NULL;
     node->child = child;
     node->num_childs = num_childs;
+    node->literal = 0;
     return node;
 }
 
@@ -101,6 +102,7 @@ static struct ena_node *create_node_with_token(ena_node_type_t type, struct ena_
     node->token = token;
     node->child = child;
     node->num_childs = num_childs;
+    node->literal = 0;
     return node;
 }
 
@@ -196,8 +198,14 @@ PARSE_RULE(primary) {
         case ENA_TOKEN_FALSE:
             ena_destroy_token(token);
             return create_node(ENA_NODE_FALSE, NULL, 0);
+        case ENA_TOKEN_MINUS:
+            token = GET_NEXT();
+            return create_int_literal_node(ENA_NODE_INT_LIT, -ena_str2int(token->str));
+        case ENA_TOKEN_PLUS:
+            token = GET_NEXT();
+            return create_int_literal_node(ENA_NODE_INT_LIT, ena_str2int(token->str));
         case ENA_TOKEN_INT_LIT:
-            return create_node_with_token(ENA_NODE_INT_LIT, token, NULL, 0);
+            return create_int_literal_node(ENA_NODE_INT_LIT, ena_str2int(token->str));
         case ENA_TOKEN_STRING_LIT:
             return create_node_with_token(ENA_NODE_STRING_LIT, token, NULL, 0);
         case ENA_TOKEN_LBRACKET:
