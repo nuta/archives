@@ -1,0 +1,12 @@
+var x = 1;
+var y = 2;
+var z = x = y = 3;
+assert_eq(x, 3);
+assert_eq(y, 3);
+assert_eq(z, 3);
+
+z = x = 4;
+assert_eq(x, 4);
+assert_eq(y, 3);
+assert_eq(z, 4);
+

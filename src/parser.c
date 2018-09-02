@@ -110,19 +110,6 @@ static inline void set_nth_child(struct ena_node *array, int nth, struct ena_nod
     ena_free(child);
 }
 
-
-#define BIN_OP(token_type, node_type) \
-    case ENA_TOKEN_##token_type: { \
-        SKIP(1); \
-        struct ena_node *rhs = PARSE(expr); \
-        struct ena_node *childs = NULL; \
-        REALLOC_NODE_ARRAY(childs, 2); \
-        set_nth_child(childs, 0, lhs); \
-        set_nth_child(childs, 1, rhs); \
-        lhs = create_node(ENA_NODE_##node_type, childs, 2); \
-        break; \
-    }
-
 // Forward declarations.
 PARSE_RULE(expr);
 PARSE_RULE(expr_list);
@@ -230,7 +217,7 @@ PARSE_RULE(primary) {
 }
 
 PARSE_RULE(unary) {
-    struct ena_node *lhs = PARSE(primary);
+    struct ena_node *expr = PARSE(primary);
     for (;;) {
         switch (NEXT_TYPE()) {
             case ENA_TOKEN_LPAREN: {
@@ -240,82 +227,96 @@ PARSE_RULE(unary) {
                 CONSUME(RPAREN);
                 struct ena_node *childs = NULL;
                 REALLOC_NODE_ARRAY(childs, 2);
-                set_nth_child(childs, 0, lhs);
+                set_nth_child(childs, 0, expr);
                 set_nth_child(childs, 1, exprs);
-                lhs = create_node(ENA_NODE_CALL, childs, 2);
+                expr = create_node(ENA_NODE_CALL, childs, 2);
                 break;
             }
             case ENA_TOKEN_DOT: {
                 SKIP(1);
                 struct ena_token *prop = EXPECT(ID);
-                lhs = create_node_with_token(ENA_NODE_PROP, prop, lhs, 1);
+                expr = create_node_with_token(ENA_NODE_PROP, prop, expr, 1);
                 break;
             }
             default:;
-                return lhs;
+                return expr;
         }
     }
 }
 
+#define BIN_OP_LEFT_ASSOC(token_type, node_type, lhs_node) \
+    case ENA_TOKEN_##token_type: { \
+        SKIP(1); \
+        struct ena_node *rhs = PARSE(lhs_node); \
+        struct ena_node *childs = NULL; \
+        REALLOC_NODE_ARRAY(childs, 2); \
+        set_nth_child(childs, 0, expr); \
+        set_nth_child(childs, 1, rhs); \
+        expr = create_node(ENA_NODE_##node_type, childs, 2); \
+        break; \
+    }
+
+#define BIN_OP_RIGHT_ASSOC(token_type, node_type) \
+    BIN_OP_LEFT_ASSOC(token_type, node_type, expr)
 
 PARSE_RULE(multiplication) {
-    struct ena_node *lhs = PARSE(unary);
+    struct ena_node *expr = PARSE(unary);
     for (;;) {
         switch (NEXT_TYPE()) {
-            BIN_OP(ASTERISK, OP_MUL)
-            BIN_OP(SLASH, OP_DIV)
-            BIN_OP(PERCENT, OP_MOD)
-            default:;
-                return lhs;
+            BIN_OP_LEFT_ASSOC(ASTERISK, OP_MUL, unary)
+            BIN_OP_LEFT_ASSOC(SLASH, OP_DIV, unary)
+            BIN_OP_LEFT_ASSOC(PERCENT, OP_MOD, unary)
+            default:
+                return expr;
         }
     }
 }
 
 PARSE_RULE(addition) {
-    struct ena_node *lhs = PARSE(multiplication);
+    struct ena_node *expr = PARSE(multiplication);
     for (;;) {
         switch (NEXT_TYPE()) {
-            BIN_OP(PLUS, OP_ADD)
-            BIN_OP(MINUS, OP_SUB)
+            BIN_OP_LEFT_ASSOC(PLUS, OP_ADD, multiplication)
+            BIN_OP_LEFT_ASSOC(MINUS, OP_SUB, multiplication)
             default:
-                return lhs;
+                return expr;
         }
     }
 }
 
 PARSE_RULE(comparison) {
-    struct ena_node *lhs = PARSE(addition);
+    struct ena_node *expr = PARSE(addition);
     for (;;) {
         switch (NEXT_TYPE()) {
-            BIN_OP(LT, OP_LT)
-            BIN_OP(LTE, OP_LTE)
-            BIN_OP(GT, OP_GT)
-            BIN_OP(GTE, OP_GTE)
-            default:;
-                return lhs;
+            BIN_OP_LEFT_ASSOC(LT, OP_LT, addition)
+            BIN_OP_LEFT_ASSOC(LTE, OP_LTE, addition)
+            BIN_OP_LEFT_ASSOC(GT, OP_GT, addition)
+            BIN_OP_LEFT_ASSOC(GTE, OP_GTE, addition)
+            default:
+                return expr;
         }
     }
 }
 
 PARSE_RULE(equality) {
-    struct ena_node *lhs = PARSE(comparison);
+    struct ena_node *expr = PARSE(comparison);
     for (;;) {
         switch (NEXT_TYPE()) {
-            BIN_OP(DOUBLE_EQ, OP_EQ)
-            BIN_OP(NEQ, OP_NEQ)
-            default:;
-                return lhs;
+            BIN_OP_LEFT_ASSOC(DOUBLE_EQ, OP_EQ, comparison)
+            BIN_OP_LEFT_ASSOC(NEQ, OP_NEQ, comparison)
+            default:
+                return expr;
         }
     }
 }
 
 PARSE_RULE(expr) {
-    struct ena_node *lhs = PARSE(equality);
+    struct ena_node *expr = PARSE(equality);
     for (;;) {
         switch (NEXT_TYPE()) {
-            BIN_OP(EQ, OP_ASSIGN)
-            default:;
-                return lhs;
+            BIN_OP_RIGHT_ASSOC(EQ, OP_ASSIGN)
+            default:
+                return expr;
         }
     }
 }
