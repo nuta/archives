@@ -501,10 +501,17 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
 /// @returns true on success or false on panic (e.g. syntax error).
 bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char *script) {
     vm->stack_end = arch_get_stack_bottom();
+    vm->error.type = ENA_ERROR_NONE;
 
     struct ena_ast *ast;
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         ast = ena_parse(vm, filepath, script);
+#ifdef __EMSCRIPTEN__
+        /* XXX: In emscripten longjmp() jumps into here. */
+        if (vm->error.type != ENA_ERROR_NONE) {
+            return false;
+        }
+#endif
     } else {
         vm->stack_end = 0;
         return false;
@@ -521,6 +528,12 @@ bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         vm->current_scope = ena_to_module_object(vm, module)->scope;
         eval_node(vm, ast->tree);
+#ifdef __EMSCRIPTEN__
+        /* XXX: In emscripten longjmp() jumps into here. */
+        if (vm->error.type != ENA_ERROR_NONE) {
+            return false;
+        }
+#endif
     } else {
         vm->stack_end = 0;
         return false;

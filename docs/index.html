@@ -34,28 +34,35 @@
 
         .sandbox {
             width: 100%;
-            height: 300px;
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            border: 2px solid #aeaeae;
+            border: 2px solid #bfbfbf;
         }
 
         .sandbox #script {
-            width: 75%;
-            border-right: 2px solid #aeaeae;
+            width: 100%;
+            height: 300px;
+            border-bottom: 2px solid #bfbfbf;
         }
 
-        .sandbox .rightside {
+        .sandbox .bottom {
             background: #fdfdfd;
-            width: 50%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
-        .sandbox .result-container {
+        .sandbox #result-container {
             width: 100%;
+            box-sizing: border-box;
             padding: 10px;
+            height: 100px;
+            overflow: scroll;
+        }
+
+        .sandbox #result-container.error {
+            background: #feb9b9;
         }
 
         .sandbox #result {
@@ -64,7 +71,7 @@
         }
 
         .sandbox .buttons {
-            background: #eaeaea;
+            background: #f0f0f0;
             width: 100%;
             padding: 5px 7px 5px;
             box-sizing: border-box;
@@ -107,8 +114,8 @@
         </div>
         <div class="sandbox">
                 <div id="script"></div>
-                <div class="rightside">
-                    <div class="result-container">
+                <div class="bottom">
+                    <div id="result-container">
                         <b id="progress"></b>
                         <pre id="result"></pre>
                     </div>
@@ -122,7 +129,8 @@
             <ul>
                 <li>Familiar syntax that you can learn in 3 minutes.</li>
                 <li>Dynamically-typed, class-based, and object-oriented language.</li>
-                <li>Slow yet small and portable implementation (tree-walk, mark-and-sweep/conservative GC).</li>
+                <li>Slow yet small and portable implementation.<br>
+                    (tree-walk, mark-and-sweep/conservative GC)</li>
             </ul>
         </div>
     </main>
@@ -142,19 +150,26 @@
 
         function runScript() {
             document.querySelector('#progress').innerText = "Running...";
+            document.querySelector('#result-container').classList.remove("error");
             document.querySelector('#result').innerText = "";
             const script = editor.getValue();
 
-            const mainStr = Module._malloc(5);
-            Module.writeStringToMemory("main", mainStr);
-            const scriptStr = Module._malloc(script.length + 1);
-            Module.writeStringToMemory(script, scriptStr);
+            const ena_create_vm = Module.cwrap('ena_create_vm', 'number', []);
+            const ena_create_module = Module.cwrap('ena_create_module', 'number', ['number']);
+            const ena_register_module = Module.cwrap('ena_register_module', 'number', ['number', 'string', 'number']);
+            const ena_eval = Module.cwrap('ena_eval', 'number', ['number', 'number', 'string', 'string']);
+            const ena_get_error_cstr = Module.cwrap('ena_get_error_cstr', 'string', ['number']);
 
-            const vm = Module._ena_create_vm();
-            const main = Module._ena_create_module(vm);
-            Module._ena_register_module(vm, mainStr, main);
-            Module._ena_eval(vm, main, mainStr, scriptStr);
-            document.querySelector('#progress').innerText = "Result:";
+            const vm = ena_create_vm();
+            const main = ena_create_module(vm);
+            ena_register_module(vm, "main", main);
+            if (!ena_eval(vm, main, "main", script)) {
+                document.querySelector('#progress').innerText = "Error!";
+                document.querySelector('#result-container').classList.add("error");
+                document.querySelector('#result').innerText += "Error: " + ena_get_error_cstr(vm);
+            } else {
+                document.querySelector('#progress').innerText = "Result:";
+            }
         }
     </script>
     <script src="ena.js"></script>

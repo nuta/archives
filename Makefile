@@ -102,11 +102,11 @@ valgrind:
 	$(PROGRESS) DOCKER_BUILD ena-valgrind
 	docker build -t ena-valgrind -f tools/valgrind/Dockerfile .
 	$(PROGRESS) DOCKER_RUN ena-valgrind
-	docker run -v $(PWD):/ena -it ena-valgrind sh -c "cd /ena && make clean && make -j2 && valgrind --leak-check=full --show-leak-kinds=all ./ena $(TEST)"
+	docker run -v $(PWD):/ena -it ena-valgrind sh -c "cd /ena && make clean && make -j2 && valgrind ./ena $(TEST)"
 	make clean
 
 wasm:
-	 emcc -g4 $(SOURCES) -o docs/ena.js -s "EXPORTED_FUNCTIONS=['_ena_create_vm', '_ena_create_module', '_ena_register_module', '_ena_eval']" -s SAFE_HEAP=1 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['writeStringToMemory']"
+	 emcc -g4 $(SOURCES) -o docs/ena.js --source-map-base http://localhost:8000/ -s "SINGLE_FILE=1" -s "EXPORTED_FUNCTIONS=['_ena_create_vm', '_ena_create_module', '_ena_register_module', '_ena_eval', '_ena_get_error_cstr']" -s SAFE_HEAP=1 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']"
 
 ena: libena.a src/main.o Makefile
 	$(PROGRESS) LD $@
