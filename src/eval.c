@@ -527,7 +527,13 @@ bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char 
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         vm->current_scope = ena_to_module_object(vm, module)->scope;
-        eval_node(vm, ast->tree);
+        PUSH_SAVEPOINT();
+        int unwind_type;
+        if ((unwind_type = EXEC_SAVEPOINT()) == 0) {
+            eval_node(vm, ast->tree);
+        } else {
+            RUNTIME_ERROR("uncaught unwind %d", unwind_type);
+        }
 #ifdef __EMSCRIPTEN__
         /* XXX: In emscripten longjmp() jumps into here. */
         if (vm->error.type != ENA_ERROR_NONE) {

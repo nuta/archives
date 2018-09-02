@@ -50,6 +50,8 @@ def run_test(filepath):
             error_type = ""
             if "Syntax Error" in stdout:
                 error_type = "syntax"
+            if "Runtime Error" in stdout:
+                error_type = "runtime"
 
             if testinfo["error"] != error_type:
                 cprint(f"{error_type} error (expected {testinfo['error']})", "red", attrs=["bold"])
