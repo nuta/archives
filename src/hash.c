@@ -144,7 +144,17 @@ void ena_hash_remove_all(struct ena_vm *vm, struct ena_hash_table *table, void *
     while (ena_hash_remove(vm, table, key));
 }
 
-void ena_hash_foreach_value(UNUSED struct ena_vm *vm, struct ena_hash_table *table, void (*cb)(struct ena_vm *vm, void *value)) {
+void ena_hash_foreach_key(struct ena_vm *vm, struct ena_hash_table *table, void (*cb)(struct ena_vm *vm, void *value)) {
+    for (int i = 0; i < table->num_buckets; i++) {
+        struct ena_hash_entry *e = table->buckets[i];
+        while (e) {
+            cb(vm, e->key);
+            e = e->next;
+        }
+    }
+}
+
+void ena_hash_foreach_value(struct ena_vm *vm, struct ena_hash_table *table, void (*cb)(struct ena_vm *vm, void *value)) {
     for (int i = 0; i < table->num_buckets; i++) {
         struct ena_hash_entry *e = table->buckets[i];
         while (e) {

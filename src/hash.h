@@ -39,6 +39,7 @@ void ena_hash_insert(struct ena_vm *vm, struct ena_hash_table *table, void *key,
 struct ena_hash_entry *ena_hash_search_or_insert(struct ena_vm *vm, struct ena_hash_table *table, void *key, void *value);
 bool ena_hash_remove(struct ena_vm *vm, struct ena_hash_table *table, void *key);
 void ena_hash_remove_all(struct ena_vm *vm, struct ena_hash_table *table, void *key);
+void ena_hash_foreach_key(struct ena_vm *vm, struct ena_hash_table *table, void (*cb)(struct ena_vm *vm, void *value));
 void ena_hash_foreach_value(struct ena_vm *vm, struct ena_hash_table *table, void (*cb)(struct ena_vm *vm, void *value));
 
 void ena_hash_init_ident_table(struct ena_vm *vm, struct ena_hash_table *table);

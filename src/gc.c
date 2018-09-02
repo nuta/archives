@@ -54,6 +54,10 @@ static inline void mark_hash_with_value_values(struct ena_vm *vm, struct ena_has
     ena_hash_foreach_value(vm, table, (void (*)(struct ena_vm *vm, void *)) mark);
 }
 
+static inline void mark_hash_with_value_keys(struct ena_vm *vm, struct ena_hash_table *table) {
+    ena_hash_foreach_key(vm, table, (void (*)(struct ena_vm *vm, void *)) mark);
+}
+
 static inline void mark_func(struct ena_vm *vm, struct ena_func *func) {
     mark_object((struct ena_object *) func);
 
@@ -76,6 +80,7 @@ static inline void mark_list(struct ena_vm *vm, struct ena_list *list) {
 
 static inline void mark_map(struct ena_vm *vm, struct ena_map *map) {
     mark_object((struct ena_object *) map);
+    mark_hash_with_value_keys(vm, &map->entries);
     mark_hash_with_value_values(vm, &map->entries);
 }
 
