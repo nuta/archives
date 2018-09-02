@@ -57,6 +57,9 @@ const char *ena_get_token_name(ena_token_type_t type) {
         DEFINE_TOKEN_NAME(WHILE),
         DEFINE_TOKEN_NAME(BREAK),
         DEFINE_TOKEN_NAME(CONTINUE),
+        DEFINE_TOKEN_NAME(NOT),
+        DEFINE_TOKEN_NAME(AND),
+        DEFINE_TOKEN_NAME(OR),
     };
 
     ENA_ASSERT(type < ENA_TOKEN_MAX_NUM);
@@ -200,9 +203,12 @@ retry:;
             switch (str_len) {
                 case 2:
                     SPECIAL_ID_TOKEN("if", ENA_TOKEN_IF, 2);
+                    SPECIAL_ID_TOKEN("or", ENA_TOKEN_OR, 2);
                     break;
                 case 3:
                     SPECIAL_ID_TOKEN("var", ENA_TOKEN_VAR, 3);
+                    SPECIAL_ID_TOKEN("not", ENA_TOKEN_NOT, 3);
+                    SPECIAL_ID_TOKEN("and", ENA_TOKEN_AND, 3);
                     break;
                 case 4:
                     SPECIAL_ID_TOKEN("if", ENA_TOKEN_IF, 4);

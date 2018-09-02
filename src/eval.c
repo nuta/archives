@@ -450,6 +450,23 @@ EVAL_NODE(FALSE) {
     return ENA_FALSE;
 }
 
+EVAL_NODE(OP_NOT) {
+    bool value = eval_node(vm, node->child) == ENA_TRUE;
+    return value ? ENA_FALSE : ENA_TRUE;
+}
+
+EVAL_NODE(OP_AND) {
+    bool lhs = eval_node(vm, &node->child[0]) == ENA_TRUE;
+    bool rhs = eval_node(vm, &node->child[1]) == ENA_TRUE;
+    return (lhs && rhs) ? ENA_TRUE : ENA_FALSE;
+}
+
+EVAL_NODE(OP_OR) {
+    bool lhs = eval_node(vm, &node->child[0]) == ENA_TRUE;
+    bool rhs = eval_node(vm, &node->child[1]) == ENA_TRUE;
+    return (lhs || rhs) ? ENA_TRUE : ENA_FALSE;
+}
+
 static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
     DEBUG("eval: %s", ena_get_node_name(node->type));
 
@@ -490,6 +507,9 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
         EVAL_CASE(WHILE);
         EVAL_CASE(CONTINUE);
         EVAL_CASE(BREAK);
+        EVAL_CASE(OP_NOT);
+        EVAL_CASE(OP_OR);
+        EVAL_CASE(OP_AND);
         default:
             NOT_YET_IMPLEMENTED();
     }

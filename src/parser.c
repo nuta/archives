@@ -49,6 +49,9 @@ const char *ena_get_node_name(ena_node_type_t type) {
         DEFINE_NODE_NAME(OP_LTE),
         DEFINE_NODE_NAME(OP_GT),
         DEFINE_NODE_NAME(OP_GTE),
+        DEFINE_NODE_NAME(OP_NOT),
+        DEFINE_NODE_NAME(OP_OR),
+        DEFINE_NODE_NAME(OP_AND),
         DEFINE_NODE_NAME(PROP),
         DEFINE_NODE_NAME(CLASS),
         DEFINE_NODE_NAME(WHILE),
@@ -206,6 +209,10 @@ PARSE_RULE(primary) {
             CONSUME(RPAREN);
             return expr;
         }
+        case ENA_TOKEN_NOT: {
+            struct ena_node *expr = PARSE(expr);
+            return create_node(ENA_NODE_OP_NOT, expr, 1);
+        }
         case ENA_TOKEN_NULL:
             ena_destroy_token(token);
             return create_node(ENA_NODE_NULL, NULL, 0);
@@ -323,12 +330,34 @@ PARSE_RULE(comparison) {
     }
 }
 
-PARSE_RULE(equality) {
+PARSE_RULE(logical_and) {
     struct ena_node *expr = PARSE(comparison);
     for (;;) {
         switch (NEXT_TYPE()) {
-            BIN_OP_LEFT_ASSOC(DOUBLE_EQ, OP_EQ, comparison)
-            BIN_OP_LEFT_ASSOC(NEQ, OP_NEQ, comparison)
+            BIN_OP_LEFT_ASSOC(AND, OP_AND, comparison)
+            default:
+                return expr;
+        }
+    }
+}
+
+PARSE_RULE(logical_or) {
+    struct ena_node *expr = PARSE(logical_and);
+    for (;;) {
+        switch (NEXT_TYPE()) {
+            BIN_OP_LEFT_ASSOC(OR, OP_OR, logical_and)
+            default:
+                return expr;
+        }
+    }
+}
+
+PARSE_RULE(equality) {
+    struct ena_node *expr = PARSE(logical_or);
+    for (;;) {
+        switch (NEXT_TYPE()) {
+            BIN_OP_LEFT_ASSOC(DOUBLE_EQ, OP_EQ, logical_or)
+            BIN_OP_LEFT_ASSOC(NEQ, OP_NEQ, logical_or)
             default:
                 return expr;
         }

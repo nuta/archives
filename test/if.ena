@@ -1,5 +1,6 @@
-if true {
-    false;
+var ans = 0;
+if false or true and not false {
+    ans = 123;
 }
 
-var ans;
+assert_eq(ans, 123);
