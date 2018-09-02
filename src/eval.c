@@ -38,11 +38,11 @@ static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_ar
     // Enther the scope and execute the body.
     struct ena_scope *caller_scope = vm->current_scope;
     struct ena_scope *new_scope = ena_create_scope(vm, func->scope);
-    PUSH_SAVEPOINT();
+    PUSH_UNWIND_POINT();
 
     int unwind_type;
     ena_value_t ret_value = ENA_UNDEFINED;
-    if ((unwind_type = EXEC_SAVEPOINT()) == 0) {
+    if ((unwind_type = EXEC_UNWIND_POINT()) == 0) {
         if (func->flags & FUNC_FLAGS_NATIVE) {
             if (func->flags & FUNC_FLAGS_METHOD) {
                 ret_value = func->native_method(vm, self, args, num_args);
@@ -66,7 +66,7 @@ static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_ar
             eval_node(vm, func->stmts);
         }
     } else {
-        // UNWIND_SAVEPOINT() is invoked in the callee.
+        // UNWIND_UNWIND_POINT() is invoked in the callee.
         switch (unwind_type) {
             case ENA_UNWIND_RETURN:
                 ret_value = vm->current_savepoint->ret_value;
@@ -77,7 +77,7 @@ static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_ar
     // Returned from the function.
     vm->current_scope = caller_scope;
     vm->self = ENA_UNDEFINED;
-    POP_SAVEPOINT();
+    POP_UNWIND_POINT();
     return ret_value;
 }
 
@@ -292,7 +292,7 @@ EVAL_NODE(RETURN) {
 
     vm->current_scope = vm->current_scope->parent;
     vm->current_savepoint->ret_value = ret_value;
-    UNWIND_SAVEPOINT(ENA_UNWIND_RETURN);
+    UNWIND_UNWIND_POINT(ENA_UNWIND_RETURN);
 
     /* UNREACHABLE */
 }
@@ -365,15 +365,15 @@ EVAL_NODE(WHILE) {
     struct ena_node *stmts = &node->child[1];
 
     // Enther the scope and execute the body.
-    PUSH_SAVEPOINT();
+    PUSH_UNWIND_POINT();
     int unwind_type;
-    if ((unwind_type = EXEC_SAVEPOINT()) == 0) {
+    if ((unwind_type = EXEC_UNWIND_POINT()) == 0) {
         while (ENA_TEST(eval_node(vm, condition_part))) {
             eval_node(vm, stmts);
 while_continue:;
         }
     } else {
-        // UNWIND_SAVEPOINT() is invoked in the callee.
+        // UNWIND_UNWIND_POINT() is invoked in the callee.
         switch (unwind_type) {
             case ENA_UNWIND_BREAK:
                 break;
@@ -381,21 +381,21 @@ while_continue:;
                 goto while_continue;
             case ENA_UNWIND_RETURN:
                 // Continue unwinding.
-                UNWIND_SAVEPOINT(unwind_type);
+                UNWIND_UNWIND_POINT(unwind_type);
         }
     }
 
-    POP_SAVEPOINT();
+    POP_UNWIND_POINT();
     return ENA_UNDEFINED;
 }
 
 EVAL_NODE(CONTINUE) {
-    UNWIND_SAVEPOINT(ENA_UNWIND_CONTINUE);
+    UNWIND_UNWIND_POINT(ENA_UNWIND_CONTINUE);
     return ENA_UNDEFINED;
 }
 
 EVAL_NODE(BREAK) {
-    UNWIND_SAVEPOINT(ENA_UNWIND_BREAK);
+    UNWIND_UNWIND_POINT(ENA_UNWIND_BREAK);
     return ENA_UNDEFINED;
 }
 
@@ -527,9 +527,9 @@ bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char 
 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         vm->current_scope = ena_to_module_object(vm, module)->scope;
-        PUSH_SAVEPOINT();
+        PUSH_UNWIND_POINT();
         int unwind_type;
-        if ((unwind_type = EXEC_SAVEPOINT()) == 0) {
+        if ((unwind_type = EXEC_UNWIND_POINT()) == 0) {
             eval_node(vm, ast->tree);
         } else {
             RUNTIME_ERROR("uncaught unwind %d", unwind_type);

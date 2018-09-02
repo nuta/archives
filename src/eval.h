@@ -7,15 +7,15 @@
 #define ENA_TEST(v) ((v) == ENA_TRUE)
 #define ENA_OBJ2VALUE(obj) ((ena_value_t) (obj))
 
-#define PUSH_SAVEPOINT() \
+#define PUSH_UNWIND_POINT() \
     do { \
         struct ena_savepoint *sp = ena_malloc(sizeof(*sp)); \
         sp->prev = vm->current_savepoint; \
         vm->current_savepoint = sp; \
     } while(0)
-#define EXEC_SAVEPOINT() ena_setjmp(vm->current_savepoint->jmpbuf)
-#define UNWIND_SAVEPOINT(unwind_type) ena_longjmp(vm->current_savepoint->jmpbuf, unwind_type); UNREACHABLE
-#define POP_SAVEPOINT() \
+#define EXEC_UNWIND_POINT() ena_setjmp(vm->current_savepoint->jmpbuf)
+#define UNWIND_UNWIND_POINT(unwind_type) ena_longjmp(vm->current_savepoint->jmpbuf, unwind_type); UNREACHABLE
+#define POP_UNWIND_POINT() \
     do { \
         struct ena_savepoint *current_sp = vm->current_savepoint; \
         if (!current_sp) { \
