@@ -284,7 +284,7 @@ EVAL_NODE(CALL) {
 }
 
 EVAL_NODE(RETURN) {
-    ena_value_t ret_value = eval_node(vm, node->child);
+    ena_value_t ret_value = node->child ? eval_node(vm, node->child) : ENA_NULL;
     if (vm->current_scope == NULL) {
         RUNTIME_ERROR("return from the top level");
         return ENA_UNDEFINED;

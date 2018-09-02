@@ -422,7 +422,7 @@ PARSE_RULE(return_stmt) {
     CONSUME(RETURN);
     struct ena_node *expr = PARSE(expr);
     CONSUME(SEMICOLON);
-    return create_node_with_token(ENA_NODE_RETURN, NULL, expr, 1);
+    return create_node(ENA_NODE_RETURN, expr, expr ? 1 : 0);
 }
 
 // if_stmt: 'if' expr block ('elseif' expr block)* ('else' block)?;
