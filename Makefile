@@ -7,7 +7,7 @@ RELEASE =
 # Test files.
 TESTS =
 # avaiable ports: x64
-PORT = x64
+PORT ?= x64
 BENCHMARKS ?= fib startup-time
 
 VERSION = $(shell git rev-parse HEAD)
