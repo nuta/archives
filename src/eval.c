@@ -196,32 +196,49 @@ EVAL_NODE(VAR) {
 }
 
 EVAL_NODE(OP_ASSIGN) {
-    ena_ident_t name = ena_cstr2ident(vm, node->child[0].token->str);
     ena_value_t rvalue = eval_node(vm, &node->child[1]);
+    ena_node_type_t lvalue_type = node->child[0].type;
 
-    if (node->child[0].type == ENA_NODE_PROP) {
-        struct ena_node *obj = node->child[0].child;
-        // FIXME:
-        if (!ena_strcmp(obj->token->str, "self")) {
-            if (vm->self == ENA_UNDEFINED) {
-                RUNTIME_ERROR("self is not available");
-            }
+    switch (lvalue_type) {
+        case ENA_NODE_PROP: {
+            ena_ident_t name = ena_cstr2ident(vm, node->child[0].token->str);
+            struct ena_node *obj = node->child[0].child;
+            // FIXME:
+            if (!ena_strcmp(obj->token->str, "self")) {
+                if (vm->self == ENA_UNDEFINED) {
+                    RUNTIME_ERROR("self is not available");
+                }
 
-            if (ena_get_type(vm, vm->self) != ENA_T_INSTANCE) {
-                RUNTIME_ERROR("self is not an instance");
-            }
+                if (ena_get_type(vm, vm->self) != ENA_T_INSTANCE) {
+                    RUNTIME_ERROR("self is not an instance");
+                }
 
-            struct ena_instance *self = (struct ena_instance *) vm->self;
-            if (!ena_set_var_value(vm, self->props, name, rvalue)) {
-                ena_define_var(vm, self->props, name, rvalue);
+                struct ena_instance *self = (struct ena_instance *) vm->self;
+                if (!ena_set_var_value(vm, self->props, name, rvalue)) {
+                    ena_define_var(vm, self->props, name, rvalue);
+                }
+            } else {
+                NOT_YET_IMPLEMENTED();
             }
-        } else {
-            NOT_YET_IMPLEMENTED();
+            break;
         }
-    } else {
-        if (!ena_set_var_value(vm, vm->current_scope, name, rvalue)) {
-            RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
+        case ENA_NODE_INDEX: {
+            ena_value_t self = eval_node(vm, &node->child[0].child[0]);
+            ena_value_t index = eval_node(vm, &node->child[0].child[1]);
+            ena_ident_t method_name = ena_cstr2ident(vm, "[]=");
+            ena_value_t args[] = { index, rvalue };
+            invoke_method(vm, method_name, self, (ena_value_t *) &args, 2);
+            break;
         }
+        case ENA_NODE_ID: {
+            ena_ident_t name = ena_cstr2ident(vm, node->child[0].token->str);
+            if (!ena_set_var_value(vm, vm->current_scope, name, rvalue)) {
+                RUNTIME_ERROR("%s is not defined", ena_ident2cstr(vm, name));
+            }
+            break;
+        }
+        default:;
+            RUNTIME_ERROR("Invalid lvalue.");
     }
 
     return rvalue;
