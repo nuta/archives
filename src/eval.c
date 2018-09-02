@@ -34,7 +34,7 @@ static ena_value_t copy_if_immutable(struct ena_vm *vm, ena_value_t value) {
     }
 }
 
-static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_args, ena_value_t self, struct ena_func *func) {
+static ena_value_t call_func(struct ena_vm *vm, ena_value_t self, struct ena_func *func, ena_value_t *args, int num_args) {
     // Enther the scope and execute the body.
     struct ena_scope *caller_scope = vm->current_scope;
     struct ena_scope *new_scope = ena_create_scope(vm, func->scope);
@@ -81,19 +81,6 @@ static ena_value_t do_call_func(struct ena_vm *vm, ena_value_t *args, int num_ar
     return ret_value;
 }
 
-static ena_value_t call_func(struct ena_vm *vm, struct ena_node *expr_list, ena_value_t self, struct ena_func *func) {
-    int num_args = expr_list->num_childs;
-
-    // Use ena_alloca() instead of ena_malloc() or GC would destroys args.
-    ena_value_t *args = ena_alloca(sizeof(ena_value_t) * num_args);
-    for (int i = 0; i < num_args; i++) {
-        args[i] = eval_node(vm, &expr_list->child[i]);
-    }
-
-    ena_value_t ret_value = do_call_func(vm, args, num_args, self, func);
-    return ret_value;
-}
-
 static struct ena_func *lookup_method(struct ena_vm *vm, struct ena_class *cls, ena_ident_t name) {
     struct ena_hash_entry *e = ena_hash_search(vm, &cls->methods, (void *) name);
     if (e) {
@@ -103,16 +90,12 @@ static struct ena_func *lookup_method(struct ena_vm *vm, struct ena_class *cls, 
     return NULL;
 }
 
-static ena_value_t invoke_method(struct ena_vm *vm, struct ena_node *node) {
-    struct ena_node *prop_node = &node->child[0];
-    ena_ident_t method_name = ena_cstr2ident(vm, prop_node->token->str);
-    ena_value_t instance = eval_node(vm, node->child[0].child);
-
+static ena_value_t invoke_method(struct ena_vm *vm, ena_ident_t method_name, ena_value_t self, ena_value_t *args, int num_args) {
     struct ena_class *cls;
-    ena_value_type_t lhs_type = ena_get_type(vm, instance);
+    ena_value_type_t lhs_type = ena_get_type(vm, self);
     switch (lhs_type) {
         case ENA_T_INSTANCE:
-            cls = ((struct ena_instance *) instance)->cls;
+            cls = ((struct ena_instance *) self)->cls;
             break;
         case ENA_T_STRING:
         case ENA_T_LIST:
@@ -129,7 +112,7 @@ static ena_value_t invoke_method(struct ena_vm *vm, struct ena_node *node) {
         RUNTIME_ERROR("method %s is not defined", ena_ident2cstr(vm, method_name));
     }
 
-    return call_func(vm, &node->child[1], instance, method);
+    return call_func(vm, self, method, args, num_args);
 }
 
 static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct ena_class *cls) {
@@ -141,7 +124,15 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
     // Call the constructor if it exists.
     struct ena_func *new_method = lookup_method(vm, cls, ena_cstr2ident(vm, "new"));
     if (new_method) {
-        call_func(vm, &node->child[1], ENA_OBJ2VALUE(instance), new_method);
+        // Use ena_alloca() instead of ena_malloc() or GC would destroys args.
+        struct ena_node *expr_list = &node->child[1];
+        int num_args = expr_list->num_childs;
+        ena_value_t *args = ena_alloca(sizeof(ena_value_t) * num_args);
+        for (int i = 0; i < num_args; i++) {
+            args[i] = eval_node(vm, &expr_list->child[i]);
+        }
+
+        call_func(vm, ENA_OBJ2VALUE(instance), new_method, args, num_args);
     }
 
     return (ena_value_t) instance;
@@ -163,7 +154,7 @@ static ena_value_t instantiate(struct ena_vm *vm, struct ena_node *node, struct 
             RUNTIME_ERROR("method `%s' is not defined", method_name); \
         } \
         ena_value_t args[] = { rhs }; \
-        ena_value_t result = do_call_func(vm, (ena_value_t *) &args, 1, lhs, method); \
+        ena_value_t result = call_func(vm, lhs, method, (ena_value_t *) &args, 1); \
         return result; \
     }
 
@@ -271,15 +262,35 @@ EVAL_NODE(CALL) {
         ena_value_t func_name = ena_cstr2ident(vm, node->child[0].token->str);
         ena_value_t func = ena_get_var_value(vm, vm->current_scope, func_name);
         switch (ena_get_type(vm, func)) {
-            case ENA_T_FUNC:
-                return call_func(vm, &node->child[1], ENA_UNDEFINED, (struct ena_func *) func);
+            case ENA_T_FUNC: {
+                // Use ena_alloca() instead of ena_malloc() or GC would destroys args.
+                struct ena_node *expr_list = &node->child[1];
+                int num_args = expr_list->num_childs;
+                ena_value_t *args = ena_alloca(sizeof(ena_value_t) * num_args);
+                for (int i = 0; i < num_args; i++) {
+                    args[i] = eval_node(vm, &expr_list->child[i]);
+                }
+                return call_func(vm, ENA_UNDEFINED, (struct ena_func *) func, args, num_args);
+            }
             case ENA_T_CLASS:
                 return instantiate(vm, node, (struct ena_class *) func);
             default:
                 RUNTIME_ERROR("%s is not a functon or class.", ena_ident2cstr(vm, func_name));
         }
     } else {
-        return invoke_method(vm, node);
+        struct ena_node *prop_node = &node->child[0];
+        struct ena_node *expr_list = &node->child[1];
+        ena_ident_t method_name = ena_cstr2ident(vm, prop_node->token->str);
+        ena_value_t self = eval_node(vm, node->child[0].child);
+
+        // Use ena_alloca() instead of ena_malloc() or GC would destroys args.
+        int num_args = expr_list->num_childs;
+        ena_value_t *args = ena_alloca(sizeof(ena_value_t) * num_args);
+        for (int i = 0; i < num_args; i++) {
+            args[i] = eval_node(vm, &expr_list->child[i]);
+        }
+
+        return invoke_method(vm, method_name, self, args, num_args);
     }
 }
 
@@ -342,6 +353,14 @@ EVAL_NODE(PROP) {
     }
 
     return value;
+}
+
+EVAL_NODE(INDEX) {
+    ena_value_t self = eval_node(vm, &node->child[0]);
+    ena_value_t index = eval_node(vm, &node->child[1]);
+    ena_ident_t method_name = ena_cstr2ident(vm, "[]");
+    ena_value_t args[] = { index };
+    return invoke_method(vm, method_name, self, (ena_value_t *) &args, 1);
 }
 
 EVAL_NODE(IF) {
@@ -510,6 +529,7 @@ static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
         EVAL_CASE(OP_NOT);
         EVAL_CASE(OP_OR);
         EVAL_CASE(OP_AND);
+        EVAL_CASE(INDEX);
         default:
             NOT_YET_IMPLEMENTED();
     }

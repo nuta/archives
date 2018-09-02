@@ -124,6 +124,9 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
             case 's':
                 expected_type = ENA_T_STRING;
                 break;
+            case 'i':
+                expected_type = ENA_T_INT;
+                break;
             case 'x':
                 expected_type = ENA_T_ANY;
                 break;
@@ -144,7 +147,7 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
         if (expected_type != ENA_T_ANY && type != expected_type) {
             RUNTIME_ERROR("%s %d%s argument must be %s (%s given)",
                 name,
-                arg_index,
+                1 + arg_index,
                 (arg_index == 1) ? "st" : ((arg_index == 2) ? "nd" : ((arg_index ==3) ? "rd" : "th")),
                 get_type_name(expected_type), get_type_name(type));
         }

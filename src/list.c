@@ -46,10 +46,23 @@ static ena_value_t list_pop(UNUSED struct ena_vm *vm, ena_value_t self, UNUSED e
     return item;
 }
 
+static ena_value_t list_get(UNUSED struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
+    ena_check_args(vm, "get()", "i", args, num_args);
+    struct ena_list *self_list = ena_to_list_object(vm, self);
+    struct ena_int *index = ena_to_int_object(vm, args[0]);
+
+    if (index->value >= self_list->num_elems) {
+        RUNTIME_ERROR("list index out of range");
+    }
+
+    return self_list->elems[index->value];
+}
+
 struct ena_class *ena_create_list_class(struct ena_vm *vm) {
     ena_value_t cls = ena_create_class(vm);
     ena_define_method(vm, cls, "append", list_append);
     ena_define_method(vm, cls, "prepend", list_prepend);
     ena_define_method(vm, cls, "pop", list_pop);
+    ena_define_method(vm, cls, "[]", list_get);
     return ena_to_class_object(vm, cls);
 }

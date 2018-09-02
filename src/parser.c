@@ -60,6 +60,7 @@ const char *ena_get_node_name(ena_node_type_t type) {
         DEFINE_NODE_NAME(LIST_LIT),
         DEFINE_NODE_NAME(MAP_LIT),
         DEFINE_NODE_NAME(MAP_ENTRY),
+        DEFINE_NODE_NAME(INDEX),
         DEFINE_NODE_NAME(NULL),
     };
 
@@ -74,6 +75,8 @@ static void do_dump_node(struct ena_node *node, int level) {
 
     if (node->token) {
         DEBUG("%s(%s)", ena_get_node_name(node->type), node->token->str);
+    } else if (node->type == ENA_NODE_INT_LIT) {
+        DEBUG("%s(%d)",ena_get_node_name(node->type), node->literal);
     } else {
         DEBUG("%s",ena_get_node_name(node->type));
     }
@@ -262,6 +265,18 @@ PARSE_RULE(unary) {
                 set_nth_child(childs, 0, expr);
                 set_nth_child(childs, 1, exprs);
                 expr = create_node(ENA_NODE_CALL, childs, 2);
+                break;
+            }
+            case ENA_TOKEN_LBRACKET: {
+                // Function call.
+                CONSUME(LBRACKET);
+                struct ena_node *index = PARSE(expr);
+                CONSUME(RBRACKET);
+                struct ena_node *childs = NULL;
+                REALLOC_NODE_ARRAY(childs, 2);
+                set_nth_child(childs, 0, expr);
+                set_nth_child(childs, 1, index);
+                expr = create_node(ENA_NODE_INDEX, childs, 2);
                 break;
             }
             case ENA_TOKEN_DOT: {

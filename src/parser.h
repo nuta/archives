@@ -54,6 +54,7 @@ typedef enum {
     ENA_NODE_LIST_LIT,
     ENA_NODE_MAP_LIT,
     ENA_NODE_MAP_ENTRY,
+    ENA_NODE_INDEX,
 
     ENA_NODE_MAX_NUM // Must be last one.
 } ena_node_type_t;
