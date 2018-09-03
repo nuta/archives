@@ -57,13 +57,11 @@ struct ena_lexer {
     // The next character offset.
     size_t next_pos;
     // The position of `nextc` in `script`.
-    int current_line, current_column;
+    int current_line;
     // The script string (terminated by NULL).
     const char *script;
     // The file path the source file (terminated by NULL).
     const char *filepath;
-    /// The last used token by parser.
-    struct ena_token *current_token;
 };
 
 #define REMAINING_TOKEN() DEBUG("REMAINING: %s", &lexer.script[lexer.next_pos])

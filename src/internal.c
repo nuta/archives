@@ -1,5 +1,6 @@
 #include "malloc.h"
 #include "eval.h"
+#include "parser.h"
 #include "gc.h"
 #include "internal.h"
 
@@ -158,5 +159,23 @@ void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_v
 
         r++;
         arg_index++;
+    }
+}
+
+void ena_stacktrace(struct ena_vm *vm) {
+    if (!vm->current_node) {
+        return;
+    }
+
+    struct ena_frame *frame = vm->current_frame;
+    int line = vm->current_node->lineno;
+    for (int i = 1; frame != NULL; i++) {
+        if (frame->func) {
+            DEBUG("#%d: %s(), line %d", i, ena_ident2cstr(vm, frame->func->name), line);
+            line = frame->called_from->lineno;
+        } else {
+            DEBUG("#%d: (top level), line %d", i, line);
+        }
+        frame = frame->prev;
     }
 }

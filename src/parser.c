@@ -74,11 +74,11 @@ static void do_dump_node(struct ena_node *node, int level) {
     }
 
     if (node->token) {
-        DEBUG("%s(%s)", ena_get_node_name(node->type), node->token->str);
+        DEBUG("%s(%s, L%d)", ena_get_node_name(node->type), node->token->str, node->lineno);
     } else if (node->type == ENA_NODE_INT_LIT) {
-        DEBUG("%s(%d)",ena_get_node_name(node->type), node->literal);
+        DEBUG("%s(%d, L%d)",ena_get_node_name(node->type), node->literal, node->lineno);
     } else {
-        DEBUG("%s",ena_get_node_name(node->type));
+        DEBUG("%s(L%d)",ena_get_node_name(node->type), node->lineno);
     }
 
     for (int i = 0; i < node->num_childs; i++) {
@@ -92,33 +92,36 @@ void ena_dump_node(struct ena_node *node) {
 }
 
 
-static struct ena_node *create_node(ena_node_type_t type, struct ena_node *child, int num_childs) {
+static struct ena_node *create_node(struct ena_vm *vm, ena_node_type_t type, struct ena_node *child, int num_childs) {
     struct ena_node *node = ena_malloc(sizeof(*node));
     node->type = type;
     node->token = NULL;
     node->child = child;
     node->num_childs = num_childs;
     node->literal = 0;
+    node->lineno = vm->lexer.current_line;
     return node;
 }
 
-static struct ena_node *create_node_with_token(ena_node_type_t type, struct ena_token *token, struct ena_node *child, int num_childs) {
+static struct ena_node *create_node_with_token(struct ena_vm *vm, ena_node_type_t type, struct ena_token *token, struct ena_node *child, int num_childs) {
     struct ena_node *node = ena_malloc(sizeof(*node));
     node->type = type;
     node->token = token;
     node->child = child;
     node->num_childs = num_childs;
     node->literal = 0;
+    node->lineno = vm->lexer.current_line;
     return node;
 }
 
-static struct ena_node *create_int_literal_node(ena_node_type_t type, int value) {
+static struct ena_node *create_int_literal_node(struct ena_vm *vm, ena_node_type_t type, int value) {
     struct ena_node *node = ena_malloc(sizeof(*node));
     node->type = type;
     node->token = NULL;
     node->child = NULL;
     node->num_childs = 0;
     node->literal = value;
+    node->lineno = vm->lexer.current_line;
     return node;
 }
 
@@ -146,7 +149,7 @@ PARSE_RULE(list_lit) {
     // LBRACKET is already consumed.
     struct ena_node *elems = PARSE(expr_list);
     CONSUME(RBRACKET);
-    return create_node(ENA_NODE_LIST_LIT, elems, 1);
+    return create_node(vm, ENA_NODE_LIST_LIT, elems, 1);
 }
 
 PARSE_RULE(map_lit) {
@@ -176,7 +179,7 @@ PARSE_RULE(map_lit) {
         REALLOC_NODE_ARRAY(childs, 2);
         set_nth_child(childs, 0, key);
         set_nth_child(childs, 1, value);
-        struct ena_node *entry = create_node(ENA_NODE_MAP_ENTRY, childs, 2);
+        struct ena_node *entry = create_node(vm, ENA_NODE_MAP_ENTRY, childs, 2);
         set_nth_child(entries, num_entries, entry);
         num_entries++;
 
@@ -186,7 +189,7 @@ PARSE_RULE(map_lit) {
     }
 
     CONSUME(RBRACE);
-    return create_node(ENA_NODE_MAP_LIT, entries, num_entries);
+    return create_node(vm, ENA_NODE_MAP_LIT, entries, num_entries);
 }
 
 /// expr: boolean_or;
@@ -214,27 +217,27 @@ PARSE_RULE(primary) {
         }
         case ENA_TOKEN_NOT: {
             struct ena_node *expr = PARSE(expr);
-            return create_node(ENA_NODE_OP_NOT, expr, 1);
+            return create_node(vm, ENA_NODE_OP_NOT, expr, 1);
         }
         case ENA_TOKEN_NULL:
             ena_destroy_token(token);
-            return create_node(ENA_NODE_NULL, NULL, 0);
+            return create_node(vm, ENA_NODE_NULL, NULL, 0);
         case ENA_TOKEN_TRUE:
             ena_destroy_token(token);
-            return create_node(ENA_NODE_TRUE, NULL, 0);
+            return create_node(vm, ENA_NODE_TRUE, NULL, 0);
         case ENA_TOKEN_FALSE:
             ena_destroy_token(token);
-            return create_node(ENA_NODE_FALSE, NULL, 0);
+            return create_node(vm, ENA_NODE_FALSE, NULL, 0);
         case ENA_TOKEN_MINUS:
             token = GET_NEXT();
-            return create_int_literal_node(ENA_NODE_INT_LIT, -ena_str2int(token->str));
+            return create_int_literal_node(vm, ENA_NODE_INT_LIT, -ena_str2int(token->str));
         case ENA_TOKEN_PLUS:
             token = GET_NEXT();
-            return create_int_literal_node(ENA_NODE_INT_LIT, ena_str2int(token->str));
+            return create_int_literal_node(vm, ENA_NODE_INT_LIT, ena_str2int(token->str));
         case ENA_TOKEN_INT_LIT:
-            return create_int_literal_node(ENA_NODE_INT_LIT, ena_str2int(token->str));
+            return create_int_literal_node(vm, ENA_NODE_INT_LIT, ena_str2int(token->str));
         case ENA_TOKEN_STRING_LIT:
-            return create_node_with_token(ENA_NODE_STRING_LIT, token, NULL, 0);
+            return create_node_with_token(vm, ENA_NODE_STRING_LIT, token, NULL, 0);
         case ENA_TOKEN_LBRACKET:
             ena_destroy_token(token);
             return PARSE(list_lit);
@@ -242,7 +245,7 @@ PARSE_RULE(primary) {
             ena_destroy_token(token);
             return PARSE(map_lit);
         case ENA_TOKEN_ID:
-            return create_node_with_token(ENA_NODE_ID, token, NULL, 0);
+            return create_node_with_token(vm, ENA_NODE_ID, token, NULL, 0);
         default:
             // Reached to the end of expression.
             PUSHBACK(token);
@@ -264,11 +267,11 @@ PARSE_RULE(unary) {
                 REALLOC_NODE_ARRAY(childs, 2);
                 set_nth_child(childs, 0, expr);
                 set_nth_child(childs, 1, exprs);
-                expr = create_node(ENA_NODE_CALL, childs, 2);
+                expr = create_node(vm, ENA_NODE_CALL, childs, 2);
                 break;
             }
             case ENA_TOKEN_LBRACKET: {
-                // Function call.
+                // Index access.
                 CONSUME(LBRACKET);
                 struct ena_node *index = PARSE(expr);
                 CONSUME(RBRACKET);
@@ -276,13 +279,13 @@ PARSE_RULE(unary) {
                 REALLOC_NODE_ARRAY(childs, 2);
                 set_nth_child(childs, 0, expr);
                 set_nth_child(childs, 1, index);
-                expr = create_node(ENA_NODE_INDEX, childs, 2);
+                expr = create_node(vm, ENA_NODE_INDEX, childs, 2);
                 break;
             }
             case ENA_TOKEN_DOT: {
                 SKIP(1);
                 struct ena_token *prop = EXPECT(ID);
-                expr = create_node_with_token(ENA_NODE_PROP, prop, expr, 1);
+                expr = create_node_with_token(vm, ENA_NODE_PROP, prop, expr, 1);
                 break;
             }
             default:;
@@ -299,7 +302,7 @@ PARSE_RULE(unary) {
         REALLOC_NODE_ARRAY(childs, 2); \
         set_nth_child(childs, 0, expr); \
         set_nth_child(childs, 1, rhs); \
-        expr = create_node(ENA_NODE_##node_type, childs, 2); \
+        expr = create_node(vm, ENA_NODE_##node_type, childs, 2); \
         break; \
     }
 
@@ -391,11 +394,11 @@ PARSE_RULE(equality) {
         REALLOC_NODE_ARRAY(rvalue_childs, 2); \
         copy_nth_child(rvalue_childs, 0, lhs); \
         set_nth_child(rvalue_childs, 1, rhs); \
-        rvalue = create_node(ENA_NODE_##op_type, rvalue_childs, 2); \
+        rvalue = create_node(vm, ENA_NODE_##op_type, rvalue_childs, 2); \
         REALLOC_NODE_ARRAY(childs, 2); \
         set_nth_child(childs, 0, lhs); \
         set_nth_child(childs, 1, rvalue); \
-        expr = create_node(ENA_NODE_OP_ASSIGN, childs, 2); \
+        expr = create_node(vm, ENA_NODE_OP_ASSIGN, childs, 2); \
         break; \
     }
 
@@ -435,7 +438,7 @@ PARSE_RULE(expr_list) {
         }
     }
 
-    return create_node_with_token(ENA_NODE_EXPR_LIST, NULL, exprs, num_exprs);
+    return create_node_with_token(vm, ENA_NODE_EXPR_LIST, NULL, exprs, num_exprs);
 }
 
 // id_list: (id (',' id_list)*)?
@@ -451,7 +454,7 @@ PARSE_RULE(id_list) {
 
         REALLOC_NODE_ARRAY(childs, num_childs + 1);
         struct ena_token *token = EXPECT(ID);
-        struct ena_node *id = create_node_with_token(ENA_NODE_ID, token, NULL, 0);
+        struct ena_node *id = create_node_with_token(vm, ENA_NODE_ID, token, NULL, 0);
         set_nth_child(childs, num_childs, id);
         num_childs++;
 
@@ -460,7 +463,7 @@ PARSE_RULE(id_list) {
         }
     }
 
-    return create_node_with_token(ENA_NODE_ID_LIST, NULL, childs, num_childs);
+    return create_node_with_token(vm, ENA_NODE_ID_LIST, NULL, childs, num_childs);
 }
 
 // Token: The class name. (ENA_NODE_ID)
@@ -471,7 +474,7 @@ PARSE_RULE(class_stmt) {
     CONSUME(LBRACE);
     struct ena_node *stmts = PARSE(stmts);
     CONSUME(RBRACE);
-    return create_node_with_token(ENA_NODE_CLASS, name_token, stmts, 1);
+    return create_node_with_token(vm, ENA_NODE_CLASS, name_token, stmts, 1);
 }
 
 // Childs: args (id_list), stmts (stmts)
@@ -492,7 +495,7 @@ PARSE_RULE(func_stmt) {
     set_nth_child(childs, 0, args);
     set_nth_child(childs, 1, stmts);
 
-    return create_node_with_token(ENA_NODE_FUNC, name_token, childs, 2);
+    return create_node_with_token(vm, ENA_NODE_FUNC, name_token, childs, 2);
 }
 
 /// Token: The variable name. (ENA_NODE_ID)
@@ -505,10 +508,10 @@ PARSE_RULE(var_stmt) {
         SKIP(1);
         struct ena_node *initializer = PARSE(expr);
         CONSUME(SEMICOLON);
-        return create_node_with_token(ENA_NODE_VAR, name_token, initializer, 1);
+        return create_node_with_token(vm, ENA_NODE_VAR, name_token, initializer, 1);
     } else {
         CONSUME(SEMICOLON);
-        return create_node_with_token(ENA_NODE_VAR, name_token, NULL, 0);
+        return create_node_with_token(vm, ENA_NODE_VAR, name_token, NULL, 0);
     }
 }
 
@@ -517,7 +520,7 @@ PARSE_RULE(return_stmt) {
     CONSUME(RETURN);
     struct ena_node *expr = PARSE(expr);
     CONSUME(SEMICOLON);
-    return create_node(ENA_NODE_RETURN, expr, expr ? 1 : 0);
+    return create_node(vm, ENA_NODE_RETURN, expr, expr ? 1 : 0);
 }
 
 // if_stmt: 'if' expr block ('elseif' expr block)* ('else' block)?;
@@ -548,7 +551,7 @@ PARSE_RULE(if_stmt) {
 
     set_nth_child(childs, 0, condition);
     set_nth_child(childs, 1, then_stmts);
-    return create_node(ENA_NODE_IF, childs, num_childs);
+    return create_node(vm, ENA_NODE_IF, childs, num_childs);
 }
 
 // while_stmt: 'while' expr block
@@ -564,19 +567,19 @@ PARSE_RULE(while_stmt) {
     REALLOC_NODE_ARRAY(childs, 2);
     set_nth_child(childs, 0, condition);
     set_nth_child(childs, 1, stmts);
-    return create_node(ENA_NODE_WHILE, childs, 2);
+    return create_node(vm, ENA_NODE_WHILE, childs, 2);
 }
 
 PARSE_RULE(break_stmt) {
     CONSUME(BREAK);
     CONSUME(SEMICOLON);
-    return create_node(ENA_NODE_BREAK, NULL, 0);
+    return create_node(vm, ENA_NODE_BREAK, NULL, 0);
 }
 
 PARSE_RULE(continue_stmt) {
     CONSUME(CONTINUE);
     CONSUME(SEMICOLON);
-    return create_node(ENA_NODE_CONTINUE, NULL, 0);
+    return create_node(vm, ENA_NODE_CONTINUE, NULL, 0);
 }
 
 
@@ -630,14 +633,14 @@ PARSE_RULE(stmts) {
         num_stmts++;
     }
 
-    return create_node(ENA_NODE_STMTS, childs, num_stmts);
+    return create_node(vm, ENA_NODE_STMTS, childs, num_stmts);
 }
 
 
 // program: stmts EOF
 PARSE_RULE(program) {
     struct ena_node *child = PARSE(stmts);
-    return create_node(ENA_NODE_PROGRAM, child, 1);
+    return create_node(vm, ENA_NODE_PROGRAM, child, 1);
 }
 
 
@@ -645,8 +648,6 @@ struct ena_ast *ena_parse(struct ena_vm *vm, const char *filepath, const char *s
     // Initialize lexer state.
     vm->lexer.next_pos = 0;
     vm->lexer.current_line = 1;
-    vm->lexer.current_column = 1;
-    vm->lexer.current_token = NULL;
     vm->lexer.filepath = filepath;
     vm->lexer.script = ena_strdup(script);
 

@@ -10,7 +10,6 @@ struct ena_token {
     char *str;
     // The position in `script`.
     int line;
-    int column;
 };
 
 typedef enum {
@@ -65,6 +64,7 @@ struct ena_node {
     struct ena_node *child;
     int num_childs;
     int literal;
+    int lineno;
 };
 
 struct ena_ast {

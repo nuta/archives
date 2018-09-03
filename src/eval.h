@@ -141,4 +141,28 @@ struct ena_savepoint {
     ena_value_t ret_value;
 };
 
+struct ena_frame {
+    struct ena_frame *prev;
+    struct ena_func *func;
+    struct ena_node *called_from;
+};
+
+#define PUSH_FRAME(func_object) do { \
+        struct ena_frame *new_frame = ena_malloc(sizeof(*new_frame)); \
+        new_frame->func = func_object; \
+        new_frame->called_from = vm->current_node; \
+        new_frame->prev = vm->current_frame; \
+        vm->current_frame = new_frame; \
+    } while(0)
+
+#define POP_FRAME() do { \
+        if (!vm->current_frame) { \
+            break; \
+        } \
+        struct ena_frame *prev = vm->current_frame->prev; \
+        ena_free(vm->current_frame); \
+        vm->current_frame = prev; \
+    } while(0)
+
+
 #endif

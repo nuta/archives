@@ -69,9 +69,8 @@ const char *ena_get_token_name(ena_token_type_t type) {
 void ena_dump_tokens(struct ena_vm *vm, const char *script) {
     // Initialize the lexer.
     vm->lexer.next_pos = 0;
+    DEBUG("dump tokens");
     vm->lexer.current_line = 1;
-    vm->lexer.current_column = 1;
-    vm->lexer.current_token = NULL;
     vm->lexer.filepath = NULL;
     vm->lexer.script = script;
 
@@ -121,7 +120,6 @@ static inline char fetch_next_char(struct ena_vm *vm) {
 void ena_pushback_token(struct ena_vm *vm, struct ena_token *token) {
     vm->lexer.next_pos -= ena_strlen(token->str);
     vm->lexer.current_line = token->line;
-    vm->lexer.current_column = token->column;
 }
 
 struct ena_token *ena_fetch_next_token(struct ena_vm *vm) {
@@ -380,6 +378,10 @@ retry:;
                             goto return_token;
                         }
 
+                        if (nextc == '\n') {
+                            vm->lexer.current_line++;
+                        }
+
                         if (prevc == '/' && nextc == '*') {
                             depth++;
                         }
@@ -405,6 +407,7 @@ retry:;
                             goto return_token;
                         }
                     } while (nextc != '\n');
+                    vm->lexer.current_line++;
                     goto retry;
                 case '=':
                     type = ENA_TOKEN_DIV_ASSIGN;
@@ -421,11 +424,9 @@ retry:;
         //
         case '\n':
             vm->lexer.current_line++;
-            vm->lexer.current_column = 1;
             goto retry;
         case ' ':
         case '\t':
-            vm->lexer.current_column++;
             goto retry;
         default:
             SYNTAX_ERROR("unexpected '%c'", nextc);
@@ -436,8 +437,6 @@ return_token:;
     token->type = type;
     token->str = (char *) ena_strndup(&vm->lexer.script[start], str_len);
     token->line = vm->lexer.current_line;
-    token->column = vm->lexer.current_column;
-    vm->lexer.current_token = token;
     return token;
 }
 
@@ -446,7 +445,6 @@ struct ena_token *ena_copy_token(struct ena_token *token) {
     new_token->type = token->type;
     new_token->str = (char *) ena_strdup(token->str);
     new_token->line = token->line;
-    new_token->column = token->column;
     return new_token;
 }
 

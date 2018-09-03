@@ -39,6 +39,7 @@ static ena_value_t call_func(struct ena_vm *vm, ena_value_t self, struct ena_fun
     struct ena_scope *caller_scope = vm->current_scope;
     struct ena_scope *new_scope = ena_create_scope(vm, func->scope);
     PUSH_UNWIND_POINT();
+    PUSH_FRAME(func);
 
     int unwind_type;
     ena_value_t ret_value = ENA_UNDEFINED;
@@ -77,6 +78,7 @@ static ena_value_t call_func(struct ena_vm *vm, ena_value_t self, struct ena_fun
     // Returned from the function.
     vm->current_scope = caller_scope;
     vm->self = ENA_UNDEFINED;
+    POP_FRAME();
     POP_UNWIND_POINT();
     return ret_value;
 }
@@ -504,7 +506,8 @@ EVAL_NODE(OP_OR) {
 }
 
 static ena_value_t eval_node(struct ena_vm *vm, struct ena_node *node) {
-    DEBUG("eval: %s", ena_get_node_name(node->type));
+    DEBUG("eval: %s, L%d", ena_get_node_name(node->type), node->lineno);
+    vm->current_node = node;
 
     switch (node->type) {
 #define EVAL_CASE(name) \
@@ -584,6 +587,7 @@ bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char 
     if (ena_setjmp(vm->panic_jmpbuf) == 0) {
         vm->current_scope = ena_to_module_object(vm, module)->scope;
         PUSH_UNWIND_POINT();
+        PUSH_FRAME(NULL);
         int unwind_type;
         if ((unwind_type = EXEC_UNWIND_POINT()) == 0) {
             eval_node(vm, ast->tree);

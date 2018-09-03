@@ -22,6 +22,7 @@
             (char *) &vm->error.str, sizeof(vm->error.str), \
             fmt, ## __VA_ARGS__ \
         ); \
+        ena_stacktrace(vm); \
         ena_longjmp(vm->panic_jmpbuf, 1); \
     } while (0)
 #define BUG(fmt, ...) \
@@ -34,7 +35,7 @@
 #define SYNTAX_ERROR(fmt, ...) \
     ENA_PANIC(ENA_ERROR_INVALID_SYNTAX, \
         "%s: line %d: Syntax Error: " fmt, \
-        vm->lexer.filepath, vm->lexer.current_token->line, ## __VA_ARGS__)
+        vm->lexer.filepath, vm->lexer.current_line, ## __VA_ARGS__)
 
 #define NOT_YET_IMPLEMENTED() \
     ENA_PANIC( \
@@ -49,13 +50,13 @@ struct ena_error {
     ena_error_type_t type;
     char str[256];
     int line;
-    int column;
 };
 
 struct ena_module;
 struct ena_scope;
 struct ena_savepoint;
 struct ena_class;
+struct ena_frame;
 struct ena_object;
 struct ena_ast;
 struct ena_vm {
@@ -66,6 +67,8 @@ struct ena_vm {
     struct ena_hash_table ident2cstr;
     struct ena_hash_table cstr2ident;
     struct ena_module *modules;
+    struct ena_frame *current_frame;
+    struct ena_node *current_node;
     struct ena_scope *current_scope;
     struct ena_savepoint *current_savepoint;
     struct ena_class *current_class;
@@ -110,5 +113,6 @@ ena_value_t ena_get_var_value(struct ena_vm *vm, struct ena_scope *scope, ena_id
 bool ena_set_var_value(struct ena_vm *vm, struct ena_scope *scope, ena_ident_t name, ena_value_t new_value);
 void ena_check_args(struct ena_vm *vm, const char *name, const char *rule, ena_value_t *args, int num_args);
 struct ena_scope *ena_create_scope(struct ena_vm *vm, struct ena_scope *parent);
+void ena_stacktrace(struct ena_vm *vm);
 
 #endif

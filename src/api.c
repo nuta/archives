@@ -146,6 +146,7 @@ struct ena_vm *ena_create_vm() {
     vm->next_ident = IDENT_START;
     vm->ast_list = NULL;
     vm->self = ENA_UNDEFINED;
+    vm->current_node = NULL;
     vm->current_scope = NULL;
     vm->current_class = NULL;
     vm->current_savepoint = NULL;

@@ -173,5 +173,17 @@
             "externalConsole": false,
             "MIMode": "lldb"
         },
+        {
+            "name": "stack trace",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ena",
+            "args": ["test/bad/stack_trace.ena"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        },
     ]
 }
