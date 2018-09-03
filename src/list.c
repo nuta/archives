@@ -49,26 +49,26 @@ static ena_value_t list_pop(UNUSED struct ena_vm *vm, ena_value_t self, UNUSED e
 static ena_value_t list_get(UNUSED struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "get()", "i", args, num_args);
     struct ena_list *self_list = ena_to_list_object(vm, self);
-    struct ena_int *index = ena_to_int_object(vm, args[0]);
+    size_t index = ena_to_int(vm, args[0]);
 
-    if (index->value >= self_list->num_elems) {
+    if (index >= self_list->num_elems) {
         RUNTIME_ERROR("list index out of range");
     }
 
-    return self_list->elems[index->value];
+    return self_list->elems[index];
 }
 
 static ena_value_t list_set(struct ena_vm *vm, ena_value_t self, ena_value_t *args, int num_args) {
     ena_check_args(vm, "set()", "ix", args, num_args);
     struct ena_list *self_list = ena_to_list_object(vm, self);
-    struct ena_int *index = ena_to_int_object(vm, args[0]);
+    size_t index = ena_to_int(vm, args[0]);
     ena_value_t value = args[1];
 
-    if (index->value >= self_list->num_elems) {
+    if (index >= self_list->num_elems) {
         RUNTIME_ERROR("list index out of range");
     }
 
-    self_list->elems[index->value] = value;
+    self_list->elems[index] = value;
     return ENA_UNDEFINED;
 }
 

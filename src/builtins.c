@@ -4,19 +4,19 @@
 
 #define DEFINE_BINOP(name, type, c_op) \
     static ena_value_t int_##name(UNUSED struct ena_vm *vm, ena_value_t self, ena_value_t *args, UNUSED int num_args) { \
-        struct ena_int *lhs = ena_to_int_object(vm, self); \
-        struct ena_int *rhs = ena_to_int_object(vm, args[0]); \
-        return ena_create_##type(vm, lhs->value c_op rhs->value); \
+        int lhs = ena_to_int(vm, self); \
+        int rhs = ena_to_int(vm, args[0]); \
+        return ena_create_##type(vm, lhs c_op rhs); \
     }
 
 #define DEFINE_BINOP_DIV(name, type, c_op) \
     static ena_value_t int_##name(UNUSED struct ena_vm *vm, ena_value_t self, ena_value_t *args, UNUSED int num_args) { \
-        struct ena_int *lhs = ena_to_int_object(vm, self); \
-        struct ena_int *rhs = ena_to_int_object(vm, args[0]); \
-        if (rhs->value == 0) { \
+        int lhs = ena_to_int(vm, self); \
+        int rhs = ena_to_int(vm, args[0]); \
+        if (rhs == 0) { \
             RUNTIME_ERROR("divide by zero"); \
         } \
-        return ena_create_##type(vm, lhs->value c_op rhs->value); \
+        return ena_create_##type(vm, lhs c_op rhs); \
     }
 
 DEFINE_BINOP(add, int, +)

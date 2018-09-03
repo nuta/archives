@@ -9,20 +9,20 @@
 
 #define PUSH_UNWIND_POINT() \
     do { \
-        struct ena_savepoint *sp = ena_malloc(sizeof(*sp)); \
-        sp->prev = vm->current_savepoint; \
-        vm->current_savepoint = sp; \
+        struct ena_unwind_point *unwind_point = ena_malloc(sizeof(*unwind_point)); \
+        unwind_point->prev = vm->current_unwind_point; \
+        vm->current_unwind_point = unwind_point; \
     } while(0)
-#define EXEC_UNWIND_POINT() ena_setjmp(vm->current_savepoint->jmpbuf)
-#define UNWIND_UNWIND_POINT(unwind_type) ena_longjmp(vm->current_savepoint->jmpbuf, unwind_type); UNREACHABLE
+#define EXEC_UNWIND_POINT() ena_setjmp(vm->current_unwind_point->jmpbuf)
+#define UNWIND_UNWIND_POINT(unwind_type) ena_longjmp(vm->current_unwind_point->jmpbuf, unwind_type); UNREACHABLE
 #define POP_UNWIND_POINT() \
     do { \
-        struct ena_savepoint *current_sp = vm->current_savepoint; \
-        if (!current_sp) { \
-            BUG("pop savepoint in the top level"); \
+        struct ena_unwind_point *current_unwind_point = vm->current_unwind_point; \
+        if (!current_unwind_point) { \
+            BUG("pop unwind_point in the top level"); \
         } \
-        vm->current_savepoint = current_sp->prev; \
-        ena_free(current_sp); \
+        vm->current_unwind_point = current_unwind_point->prev; \
+        ena_free(current_unwind_point); \
     } while(0)
 
 struct ena_object_header {
@@ -135,8 +135,8 @@ typedef enum {
     ENA_UNWIND_CONTINUE = 3,
 } ena_unwind_type_t;
 
-struct ena_savepoint {
-    struct ena_savepoint *prev;
+struct ena_unwind_point {
+    struct ena_unwind_point *prev;
     ena_jmpbuf jmpbuf;
     ena_value_t ret_value;
 };
@@ -164,5 +164,24 @@ struct ena_frame {
         vm->current_frame = prev; \
     } while(0)
 
+// Assuming that ena_alloc_object() always returns an aligned address.
+#define IS_SMALLINT(value)  (((value) & 1) != 0)
+#define INT2SMALLINT(value) (((value) << 1) | 1)
+#define SMALLINT2INT(value) ((value) >> 1)
+
+// Assuming that sizeof(ena_value_t) > sizeof(uint16_t).
+// TODO: support negative integers.
+#define SMALL_INT_MAX ((int) sizeof(uint16_t))
+
+static inline int ena_to_int(struct ena_vm *vm, ena_value_t value) {
+    if (IS_SMALLINT(value)) {
+        return SMALLINT2INT(value);
+    } else if (ena_get_type(vm, value)) {
+        return ((struct ena_int *) value)->value;
+    } else {
+        // XXX: Unreachable
+        return 0;
+    }
+}
 
 #endif

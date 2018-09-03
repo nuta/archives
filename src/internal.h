@@ -54,7 +54,7 @@ struct ena_error {
 
 struct ena_module;
 struct ena_scope;
-struct ena_savepoint;
+struct ena_unwind_point;
 struct ena_class;
 struct ena_frame;
 struct ena_object;
@@ -70,7 +70,7 @@ struct ena_vm {
     struct ena_frame *current_frame;
     struct ena_node *current_node;
     struct ena_scope *current_scope;
-    struct ena_savepoint *current_savepoint;
+    struct ena_unwind_point *current_unwind_point;
     struct ena_class *current_class;
     ena_value_t self;
     struct ena_ast *ast_list;
@@ -96,7 +96,6 @@ typedef uintptr_t ena_ident_t;
      \
         return (struct ena_##type_name *) value; \
     }
-DEFINE_VALUE2OBJ_FUNC(int, ENA_T_INT)
 DEFINE_VALUE2OBJ_FUNC(string, ENA_T_STRING)
 DEFINE_VALUE2OBJ_FUNC(bool, ENA_T_BOOL)
 DEFINE_VALUE2OBJ_FUNC(list, ENA_T_LIST)

@@ -26,6 +26,10 @@ static void mark(struct ena_vm *vm, ena_value_t value) {
 
     switch (ena_get_type(vm, value)) {
         case ENA_T_INT:
+            if (!IS_SMALLINT(value)) {
+                mark_object((struct ena_object *) value);
+            }
+            break;
         case ENA_T_STRING:
             mark_object((struct ena_object *) value);
             break;

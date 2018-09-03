@@ -15,7 +15,7 @@
 void ena_stringify(UNUSED struct ena_vm *vm, char *buf, size_t buf_len, ena_value_t value) {
     switch (ena_get_type(vm, value)) {
         case ENA_T_INT:
-            ena_snprintf(buf, buf_len, "int(%d)", ena_to_int_object(vm, value)->value);
+            ena_snprintf(buf, buf_len, "int(%d)", ena_to_int(vm, value));
             break;
         case ENA_T_STRING:
             ena_snprintf(buf, buf_len, "string(%s)", ena_to_string_object(vm, value)->str);
@@ -64,6 +64,10 @@ ena_value_type_t ena_get_type(struct ena_vm *vm, ena_value_t v) {
         return ENA_T_BOOL;
     }
 
+    if (IS_SMALLINT(v)) {
+        return ENA_T_INT;
+    }
+
     if (ena_is_in_heap(vm, v)) {
         return ((struct ena_object *) v)->header.flags & OBJECT_FLAG_TYPE_MASK;
     }
@@ -76,9 +80,13 @@ ena_value_t ena_create_bool(UNUSED struct ena_vm *vm, int condition) {
 }
 
 ena_value_t ena_create_int(struct ena_vm *vm, int value) {
-    struct ena_int *obj = (struct ena_int *) ena_alloc_object(vm, ENA_T_INT);
-    obj->value = value;
-    return ENA_OBJ2VALUE(obj);
+    if (0 <= value && value <= SMALL_INT_MAX) {
+        return INT2SMALLINT(value);
+    } else {
+        struct ena_int *obj = (struct ena_int *) ena_alloc_object(vm, ENA_T_INT);
+        obj->value = value;
+        return ENA_OBJ2VALUE(obj);
+    }
 }
 
 ena_value_t ena_create_userdata(struct ena_vm *vm, void *data, void (*free)(struct ena_vm *vm, void *data)) {
@@ -99,7 +107,7 @@ static ena_value_t print_func_handler(UNUSED struct ena_vm *vm, ena_value_t *arg
         ena_value_t value = args[i];
         switch (ena_get_type(vm, value)) {
             case ENA_T_INT:
-                printf("%d ", ena_to_int_object(vm, value)->value);
+                printf("%d ", ena_to_int(vm, value));
                 break;
             case ENA_T_STRING:
                 printf("%s ", ena_to_string_object(vm, value)->str);
@@ -149,7 +157,7 @@ struct ena_vm *ena_create_vm() {
     vm->current_node = NULL;
     vm->current_scope = NULL;
     vm->current_class = NULL;
-    vm->current_savepoint = NULL;
+    vm->current_unwind_point = NULL;
     vm->modules = NULL;
     vm->error.type = ENA_ERROR_NONE;
     vm->stack_end = 0;
@@ -231,7 +239,7 @@ bool ena_is_equal(struct ena_vm *vm, ena_value_t v1, ena_value_t v2) {
         case ENA_T_NULL:
             return v1 == v2;
         case ENA_T_INT:
-            return ena_to_int_object(vm, v1)->value == ena_to_int_object(vm, v2)->value;
+            return ena_to_int(vm, v1) == ena_to_int(vm, v2);
         case ENA_T_STRING:
             return ena_to_string_object(vm, v1)->ident == ena_to_string_object(vm, v2)->ident;
         default:;

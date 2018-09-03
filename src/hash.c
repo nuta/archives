@@ -219,7 +219,7 @@ static bool value_equals(struct ena_vm *vm, void *key1, void *key2) {
 static ena_hash_digest_t value_hash(struct ena_vm *vm, void *key) {
     switch (ena_get_type(vm, (ena_value_t) key)) {
         case ENA_T_INT:
-            return ena_to_int_object(vm, (ena_value_t) key)->value;
+            return ena_to_int(vm, (ena_value_t) key);
         case ENA_T_STRING:
             return ena_to_string_object(vm, (ena_value_t) key)->size_in_bytes;
         default:

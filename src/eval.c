@@ -28,7 +28,7 @@ static inline struct ena_class *get_builtin_class_by_type(struct ena_vm *vm, ena
 static ena_value_t copy_if_immutable(struct ena_vm *vm, ena_value_t value) {
     switch (ena_get_type(vm, value)) {
         case ENA_T_INT:
-            return ena_create_int(vm, ena_to_int_object(vm, value)->value);
+            return ena_create_int(vm, ena_to_int(vm, value));
         default:
             return value;
     }
@@ -70,7 +70,7 @@ static ena_value_t call_func(struct ena_vm *vm, ena_value_t self, struct ena_fun
         // UNWIND_UNWIND_POINT() is invoked in the callee.
         switch (unwind_type) {
             case ENA_UNWIND_RETURN:
-                ret_value = vm->current_savepoint->ret_value;
+                ret_value = vm->current_unwind_point->ret_value;
                 break;
         }
     }
@@ -321,7 +321,7 @@ EVAL_NODE(RETURN) {
     }
 
     vm->current_scope = vm->current_scope->parent;
-    vm->current_savepoint->ret_value = ret_value;
+    vm->current_unwind_point->ret_value = ret_value;
     UNWIND_UNWIND_POINT(ENA_UNWIND_RETURN);
 
     /* UNREACHABLE */

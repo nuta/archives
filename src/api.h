@@ -3,12 +3,12 @@
 
 #include "utils.h"
 
-#define ENA_MAX_NUM_VALUES 4096
+#define ENA_MAX_NUM_VALUES 8192
 #ifdef ENA_DEBUG_BUILD
 // Run GC frequently to discover GC bugs.
 #   define ENA_GC_THRESHOLD   4060
 #else
-#   define ENA_GC_THRESHOLD   1024
+#   define ENA_GC_THRESHOLD   4098
 #endif
 
 // We use only lower 32-bit and MSB.
