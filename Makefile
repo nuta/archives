@@ -1,3 +1,5 @@
+VERSION = 0.0.0
+
 include ena.mk
 # Set 1 to verbose output.
 V =
@@ -8,7 +10,6 @@ TESTS =
 
 BENCHMARKS ?= fib startup_time print_loop
 
-VERSION = $(shell git rev-parse HEAD)
 ifeq ($(shell uname), Darwin)
 LLVM_PREFIX = /usr/local/opt/llvm/bin/
 endif
