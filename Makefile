@@ -1,13 +1,11 @@
+include ena.mk
 # Set 1 to verbose output.
 V =
 # Set 1 to build with coverage collector.
 COVERAGE =
-# Set 1 for release build.
-RELEASE =
 # Test files.
 TESTS =
-# avaiable ports: x64
-PORT ?= x64
+
 BENCHMARKS ?= fib startup-time
 
 VERSION = $(shell git rev-parse HEAD)
@@ -21,9 +19,9 @@ PROGRESS ?= printf "  \033[1;35m%7s  \033[1;m%s\033[m\n"
 override LD = $(CC)
 override LDFLAGS =
 override CFLAGS += \
+	$(ENA_CFLAGS) \
 	-g3 -Isrc/include -DENA_VERSION='"$(VERSION)"' \
 	-std=c11 -Wall -Wextra \
-	-DENA_PORT_$(PORT) \
 	-Werror=implicit-function-declaration \
 	-Werror=int-conversion \
 	-Werror=incompatible-pointer-types \
@@ -36,15 +34,12 @@ override CFLAGS += -fprofile-instr-generate -fcoverage-mapping
 override LDFLAGS += -fprofile-instr-generate -fcoverage-mapping
 endif
 
-COMMON_SOURCES := src/api.c src/lexer.c src/parser.c src/eval.c src/gc.c \
-	src/builtins.c src/string.c src/list.c src/map.c \
-	src/hash.c src/internal.c src/malloc.c src/utils.c
 
-SOURCES := $(COMMON_SOURCES) src/port/$(PORT).c
-WASM_SOURCES := $(COMMON_SOURCES) src/port/emscripten.c
+SOURCES := $(ENA_SOURCES) src/port/$(ENA_PORT).c
+WASM_SOURCES := $(ENA_SOURCES) src/port/emscripten.c
 
-ifeq ($(RELEASE),)
-override CFLAGS += -DENA_DEBUG_BUILD -DENA_WITH_TEST
+ifeq ($(ENA_RELEASE),)
+override CFLAGS += -DENA_WITH_TEST
 SOURCES += src/test.c
 endif
 
