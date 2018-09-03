@@ -10,6 +10,7 @@ static inline void mark_instance(struct ena_vm *vm, struct ena_instance *instanc
 static inline void mark_map(struct ena_vm *vm, struct ena_map *map);
 static inline void mark_list(struct ena_vm *vm, struct ena_list *list);
 static inline void mark_scope(struct ena_vm *vm, struct ena_scope *scope);
+static inline void mark_userdata(struct ena_vm *vm, struct ena_userdata *userdata);
 
 static inline void mark_object(struct ena_object *obj) {
     obj->header.flags |= OBJECT_FLAG_MARKED;
@@ -45,6 +46,9 @@ static void mark(struct ena_vm *vm, ena_value_t value) {
             break;
         case ENA_T_LIST:
             mark_list(vm, (struct ena_list *) value);
+            break;
+        case ENA_T_USERDATA:
+            mark_userdata(vm, (struct ena_userdata *) value);
             break;
         default:;
     }
@@ -103,6 +107,10 @@ static inline void mark_module(struct ena_vm *vm, struct ena_module *module) {
     mark_scope(vm, module->scope);
 }
 
+static inline void mark_userdata(UNUSED struct ena_vm *vm, struct ena_userdata *userdata) {
+    mark_object((struct ena_object *) userdata);
+}
+
 static inline void try_mark(struct ena_vm *vm, ena_value_t ptr) {
     bool aligned = ((uintptr_t) ptr - (uintptr_t) vm->value_pool) % sizeof(struct ena_object) == 0;
     if (ena_is_in_heap(vm, ptr) && aligned) {
@@ -143,6 +151,10 @@ static inline void destroy_map(struct ena_vm *vm, struct ena_map *map) {
     ena_hash_free_table(vm, &map->entries, NULL);
 }
 
+static inline void destroy_userdata(struct ena_vm *vm, struct ena_userdata *userdata) {
+    userdata->free(vm, userdata->data);
+}
+
 static void destroy(struct ena_vm *vm, ena_value_t value) {
     switch (ena_get_type(vm, value)) {
         case ENA_T_SCOPE:
@@ -153,6 +165,9 @@ static void destroy(struct ena_vm *vm, ena_value_t value) {
             break;
         case ENA_T_MAP:
             destroy_map(vm, (struct ena_map *) value);
+            break;
+        case ENA_T_USERDATA:
+            destroy_userdata(vm, (struct ena_userdata *) value);
             break;
         default:;
     }

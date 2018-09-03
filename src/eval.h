@@ -105,6 +105,12 @@ struct ena_module {
     struct ena_scope *scope;
 };
 
+struct ena_userdata {
+    struct ena_object_header header;
+    void *data;
+    void (*free)(struct ena_vm *vm, void *data);
+};
+
 struct ena_object {
     union {
         struct ena_object_header header;
@@ -116,6 +122,7 @@ struct ena_object {
         struct ena_list list;
         struct ena_map map;
         struct ena_module module;
+        struct ena_userdata userdata;
     };
 };
 

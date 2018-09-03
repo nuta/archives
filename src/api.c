@@ -44,6 +44,9 @@ void ena_stringify(UNUSED struct ena_vm *vm, char *buf, size_t buf_len, ena_valu
         case ENA_T_MODULE:
             ena_snprintf(buf, buf_len, "module");
             break;
+        case ENA_T_USERDATA:
+            ena_snprintf(buf, buf_len, "userdata(%p)", ena_to_userdata_object(vm, value)->data);
+            break;
         case ENA_T_UNDEFINED:
             ena_snprintf(buf, buf_len, "(undefined)");
             break;
@@ -76,6 +79,13 @@ ena_value_t ena_create_int(struct ena_vm *vm, int value) {
     struct ena_int *obj = (struct ena_int *) ena_alloc_object(vm, ENA_T_INT);
     obj->value = value;
     return ENA_OBJ2VALUE(obj);
+}
+
+ena_value_t ena_create_userdata(struct ena_vm *vm, void *data, void (*free)(struct ena_vm *vm, void *data)) {
+    struct ena_userdata *userdata = (struct ena_userdata *) ena_alloc_object(vm, ENA_T_USERDATA);
+    userdata->data = data;
+    userdata->free = free;
+    return ENA_OBJ2VALUE(userdata);
 }
 
 ena_value_t ena_create_class(struct ena_vm *vm) {

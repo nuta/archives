@@ -101,6 +101,7 @@ DEFINE_VALUE2OBJ_FUNC(map, ENA_T_MAP)
 DEFINE_VALUE2OBJ_FUNC(instance, ENA_T_INSTANCE)
 DEFINE_VALUE2OBJ_FUNC(class, ENA_T_CLASS)
 DEFINE_VALUE2OBJ_FUNC(module, ENA_T_MODULE)
+DEFINE_VALUE2OBJ_FUNC(userdata, ENA_T_USERDATA)
 
 ena_ident_t ena_cstr2ident(struct ena_vm *vm, const char *str);
 const char *ena_ident2cstr(struct ena_vm *vm, ena_ident_t ident);

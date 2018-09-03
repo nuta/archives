@@ -26,6 +26,7 @@ typedef enum {
     ENA_T_CLASS,
     ENA_T_INSTANCE,
     ENA_T_MODULE,
+    ENA_T_USERDATA,
     ENA_T_SCOPE, // used internally
     ENA_T_ANY, // used internally
 } ena_value_type_t;
@@ -65,6 +66,7 @@ ena_value_t ena_create_string(struct ena_vm *vm, const char *str, size_t size);
 ena_value_t ena_create_bool(struct ena_vm *vm, int condition);
 ena_value_t ena_create_func(struct ena_vm *vm, ena_native_func_t native_func);
 ena_value_t ena_create_class(struct ena_vm *vm);
+ena_value_t ena_create_userdata(struct ena_vm *vm, void *data, void (*free)(struct ena_vm *vm, void *data));
 void ena_define_method(struct ena_vm *vm, ena_value_t cls, const char *name, ena_native_method_t method);
 ena_value_t ena_create_module(struct ena_vm *vm);
 void ena_register_module(struct ena_vm *vm, const char *name, ena_value_t module);
