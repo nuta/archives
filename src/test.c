@@ -119,8 +119,8 @@ UNITTEST(gc) {
     struct ena_vm *vm = ena_create_vm();
     ena_value_t mod = ena_create_module(vm);
     struct ena_int *pi = (struct ena_int *) ena_create_int(vm, 3);
-    struct ena_int *unused1 = (struct ena_int *) ena_create_int(vm, 1);
-    struct ena_int *unused2 = (struct ena_int *) ena_create_int(vm, 2);
+    struct ena_string *unused1 = (struct ena_string *) ena_create_string(vm, "abc", 3);
+    struct ena_string *unused2 = (struct ena_string *) ena_create_string(vm, "123", 3);
     ena_add_to_module(vm, mod, "pi", ENA_OBJ2VALUE(pi));
     ena_register_module(vm, "mod", mod);
     ena_gc(vm);
