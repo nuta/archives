@@ -6,7 +6,7 @@ COVERAGE =
 # Test files.
 TESTS =
 
-BENCHMARKS ?= fib startup_time
+BENCHMARKS ?= fib startup_time print_loop
 
 VERSION = $(shell git rev-parse HEAD)
 ifeq ($(shell uname), Darwin)
