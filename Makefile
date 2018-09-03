@@ -35,14 +35,21 @@ override LDFLAGS += -fprofile-instr-generate -fcoverage-mapping
 endif
 
 
-SOURCES := $(ENA_SOURCES) src/port/$(ENA_PORT).c
-WASM_SOURCES := $(ENA_SOURCES) src/port/emscripten.c
-
+SOURCES := $(ENA_SOURCES)
 ifeq ($(ENA_RELEASE),)
 override CFLAGS += -DENA_WITH_TEST
 SOURCES += src/test.c
 endif
 
+ifeq ($(ENA_PORT), emscripten)
+SOURCES := $(ENA_SOURCES) src/port/emscripten.c
+CC := emcc
+override CFLAGS += \
+	-s "SINGLE_FILE=1" \
+	-s SAFE_HEAP=1 \
+	-s "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']" \
+	 -s "EXPORTED_FUNCTIONS=['_ena_create_vm', '_ena_create_module', '_ena_register_module', '_ena_eval', '_ena_get_error_cstr']"
+endif
 
 $(V).SILENT:
 .SECONDARY:
@@ -111,11 +118,15 @@ valgrind:
 	make clean
 
 wasm:
-	 emcc -DENA_PORT_emscripten -g4 $(WASM_SOURCES) -o docs/ena.js -s "SINGLE_FILE=1" -s "EXPORTED_FUNCTIONS=['_ena_create_vm', '_ena_create_module', '_ena_register_module', '_ena_eval', '_ena_get_error_cstr']" -s SAFE_HEAP=1 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']"
+	make ENA_RELEASE=1 ENA_PORT=emscripten ena.js
 
 ena: libena.a src/main.o Makefile
 	$(PROGRESS) LD $@
 	$(LD) $(LDFLAGS) -o $@ src/main.o libena.a
+
+ena.js: $(SOURCES:.c=.o) Makefile
+	$(PROGRESS) EMCC $@
+	$(CC) -o $@ $(SOURCES:.c=.o)
 
 libena.a: $(SOURCES:.c=.o) Makefile
 	$(PROGRESS) AR $@

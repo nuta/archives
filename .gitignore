@@ -3,12 +3,13 @@
 *.a
 *.profraw
 *.profdata
+*.wasm*
+*.wast
 /ena
 /compile_commands.json
 /.vscode/cquery_cached_index
+/ena.js
 /docs/ena.js
-/docs/ena.wasm*
-/docs/ena.wast
 /doxygen
 /coverage
 /clang-static-analyzer
