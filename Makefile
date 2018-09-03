@@ -74,8 +74,8 @@ coverage:
 benchmark:
 	$(PROGRESS) MAKE CLEAN
 	$(MAKE) clean
-	$(PROGRESS) MAKE RELEASE=1
-	$(MAKE) RELEASE=1
+	$(PROGRESS) MAKE ENA_RELEASE=1
+	$(MAKE) ENA_RELEASE=1
 	$(PROGRESS) BENCHMARK
 	cd benchmark && ./benchmark.py --verbose $(BENCHMARKS) -o results.json
 

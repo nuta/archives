@@ -47,7 +47,7 @@ jobs:
         - pyenv global 3.6.3
         - pip3 install -r tools/requirements.txt
       script:
-        - make benchmark CC=clang RELEASE=1
+        - make benchmark CC=clang ENA_RELEASE=1
 
     - name: valgrind
       os: linux
