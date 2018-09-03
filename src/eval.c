@@ -563,15 +563,7 @@ bool ena_eval(struct ena_vm *vm, ena_value_t module, const char *filepath, char 
     vm->error.type = ENA_ERROR_NONE;
 
     struct ena_ast *ast;
-    if (ena_setjmp(vm->panic_jmpbuf) == 0) {
-        ast = ena_parse(vm, filepath, script);
-#ifdef __EMSCRIPTEN__
-        /* XXX: In emscripten longjmp() jumps into here. */
-        if (vm->error.type != ENA_ERROR_NONE) {
-            return false;
-        }
-#endif
-    } else {
+    if ((ast = ena_parse(vm, filepath, script)) == NULL) {
         vm->stack_end = 0;
         return false;
     }
