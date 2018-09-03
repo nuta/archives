@@ -1,5 +1,5 @@
 # Set 1 for release build.
-ENA_RELEASE ?= 1
+ENA_RELEASE ?=
 
 # The directory to the ena.
 ENA_DIR ?=

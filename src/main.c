@@ -145,7 +145,8 @@ int main(int argc, char **argv) {
 
         FILE *f = fopen(argv[1], "r");
         if (!f) {
-            perror("ena");
+            fprintf(stderr, "ena: failed to open %s: ", argv[1]);
+            perror("");
             return 1;
         }
 
