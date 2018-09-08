@@ -46,7 +46,6 @@ window.onload = () => {
     for (const slide of slides) {
         const maxHeight = slide.clientHeight;
         const maxWidth = slide.clientWIdth;
-        console.log(slide.clientHeight, slide.scrollHeight);
         if (maxHeight < slide.scrollHeight - threshold
             || maxWidth < slide.scrollWidth - threshold) {
             addError(slide, "overflowed content");
