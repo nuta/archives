@@ -39,7 +39,7 @@ class SupershowController {
 
     private render(editor: vscode.TextEditor, doc: vscode.TextDocument) {
         let html = fs.readFileSync(
-            path.resolve(__dirname, "../ui/index.vscode.html"),
+            path.resolve(__dirname, "../ui/index.html"),
             { encoding: "utf-8" }
         );
 
@@ -59,7 +59,6 @@ class SupershowController {
         } else {
             mdHtml = "<html><body><pre>" + error + "</pre></body></html>";
         }
-
 
         html = html.replace("__HTML__", mdHtml);
         this.panel.webview.html = html;

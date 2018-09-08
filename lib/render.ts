@@ -54,7 +54,11 @@ export class RenderedMarkdown {
     }
 }
 
-export function render(text: string) {
+const SLIDE_HEADER = `
+<ul class="error"></ul>
+`;
+
+export function render(text: string): RenderedMarkdown {
     let lines = text.split("\n");
    const endOfFront = 1 + lines.slice(1).indexOf("---");
     if (lines[0] !== "---" || endOfFront == -1) {
@@ -65,11 +69,11 @@ export function render(text: string) {
     const front = yaml.safeLoad(lines.slice(1, endOfFront).join("\n"));
 
     // Split into slides.
-    // FIXME: Support blank slideTexts (i.e. "---\n---").
     const slideTexts = lines
         .slice(1 + endOfFront)
         .join("\n")
-        .split(/\n---(-*\s*)\n/)
+        .trim()
+        .split(/\n----*[^\n]*\n/)
         .filter(page => page.length > 0);
 
     const md = new Markdown({
@@ -104,7 +108,7 @@ export function render(text: string) {
 
         return {
             index: index + 1,
-            html: md.render(slideText)
+            html: SLIDE_HEADER + md.render(slideText)
         };
     });
 

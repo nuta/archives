@@ -1,4 +1,6 @@
 #!/usr/bin/env node
 
 const { main } = require('.')
-main.run()
+main.run().catch(err => {
+    console.error(err);
+})

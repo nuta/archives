@@ -1,0 +1,48 @@
+@page {
+    size: 908px 681px;
+    margin: 0;
+}
+
+@media print {
+    body: {
+        margin: 0;
+    }
+}
+
+body {
+    margin: 0;
+}
+
+.slide {
+    page-break-after: always;
+    width: 908px;
+    height: 681px;
+
+    h1 {
+        width: fit-content;
+    }
+
+    .error {
+        position: absolute;
+        margin: 0;
+        display: block;
+        width: 500px;
+        background: #ffb5b5;
+        z-index: 1000;
+        border-radius: 3px;
+    }
+}
+
+@media screen {
+    .slide {
+        border: 1px solid #5a5a5a;
+        margin: 30px auto 0;
+        overflow: hidden;
+    }
+}
+
+@media print {
+    .slide {
+        -webkit-print-color-adjust: exact;
+    }
+}

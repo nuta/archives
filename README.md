@@ -4,13 +4,13 @@ Supershow
 [![Test Coverage](https://api.codeclimate.com/v1/badges/9f03488e336796a1956f/test_coverage)](https://codeclimate.com/github/seiyanuta/supershow/test_coverage)
 [![Maintainability](https://api.codeclimate.com/v1/badges/9f03488e336796a1956f/maintainability)](https://codeclimate.com/github/seiyanuta/supershow/maintainability)
 
-A handy markdown presentation tool.
+Supershow creates a PDF presentation from Markdown by one command.
 
 Getting Started
 ---------------
 ```
 $ npm install -g supershow
-$ supershow file.md
+$ supershow file.md -o file.pdf
 ```
 
 Markdown

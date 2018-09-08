@@ -1,14 +1,6 @@
 import * as caporal from "caporal";
-import * as fs from "fs";
 import * as path from "path";
-import * as http from "http";
-import * as Event from "events";
-import * as express from "express";
-import * as WebSocket from "ws";
-import * as mime from "mime-types";
-import { Request, Response } from "express";
-import { logger } from "./logger";
-import { exportTo } from "./export";
+import { generatePdf } from "./pdf";
 const { version } = require(path.resolve(__dirname, "../package.json"));
 
 export interface CliArgs {
@@ -16,103 +8,20 @@ export interface CliArgs {
 }
 
 export interface CliOpts {
-    export: string;
+    output: string;
 }
 
-function serve(args: CliArgs) {
-    // Poll for file changes.
-    const fileEvent = new Event();
-    fs.watch(args.file, (ev) => {
-        logger.info("Detected a change, updating...");
-        const newText = fs.readFileSync(args.file, { encoding: "utf-8" });
-        if (newText.length > 0) {
-            fileEvent.emit("change", newText);
-        }
-    })
-
-    // Launch a local server.
-    const app = express();
-    const server = http.createServer(app);
-
-    app.get("/", (req: Request, res: Response) => {
-        const indexHtmlPath = path.resolve(__dirname, "../ui/index.standalone.html");
-        const html = fs.readFileSync(indexHtmlPath, { encoding: "utf-8" });
-        res.send(html);
-    });
-
-    // XXX
-    const nodeModulesPath = path.resolve(require.resolve("katex"), "../../..");
-
-    app.get("/katex/katex.min.css", (req: Request, res: Response) => {
-        const filepath = path.resolve(nodeModulesPath, "katex/dist/katex.min.css");
-        const css = fs.readFileSync(filepath, { encoding: "utf-8" });
-        res.type("text/css");
-        res.send(css);
-    });
-
-    app.get("/mdi/css/materialdesignicons.min.css", (req: Request, res: Response) => {
-        const filepath = path.resolve(nodeModulesPath, "@mdi/font/css/materialdesignicons.min.css");
-        const css = fs.readFileSync(filepath, { encoding: "utf-8" });
-        res.type("text/css");
-        res.send(css);
-    });
-
-    app.get("/mdi/fonts/*", (req: Request, res: Response) => {
-        const basename = path.basename(req.path);
-        const filepath = path.join(nodeModulesPath, "@mdi/font/fonts", basename);
-        const css = fs.readFileSync(filepath);
-        res.type(mime.lookup(basename) || "application/octet-stream");
-        res.send(css);
-    });
-
-    app.get("/katex/fonts/*", (req: Request, res: Response) => {
-        const basename = path.basename(req.path);
-        const filepath = path.join(nodeModulesPath, "katex/dist/fonts", basename);
-        const css = fs.readFileSync(filepath);
-        res.type(mime.lookup(basename) || "application/octet-stream");
-        res.send(css);
-    });
-
-    app.use(express.static(path.resolve(__dirname, "ui")));
-    app.use(express.static(path.resolve(path.dirname(args.file))));
-
-    // Launch a WebSocket server for auto update.
-    const wsServer = new WebSocket.Server({ server });
-    wsServer.on("connection", (ws: WebSocket) => {
-        ws.send(JSON.stringify({
-            event: "changed",
-            text: fs.readFileSync(args.file, { encoding: "utf-8" }),
-        }))
-
-        fileEvent.on("change", (newText: string) => {
-            ws.send(JSON.stringify({
-                event: "changed",
-                text: newText
-            }))
-        })
-    })
-
-    server.listen(2020, () => {
-        logger.progress("Started a local server at http://localhost:2020");
-    });
+async function doRun(args: CliArgs, opts: CliOpts) {
+    await generatePdf(args.file, opts.output ? opts.output : "output.pdf");
 }
 
-function doRun(args: CliArgs, opts: CliOpts) {
-
-    if (opts.export) {
-        exportTo(args.file, opts.export);
-    } else {
-        serve(args);
-    }
-}
-
-export function run(args?: string[]) {
+export async function run(args?: string[]) {
     caporal
         .version(version)
         .argument("file", "The markdown file.")
-        .option("--export <output>", "Export to a file.")
+        .option("-o <output>", "The output file.")
         .action(doRun as any);
 
-    const argv = args ? [process.argv0, "makestack", ...args] : process.argv;
-    caporal.parse(argv);
+    const argv = args ? [process.argv0, "supershow", ...args] : process.argv;
+    await caporal.parse(argv);
 }

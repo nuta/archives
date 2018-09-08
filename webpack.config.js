@@ -1,36 +1,16 @@
 const path = require("path");
-const { DefinePlugin } = require("webpack");
-const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlWebpackInlineSourcePlugin = require("html-webpack-inline-source-plugin");
 
-module.exports = {
+const config = {
     mode: process.env.WEBPACK_MODE,
     entry: "./ui/index.js",
     output: {
         filename: "index.js",
         path: path.resolve(__dirname, "dist/ui")
     },
-    resolve: {
-        alias: {
-            render: path.resolve(__dirname, "dist/render.js")
-        }
-    },
     module: {
         rules: [
-            {
-                test: /\.vue$/,
-                loader: "vue-loader",
-                options: {
-                    loaders: {
-                        scss: [
-                            "vue-style-loader",
-                            "css-loader",
-                            "postcss-loader",
-                            "sass-loader"
-                        ]
-                    }
-                }
-            },
             {
                 test: /\.scss$/,
                 use: [
@@ -50,13 +30,9 @@ module.exports = {
         ]
     },
     plugins: [
-        new DefinePlugin({
-            WEBPACK_MODE: JSON.stringify(process.env.WEBPACK_MODE)
-        }),
-        new VueLoaderPlugin(),
         new HtmlWebpackPlugin({
             inlineSource: ".(js|css)$",
-            template: path.resolve(__dirname, "ui/index.html"),
+            template: path.resolve(__dirname, "ui/index.html")
         }),
     ],
     devServer: {
@@ -68,3 +44,9 @@ module.exports = {
         port: 9000,
     }
 }
+
+if (process.env.WEBPACK_MODE === "production") {
+    config.plugins.push(new HtmlWebpackInlineSourcePlugin());
+}
+
+module.exports = config;
