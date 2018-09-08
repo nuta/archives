@@ -37,11 +37,13 @@ function scaleFontSizeToFit(container, elem) {
 window.onload = () => {
     const slides = document.querySelectorAll(".slide");
 
+    // Scale the size of slide title.
     for (const slide of slides) {
         const h1 = slide.querySelector("h1");
         scaleFontSizeToFit(slide, h1);
     }
 
+    // Warn overflows.
     const threshold = 10;
     for (const slide of slides) {
         const maxHeight = slide.clientHeight;
@@ -51,6 +53,17 @@ window.onload = () => {
             addError(slide, "overflowed content");
             console.error(`overflowed content (in "${getSlideTitle(slide)}")`);
         }
+    }
+
+    // Assign page numbers.
+    for (let i = 1; i < slides.length + 1; i++) {
+        if (i == 1) {
+            // Skip the title page.
+            continue;
+        }
+
+        const elem = slides[i - 1].querySelector(".page-number");
+        elem.innerText = i;
     }
 
     document.querySelector("#slides").style.visibility = "visible";

@@ -56,6 +56,7 @@ export class RenderedMarkdown {
 
 const SLIDE_HEADER = `
 <ul class="error"></ul>
+<p class="page-number"></p>
 `;
 
 export function render(text: string): RenderedMarkdown {

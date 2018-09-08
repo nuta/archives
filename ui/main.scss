@@ -17,9 +17,18 @@ body {
     page-break-after: always;
     width: 908px;
     height: 681px;
+    position: relative;
 
     h1 {
         width: fit-content;
+    }
+
+    .page-number {
+        position: absolute;
+        bottom: 0px;
+        right: 10px;
+        margin: 0;
+        padding: 0;
     }
 
     .error {
