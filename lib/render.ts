@@ -87,16 +87,8 @@ export function render(text: string): RenderedMarkdown {
         }
     });
 
-    // Enable KaTeX.
     md.use(MarkdownKaTeX, { throwOnError: true });
-
-    // Remove unwanted spaces in CJK sentences.
-    md.use(MarkdownCjkBreaks);
-
-    // Remove unwanted spaces in CJK sentences.
     md.use(MarkdownFootnote);
-
-    // Enable Emoji.
     md.use(MarkdownEmoji);
     md.renderer.rules.emoji = (token: Markdown.Token[], index: number) => {
       return twemoji.parse(token[index].content, { folder: "svg", ext: ".svg" });

@@ -5,6 +5,9 @@
     <title>{{ title }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0/katex.min.css" integrity="sha256-uXNHy6FK52Pb83SmU45mVAg7YECmr9Lwwu1zOz31j5c=" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/solarized-light.min.css" integrity="sha256-KacbO6Nou2geGJEUzQeKzKEdp/DENVGJKAd2v37moh0=" crossorigin="anonymous">
+    {{#csp}}
+        <meta http-equiv="Content-Security-Policy" content="{{{ csp }}}">
+    {{/csp}}
 </head>
 <body>
     <div id="slides" data-theme="{{ theme }}" style="visibility: hidden;">
