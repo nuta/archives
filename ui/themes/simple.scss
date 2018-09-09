@@ -13,13 +13,19 @@
         width: 30px;
     }
 
-    img {
-        width: 80vw;
-        margin: 0 auto;
+    code {
+        background: #fafafa;
+        display: block;
+        padding: 20px 35px;
+        font-size: 25px;
     }
 
-    .wallpaper {
-        background: #1a1c1f;
+    img {
+        margin: 0 auto;
+        max-width: 80%;
+        max-height: 80%;
+        text-align: center;
+        display: block;
     }
 
     .slide {
@@ -30,5 +36,20 @@
     .page-number {
         color: #5a5a5a;
         font-size: 70%;
+    }
+
+    .footnotes-sep {
+        border: none;
+    }
+
+    .footnote-backref {
+        display: none;
+    }
+
+    .footnotes {
+        position: absolute;
+        bottom: 10px;
+        display: block;
+        font-size: 75%;
     }
 }

@@ -1,5 +1,6 @@
 import * as path from "path";
 import * as fs from "fs";
+import * as mustache from "mustache";
 import * as puppeteer from "puppeteer";
 import { render } from "./render";
 
@@ -11,13 +12,16 @@ export async function generatePdf(file: string, output: string) {
 
     let slidesHtml = "";
     const rendered = render(md);
+    const size = (rendered.front.size || "4:3").replace(":", "x");
     for (const slide of rendered.slides) {
-        slidesHtml += "<div class=\"slide\">" + slide.html + "</div>";
+        slidesHtml += `<div class="slide size-${size}">${slide.html}</div>`;
     }
 
-    let html = template.replace("__TITLE__", rendered.front.title);
-    html = html.replace("__THEME__", rendered.front.theme || "simple");
-    html = html.replace("__HTML__", slidesHtml);
+    const html = mustache.render(template, {
+        title: rendered.front.title || "No title",
+        theme: rendered.front.theme || "simple",
+        body: slidesHtml,
+    });
     fs.writeFileSync(htmlFile, html);
     const uri = "file://" + htmlFile;
 
@@ -25,8 +29,8 @@ export async function generatePdf(file: string, output: string) {
     const page = await browser.newPage();
     page.on('console', msg => console.log('chrome:', msg.text()));
     await page.goto(uri, { waitUntil: "networkidle0" });
-    const width  = "908px";
-    const height = "681px";
+    const width  = size == "16x9" ? "1210px" : "908px";
+    const height = size == "16x9" ? "681px" : "681px";
     await page.pdf({ path: output, width, height });
     await browser.close();
 }

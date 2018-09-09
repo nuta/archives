@@ -1,8 +1,3 @@
-@page {
-    size: 908px 681px;
-    margin: 0;
-}
-
 @media print {
     body: {
         margin: 0;
@@ -15,9 +10,17 @@ body {
 
 .slide {
     page-break-after: always;
-    width: 908px;
-    height: 681px;
     position: relative;
+
+    &.size-4x3 {
+        width: 908px;
+        height: 681px;
+    }
+
+    &.size-16x9 {
+        width: 1210px;
+        height: 681px;
+    }
 
     h1 {
         width: fit-content;
