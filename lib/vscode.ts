@@ -1,8 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as mustache from "mustache";
 import * as vscode from "vscode";
-import { render } from "./render";
+import { renderHtml } from "./render";
 
 class SupershowController {
     private disposable: vscode.Disposable;
@@ -45,33 +44,20 @@ class SupershowController {
     }
 
     private render(editor: vscode.TextEditor, doc: vscode.TextDocument) {
-        let rendered;
-        let error;
+        const md = doc.getText();
+        const line = editor.selection.active.line;
+        const csp = [
+            "default-src 'none'",
+            "img-src    vscode-resource: https: file:",
+            "script-src vscode-resource: https: 'unsafe-inline'",
+            "style-src  vscode-resource: https: 'unsafe-inline'",
+            "font-src   vscode-resource: https:",
+        ];
         try {
-            rendered = render(doc.getText());
+            this.panel.webview.html = renderHtml(md, line, { csp: csp.join(";") }).html;
         } catch (e) {
-            error = e.stack;
+            this.panel.webview.html = "<html><body><pre>" + e.stack + "</pre></body></html>";
         }
-
-        let html;
-        if (rendered) {
-            html = mustache.render(this.template, {
-                title: rendered.front.title || "No title",
-                theme: rendered.front.theme || "simple",
-                body: rendered.htmlByLine(editor.selection.active.line),
-                csp: [
-                    "default-src 'none'",
-                    "img-src    vscode-resource: https: file:",
-                    "script-src vscode-resource: https: 'unsafe-inline'",
-                    "style-src  vscode-resource: https: 'unsafe-inline'",
-                    "font-src   vscode-resource: https:",
-                ].join(";")
-            });
-        } else {
-            html = "<html><body><pre>" + error + "</pre></body></html>";
-        }
-
-        this.panel.webview.html = html;
     }
 }
 

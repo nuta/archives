@@ -1,6 +1,10 @@
+import * as fs from "fs";
+import * as path from "path";
 import * as yaml from "js-yaml";
 import * as highlightjs from "highlight.js";
 import * as Markdown from "markdown-it";
+import * as querystring from "querystring";
+import * as mustache from "mustache";
 const MarkdownKaTeX = require("@iktakahiro/markdown-it-katex");
 const MarkdownEmoji = require("markdown-it-emoji");
 const MarkdownFootnote = require("markdown-it-footnote");
@@ -49,8 +53,8 @@ export class RenderedMarkdown {
         return this.slides[index].html;
     }
 
-    public htmlByLine(line: number): string {
-        return this.html(this.ranges.getIndexByLine(line));
+    public getIndexByLine(line: number): number {
+        return this.ranges.getIndexByLine(line);
     }
 }
 
@@ -68,6 +72,7 @@ export function render(text: string): RenderedMarkdown {
 
     // Parse front matter.
     const front = yaml.safeLoad(lines.slice(1, endOfFront).join("\n"));
+    front["fonts"] = front["fonts"] || {};
 
     // Split into slides.
     const slideTexts = lines
@@ -89,6 +94,7 @@ export function render(text: string): RenderedMarkdown {
 
     md.use(MarkdownKaTeX, { throwOnError: true });
     md.use(MarkdownFootnote);
+    md.use(MarkdownCjkBreaks);
     md.use(MarkdownEmoji);
     md.renderer.rules.emoji = (token: Markdown.Token[], index: number) => {
       return twemoji.parse(token[index].content, { folder: "svg", ext: ".svg" });
@@ -107,4 +113,41 @@ export function render(text: string): RenderedMarkdown {
 
     const range = new SlideRanges(ranges);
     return new RenderedMarkdown(front, slides, range);
+}
+
+export function renderHtml(text: string, line?: number, ctx?: any): any {
+    const templateFile = path.resolve(__dirname, "../dist/ui/index.html");
+    const template = fs.readFileSync(templateFile, { encoding: "utf-8" });
+    const rendered = render(text);
+    const slideIndex = line ? rendered.getIndexByLine(line) : null;
+    const size = (rendered.front.size || "4:3").replace(":", "x");
+
+    let body = "";
+    if (slideIndex) {
+        body = rendered.slides[slideIndex].html;
+    } else {
+        for (const slide of rendered.slides) {
+            body += `<div class="slide size-${size}">${slide.html}</div>`;
+        }
+    }
+
+    const titleFont = rendered.front.fonts["title"] || "Roboto";
+    const bodyFont = rendered.front.fonts["body"] || "Lato";
+    const codeFont = rendered.front.fonts["code"] || "Source Code Pro";
+    const fontFamily = querystring.stringify({
+        family: [titleFont, bodyFont, codeFont].map(f => `${f}:400,700`)
+    });
+
+    const html = mustache.render(template, {
+        title: rendered.front.title || "No Title",
+        theme: rendered.front.theme || "simple",
+        body,
+        fontFamily,
+        titleFont,
+        bodyFont,
+        codeFont,
+        ...ctx
+    });
+
+    return { html, front: rendered.front };
 }

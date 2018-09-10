@@ -22,7 +22,9 @@ body {
         height: 681px;
     }
 
+    font-family: var(--body-font), -apple-system, BlinkMacSystemFont, 'Segoe UI'  Ubuntu, 'Open Sans', 'Helvetica Neue', sans-serif;
     h1 {
+        font-family: var(--title-font), -apple-system, BlinkMacSystemFont, 'Segoe UI'  Ubuntu, 'Open Sans', 'Helvetica Neue', sans-serif;
         width: fit-content;
     }
 
