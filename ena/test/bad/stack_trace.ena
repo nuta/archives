@@ -1,0 +1,30 @@
+// error: runtime
+
+func a(n) {
+    // comment
+    // comment
+    // comment
+    b(n + 1);
+}
+
+func b(n) {
+    e(n + 1);
+    e(n + 1);
+    c(n + 1);
+}
+
+func c(n) {
+    // comment
+    // comment
+    d(n + 1);
+}
+
+func d(n) {
+    print(n);
+    func_does_not_exist();
+}
+
+func e(n) {
+}
+
+a(1);

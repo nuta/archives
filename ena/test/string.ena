@@ -1,0 +1,5 @@
+var s = "Hello, ";
+s = s.concat("World");
+s = s.replace(", World", " ");
+s = s + ":)";
+assert_eq(s, "Hello :)");

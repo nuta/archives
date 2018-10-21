@@ -1,0 +1,13 @@
+var small1 = 1;
+var small2 = 32768;
+small2 += 1;
+assert_eq(small1, 1);
+assert_eq(small2, 32769);
+
+var small3 = -32768;
+small3 -= 2;
+assert_eq(small3, -32770);
+
+var small4 = 410000000;
+var small5 = small4 + 10000000;
+assert_eq(small5, 420000000);

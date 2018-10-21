@@ -1,0 +1,14 @@
+func returnCounter() {
+    var i = 0;
+    func counter() {
+        i = i + 1;
+        return i;
+    }
+
+    return counter;
+}
+
+var f = returnCounter();
+assert_eq(f(), 1);
+assert_eq(f(), 2);
+assert_eq(f(), 3);

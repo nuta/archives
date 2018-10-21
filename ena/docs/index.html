@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>The ena Programming Language</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.1/ace.js" integrity="sha256-kCykSp9wgrszaIBZpbagWbvnsHKXo4noDEi6ra6Y43w=" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: "Source Code Pro", "Monaco", Ubuntu, 'Helvetica Neue', sans-serif;
+            color: #1e1e1e;
+        }
+
+        h2, h3, h4 {
+            font-family: "Open Sans", -apple-system, Ubuntu, 'Helvetica Neue', sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        nav {
+            text-align: center;
+        }
+
+        main {
+            width: 700px;
+            margin: 10px auto 10px;
+        }
+
+        .pitch {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sandbox {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 2px solid #bfbfbf;
+        }
+
+        .sandbox #script {
+            width: 100%;
+            height: 300px;
+            border-bottom: 2px solid #bfbfbf;
+        }
+
+        .sandbox .bottom {
+            background: #fdfdfd;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .sandbox #result-container {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            height: 100px;
+            overflow: scroll;
+        }
+
+        .sandbox #result-container.error {
+            background: #feb9b9;
+        }
+
+        .sandbox #result {
+            margin-top: 10px;
+            font-size: 15px;
+        }
+
+        .sandbox .buttons {
+            background: #f0f0f0;
+            width: 100%;
+            padding: 5px 7px 5px;
+            box-sizing: border-box;
+        }
+
+        .button {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            background: #2f65ea;
+            color: #fafafa;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background: #3f75fa;
+            cursor: pointer;
+        }
+
+        .button:active {
+            background: #194197;
+        }
+
+        .features {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ena</h1>
+    </header>
+    <nav>
+        <a href="https://github.com/seiyanuta/ena">GitHub</a>
+    </nav>
+    <main>
+        <div class="pitch">
+            <p>A simple, intuitive, embeddable scripting language.</p>
+        </div>
+        <div class="sandbox">
+                <div id="script"></div>
+                <div class="bottom">
+                    <div id="result-container">
+                        <b id="progress"></b>
+                        <pre id="result"></pre>
+                    </div>
+                    <div class="buttons">
+                        <a class="button" href="#" onClick="runScript()">Run</a>
+                    </div>
+                </div>
+        </div>
+        <div class="features">
+            <b>Features:</b>
+            <ul>
+                <li>Familiar syntax that you can learn in 3 minutes.</li>
+                <li>Dynamically-typed, class-based, and object-oriented language.</li>
+                <li>Slow yet small and portable implementation.<br>
+                    (tree-walk, mark-and-sweep/conservative GC)</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const editor = ace.edit(document.querySelector('#script'), {
+            mode: "ace/mode/swift",
+            fontSize: "14px",
+        });
+        editor.setValue(`print("Hello World from ena!");`, 1);
+
+        Module = {
+            'print': (text) => {
+                document.querySelector('#result').innerText += text + "\n";
+            }
+        }
+
+        function runScript() {
+            document.querySelector('#progress').innerText = "Running...";
+            document.querySelector('#result-container').classList.remove("error");
+            document.querySelector('#result').innerText = "";
+            const script = editor.getValue();
+
+            const ena_create_vm = Module.cwrap('ena_create_vm', 'number', []);
+            const ena_create_module = Module.cwrap('ena_create_module', 'number', ['number']);
+            const ena_register_module = Module.cwrap('ena_register_module', 'number', ['number', 'string', 'number']);
+            const ena_eval = Module.cwrap('ena_eval', 'number', ['number', 'number', 'string', 'string']);
+            const ena_get_error_cstr = Module.cwrap('ena_get_error_cstr', 'string', ['number']);
+
+            const vm = ena_create_vm();
+            const main = ena_create_module(vm);
+            ena_register_module(vm, "main", main);
+            if (!ena_eval(vm, main, "main", script)) {
+                document.querySelector('#progress').innerText = "Error!";
+                document.querySelector('#result-container').classList.add("error");
+                document.querySelector('#result').innerText += "Error: " + ena_get_error_cstr(vm);
+            } else {
+                document.querySelector('#progress').innerText = "Result:";
+            }
+        }
+    </script>
+    <script src="ena.js"></script>
+</body>
+</html>

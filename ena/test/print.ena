@@ -1,0 +1,2 @@
+print("Hello!");
+print("My", "name", "is", null, 101);

@@ -1,0 +1,35 @@
+var i = 0;
+var ans = 0;
+
+// ans += 3
+i = 0;
+while i < 3 {
+    ans = ans + i;
+    i = i + 1;
+}
+
+// ans += 2
+i = 0;
+while i < 3 {
+    ans = ans + i;
+    if i == 1 {
+        break;
+    }
+    i = i + 1;
+}
+
+// ans += 5
+i = 0;
+var continued = 0;
+while i < 4 {
+    ans = ans + i;
+
+    if continued == 0 {
+        continued = 1;
+        continue;
+    }
+
+    i = i + 1;
+}
+
+assert_eq(ans, 10);

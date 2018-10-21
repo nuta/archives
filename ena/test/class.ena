@@ -1,0 +1,20 @@
+class Car {
+    func gas() {
+        return 10;
+    }
+}
+
+class User {
+    func new(age) {
+        self.user_age = age;
+        self.my_car = Car();
+    }
+
+    func age() {
+        return self.user_age - 3;
+    }
+}
+
+var mike = User(24);
+var age = mike.age();
+assert_eq(mike.my_car.gas(), 10);

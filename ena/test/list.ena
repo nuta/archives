@@ -1,0 +1,9 @@
+var users = [
+    ["Joey", "Actor", 27],
+    ["Chandler", "Data Processing Supervisor", 27],
+    ["Ross", "Dinosaur", 27]
+];
+
+users.append([1, 2, 3]);
+users.append(774);
+assert_eq(users.pop(), 774);
