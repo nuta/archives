@@ -1,0 +1,40 @@
+language: rust
+rust: nightly
+dist: trusty
+sudo: false
+
+cache:
+  pip: true
+  directories:
+    - qemu
+
+notifications:
+  on_success: change
+  on_failure: change
+
+kernel_addons: &kernel_addons
+    apt:
+      sources:
+        - llvm-toolchain-trusty-6.0
+        - ubuntu-toolchain-r-test
+      packages:
+        - clang-6.0
+        - lld-6.0
+        - mtools
+
+matrix:
+  include:
+    - env: M=kernel ARCH=x64
+      addons: *kernel_addons
+    - env: M=kernel ARCH=posix
+      addons: *kernel_addons
+    - env: M=lib LIB=netstack
+
+before_script:
+  - pyenv global 3.6.3
+  - wget http://www.antlr.org/download/antlr-4.7.1-complete.jar
+  - ./tools/install-qemu
+  - ./tools/bootstrap
+
+script:
+  - ./tools/ci.py

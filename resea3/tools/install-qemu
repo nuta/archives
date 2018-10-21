@@ -1,0 +1,13 @@
+#!/bin/sh
+set -ue
+if [ -f qemu/x86_64-softmmu/qemu-system-x86_64 ]; then
+    echo "QEMU is already installed in $PWD/qemu, skipping..."
+else
+    rm -rf qemu
+    wget https://download.qemu.org/qemu-3.0.0-rc2.tar.xz
+    tar xf qemu-3.0.0-rc2.tar.xz
+    mv qemu-3.0.0-rc2 qemu
+    cd qemu
+    ./configure --target-list=x86_64-softmmu
+    make -j2
+fi

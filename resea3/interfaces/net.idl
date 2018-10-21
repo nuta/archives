@@ -1,0 +1,12 @@
+[id(7)]
+interface net {
+    [id(1)] close(sock: usize) -> ();
+//    [id(3)] connect_tcp(addr: string, addr_length: usize, flags: u32) -> (sock: usize);
+//    [id(5)] listen_tcp(addr: string, addr_length: usize, flags: u32) -> (sock: usize);
+   [id(7)] open_udp(addr: string, addr_length: usize, flags: u32) -> (sock: usize);
+//    [id(9)] accept(sock: usize) -> (sock: usize, addr: string, addr_length: usize);
+//    [id(11)] send(sock: usize, data: buffer, data_length: usize, addr: string, addr_length: usize);
+//    [id(13)] recv(sock: usize) -> (data: buffer, data_length: usize, addr: string, addr_length: usize);
+//    [id(15)] write(sock: usize, data: buffer, data_length: usize) -> ();
+//    [id(16)] read(sock: usize) -> (data: buffer, data_length: usize);
+}

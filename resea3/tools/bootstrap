@@ -1,0 +1,10 @@
+#!/bin/bash
+if [ "$(uname)" = "Darwin" ]; then
+    brew install coreutils gnu-tar python3 llvm binutils \
+        qemu bochs mtools cquery
+else
+    sudo apt install build-essential clang lld mtools qemu-system \
+        python3 python3-pip
+fi
+
+pip3 install antlr4-python3-runtime jinja2 colorama

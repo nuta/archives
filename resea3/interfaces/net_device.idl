@@ -1,0 +1,9 @@
+[id(104)]
+interface net_device {
+    [id(1)] send(data: buffer, data_length: usize) -> ();
+    [id(3)] listen(listener: channel) -> ();
+    [id(5)] get_hwaddr() -> (hwaddr: buffer, hwaddr_length: usize);
+
+    // TODO: this should be in net_device_listener
+    [id(7), oneway] received(data: buffer, data_length: usize);
+}

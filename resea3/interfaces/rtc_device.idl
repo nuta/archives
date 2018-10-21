@@ -1,0 +1,4 @@
+[id(102)]
+interface rtc_device {
+    [id(1)] read() -> (ymd: u32, hms: u32, nsec: u32);
+}

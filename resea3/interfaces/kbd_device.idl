@@ -1,0 +1,6 @@
+[id(101)]
+interface kbd_device {
+    [id(1)] listen(listener: channel) -> ();
+    [id(3), oneway] keydown(keycode: u16) -> ();
+    [id(4), oneway] keyup(keycode: u16) -> ();
+}

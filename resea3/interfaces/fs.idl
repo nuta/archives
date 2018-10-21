@@ -1,0 +1,10 @@
+[id(6)]
+interface fs {
+    [id(1)] open(path: string, path_length: usize) -> (fd: imax);
+    [id(3)] open_dir(path: string, path_length: usize) -> (fd: imax);
+    [id(5)] close(fd: imax) -> ();
+    [id(7)] read(fd: imax, offset: u64, length: usize) -> (data: buffer, data_length: usize);
+    [id(9)] write(fd: imax, offset: u64, data: buffer, data_length: usize) -> ();
+    [id(11)] readdir(fd: imax, offset: u64) -> (path: string, path_length: usize);
+    [id(13)] stat(fd: imax, path: string, path_length: usize) -> (stat: buffer, stat_length: usize);
+}

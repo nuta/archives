@@ -1,0 +1,4 @@
+[id(2)]
+interface logging {
+    [id(1)] emit(str: string, str_length: usize) -> ();
+}
