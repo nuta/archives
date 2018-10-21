@@ -1,0 +1,11 @@
+{
+    "private": true,
+    "makestack": {
+        "production": {
+            "platform": "firebase",
+            "firebaseProject": ""
+        },
+        "plugins": ["http_adapter"],
+        "devPlugins": ["serial_adapter", "http_adapter"]
+    }
+}

@@ -1,0 +1,16 @@
+*.o
+*.log
+*.tgz
+compile_commands.json
+dist
+coverage
+.nyc_output
+node_modules
+esp32/app
+esp32/build
+esp32/deps
+esp32/sdkconfig.old
+.vscode/cquery_cached_index
+
+# example proejct
+hello

@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+import glob
+import os
+import argparse
+import re
+import subprocess
+import sys
+import functools
+
+RELEASED_TAGS = subprocess.check_output(["git", "tag"], encoding="utf-8").strip().split("\n")
+
+def is_clean():
+    return subprocess.check_output(["git", "status", "--porcelain"]) == b''
+
+def compare_semvers(x, y):
+    x_major, x_minor, x_patch = map(int, x.lstrip("v").split("."))
+    y_major, y_minor, y_patch = map(int, y.lstrip("v").split("."))
+    return (
+        x_major > y_major or
+        (x_major == y_major) and (x_minor > y_minor) or
+        (x_major == y_major) and (x_minor == y_minor) and (x_patch > y_patch)
+    )
+
+def current_version():
+    return max(RELEASED_TAGS, key=functools.cmp_to_key(compare_semvers))
+
+def compute_version(current, next):
+    if next.startswith("v"):
+        return next
+
+    major, minor, patch = map(int, current.lstrip("v").split("."))
+    if next == "major":
+        major += 1
+        minor = 0
+        patch = 0
+    elif next == "minor":
+        minor += 1
+        patch = 0
+    elif next == "patch":
+        patch += 1
+
+    return f"v{major}.{minor}.{patch}"
+
+def bump_npmpkg_versions(version):
+    stdout = subprocess.check_output(
+        ["npm", "--no-git-tag-version", "version", version],
+        encoding="utf-8"
+    ).rstrip()
+
+    if stdout != version:
+        sys.exit("Error: something went wrong with npm versions:\n" + stdout)
+
+def main():
+    parser = argparse.ArgumentParser(description="Release a new version.")
+    parser.add_argument("version")
+    args = parser.parse_args()
+
+    if not re.compile(r"v[0-9]+\.[0-9]+\.[0-9]+").match(args.version) and \
+        args.version not in ['major', 'minor', 'patch']:
+        sys.exit("Usage: ./tools/release <vX.X.X | major | minor | patch>")
+
+    if not is_clean():
+        subprocess.run(["git", "status", "-s"])
+        sys.exit("The git repo is not clean.")
+
+    version = compute_version(current_version(), args.version)
+    if version in RELEASED_TAGS:
+        sys.exit(f"{version} already exists.")
+
+    print(f"Release {version}")
+
+    print("Updating package.json...")
+    bump_npmpkg_versions(version)
+
+    print("Creating a new commit...")
+    subprocess.run(["git", "add", "."])
+    subprocess.run(["git", "commit", "-m", f"version {version.lstrip('v')}"])
+    subprocess.run(["git", "tag", version])
+
+    print("Done! Push the release commit and tags to GitHub!")
+
+if __name__ == "__main__":
+    main()

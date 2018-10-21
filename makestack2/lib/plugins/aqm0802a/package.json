@@ -1,0 +1,6 @@
+{
+    "name": "@makestack/aqm0802a",
+    "makestack": {
+        "sources": ["aqm0802a.cpp", "aqm0802a.h"]
+    }
+}
