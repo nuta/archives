@@ -1,0 +1,63 @@
+[data-theme="simple"] {
+    font-size: 35px;
+    line-height: 2.5em;
+    color: #3a3a3a;
+
+    h1 {
+        color: #1a1a1a;
+        font-weight: 700;
+    }
+
+    .katex {
+        font-size: 1em !important;
+    }
+
+    .emoji {
+        display: inline-block;
+        height: 30px;
+        width: 30px;
+    }
+
+    code {
+        background: #fafafa;
+        display: block;
+        padding: 20px 35px;
+        font-family: var(--code-font), monospace;
+        font-size: 28px;
+        line-height: 1.8em;
+    }
+
+    img {
+        margin: 0 auto;
+        max-width: 80%;
+        max-height: 80%;
+        text-align: center;
+        display: block;
+    }
+
+    .slide {
+        background: #ffffff;
+        padding: 10px 20px;
+    }
+
+    .page-number {
+        color: #5a5a5a;
+        font-size: 70%;
+    }
+
+    .footnotes-sep {
+        border: none;
+    }
+
+    .footnote-backref {
+        display: none;
+    }
+
+    .footnotes {
+        position: absolute;
+        bottom: 10px;
+        display: block;
+        font-size: 75%;
+        width: 100%;
+    }
+}
