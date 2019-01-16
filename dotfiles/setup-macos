@@ -1,0 +1,74 @@
+#!/usr/bin/env zsh
+set -ev
+
+PKGS=(tmux zsh git coreutils findutils gnupg2 vim mutt \
+      wget xz gnu-tar the_silver_searcher tree peco jq \
+      python3 ruby node npm yarn ghc cabal-install rustup-init \
+      binutils nmap tig peco docker-machine reattach-to-user-namespace)
+APPS=(google-chrome shiftit keepingyouawake google-cloud-sdk \
+      wireshark vlc java xquartz basictex)
+FONTS=(font-source-code-pro font-source-sans-pro font-satisfy \
+       font-m-plus font-noto-sans font-noto-serif)
+PIPS=(ipython)
+VSCODE=(robertohuertasm.vscode-icons dbaeumer.vscode-eslint ms-vscode.cpptools \
+        octref.vetur PeterJausovec.vscode-docker donjayamanne.python \
+        rust-lang.rust wmaurer.vscode-jumpy justusadam.language-haskell \
+        msjsdiag.debugger-for-chrome christian-kohler.path-intellisense eamodio.gitlens)
+
+cd ~/.dotfiles
+sudo -v
+
+if ! finger seiya|grep Shell|grep /bin/zsh > /dev/null 2>&1; then
+    chsh -s `which zsh`
+fi
+
+if ! brew --version > /dev/null 2>&1 ; then
+    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+else
+    brew update  --verbose
+    brew upgrade --verbose
+fi
+
+brew install caskroom/cask/brew-cask
+brew tap caskroom/fonts
+brew cask install $APPS $FONTS
+brew install $PKGS
+pip3 install $PIPS
+yes 1 | rustup-init
+code --install-extension $VSCODE
+
+echo "Set the GPG key password in Keychain!"
+security add-generic-password -a pinentry-macos-keychain -s pinentry-macos-keychain
+open -a "Keychain Access"
+
+# dock
+defaults write com.apple.dock persistent-apps -array '()'
+defaults write com.apple.dock autohide -bool true
+
+# misc
+sudo nvram SystemAudioVolume=" "
+defaults write com.apple.LaunchServices LSQuarantine -bool false
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+
+# chrome
+defaults write com.google.Chrome DisablePrintPreview -bool true
+defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
+
+# login
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+# screenshot
+defaults write com.apple.screencapture disable-shadow -bool true
+
+# finder
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+defaults write NSGlobalDomain com.apple.springing.enabled -bool true
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+
+killall Dock
+killall Finder
+

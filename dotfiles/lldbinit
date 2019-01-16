@@ -1,0 +1,3 @@
+settings set prompt ">>> "
+settings set x86-disassembly-flavor intel
+settings set notify-void true

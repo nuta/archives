@@ -1,0 +1,55 @@
+[core]
+  editor = nano
+  quotepath = false
+  attributesfile = ~/.gitattributes
+  excludesfile   = ~/.gitignore
+
+[user]
+  name  = Seiya Nuta
+  email = nuta@seiya.me
+  signingkey = 94EC908C
+
+[color]
+  ui     = auto
+  status = auto
+  diff   = auto
+  branch = auto
+  interative = auto
+
+[color "diff"]
+  whitespace = "red reverse"
+
+[alias]
+  a   = add
+  b   = brach
+  p   = push
+  pu  = push -u
+  up  = pull --rebase
+  c   = clone --recursive
+  co  = checkout
+  cm  = commit
+  cma = commit --amend
+  r   = rebase
+  ri  = rebase -i
+  rc  = rebase --continue
+  s   = status --short --branch
+  df  = diff
+  st  = diff --staged
+  l   = log --stat -p
+  wip = "!git add -A .; git commit -m wip"
+  squashed-merge = "merge --squash --no-commit --ff-only"
+
+[diff]
+  compactionHeuristic = true
+
+[commit]
+  gpgsign = true
+
+[push]
+  default = current
+	followTags = true
+
+[grep]
+  lineNumber = true
+[credential "https://source.developers.google.com"]
+	helper = gcloud

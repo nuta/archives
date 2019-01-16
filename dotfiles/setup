@@ -1,0 +1,40 @@
+#!/usr/bin/env zsh
+set -e
+
+symlink() {
+    src=~/.dotfiles/$1
+    dest=$2
+    [ "$dest" = "" ] && dest=~/.$(basename $src)
+
+    mkdir -p "$(dirname $dest)"
+    if [ ! -f "$dest" -a ! -d "$dest" ]; then
+      echo "$src -> $dest"
+      ln -si $src $dest
+    fi
+}
+
+[ "$(uname)" = "Darwin" ] && CONFIG_DIR=~/Library/Application\ Support
+[ "$(uname)" = "Linux" ]  && CONFIG_DIR=~/.config
+
+cd
+mkdir -p ~/.ssh ~/.gnupg
+
+symlink bin
+symlink curlrc
+symlink lldbinit
+symlink zshrc
+symlink tmux.conf
+symlink vimrc
+symlink gitattributes
+symlink gitconfig
+symlink gitignore
+symlink curlrc
+symlink wgetrc
+symlink muttrc
+symlink hyper.js
+symlink gpg-agent.conf ~/.gnupg/gpg-agent.conf
+symlink ssh_config ~/.ssh/config
+symlink vscode.json             $CONFIG_DIR/Code/User/settings.json
+symlink vscode-keybindings.json $CONFIG_DIR/Code/User/keybindings.json
+
+zcompile ~/.zshrc

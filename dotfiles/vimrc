@@ -1,0 +1,73 @@
+syntax enable
+set nocompatible
+set ttyfast
+set t_Co=256
+set number
+set sidescroll=1
+set confirm
+set hidden
+set hlsearch
+set incsearch
+set ignorecase
+set smartcase
+set wrapscan
+set gdefault
+set expandtab
+set tabstop=8
+set shiftwidth=4
+set nrformats-=octal
+set virtualedit=block
+set whichwrap=b,s,[,],<,>
+set backspace=indent,eol,start
+set showmatch
+set wildmenu
+set wildmode=full:list
+set matchtime=1
+set visualbell t_vb=
+set laststatus=2
+set nofoldenable
+set backup
+set backupdir=~/.vim/backup
+set directory=~/.vim/tmp
+set formatoptions-=rcot
+set mouse=
+set tags=./tags;
+set splitbelow
+set splitright
+set showcmd
+set autoindent
+set smartindent
+
+filetype plugin on
+colorscheme default
+
+"
+"  Key bindings
+"
+inoremap <C-a> <Esc>0i
+inoremap <C-e> <Esc>0$
+nnoremap <C-a> 0
+nnoremap <C-e> $
+nnoremap <C-x> i
+inoremap <C-x> <Esc>
+vnoremap <C-x> <Esc>
+snoremap <C-x> <Esc>
+xnoremap <C-x> <Esc>
+nnoremap <C-j> <C-w><C-j>
+nnoremap <C-k> <C-w><C-k>
+nnoremap <C-l> <C-w><C-l>
+nnoremap <C-h> <C-w><C-h>
+
+"
+"  File types
+"
+autocmd BufRead,BufNewFile *.cpp setfiletype cpp
+autocmd BufRead,BufNewFile *.cxx setfiletype cpp
+autocmd BufRead,BufNewFile *.c   setfiletype cpp
+autocmd BufRead,BufNewFile *.h   setfiletype cpp
+autocmd BufRead,BufNewFile *.go  setfiletype go
+autocmd BufRead,BufNewFile *.py  setfiletype python
+autocmd BufRead,BufNewFile *.rb  setfiletype ruby
+autocmd BufRead,BufNewFile *.yml setfiletype yml
+autocmd FileType make setlocal noexpandtab shiftwidth=8 softtabstop=0
+

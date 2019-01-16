@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+import os
+import sys
+import time
+import subprocess
+import logging
+
+logging.basicConfig(filename=os.path.expanduser('~/.pinentry.log'),
+                    level=logging.DEBUG)
+logger = logging.getLogger("pinentry-macos-keychain")
+
+def main():
+    print("OK Pleased to meet you")
+    while True:
+        try:
+            line = input()
+        except EOFError:
+            return
+
+        logger.debug(f"> {line}")
+        if line.startswith("GETINFO"):
+            _, key = line.split(" ", 1)
+            info = {
+                "flavor": "",
+            }
+
+            if key in info:
+                print(f"D {info[key]}")
+            else:
+                logger.error(f"undefied info: `{key}'")
+        elif line.startswith("GETPIN"):
+            pin = subprocess.check_output(["security", "find-generic-password",
+                                           "-a", "pinentry-macos-keychain",
+                                           "-s", "pinentry-macos-keychain", "-w"]).decode("utf-8").strip()
+
+            if pin == "":
+                logger.error("password is not set")
+
+            print(f"D {pin}")
+            logger.debug(f"D {pin}")
+            pin = "X" * len(pin)
+        else:
+            logger.debug("unknown command, ignoring")
+
+        print("OK")
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        logger.error(e, exc_info=True)

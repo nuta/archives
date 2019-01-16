@@ -1,0 +1,4 @@
+mutt/cache
+/vim/.netrwhist
+/config
+!/config/nvim

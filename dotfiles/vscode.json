@@ -1,0 +1,48 @@
+{
+  "files.autoSave": "off",
+  "files.exclude": {
+    "**/*.o": true,
+    "**/.*.deps": true,
+    "**/*.so": true
+  },
+
+  "editor.codeLens": false,
+  "update.channel": "none",
+  "editor.fontSize": 11,
+  "terminal.integrated.fontSize": 11,
+
+  "git.enableSmartCommit": true,
+
+  "diffEditor.renderSideBySide": false,
+  "editor.wordWrap": "off",
+  "editor.formatOnType": false,
+  "editor.cursorBlinking": "smooth",
+  "editor.renderControlCharacters": true,
+  "editor.renderIndentGuides": true,
+  "editor.renderLineHighlight": "all",
+  "editor.parameterHints": false,
+  "files.trimTrailingWhitespace": true,
+  "extensions.ignoreRecommendations": true,
+  "extensions.autoUpdate": true,
+
+  "editor.minimap.enabled": false,
+
+  "workbench.activityBar.visible": false,
+  "workbench.iconTheme": "vscode-icons",
+  "terminal.integrated.cursorStyle": "line",
+  "terminal.integrated.fontFamily": "Source Code Pro",
+  "terminal.integrated.cursorBlinking": true,
+  "python.pythonPath": "python3",
+  "window.zoomLevel": 1,
+  "cquery.cacheDirectory": "/Users/seiya/.vscode/cquery/${workspaceFolderBasename}",
+  "latex-workshop.chktex.enabled": true,
+  "latex-workshop.latex.autoBuild.onSave.enabled":false,
+  "typescript.tsserver.log": "verbose",
+  "workbench.startupEditor": "newUntitledFile",
+  "vsicons.dontShowNewVersionMessage": true,
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.message.update.show": false,
+  "cquery.highlighting.enabled.types": true,
+  "C_Cpp.autoAddFileAssociations": false,
+  "workbench.colorTheme": "Material Theme Darker"
+}

@@ -1,0 +1,2 @@
+#!/usr/bin/env zsh
+ag -t '(TODO|XXX|FIXME)' $*

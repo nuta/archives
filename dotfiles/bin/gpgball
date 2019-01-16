@@ -1,0 +1,6 @@
+#!/usr/bin/env zsh
+set -ue
+name=$1
+target=$2
+
+tar Jcf - $target | gpg2 -e -r nuta@seiya.me > $name.tar.xz.gpg

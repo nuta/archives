@@ -1,0 +1,38 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+    {
+        "key": "cmd+'",
+        "command": "workbench.action.terminal.toggleTerminal"
+    },
+    {
+        "key": "cmd+;",
+        "command": "workbench.action.terminal.focus"
+    },
+    {
+        "key": "cmd+;",
+        "command": "workbench.action.focusActiveEditorGroup",
+        "when": "terminalFocus"
+    },
+    {
+        "key": "cmd+j",
+        "command": "extension.jumpy-word",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "cmd+i",
+        "command": "workbench.action.keepEditor"
+    },
+    {
+        "key": "cmd+k enter",
+        "command": "-workbench.action.keepEditor"
+    },
+    {
+        "key": "cmd+k",
+        "command": "workbench.action.webview.openDeveloperTools"
+    },
+    {
+        "key": "shift+enter",
+        "command": "-python.execSelectionInTerminal",
+        "when": "editorFocus && !findInputFocussed && !replaceInputFocussed && editorLangId == 'python'"
+    }
+]

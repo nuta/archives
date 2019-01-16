@@ -1,0 +1,36 @@
+set imap_user = seiyanuta
+set imap_pass = `security find-generic-password -w -s mutt -a mutt`
+
+set folder = "imaps://imap.gmail.com:993"
+set spoolfile = "+INBOX"
+set postponed="+[Gmail]/Drafts"
+unset record
+
+set realname = "Seiya Nuta"
+set from = "nuta@seiya.me"
+set smtp_url = "smtp://seiyanuta@smtp.gmail.com:587"
+set smtp_pass = `security find-generic-password -w -s mutt -a mutt`
+
+set sort = threads
+set sort_aux = 'reverse-last-date-received'
+
+set timeout = 3
+set mail_check = 900
+set imap_keepalive = 300
+
+set header_cache = "~/.mutt/cache/headers"
+set message_cachedir = "~/.mutt/cache/bodies"
+set certificate_file = "~/.mutt/certificates"
+
+set imap_idle
+set imap_check_subscribed
+unset imap_passive
+unset imap_peek
+
+set sidebar_visible = yes
+set sidebar_width = 20
+set sidebar_short_path = no
+color sidebar_new yellow default
+bind index,pager \CP sidebar-prev
+bind index,pager \CN sidebar-next
+bind index,pager \CI sidebar-open

@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+[ "$1" = "" ] && "Usage: af query"
+find . | grep $1
