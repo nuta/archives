@@ -1,0 +1,21 @@
+language: rust
+dist: xenial
+osx_image: xcode10.1
+cache: cargo
+
+os:
+  - linux
+  - osx
+
+rust:
+  - nightly
+  - beta
+  - stable
+
+script:
+  - cargo build --release
+  - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then cargo bench; fi
+  - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then cargo test --release; fi
+
+notifications:
+  email: false
