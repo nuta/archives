@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import time
+import tempfile
+import subprocess
+import webbrowser
+
+WEBUI_SERVER_PATH = os.path.abspath(os.path.dirname(__file__)) + "/homu-webui/server.py"
+
+
+
+if __name__ == "__main__":
+
+  devnull = open("/dev/null") if os.path.exists("/dev/null") else tempfile.TemporaryFile()
+  webui   = subprocess.Popen(
+                             [sys.executable, os.path.basename(WEBUI_SERVER_PATH)], 
+                             stdout=subprocess.PIPE,
+                             stderr=devnull,
+                             cwd=os.path.dirname(os.path.abspath(WEBUI_SERVER_PATH))
+                            )
+  URLLine = False
+  url     = ""
+
+
+  while True:
+    line = webui.stdout.readline().rstrip()
+
+    if URLLine:
+      url = line
+      break
+
+    URLLine = True # the URL is written in the secound line
+
+  webbrowser.open(url)
+
+  # wait for homu-webui
+  while webui.poll() == None:
+    time.sleep(7)
+
+  # exit
+  devnull.close()

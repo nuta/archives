@@ -1,0 +1,11 @@
+Package: Homu
+Version: 1.0
+Section: admin
+Priority: optional
+Architecture: all
+Installed-Size: 832
+Depends: python-yaml, python-flask
+Maintainer: Seiya Nuta <nutaseiya@users.sourceforge.jp>
+Homepage: http://bitbucket.org/seiya/homu
+Description: A security enhancement for non-professional users.
+

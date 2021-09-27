@@ -1,0 +1,3489 @@
+From 2fb8f1fbccdef15c57e5da2f0717c000c5120c77 Mon Sep 17 00:00:00 2001
+From: Seiya Nuta <nuta@seiya.me>
+Date: Thu, 5 Jul 2012 15:15:59 +0900
+Subject: [PATCH 1/2] homu: first commit
+
+---
+ Makefile                 |    4 +-
+ arch/x86/kernel/ioport.c |   10 ++
+ fs/exec.c                |    9 ++
+ fs/ioctl.c               |    8 +
+ fs/namei.c               |   27 ++++
+ fs/open.c                |   16 +-
+ homu/Makefile            |   12 ++
+ homu/homu_port.h         |   82 ++++++++++
+ homu/hook.c              |  381 ++++++++++++++++++++++++++++++++++++++++++++++
+ homu/init.c              |   43 ++++++
+ homu/lib.c               |   23 +++
+ homu/main/Makefile       |   14 ++
+ homu/main/OMakefile      |   48 ++++++
+ homu/main/OMakeroot      |    5 +
+ homu/main/app.c          |  106 +++++++++++++
+ homu/main/error.c        |   30 ++++
+ homu/main/homu_main.h    |  278 +++++++++++++++++++++++++++++++++
+ homu/main/info.c         |   22 +++
+ homu/main/init.c         |   17 +++
+ homu/main/judge.c        |   68 +++++++++
+ homu/main/log.c          |   42 +++++
+ homu/main/memory.c       |   53 +++++++
+ homu/main/mode.c         |   41 +++++
+ homu/main/process.c      |  124 +++++++++++++++
+ homu/main/query.c        |  234 ++++++++++++++++++++++++++++
+ homu/main/reset.c        |   40 +++++
+ homu/main/string.c       |  104 +++++++++++++
+ homu/main/test_main.c    |   94 ++++++++++++
+ homu/main/user.c         |   40 +++++
+ homu/main/userres.c      |   31 ++++
+ homu/memory.c            |   21 +++
+ homu/proc.c              |  113 ++++++++++++++
+ homu/prosid.c            |   59 +++++++
+ homu/userid.c            |   52 +++++++
+ kernel/fork.c            |   13 ++
+ net/socket.c             |   10 ++
+ 36 files changed, 2271 insertions(+), 3 deletions(-)
+ create mode 100644 homu/Makefile
+ create mode 100644 homu/homu_port.h
+ create mode 100644 homu/hook.c
+ create mode 100644 homu/init.c
+ create mode 100644 homu/lib.c
+ create mode 100644 homu/main/Makefile
+ create mode 100644 homu/main/OMakefile
+ create mode 100644 homu/main/OMakeroot
+ create mode 100644 homu/main/app.c
+ create mode 100644 homu/main/error.c
+ create mode 100644 homu/main/homu_main.h
+ create mode 100644 homu/main/info.c
+ create mode 100644 homu/main/init.c
+ create mode 100644 homu/main/judge.c
+ create mode 100644 homu/main/log.c
+ create mode 100644 homu/main/memory.c
+ create mode 100644 homu/main/mode.c
+ create mode 100644 homu/main/process.c
+ create mode 100644 homu/main/query.c
+ create mode 100644 homu/main/reset.c
+ create mode 100644 homu/main/string.c
+ create mode 100644 homu/main/test_main.c
+ create mode 100644 homu/main/user.c
+ create mode 100644 homu/main/userres.c
+ create mode 100644 homu/memory.c
+ create mode 100644 homu/proc.c
+ create mode 100644 homu/prosid.c
+ create mode 100644 homu/userid.c
+
+diff --git a/Makefile b/Makefile
+index 058320d..1dfb6ef 100644
+--- a/Makefile
++++ b/Makefile
+@@ -360,7 +360,7 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
+ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
+                    -Iarch/$(hdr-arch)/include/generated -Iinclude \
+                    $(if $(KBUILD_SRC), -I$(srctree)/include) \
+-                   -include $(srctree)/include/linux/kconfig.h
++                   -include $(srctree)/include/linux/kconfig.h -Ihomu\
+ 
+ KBUILD_CPPFLAGS := -D__KERNEL__
+ 
+@@ -708,7 +708,7 @@ export mod_strip_cmd
+ 
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+-core-y		+= kernel/ mm/ fs/ ipc/ security/ crypto/ block/
++core-y		+= kernel/ mm/ fs/ ipc/ security/ crypto/ block/ homu/
+ 
+ vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, $(init-y) $(init-m) \
+ 		     $(core-y) $(core-m) $(drivers-y) $(drivers-m) \
+diff --git a/arch/x86/kernel/ioport.c b/arch/x86/kernel/ioport.c
+index 8c96897..2fbdb20 100644
+--- a/arch/x86/kernel/ioport.c
++++ b/arch/x86/kernel/ioport.c
+@@ -20,12 +20,22 @@
+ /*
+  * this changes the io permissions bitmap in the current task.
+  */
++
++/*homu*/
++#include <homu_port.h>
++/*homu_end*/
++
+ asmlinkage long sys_ioperm(unsigned long from, unsigned long num, int turn_on)
+ {
+ 	struct thread_struct *t = &current->thread;
+ 	struct tss_struct *tss;
+ 	unsigned int i, max_long, bytes, bytes_updated;
+ 
++	/*homu*/
++	if(!homu_hook_ioperm())
++		return -EPERM;
++	/*homu_end*/
++
+ 	if ((from + num <= from) || (from + num > IO_BITMAP_BITS))
+ 		return -EINVAL;
+ 	if (turn_on && !capable(CAP_SYS_RAWIO))
+diff --git a/fs/exec.c b/fs/exec.c
+index b1fd202..9cd3858 100644
+--- a/fs/exec.c
++++ b/fs/exec.c
+@@ -1451,6 +1451,10 @@ int search_binary_handler(struct linux_binprm *bprm,struct pt_regs *regs)
+ 
+ EXPORT_SYMBOL(search_binary_handler);
+ 
++/*homu*/
++#include <homu_port.h>
++/*homu_end*/
++
+ /*
+  * sys_execve() executes a new program.
+  */
+@@ -1466,6 +1470,11 @@ static int do_execve_common(const char *filename,
+ 	int retval;
+ 	const struct cred *cred = current_cred();
+ 
++	/*homu*/
++	if(!homu_hook_execve(filename))
++		return -EPERM;
++	/*homu_end*/
++
+ 	/*
+ 	 * We move the actual failure in case of RLIMIT_NPROC excess from
+ 	 * set*uid() to execve() because too many poorly written programs
+diff --git a/fs/ioctl.c b/fs/ioctl.c
+index 29167be..7058b13 100644
+--- a/fs/ioctl.c
++++ b/fs/ioctl.c
+@@ -601,12 +601,20 @@ int do_vfs_ioctl(struct file *filp, unsigned int fd, unsigned int cmd,
+ 	return error;
+ }
+ 
++/*homu*/
++#include <homu_port.h>
++/*homu_end*/
+ SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
+ {
+ 	struct file *filp;
+ 	int error = -EBADF;
+ 	int fput_needed;
+ 
++	/*homu*/
++	if(!homu_hook_ioctl())
++		return -EPERM;
++	/*homu_end*/
++
+ 	filp = fget_light(fd, &fput_needed);
+ 	if (!filp)
+ 		goto out;
+diff --git a/fs/namei.c b/fs/namei.c
+index c427919..048d3ec 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -2674,8 +2674,15 @@ out_dput:
+ 	return error;
+ }
+ 
++/*homu*/
++#include <homu_port.h>
++/*homu_end*/
+ SYSCALL_DEFINE2(mkdir, const char __user *, pathname, umode_t, mode)
+ {
++	/*homu*/
++	if(!homu_hook_mkdir())
++		return PTR_ERR(ERR_PTR(-EPERM));
++	/*homu_end*/
+ 	return sys_mkdirat(AT_FDCWD, pathname, mode);
+ }
+ 
+@@ -2795,6 +2802,10 @@ exit1:
+ 
+ SYSCALL_DEFINE1(rmdir, const char __user *, pathname)
+ {
++	/*homu*/
++	if(!homu_hook_rmdir())
++		return PTR_ERR(ERR_PTR(-EPERM));
++	/*homu_end*/
+ 	return do_rmdir(AT_FDCWD, pathname);
+ }
+ 
+@@ -2904,6 +2915,10 @@ SYSCALL_DEFINE3(unlinkat, int, dfd, const char __user *, pathname, int, flag)
+ 
+ SYSCALL_DEFINE1(unlink, const char __user *, pathname)
+ {
++	/*homu*/
++	if(!homu_hook_unlink())
++		return PTR_ERR(ERR_PTR(-EPERM));
++	/*homu_end*/
+ 	return do_unlinkat(AT_FDCWD, pathname);
+ }
+ 
+@@ -2964,6 +2979,10 @@ out_putname:
+ 
+ SYSCALL_DEFINE2(symlink, const char __user *, oldname, const char __user *, newname)
+ {
++        /*homu*/
++        if(!homu_hook_mkdir())
++                return PTR_ERR(ERR_PTR(-EPERM));
++        /*homu_end*/
+ 	return sys_symlinkat(oldname, AT_FDCWD, newname);
+ }
+ 
+@@ -3077,6 +3096,10 @@ out:
+ 
+ SYSCALL_DEFINE2(link, const char __user *, oldname, const char __user *, newname)
+ {
++        /*homu*/
++        if(!homu_hook_link())
++                return PTR_ERR(ERR_PTR(-EPERM));
++        /*homu_end*/
+ 	return sys_linkat(AT_FDCWD, oldname, AT_FDCWD, newname, 0);
+ }
+ 
+@@ -3328,6 +3351,10 @@ exit:
+ 
+ SYSCALL_DEFINE2(rename, const char __user *, oldname, const char __user *, newname)
+ {
++        /*homu*/
++        if(!homu_hook_rename())
++                return PTR_ERR(ERR_PTR(-EPERM));
++        /*homu_end*/
+ 	return sys_renameat(AT_FDCWD, oldname, AT_FDCWD, newname);
+ }
+ 
+diff --git a/fs/open.c b/fs/open.c
+index 5720854..c73f543 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -644,6 +644,10 @@ static inline int __get_file_write_access(struct inode *inode,
+ 	return error;
+ }
+ 
++/*homu*/
++#include <homu_port.h>
++/*homu_end*/
++
+ static struct file *__dentry_open(struct dentry *dentry, struct vfsmount *mnt,
+ 					struct file *f,
+ 					int (*open)(struct inode *, struct file *),
+@@ -685,6 +689,13 @@ static struct file *__dentry_open(struct dentry *dentry, struct vfsmount *mnt,
+ 	if (error)
+ 		goto cleanup_all;
+ 
++	/*homu*/
++	if(!homu_hook_open(f)){
++		error = -EPERM;
++		goto cleanup_all;
++	}
++	/*homu_end*/
++
+ 	error = break_lease(inode, f->f_flags);
+ 	if (error)
+ 		goto cleanup_all;
+@@ -976,9 +987,10 @@ long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
+ 	int lookup = build_open_flags(flags, mode, &op);
+ 	char *tmp = getname(filename);
+ 	int fd = PTR_ERR(tmp);
+-
+ 	if (!IS_ERR(tmp)) {
++
+ 		fd = get_unused_fd_flags(flags);
++
+ 		if (fd >= 0) {
+ 			struct file *f = do_filp_open(dfd, tmp, &op, lookup);
+ 			if (IS_ERR(f)) {
+@@ -988,9 +1000,11 @@ long do_sys_open(int dfd, const char __user *filename, int flags, umode_t mode)
+ 				fsnotify_open(f);
+ 				fd_install(fd, f);
+ 			}
++
+ 		}
+ 		putname(tmp);
+ 	}
++
+ 	return fd;
+ }
+ 
+diff --git a/homu/Makefile b/homu/Makefile
+new file mode 100644
+index 0000000..32a1e29
+--- /dev/null
++++ b/homu/Makefile
+@@ -0,0 +1,12 @@
++#
++# Makefile for Homu
++#
++
++obj-y := main/       \
++         init.o      \
++         proc.o      \
++         memory.o    \
++         userid.o    \
++         prosid.o    \
++         lib.o       \
++         hook.o
+diff --git a/homu/homu_port.h b/homu/homu_port.h
+new file mode 100644
+index 0000000..78650bb
+--- /dev/null
++++ b/homu/homu_port.h
+@@ -0,0 +1,82 @@
++
++#ifndef _HOMU_PORT_H_
++#define _HOMU_PORT_H_
++
++
++#include <linux/fs.h>
++#include "main/homu_main.h"
++
++#define QUERY_MAX      (1000)
++#define HOMU_USER_MAX  (1000)
++#define HOMU_PROS_MAX  (8000)
++
++
++#define HOMU_RD_LOG(name) do{ char* homu_log_tmp        = kmalloc(100, GFP_KERNEL);           \
++                              homu_main_userid_t userid = homu_getUserIdByUID(homu_getUID()); \
++                                                                                              \
++                                sprintf(homu_log_tmp, "MODE_CHANGED %s", name);               \
++                                homu_main_writeLog(homu_main, userid, homu_log_tmp);          \
++                            }while(0)
++
++#define HOMU_RV_LOG(res) do{ char* homu_log_tmp     = kmalloc(2000, GFP_KERNEL);                                   \
++                             homu_main_userid_t userid = homu_getUserIdByUID(homu_getUID());                       \
++                             char* homu_log_appname = homu_main->users[userid].apps[homu_main->users[userid].      \
++                                                      process[homu_getProsIdByPID(userid, homu_getPID())].appid    \
++                                                      ].path;                                                      \
++                                                                                                                   \
++                               sprintf(homu_log_tmp, "RULE_VIOLATION %s %d", homu_log_appname, (int) res);         \
++                               homu_main_writeLog(homu_main, userid, homu_log_tmp);                                \
++                           }while(0)
++
++#define HOMU_JUDGE(res) ((homu_main_judge(                                                          \
++                            homu_main,                                                              \
++                            homu_getUserIdByUID(homu_getUID()),                                     \
++                            homu_getProsIdByPID(homu_getUserIdByUID(homu_getUID()), homu_getPID()), \
++                            res,                                                                    \
++                            ""                                                                      \
++                        ) == HOMU_MAIN_ALLOW)? 1:0)
++
++#define HOMU_JUDGE_WITH_STR(res, str)   ((homu_main_judge(                                                        \
++                                          homu_main,                                                              \
++                                          homu_getUserIdByUID(homu_getUID()),                                     \
++                                          homu_getProsIdByPID(homu_getUserIdByUID(homu_getUID()), homu_getPID()), \
++                                          res,                                                                    \
++                                          str                                                                     \
++                                      ) == HOMU_MAIN_ALLOW)? 1:0)
++
++#define HOMU_MODE(mode) (homu_main_getMode(homu_main, homu_getUserIdByUID(homu_getUID())) == mode)
++
++extern struct homu_main_state* homu_main;
++
++
++uid_t                 homu_getUID          (void);
++pid_t                 homu_getPID          (void);
++void*                 homu_malloc          (homu_main_size_t size);
++void                  homu_mfree           (void* ptr);
++void                  homu_init            (void);
++void                  homu_initProc        (void);
++void                  homu_initUserTable   (void);
++void                  homu_initProsTable   (homu_main_prosid_t prosid);
++homu_main_userid_t    homu_getUserIdByUID  (uid_t uid);
++homu_main_prosid_t    homu_getProsIdByPID  (homu_main_userid_t userid, pid_t pid);
++void                  homu_setProsId       (homu_main_userid_t userid, pid_t pid, homu_main_prosid_t prosid);
++void                  homu_delProsId       (homu_main_userid_t userid, homu_main_prosid_t prosid);
++
++int  homu_hook_execve    (const char* path);
++int  homu_hook_fork      (pid_t newpid);
++int  homu_hook_exit      (void);
++int  homu_hook_open      (struct file* f);
++int  homu_hook_socketall (int call);
++int  homu_hook_mkdir     (void);
++int  homu_hook_rmdir     (void);
++int  homu_hook_symlink   (void);
++int  homu_hook_link      (void);
++int  homu_hook_unlink    (void);
++int  homu_hook_rename    (void);
++int  homu_hook_ioctl     (void);
++int  homu_hook_ioperm    (void);
++int  homu_hook_reboot    (void);
++
++
++#endif
++
+diff --git a/homu/hook.c b/homu/hook.c
+new file mode 100644
+index 0000000..b3df80e
+--- /dev/null
++++ b/homu/hook.c
+@@ -0,0 +1,381 @@
++#include <linux/kernel.h>
++#include <linux/sched.h>
++#include <linux/slab.h>
++#include <linux/fcntl.h>
++#include <linux/net.h>
++#include <linux/fs.h>
++
++#include "homu_port.h"
++
++
++static char* prosPath [HOMU_MAIN_PROS_MAX];
++
++
++
++/**
++*
++*  These hooks returns 1 on success (ALLOW) or 0 on failure (DENY).
++*
++*/
++
++
++
++int homu_hook_execve (const char* path){
++
++ homu_main_userid_t userid;
++ homu_main_prosid_t prosid;
++
++
++  if(homu_main == NULL)
++    homu_init();
++
++  userid = homu_getUserIdByUID(homu_getUID());
++  prosid = homu_getProsIdByPID(userid, homu_getPID());
++
++  if(prosid > 0){
++
++    /* forked process */
++    homu_main_addCopiedProcess(homu_main, userid, (char *) path, prosid);
++
++  }else{
++
++    prosid = homu_main_addProcess(homu_main, userid, (char *) path);
++  }
++
++  homu_setProsId(userid, homu_getPID(), prosid);
++
++  return 1;
++}
++
++
++
++
++int homu_hook_fork (pid_t newpid){
++
++ homu_main_userid_t userid;
++ homu_main_prosid_t parent, prosid;
++
++  if(homu_main == NULL)
++    homu_init();
++
++  userid = homu_getUserIdByUID(homu_getUID());
++  parent = homu_getProsIdByPID(userid, homu_getPID());
++  prosid = homu_main_copyProcess(homu_main, userid, parent);
++
++  homu_setProsId(userid, newpid, prosid);
++
++  return 1;
++}
++
++
++
++
++int homu_hook_exit (void){
++
++ homu_main_userid_t userid;
++ homu_main_prosid_t prosid;
++
++
++  if(homu_main == NULL)
++    homu_init();
++
++  userid = homu_getUserIdByUID(homu_getUID());
++  prosid = homu_getProsIdByPID(userid, homu_getPID());
++
++  homu_delProsId(userid, prosid);
++  homu_main_delProcess(homu_main, userid, prosid);
++  kfree(prosPath[prosid]);
++
++  return 1;
++}
++
++
++
++
++int homu_hook_open (struct file* f){
++
++ signed int write, read;
++ char*      buf;
++ char*      filepath;
++
++  buf      = kmalloc(sizeof(char) * 2048, GFP_KERNEL);
++  filepath = d_absolute_path(&f->f_path, buf, (sizeof(char) * 2048) - 1);
++
++  if(!filepath || IS_ERR((const void *) filepath))
++    return 1;
++
++
++  /*
++  *  access mode:
++  *
++  *  0: readonly
++  *  1: writeonly
++  *  2: read / write
++  *
++  *  Note that O_WRONLY|O_RDONLY is not same as O_RDWR.
++  *
++  */
++
++  if((f->f_flags & O_ACCMODE) == O_RDONLY){
++
++    write = HOMU_MAIN_RES_NULL;
++    read  = HOMU_MAIN_RES_FS_READ;
++
++  }else if((f->f_flags & O_ACCMODE) == O_WRONLY){
++
++    write = HOMU_MAIN_RES_FS_WRITE;
++    read  = HOMU_MAIN_RES_NULL;
++
++  }else if((f->f_flags & O_ACCMODE) ==  O_RDWR){
++
++    write = HOMU_MAIN_RES_FS_WRITE;
++    read  = HOMU_MAIN_RES_FS_READ;
++
++  /* nonstandard access mode (mode: 3) */
++  }else{
++
++    write = HOMU_MAIN_RES_NULL;
++    read  = HOMU_MAIN_RES_NULL;
++  }
++
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(read != HOMU_MAIN_RES_NULL){
++
++      if(!HOMU_JUDGE_WITH_STR(read, filepath)){
++
++        HOMU_RV_LOG(read);
++
++        if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE)){
++          kfree(buf);
++          return 0;
++        }
++      }
++    }
++
++    if(write != HOMU_MAIN_RES_NULL){
++
++      if(!HOMU_JUDGE_WITH_STR(write, filepath)){
++
++        HOMU_RV_LOG(write);
++
++        if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE)){
++          kfree(buf);
++          return 0;
++        }
++      }
++    }
++  }
++
++  kfree(buf);
++  return 1;
++}
++
++
++
++
++int homu_hook_socketall (int call){
++
++ homu_main_resid_t res;
++
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    switch(call){
++      case SYS_CONNECT: res = HOMU_MAIN_RES_NET_CONNECT; break;
++      case SYS_LISTEN:  res = HOMU_MAIN_RES_NET_SERVER;  break;
++      default:                                           return 1;
++    }
++
++    if(!HOMU_JUDGE(res)){
++
++      HOMU_RV_LOG(res);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_mkdir (void){
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_FS_WRITE)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_FS_WRITE);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_rmdir (void){
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_FS_WRITE)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_FS_WRITE);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++        return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_unlink (void){
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_FS_WRITE)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_FS_WRITE);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_symlink (void){
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_FS_WRITE)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_FS_WRITE);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_link (void){
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_FS_WRITE)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_FS_WRITE);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_rename (void){
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_FS_WRITE)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_FS_WRITE);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_ioperm (void){
++
++  /* always allow */
++  return 1;
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_HW_FULLCTRL)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_HW_FULLCTRL);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_ioctl (void){
++
++  /* always allow */
++  return 1;
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_HW_FULLCTRL)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_HW_FULLCTRL);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
++
++
++
++
++int homu_hook_reboot (void){
++
++  /* always allow */
++  return 1;
++
++  if(!HOMU_MODE(HOMU_MAIN_SLEEP_MODE)){
++
++    if(!HOMU_JUDGE(HOMU_MAIN_RES_SYS_CHANGE)){
++
++      HOMU_RV_LOG(HOMU_MAIN_RES_SYS_CHANGE);
++
++      if(HOMU_MODE(HOMU_MAIN_INVOKE_MODE))
++          return 0;
++    }
++  }
++
++  return 1;
++}
+diff --git a/homu/init.c b/homu/init.c
+new file mode 100644
+index 0000000..a0f67cd
+--- /dev/null
++++ b/homu/init.c
+@@ -0,0 +1,43 @@
++#include <linux/kernel.h>
++#include <linux/slab.h>
++
++#include "main/homu_main.h"
++#include "homu_port.h"
++
++struct homu_main_state* homu_main = NULL;
++
++
++
++void homu_init (void){
++
++ homu_main_resid_t defres [] = {
++                                 HOMU_MAIN_RES_NULL,
++                                 HOMU_MAIN_RES_NET_CONNECT,
++                                 HOMU_MAIN_RES_NET_SERVER,
++                                 HOMU_MAIN_RES_FS_READ,
++                                 HOMU_MAIN_RES_FS_WRITE,
++                                 HOMU_MAIN_RES_SYS_CHANGE,
++                                 HOMU_MAIN_RES_HW_FULLCTRL
++                               };
++
++
++  if(homu_main != NULL)
++    return;
++
++
++  printk("Homu: Hello!");
++
++  homu_main = kmalloc(sizeof(struct homu_main_state), GFP_KERNEL);
++
++  homu_main_init(homu_main, homu_malloc, homu_mfree);
++
++  homu_initProc();
++  homu_initUserTable();
++
++  /* init */
++  homu_main_setDefaultAppRule(homu_main, 1, defres);
++  homu_main_setMode(homu_main, 1, HOMU_MAIN_SLEEP_MODE);
++
++  return;
++}
++
+diff --git a/homu/lib.c b/homu/lib.c
+new file mode 100644
+index 0000000..83dd865
+--- /dev/null
++++ b/homu/lib.c
+@@ -0,0 +1,23 @@
++#include <linux/kernel.h>
++#include <linux/sched.h>
++
++#include "homu_port.h"
++
++
++
++pid_t homu_getPID (void){
++
++ struct task_struct* task = get_current();
++
++  return task->pid;
++}
++
++
++
++
++uid_t homu_getUID (void){
++
++ struct task_struct* task = get_current();
++
++  return task->cred->uid;
++}
+diff --git a/homu/main/Makefile b/homu/main/Makefile
+new file mode 100644
+index 0000000..841e22d
+--- /dev/null
++++ b/homu/main/Makefile
+@@ -0,0 +1,14 @@
++obj-y   := app.o         \
++           init.o        \
++           log.o         \
++           process.o     \
++           error.o       \
++           memory.o      \
++           query.o       \
++           user.o        \
++           info.o        \
++           judge.o       \
++           mode.o        \
++           string.o      \
++           userres.o     \
++           reset.o
+diff --git a/homu/main/OMakefile b/homu/main/OMakefile
+new file mode 100644
+index 0000000..83876d2
+--- /dev/null
++++ b/homu/main/OMakefile
+@@ -0,0 +1,48 @@
++#
++#  for extremely comfortable debugging
++#
++
++TEST_PROG = test_main$(EXE)
++
++CC = gcc
++LD = gcc
++
++CFLAGS   = -g -c -ansi -pipe -pedantic -DHOMU_MAIN_DEBUG \
++           -Wall -Wextra
++CSRCS[]  = test_main.c   \
++           init.c        \
++           user.c        \
++           userres.c     \
++           app.c         \
++           string.c      \
++           memory.c      \
++           interpreter.c \
++           process.c     \
++           mode.c        \
++           info.c        \
++           error.c       \
++           judge.c       \
++           query.c
++
++
++
++%.o: %.c
++  $(CC) $(CFLAGS) -o $@ $<
++
++$(TEST_PROG): $(replacesuffixes .c, .o, $(CSRCS))
++  $(LD) -o $@ $^
++
++
++.PHONY: build
++build: $(TEST_PROG)
++
++.PHONY: test
++test: build
++  $(shell pwd)/$(TEST_PROG)
++
++.PHONY: clean
++clean:
++  rm $(filter-proper-targets $(ls R, .))
++
++.DEFAULT: build
++
+diff --git a/homu/main/OMakeroot b/homu/main/OMakeroot
+new file mode 100644
+index 0000000..303b5e1
+--- /dev/null
++++ b/homu/main/OMakeroot
+@@ -0,0 +1,5 @@
++open build/C
++DefineCommandVars()
++
++.SUBDIRS: .
++
+diff --git a/homu/main/app.c b/homu/main/app.c
+new file mode 100644
+index 0000000..b19aed2
+--- /dev/null
++++ b/homu/main/app.c
+@@ -0,0 +1,106 @@
++#include "homu_main.h"
++
++
++
++homu_main_result_t homu_main_setAppRule (
++                                          struct homu_main_state* state,
++                                          homu_main_userid_t      userid,
++                                          char*                   path,
++                                          homu_main_resid_t*      res
++                                        ){
++
++ homu_main_uintmax_t   i,j;
++ homu_main_size_t      resNum;
++ homu_main_resid_t*    appres;
++
++
++  /* count the number of resources */
++  for(i=0; res[i] != HOMU_MAIN_RES_NULL; i++);
++  resNum = i+1;
++
++  /* look for the app by the path */
++  for(i=2; i < HOMU_MAIN_APP_MAX; i++){
++
++    if(state->users[userid].apps[i].path == HOMU_MAIN_NULL)
++      continue;
++
++    if(homu_main_strcmp(path, state->users[userid].apps[i].path) == 0)
++      break;
++  }
++
++  if(i == HOMU_MAIN_APP_MAX){
++
++    /* look for unused "state->users[userud].apps[x]" to add a new app */
++    for(
++         i=2;
++              state->users[userid].apps[i].path != HOMU_MAIN_NULL &&
++              i < HOMU_MAIN_APP_MAX                               ;
++         i++
++       );
++
++
++    if(i == HOMU_MAIN_APP_MAX){
++
++      /* the number of apps has reached the limit */
++      state->users[userid].lastErr = HOMU_MAIN_ERR_TOO_MANY_APPS;
++      HOMU_MAIN_DEBUGMSG("<TOO_MANY_APPS>", userid, 0, 0, 0);
++      return HOMU_MAIN_FAILURE;
++
++    }else{
++
++      state->users[userid].apps[i].path = homu_main_mrealloc(state, state->users[userid].apps[i].path, homu_main_strlen(path) + 1);
++      homu_main_strcpy(state->users[userid].apps[i].path, path);
++      state->users[userid].apps[i].path[homu_main_strlen(path)] = '\0';
++    }
++  }
++
++  appres = state->users[userid].apps[i].res;
++
++
++  /* set the new app rule */
++  appres = homu_main_mrealloc(state, appres, sizeof(*appres) * (resNum+1));
++
++  for(j=0; res[j] != HOMU_MAIN_RES_NULL; j++)
++    appres[j] = res[j];
++
++  appres[j] = HOMU_MAIN_RES_NULL;
++
++  state->users[userid].apps[i].res = appres;
++
++  return HOMU_MAIN_SUCCESS;
++}
++
++
++
++
++homu_main_result_t homu_main_setDefaultAppRule (
++                                                 struct homu_main_state* state,
++                                                 homu_main_userid_t      userid,
++                                                 homu_main_resid_t*      res
++                                               ){
++
++ homu_main_uintmax_t i;
++ homu_main_size_t    resNum;
++ homu_main_resid_t*  defaultres;
++
++
++  defaultres = state->users[userid].apps[1].res;
++
++  /* count the number of resources */
++  for(i=0; res[i] != HOMU_MAIN_RES_NULL; i++);
++  resNum = i;
++
++  /* set the new app rule */
++  defaultres = homu_main_mrealloc(state, defaultres, sizeof(*defaultres) * (resNum+1));
++
++  for(i=0; res[i] != HOMU_MAIN_RES_NULL; i++)
++    defaultres[i] = res[i];
++
++
++  defaultres[i] = HOMU_MAIN_RES_NULL;
++
++  state->users[userid].apps[1].res = defaultres;
++
++  return HOMU_MAIN_SUCCESS;
++}
++
+diff --git a/homu/main/error.c b/homu/main/error.c
+new file mode 100644
+index 0000000..679d12f
+--- /dev/null
++++ b/homu/main/error.c
+@@ -0,0 +1,30 @@
++
++#include "homu_main.h"
++
++static const char* errorStr [] = {
++
++  "HOMU_MAIN_ERR_NULL",
++  "HOMU_MAIN_ERR_TOO_MANY_APPS",
++  "HOMU_MAIN_ERR_TOO_MANY_PROCESSES",
++};
++
++
++enum homu_main_errType homu_main_getLastError (
++                                                struct homu_main_state* state,
++                                                homu_main_userid_t      userid
++                                              ){
++
++  return state->users[userid].lastErr;
++}
++
++
++
++
++const char* homu_main_getLastErrorStr (
++                                        struct homu_main_state* state,
++                                        homu_main_userid_t      userid
++                                      ){
++
++  return errorStr[state->users[userid].lastErr];
++}
++
+diff --git a/homu/main/homu_main.h b/homu/main/homu_main.h
+new file mode 100644
+index 0000000..2ad88a0
+--- /dev/null
++++ b/homu/main/homu_main.h
+@@ -0,0 +1,278 @@
++
++#ifndef homu_main_included_main_h
++#define homu_main_included_main_h
++
++#define HOMU_MAIN_VERSION  100
++
++#ifdef HOMU_MAIN_DEBUG
++  #include <stdlib.h>
++  #include <stdio.h>
++  #include <string.h>
++#endif
++
++
++
++#define HOMU_MAIN_DENY      ('S'|'O'|'N'|'O'|                     \
++                             'H'|'I'|'T'|'U'|'Y'|'O'|'U'|'H'|'A'| \
++                             'N'|'A'|'I'|'W'|'A')
++#define HOMU_MAIN_ALLOW      (~HOMU_MAIN_DENY)
++#define HOMU_MAIN_NULL       ((void *) 0)
++#define HOMU_MAIN_SUCCESS    (1)
++#define HOMU_MAIN_FAILURE    (0)
++#define HOMU_MAIN_TRUE       (1)
++#define HOMU_MAIN_FALSE      (0)
++
++typedef unsigned long int    homu_main_uintmax_t;
++typedef signed long int      homu_main_sintmax_t;
++typedef unsigned char        homu_main_uint8_t;
++typedef unsigned char        homu_main_bool_t;
++typedef homu_main_uintmax_t  homu_main_size_t;
++typedef signed int           homu_main_result_t;
++typedef homu_main_uintmax_t  homu_main_userid_t;
++typedef homu_main_uintmax_t  homu_main_appid_t;
++typedef homu_main_uintmax_t  homu_main_prosid_t;
++typedef homu_main_uintmax_t  homu_main_resid_t;
++typedef homu_main_uintmax_t  homu_main_version_t;
++typedef homu_main_sintmax_t  homu_main_judge_t;
++
++
++#define HOMU_MAIN_USER_MAX         (30)
++#define HOMU_MAIN_APP_MAX          (500)
++#define HOMU_MAIN_USERRES_MAX      (300)
++#define HOMU_MAIN_PROS_MAX         (5000)
++#define HOMU_MAIN_LOG_MAX          (2000)
++enum homu_main_mode{
++
++  HOMU_MAIN_SLEEP_MODE,
++  HOMU_MAIN_OBSERVE_MODE,
++  HOMU_MAIN_INVOKE_MODE
++};
++
++enum homu_main_errType{
++
++  HOMU_MAIN_ERR_NULL                      = 0,
++  HOMU_MAIN_ERR_TOO_MANY_APPS             = 1,
++  HOMU_MAIN_ERR_TOO_MANY_PROCESSES        = 2,
++  HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS   = 3,
++  HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT    = 4,
++  HOMU_MAIN_ERR_QUERY_UNKNOWN_COMMAND     = 5
++};
++
++enum homu_main_userresType{
++
++  HOMU_MAIN_USERRES_NULL,
++  HOMU_MAIN_USERRES_FILE
++};
++
++enum homu_main_resType{
++
++  HOMU_MAIN_RES_NULL              = 0,
++  HOMU_MAIN_RES_NET_CONNECT       = 1,
++  HOMU_MAIN_RES_NET_SERVER        = 2,
++  HOMU_MAIN_RES_FS_READ           = 3,
++  HOMU_MAIN_RES_FS_WRITE          = 4,
++  HOMU_MAIN_RES_SYS_CHANGE        = 5,
++  HOMU_MAIN_RES_HW_FULLCTRL       = 6,
++  HOMU_MAIN_RES_USERRES_BEGINNING = 10
++};
++
++
++struct homu_main_app{
++
++  char*               path;
++  homu_main_resid_t  *res;
++};
++
++struct homu_main_userres{
++
++  enum homu_main_userresType  type;
++  char*                       str;
++};
++
++struct homu_main_process{
++
++  homu_main_appid_t appid;
++};
++
++struct homu_main_info{
++
++  enum homu_main_mode     mode;
++  enum homu_main_errType  lastErr;
++  homu_main_version_t     version;
++  homu_main_size_t        appMax;
++  homu_main_size_t        userresMax;
++  homu_main_size_t        processMax;
++};
++
++struct homu_main_user{
++
++  enum homu_main_errType   lastErr;
++  enum homu_main_mode      mode;
++
++  homu_main_size_t         logLen;
++  char*                    log;
++
++  struct homu_main_app      apps    [HOMU_MAIN_APP_MAX];
++  struct homu_main_userres  userres [HOMU_MAIN_USERRES_MAX];
++  struct homu_main_process  process [HOMU_MAIN_PROS_MAX];
++};
++
++struct homu_main_state{
++
++  struct homu_main_user users [HOMU_MAIN_USER_MAX];
++
++  void* (*malloc) (homu_main_size_t size);
++  void  (*mfree)  (void* ptr);
++};
++
++
++/* macros */
++/*#ifdef HOMU_MAIN_DEBUG*/
++#include<linux/kernel.h>
++  #define HOMU_MAIN_DEBUGMSG(msg, userid, appid, prosid, resid) do{ \
++                              printk(KERN_INFO "HOMU_MAIN_DEBUG %s:%d: %s userid: %u, appid: %u, prosid: %u, resid: %u\n", \
++                              __FILE__, __LINE__, msg, (unsigned int) userid, (unsigned int) appid, (unsigned int) prosid, (unsigned int) resid); \
++                            }while(0)
++/*
++#else
++
++  #define HOMU_MAIN_DEBUGMSG(msg, userid, appid, prosid, resid) do{}while(0)
++
++#endif
++*/
++
++/* init.c */
++homu_main_result_t homu_main_init (
++                                    struct homu_main_state* state,
++                                    void* (*malloc) (homu_main_size_t size),
++                                    void  (*mfree)  (void* ptr)
++                                  );
++
++/* reset.c */
++
++void homu_main_reset (struct homu_main_state* state, homu_main_userid_t userid);
++
++/* query.c */
++homu_main_result_t homu_main_query (
++                                     struct homu_main_state* state,
++                                     homu_main_userid_t      userid,
++                                     const char*             query
++                                   );
++
++/* user.c */
++homu_main_result_t homu_main_initUser (
++                                        struct homu_main_state* state,
++                                        homu_main_userid_t      userid
++                                      );
++
++/* app.c */
++homu_main_result_t homu_main_setAppRule (
++                                          struct homu_main_state* state,
++                                          homu_main_userid_t      userid,
++                                          char*                   path,
++                                          homu_main_resid_t*      res
++                                        );
++homu_main_result_t homu_main_setDefaultAppRule (
++                                                 struct homu_main_state* state,
++                                                 homu_main_userid_t      userid,
++                                                 homu_main_resid_t*      res
++                                               );
++
++/* userres.c */
++homu_main_result_t homu_main_setUserRes (
++                                          struct homu_main_state*     state,
++                                          homu_main_userid_t          userid,
++                                          homu_main_resid_t           resid,
++                                          enum homu_main_userresType  type,
++                                          char*                       str
++                                        );
++
++/* process.c */
++homu_main_prosid_t homu_main_copyProcess (
++                                           struct homu_main_state* state,
++                                           homu_main_userid_t      userid,
++                                           homu_main_prosid_t      origProsId
++                                         );
++void homu_main_addCopiedProcess (
++                                  struct homu_main_state* state,
++                                  homu_main_userid_t      userid,
++                                  char*                   path,
++                                  homu_main_prosid_t      prosid
++                                );
++homu_main_prosid_t homu_main_addProcess (
++                                          struct homu_main_state* state,
++                                          homu_main_userid_t      userid,
++                                          char*                   path
++                                        );
++void homu_main_delProcess (
++                            struct homu_main_state* state,
++                            homu_main_userid_t      userid,
++                            homu_main_prosid_t      prosid
++                          );
++
++/* mode.c */
++enum homu_main_mode homu_main_getMode (
++                                        struct homu_main_state* state,
++                                        homu_main_userid_t      userid
++                                      );
++homu_main_result_t  homu_main_setMode (
++                                        struct homu_main_state* state,
++                                        homu_main_userid_t      userid,
++                                        enum homu_main_mode     mode
++                                      );
++
++/* info.c */
++struct homu_main_info* homu_main_getInfo (
++                                           struct homu_main_state* state,
++                                           homu_main_userid_t      userid,
++                                           struct homu_main_info*  info
++                                         );
++
++/* error.c */
++enum homu_main_errType homu_main_getLastError (
++                                                struct homu_main_state* state,
++                                                homu_main_userid_t      userid
++                                              );
++const char* homu_main_getLastErrorStr (
++                                        struct homu_main_state* state,
++                                        homu_main_userid_t      userid
++                                      );
++
++/* judge.c */
++homu_main_judge_t homu_main_judge (
++                                    struct homu_main_state* state,
++                                    homu_main_userid_t      userid,
++                                    homu_main_prosid_t      prosid,
++                                    homu_main_resid_t       resid,
++                                    const char*             str
++                                  );
++
++/* memory.c */
++void* homu_main_mrealloc (
++                           struct homu_main_state*  state,
++                           void*                    ptr,
++                           homu_main_size_t         size
++                         );
++
++/* log.c */
++
++const char* homu_main_readLog (
++                                struct homu_main_state* state,
++                                homu_main_userid_t      userid
++                              );
++void homu_main_writeLog (
++                          struct homu_main_state* state,
++                          homu_main_userid_t      userid,
++                          const char*             msg
++			 );
++
++/* string.c */
++unsigned int      homu_main_str2uint  (const char* str);
++int               homu_main_strcmp    (const char* str1, const char* str2);
++homu_main_size_t  homu_main_strlen    (const char* str);
++char*             homu_main_strcpy    (char* str1, const char* str2);
++void*             homu_main_memcpy    (void* dest, const void* src, homu_main_size_t num);
++
++
++#endif
++
+diff --git a/homu/main/info.c b/homu/main/info.c
+new file mode 100644
+index 0000000..87f6042
+--- /dev/null
++++ b/homu/main/info.c
+@@ -0,0 +1,22 @@
++
++#include "homu_main.h"
++
++
++
++struct homu_main_info* homu_main_getInfo (
++                                           struct homu_main_state* state,
++                                           homu_main_userid_t      userid,
++                                           struct homu_main_info*  info
++                                         ){
++
++
++  info->version         = HOMU_MAIN_VERSION;
++  info->mode            = state->users[userid].mode;
++  info->lastErr         = state->users[userid].lastErr;
++  info->appMax          = HOMU_MAIN_APP_MAX;
++  info->userresMax      = HOMU_MAIN_USERRES_MAX;
++  info->processMax      = HOMU_MAIN_PROS_MAX;
++
++  return info;
++}
++
+diff --git a/homu/main/init.c b/homu/main/init.c
+new file mode 100644
+index 0000000..048a818
+--- /dev/null
++++ b/homu/main/init.c
+@@ -0,0 +1,17 @@
++
++#include "homu_main.h"
++
++
++
++homu_main_result_t homu_main_init (
++                                    struct homu_main_state* state,
++                                    void* (*malloc) (homu_main_size_t size),
++                                    void  (*mfree)  (void* ptr)
++                                  ){
++
++  state->malloc  = malloc;
++  state->mfree   = mfree;
++
++  return HOMU_MAIN_SUCCESS;
++}
++
+diff --git a/homu/main/judge.c b/homu/main/judge.c
+new file mode 100644
+index 0000000..aa2f57f
+--- /dev/null
++++ b/homu/main/judge.c
+@@ -0,0 +1,68 @@
++#include "homu_main.h"
++
++
++
++homu_main_judge_t homu_main_judge (
++                                    struct homu_main_state* state,
++                                    homu_main_userid_t      userid,
++                                    homu_main_prosid_t      prosid,
++                                    homu_main_resid_t       resid,
++                                    const char*             str
++                                  ){
++
++ homu_main_uintmax_t i;
++ homu_main_resid_t*  appRes;
++
++
++  /* @bug Homu Main seems to allocate appid 0. */
++  /*temporary repairs*/
++  homu_main_resid_t appResForAppId0 [] = {1,2,3,4,5,6,7,8,9,0};
++  if(state->users[userid].process[prosid].appid == 0)
++    appRes = &appResForAppId0[0];
++  else
++  /*temporary repairs end*/
++  appRes = state->users[userid].apps[state->users[userid].process[prosid].appid].res;
++
++
++  /*
++   *  verify whether the resource the app attempt to access is specified as an User Resource
++   */
++
++  /* file */
++  if((resid == HOMU_MAIN_RES_FS_READ) || (resid == HOMU_MAIN_RES_FS_WRITE)){
++
++    for(
++         i=1;
++              state->users[userid].userres[i].type != HOMU_MAIN_USERRES_NULL &&
++              i < HOMU_MAIN_USERRES_MAX                                      ;
++         i++
++       ){
++
++      if(
++          state->users[userid].userres[i].type == HOMU_MAIN_USERRES_FILE  &&
++	  homu_main_strcmp(state->users[userid].userres[i].str, str) == 0
++        ){
++
++        if(homu_main_judge(state, userid, prosid, HOMU_MAIN_RES_USERRES_BEGINNING + i, "") == HOMU_MAIN_DENY)
++          return HOMU_MAIN_DENY;
++      }
++    }
++  }
++
++
++  /* If the resource for the app is not set, I allow the access for now. */
++  if(appRes == HOMU_MAIN_NULL)
++    return HOMU_MAIN_ALLOW;
++
++
++  /* look for resid in the app's resid list */
++  for(
++       i=0;
++            appRes[i] != resid              &&
++            appRes[i] != HOMU_MAIN_RES_NULL ;
++       i++
++     );
++
++
++  return ((appRes[i] == HOMU_MAIN_RES_NULL)? HOMU_MAIN_DENY : HOMU_MAIN_ALLOW);
++}
+diff --git a/homu/main/log.c b/homu/main/log.c
+new file mode 100644
+index 0000000..7293ead
+--- /dev/null
++++ b/homu/main/log.c
+@@ -0,0 +1,42 @@
++
++#include "homu_main.h"
++
++
++
++const char* homu_main_readLog (
++                                struct homu_main_state* state,
++                                homu_main_userid_t      userid
++                              ){
++
++  return state->users[userid].log;
++}
++
++
++
++
++void homu_main_writeLog (
++                          struct homu_main_state* state,
++                          homu_main_userid_t      userid,
++                          const char*             msg
++                        ){
++
++  if((homu_main_strlen(state->users[userid].log) + homu_main_strlen(msg)) > HOMU_MAIN_LOG_MAX){
++
++    state->mfree(state->users[userid].log);
++    state->users[userid].log = HOMU_MAIN_NULL;
++  }
++
++  state->users[userid].log = homu_main_mrealloc(
++                                                 state,
++                                                 state->users[userid].log,
++                                                 state->users[userid].logLen + homu_main_strlen(msg) + 2 /* '\n' and '\0' */
++                                               );
++
++  homu_main_strcpy(&state->users[userid].log[state->users[userid].logLen], msg);
++  state->users[userid].log[state->users[userid].logLen + homu_main_strlen(msg)]   = '\n';
++  state->users[userid].log[state->users[userid].logLen + homu_main_strlen(msg)+1] = '\0';
++  state->users[userid].logLen += homu_main_strlen(msg) + 1;
++
++  return;
++}
++
+diff --git a/homu/main/memory.c b/homu/main/memory.c
+new file mode 100644
+index 0000000..fa8bc7e
+--- /dev/null
++++ b/homu/main/memory.c
+@@ -0,0 +1,53 @@
++
++#include "homu_main.h"
++
++/**
++*
++*  @note
++*
++*    The allocated size is written at the beginning of the allocated memory space.
++*
++*
++*  @warning
++*
++*    malloc and mfree must *not* return NULL.
++*    Errors caused in malloc/mfree must be handled in each function.
++*
++*/
++
++
++
++void* homu_main_mrealloc (
++                           struct homu_main_state* state,
++                           void*                   ptr,
++                           homu_main_size_t        size
++                         ){
++
++ void*             oldptr;
++ void*             newptr;
++ void*             newdptr;
++ homu_main_size_t* newsptr;
++
++
++  newptr  = state->malloc(size + sizeof(homu_main_size_t));
++  newsptr = newptr;
++  newdptr = ((homu_main_uint8_t *) newptr + sizeof(homu_main_size_t));
++
++  if(ptr != HOMU_MAIN_NULL){
++
++    homu_main_memcpy(
++                      newdptr,
++                      ptr,
++                      *((homu_main_size_t *) ((homu_main_uint8_t *) ptr - sizeof(homu_main_size_t)))
++                    );
++
++    oldptr = ((homu_main_uint8_t *) ptr - sizeof(homu_main_size_t));
++    state->mfree(oldptr);
++  }
++
++  /* write the allocated size */
++  *newsptr = size;
++
++  return newdptr;
++}
++
+diff --git a/homu/main/mode.c b/homu/main/mode.c
+new file mode 100644
+index 0000000..38dd678
+--- /dev/null
++++ b/homu/main/mode.c
+@@ -0,0 +1,41 @@
++
++#include "homu_main.h"
++
++
++
++enum homu_main_mode homu_main_getMode (
++                                        struct homu_main_state* state,
++                                        homu_main_userid_t      userid
++                                      ){
++
++
++  return state->users[userid].mode;
++}
++
++
++
++
++homu_main_result_t homu_main_setMode (
++                                       struct homu_main_state* state,
++                                       homu_main_userid_t      userid,
++                                       enum homu_main_mode     mode
++                                     ){
++
++
++  if(mode == HOMU_MAIN_SLEEP_MODE){
++
++    homu_main_writeLog(state, userid, "MODE_CHANGED SLEEP");
++
++  }else if(mode == HOMU_MAIN_OBSERVE_MODE){
++
++    homu_main_writeLog(state, userid, "MODE_CHANGED OBSERVE");
++
++  }else if(mode == HOMU_MAIN_INVOKE_MODE){
++
++    homu_main_writeLog(state, userid, "MODE_CHANGED INVOKE");
++  }
++
++  state->users[userid].mode = mode;
++  return HOMU_MAIN_SUCCESS;
++}
++
+diff --git a/homu/main/process.c b/homu/main/process.c
+new file mode 100644
+index 0000000..81a32ff
+--- /dev/null
++++ b/homu/main/process.c
+@@ -0,0 +1,124 @@
++#include "homu_main.h"
++
++
++
++homu_main_appid_t homu_main_getAppIdByPath (
++                                             struct homu_main_state* state,
++                                             homu_main_userid_t      userid,
++                                             char*                   path
++                                           ){
++
++ homu_main_uintmax_t i;
++
++
++  /* look for the app rule by the path */
++  for(i=2; i < HOMU_MAIN_APP_MAX; i++){
++
++    if(state->users[userid].apps[i].path == HOMU_MAIN_NULL)
++      continue;
++
++    if(homu_main_strcmp(path, state->users[userid].apps[i].path) == 0)
++      break;
++  }
++
++  return ((i == HOMU_MAIN_APP_MAX)? 1 : i);
++}
++
++
++
++/* for fork() */
++homu_main_prosid_t homu_main_copyProcess (
++                                           struct homu_main_state* state,
++                                           homu_main_userid_t      userid,
++                                           homu_main_prosid_t      origProsId
++                                         ){
++
++  homu_main_uintmax_t i;
++  homu_main_appid_t   origAppId;
++
++
++  origAppId = state->users[userid].process[origProsId].appid;
++
++  /* look for an unused space */
++  for(
++       i=1;
++            state->users[userid].process[i].appid != 0 &&
++            i < HOMU_MAIN_PROS_MAX                     ;
++       i++
++     );
++
++  if(i == HOMU_MAIN_PROS_MAX){
++
++    /* the number of processes has reached the limit */
++    state->users[userid].lastErr = HOMU_MAIN_ERR_TOO_MANY_PROCESSES;
++    HOMU_MAIN_DEBUGMSG("<TOO_MANY_PROCESSES>", userid, 0, 0, 0);
++    return 0;
++  }
++
++
++  state->users[userid].process[i].appid = (origAppId == 0)? 1 : origAppId;
++
++  return i;
++}
++
++
++
++
++void homu_main_addCopiedProcess (
++                                  struct homu_main_state* state,
++                                  homu_main_userid_t      userid,
++                                  char*                   path,
++                                  homu_main_prosid_t      prosid
++                                ){
++
++  state->users[userid].process[prosid].appid = homu_main_getAppIdByPath(state, userid, path);
++  return;
++}
++
++
++
++
++homu_main_prosid_t homu_main_addProcess (
++                                          struct homu_main_state* state,
++                                          homu_main_userid_t      userid,
++                                          char*                   path
++                                        ){
++
++  homu_main_uintmax_t i;
++
++
++  /* look for an unused space */
++  for(
++       i=1;
++            state->users[userid].process[i].appid != 0 &&
++            i < HOMU_MAIN_PROS_MAX                     ;
++       i++
++     );
++
++  if(i == HOMU_MAIN_PROS_MAX){
++
++    /* the number of processes has reached the limit */
++    state->users[userid].lastErr = HOMU_MAIN_ERR_TOO_MANY_PROCESSES;
++    HOMU_MAIN_DEBUGMSG("<TOO_MANY_PROCESSES>", userid, 0, 0, 0);
++    return 0;
++  }
++
++  state->users[userid].process[i].appid = homu_main_getAppIdByPath(state, userid, path);
++
++  return i;
++}
++
++
++
++
++void homu_main_delProcess (
++                            struct homu_main_state* state,
++                            homu_main_userid_t      userid,
++                            homu_main_prosid_t      prosid
++                          ){
++
++
++  state->users[userid].process[prosid].appid = 0;
++  return;
++}
++
+diff --git a/homu/main/query.c b/homu/main/query.c
+new file mode 100644
+index 0000000..e1a2930
+--- /dev/null
++++ b/homu/main/query.c
+@@ -0,0 +1,234 @@
++
++#include "homu_main.h"
++
++
++
++homu_main_result_t homu_main_query (
++                                     struct homu_main_state* state,
++                                     homu_main_userid_t      userid,
++                                     const char*             query
++                                   ){
++
++ homu_main_uintmax_t        i, j, k;
++ homu_main_size_t           argNum;
++ enum homu_main_userresType userrestype;
++ homu_main_resid_t*   res;
++ homu_main_bool_t     breaknow;
++ homu_main_bool_t     isString;
++ char*  str;
++ char*  cmd;
++ char** args;
++
++
++  res = homu_main_mrealloc(state, HOMU_MAIN_NULL, sizeof(*res) * HOMU_MAIN_USERRES_MAX);
++
++  /* copy the query string */
++  str = homu_main_mrealloc(state, HOMU_MAIN_NULL, homu_main_strlen(query)+1);
++  homu_main_strcpy(str, query);
++  str[homu_main_strlen(query)] = '\0';
++
++  /* count the number of arguments */
++  argNum   = 0;
++  isString = HOMU_MAIN_FALSE;
++
++  for(i=0; str[i] != '\0'; i++){
++
++    if(str[i] == '"')
++      isString = (isString)? HOMU_MAIN_FALSE : HOMU_MAIN_TRUE;
++
++    if(!isString && str[i] == ' ')
++      argNum++;
++  }
++
++  args = homu_main_mrealloc(state, HOMU_MAIN_NULL, (argNum+1) * sizeof(*args));
++
++
++
++  /*
++  *
++  *  parse
++  *
++  */
++
++  /* command */
++  cmd = &str[0];
++  for(i=0; (str[i] != ' ') && (str[i] != '\0'); i++);
++
++  /* arguments */
++  for(j=0; str[i] != '\0'; j++){
++
++    str[i]  = '\0';
++    args[j] = &str[i+1];
++
++    if(str[i+1] == '\0')
++      break;
++
++    for(i++; (str[i] != ' ') && (str[i] != '\0'); i++);
++  }
++
++  args[j] = HOMU_MAIN_NULL;
++
++
++  /*
++  *
++  *  execute
++  *
++  */
++
++
++
++  /*
++  *  set_mode
++  */
++
++  if(homu_main_strcmp(cmd, "set_mode") == 0){
++
++    if(argNum != 1){
++
++      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
++      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      goto ret_failure;
++    }
++
++    /* sleep mode */
++    if(homu_main_strcmp(args[0], "sleep") == 0){
++      homu_main_setMode(state, userid, HOMU_MAIN_SLEEP_MODE);
++
++    /* observe mode */
++    }else if(homu_main_strcmp(args[0], "observe") == 0){
++      homu_main_setMode(state, userid, HOMU_MAIN_OBSERVE_MODE);
++
++    /* invoke mode */
++    }else if(homu_main_strcmp(args[0], "invoke") == 0){
++      homu_main_setMode(state, userid, HOMU_MAIN_INVOKE_MODE);
++
++    /* unknown mode */
++    }else{
++
++
++      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT;
++      HOMU_MAIN_DEBUGMSG("<QUERY_INVALID_ARGUMENT>", userid, 0, 0, 0);
++      goto ret_failure;
++    }
++
++
++  /*
++  *  set_apprule
++  */
++
++  }else if(homu_main_strcmp(cmd, "set_apprule") == 0){
++
++    if(argNum != 2){
++
++      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
++      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      goto ret_failure;
++    }
++
++    for(i=0, k=0, breaknow=HOMU_MAIN_FALSE; breaknow == HOMU_MAIN_FALSE; k++){
++
++      for(j=i; (args[1][i] != ',') && (args[1][i] != '\0'); i++);
++
++      if(args[1][i] == '\0')
++        breaknow = HOMU_MAIN_TRUE;
++
++      args[1][i] = '\0';
++      i++;
++
++      res[k] = homu_main_str2uint(&args[1][j]);
++   }
++
++    res[k] = HOMU_MAIN_RES_NULL;
++
++    homu_main_setAppRule(state, userid, args[0], res);
++
++
++  /*
++  *  set_defaultapprule
++  */
++
++  }else if(homu_main_strcmp(cmd, "set_defaultapprule") == 0){
++
++    if(argNum != 1){
++
++      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
++      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      goto ret_failure;
++    }
++
++    for(i=0, k=0, breaknow=HOMU_MAIN_FALSE; breaknow == HOMU_MAIN_FALSE; k++){
++
++      for(j=i; (args[0][i] != ',') && (args[0][i] != '\0'); i++);
++
++      if(args[0][i] == '\0')
++        breaknow = HOMU_MAIN_TRUE;
++
++      args[0][i] = '\0';
++      i++;
++
++      res[k] = homu_main_str2uint(&args[0][j]);
++   }
++
++    res[k] = HOMU_MAIN_RES_NULL;
++
++    homu_main_setDefaultAppRule(state, userid, res);
++
++
++  /*
++  *  reset_rule
++  */
++
++  }else if(homu_main_strcmp(cmd, "reset_rule") == 0){
++
++    homu_main_reset(state, userid);
++
++
++  /*
++  *  set_userres
++  */
++
++  }else if(homu_main_strcmp(cmd, "set_userres") == 0){
++
++    if(argNum != 3){
++
++      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
++      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      goto ret_failure;
++    }
++
++    if(homu_main_strcmp(args[1], "FILE") == 0){
++
++      userrestype = HOMU_MAIN_USERRES_FILE;
++
++    }else{
++
++      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT;
++      HOMU_MAIN_DEBUGMSG("<QUERY_INVALID_ARGUMENT>", userid, 0, 0, 0);
++      goto ret_failure;
++    }
++
++    homu_main_setUserRes(state, userid, homu_main_str2uint(args[0]), userrestype, args[2]);
++
++
++  /*
++  *  unknown command
++  */
++  }else{
++
++    state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_UNKNOWN_COMMAND;
++    HOMU_MAIN_DEBUGMSG("<QUERY_UNKNOWN_COMMAND>", userid, 0, 0, 0);
++    goto ret_failure;
++  }
++
++
++
++  state->mfree(str);
++  state->mfree(args);
++  return HOMU_MAIN_SUCCESS;
++
++  ret_failure:
++  state->mfree(str);
++  state->mfree(args);
++  return HOMU_MAIN_FAILURE;
++}
++
+diff --git a/homu/main/reset.c b/homu/main/reset.c
+new file mode 100644
+index 0000000..8c206bf
+--- /dev/null
++++ b/homu/main/reset.c
+@@ -0,0 +1,40 @@
++
++#include "homu_main.h"
++
++
++
++void homu_main_reset (struct homu_main_state* state, homu_main_userid_t userid){
++
++
++ homu_main_uintmax_t i;
++ struct homu_main_user* user = &state->users[userid];
++
++  for(i=0; i < HOMU_MAIN_APP_MAX; i++){
++
++    if(user->apps[i].path != HOMU_MAIN_NULL)
++      state->mfree(user->apps[i].path);
++
++    if(user->apps[i].res != HOMU_MAIN_NULL)
++      state->mfree(user->apps[i].res);
++  }
++
++  for(i=0; i < HOMU_MAIN_USERRES_MAX; i++){
++
++    user->userres[i].type = HOMU_MAIN_USERRES_NULL;
++
++    if(user->userres[i].str != HOMU_MAIN_NULL)
++      state->mfree(user->userres[i].str);
++  }
++
++  for(i=0; i < HOMU_MAIN_PROS_MAX; i++)
++    user->process[i].appid = 0;
++
++  if(user->log != HOMU_MAIN_NULL)
++    state->mfree(user->log);
++
++  user->logLen = 0;
++  user->mode   = HOMU_MAIN_SLEEP_MODE;
++
++  return;
++}
++
+diff --git a/homu/main/string.c b/homu/main/string.c
+new file mode 100644
+index 0000000..3f21596
+--- /dev/null
++++ b/homu/main/string.c
+@@ -0,0 +1,104 @@
++
++#include "homu_main.h"
++
++
++
++#define isdigit(c) (((c=='0')||(c=='1')||(c=='2')||(c=='3')||(c=='4')|| \
++                     (c=='5')||(c=='6')||(c=='7')||(c=='8')||(c=='9')) ? 1:0)
++#define digit2int(c) (c-48)
++
++
++unsigned int homu_main_pow (unsigned int base, unsigned int exp){
++
++ unsigned int res, i;
++
++
++  res = base;
++
++  if(exp == 0)
++    return 1;
++
++  for(i=0; i < (exp-1); i++)
++    res *= base;
++
++  return res;
++}
++
++
++
++
++unsigned int homu_main_str2uint (const char* str){
++
++ unsigned int res = 0;
++ signed   int i, j, l;
++
++
++  for(i=0; isdigit(str[i]) && (str[i] != '\0'); i++);
++  i--;
++
++  if(i == 0)
++    return digit2int(str[0]);
++
++  for(j=i, l=0; j >= 0; j--, l++)
++    res += digit2int(str[j]) * homu_main_pow(10, l);
++
++ return res;
++}
++
++
++
++
++homu_main_size_t homu_main_strlen (const char* str){
++
++ homu_main_size_t i;
++
++  for(i=0; str[i] != '\0'; i++);
++
++  return i;
++}
++
++
++
++
++int homu_main_strcmp (const char* str1, const char* str2){
++
++ homu_main_uintmax_t i;
++
++
++  for(i=0; (str1[i] == str2[i]) && (str1[i] != '\0') && (str2[i] != '\0'); i++);
++
++  return (((str1[i] == '\0') && (str2[i] == '\0'))? 0 : 1);
++}
++
++
++
++
++char* homu_main_strcpy (char* dest, const char* src){
++
++ homu_main_uintmax_t i;
++
++
++  for(i=0; src[i] != '\0'; i++){
++
++    dest[i] = src[i];
++  }
++
++  dest[i] = '\0';
++  return dest;
++}
++
++
++
++
++void* homu_main_memcpy (void* dest, const void* src, homu_main_size_t num){
++
++ homu_main_size_t i;
++
++  for(i=0; i < num; i++){
++
++    *((homu_main_uint8_t *) dest+i) = *((homu_main_uint8_t *) src+i);
++  }
++
++  return dest;
++}
++
+diff --git a/homu/main/test_main.c b/homu/main/test_main.c
+new file mode 100644
+index 0000000..d8ffb73
+--- /dev/null
++++ b/homu/main/test_main.c
+@@ -0,0 +1,94 @@
++/*
++ *  test program for homu main
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++
++#include "homu_main.h"
++
++
++
++void* homu_malloc (homu_main_size_t size){
++
++  return malloc((size_t) size);
++}
++
++
++
++void homu_mfree (void* ptr){
++
++  free(ptr);
++  return;
++}
++
++
++
++void test (
++            struct homu_main_state* state,
++            homu_main_userid_t      userid,
++            const char*             query
++         ){
++
++  if(homu_main_query(state, userid, query) == HOMU_MAIN_FAILURE){
++
++    printf("failed to execute query: %s\n", query);
++    abort();
++  }
++
++  return;
++}
++
++
++
++
++int main (void){
++
++ struct homu_main_state* homu;
++ homu_main_userid_t      userid  = 1;
++ homu_main_prosid_t      prosid1, prosid2, prosid3;
++
++  homu = (struct homu_main_state *) malloc(sizeof(*homu));
++
++
++  if(homu_main_init(homu, homu_malloc, homu_mfree) == HOMU_MAIN_FAILURE){
++
++    puts("homu_main_init: failed");
++    return 1;
++  }
++
++  if(homu_main_initUser(homu, userid) == HOMU_MAIN_FAILURE){
++
++    puts("homu_main_initUser: failed");
++    return 1;
++  }
++
++
++
++  test(homu, userid, "set_apprule /usr/bin/vim 1,0");
++  test(homu, userid, "set_apprule /bin/zsh 1,3,0");
++  test(homu, userid, "set_userres 1 FILE /homu/db/test");
++  test(homu, userid, "set_mode \"observe\"");
++
++  prosid1 = homu_main_addProcess(homu, userid, "/bin/zsh");
++  prosid2 = homu_main_addProcess(homu, userid, "/bin/vim");
++  prosid3 = homu_main_addProcess(homu, userid, "/bin/zsh");
++
++  if(homu_main_judge(homu, userid, prosid1, HOMU_MAIN_RES_FS_READ, "/hello") == HOMU_MAIN_DENY)
++    puts("invalid judge: (DENIED) prosid1 --> FS_READ");
++
++  if(homu_main_judge(homu, userid, prosid1, HOMU_MAIN_RES_FS_WRITE, "/hello") == HOMU_MAIN_ALLOW)
++    puts("invalid judge: (ALLOWED) prosid1 --> FS_WRITE");
++
++  if(homu_main_judge(homu, userid, prosid2, HOMU_MAIN_RES_SYS_CHANGE, "/hello") == HOMU_MAIN_ALLOW)
++    puts("invalid judge: (ALLOWED) prosid2 --> SYS_CHANGE");
++
++  if(homu_main_judge(homu, userid, prosid3, HOMU_MAIN_RES_FS_READ, "/hello") == HOMU_MAIN_DENY)
++    puts("invalid judge: (DENIED) prosid3 --> FS_READ");
++
++  if(homu_main_judge(homu, userid, prosid3, HOMU_MAIN_RES_FS_READ, "/homu/db/test") == HOMU_MAIN_ALLOW)
++    puts("invalid judge: (ALLOWED) prosid3 --> FS_READ(/homu/db/test)");
++
++  return 0;
++}
++
+diff --git a/homu/main/user.c b/homu/main/user.c
+new file mode 100644
+index 0000000..996544c
+--- /dev/null
++++ b/homu/main/user.c
+@@ -0,0 +1,40 @@
++
++#include "homu_main.h"
++
++
++
++homu_main_result_t homu_main_initUser (
++                                        struct homu_main_state* state,
++                                        homu_main_userid_t      userid
++                                      ){
++
++ homu_main_uintmax_t i;
++
++
++
++  for(i=0; i < HOMU_MAIN_APP_MAX; i++){
++
++    state->users[userid].apps[i].path = HOMU_MAIN_NULL;
++    state->users[userid].apps[i].res  = HOMU_MAIN_NULL;
++  }
++
++  for(i=0; i < HOMU_MAIN_USERRES_MAX; i++){
++
++    state->users[userid].userres[i].type = HOMU_MAIN_USERRES_NULL;
++    state->users[userid].userres[i].str  = HOMU_MAIN_NULL;
++  }
++
++  for(i=0; i < HOMU_MAIN_PROS_MAX; i++){
++
++    state->users[userid].process[i].appid = 0;
++  }
++
++  state->users[userid].apps[1].path = "///defaultapprule///";
++  state->users[userid].log          = homu_main_mrealloc(state, HOMU_MAIN_NULL, 1);
++  homu_main_strcpy(state->users[userid].log, "");
++  state->users[userid].logLen       = 0;
++  state->users[userid].mode         = HOMU_MAIN_SLEEP_MODE;
++
++  return HOMU_MAIN_SUCCESS;
++}
++
+diff --git a/homu/main/userres.c b/homu/main/userres.c
+new file mode 100644
+index 0000000..c629d51
+--- /dev/null
++++ b/homu/main/userres.c
+@@ -0,0 +1,31 @@
++
++#include "homu_main.h"
++
++
++
++homu_main_result_t homu_main_setUserRes (
++                                          struct homu_main_state*     state,
++                                          homu_main_userid_t          userid,
++                                          homu_main_resid_t           resid,
++                                          enum homu_main_userresType  type,
++                                          char*                       str
++                                        ){
++
++ struct homu_main_userres* res;
++
++
++  res = &state->users[userid].userres[resid];
++
++  res->type = type;
++  res->str  = homu_main_mrealloc(
++                                  state,
++                                  res->str,
++                                  homu_main_strlen(str) + 1
++                                );
++
++  homu_main_strcpy(res->str, str);
++  res->str[homu_main_strlen(str)] = '\0';
++
++  return HOMU_MAIN_SUCCESS;
++}
++
+diff --git a/homu/memory.c b/homu/memory.c
+new file mode 100644
+index 0000000..bc9c1dc
+--- /dev/null
++++ b/homu/memory.c
+@@ -0,0 +1,21 @@
++#include <linux/kernel.h>
++#include <linux/slab.h>
++
++#include "main/homu_main.h"
++#include "homu_port.h"
++
++
++void* homu_malloc (homu_main_size_t size){
++
++  return kmalloc(size, GFP_KERNEL);
++}
++
++
++
++
++void homu_mfree (void* ptr){
++
++/*  kfree(ptr); */
++  return;
++}
++
+diff --git a/homu/proc.c b/homu/proc.c
+new file mode 100644
+index 0000000..5470b7f
+--- /dev/null
++++ b/homu/proc.c
+@@ -0,0 +1,113 @@
++#include <linux/kernel.h>
++#include <linux/proc_fs.h>
++#include <linux/string.h>
++#include <asm/uaccess.h>
++
++#include "homu_port.h"
++
++static struct{
++
++ struct proc_dir_entry* query;
++ struct proc_dir_entry* status;
++ struct proc_dir_entry* log;
++
++} homu_proc;
++
++
++
++
++static int homu_proc_query_write (
++                                   struct file*        file,
++                                   const char __user*  buf,
++                                   unsigned long       count,
++                                   void*               data
++                                 ){
++
++ char* queryBuf;
++
++
++  queryBuf = kmalloc(sizeof(char) * QUERY_MAX, GFP_KERNEL);
++
++  if((count > QUERY_MAX) || !buf)
++    return -EINVAL;
++
++  memset(queryBuf, '\0', sizeof(char) * QUERY_MAX);
++
++  if(copy_from_user(queryBuf, buf, count))
++    return -EFAULT;
++
++  queryBuf[strlen(queryBuf)-1] = '\0';
++
++  homu_main_query(homu_main, homu_getUserIdByUID(homu_getUID()), queryBuf);
++
++  return count;
++}
++
++
++
++static int homu_proc_status_read (
++                                   char*  page,
++                                   char** start,
++                                   off_t  off,
++                                   int    count,
++                                   int*   eof,
++                                   void* data
++                                 ){
++
++ int len;
++ struct homu_main_info info;
++
++  homu_main_getInfo(homu_main, homu_getUserIdByUID(homu_getUID()), &info);
++
++  len  = sprintf(page, "version: %d\nmode: %s\nlast error: %d\n", (int) info.version,
++                                                                  (info.mode == HOMU_MAIN_SLEEP_MODE)   ? "sleep":
++                                                                  (info.mode == HOMU_MAIN_OBSERVE_MODE) ? "observe":
++                                                                  (info.mode == HOMU_MAIN_INVOKE_MODE)  ? "invoke": "Unknown (BUG)"
++                                                                , (int) info.lastErr
++                );
++  *eof = 1;
++
++  return len;
++}
++
++
++
++
++static int homu_proc_log_read (
++                                char*  page,
++                                char** start,
++                                off_t  off,
++                                int    count,
++                                int*   eof,
++                                void* data
++                              ){
++
++ int len;
++ const char* log;
++
++  log  = homu_main_readLog(homu_main, homu_getUserIdByUID(homu_getUID()));
++  len  = strlen(log);
++  len  = sprintf(page, log);
++  *eof = 1;
++
++  return len;
++}
++
++
++
++
++void homu_initProc (void){
++
++  homu_proc.query  = create_proc_entry("homu_query",  0222, NULL);
++  homu_proc.status = create_proc_entry("homu_status", 0444, NULL);
++  homu_proc.log    = create_proc_entry("homu_log",    0444, NULL);
++
++  homu_proc.query->read_proc   = NULL;
++  homu_proc.query->write_proc  = homu_proc_query_write;
++  homu_proc.status->read_proc  = homu_proc_status_read;
++  homu_proc.status->write_proc = NULL;
++  homu_proc.log->read_proc     = homu_proc_log_read;
++  homu_proc.log->write_proc    = NULL;
++
++  return;
++}
+diff --git a/homu/prosid.c b/homu/prosid.c
+new file mode 100644
+index 0000000..5d5c6b9
+--- /dev/null
++++ b/homu/prosid.c
+@@ -0,0 +1,59 @@
++#include <linux/kernel.h>
++
++#include "main/homu_main.h"
++#include "homu_port.h"
++
++static signed long int process[HOMU_MAIN_USER_MAX][HOMU_MAIN_PROS_MAX];
++
++
++
++void homu_initProsTable (homu_main_userid_t userid){
++
++ unsigned long int i;
++
++  /* root */
++  if(userid == 1){
++
++    /* init */
++    process[userid][0] = 1;
++  }
++
++  for(i=1; i < HOMU_MAIN_PROS_MAX; i++)
++    process[userid][i] = -1;
++
++  return;
++}
++
++
++
++
++void homu_delProsId(homu_main_userid_t userid, homu_main_prosid_t prosid){
++
++  process[userid][prosid] = -1;
++  return;
++}
++
++
++
++
++void homu_setProsId(homu_main_userid_t userid, pid_t pid, homu_main_prosid_t prosid){
++
++  process[userid][prosid] = pid;
++  return;
++}
++
++
++
++
++homu_main_prosid_t homu_getProsIdByPID (homu_main_userid_t userid, pid_t pid){
++
++ unsigned long int i;
++
++  for(i=1; (process[userid][i] != pid) && (i < HOMU_MAIN_PROS_MAX); i++);
++
++
++  if(i == HOMU_MAIN_PROS_MAX)
++    return 0;
++
++  return i;
++}
+diff --git a/homu/userid.c b/homu/userid.c
+new file mode 100644
+index 0000000..81f7525
+--- /dev/null
++++ b/homu/userid.c
+@@ -0,0 +1,52 @@
++#include <linux/kernel.h>
++#include <linux/slab.h>
++
++#include "main/homu_main.h"
++#include "homu_port.h"
++
++static signed long int* users;
++
++
++
++void homu_initUserTable (){
++
++ unsigned long int i;
++
++  users = kmalloc(HOMU_MAIN_USER_MAX * sizeof(*users), GFP_KERNEL);
++
++  for(i=2; i < HOMU_MAIN_USER_MAX; i++)
++    users[i] = -1;
++
++  /* root */
++  homu_main_initUser(homu_main, 1);
++  homu_initProsTable(1);
++  users[1] = 0;
++
++  return;
++}
++
++
++
++
++homu_main_userid_t homu_getUserIdByUID (uid_t uid){
++
++ unsigned long int i;
++
++  for(i=1; (users[i] != uid) && (i < HOMU_MAIN_USER_MAX); i++);
++
++  if(i != HOMU_MAIN_USER_MAX)
++    return i;
++
++
++  /* treat as a new user */
++  for(i=2; (users[i] != -1) && (i < HOMU_MAIN_USER_MAX); i++);
++
++  if(i == HOMU_MAIN_USER_MAX)
++    printk(KERN_CRIT "homu: too many users");
++
++  users[i] = uid;
++  homu_initProsTable(i);
++  homu_main_initUser(homu_main, i);
++
++  return i;
++}
+diff --git a/kernel/fork.c b/kernel/fork.c
+index 8163333..0cca216 100644
+--- a/kernel/fork.c
++++ b/kernel/fork.c
+@@ -1542,6 +1542,11 @@ struct task_struct * __cpuinit fork_idle(int cpu)
+  * It copies the process, and if successful kick-starts
+  * it and waits for it to finish using the VM if required.
+  */
++
++/*homu*/
++#include <homu_port.h>
++/*homu_end*/
++
+ long do_fork(unsigned long clone_flags,
+ 	      unsigned long stack_start,
+ 	      struct pt_regs *regs,
+@@ -1588,6 +1593,14 @@ long do_fork(unsigned long clone_flags,
+ 
+ 	p = copy_process(clone_flags, stack_start, regs, stack_size,
+ 			 child_tidptr, NULL, trace);
++
++	/*homu*/
++	if(!IS_ERR(p)){
++
++		homu_hook_fork(p->pid);
++	}
++	/*homu_end*/
++
+ 	/*
+ 	 * Do this prior waking up the new thread - the thread pointer
+ 	 * might get invalid after that point, if the thread exits quickly.
+diff --git a/net/socket.c b/net/socket.c
+index 851edcd..ab1d0d4 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2355,6 +2355,9 @@ static const unsigned char nargs[21] = {
+  *  it is set by the callees.
+  */
+ 
++/*homu*/
++#include <homu_port.h>
++/*homu_end*/
+ SYSCALL_DEFINE2(socketcall, int, call, unsigned long __user *, args)
+ {
+ 	unsigned long a[6];
+@@ -2378,6 +2381,13 @@ SYSCALL_DEFINE2(socketcall, int, call, unsigned long __user *, args)
+ 	a0 = a[0];
+ 	a1 = a[1];
+ 
++	/*homu*/
++	if(!homu_hook_socketall(call)){
++		err = -EPERM;
++		return err;
++	}
++	/*homu_end*/
++
+ 	switch (call) {
+ 	case SYS_SOCKET:
+ 		err = sys_socket(a0, a1, a[2]);
+-- 
+1.7.9.5
+
+
+From 61703bf3ba792b26f293c0dfb1f5ed9657a7382e Mon Sep 17 00:00:00 2001
+From: Seiya Nuta <nuta@seiya.me>
+Date: Sun, 15 Jul 2012 14:38:15 +0900
+Subject: [PATCH 2/2] homu: some bug fixes
+
+---
+ homu/main/OMakefile   |   19 ++++++++++++----
+ homu/main/OMakeroot   |    2 --
+ homu/main/app.c       |   10 ++++-----
+ homu/main/error.c     |   32 +++++++++++----------------
+ homu/main/homu_main.h |   48 +++++++++++++++++++---------------------
+ homu/main/info.c      |    1 -
+ homu/main/judge.c     |    7 ------
+ homu/main/log.c       |   11 ++-------
+ homu/main/memory.c    |   47 +++++++++++++++++++++++----------------
+ homu/main/process.c   |    6 ++---
+ homu/main/query.c     |   36 ++++++++++++------------------
+ homu/main/reset.c     |   25 ++++++++++++++++-----
+ homu/main/test_main.c |   59 +++++++++++++++++++++++++++----------------------
+ homu/main/user.c      |    2 +-
+ homu/main/userres.c   |   10 ++++-----
+ homu/memory.c         |    3 ++-
+ homu/proc.c           |    9 ++++----
+ 17 files changed, 165 insertions(+), 162 deletions(-)
+
+diff --git a/homu/main/OMakefile b/homu/main/OMakefile
+index 83876d2..990bb91 100644
+--- a/homu/main/OMakefile
++++ b/homu/main/OMakefile
+@@ -2,13 +2,14 @@
+ #  for extremely comfortable debugging
+ #
+ 
+-TEST_PROG = test_main$(EXE)
++TEST_PROG = test_main.bin
+ 
+ CC = gcc
+ LD = gcc
+ 
+ CFLAGS   = -g -c -ansi -pipe -pedantic -DHOMU_MAIN_DEBUG \
+            -Wall -Wextra
++
+ CSRCS[]  = test_main.c   \
+            init.c        \
+            user.c        \
+@@ -16,11 +17,12 @@ CSRCS[]  = test_main.c   \
+            app.c         \
+            string.c      \
+            memory.c      \
+-           interpreter.c \
+            process.c     \
+            mode.c        \
+            info.c        \
+            error.c       \
++           log.c         \
++           reset.c       \
+            judge.c       \
+            query.c
+ 
+@@ -32,17 +34,26 @@ CSRCS[]  = test_main.c   \
+ $(TEST_PROG): $(replacesuffixes .c, .o, $(CSRCS))
+   $(LD) -o $@ $^
+ 
+-
++#
++#  build
++#
+ .PHONY: build
+ build: $(TEST_PROG)
+ 
++
++#
++#  test
++#
+ .PHONY: test
+ test: build
+   $(shell pwd)/$(TEST_PROG)
+ 
++
++#
++#  clean
++#
+ .PHONY: clean
+ clean:
+   rm $(filter-proper-targets $(ls R, .))
+ 
+ .DEFAULT: build
+-
+diff --git a/homu/main/OMakeroot b/homu/main/OMakeroot
+index 303b5e1..211700c 100644
+--- a/homu/main/OMakeroot
++++ b/homu/main/OMakeroot
+@@ -1,5 +1,3 @@
+-open build/C
+ DefineCommandVars()
+-
+ .SUBDIRS: .
+ 
+diff --git a/homu/main/app.c b/homu/main/app.c
+index b19aed2..4f49187 100644
+--- a/homu/main/app.c
++++ b/homu/main/app.c
+@@ -1,3 +1,4 @@
++
+ #include "homu_main.h"
+ 
+ 
+@@ -42,13 +43,12 @@ homu_main_result_t homu_main_setAppRule (
+     if(i == HOMU_MAIN_APP_MAX){
+ 
+       /* the number of apps has reached the limit */
+-      state->users[userid].lastErr = HOMU_MAIN_ERR_TOO_MANY_APPS;
+-      HOMU_MAIN_DEBUGMSG("<TOO_MANY_APPS>", userid, 0, 0, 0);
++      homu_main_throwError(state, userid, HOMU_MAIN_ERR_TOO_MANY_APPS);
+       return HOMU_MAIN_FAILURE;
+ 
+     }else{
+ 
+-      state->users[userid].apps[i].path = homu_main_mrealloc(state, state->users[userid].apps[i].path, homu_main_strlen(path) + 1);
++      state->users[userid].apps[i].path = homu_main_malloc(state, state->users[userid].apps[i].path, homu_main_strlen(path) + 1);
+       homu_main_strcpy(state->users[userid].apps[i].path, path);
+       state->users[userid].apps[i].path[homu_main_strlen(path)] = '\0';
+     }
+@@ -58,7 +58,7 @@ homu_main_result_t homu_main_setAppRule (
+ 
+ 
+   /* set the new app rule */
+-  appres = homu_main_mrealloc(state, appres, sizeof(*appres) * (resNum+1));
++  appres = homu_main_malloc(state, appres, sizeof(*appres) * (resNum+1));
+ 
+   for(j=0; res[j] != HOMU_MAIN_RES_NULL; j++)
+     appres[j] = res[j];
+@@ -91,7 +91,7 @@ homu_main_result_t homu_main_setDefaultAppRule (
+   resNum = i;
+ 
+   /* set the new app rule */
+-  defaultres = homu_main_mrealloc(state, defaultres, sizeof(*defaultres) * (resNum+1));
++  defaultres = homu_main_malloc(state, defaultres, sizeof(*defaultres) * (resNum+1));
+ 
+   for(i=0; res[i] != HOMU_MAIN_RES_NULL; i++)
+     defaultres[i] = res[i];
+diff --git a/homu/main/error.c b/homu/main/error.c
+index 679d12f..3f3ff1c 100644
+--- a/homu/main/error.c
++++ b/homu/main/error.c
+@@ -3,28 +3,22 @@
+ 
+ static const char* errorStr [] = {
+ 
+-  "HOMU_MAIN_ERR_NULL",
+-  "HOMU_MAIN_ERR_TOO_MANY_APPS",
+-  "HOMU_MAIN_ERR_TOO_MANY_PROCESSES",
++  "ERROR   NULL (this is not an error)",
++  "ERROR   TOO_MANY_APPS",
++  "ERROR   TOO_MANY_PROCESSES",
++  "WARNING QUERY_INVALID_ARGUMENTS_NUM",
++  "WARNING QUERY_INVALID_ARGUMENT",
++  "WARNING QUERY_UNKNOWN_COMMAND"
+ };
+ 
+ 
+-enum homu_main_errType homu_main_getLastError (
+-                                                struct homu_main_state* state,
+-                                                homu_main_userid_t      userid
+-                                              ){
+-
+-  return state->users[userid].lastErr;
+-}
+-
++void homu_main_throwError (
++                            struct homu_main_state* state,
++                            homu_main_userid_t      userid,
++                            enum homu_main_errType  err
++                          ){
+ 
++  homu_main_writeLog(state, userid, errorStr[err]);
+ 
+-
+-const char* homu_main_getLastErrorStr (
+-                                        struct homu_main_state* state,
+-                                        homu_main_userid_t      userid
+-                                      ){
+-
+-  return errorStr[state->users[userid].lastErr];
++  return;
+ }
+-
+diff --git a/homu/main/homu_main.h b/homu/main/homu_main.h
+index 2ad88a0..ae6226f 100644
+--- a/homu/main/homu_main.h
++++ b/homu/main/homu_main.h
+@@ -50,12 +50,12 @@ enum homu_main_mode{
+ 
+ enum homu_main_errType{
+ 
+-  HOMU_MAIN_ERR_NULL                      = 0,
+-  HOMU_MAIN_ERR_TOO_MANY_APPS             = 1,
+-  HOMU_MAIN_ERR_TOO_MANY_PROCESSES        = 2,
+-  HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS   = 3,
+-  HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT    = 4,
+-  HOMU_MAIN_ERR_QUERY_UNKNOWN_COMMAND     = 5
++  HOMU_MAIN_ERR_NULL                        = 0,
++  HOMU_MAIN_ERR_TOO_MANY_APPS               = 1,
++  HOMU_MAIN_ERR_TOO_MANY_PROCESSES          = 2,
++  HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENTS_NUM = 3,
++  HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT      = 4,
++  HOMU_MAIN_ERR_QUERY_UNKNOWN_COMMAND       = 5
+ };
+ 
+ enum homu_main_userresType{
+@@ -97,7 +97,6 @@ struct homu_main_process{
+ struct homu_main_info{
+ 
+   enum homu_main_mode     mode;
+-  enum homu_main_errType  lastErr;
+   homu_main_version_t     version;
+   homu_main_size_t        appMax;
+   homu_main_size_t        userresMax;
+@@ -106,7 +105,6 @@ struct homu_main_info{
+ 
+ struct homu_main_user{
+ 
+-  enum homu_main_errType   lastErr;
+   enum homu_main_mode      mode;
+ 
+   homu_main_size_t         logLen;
+@@ -127,19 +125,18 @@ struct homu_main_state{
+ 
+ 
+ /* macros */
+-/*#ifdef HOMU_MAIN_DEBUG*/
+-#include<linux/kernel.h>
++#ifdef HOMU_MAIN_DEBUG
++
+   #define HOMU_MAIN_DEBUGMSG(msg, userid, appid, prosid, resid) do{ \
+-                              printk(KERN_INFO "HOMU_MAIN_DEBUG %s:%d: %s userid: %u, appid: %u, prosid: %u, resid: %u\n", \
+-                              __FILE__, __LINE__, msg, (unsigned int) userid, (unsigned int) appid, (unsigned int) prosid, (unsigned int) resid); \
++                            /* call a function to print a message (e.g. printk). */ \
+                             }while(0)
+-/*
++
+ #else
+ 
+   #define HOMU_MAIN_DEBUGMSG(msg, userid, appid, prosid, resid) do{}while(0)
+ 
+ #endif
+-*/
++
+ 
+ /* init.c */
+ homu_main_result_t homu_main_init (
+@@ -229,14 +226,11 @@ struct homu_main_info* homu_main_getInfo (
+                                          );
+ 
+ /* error.c */
+-enum homu_main_errType homu_main_getLastError (
+-                                                struct homu_main_state* state,
+-                                                homu_main_userid_t      userid
+-                                              );
+-const char* homu_main_getLastErrorStr (
+-                                        struct homu_main_state* state,
+-                                        homu_main_userid_t      userid
+-                                      );
++void homu_main_throwError (
++                            struct homu_main_state* state,
++                            homu_main_userid_t      userid,
++                            enum homu_main_errType  err 
++                          );
+ 
+ /* judge.c */
+ homu_main_judge_t homu_main_judge (
+@@ -248,10 +242,14 @@ homu_main_judge_t homu_main_judge (
+                                   );
+ 
+ /* memory.c */
+-void* homu_main_mrealloc (
++void* homu_main_malloc (
++                         struct homu_main_state*  state,
++                         void*                    ptr,
++                         homu_main_size_t         size
++                       );
++void  homu_main_mrelease (
+                            struct homu_main_state*  state,
+-                           void*                    ptr,
+-                           homu_main_size_t         size
++                           void*                    ptr
+                          );
+ 
+ /* log.c */
+diff --git a/homu/main/info.c b/homu/main/info.c
+index 87f6042..8e278b7 100644
+--- a/homu/main/info.c
++++ b/homu/main/info.c
+@@ -12,7 +12,6 @@ struct homu_main_info* homu_main_getInfo (
+ 
+   info->version         = HOMU_MAIN_VERSION;
+   info->mode            = state->users[userid].mode;
+-  info->lastErr         = state->users[userid].lastErr;
+   info->appMax          = HOMU_MAIN_APP_MAX;
+   info->userresMax      = HOMU_MAIN_USERRES_MAX;
+   info->processMax      = HOMU_MAIN_PROS_MAX;
+diff --git a/homu/main/judge.c b/homu/main/judge.c
+index aa2f57f..5487f83 100644
+--- a/homu/main/judge.c
++++ b/homu/main/judge.c
+@@ -14,13 +14,6 @@ homu_main_judge_t homu_main_judge (
+  homu_main_resid_t*  appRes;
+ 
+ 
+-  /* @bug Homu Main seems to allocate appid 0. */
+-  /*temporary repairs*/
+-  homu_main_resid_t appResForAppId0 [] = {1,2,3,4,5,6,7,8,9,0};
+-  if(state->users[userid].process[prosid].appid == 0)
+-    appRes = &appResForAppId0[0];
+-  else
+-  /*temporary repairs end*/
+   appRes = state->users[userid].apps[state->users[userid].process[prosid].appid].res;
+ 
+ 
+diff --git a/homu/main/log.c b/homu/main/log.c
+index 7293ead..f57992e 100644
+--- a/homu/main/log.c
++++ b/homu/main/log.c
+@@ -20,18 +20,12 @@ void homu_main_writeLog (
+                           const char*             msg
+                         ){
+ 
++
+   if((homu_main_strlen(state->users[userid].log) + homu_main_strlen(msg)) > HOMU_MAIN_LOG_MAX){
+ 
+-    state->mfree(state->users[userid].log);
+-    state->users[userid].log = HOMU_MAIN_NULL;
++    state->users[userid].logLen = 0;
+   }
+ 
+-  state->users[userid].log = homu_main_mrealloc(
+-                                                 state,
+-                                                 state->users[userid].log,
+-                                                 state->users[userid].logLen + homu_main_strlen(msg) + 2 /* '\n' and '\0' */
+-                                               );
+-
+   homu_main_strcpy(&state->users[userid].log[state->users[userid].logLen], msg);
+   state->users[userid].log[state->users[userid].logLen + homu_main_strlen(msg)]   = '\n';
+   state->users[userid].log[state->users[userid].logLen + homu_main_strlen(msg)+1] = '\0';
+@@ -39,4 +33,3 @@ void homu_main_writeLog (
+ 
+   return;
+ }
+-
+diff --git a/homu/main/memory.c b/homu/main/memory.c
+index fa8bc7e..f73112b 100644
+--- a/homu/main/memory.c
++++ b/homu/main/memory.c
+@@ -10,44 +10,53 @@
+ *
+ *  @warning
+ *
+-*    malloc and mfree must *not* return NULL.
+-*    Errors caused in malloc/mfree must be handled in each function.
++*    state->malloc() and state->mfree() must *not* return NULL.
++*    Errors caused in these functions must be handled in each function.
+ *
+ */
+ 
+ 
+ 
+-void* homu_main_mrealloc (
+-                           struct homu_main_state* state,
+-                           void*                   ptr,
+-                           homu_main_size_t        size
+-                         ){
++void* homu_main_malloc (
++                         struct homu_main_state* state,
++                         void*                   ptr,
++                         homu_main_size_t        size
++                       ){
+ 
+- void*             oldptr;
+  void*             newptr;
+- void*             newdptr;
+- homu_main_size_t* newsptr;
++ void*             newptr_data;
++ homu_main_size_t* newptr_size;
+ 
+ 
+-  newptr  = state->malloc(size + sizeof(homu_main_size_t));
+-  newsptr = newptr;
+-  newdptr = ((homu_main_uint8_t *) newptr + sizeof(homu_main_size_t));
++  newptr      = state->malloc(size + sizeof(homu_main_size_t));
++  newptr_size = newptr;
++  newptr_data = ((homu_main_uint8_t *) newptr + sizeof(homu_main_size_t));
+ 
+   if(ptr != HOMU_MAIN_NULL){
+ 
+     homu_main_memcpy(
+-                      newdptr,
++                      newptr_data,
+                       ptr,
+                       *((homu_main_size_t *) ((homu_main_uint8_t *) ptr - sizeof(homu_main_size_t)))
+                     );
+ 
+-    oldptr = ((homu_main_uint8_t *) ptr - sizeof(homu_main_size_t));
+-    state->mfree(oldptr);
++    homu_main_mrelease(state, ptr);
+   }
+ 
+   /* write the allocated size */
+-  *newsptr = size;
+-
+-  return newdptr;
++  *newptr_size = size;
++  return newptr_data;
+ }
+ 
++
++
++void homu_main_mrelease (struct homu_main_state* state, void* ptr){
++
++  homu_main_uint8_t* tmpptr;
++
++
++  tmpptr = ((homu_main_uint8_t *) ptr - sizeof(homu_main_size_t));
++  state->mfree(tmpptr);
++
++  return;
++}
+diff --git a/homu/main/process.c b/homu/main/process.c
+index 81a32ff..eadb97d 100644
+--- a/homu/main/process.c
++++ b/homu/main/process.c
+@@ -50,8 +50,7 @@ homu_main_prosid_t homu_main_copyProcess (
+   if(i == HOMU_MAIN_PROS_MAX){
+ 
+     /* the number of processes has reached the limit */
+-    state->users[userid].lastErr = HOMU_MAIN_ERR_TOO_MANY_PROCESSES;
+-    HOMU_MAIN_DEBUGMSG("<TOO_MANY_PROCESSES>", userid, 0, 0, 0);
++    homu_main_throwError(state, userid, HOMU_MAIN_ERR_TOO_MANY_PROCESSES);
+     return 0;
+   }
+ 
+@@ -98,8 +97,7 @@ homu_main_prosid_t homu_main_addProcess (
+   if(i == HOMU_MAIN_PROS_MAX){
+ 
+     /* the number of processes has reached the limit */
+-    state->users[userid].lastErr = HOMU_MAIN_ERR_TOO_MANY_PROCESSES;
+-    HOMU_MAIN_DEBUGMSG("<TOO_MANY_PROCESSES>", userid, 0, 0, 0);
++    homu_main_throwError(state, userid, HOMU_MAIN_ERR_TOO_MANY_PROCESSES);
+     return 0;
+   }
+ 
+diff --git a/homu/main/query.c b/homu/main/query.c
+index e1a2930..18a57af 100644
+--- a/homu/main/query.c
++++ b/homu/main/query.c
+@@ -20,10 +20,10 @@ homu_main_result_t homu_main_query (
+  char** args;
+ 
+ 
+-  res = homu_main_mrealloc(state, HOMU_MAIN_NULL, sizeof(*res) * HOMU_MAIN_USERRES_MAX);
++  res = homu_main_malloc(state, HOMU_MAIN_NULL, sizeof(*res) * HOMU_MAIN_USERRES_MAX);
+ 
+   /* copy the query string */
+-  str = homu_main_mrealloc(state, HOMU_MAIN_NULL, homu_main_strlen(query)+1);
++  str = homu_main_malloc(state, HOMU_MAIN_NULL, homu_main_strlen(query) + 1);
+   homu_main_strcpy(str, query);
+   str[homu_main_strlen(query)] = '\0';
+ 
+@@ -40,7 +40,7 @@ homu_main_result_t homu_main_query (
+       argNum++;
+   }
+ 
+-  args = homu_main_mrealloc(state, HOMU_MAIN_NULL, (argNum+1) * sizeof(*args));
++  args = homu_main_malloc(state, HOMU_MAIN_NULL, (argNum+1) * sizeof(*args));
+ 
+ 
+ 
+@@ -85,8 +85,7 @@ homu_main_result_t homu_main_query (
+ 
+     if(argNum != 1){
+ 
+-      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
+-      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      homu_main_throwError(state, userid, HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENTS_NUM);
+       goto ret_failure;
+     }
+ 
+@@ -105,9 +104,7 @@ homu_main_result_t homu_main_query (
+     /* unknown mode */
+     }else{
+ 
+-
+-      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT;
+-      HOMU_MAIN_DEBUGMSG("<QUERY_INVALID_ARGUMENT>", userid, 0, 0, 0);
++      homu_main_throwError(state, userid, HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT);
+       goto ret_failure;
+     }
+ 
+@@ -120,8 +117,7 @@ homu_main_result_t homu_main_query (
+ 
+     if(argNum != 2){
+ 
+-      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
+-      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      homu_main_throwError(state, userid, HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENTS_NUM);
+       goto ret_failure;
+     }
+ 
+@@ -151,8 +147,7 @@ homu_main_result_t homu_main_query (
+ 
+     if(argNum != 1){
+ 
+-      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
+-      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      homu_main_throwError(state, userid, HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENTS_NUM);
+       goto ret_failure;
+     }
+ 
+@@ -191,8 +186,7 @@ homu_main_result_t homu_main_query (
+ 
+     if(argNum != 3){
+ 
+-      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_TOO_FEW_ARGUMENTS;
+-      HOMU_MAIN_DEBUGMSG("<QUERY_TOO_FEW_ARGUMENTS>", userid, 0, 0, 0);
++      homu_main_throwError(state, userid, HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENTS_NUM);
+       goto ret_failure;
+     }
+ 
+@@ -202,8 +196,7 @@ homu_main_result_t homu_main_query (
+ 
+     }else{
+ 
+-      state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT;
+-      HOMU_MAIN_DEBUGMSG("<QUERY_INVALID_ARGUMENT>", userid, 0, 0, 0);
++      homu_main_throwError(state, userid, HOMU_MAIN_ERR_QUERY_INVALID_ARGUMENT);
+       goto ret_failure;
+     }
+ 
+@@ -215,20 +208,19 @@ homu_main_result_t homu_main_query (
+   */
+   }else{
+ 
+-    state->users[userid].lastErr = HOMU_MAIN_ERR_QUERY_UNKNOWN_COMMAND;
+-    HOMU_MAIN_DEBUGMSG("<QUERY_UNKNOWN_COMMAND>", userid, 0, 0, 0);
++    homu_main_throwError(state, userid, HOMU_MAIN_ERR_QUERY_UNKNOWN_COMMAND);
+     goto ret_failure;
+   }
+ 
+ 
+ 
+-  state->mfree(str);
+-  state->mfree(args);
++  homu_main_mrelease(state, str);
++  homu_main_mrelease(state, args);
+   return HOMU_MAIN_SUCCESS;
+ 
+   ret_failure:
+-  state->mfree(str);
+-  state->mfree(args);
++  homu_main_mrelease(state, str);
++  homu_main_mrelease(state, args);
+   return HOMU_MAIN_FAILURE;
+ }
+ 
+diff --git a/homu/main/reset.c b/homu/main/reset.c
+index 8c206bf..c1071c1 100644
+--- a/homu/main/reset.c
++++ b/homu/main/reset.c
+@@ -9,28 +9,41 @@ void homu_main_reset (struct homu_main_state* state, homu_main_userid_t userid){
+  homu_main_uintmax_t i;
+  struct homu_main_user* user = &state->users[userid];
+ 
++
++
+   for(i=0; i < HOMU_MAIN_APP_MAX; i++){
+ 
+-    if(user->apps[i].path != HOMU_MAIN_NULL)
+-      state->mfree(user->apps[i].path);
++    if(user->apps[i].res  != HOMU_MAIN_NULL)
++      homu_main_mrelease(state, user->apps[i].res);
+ 
+-    if(user->apps[i].res != HOMU_MAIN_NULL)
+-      state->mfree(user->apps[i].res);
++    /* appid[1]'s path is "///defaultapprule///" (not allocated by homu_main_malloc) */
++    if(i == 1)
++      continue;
++
++    if(user->apps[i].path != HOMU_MAIN_NULL)
++      homu_main_mrelease(state, user->apps[i].path);
+   }
+ 
++
++
+   for(i=0; i < HOMU_MAIN_USERRES_MAX; i++){
+ 
++    if(user->userres[i].type == HOMU_MAIN_USERRES_NULL)
++      continue;
++
+     user->userres[i].type = HOMU_MAIN_USERRES_NULL;
+ 
+     if(user->userres[i].str != HOMU_MAIN_NULL)
+-      state->mfree(user->userres[i].str);
++      homu_main_mrelease(state, user->userres[i].str);
+   }
+ 
++
++
+   for(i=0; i < HOMU_MAIN_PROS_MAX; i++)
+     user->process[i].appid = 0;
+ 
+   if(user->log != HOMU_MAIN_NULL)
+-    state->mfree(user->log);
++    homu_main_mrelease(state, user->log);
+ 
+   user->logLen = 0;
+   user->mode   = HOMU_MAIN_SLEEP_MODE;
+diff --git a/homu/main/test_main.c b/homu/main/test_main.c
+index d8ffb73..78a679f 100644
+--- a/homu/main/test_main.c
++++ b/homu/main/test_main.c
+@@ -1,6 +1,6 @@
+ /*
+- *  test program for homu main
+- */
++*  test program for homu main
++*/
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -11,7 +11,15 @@
+ 
+ void* homu_malloc (homu_main_size_t size){
+ 
+-  return malloc((size_t) size);
++  void *p = malloc((size_t) size);
++
++  if(p == NULL){
++
++    printf("homu_malloc: malloc() returned NULL.");
++    exit(EXIT_FAILURE);
++  }
++
++  return p;
+ }
+ 
+ 
+@@ -46,10 +54,10 @@ int main (void){
+ 
+  struct homu_main_state* homu;
+  homu_main_userid_t      userid  = 1;
+- homu_main_prosid_t      prosid1, prosid2, prosid3;
++ homu_main_prosid_t      prosid1, prosid2;
+ 
+-  homu = (struct homu_main_state *) malloc(sizeof(*homu));
+ 
++  homu = (struct homu_main_state *) malloc(sizeof(*homu));
+ 
+   if(homu_main_init(homu, homu_malloc, homu_mfree) == HOMU_MAIN_FAILURE){
+ 
+@@ -63,31 +71,28 @@ int main (void){
+     return 1;
+   }
+ 
++  test(homu, userid, "reset_rule");
++  test(homu, userid, "set_defaultapprule 1,2,3,4,5,6");
+ 
++  test(homu, userid, "set_apprule /usr/bin/vim 4,11");
+ 
+-  test(homu, userid, "set_apprule /usr/bin/vim 1,0");
+-  test(homu, userid, "set_apprule /bin/zsh 1,3,0");
+-  test(homu, userid, "set_userres 1 FILE /homu/db/test");
+-  test(homu, userid, "set_mode \"observe\"");
++  test(homu, userid, "set_apprule /bin/zsh 11,2,3");
++  test(homu, userid, "set_apprule /bin/zsh 4");
+ 
+-  prosid1 = homu_main_addProcess(homu, userid, "/bin/zsh");
+-  prosid2 = homu_main_addProcess(homu, userid, "/bin/vim");
+-  prosid3 = homu_main_addProcess(homu, userid, "/bin/zsh");
+-
+-  if(homu_main_judge(homu, userid, prosid1, HOMU_MAIN_RES_FS_READ, "/hello") == HOMU_MAIN_DENY)
+-    puts("invalid judge: (DENIED) prosid1 --> FS_READ");
+-
+-  if(homu_main_judge(homu, userid, prosid1, HOMU_MAIN_RES_FS_WRITE, "/hello") == HOMU_MAIN_ALLOW)
+-    puts("invalid judge: (ALLOWED) prosid1 --> FS_WRITE");
+-
+-  if(homu_main_judge(homu, userid, prosid2, HOMU_MAIN_RES_SYS_CHANGE, "/hello") == HOMU_MAIN_ALLOW)
+-    puts("invalid judge: (ALLOWED) prosid2 --> SYS_CHANGE");
+-
+-  if(homu_main_judge(homu, userid, prosid3, HOMU_MAIN_RES_FS_READ, "/hello") == HOMU_MAIN_DENY)
+-    puts("invalid judge: (DENIED) prosid3 --> FS_READ");
+-
+-  if(homu_main_judge(homu, userid, prosid3, HOMU_MAIN_RES_FS_READ, "/homu/db/test") == HOMU_MAIN_ALLOW)
+-    puts("invalid judge: (ALLOWED) prosid3 --> FS_READ(/homu/db/test)");
++  test(homu, userid, "set_userres 1 FILE /homu/db/test");
++  test(homu, userid, "set_mode invoke");
++
++  prosid1 = homu_main_addProcess(homu, userid, "/usr/bin/vim");
++  prosid2 = homu_main_addProcess(homu, userid, "/bin/zsh");
++
++  if(homu_main_judge(homu, userid, prosid1, HOMU_MAIN_RES_FS_READ,  "/hello")         == HOMU_MAIN_ALLOW)
++    puts("1. invalid judge: (ALLOWED) prosid1 (vim) --> FS_READ");
++  if(homu_main_judge(homu, userid, prosid2, HOMU_MAIN_RES_FS_WRITE, "/hello")         == HOMU_MAIN_DENY)
++    puts("2. invalid judge: (DENIED)  prosid2 (zsh) --> FS_WRITE");
++  if(homu_main_judge(homu, userid, prosid2, HOMU_MAIN_RES_FS_READ,  "/homu/db/test")  == HOMU_MAIN_ALLOW)
++    puts("3. invalid judge: (ALLOWED) prosid2 (zsh) --> USER_RES(1)");
++  if(homu_main_judge(homu, userid, prosid1, HOMU_MAIN_RES_FS_WRITE, "/homu/db/test")  == HOMU_MAIN_DENY)
++    puts("4. invalid judge: (DENIED)  prosid1 (vim) --> USER_RES(1)");
+ 
+   return 0;
+ }
+diff --git a/homu/main/user.c b/homu/main/user.c
+index 996544c..bff0dcf 100644
+--- a/homu/main/user.c
++++ b/homu/main/user.c
+@@ -30,7 +30,7 @@ homu_main_result_t homu_main_initUser (
+   }
+ 
+   state->users[userid].apps[1].path = "///defaultapprule///";
+-  state->users[userid].log          = homu_main_mrealloc(state, HOMU_MAIN_NULL, 1);
++  state->users[userid].log          = homu_main_malloc(state, HOMU_MAIN_NULL, HOMU_MAIN_LOG_MAX);
+   homu_main_strcpy(state->users[userid].log, "");
+   state->users[userid].logLen       = 0;
+   state->users[userid].mode         = HOMU_MAIN_SLEEP_MODE;
+diff --git a/homu/main/userres.c b/homu/main/userres.c
+index c629d51..41e1cbf 100644
+--- a/homu/main/userres.c
++++ b/homu/main/userres.c
+@@ -17,11 +17,11 @@ homu_main_result_t homu_main_setUserRes (
+   res = &state->users[userid].userres[resid];
+ 
+   res->type = type;
+-  res->str  = homu_main_mrealloc(
+-                                  state,
+-                                  res->str,
+-                                  homu_main_strlen(str) + 1
+-                                );
++  res->str  = homu_main_malloc(
++                                state,
++                                res->str,
++                                homu_main_strlen(str) + 1
++                              );
+ 
+   homu_main_strcpy(res->str, str);
+   res->str[homu_main_strlen(str)] = '\0';
+diff --git a/homu/memory.c b/homu/memory.c
+index bc9c1dc..35203fc 100644
+--- a/homu/memory.c
++++ b/homu/memory.c
+@@ -15,7 +15,8 @@ void* homu_malloc (homu_main_size_t size){
+ 
+ void homu_mfree (void* ptr){
+ 
++
++  /** @bug Linux kernel halts (not panic) in mfree().  */
+ /*  kfree(ptr); */
+   return;
+ }
+-
+diff --git a/homu/proc.c b/homu/proc.c
+index 5470b7f..2aa1beb 100644
+--- a/homu/proc.c
++++ b/homu/proc.c
+@@ -59,11 +59,10 @@ static int homu_proc_status_read (
+ 
+   homu_main_getInfo(homu_main, homu_getUserIdByUID(homu_getUID()), &info);
+ 
+-  len  = sprintf(page, "version: %d\nmode: %s\nlast error: %d\n", (int) info.version,
+-                                                                  (info.mode == HOMU_MAIN_SLEEP_MODE)   ? "sleep":
+-                                                                  (info.mode == HOMU_MAIN_OBSERVE_MODE) ? "observe":
+-                                                                  (info.mode == HOMU_MAIN_INVOKE_MODE)  ? "invoke": "Unknown (BUG)"
+-                                                                , (int) info.lastErr
++  len  = sprintf(page, "version: %d\nmode: %s\n", (int) info.version,
++                                                  (info.mode == HOMU_MAIN_SLEEP_MODE)   ? "sleep":
++                                                  (info.mode == HOMU_MAIN_OBSERVE_MODE) ? "observe":
++                                                  (info.mode == HOMU_MAIN_INVOKE_MODE)  ? "invoke": "Unknown (BUG)"
+                 );
+   *eof = 1;
+ 
+-- 
+1.7.9.5
+

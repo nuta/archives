@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Homu
+Exec=/homu/apps/desktop/homu-desktop
+Terminal=false
+Type=Application
+Icon=/homu/icon.png
+StartupNotify=true
+X-Unity-IconBackgroundColor=#EDE4E1

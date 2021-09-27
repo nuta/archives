@@ -1,0 +1,1 @@
+Source code in this directory are released under the GPLv2.

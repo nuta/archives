@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <title>Homu WebUI</title>
+
+  <script src="{{ url_for('static', filename='jquery-1.6.4.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='jquery.qtip-1.0.0-rc3.min.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='drawerbox.js') }}"></script>
+  <link  href="{{ url_for('static', filename='drawerbox.css') }}" rel="stylesheet" type="text/css">
+  <script src="{{ url_for('static', filename='filer.js') }}"></script>
+  <link  href="{{ url_for('static', filename='filer.css') }}" rel="stylesheet" type="text/css">
+
+  <script src="{{ url_for('static', filename='webui.js') }}"></script>
+  <link  href="{{ url_for('static', filename='webui.css') }}" rel="stylesheet" type="text/css">
+
+  <script src="{{ url_for('static', filename='lang.js') }}"></script>
+
+  <script>
+
+    $(document).ready(function(){
+
+      $(".tooltip").each(function(){
+
+        $("script", this).empty();
+
+        $(this).qtip({
+
+          content: $(this).html(),
+          show:    "mouseover",
+          hide:    "mouseout",
+          style:   { name: "light" }
+        });
+
+        $(this).html("<b>?</b>");
+        $(this).css("display", "inline");
+      });
+
+      drawerbox_init();
+      jsfiler_ls("/filelist", $("#jsfiler_list").selector, "~");
+      webui_init();
+    });
+
+
+  </script>
+
+</head>
+<body>
+
+
+
+<div class="drawerbox_window" id="win_changeMode">
+
+  <p id="title"><script>document.write(lang["change_mode"])</script></p>
+
+  <div id="body">
+    <p>
+      <script>document.write(lang["mode"])</script>
+      <span class="tooltip"><script>document.write(lang["help_mode"])</script></span>
+
+      <select id="win_changeMode_mode">
+        <option value="sleep">   <script>document.write(lang["mode_SLEEP"])</script>   </option>
+        <option value="observe"> <script>document.write(lang["mode_OBSERVE"])</script> </option>
+        <option value="invoke">  <script>document.write(lang["mode_INVOKE"])</script>  </option>
+      </select>
+    </p>
+
+    <button class="drawerbox_button3" onclick="webui_changeMode($('#win_changeMode_mode').val())"><script>document.write(lang["change"])</script></button>
+  </div>
+
+</div>
+
+
+<div class="drawerbox_window" id="win_about">
+
+  <p id="title"><script>document.write(lang["about_homu"])</script></p>
+
+  <div id="body">
+    <p><script>document.write(lang["about_homu_body"])</script></p>
+  </div>
+
+</div>
+
+
+<div class="drawerbox_window" id="win_addException">
+  <p id="title"><script>document.write(lang["add_exception"])</script></p>
+  <div id="body">
+
+    <p class="subtitle">
+      <script>document.write(lang["target_app"])</script>
+      <span class="tooltip"><script>document.write(lang["help_search_target_app"])</script></span>
+    </p>
+    <p><input type="search" id="win_addException_searchbox" class="drawerbox_emd_searchbox" onKeyDown="if(event.keyCode == 13){webui_searchApplication($(this).val())}"></p>
+    <input type="hidden" id="selected_app">
+
+    <div id="applist"></div>
+
+    <p class="subtitle">
+      <script>document.write(lang["res_to_be_allowed"])</script>
+      <span class="tooltip"><script>document.write(lang["help_res_to_be_allowed"])</script></span>
+    </p>
+
+
+    <!-- well known resources -->
+    <table border="0" id="win_addException_reslist" style="text-align: center; width: 100%; font-size: 75%;">
+       <tr>
+         <td><input type="checkbox" value="NET_CONNECT" class="win_addException_resCheckbox"></td><td> <script>document.write(lang["res_NET_CONNECT"])</script></td>
+         <td><input type="checkbox" value="NET_SERVER"  class="win_addException_resCheckbox"></td><td> <script>document.write(lang["res_NET_SERVER"])</script></td>
+       </tr>
+       <tr>
+         <td><input type="checkbox" value="FS_READ"     class="win_addException_resCheckbox"></td><td> <script>document.write(lang["res_FS_READ"])</script></td>
+         <td><input type="checkbox" value="FS_WRITE"    class="win_addException_resCheckbox"></td><td> <script>document.write(lang["res_FS_WRITE"])</script></td>
+       </tr>
+       <tr>
+         <td><input type="checkbox" value="SYS_CHANGE"  class="win_addException_resCheckbox"></td><td> <script>document.write(lang["res_SYS_CHANGE"])</script></td>
+         <td><input type="checkbox" value="HW_FULLCTRL" class="win_addException_resCheckbox"></td><td> <script>document.write(lang["res_HW_FULLCTRL"])</script></td>
+       </tr>
+    </table>
+
+    <script>
+
+      $.ajax({
+               url:      "/userres/all",
+               type:     "GET",
+               dataType: "json",
+
+               success: function(userres, type){
+
+                 i       = 0;
+                 resHTML = "";
+
+                 for(; i < userres.length; i++){
+
+                   if(i%2 == 0)
+                     resHTML += "<tr> <td><input type='checkbox' value='" + userres[i]["id"] + "' class='win_addException_resCheckbox'></td><td>"+ lang["user_res"] + ":&nbsp;" + userres[i]["desc"] +"</td>";
+                   else
+                     resHTML += "     <td><input type='checkbox' value='" + userres[i]["id"] + "' class='win_addException_resCheckbox'></td><td>"+ lang["user_res"] + ":&nbsp;" + userres[i]["desc"] +"</td></tr>";
+                 }
+
+                 if(i%2 == 0)
+                   resHTML += "<td></td></tr>";
+
+                 $("#win_addException_reslist").append(resHTML);
+               }
+      });
+
+    </script>
+
+    <button class="drawerbox_button3" onClick="webui_addExApp()"><script>document.write(lang["add"])</script></button>
+
+  </div>
+</div>
+
+
+<div class="drawerbox_window" id="win_addUserRes">
+  <p id="title"><script>document.write(lang["add_user_res"])</script></p>
+  <div id="body"> 
+
+
+    <p class="subtitle">
+      <script>document.write(lang["description"])</script>
+      <span class="tooltip"><script>document.write(lang["help_user_res_desc"])</script></span>
+    </p>
+    <p><input type="text" id="win_addUserRes_desc"></p>
+
+    <p class="subtitle"><script>document.write(lang["type"])</script></p>
+    <p id="win_addUserRes_type"><input type="radio" name="type" value="FILE" checked>&nbsp;<script>document.write(lang["userres_FILE"])</script></p>
+
+    <p class="subtitle">
+      <script>document.write(lang["user_res_str"])</script>
+      <span class="tooltip"><script>document.write(lang["help_user_res_str"])</script></span>
+    </p>
+    <input type="hidden" id="win_addUserRes_path" value="">
+    <p id="jsfiler_current"></p>
+    <div id="jsfiler_list"></div>
+
+    <button class="drawerbox_button3" onClick="webui_addUserRes()"><script>document.write(lang["add"])</script></button>
+
+  </div>
+</div>
+
+
+
+<div id="wallpaper">
+
+
+<!-- ------------------------------
+             Header
+------------------------------- -->
+
+<header>
+
+  <!-- buttons -->
+  <div style="text-align: right;">
+    <a href="#" class="drawerbox_button1" onClick="drawerbox_openWindow($('#win_about'))"><script>document.write(lang["about_homu"])</script></a>
+    <a href="#" class="drawerbox_button1" onClick="drawerbox_openWindow($('#win_changeMode'))"><script>document.write(lang["change_mode"])</script></a>
+    <a href="#" class="drawerbox_button1" onClick="webui_applyRules()"><script>document.write(lang["apply_rules"])</script></a>
+    <a href="#" class="drawerbox_button1" onClick="webui_logout()"><script>document.write(lang["logout"])</script></a>
+  </div>
+
+  <div id="titleImg">
+    <img src="{{ url_for('static', filename='title.png') }}">
+  </div>
+
+  <p id="current_mode"></p>
+
+</header>
+
+<!-- ------------------------------
+          Notifications
+------------------------------- -->
+
+<div class="drawerbox" id="notifications">
+  <p id="title"><script>document.write(lang["notification"])</script></p>
+  <p id="notification"></p>
+
+  <div id="body"> 
+    <ul></ul>
+  </div>
+</div>
+
+<!-- ------------------------------
+     Exceptional Applications
+------------------------------- -->
+
+
+<div class="drawerbox drawerbox_searchbox" id="applications">
+
+  <p id="title"><script>document.write(lang["ex_app"])</script></p>
+
+  <p style="text-align: center;">
+    <span class="drawerbox_button1" onClick="
+                                              $('#selected_app').val('');
+                                              $('#win_addException_searchbox').val('');
+                                              $('#applist').empty();
+                                              $('.win_addException_resCheckbox').attr('checked', false);
+                                              drawerbox_openWindow($('#win_addException'));
+                                            "
+    >
+      <script>document.write(lang["add_exception"])</script>
+    </span>
+  </p>
+
+  <div id="body"> 
+    <ul></ul>
+  </div>
+</div>
+
+<!-- ------------------------------
+          User Resources
+------------------------------- -->
+
+
+<div class="drawerbox drawerbox_searchbox" id="userres">
+
+  <p id="title"><script>document.write(lang["user_res"])</script></p>
+
+  <p style="text-align: center;">
+    <span class="drawerbox_button1" onClick="drawerbox_openWindow($('#win_addUserRes'))"><script>document.write(lang["add_user_res"])</script></span>
+  </p>
+
+  <div id="body"> 
+    <ul></ul>
+  </div>
+</div>
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+body{
+
+  color:        #333333;
+  background:   #f3f3f3;
+  font-family:  sans-serif;
+}
+
+input[type=text]{
+
+  width: 60%;
+  padding:        6px;
+  font-size:      96%;
+  background:     #fefefe;
+  border:         1px solid #888888:
+}
+
+a:not(.drawerbox_button1):link{
+
+  text-decoration:  none;
+  color:            #00bfff;
+}
+
+a:not(.drawerbox_button1):visited{
+
+  text-decoration:  none;
+  color:            #00bfff;
+}
+
+a:not(.drawerbox_button1):hover{
+
+  text-decoration:  none;
+  color:            #1e90ff;
+}
+
+a:not(.drawerbox_button1):active{
+
+  text-decoration:  none;
+  color:            #b0e0e6;
+}
+
+
+#wallpaper{
+
+  width:         95%;
+  margin-top:    1em;
+  margin-left:   auto;
+  margin-right:  auto;
+}
+
+.tooltip{
+
+  display: none;
+  cursor:  help;
+}
+
+#titleImg{
+
+  text-align: center;
+}
+
+#current_mode{
+
+  text-align: center;
+  font-size:  88%;
+}
+
+#notifications, #applications, #userres{
+
+  float:  left;
+  width:  29%;
+}
+
+#applist{
+
+  margin-left:   0.8em;
+  margin-bottom: 3.5em;
+}
+
+#applist > .app{
+
+  padding:        12px;
+  margin-bottom:  5px;
+  border:         1px solid #cacaca;
+  clear:          both;
+}
+
+#applist > .app > img{
+
+  width:  24px;
+  height: 24px;
+  float:  left;
+}
+
+#applist > .app > span{
+
+  margin-left: 1em;
+}
+
+#applist > .app:hover{
+
+  cursor:           pointer;
+  background-color: #e3e3e3;
+}

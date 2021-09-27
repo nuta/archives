@@ -1,0 +1,42 @@
+#jsfiler_list{
+
+  margin:   0px 1em 1.5em;
+  overflow: scroll;
+  width:    85%;
+  height:   9em;
+}
+
+
+#jsfiler_current{
+
+  font-size: 78%;
+}
+
+
+.jsfiler_file, .jsfiler_dir{
+
+  list-style: none;
+  background: #e7e8e8;
+  padding:    3px 7px 3px;
+  font-size:  82%;
+}
+
+
+.jsfiler_file{
+
+  color: #66cccc;
+}
+
+.jsfiler_dir{
+
+  font-weight: bold;
+  color:       #cccc33;
+}
+
+
+.jsfiler_file:hover, .jsfiler_dir:hover{
+
+  background: #efefef;
+  cursor:     pointer;
+}
+

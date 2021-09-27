@@ -1,0 +1,59 @@
+#
+#  for extremely comfortable debugging
+#
+
+TEST_PROG = test_main.bin
+
+CC = gcc
+LD = gcc
+
+CFLAGS   = -g -c -ansi -pipe -pedantic -DHOMU_MAIN_DEBUG \
+           -Wall -Wextra
+
+CSRCS[]  = test_main.c   \
+           init.c        \
+           user.c        \
+           userres.c     \
+           app.c         \
+           string.c      \
+           memory.c      \
+           process.c     \
+           mode.c        \
+           info.c        \
+           error.c       \
+           log.c         \
+           reset.c       \
+           judge.c       \
+           query.c
+
+
+
+%.o: %.c
+  $(CC) $(CFLAGS) -o $@ $<
+
+$(TEST_PROG): $(replacesuffixes .c, .o, $(CSRCS))
+  $(LD) -o $@ $^
+
+#
+#  build
+#
+.PHONY: build
+build: $(TEST_PROG)
+
+
+#
+#  test
+#
+.PHONY: test
+test: build
+  $(shell pwd)/$(TEST_PROG)
+
+
+#
+#  clean
+#
+.PHONY: clean
+clean:
+  rm $(filter-proper-targets $(ls R, .))
+
+.DEFAULT: build

@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+# conding: utf-8
+
+import os
+import time
+import pynotify
+from homulib import *
+
+logFilePath = os.environ["HOME"] + "/.homu.log"
+
+
+
+if __name__ == "__main__":
+
+  homu = homulib()
+
+  #
+  #  apply user's rules
+  #
+
+  homu.applyRules()
+
+
+  #
+  #  watch homu_log
+  #
+
+  rp = 1
+  first = True
+
+  while True:
+
+    log = homu.getLog(rp)
+
+    if first:
+      first = False
+      rp    = log["readP"]
+      continue
+
+    if rp > log["readP"]:
+      rp = 1
+      continue
+
+    if rp != log["readP"]:
+
+      rp = log["readP"]
+
+      for line in log["unread"]:
+
+        if   line["type"] == "ERROR":
+          msg = "An internal error occurred."
+        elif line["type"] == "RULE_VIOLATION":
+          msg = "An rule violation occurred."
+        elif line["type"] == "MODE_CHANGED":
+          msg = "The mode changed."
+        else:
+          msg = "You have a new notification from Homu.";
+
+
+        pynotify.init("homu-starter")
+        notify = pynotify.Notification("Homu", msg)
+        notify.show()
+
+    time.sleep(7)

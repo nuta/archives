@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=/homu/apps/starter/homu-starter
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Homu Starter
+Comment=Startup Homu.
+

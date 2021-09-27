@@ -1,0 +1,220 @@
+
+.drawerbox{
+
+  margin:        12px;
+  border-radius: 3px;
+  background:    #eeeeee;
+  box-shadow:    1px 1px 2px #ccc;
+}
+
+.drawerbox > #title{
+
+  color:         #535353;
+  font-size:     111%;
+  text-align:    center;
+  border-radius: 3px 3px 0px 0px / 3px 3px 0px 0px;
+  padding:       6px 0px 4px;
+
+  background:    -o-linear-gradient(       top, #eeeeee, #dddddd);
+  background:    -ms-linear-gradient(      top, #eeeeee, #dddddd);
+  background:    -moz-linear-gradient(     top, #eeeeee, #dddddd);
+  background:    -webkit-linear-gradient(  top, #eeeeee, #dddddd);
+}
+
+.drawerbox_emd_searchbox{
+
+  width:                      75%;
+  margin-bottom:              2em;
+  font-size:                  111%;
+}
+
+.drawerbox > #notification{
+
+  text-align:     center;
+  cursor:         pointer;
+  padding:        5px;
+  margin:         12px;
+  background:     #dfdfdf;
+  border-radius:  3px;
+  display:        none;
+}
+
+.drawerbox > #body{
+
+  color:       #333333;
+  font-size:   92%;
+  padding:     0px 0px 15px;
+}
+
+.drawerbox > #body > ul{
+
+  list-style:   none;
+  padding-left: 0px;
+}
+
+.drawerbox > #body > ul > li{
+
+  margin:               12px;
+  font-size:            79%;
+  padding-top:          5px;
+  border-radius:        5px;
+  border-bottom:        3px solid #cfcfcf;
+  -webkit-transition:   background-color 0.2s linear;
+}
+
+.drawerbox > #body > ul > li:hover{
+
+  cursor:       pointer;
+  background:   #dfdfdf;
+}
+
+.drawerbox > #body > ul > li > b{
+
+  margin-left: 9px;
+}
+
+.drawerbox > #body > ul > li > img{
+
+  float:          left;
+  width:          24px;
+  height:         24px;
+  margin-bottom:  12px;
+}
+
+.drawerbox > #body > ul > li > table{
+
+  clear:   both;
+  margin:  5px 7px 12px;
+}
+
+.drawerbox > #body > ul > li > table td:first-child{
+
+  color:        #565656;
+  font-weight:  bold;
+  float:        left;
+}
+
+.drawerbox > #body > ul > li > table td:first-child:after{
+
+  content: ":";
+}
+
+.drawerbox > #body > ul > li > div{
+
+  display:        none;
+  background:     #d3d3d3;
+  border-radius:  0px 0px 5px 5px / 0px 0px 5px 5px;
+  margin:         0px;
+  padding:        6px 8px 5px;
+}
+
+
+
+/*=================================================
+
+  Window
+
+=================================================*/
+
+.drawerbox_window{
+
+  display:        none;
+  padding:        1em;
+  border-radius:  5px;
+  background:     #fafafa;
+  width:          65%;
+  position:       absolute;
+  top:            75px;
+  left:           135px;
+  margin-left:    auto;
+  margin-top:     auto;
+  z-index:        512;
+}
+
+.drawerbox_window > #title{
+
+  color:            #868686;
+  font-size:        135%;
+  margin-bottom:    2em;
+  text-align:       center;
+}
+
+.drawerbox_window > #body > p{
+
+  font-size:   90%;
+  margin-left: 3em;
+}
+
+.drawerbox_window > #body > .subtitle{
+
+  color:       #656565;
+  font-size:   103%;
+  margin-left: 1em;
+}
+
+
+
+/*=================================================
+
+  Buttons
+
+=================================================*/
+
+.drawerbox_button1{
+
+  color:            #333333;
+  text-decoration:  none;
+  font-size:        85%;
+  border-radius:    3px;
+  border:           1px solid #dddddd;
+  padding:          3px;
+  background:       -webkit-linear-gradient(  top, #ededed, #efefef);
+}
+
+.drawerbox_button1:hover{
+
+  cursor:      pointer;
+  background:  #dedede;
+}
+
+
+
+.drawerbox_button2{
+
+  color:            #333333;
+  text-decoration:  none;
+  font-size:        93%;
+  border-radius:    3px;
+  border:           1px solid #aaaaaa;
+  padding:          12px;
+  background:       -webkit-linear-gradient(top, #cdcdcd, #dfdfdf);
+}
+
+.drawerbox_button2:hover{
+
+  cursor:      pointer;
+  background:  #d3d3d3;
+}
+
+
+
+.drawerbox_button3{
+
+  color:            #333333;
+  text-decoration:  none;
+  font-size:        93%;
+  border-radius:    3px;
+  border:           1px solid #aaaaaa;
+  background:       #f6d8f7;
+  display:          block;
+  width:            7.5em;
+  padding:          12px;
+  text-align:       center;
+  margin:           1.6em auto 0;
+}
+
+.drawerbox_button3:hover{
+
+  cursor:      pointer;
+  background:  #cdbac3;
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <title>Welcome to Homu WebUI</title>
+
+  <script src="{{ url_for('static', filename='jquery-1.6.4.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='jquery.slideshow.js') }}"></script>
+  <link  href="{{ url_for('static', filename='jquery.slideshow.css') }}" rel="stylesheet" type="text/css">
+  <script src="{{ url_for('static', filename='lang.js') }}"></script>
+  <script src="{{ url_for('static', filename='welcome.js') }}"></script>
+  <link  href="{{ url_for('static', filename='welcome.css') }}" rel="stylesheet" type="text/css">
+
+  <script>
+
+    $(document.body).ready(function(){
+
+      $("#canvas").slideshow({
+
+        slides: [
+                  {title: lang["welcome_1_title"], body: lang["welcome_1_body"], bodyStyle: "text-align: center"},
+                  {title: lang["welcome_2_title"], body: lang["welcome_2_body"]},
+                  {title: lang["welcome_3_title"], body: lang["welcome_3_body"]},
+                  {title: lang["welcome_4_title"], body: lang["welcome_4_body"]},
+                  {title: lang["welcome_5_title"], body: lang["welcome_5_body"]},
+                  {title: lang["welcome_6_title"], body: lang["welcome_6_body"]},
+                  {title: lang["welcome_7_title"], body: lang["welcome_7_body"], bodyStyle: "text-align: center"},
+                ]
+      });
+    });
+
+  </script>
+
+</head>
+<body>
+
+  <div id="canvas"></div>
+
+</body>
+</html>

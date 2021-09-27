@@ -1,0 +1,3 @@
+This Software is licensed under the MIT license excluding
+source code in port directory. 
+Please refer to http://www.opensource.org/licenses/mit-license
