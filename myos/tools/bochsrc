@@ -1,0 +1,8 @@
+
+megs: 128
+ata0-master: type=disk, path=myos.img
+ata0: enabled=1
+
+boot: disk
+
+fullscreen: enabled=0
