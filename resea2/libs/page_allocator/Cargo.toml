@@ -1,0 +1,12 @@
+[package]
+name = "page_allocator"
+version = "0.0.1"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[lib]
+name = "page_allocator"
+path = "lib.rs"
+
+[dependencies]
+etc = { path = "../etc" }

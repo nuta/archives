@@ -1,0 +1,21 @@
+[package]
+name = "riscv64_arch"
+version = "0.0.1"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[lib]
+name = "riscv64_arch"
+path = "lib.rs"
+
+[dependencies]
+cfg-if = "1"
+bit_field = "0"
+arrayvec = { version = "^0.7", default-features = false }
+arch_common = { path = "../../libs/arch_common" }
+etc = { path = "../../libs/etc" }
+print = { path = "../../libs/print" }
+
+[features]
+riscv64_qemu = []
+hosting = []

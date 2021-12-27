@@ -1,0 +1,27 @@
+[package]
+name = "kernel"
+version = "0.0.1"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[[bin]]
+name = "kernel"
+path = "main.rs"
+
+[dependencies]
+spin = "^0.9"
+arrayvec = { version = "^0.7", default-features = false }
+etc = { path = "../libs/etc" }
+print = { path = "../libs/print" }
+page_allocator = { path = "../libs/page_allocator" }
+heap_allocator = { path = "../libs/heap_allocator" }
+arch_common = { path = "../libs/arch_common" }
+riscv64_arch = { path = "../arch/riscv64", optional = true }
+skelton_arch = { path = "../arch/skelton", optional = true }
+
+[features]
+hosting = ["skelton_arch"]
+
+riscv64 = ["riscv64_arch"]
+riscv64_qemu = ["riscv64_arch/riscv64_qemu"]
+

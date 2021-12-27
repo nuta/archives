@@ -1,0 +1,12 @@
+[package]
+name = "arch_common"
+version = "0.0.1"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[lib]
+name = "arch_common"
+path = "lib.rs"
+
+[dependencies]
+arrayvec = { version = "^0.7", default-features = false }

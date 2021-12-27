@@ -1,0 +1,9 @@
+[package]
+name = "run_emulator"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+structopt = "0"
+ansi_term = "0"
+phf = { version = "0", features = ["std", "macros"] }

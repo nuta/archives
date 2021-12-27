@@ -1,0 +1,13 @@
+[package]
+name = "skelton_arch"
+version = "0.0.1"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[lib]
+name = "skelton_arch"
+path = "lib.rs"
+
+[dependencies]
+libc = "0"
+arch_common = { path = "../../libs/arch_common" }

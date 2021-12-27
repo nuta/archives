@@ -1,0 +1,16 @@
+/target
+*.elf
+*.bin
+*.iso
+*.log
+*.map
+*.pcap
+*.profraw
+
+.gdb_history
+
+/.vscode
+!/.vscode/launch.json
+!/.vscode/tasks.json
+!/.vscode/settings.recommended.json
+!/.vscode/extensions.json

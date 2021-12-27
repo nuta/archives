@@ -1,0 +1,9 @@
+[package]
+name = "etc"
+version = "0.0.1"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[lib]
+name = "etc"
+path = "lib.rs"
