@@ -1,0 +1,17 @@
+[package]
+name = "kerla_utils"
+version = "0.0.1"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "kerla_utils"
+path = "lib.rs"
+
+[features]
+no_std = []
+
+[dependencies]
+spin = "0.7.1"
