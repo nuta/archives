@@ -1,0 +1,27 @@
+[package]
+name = "noa_replace"
+version = "0.0.0"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[[bin]]
+name = "noa-replace"
+path = "main.rs"
+
+[dev-dependencies]
+pretty_assertions = "0"
+
+[dependencies]
+log = "0"
+anyhow = "1"
+structopt = "0"
+tokio = { version = "1", features = ["full"] }
+futures = "0"
+parking_lot = "0"
+crossterm = { version = "0", features = ["event-stream"] }
+grep = "0"
+ignore = "0"
+regex = "1"
+
+noa_buffer = { path = "../buffer" }
+noa_common = { path = "../common" }

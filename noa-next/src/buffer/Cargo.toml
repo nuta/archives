@@ -1,0 +1,20 @@
+[package]
+name = "noa_buffer"
+version = "0.0.0"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[dev-dependencies]
+pretty_assertions = "0"
+
+[dependencies]
+log = "0"
+ropey = "1"
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+
+noa_editorconfig = { path = "../editorconfig" }
+noa_langs = { path = "../langs" }
