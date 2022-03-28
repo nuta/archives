@@ -1,0 +1,7 @@
+{
+    "private": true,
+    "makestack": {
+        "name": "blink",
+        "board": "esp32"
+    }
+}

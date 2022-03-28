@@ -1,0 +1,10 @@
+{
+    "private": true,
+    "makestack": {
+        "name": "plot-soil-moisture",
+        "board": "esp32"
+    },
+    "dependencies": {
+        "superagent": "^5.1.0"
+    }
+}

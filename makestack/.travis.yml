@@ -1,0 +1,38 @@
+language: node_js
+
+jobs:
+  include:
+    - stage: test
+      os: linux
+      dist: xenial
+      node_js: "10"
+      addons:
+        apt:
+          packages:
+            - libncurses-dev
+            - flex
+            - bison
+            - gperf
+    - os: osx
+      osx_image: xcode11
+      node_js: "10"
+
+install:
+  - yarn
+
+script:
+  - yarn build
+  - yarn test
+  # XXX: On macOS we need to run build twice (perhaps build dependencies of
+  #      auto-generated makefiles are broken).
+  - "DISABLE_SPINNER=y ./makestack build --app-dir examples/blink || DISABLE_SPINNER=y ./makestack build --app-dir examples/blink"
+
+cache:
+  yarn: true
+  pip: true
+  directories:
+    - firmware/deps
+
+notifications:
+  on_success: change
+  on_failure: change

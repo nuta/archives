@@ -1,0 +1,7 @@
+{
+    "private": true,
+    "makestack": {
+        "name": "lang-test",
+        "board": "esp32"
+    }
+}
