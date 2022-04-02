@@ -1,0 +1,46 @@
+[package]
+name = "noa"
+version = "0.0.0"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2018"
+
+[[bin]]
+name = "noa"
+path = "main.rs"
+
+[dev-dependencies]
+pretty_assertions = "0"
+
+[dependencies]
+log = "0"
+anyhow = "1"
+clap = { version = "3", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+futures = "0"
+parking_lot = "0"
+arc-swap = "1"
+rayon = "1"
+bitflags = "1"
+arrayvec = "0"
+which = "4"
+fuzzy-matcher = "0"
+regex = "1"
+once_cell = "1"
+base64 = "0"
+ignore = "0"
+grep = "0"
+git2 = { version = "0", default-features = false }
+libgit2-sys = "0"
+toml = "0"
+serde = { version = "1.0", features = ["derive"] }
+textwrap = "0"
+tempfile = "3"
+dirs = "3"
+notify = "4"
+
+noa_common = { path = "../common" }
+noa_buffer = { path = "../buffer" }
+noa_languages = { path = "../languages" }
+noa_editorconfig = { path = "../editorconfig" }
+noa_compositor = { path = "../compositor" }
+noa_proxy = { path = "../proxy" }
