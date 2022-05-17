@@ -1,0 +1,22 @@
+{
+    "private": true,
+    "scripts": {
+        "build": "node webc",
+        "dev": "node webc --dev"
+    },
+    "devDependencies": {
+        "commander": "^6.2.1",
+        "cssnano": "^4.1.10",
+        "front-matter": "^4.0.2",
+        "glob": "^7.2.0",
+        "highlight.js": "^10.5.0",
+        "marked": "^2.0.0",
+        "node-sass": "^7.0.0",
+        "nunjucks": "^3.2.2",
+        "postcss": "^8.2.2",
+        "postcss-cli": "^8.3.1",
+        "postcss-preset-env": "^6.7.0",
+        "serve": "^13.0.2",
+        "ws": "^8.3.0"
+    }
+}

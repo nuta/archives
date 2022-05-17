@@ -1,0 +1,4 @@
+node_modules
+http-server/build
+out
+.git

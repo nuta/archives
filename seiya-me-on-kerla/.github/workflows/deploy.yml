@@ -1,0 +1,74 @@
+name: Deploy
+
+on:
+  push:
+    branches: "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y%m%d-%H%M')"
+
+      - name: Set up Rust
+        run: |
+          rustup override set nightly
+          rustup component add llvm-tools-preview rust-src clippy
+
+      - name: Install cargo crates
+        run: cargo install cargo-binutils rustfilt
+
+      - name: Build OS
+        run: make os KERLA_TAG=reduce-memory-footprint
+
+      - uses: actions/upload-artifact@master
+        with:
+          name: golden-image
+          path: build/kerla/kerla.x64.elf
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@master
+        with:
+          name: golden-image
+          path: golden-image
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install requirements
+        run: pip3 install requests python-digitalocean
+
+      - name: Save the uploader SSH key
+        run: echo "$UPLOADER_SSH_KEY" > uploader_ssh_key && chmod 0400 uploader_ssh_key
+        env:
+          UPLOADER_SSH_KEY: ${{ secrets.UPLOADER_SSH_KEY }}
+
+      - name: Upload the image
+        run: ./infra/upload-image.py -i uploader_ssh_key golden-image/kerla.x64.elf
+        env:
+          DO_TOKEN: ${{ secrets.DO_TOKEN }}
+
+      - name: Reboot VMs
+        run: ./infra/reboot-all.py --slowly
+        env:
+          DO_TOKEN: ${{ secrets.DO_TOKEN }}

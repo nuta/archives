@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+
+    <title>Seiya Nuta</title>
+    <style>
+        :root {
+            --background-color: #fefefe;
+            --text-color: #222;
+            --footer-color: #606060;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #212121;
+                --text-color: #e7e7e7;
+                --footer-color: #bababa;
+            }
+
+            a {
+                color: #52aef0;
+            }
+        }
+
+        body {
+            color: var(--text-color);
+            background: var(--background-color);
+            font-size: 18px;
+            font-family: "PT Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", YuGothic, Verdana, Meiryo, sans-serif;
+            line-height: 1.7em;
+        }
+
+        main {
+            max-width: 700px;
+            margin: 50px auto 0;
+        }
+
+        section>h1 {
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        section>p:nth-of-type(1) {
+            margin-top: 0;
+        }
+
+        section ul {
+            margin: 0;
+        }
+
+        section ul li:not(:first-child) {
+            margin-top: 10px;
+        }
+
+        section ul>li>h2 {
+            font-size: 18px;
+            display: inline;
+        }
+
+        section ul>li>p:before {
+            content: " - ";
+        }
+
+        section ul>li>p {
+            display: inline;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        main>header {
+            display: flex;
+        }
+
+        .headshot img {
+            width: 120px;
+            border-radius: 2px;
+        }
+
+        .tldr {
+            padding-left: 30px;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.4em;
+        }
+
+        .tldr>h1 {
+            margin: 0;
+            padding: 0;
+            font-size: 24px;
+        }
+
+        .accounts {
+            margin: 0;
+        }
+
+        .accounts span:not(:first-child):before {
+            content: " / ";
+        }
+
+        code {
+            font-family: "Menlo", monospace;
+            font-size: 0.8rem;
+            padding: 2px 3px;
+            border-radius: 4px;
+        }
+
+        footer {
+            margin-top: 3rem;
+            line-height: 1.5rem;
+            margin-bottom: 3rem;
+            font-size: 0.85rem;
+            text-align: center;
+            color: var(--footer-color);
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <header>
+            <div class="headshot">
+                <img src="me.jpg">
+            </div>
+            <div class="tldr">
+                <h1>Seiya Nuta</h1>
+                <p class="intro">
+                    An operating system kernel enthusiast.
+                </p>
+                <p class="accounts">
+                    <span>nuta@seiya.me</span>
+                    <span><a href="blog">Blog</a></span>
+                    <span><a href="https://github.com/nuta">GitHub</a></span>
+                    <span><a href="https://www.linkedin.com/in/seiyanuta">LinkedIn</a></span>
+                </p>
+            </div>
+        </header>
+
+        <section>
+            <h1>Projects</h1>
+            <ul>
+                <li>
+                    <h2><a href="https://github.com/nuta/resea">Resea</a></h2>
+                    <p>
+                        A minimalistic and policy-free microkernel based operating system written from scratch, with
+                        TCP/IP, FAT file system,
+                        hardware-accelerated hypervisor, and x86_64 / 64-bit ARM support.
+                        I began this open source software project to develop a developer-friendly alternative to MINIX
+                        and L4.
+                    </p>
+                </li>
+                <li>
+                    <h2><a href="https://github.com/nuta/kerla">Kerla</a></h2>
+                    <p>
+                        A monolithic kernel with Linux binary compatibility written from scratch in Rust.
+                        I've implemented basic *NIX kernel features like fork/execve, signals, mmap, pipe, poll,
+                        tty/pty, tmpfs, UDP/TCP sockets, etc.
+                        You can try it on an ephemeral demo microVM running Kerla:
+                        <code>ssh root@demo.kerla.dev</code>
+                    </p>
+                </li>
+                <li>
+                    <h2><a href="https://github.com/nuta/nsh">nsh</a></h2>
+                    <p>
+                        A almost-POSIX-compliant command-line shell written in Rust featuring
+                        out-of-the-box features just like fish shell. It aims to be
+                        drop-in replacement for Bash as an interactive shell.
+                    </p>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h1>Experience</h1>
+            <ul>
+                <li><a href="https://summerofcode.withgoogle.com/archive/2019/projects/5871651231629312/">Google Summer
+                        of Code 2019 student (LLVM Project)</a></li>
+                <li><a href="https://www.meti.go.jp/english/press/2017/0530_001.html">MITOU Program 2016 (Super Creator
+                        Award)</a></li>
+                <li><a href="https://www.google-melange.com/archive/gsoc/2014/orgs/freebsd/projects/seiya.html">Google
+                        Summer of Code 2014 student (FreeBSD Project)</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        ―<br>
+        This website is powered by <a href="https://kerla.dev">Kerla</a>,<br>
+        a new operating system written from scratch in Rust.
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <title>Blog - seiya.me</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+        integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/base16/solarized-light.min.css"
+        integrity="sha512-ZW2g6Pn2pMbKSyjcA+r4Lc58kcfvOdcsTuCCTl3qz8NqVJwUtAuiN61pDoW3EEfrjwH2CPtkFWMdkzMY1idilA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="blog.css">
+</head>
+
+<body>
+    <main>
+        <nav>
+            <div class="left-side">
+                <a href="/">seiya.me</a>
+                &nbsp;/&nbsp;
+                <a href="/blog">blog</a>
+            </div>
+            <div class="right-side">
+                <a href="/atom.xml">Feed</a>
+            </div>
+        </nav>
+        <div class="article-list">
+            <ul>
+                {% for link in links %}
+                <li><span class="date">{{ link.date }}</span> - <a href="{{ link.href }}">{{ link.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </main>
+    <footer>
+        <p>
+            Written by <a href="https://seiya.me">Seiya Nuta</a><br>
+            CC BY 4.0
+        </p>
+
+        <p>
+            This website is powered by <a href="https://kerla.dev">Kerla</a>,<br>
+            a new operating system written from scratch in Rust.
+        </p>
+    </footer>
+</body>
+
+</html>

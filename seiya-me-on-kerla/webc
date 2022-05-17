@@ -1,0 +1,262 @@
+#!/usr/bin/env node
+const { program } = require("commander");
+const fs = require("fs");
+const hljs = require("highlight.js");
+const nunjucks = require("nunjucks");
+const marked = require("marked");
+const frontmatter = require("front-matter");
+const http = require('http');
+const { WebSocketServer } = require("ws");
+const path = require("path/posix");
+const glob = require("glob");
+const sass = require("node-sass");
+
+const renderer = new marked.Renderer();
+
+// https://github.com/markedjs/marked/pull/675#issuecomment-408135046
+renderer.oldImage = renderer.image;
+renderer.image = function (href, title, text) {
+    var videos = ['webm', 'mp4', 'mov'];
+    var filetype = href.split('.')[1];
+    if (videos.indexOf(filetype) > -1) {
+        var out = '<video autoplay loop alt="' + text + '" muted>'
+            + '  <source src="' + href + '" type="video/' + filetype + '">'
+            + '</video>'
+        return out;
+    } else {
+        return renderer.oldImage(href, title, text);
+    }
+};
+
+marked.setOptions({
+    renderer,
+    highlight: function (code, lang) {
+        lang = hljs.getLanguage(lang) ? lang : 'plaintext';
+        return hljs.highlight(code, { language: lang }).value;
+    },
+    xhtml: false,
+    pedantic: false,
+    gfm: true,
+    breaks: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false,
+});
+
+function md2html(mdFile, { css, template, title }) {
+    const md = frontmatter(fs.readFileSync(mdFile, { encoding: "utf-8" }));
+    const cssBody = fs.readFileSync(css, { encoding: "utf-8" });
+    const templateHtml = fs.readFileSync(template, { encoding: "utf-8" });
+    let bodyHtml = marked(md.body);
+    bodyHtml = bodyHtml.replace(/<img /g, "<figure><img ");
+    bodyHtml = bodyHtml.replace(/<video /g, "<figure><video ");
+    bodyHtml = bodyHtml.replace(/alt="([^"]*)">/g, "alt=\"$1\"><figcaption>$1</figcaption></figure>");
+    bodyHtml = bodyHtml.replace(/alt="([^"]*)" muted>(.+)<\/video>/g, "alt=\"$1\" muted>$2</video><figcaption>$1</figcaption></figure>");
+    const env = new nunjucks.Environment();
+    let html = env.renderString(templateHtml, {
+        body: bodyHtml,
+        title,
+        css: cssBody,
+        ...md.attributes,
+    });
+
+    if (program.opts().dev) {
+        html = html.replace("</body>", `
+            <script>
+                const sock = new WebSocket('ws://localhost:7778');
+                sock.addEventListener("message", () => location.reload(true));
+            </script>
+            </body>
+        `)
+    }
+    return html;
+}
+
+ATOM_TEMPLATE = `\
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>seiya.me</title>
+    <link href="https://seiya.me/atom.xml" rel="self" />
+    <link href="https://seiya.me/" />
+    <id>https://seiya.me</id>
+    <updated>{{ now }}</updated>
+    <author>
+        <name>Seiya Nuta</name>
+    </author>
+    {% for file in files %}
+	<entry>
+		<title>{{ file.attributes.title }}</title>
+		<link href="https://seiya.me/{{ file.basename }}" />
+		<id>https://seiya.me/{{ file.basename }}</id>
+		<updated>{{ file.isoDate }}</updated>
+    </entry>
+    {% endfor %}
+</feed>
+`
+
+function generateIndex(files) {
+    const links = [];
+    for (const { attributes, basename } of files) {
+        links.push({
+            title: attributes.title,
+            title_en: attributes.title_en,
+            date: attributes.date,
+            href: `/${basename}`,
+        });
+    }
+
+    const renderer = new nunjucks.Environment();
+    return renderer.renderString(fs.readFileSync("templates/blog_index.html", { encoding: "utf-8" }), { links });
+}
+
+function generateFeed(files) {
+    const now = new Date(Date.now()).toISOString();
+    const renderer = new nunjucks.Environment();
+    return renderer.renderString(ATOM_TEMPLATE, { files, now });
+}
+
+function shouldUpdateFile(src, dst, otherDepsNs) {
+    return true;
+    /*
+        if (!fs.existsSync(dst)) {
+            return true;
+        }
+    
+        if (fs.statSync(src).mtimeNs > fs.statSync(dst).mtimeNs) {
+            return true;
+        }
+    
+        if (otherDepsNs !== null && otherDepsNs > fs.statSync(dst).mtimeNs) {
+            return true;
+        }
+    
+        return false;
+    */
+}
+
+function build() {
+    const newestAssetNs = Math.max(...[...glob.sync("styles/*.scss"), ...glob.sync("styles/*.html")].map(file => {
+        fs.statSync(file).mtimeMs
+    }));
+
+    fs.mkdirSync("out", { recursive: true });
+    for (const dir of ["pub", "blog/media"]) {
+        for (const basename of fs.readdirSync(dir)) {
+            const dst = path.join("out", basename);
+            const src = path.join(dir, basename);
+            if (!shouldUpdateFile(src, dst, null)) {
+                continue;
+            }
+
+            console.log(`==> ${dst}`);
+            fs.copyFileSync(src, dst);
+        }
+    }
+
+    for (const basename of fs.readdirSync("styles")) {
+        const dst = path.join("out", basename.replace(".scss", ".css"));
+        const src = path.join("styles", basename);
+        if (!shouldUpdateFile(src, dst, null)) {
+            continue;
+        }
+
+        console.log(`==> ${dst}`);
+        try {
+            const body = sass.renderSync({
+                file: src,
+                data: fs.readFileSync(src, { encoding: "utf-8" }),
+                outputStyle: "compressed"
+            }).css.toString();
+            fs.writeFileSync(dst, body)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const mdFiles = [];
+    let anyPostChanged = false;
+    for (const basename of fs.readdirSync("blog")) {
+        const dst = path.join("out", basename.replace(".md", ".html"));
+        const src = path.join("blog", basename);
+
+        if (path.extname(src) !== ".md") {
+            continue;
+        }
+
+        mdFiles.push(src);
+        if (!shouldUpdateFile(src, dst, newestAssetNs)) {
+            continue;
+        }
+
+        console.log(`==> ${dst}`);
+        const html = md2html(src, { css: "styles/blog.scss", template: "templates/blog_post.html" });
+        fs.writeFileSync(dst, html);
+        anyPostChanged = true;
+    }
+
+    let files = [];
+    for (const mdFile of mdFiles) {
+        const basename = `${path.basename(mdFile).replace('.md', '')}`;
+        if (["blog", "lorem"].includes(basename)) {
+            continue;
+        }
+
+        const md = frontmatter(fs.readFileSync(mdFile, { encoding: "utf-8" }));
+        files.push({
+            basename,
+            date: new Date(Date.parse(md.attributes.date)),
+            isoDate: new Date(Date.parse(md.attributes.date)).toISOString(),
+            attributes: md.attributes,
+        });
+    }
+
+    files.sort((a, b) => b.date - a.date);
+
+    console.log(`==> out/blog.html`);
+    fs.writeFileSync("out/blog.html", generateIndex(files));
+    console.log(`==> out/atom.xml`);
+    fs.writeFileSync("out/atom.xml", generateFeed(files));
+}
+
+program
+    .option("--dev")
+    .parse(process.argv);
+
+if (program.opts().dev) {
+    build()
+
+    const server = http.createServer((request, response) => {
+        const handler = require('serve-handler');
+        return handler(request, response, {
+            public: "out",
+            headers: [
+                {
+                    source: "**/*",
+                    headers: [{ key: "Access-Control-Allow-Origin", value: "*" }]
+                }
+            ]
+        });
+    })
+
+    server.listen(7777, () => {
+        console.log("Serving at http://localhost:7777");
+    });
+
+    const wss = new WebSocketServer({ host: "127.0.0.1", port: 7778 });
+    const clients = [];
+    wss.on('connection', function connection(ws) {
+        clients.push(ws);
+    });
+
+    fs.watch("./", { recursive: true }, (eventType, filename) => {
+        if (!filename.startsWith("out") && [".md", ".scss", ".html"].includes(path.extname(filename))) {
+            build()
+
+            for (const ws of clients) {
+                ws.send("reload");
+            }
+        }
+    })
+} else {
+    build()
+}
