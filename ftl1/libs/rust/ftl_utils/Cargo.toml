@@ -1,0 +1,9 @@
+[package]
+name = "ftl_utils"
+description = "A collection of useful utilities for Rust"
+version = { workspace = true }
+authors = { workspace = true }
+edition = { workspace = true }
+
+# Note: Do not add any dependencies here.
+[dependencies]

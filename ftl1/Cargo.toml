@@ -1,0 +1,46 @@
+[workspace.package]
+version = "0.0.0"
+authors = ["Seiya Nuta <nuta@seiya.me>"]
+edition = "2024"
+
+[workspace]
+resolver = "2"
+members = [
+    "kernel",
+    "libs/rust/*",
+    "apps/hello",
+    "apps/echo",
+    "apps/tcpip",
+    "apps/apiserver",
+    "apps/echo_client",
+    "apps/virtio_net",
+    "apps/virtio_blk",
+]
+
+[workspace.dependencies]
+arrayvec = { version = "0.7.6", default-features = false }
+log = { version = "0.4.28", default-features = false }
+talc = "4.4.3"
+spin = "0.10.0"
+hashbrown = "0.16.0"
+serde = { version = "1.0.219", default-features = false }
+serde_json = { version = "1.0.143", default-features = false }
+
+# Libraries
+ftl = { path = "libs/rust/ftl" }
+ftl_types = { path = "libs/rust/ftl_types" }
+ftl_macros = { path = "libs/rust/ftl_macros" }
+ftl_utils = { path = "libs/rust/ftl_utils" }
+ftl_driver = { path = "libs/rust/ftl_driver" }
+ftl_dtb_parser = { path = "libs/rust/dtb_parser" }
+virtio = { path = "libs/rust/virtio" }
+
+[workspace.lints.clippy]
+single_match = "allow"
+
+[profile.dev]
+opt-level = 1
+codegen-units = 256
+incremental = true
+lto = "off"
+debug = "line-tables-only"

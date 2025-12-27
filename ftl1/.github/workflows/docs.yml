@@ -1,0 +1,108 @@
+# Generate docs and deploy to Vercel.
+name: Docs
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_docs:
+    name: Build (docs)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: oven-sh/setup-bun@v2
+
+    - name: Install Dependencies
+      run: bun install
+      working-directory: docs
+
+    - name: Build Docs
+      run: bun run build
+      working-directory: docs
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: docs
+        path: docs/.vitepress/dist
+
+  deploy_docs:
+    name: Deploy to Vercel (docs)
+    runs-on: ubuntu-latest
+    needs: build_docs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: oven-sh/setup-bun@v2
+    - uses: actions/download-artifact@v4
+      with:
+        name: docs
+        path: dist
+
+    - name: Deploy to Vercel
+      run: |
+        echo '{"cleanUrls": true}' > vercel.json
+        DEPLOYMENT_URL=$(bunx vercel --prod . -t "$VERCEL_TOKEN")
+        echo "$DEPLOYMENT_URL" >> $GITHUB_STEP_SUMMARY
+      working-directory: dist
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_DOCS_PROJECT_ID }}
+
+  build_rustdoc:
+    name: Build (rustdoc)
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: actions/cache@v4
+      with:
+        path: &cache_paths |
+          ~/.rustup/
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+        key: build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: build-${{ runner.os }}-
+    - name: Build Rustdoc
+      run: cargo doc
+    - name: Upload Rustdoc
+      uses: actions/upload-artifact@v4
+      with:
+        name: rustdoc
+        path: target/doc
+
+  deploy_rustdoc:
+    name: Deploy to Vercel (rustdoc)
+    runs-on: ubuntu-latest
+    needs: build_rustdoc
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: oven-sh/setup-bun@v2
+    - uses: actions/download-artifact@v4
+      with:
+        name: rustdoc
+        path: dist
+
+    - name: Deploy to Vercel
+      run: |
+        echo '{}' > vercel.json
+        DEPLOYMENT_URL=$(bunx vercel --prod . -t "$VERCEL_TOKEN")
+        echo "$DEPLOYMENT_URL" >> $GITHUB_STEP_SUMMARY
+      working-directory: dist
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_RUSTDOC_PROJECT_ID }}

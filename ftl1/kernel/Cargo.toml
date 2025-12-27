@@ -1,0 +1,27 @@
+[package]
+name = "ftl_kernel"
+description = "The microkernel of FTL"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+ftl_types = { workspace = true }
+ftl_utils = { workspace = true }
+ftl_dtb_parser = { workspace = true }
+
+# TODO: Replace following dependencies with our own implementation,
+#       and achieve "zero dependencies" for the kernel.
+arrayvec = { workspace = true }
+spin = { workspace = true }
+talc = { workspace = true }
+serde_json = { workspace = true, features = ["alloc"] }
+
+# Apps.
+hello = { path = "../apps/hello" }
+echo = { path = "../apps/echo" }
+echo_client = { path = "../apps/echo_client" }
+virtio_blk = { path = "../apps/virtio_blk" }
+virtio_net = { path = "../apps/virtio_net" }
+tcpip = { path = "../apps/tcpip" }
+apiserver = { path = "../apps/apiserver" }

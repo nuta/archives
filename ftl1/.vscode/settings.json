@@ -1,0 +1,7 @@
+{
+    "editor.formatOnSave": true,
+    "rust-analyzer.cargo.allTargets": false,
+    "rust-analyzer.cargo.target": "aarch64-unknown-none-softfloat",
+    "rust-analyzer.diagnostics.enable": true,
+    "rust-analyzer.cargo.targetDir": "build/rust-analyzer",
+}

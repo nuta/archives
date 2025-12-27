@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ubuntu_build:
+    name: "Build (Ubuntu)"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: oven-sh/setup-bun@v2
+    - uses: actions/cache@v4
+      with:
+        path: &cache_paths |
+          ~/.rustup/
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+        key: build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: build-${{ runner.os }}-
+    - name: Build World
+      run: bin/ftl build
+
+  macos_build:
+    name: "Build (macOS)"
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: oven-sh/setup-bun@v2
+    - uses: actions/cache@v4
+      with:
+        path: *cache_paths
+        key: build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: build-${{ runner.os }}-
+    - name: Build World
+      run: bin/ftl build
+
+  e2e_tests:
+    name: "E2E Tests"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: oven-sh/setup-bun@v2
+    - uses: actions/cache@v4
+      with:
+        path: *cache_paths
+        key: e2e-tests-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+    - name: Build World (riscv64)
+      run: bin/ftl build --arch riscv64
+      env:
+        ARCH: riscv64
+    - name: Install QEMU (riscv64)
+      run: sudo apt-get update && sudo apt-get install -y qemu-system-riscv64
+    - name: Run E2E Tests (riscv64)
+      run: bin/ftl test --arch riscv64
+      env:
+        ARCH: riscv64
+
+  unit_tests:
+    name: "Unit Tests"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - uses: actions/cache@v4
+      with:
+        path: *cache_paths
+        key: unit-tests-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+    - name: Run Unit Tests
+      run: cargo test

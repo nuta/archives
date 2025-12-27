@@ -1,0 +1,11 @@
+[package]
+name = "apiserver"
+publish = false
+version = { workspace = true }
+authors = { workspace = true }
+edition = { workspace = true }
+
+[dependencies]
+ftl = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+spin = { workspace = true }

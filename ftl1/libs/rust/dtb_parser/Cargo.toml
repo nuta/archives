@@ -1,0 +1,12 @@
+[package]
+name = "ftl_dtb_parser"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+ftl_utils = { workspace = true }
+arrayvec = { workspace = true }
+
+[dev-dependencies]
+vm-fdt = "0.3.0"

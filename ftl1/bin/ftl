@@ -1,0 +1,11 @@
+#!/usr/bin/env bun
+import { main } from "../libs/typescript/cli/src/index.ts";
+
+main(process.argv)
+    .then((exitCode) => {
+        process.exit(exitCode);
+    })
+    .catch((error) => {
+        console.error(`main failed: ${error}`);
+        process.exit(1);
+    });

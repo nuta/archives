@@ -1,0 +1,134 @@
+:root {
+    --color-bg: #fefefe;
+    --color-text: #444;
+    --color-title: #222;
+    --color-footer: #575757;
+    --color-border: #cacaca;
+    --color-it-works-bg: #fff3cf;
+    --color-it-works-border: #ffc107;
+    --color-link: #0066cc;
+    --color-link-visited: #8855cc;
+    --color-link-hover: #0080ff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg: #1a1a1a;
+        --color-text: #d4d4d4;
+        --color-title: #e4e4e4;
+        --color-footer: #a0a0a0;
+        --color-border: #404040;
+        --color-it-works-bg: #2a2200;
+        --color-it-works-border: #7a6300;
+        --color-link: #6eb5ff;
+        --color-link-visited: #b899ff;
+        --color-link-hover: #8fc9ff;
+    }
+}
+
+body {
+    background: var(--color-bg);
+    font-family: -apple-system, "Segoe UI", sans-serif;
+}
+
+a {
+    color: var(--color-link);
+}
+
+a:visited {
+    color: var(--color-link-visited);
+}
+
+a:hover {
+    color: var(--color-link-hover);
+}
+
+main {
+    color: var(--color-text);
+    max-width: 900px;
+    margin: 3rem auto;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+h1 {
+    color: var(--color-title);
+    text-align: center;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    padding: 0;
+    margin-block: 7px;
+    gap: 1rem;
+}
+
+.it-works {
+    font-size: 0.95rem;
+    background: var(--color-it-works-bg);
+    border: 1px solid var(--color-it-works-border);
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+}
+
+.it-works .title {
+    font-weight: bold;
+    margin-block: 0;
+}
+
+.ascii-art {
+    border: 1px solid var(--color-border);
+    padding: 1rem 2rem;
+    margin-block: 1rem;
+}
+
+.ascii-art pre {
+    font-family: 'Menlo', monospace;
+    font-size: 0.8rem;
+    line-height: 1;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.feature {
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    padding-block: 0.3rem;
+    padding-inline: 1rem;
+}
+
+.feature h3 {
+    color: var(--color-title);
+    margin-block: 0.4rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.feature p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+footer {
+    font-family: monospace;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--color-footer);
+    margin-block: 2rem;
+}

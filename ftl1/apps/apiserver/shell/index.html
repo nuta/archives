@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTL</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="main.js"></script>
+</head>
+</html>
+<body>
+    <main>
+        <h1>FTL</h1>
+        <nav>
+            <ul>
+                <li><a href="https://github.com/nuta/ftl2">Getting Started</a></li>
+                <li><a href="https://github.com/nuta/ftl2">Documentation</a></li>
+                <li><a href="https://github.com/nuta/ftl2">GitHub</a></li>
+            </ul>
+        </nav>
+
+        <p>FTL is a modern, microkernel-based, general-purpose operating system written in Rust. It aims to be a production-ready OS with a focus on making OS development as easy as writing web applications.</p>
+
+        <section class="it-works">
+            <span class="title">🎉 FTL serves this web page!</span>
+            Seeing this text means you're successfully talking to FTL over HTTP. The instance is running for <span id="uptime"></span>. Let's start <a href="https://github.com/nuta/ftl2">writing your first FTL application</a>.
+        </section>
+
+        <div class="ascii-art"><pre>
+                   Message Passing
+Isolation #1  ┌ ─ ─ ─ ┐        ┌ ─ ─ ┐  Isolation #2
+┌─────────────│──┐┌───│────────│─────│─────────────┐
+│ Process     ▼  ││   ▼        ▼     ▼             │
+│ ┏━━━━━━━━━━━━▄ ││ ┏━━━━━━━━━━━━▄  ┏━━━━━━━━━━━━▄ │
+│ ┃            █ ││ ┃            █  ┃            █ │
+│ ┃  API       █ ││ ┃  TCP/IP    █  ┃  Ethernet  █ │
+│ ┃  Server    █ ││ ┃  Stack     █  ┃  Driver    █ │
+│ ┃            █ ││ ┃            █  ┃            █ │
+│ ▝▀▀▀▀▀▀▀▀▀▀▀▀▀ ││ ▝▀▀▀▀▀▀▀▀▀▀▀▀▀  ▝▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+└───│────────────┘└────────────────────────────────┘
+    │                                   Applications
+╶╶╶╶│╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶
+    ▼ System Calls                            Kernel
+╔══════════════════════════════════════════════════╗
+║       Microkernel (memory, threads, IPC, ...)    ║
+╚══════════════════════════════════════════════════╝
+        </pre></div>
+
+        <section class="features">
+            <div class="feature">
+                <h3>API First</h3>
+                <p>
+
+                    <a href="https://seiya.me/blog/rethinking-microkernels">Learn more</a>.
+
+                </p>
+            </div>
+            <div class="feature">
+                <h3>Performant</h3>
+                <p>
+                    In traditional microkernel design, user mode is how to isolate components such as device drivers.
+                    FTL is designed to unlock lightweight isolation mechanisms like Rust's memory safety: run OS services in the kernel mode safely!
+                </p>
+            </div>
+            <div class="feature">
+                <h3>Developer Friendly</h3>
+                <p>
+                    s
+                </p>
+            </div>
+            <div class="feature">
+                <h3>Incrementally Adoptable</h3>
+                <p>
+                    <a href="https://seiya.me/blog/hypervisor-as-a-library">Learn more</a>.
+                </p>
+            </div>
+        </section>
+
+        <footer>
+            <p>This web page is served by FTL</p>
+        </footer>
+    </main>
+</body>
